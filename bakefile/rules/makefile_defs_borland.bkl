@@ -36,8 +36,6 @@
     <set var="__FLAG_ARCH_I486">-4</set>
     <set var="__FLAG_ARCH_I586">-5</set>
     <set var="__FLAG_ARCH_I686">-6</set>
-    <set var="__FLAG_USE_PCH">-H -Hs</set>
-    <set var="__FLAG_PCH_FILE">-H=%s.csm</set>
     <set var="__FLAG_SINGLE_THREADING"/>
     <set var="__FLAG_MULTI_THREADING">-tWM</set>
     <!-- FIXME: -tWR sets -tW as well, so it must be before -tC !! -->
@@ -110,6 +108,30 @@
                 $(substituteFromDict(value, {'multi':'mt', 'single':''}))
             </set>
         </define-tag>
+        
+        <define-tag name="precomp-headers">
+                <!-- FIXME: should be cppflags, this is temporary hack to
+                make wxWindows work -->
+            <cxxflags> 
+                $(substituteFromDict(value,{'on':'-Hu', 'off':''}))
+            </cxxflags>
+        </define-tag>
+        <define-tag name="precomp-headers-file">
+                <!-- FIXME: should be cppflags, this is temporary hack to
+                make wxWindows work -->
+            <cxxflags>
+                $(formatIfNotEmpty('-H=%s.csm', mkPathPrefix(BUILDDIR)+value))
+            </cxxflags>
+        </define-tag>
+        <define-tag name="precomp-headers-gen">
+            <set var="__pch_object">$(getObjectName(value, id, OBJEXT))</set>
+            <set var="__deps" append="1">$(__pch_object)</set>
+            <modify-target target="$(__pch_object)">
+                <set var="__cflags" append="1">-H</set>
+                <set var="__cxxflags" append="1">-H</set>
+            </modify-target>
+        </define-tag>
+
     </define-rule>
     
     <define-rule name="__borland_dll" extends="__borland_comp">
