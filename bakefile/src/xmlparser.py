@@ -22,6 +22,9 @@
 #  module (which uses expat)
 #
 
+# (optional) database with pre-parsed XML files:
+cache = None
+
 class Element:
     def __init__(self):
         self.name = None
@@ -148,20 +151,43 @@ def __parseFileMinidom(filename):
     return __doParseMinidom(xml.dom.minidom.parse, filename)
 
 def __parseStringMinidom(data):
+    import xml.sax, xml.dom, xml.dom.minidom
     return __doParseMinidom(xml.dom.minidom.parseString, data)
 
-
-import xml.sax, xml.dom, xml.dom.minidom
 parseString = __parseStringMinidom
 
-# Use libxml2 if available, it gives us better error checking than
-# xml.dom.minidom (DTD validation, line numbers etc.)
-try:
-    import libxml2
-    parseFile = __parseFileLibxml2
-    libxml2.registerErrorHandler(__libxml2err, "-->")
-except(ImportError):
-    parseFile = __parseFileMinidom
-    import xml.parsers.expat
-    import sys
-    sys.stderr.write("Warning: libxml2 missing, will not show line numbers on errors\n")
+def __initParseFileXML():
+    # Use libxml2 if available, it gives us better error checking than
+    # xml.dom.minidom (DTD validation, line numbers etc.)
+    global parseFileXML
+    try:
+        global libxml2
+        import libxml2
+        parseFileXML = __parseFileLibxml2
+        libxml2.registerErrorHandler(__libxml2err, "-->")
+    except(ImportError):
+        parseFileXML = __parseFileMinidom
+        global xml
+        import xml.sax, xml.dom, xml.dom.minidom
+        import xml.parsers.expat
+        import sys
+        sys.stderr.write("Warning: libxml2 missing, will not show line numbers on errors\n")
+
+def __parseFileXMLStub(filename):
+    global parseFileXML
+    __initParseFileXML()
+    return parseFileXML(filename)
+
+parseFileXML = __parseFileXMLStub
+
+def parseFile(filename):
+    if cache == None:
+        return parseFileXML(filename)
+    else:
+        if filename in cache:
+            return cache[filename]
+        else:
+            print '*** MISS',filename
+            data = parseFileXML(filename)
+            cache[filename] = data
+            return data
