@@ -126,13 +126,19 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__uses_cxx">0</set>
             <set var="__ldflags">$(LDFLAGS)</set>
             <set var="__ldlibs"/>
-            <set var="__cppflags">$(CPPFLAGS)</set>
-            <set var="__cflags">$(CFLAGS)</set>
-            <set var="__cxxflags">$(CXXFLAGS)</set>
+            <set var="__cppflags"/>
+            <set var="__cflags"/>
+            <set var="__cxxflags"/>
 
-            <!-- cflags, cxxflags make variables: -->
-            <set var="__cflags_mv" eval="0">$(__cppflags) $(__cflags)</set>
-            <set var="__cxxflags_mv" eval="0">$(__cppflags) $(__cxxflags)</set>
+            <!-- cflags, cxxflags make variables (CFLAGS etc. options must
+                 be last, so that e.g. headers from -I passed by configure
+                 don't override headers from build tree): -->
+            <set var="__cflags_mv" eval="0">
+                $(__cppflags) $(__cflags) $(CPPFLAGS) $(CFLAGS)
+            </set>
+            <set var="__cxxflags_mv" eval="0">
+                $(__cppflags) $(__cxxflags) $(CPPFLAGS) $(CXXFLAGS)
+            </set>
             <set var="__cflags_var">
                 $(createMakeVar(id, '__cflags_mv', 'CFLAGS'))
             </set>
