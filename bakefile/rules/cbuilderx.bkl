@@ -1,0 +1,295 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<!--
+    Borland C++ Builder X project files.
+    So far Windows platform only.
+
+    Development of this format was sponsored by Borland.
+-->
+
+<makefile>
+
+    <include file="win32.bkl"/>
+    
+    <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+
+    <option name="COMPILER">
+        <values>bcc,gcc,vc</values>
+    </option>
+    
+    <set var="CBX_TOOLCHAIN">
+        <if cond="COMPILER=='gcc'">MinGW</if>
+        <if cond="COMPILER=='bcc'">win32b</if>
+        <if cond="COMPILER=='vc'">mswin32</if>
+    </set>
+
+    <set var="CBX_DEFAULT_TOOLCHAIN">win32b</set>
+
+    <set var="LIBPREFIX">
+        <if cond="COMPILER=='gcc'">lib</if>
+        <if cond="COMPILER=='bcc'"></if>
+        <if cond="COMPILER=='vc'"></if>
+    </set>
+    <set var="LIBEXT">
+        <if cond="COMPILER=='gcc'">a</if>
+        <if cond="COMPILER=='bcc'">lib</if>
+        <if cond="COMPILER=='vc'">lib</if>
+    </set>
+
+    <define-rule name="__any">
+
+        <template>
+            <set var="__toolchain">$(CBX_TOOLCHAIN)</set>
+            <set var="__platform">win32</set> <!-- FIXME? -->
+            
+            <set var="__depname">$(id)</set>
+            <set var="__deps"/>
+            <set var="__targetdir"/>
+            <set var="__targetname">$(id)</set>
+        </template>
+        
+        <define-tag name="dirname">
+            <set var="__targetdir">$(nativePaths(value))$(DIRSEP)</set>
+        </define-tag>
+
+        <define-tag name="depends">
+            <set var="__deps" append="1">
+                $(substitute(value, lambda x: ifthenelse(isDeadTarget(x),'',ref('__depname', x)), 'DEP'))
+            </set>
+        </define-tag>
+        
+        <define-tag name="dependency-of">
+            <modify-target target="$(value)">
+                <depends>$(id)</depends>
+            </modify-target>
+        </define-tag>
+        
+    </define-rule>
+
+
+    <define-rule name="__compiled" extends="__any">        
+        <template>
+            <set var="__kind">project</set>
+            <set var="__sources"/>
+            <set var="__more_files"/>
+            <set var="__defines"/>
+            <set var="__ldlibs"/>
+            <set var="__cppflags"/>
+            <set var="__ldflags"/>
+            <set var="__include_paths"/>
+            <set var="__lib_paths"/>
+            <set var="__win32rc_flags"/>
+            <set var="__optimize">speed</set>
+            <set var="__debug">release</set>
+            <set var="__threading">single</set>
+            <set var="__runtime_libs">static</set>
+            <set var="__builddir" eval="0">
+                <if cond="BUILDDIR=='.'"></if>
+                <if cond="BUILDDIR!='.'">$(nativePaths(BUILDDIR))</if>
+            </set>
+            <set var="__targetdir">$(__builddir)$(DIRSEP)</set>
+
+            <set var="__pch_use_pch"/>
+            <set var="__pch_generator"/>
+            <set var="__pch_excluded"/>
+            <set var="__pch_header"/>
+            <set var="__pch_file"/>
+
+            <lib-path>$(BUILDDIR)</lib-path>
+        </template>
+        
+        <define-tag name="sources">
+            <set var="__sources" append="1">$(value)</set>
+        </define-tag>
+
+        <!-- FIXME: rename to "headers" -->
+        <define-tag name="msvc-project-files">
+            <set var="__more_files" append="1">$(value)</set>
+        </define-tag>
+
+        <define-tag name="win32-res">
+            <sources>$(value)</sources>
+        </define-tag>
+        
+        <define-tag name="define">
+            <set var="__defines" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="include">
+            <set var="__include_paths" append="1">$(value)</set>
+        </define-tag>
+
+        <define-tag name="cppflags">
+            <set var="__cppflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="cflags">
+            <set var="__cppflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="cxxflags">
+            <set var="__cppflags" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="sys-lib">
+            <set var="__ldlibs" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="ldflags">
+            <set var="__ldflags" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="lib-path">
+            <set var="__lib_paths" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="ldlibs">
+            <set var="__ldlibs" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="library">
+            <depends>$(value)</depends>
+            <ldlibs>
+                $(substitute(value, lambda x: ref('__linkname', x), 'LIBR'))
+            </ldlibs>
+        </define-tag>
+        
+        <define-tag name="optimize">
+            <set var="__optimize">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="debug-info">
+            <set var="__debug">
+                $(substituteFromDict(value, {'on':'debug','off':'release'}))
+            </set>
+        </define-tag>       
+        
+        <define-tag name="threading">
+            <set var="__threading">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="runtime-libs">
+            <set var="__runtime_libs">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="debug-runtime-libs"/>
+
+        <define-tag name="install-to"/>
+        <define-tag name="install-if"/>
+        
+        <define-tag name="precomp-headers-gen">
+            <set var="__pch_generator">$(value)</set>
+        </define-tag>
+        <define-tag name="precomp-headers-exclude">
+            <set var="__pch_excluded" append="1">$(value)</set>
+        </define-tag>    
+        <define-tag name="precomp-headers">
+            <set var="__pch_use_pch">$(value)</set>
+        </define-tag>
+        <define-tag name="precomp-headers-header" rules="exe,dll,module,lib">
+            <set var="__pch_header">$(value)</set>
+        </define-tag>
+        <define-tag name="precomp-headers-file" rules="exe,dll,module,lib">
+            <set var="__pch_file">$(value)</set>
+        </define-tag>
+
+    </define-rule>
+
+    <define-rule name="exe" extends="__compiled">
+        <template>
+            <set var="__type">exeproject</set>
+            <app-type>console</app-type>
+            <set var="__targetname">$(id).exe</set>
+            <set var="__name">$(id)</set>
+            <set var="__app_type">console</set>
+        </template>
+        <define-tag name="app-type">
+            <set var="__app_type">$(value)</set>
+        </define-tag>
+    </define-rule>
+    
+    <define-rule name="_dll" extends="__compiled">
+        <template>
+            <set var="__type">dllproject</set>
+            <set var="__importlib" eval="0">
+                $(LIBPREFIX)$(__name).$(LIBEXT)
+            </set>
+            <dllname>$(id)</dllname>
+        </template>
+        <define-tag name="dllname">
+            <set var="__name">$(value)</set>
+            <set var="__targetname">$(value).dll</set>
+        </define-tag>
+    </define-rule>
+    
+    <define-rule name="dll" extends="_dll">
+        <template>
+            <libname>$(id)</libname>
+        </template>
+        <define-tag name="libname">
+            <set var="__importlib">$(LIBPREFIX)$(value).$(LIBEXT)</set>
+            <set var="__linkname">$(value)</set>
+        </define-tag>
+    </define-rule>
+    
+    <define-rule name="module" extends="_dll"/>
+    
+    <define-rule name="lib" extends="__compiled">
+        <template>
+            <set var="__type">libraryproject</set>
+            <libname>$(id)</libname>
+        </template>
+        <define-tag name="libname">
+            <set var="__name">$(value)</set>
+            <set var="__targetname">$(LIBPREFIX)$(value).$(LIBEXT)</set>
+            <set var="__linkname">$(value)</set>
+        </define-tag>
+    </define-rule>
+    
+    
+    <!-- phony targets are used only to track dependencies: -->
+    <define-rule name="phony" extends="__any">
+        <template>
+            <set var="__kind">phony</set>
+            <set var="__depname" eval="0">$(__deps)</set>
+        </template>
+    </define-rule>
+
+    <!-- some fake, never used targets: -->
+    <phony id="all"/>
+    <phony id="clean"/>
+
+    <!-- 
+    action rules - they are transformed into special target with
+    nmake content:  FIXME FIXME FIXME
+    -->
+    <define-rule name="action" extends="__any">
+        <template>
+            <set var="__kind">action</set>
+        </template>
+        <define-tag name="command">
+        </define-tag>
+        <define-tag name="is-phony">
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="subproject" extends="__any">
+        <template>
+            <set var="__kind">phony</set>
+        </template>
+        <define-tag name="installable"/>
+        <define-tag name="dir"/>
+    </define-rule>
+
+    <define-tag name="version" rules="dll"/>
+    <define-tag name="so_version" rules="dll"/>
+    <define-tag name="mac_version" rules="dll"/>
+    <define-tag name="mac-res" rules="exe"/>
+
+
+    <!-- =============================================================== -->
+    <!--                            output:                              -->
+    <!-- =============================================================== -->
+
+    <output file="$(OUTPUT_FILE)" writer="cbuilderx.py"/>
+
+</makefile>
