@@ -153,6 +153,9 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="ldflags">
             <set var="__ldflags" append="1">$(value)</set>
         </define-tag>
+        <define-tag name="ldlibs">
+            <set var="__ldlibs" append="1">$(value)</set>
+        </define-tag>
 
         <define-tag name="sources">
             <set var="__objtmp">

@@ -564,13 +564,27 @@
               
               <row>
                 <entry role="tagname">
-                  <para id="tag.ldflags">ldflags</para>
+                  <para id="tag.ldflags" xreflabel="ldflags">ldflags</para>
                 </entry>
                 <entry>
                   Add <emphasis>linker dependent</emphasis>
                   flags for the linker.
                 </entry>
                 <entry role="availability">exe, dll, lib</entry>
+              </row>
+              
+              
+              <row>
+                <entry role="tagname">
+                  <para id="tag.ldlibs">ldlibs</para>
+                </entry>
+                <entry>
+                  Same as <xref linkend="tag.ldflags"/>, but adds the flags
+                  <emphasis>after</emphasis> all flags specified using
+                  <function>ldflags</function>. This is useful when resolving
+                  command line order problems that gcc is prone to.
+                </entry>
+                <entry role="availability">exe, dll</entry>
               </row>
               
               
