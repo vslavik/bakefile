@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#ifdef __WIN32__
+#ifdef WIN32
 __declspec(dllexport)
 #endif
 void print()
