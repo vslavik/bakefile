@@ -68,23 +68,24 @@
         /MTd     ditto debug
     -->
 
+    <tag-info name="threading" position="before:runtime-libs"/>
+    
     <define-rule name="__msvc_comp">
         <template>
             <set var="__pch_header"/>
             <set var="__pch_useflag" eval="0">/YX$(__pch_header)</set>
             <set var="__pch_flags" eval="0">$(__pch_useflag)</set>
             <set var="__rtl_dbg"/>
-            <set var="__rtl_static" eval="0">L</set>
-            <set var="__rtl_type" eval="0">D</set>
+            <set var="__rtl_static">L</set>
+            <set var="__rtl_type">D</set>
             <set var="__rtl" eval="0">/M$(__rtl_type)$(__rtl_dbg)</set>
             <cppflags>$(__rtl)</cppflags>
         </template>
 
         <define-tag name="runtime-libs">
             <set var="__rtl_type">
-                $(substituteFromDict(value, 
-                {'static':'$(ref("__rtl_static","%s")' % id,
-                'dynamic':'D'}))
+                $(substituteFromDict(value,
+                  {'static':__rtl_static, 'dynamic':'D'}))
             </set>
         </define-tag>
         <define-tag name="threading">
