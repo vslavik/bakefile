@@ -9,13 +9,7 @@ body
     font-family: sans-serif;
     background: white;
   
-    /* this is pirated from w3c: */
-    background-image: url(images/logo.png);
-    background-position: top left;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    margin: 2em 1em 2em 70px;
-    /* end of w3c style */
+    margin: 2em 1em 2em 1em;
 }
 
 h1,h2,h3
