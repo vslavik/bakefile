@@ -22,8 +22,8 @@ output_DATA = output/autoconf.empy \
               output/msvc.empy \
               output/msvc-opts.empy \
               output/msvc6prj.py \
-              output/mingw.empy \
-              output/mingw-opts.empy \
+              output/gnumake.empy \
+              output/gnumake-opts.empy \
               output/watcom.empy \
               output/watcom-opts.empy \
               output/_hdr_makefile.empy
