@@ -99,8 +99,7 @@ EXTRA_DIST = \
     src/empy/README src/empy/COPYING \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
-	src/bakefile.exe \
-	src/bakefile_gen.exe
+    makefile.vc
 
 dist-hook:
 	(cd $(distdir)/doc ; ./process.sh)
