@@ -264,6 +264,8 @@ def __resetUsageTracker(reset_coverage):
 
 __curNamespace = {}
 
+False, True = 0, 1
+
 def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     if use_options:
         vlist = [__vars_opt, vars]
@@ -297,6 +299,8 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     oldNS = __curNamespace
     __curNamespace = v
     val = eval(expr.replace('\\','\\\\'), globals(), v)
+    if val == True: val = 1
+    elif val == False: val = 0
     __curNamespace = oldNS
     return str(val)
 
