@@ -37,6 +37,7 @@ def handleSet(e, target=None, add_dict=None):
     errors.pushCtx(e)
     name = e.props['var']
     if (name in mk.override_vars) and target == None:
+        errors.popCtx()
         return # can't change value of variable overriden with -D=xxx
     
     doEval = not ('eval' in e.props and e.props['eval'] == '0')
@@ -81,6 +82,7 @@ def handleSet(e, target=None, add_dict=None):
             name = e.props['var']
             if target != None:
                 if (not overwrite) and (name in target.vars):
+                    errors.popCtx()
                     return
                 name = '__%s_%s' % (target.id, name)
                 mk.setVar(e.props['var'], '$(%s)' % name,
@@ -90,6 +92,7 @@ def handleSet(e, target=None, add_dict=None):
                 raise ReaderError(e, "malformed condition: '%s'" % condstr)
             if name in mk.cond_vars:
                 if not overwrite:
+                    errors.popCtx()
                     return
                 var = mk.cond_vars[name]
             else:
@@ -100,7 +103,9 @@ def handleSet(e, target=None, add_dict=None):
             else:
                 value = e_if.value
             var.add(cond, value)
-        if isCond: return
+        if isCond: 
+            errors.popCtx()
+            return
 
     # Non-conditional variables:
     if value == None: value = ''
