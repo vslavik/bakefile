@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<makefile>
+    
+    <using module="datafiles"/>
+    
+    <copy-files id="data">
+        <dependency-of>all</dependency-of>
+        <srcdir>$(SRCDIR)</srcdir>
+        <dstdir>$(BUILDDIR)</dstdir>
+        <files>datafiles.bkl</files>
+    </copy-files>
+
+</makefile>

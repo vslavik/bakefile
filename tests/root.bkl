@@ -15,5 +15,6 @@
     <subproject id="module" template="sub"/>
     <subproject id="pch" template="sub"/>
     <subproject id="regressions" template="sub"/>
+    <subproject id="datafiles" template="sub"/>
 
 </makefile>
