@@ -46,6 +46,7 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
     PLATFORM_WIN32=0
     PLATFORM_MSDOS=0
     PLATFORM_MAC=0
+    PLATFORM_MACOS=0
     PLATFORM_MACOSX=0
     PLATFORM_OS2=0
     PLATFORM_BEOS=0
@@ -67,6 +68,10 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
             ;; 
             *-*-beos* )
                 PLATFORM_BEOS=1
+            ;;
+            powerpc-apple-macos* )
+                PLATFORM_MAC=1
+                PLATFORM_MACOS=1
             ;;
             * )
                 PLATFORM_UNIX=1
@@ -103,6 +108,7 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
     AC_SUBST(PLATFORM_WIN32)
     AC_SUBST(PLATFORM_MSDOS)
     AC_SUBST(PLATFORM_MAC)
+    AC_SUBST(PLATFORM_MACOS)
     AC_SUBST(PLATFORM_MACOSX)
     AC_SUBST(PLATFORM_OS2)
     AC_SUBST(PLATFORM_BEOS)
@@ -369,6 +375,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
         chmod +x dllar.sh
       ;;
       
+      powerpc-apple-macos* | \
       *-*-freebsd* | *-*-openbsd* | *-*-netbsd* | \
       *-*-sunos4* | \
       *-*-osf* | \
@@ -544,7 +551,7 @@ AC_DEFUN([AC_BAKEFILE_RES_COMPILERS],
             fi
          ;;
  
-      *-*-darwin* )
+      *-*-darwin* | powerpc-apple-macos* )
             AC_CHECK_PROG(RESCOMP, Rez, Rez, /Developer/Tools/Rez)
             AC_CHECK_PROG(SETFILE, SetFile, SetFile, /Developer/Tools/SetFile)
         ;;
