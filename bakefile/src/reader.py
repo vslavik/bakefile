@@ -43,6 +43,7 @@ def handleSet(e, target=None, add_dict=None):
     doEval = not ('eval' in e.props and e.props['eval'] == '0')
     overwrite = not ('overwrite' in e.props and e.props['overwrite'] == '0')
     isCond = (len(e.children) > 0)
+    isMakeVar = 'make_var' in e.props and e.props['make_var'] == '1'
     value = e.value
 
     # Handle conditions:
@@ -89,7 +90,8 @@ def handleSet(e, target=None, add_dict=None):
                 if (not overwrite) and (name in target.vars):
                     errors.popCtx()
                     return
-                name = '__%s_%s' % (target.id.replace('-','_'), name)
+                name = '__%s_%s' % (target.id.replace('-','_').replace('.','_'),
+                                    name)
                 mk.setVar(e.props['var'], '$(%s)' % name,
                              eval=0, target=target,
                              add_dict=add_dict)
@@ -135,9 +137,15 @@ def handleSet(e, target=None, add_dict=None):
                 store_in = mk.targets[sc].vars
             else:
                 raise ReaderError(e, "invalid scope '%s': must be 'global', 'local' or target name" % sc)
+
+    if isMakeVar:
+        if doAppend or store_in != None or not doEval:
+            raise ReaderError(e, "make variable (%s) can't be appended or stored in nondefault scope or not evaluated" % name)
+ 
     mk.setVar(name, value, eval=doEval, target=target,
               add_dict=add_dict, store_in=store_in,
-              append=doAppend, overwrite=overwrite)
+              append=doAppend, overwrite=overwrite,
+              makevar=isMakeVar)
     errors.popCtx()
 
 
