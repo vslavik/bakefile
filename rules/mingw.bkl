@@ -15,6 +15,23 @@
         </set>
         <ldflags>$(__importlib)</ldflags>
     </define-tag>
+    
+    <!-- =============================================================== -->
+    <!--                   Compiler-specific tags:                       -->
+    <!-- =============================================================== -->
+    
+    <define-tag name="cppflags-mingw" rules="exe,lib,dll,module">
+        <cppflags>$(value)</cppflags>
+    </define-tag>
+    <define-tag name="cflags-mingw" rules="exe,lib,dll,module">
+        <cflags>$(value)</cflags>
+    </define-tag>
+    <define-tag name="cxxflags-mingw" rules="exe,lib,dll,module">
+        <cxxflags>$(value)</cxxflags>
+    </define-tag>
+    <define-tag name="ldflags-mingw" rules="exe,dll,module">
+        <ldflags>$(value)</ldflags>
+    </define-tag>
 
     <!-- =============================================================== -->
     <!--                         "make clean":                           -->

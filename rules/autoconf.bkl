@@ -105,6 +105,23 @@
     <!-- autoconf can be used to compile win32 apps, too: -->
     <include file="makefile_mingw.bkl"/>    
     
+    <!-- =============================================================== -->
+    <!--                   Compiler-specific tags:                       -->
+    <!-- =============================================================== -->
+    
+    <define-tag name="cppflags-unix" rules="exe,lib,dll,module">
+        <cppflags>$(value)</cppflags>
+    </define-tag>
+    <define-tag name="cflags-unix" rules="exe,lib,dll,module">
+        <cflags>$(value)</cflags>
+    </define-tag>
+    <define-tag name="cxxflags-unix" rules="exe,lib,dll,module">
+        <cxxflags>$(value)</cxxflags>
+    </define-tag>
+    <define-tag name="ldflags-unix" rules="exe,dll,module">
+        <ldflags>$(value)</ldflags>
+    </define-tag>
+    
 
     <!-- =============================================================== -->
     <!--               Shared libs/DLLs handling:                        -->

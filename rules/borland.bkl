@@ -6,6 +6,23 @@
     <set var="MAKEFILE_SYNTAX">borland</set>
 
     <include file="makefile.bkl"/>
+    
+    <!-- =============================================================== -->
+    <!--                   Compiler-specific tags:                       -->
+    <!-- =============================================================== -->
+    
+    <define-tag name="cppflags-borland" rules="exe,lib,dll,module">
+        <cppflags>$(value)</cppflags>
+    </define-tag>
+    <define-tag name="cflags-borland" rules="exe,lib,dll,module">
+        <cflags>$(value)</cflags>
+    </define-tag>
+    <define-tag name="cxxflags-borland" rules="exe,lib,dll,module">
+        <cxxflags>$(value)</cxxflags>
+    </define-tag>
+    <define-tag name="ldflags-borland" rules="exe,dll,module">
+        <ldflags>$(value)</ldflags>
+    </define-tag>
 
     <!-- =============================================================== -->
     <!--                         "make clean":                           -->
