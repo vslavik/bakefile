@@ -165,9 +165,7 @@
         <define-tag name="pic"/> <!-- win32 code is always PIC -->
         
         <define-tag name="debug-info">
-            <cppflags>
-                $(substituteFromDict(value, {'on':'/Zi /Gm /GZ', 'off':''}))
-            </cppflags>
+            <!-- NB: cppflags are set in ms{vc6,evc4}prj.bkl, they differ -->
             <ldflags>
                 $(substituteFromDict(value, {'on':'/debug','off':''}))
             </ldflags>
@@ -184,19 +182,7 @@
                     'max':'/W4'}))
             </cppflags>
         </define-tag>
-            
-            
-        <define-tag name="cxx-rtti">
-            <cxxflags>
-                $(substituteFromDict(value, {'on':'/GR','off':''}))
-            </cxxflags>
-        </define-tag>
-        <define-tag name="cxx-exceptions">
-            <cxxflags>
-                $(substituteFromDict(value, {'on':'/GX','off':''}))
-            </cxxflags>
-        </define-tag>
-
+ 
         <define-tag name="install-to"/>
         <define-tag name="install-if"/>
         

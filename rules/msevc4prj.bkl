@@ -188,7 +188,13 @@
     </template>
 
     <define-rule name="_compiled_specific">
-        <template/>
+        <define-tag name="debug-info">
+            <cppflags>
+                $(substituteFromDict(value, {'on':'/Zi', 'off':''}))
+            </cppflags>
+            <!-- NB: rest of handling is done in msvc_prj_common.bkl -->
+        </define-tag>
+
         <define-tag name="debug-runtime-libs">
             <define>
                 $(substituteFromDict(value, {'on':'DEBUG', 'off':''}))
@@ -199,6 +205,11 @@
                      'off':'/M$(DOLLAR)(CECrtMT)'}))
             </cppflags>
         </define-tag>
+        
+        <!-- Not supported by eVC++ (?) -->
+        <define-tag name="cxx-rtti"/>
+        <define-tag name="cxx-exceptions"/>
+
     </define-rule>
 
     <!-- Load common code and run it: -->
