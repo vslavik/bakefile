@@ -78,9 +78,13 @@ Package=<4>
 ###############################################################################
 """
 
+    single_target = (len(dsw_targets) == 1)
     for t in dsw_targets:
         deps = ''
-        dsp_name = '%s_%s' % (basename, t.id)
+        if single_target:
+            dsp_name = basename
+        else:
+            dsp_name = '%s_%s' % (basename, t.id)
         for d in t.__deps.split():
            deps += """\
 Begin Project Dependency
