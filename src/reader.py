@@ -766,6 +766,7 @@ def processXML(data):
 
 def setStdVars():
     mk.setVar('LF', '\n')
+    mk.setVar('TAB', '\t')
     mk.setVar('SPACE', '$(" ")', eval=0)
     mk.setVar('DOLLAR', '&dollar;')
     mk.setVar('OUTPUT_FILE', config.output_file)
