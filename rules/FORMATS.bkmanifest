@@ -19,7 +19,7 @@
     </format>
     
     <format id="mingw">
-        <description>MinGW makefiles</description>
+        <description>MinGW makefiles (mingw32-make)</description>
         <default-filename>makefile.gcc</default-filename>
     </format>
     
