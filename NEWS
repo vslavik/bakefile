@@ -1,3 +1,9 @@
+Version 0.1.9
+-------------
+
+- dmars: fixed precompiled headers to not recompile everything
+
+
 Version 0.1.8
 -------------
 
