@@ -25,7 +25,8 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__LINKER_CC" eval="0">$(CC)</set>
     <set var="__LINKER_CXX" eval="0">$(CXX)</set>
     
-    <set var="__FLAG_MULTI_THREADING">-mthreads</set>
+    <set var="__FLAG_MULTI_THREADING_LD">-mthreads</set>
+    <set var="__FLAG_MULTI_THREADING_CPP">-mthreads</set>
 
     <set var="__FLAG_EXE_CONSOLE"></set>
     <set var="__FLAG_EXE_GUI">-Wl,--subsystem,windows -mwindows</set>

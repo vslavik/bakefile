@@ -7,6 +7,8 @@ Version 0.1.8
 - added scripts for making Debian package (Vadim Zeitlin)
 - gnu: fixed <module> targets to not have "lib" prefix in name
 - added --quiet option
+- gnu,mingw: fixed <threading>multi</threading> to use -pthread or -mthreads
+  for compilation and not only linking
 
 
 Version 0.1.7

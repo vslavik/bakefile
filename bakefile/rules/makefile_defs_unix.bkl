@@ -70,8 +70,10 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__FLAG_ARCH_I686"></set>
     <set var="__FLAG_USE_PCH"></set>
     <set var="__FLAG_PCH_FILE"></set>
-    <set var="__FLAG_SINGLE_THREADING"/>
-    <set var="__FLAG_MULTI_THREADING"/>
+    <set var="__FLAG_SINGLE_THREADING_LD"/>
+    <set var="__FLAG_MULTI_THREADING_LD"/>
+    <set var="__FLAG_SINGLE_THREADING_CPP"/>
+    <set var="__FLAG_MULTI_THREADING_CPP"/>
     <set var="__FLAG_WARNINGS_NO"/>
     <set var="__FLAG_WARNINGS_DEFAULT"/>
     <set var="__FLAG_WARNINGS_MAX"/>
