@@ -403,18 +403,30 @@ def evalExpr(e, use_options=1, target=None, add_dict=None):
                         target=target, 
                         add_dict=add_dict)
 
+    
+def __recordDeps(mod):
+    import dependencies
+    modfile = '/%s.py' % mod
+    for path in sys.path:
+        if os.path.isfile(path+modfile):
+            dependencies.addDependency(vars['INPUT_FILE'], path+modfile)
+            return
 
 def importPyModule(modname):
     try:
         exec('import utils.%s' % modname, globals())
         if config.verbose:
             print 'imported python module utils.%s' % modname
+        if config.track_deps:
+            __recordDeps('utils/%s' % modname)
     except ImportError: pass
 
     try:
         exec('import %s' % modname, globals())
         if config.verbose:
             print 'imported python module %s' % modname
+        if config.track_deps:
+            __recordDeps(modname)
     except ImportError: pass
     if config.debug:
         print '[dbg] --- after importing module %s --' % modname
