@@ -158,7 +158,7 @@
         <define-tag name="optimize">
             <cppflags>
                 $(substituteFromDict(value,
-                      {'off':'/Od', 'speed':'/O1', 'size':'/O2'}))
+                      {'off':'/Od', 'speed':'/O2', 'size':'/O1'}))
             </cppflags>
         </define-tag>
         
