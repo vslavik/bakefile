@@ -59,6 +59,7 @@ def handleSet(e, target=None, add_dict=None):
                     raise ReaderError(e_if, "'target' condition can't be used at global scope")
                 cond = target.cond
                 if cond == None:
+                    noValueSet = 0
                     isCond = 0
                     value = e_if.value
                     break
