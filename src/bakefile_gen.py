@@ -333,6 +333,10 @@ def run(args):
 
 
 if __name__ == '__main__':
+    if sys.version_info[0:2] < (2,2,2):
+        sys.stderr.write('error: Bakefile requires at least Python 2.2.2\n')
+        sys.exit(1)
+        
     try:
         run(sys.argv[1:])
     except KeyboardInterrupt:
