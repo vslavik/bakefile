@@ -50,7 +50,7 @@
             <set var="__sources"/>
             <set var="__more_files"/>
             <set var="__defines">/D "WIN32"</set>
-            <set var="__cppflags">/FD</set>
+            <set var="__cppflags">/FD /W4</set>
             <set var="__ldlibs"/>
             <set var="__ldflags">/machine:i386</set>
             <set var="__win32rc_flags"/>
