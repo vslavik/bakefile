@@ -221,9 +221,10 @@ def makeCondition(cond_str):
                 return None
         condexpr_list.append(Condition.Expr(options[name], value))
 
-    cname = '_'.join(['%s_%s' % (e.option.name.upper(),
-                                 str(e.value).upper()) for \
-                      e in condexpr_list])
+    def safeValue(s):
+        return str(s).replace('.','_').replace('/','').replace('\\','')
+    cname = '_'.join(['%s_%s' % (e.option.name.upper(), safeValue(e.value)) \
+                      for e in condexpr_list])
     if cname in conditions:
         return conditions[cname]
     else:
