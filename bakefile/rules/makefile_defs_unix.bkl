@@ -80,16 +80,30 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__FLAG_EXCEPTIONS_ON"></set>    
     <set var="__FLAG_EXCEPTIONS_OFF"></set>
 
-    <template id="__commands_templ_C">
+    <template id="__commands_templ_common">
+        <!--
+         GNU make allows use of $< in non-suffix rules, but some other makes
+         (e.g. *BSD one) don't, we have to use full source name (and generate
+         larger files). See here for more details:
+         https://sourceforge.net/tracker/?func=detail&aid=949940&group_id=83016&atid=568029
+         -->
+        <set var="_srcref" eval="0">
+            <if cond="FORMAT=='gnu'">$&lt;</if>
+            <if cond="FORMAT!='gnu'">$(src)</if>
+        </set>
+    </template>
+
+    <template id="__commands_templ_C" template="__commands_templ_common">
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CCC) -c -o $@ $(__cflags) $&lt;
+            $(CCC) -c -o $@ $(__cflags) $(_srcref)
         </set>
     </template>
-    <template id="__commands_templ_CXX">
+    <template id="__commands_templ_CXX" template="__commands_templ_common">
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXXC) -c -o $@ $(__cxxflags) $&lt;
+            $(CXXC) -c -o $@ $(__cxxflags) $(_srcref)
         </set>
     </template>
+
     <template id="__commands_templ">
         <set var="__LINK_EXE_CMD" eval="0">
             $(__linker) -o $@ $(__objects_var) $(__ldflags) $(__ldlibs)
