@@ -5,41 +5,44 @@
 
     <!-- some nontrivial settings shared by all msvc formats: -->
 
-    <tag-info name="threading"
-              position="before:runtime-libs"/>      
-    
-    <define-tag name="runtime-libs" rules="exe,dll,module,lib">
-        <set var="__rtl_type">
-            $(substituteFromDict(value,
-              {'static':__rtl_static, 'dynamic':'D'}))
-        </set>
-    </define-tag>
-    <define-tag name="threading" rules="exe,dll,module,lib">
-        <set var="__rtl_static">
-            $(substituteFromDict(value, {'multi':'T', 'single':'L'}))
-        </set>
-    </define-tag>
+    <if cond="COMPILER!='evc'">
+        <tag-info name="threading"
+                  position="before:runtime-libs"/>      
+        
+        <define-tag name="runtime-libs" rules="exe,dll,module,lib">
+            <set var="__rtl_type">
+                $(substituteFromDict(value,
+                  {'static':__rtl_static, 'dynamic':'D'}))
+            </set>
+        </define-tag>
+        
+        <define-tag name="threading" rules="exe,dll,module,lib">
+            <set var="__rtl_static">
+                $(substituteFromDict(value, {'multi':'T', 'single':'L'}))
+            </set>
+        </define-tag>
+
+        <define-tag name="debug-runtime-libs" rules="exe,dll,module,lib">
+            <define>
+                $(substituteFromDict(value, {'on':'_DEBUG', 'off':''}))
+            </define>
+            <set var="__rtl_dbg">
+                $(substituteFromDict(value, {'on':'d', 'off':''}))
+            </set>
+        </define-tag>
+        
+        <define-tag name="app-type" rules="exe">
+            <define>
+                $(substituteFromDict(value,
+                {'console':'_CONSOLE', 'gui':'_WINDOWS'}))
+            </define>
+        </define-tag>
+    </if>
 
     <define-tag name="debug-info" rules="exe,dll,module,lib">
         <debug-runtime-libs>$(value)</debug-runtime-libs>
         <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
         <cppflags>/Fd$(__pdbfile)</cppflags>
-    </define-tag>
-
-    <define-tag name="debug-runtime-libs" rules="exe,dll,module,lib">
-        <define>
-            $(substituteFromDict(value, {'on':'_DEBUG', 'off':''}))
-        </define>
-        <set var="__rtl_dbg">
-            $(substituteFromDict(value, {'on':'d', 'off':''}))
-        </set>
-    </define-tag>
-    
-    <define-tag name="app-type" rules="exe">
-        <define>
-            $(substituteFromDict(value,
-            {'console':'_CONSOLE', 'gui':'_WINDOWS'}))
-        </define>
     </define-tag>
 
 
