@@ -66,6 +66,11 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__FLAG_WARNINGS_NO"/>
     <set var="__FLAG_WARNINGS_DEFAULT"/>
     <set var="__FLAG_WARNINGS_MAX">-Wall</set>
+    
+    <set var="__FLAG_RTTI_ON"></set>
+    <set var="__FLAG_RTTI_OFF">-fno-rtti</set>
+    <set var="__FLAG_EXCEPTIONS_ON"></set>    
+    <set var="__FLAG_EXCEPTIONS_OFF">-fno-exceptions</set>
 
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">

@@ -681,6 +681,26 @@
               </row>
               
               
+              <row id="tag.cxx-rtti" xreflabel="cxx-rtti">
+                <entry role="tagname">cxx-rtti</entry>
+                <entry>
+                  Enable or disable RTTI when compiling C++ sources. Can be either
+                  <literal>on</literal> or <literal>off</literal>.
+                </entry>
+                <entry role="availability">exe, dll, module, lib</entry>
+              </row>
+              
+              
+              <row id="tag.cxx-exceptions" xreflabel="cxx-exceptions">
+                <entry role="tagname">cxx-exceptions</entry>
+                <entry>
+                  Enable or disable C++ exceptions handling. Can be either
+                  <literal>on</literal> or <literal>off</literal>.
+                </entry>
+                <entry role="availability">exe, dll, module, lib</entry>
+              </row>
+              
+              
               <row id="tag.precomp-headers-file"
                 xreflabel="precomp-headers-file">
                 <entry role="tagname">precomp-headers-file</entry>

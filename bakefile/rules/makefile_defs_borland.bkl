@@ -50,6 +50,11 @@
     <set var="__FLAG_WARNINGS_DEFAULT"/>
     <set var="__FLAG_WARNINGS_MAX"/>
     
+    <set var="__FLAG_RTTI_ON"></set>
+    <set var="__FLAG_RTTI_OFF"></set>
+    <set var="__FLAG_EXCEPTIONS_ON"></set>    
+    <set var="__FLAG_EXCEPTIONS_OFF"></set>
+    
     <set var="__MAKEARGS" eval="0">
         $(' '.join(['-D%s="$(%s)"' % (x,x) for x in OPTIONS.split()]))
     </set>
