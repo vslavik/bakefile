@@ -3,7 +3,8 @@ Version 0.1.8
 
 - gnu: define PLATFORM_UNIX
 - gnu: implemented dependencies tracking
-- msvc*: use /EHsc instead of /GX, which is deprecated in VC 2005
+- msvc*: use /EHsc instead of /GX, which is deprecated in VC8 (Vadim Zeitlin)
+- added scripts for making Debian package (Vadim Zeitlin)
 
 
 Version 0.1.7
