@@ -129,7 +129,7 @@
     
     <template id="__commands_templ">
         <set var="__LINK_EXE_CMD" eval="0">
-            $(__linker) /NOLOGO /OPT:REF /OUT:$@ $(__ldflags) @&lt;&lt;
+            $(__linker) /NOLOGO /OUT:$@ $(__ldflags) @&lt;&lt;
             $(__objects) $(__ldlibs)
             &lt;&lt;NOKEEP
         </set>        
@@ -140,7 +140,7 @@
             &lt;&lt;NOKEEP
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) /NOLOGO /OPT:REF /OUT:$@ $(__ldflags) @&lt;&lt;
+            $(__dll_linker) /NOLOGO /OUT:$@ $(__ldflags) @&lt;&lt;
             $(__objects) $(__ldlibs) /IMPLIB:$(__targetdir)$(__libname).lib
             &lt;&lt;NOKEEP
         </set>
