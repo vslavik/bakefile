@@ -1,12 +1,8 @@
 # MS Visual C++ projects generator script
 # $Id$
 
-import fnmatch, re
+import fnmatch, re, os, os.path
 import errors, utils
-
-basename = os.path.splitext(os.path.basename(FILE))[0]
-dirname = os.path.dirname(FILE)
-
 
 # ------------------------------------------------------------------------
 #   helpers
@@ -64,17 +60,21 @@ def sortByBasename(files):
 # ------------------------------------------------------------------------
 
 class ProjectGeneratorMsvc6:
-    
+
+    def __init__(self):
+        self.basename = os.path.splitext(os.path.basename(FILE))[0]
+        self.dirname = os.path.dirname(FILE)
+ 
     # --------------------------------------------------------------------
     #   basic configuration
     # --------------------------------------------------------------------
 
-    def getDSWextension(self):
+    def getDswExtension(self):
         return 'dsw'
-    def getDSWversion(self):
-        return '6.00'
-    def getDSPextension(self):
+    def getDspExtension(self):
         return 'dsp'
+    def getMakefileExtension(self):
+        return 'mak'
 
     # --------------------------------------------------------------------
     #   helpers
@@ -95,15 +95,17 @@ End Project Dependency
     #   DSW file
     # --------------------------------------------------------------------
 
-    def genDSW(self, dsw_targets, dsp_list, deps_translation):
-        dsw = """\
-Microsoft Developer Studio Workspace File, Format Version %s
+    def makeDswHeader(self):
+        return """\
+Microsoft Developer Studio Workspace File, Format Version 6.00
 # WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
 
-###############################################################################""" % self.getDSWversion()
+###############################################################################"""
 
+    def genDSW(self, dsw_targets, dsp_list, deps_translation):
+        dsw = self.makeDswHeader()
         project = """
-Project: "%s"=%s.""" + self.getDSPextension() + """ - Package Owner=<4>
+Project: "%s"=%s.""" + self.getDspExtension() + """ - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -120,9 +122,9 @@ Package=<4>
         for t in dsw_targets:
             deps = ''
             if single_target:
-                dsp_name = basename
+                dsp_name = self.basename
             else:
-                dsp_name = '%s_%s' % (basename, t.id)
+                dsp_name = '%s_%s' % (self.basename, t.id)
             deplist = t._deps.split()
             # add external dsp dependencies:
             for d in t._dsp_deps.split():
@@ -137,8 +139,8 @@ Package=<4>
 
             dsw += project % (t.id, dsp_name, deps)
             dspfile = (t, 
-                       os.path.join(dirname,
-                                    dsp_name + '.' + self.getDSPextension()),
+                       os.path.join(self.dirname,
+                                    dsp_name + '.' + self.getDspExtension()),
                        dsp_name)
             if dspfile not in dsp_list:
                 dsp_list.append(dspfile)
@@ -161,8 +163,8 @@ Package=<4>
                               os.path.splitext(d_components[1])[0], deps)
 
         writer.writeFile('%s.%s' % (
-            os.path.join(dirname,basename),
-            self.getDSWextension()
+            os.path.join(self.dirname, self.basename),
+            self.getDswExtension()
             ), dsw)
 
 
@@ -216,17 +218,19 @@ Package=<4>
         return '\n'.join(result)+'\n'
 
 
-    def genDSP(self, t, filename, prjname):
-        # Create header and list of configurations:
-        
-        default_cfg = sortedKeys(t.configs)[-1]
-        dsp = """\
+    def makeDspHeader(self, id):
+        return """\
 # Microsoft Developer Studio Project File - Name="%s" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
-""" % (t.id)
+""" % id
 
+    def genDSP(self, t, filename, prjname):
+        # Create header and list of configurations:
+        
+        default_cfg = sortedKeys(t.configs)[-1]
+        dsp = self.makeDspHeader(t.id)
         targ_types = []
         for c in t.configs:
             targ = '%s %s' % (t.configs[c]._type, t.configs[c]._type_code)
@@ -240,16 +244,18 @@ Package=<4>
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "%s.mak".
+!MESSAGE NMAKE /f "%s.%s".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "%s.mak" CFG="%s"
+!MESSAGE NMAKE /f "%s.%s" CFG="%s"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-""" % (prjname, prjname, self.mkConfigName(t.id, default_cfg))
+""" % (prjname, self.getMakefileExtension(),
+       prjname, self.getMakefileExtension(),
+       self.mkConfigName(t.id, default_cfg))
         for c in sortedKeys(t.configs):
             dsp += '!MESSAGE "%s" (based on %s)\n' % (self.mkConfigName(t.id, c), t.configs[c]._type)
         dsp += """\
@@ -415,6 +421,6 @@ SOURCE=%s\\%s
 
         writer.writeFile(filename, dsp)
 
-
-generator = ProjectGeneratorMsvc6()
-generator.genWorkspaces()
+def run():
+    generator = ProjectGeneratorMsvc6()
+    generator.genWorkspaces()
