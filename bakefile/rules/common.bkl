@@ -28,7 +28,7 @@
     <define-rule name="compilation_rule">
         <define-tag name="src">
             <set var="src">$(findSources(value))</set>
-            <set var="__deps">$(src)</set>
+            <set var="__deps" append="1">$(src)</set>
         </define-tag>
         <define-tag name="dst">
             <set var="__targetname">$(value)</set>
