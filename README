@@ -32,3 +32,4 @@ to run autogen.sh successfully, you need the following packages: SWIG 1.3.x
 (http://www.swig.org), Automake >= 1.6, Autoconf >= 2.53, libtool, libxslt
 (including xsltproc program) and DocBook XSL stylesheets (last two are needed
 only to build HTML documentation).
+On Windows, you need SWIG to build Bakefile from CVS.
