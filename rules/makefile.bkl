@@ -146,7 +146,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__module_linker" eval="0">
                 $(ifthenelse(__uses_cxx, __MODULE_LINKER_CXX, __MODULE_LINKER_CC))
             </set>
-            
+
             <__clean-target-files/>
         </template>
 
@@ -260,6 +260,22 @@ makefiles (most notably GNU Make and Autoconf formats).
                        'default':__FLAG_WARNINGS_DEFAULT,
                        'max':__FLAG_WARNINGS_MAX}))
             </cppflags>
+        </define-tag>
+        
+        <define-tag name="cxx-rtti">
+            <cxxflags>
+                $(substituteFromDict(value,
+                        {'on':__FLAG_RTTI_ON,
+                         'off':__FLAG_RTTI_OFF}))
+            </cxxflags>
+        </define-tag>
+        
+        <define-tag name="cxx-exceptions">
+            <cxxflags>
+                $(substituteFromDict(value,
+                        {'on':__FLAG_EXCEPTIONS_ON,
+                         'off':__FLAG_EXCEPTIONS_OFF}))
+            </cxxflags>
         </define-tag>
 
         <define-tag name="runtime-libs"/>

@@ -43,7 +43,10 @@
     <set var="__FLAG_WARNINGS_NO">/w</set>
     <set var="__FLAG_WARNINGS_DEFAULT"></set>
     <set var="__FLAG_WARNINGS_MAX">/W4</set>
-
+    <set var="__FLAG_RTTI_ON">/GR</set>
+    <set var="__FLAG_RTTI_OFF"></set>
+    <set var="__FLAG_EXCEPTIONS_ON">/GX</set>
+    <set var="__FLAG_EXCEPTIONS_OFF"></set>
 
     <!-- rules building blocks: -->
     
@@ -87,7 +90,8 @@
 
             <!-- enable C++ exception handling and rtti
                  (FIXME: make it configurable) -->
-            <cxxflags>/GR /GX</cxxflags>
+            <cxx-rtti>on</cxx-rtti>
+            <cxx-exceptions>on</cxx-exceptions>
         </template>
 
         <define-tag name="precomp-headers-gen">
