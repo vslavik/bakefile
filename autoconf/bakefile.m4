@@ -253,7 +253,7 @@ if test \${verbose} = 1; then
     echo "c++ -r -keep_private_externs -nostdlib \${objects} -o master.\$\$.o"
 fi
 c++ -r -keep_private_externs -nostdlib \${objects} -o master.\$\$.o
-{status}=\$?
+status=\$?
 if test \${status} != 0; then
     exit \${status}
 fi
