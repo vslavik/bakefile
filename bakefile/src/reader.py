@@ -69,6 +69,7 @@ def handleSet(e, target=None, add_dict=None):
                     continue
                 # Condition always met:
                 elif typ == '1':
+                    noValueSet = 0
                     isCond = 0
                     value = e_if.value
                     break
