@@ -48,8 +48,9 @@
         <template>
             <set var="__kind">project</set>
             <set var="__sources"/>
+            <set var="__more_files"/>
             <set var="__defines">/D "WIN32"</set>
-            <set var="__cppflags"/>
+            <set var="__cppflags">/FD</set>
             <set var="__ldlibs"/>
             <set var="__ldflags">/machine:i386</set>
             <set var="__win32rc_flags"/>
@@ -132,10 +133,10 @@
         
         <define-tag name="debug-info">
             <cppflags>
-                $(substituteFromDict(value, {'on':'/Zi', 'off':''}))
+                $(substituteFromDict(value, {'on':'/Zi /Gm /GZ', 'off':''}))
             </cppflags>
             <ldflags>
-                $(substituteFromDict(value, {'on':'/DEBUG','off':''}))
+                $(substituteFromDict(value, {'on':'/debug','off':''}))
             </ldflags>
             <set var="__debug">
                 $(substituteFromDict(value, {'on':'1','off':'0'}))
@@ -143,6 +144,11 @@
         </define-tag>       
 
         <define-tag name="install-to"/>
+        
+        <define-tag name="msvc-project-files">
+            <set var="__more_files" append="1">$(value)</set>
+        </define-tag>
+
     </define-rule>
 
     <define-rule name="exe" extends="__compiled">
