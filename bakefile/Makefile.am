@@ -14,10 +14,14 @@ man_MANS = doc/man/bakefile.1
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
               output/borland.empy \
+              output/borland-opts.empy \
               output/msvc.empy \
+              output/msvc-opts.empy \
               output/msvc6prj.py \
               output/mingw.empy \
+              output/mingw-opts.empy \
               output/watcom.empy \
+              output/watcom-opts.empy \
               output/_hdr_makefile.empy
 
 rules_DATA =  rules/autoconf.bkl \
