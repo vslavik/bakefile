@@ -17,6 +17,9 @@ def sortedKeys(dic):
     for c in configs_order:
         if c in dic:
             l.append(c)
+    # in VC++ IDE, the last config is the default one, i.e. what you would
+    # logically expect to be the first one => reverse the order:
+    l.reverse()
     return l
 
 def mkConfigName(target, config):
@@ -187,7 +190,7 @@ def mkFlags(keyword, lines):
 def genDSP(t, filename, prjname):
     # Create header and list of configurations:
     
-    default_cfg = t.configs.keys()[0]
+    default_cfg = sortedKeys(t.configs)[-1]
     dsp = """\
 # Microsoft Developer Studio Project File - Name="%s" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
