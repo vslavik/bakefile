@@ -1,0 +1,12 @@
+Document: bakefile
+Title: bakefile Manual
+Author: Vaclav Slavik
+Abstract: This manual describes what bakefile is
+ and how to use it for makefile generation.
+Section: unknown
+
+Format: HTML
+Index: /usr/share/doc/bakefile/html/index.html
+Files: /usr/share/doc/bakefile/html/*.html
+
+  
