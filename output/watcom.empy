@@ -3,7 +3,7 @@
 def makeCondBegin(c):
     s = ''
     for e in c.exprs:
-        s += 'ifeq "$(%s)" "%s"\n' % (e.option.name, e.value)
+        s += 'ifeq %s %s\n' % (e.option.name, e.value)
     return s.strip()
 def makeCondEnd(c):
     s = ''
