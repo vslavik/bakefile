@@ -164,6 +164,10 @@ def __findWriter(writer):
         if os.path.isfile(template):
             found = 1
             rulesdir = p
+            if config.track_deps:
+                dependencies.addDependency(
+                    mk.vars['INPUT_FILE'], config.format,
+                    os.path.abspath(template))
             break
     if not found:        
         raise errors.Error("can't find output writer '%s'" % writer)
