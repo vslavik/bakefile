@@ -345,6 +345,9 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="command">
             <__command>$(value)</__command>
         </define-tag>
+        <define-tag name="is-phony">
+            <set var="__is_phony">1</set>
+        </define-tag>
     </define-rule>
 
     <template id="__phony">
