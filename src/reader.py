@@ -778,9 +778,11 @@ def handleRequires(e):
         vreq = e.props['version'].split('.')
         if vcur < vreq:
             sys.stderr.write("""
+-----------------------------------------------------------------------
 This file cannot be processed with Bakefile version older than %s.
 You are using Bakefile version %s. Please install the newest version
 from http://bakefile.sourceforge.net.
+-----------------------------------------------------------------------
 
 """ % (e.props['version'], mk.vars['BAKEFILE_VERSION']))
             raise ReaderError(e, "Bakefile not new enough")
