@@ -151,6 +151,7 @@ def __parseFileMinidom(filename):
     return __doParseMinidom(xml.dom.minidom.parse, filename)
 
 def __parseStringMinidom(data):
+    global xml
     import xml.sax, xml.dom, xml.dom.minidom
     return __doParseMinidom(xml.dom.minidom.parseString, data)
 
