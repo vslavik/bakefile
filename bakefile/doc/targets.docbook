@@ -580,7 +580,7 @@
                   libraries that were built by the same makefile, use
                   <xref linkend="tag.library"/> for that. This command links
                   against a library installed in the system or provided by the
-                  compiler and corresponds to <literal>-l</literal> switch
+                  compiler and corresponds to the <literal>-l</literal> switch
                   of Unix compilers.
               <programlisting><![CDATA[
 <exe id="png2bmp">
@@ -597,7 +597,10 @@
   <sys-lib>png z</sys-lib> <!-- INCORRECT -->
 </exe>
 ]]></programlisting>
-                  See also <xref linkend="tag.lib-path"/>.
+                  Note that the name of library in this tag is
+                  <emphasis>not</emphasis> filename and must not include
+                  paths; use <xref linkend="tag.lib-path"/> to specify
+                  library search path.
                 </entry>
                 <entry role="availability">exe, dll, module</entry>
               </row>
