@@ -341,7 +341,8 @@ def finalize():
     if eliminateDuplicateCondVars():
         finalEvaluation()
 
-    if mk.vars['FORMAT_SUPPORTS_CONDITIONS'] != '1':
+    if mk.vars['FORMAT_SUPPORTS_CONDITIONS'] != '1' and \
+       mk.vars['FORMAT_SUPPORTS_CONFIGURATIONS'] == '1':
         import flatten
         flatten.flatten()
     

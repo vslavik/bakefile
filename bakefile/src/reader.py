@@ -77,6 +77,16 @@ def translateSpecialCondition(e, condstr, target=None):
         return condstr
 
 
+def checkConditionsSupport(e):
+    """Raises exception of the output format does not support some form
+       of conditions (e.g. DigitalMars)."""
+    if mk.vars['FORMAT_SUPPORTS_CONDITIONS'] != '1' and \
+       mk.vars['FORMAT_SUPPORTS_CONFIGURATIONS'] != '1':
+           raise ReaderError(e, 
+                       'output format does not support conditional processing')
+
+
+
 def handleSet(e, target=None, add_dict=None):
     errors.pushCtx(e)
     name = evalConstExpr(e, e.props['var'], target)
@@ -124,6 +134,9 @@ def handleSet(e, target=None, add_dict=None):
             noValueSet = 0
             
             # Real conditions:
+
+            checkConditionsSupport(e)
+            
             if 'scope' in e.props:
                 raise ReaderError(e, "conditional variable can't have nondefault scope ('%s')" % e.props['scope'])
 
@@ -538,6 +551,7 @@ def handleTarget(e):
             raise ReaderError(e, "malformed condition: '%s'" % condstr)
 
         if isCond:
+            checkConditionsSupport(e)
             cond = mk.makeCondition(condstr)
             if cond == None:
                 raise ReaderError(e, "malformed condition: '%s'" % condstr)
