@@ -4,6 +4,8 @@
 <makefile>
     
     <include file="win32.bkl"/>
+
+    <set var="__TLIB_PAGESIZE">2048</set>
     
     <set var="__DEFINE_ARG">-D</set>
     <set var="__INCLUDE_ARG">-I</set>
@@ -178,7 +180,7 @@
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
             if exist $@ del $@
-            tlib /a $@ @&amp;&amp;|
+            tlib /a /p$(__TLIB_PAGESIZE) $@ @&amp;&amp;|
             $(__objects)
             |
         </set>
