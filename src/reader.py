@@ -764,13 +764,15 @@ def processXML(data):
 
 # -------------------------------------------------------------------------
 
-def setStdVars():
+def setStdVars(filename):
     mk.setVar('LF', '\n')
     mk.setVar('TAB', '\t')
     mk.setVar('SPACE', '$(" ")', eval=0)
     mk.setVar('DOLLAR', '&dollar;')
+    
+    mk.setVar('INPUT_FILE', filename)
     mk.setVar('OUTPUT_FILE', config.output_file)
-    mk.setVar('FORMAT', config.format)
+    mk.setVar('FORMAT', config.format)    
 
 def setOverrideVars():
     for v in config.defines:
@@ -780,7 +782,7 @@ def setOverrideVars():
 
 def read(filename):
     try:
-        setStdVars()
+        setStdVars(filename)
         setOverrideVars()
         buildModulesList()
         loadModule('common')

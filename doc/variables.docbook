@@ -247,7 +247,25 @@
                   three numbers delimined by period. Read only.
                 </entry>
               </row>
+              
+              <row id="var.OPTIONS">
+                <entry role="varname">OPTIONS</entry>
+                <entry>
+                  Space-separation list of 
+                  <link linkend="concept.option">options</link> defined in
+                  the makefiles. Note that the value of this variable
+                  changes during processing as new options are defined!
+                </entry>
+                <entry role="default"></entry>
+              </row>
 
+              <row id="var.INPUT_FILE" xreflabel="INPUT_FILE">
+                <entry role="varname">INPUT_FILE</entry>
+                <entry>
+                  Name of input file. Read only.
+                </entry>
+              </row>
+              
               <row id="var.OUTPUT_FILE" xreflabel="OUTPUT_FILE">
                 <entry role="varname">OUTPUT_FILE</entry>
                 <entry>
