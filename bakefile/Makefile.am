@@ -15,7 +15,7 @@ output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
               output/borland.empy \
               output/borland-opts.empy \
-              output/dmarg.empy \
+              output/dmars.empy \
               output/msvc.empy \
               output/msvc-opts.empy \
               output/msvc6prj.py \
