@@ -179,12 +179,13 @@
                           substituted by Bakefile. This happens only if the
                           output format supports it
                           (<varname>FORMAT_HAS_VARIABLES</varname> is set to
-                          <literal>1</literal>). This settings is useful
+                          <literal>1</literal>) and if variable's value is not
+                          empty string. This settings is useful
                           together with frequently used variables with long
                           values, it helps reduce size of generated makefiles.
                       </para>
                       <para role="default">
-                          0
+                          Default value: 0
                       </para>
                   </listitem>
               </varlistentry>

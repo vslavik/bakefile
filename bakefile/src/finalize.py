@@ -97,7 +97,14 @@ def finalEvaluation(outputVarsOnly=1):
         sys.stdout.flush()
     iterateModifications(list)
     if config.verbose: sys.stdout.write('\n')
-        
+
+
+def _getUneliminatableVars():
+    """Returns list of variables that cannot be eliminated. This is union
+       of VARS_DONT_ELIMINATE and FORMAT_OUTPUT_VARIABLES."""
+    return mk.vars['FORMAT_OUTPUT_VARIABLES'].strip().split(',') + \
+           mk.vars['VARS_DONT_ELIMINATE'].strip().split()
+
 
 def purgeUnusedOptsVars():
     """Removes unused options, conditional variables and make variables. This
@@ -108,7 +115,7 @@ def purgeUnusedOptsVars():
         sys.stdout.flush()
     toKill = []
 
-    vars_to_keep = mk.vars['VARS_DONT_ELIMINATE'].split()
+    vars_to_keep = _getUneliminatableVars()
 
     if mk.vars['FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS'] != '0':
         usedOpts = []
@@ -178,6 +185,28 @@ def purgeConstantCondVars():
     return len(toDel) > 0
 
 
+def purgeEmptyMakeVars():
+    """Removes make variables that are empty, and replaces them with
+       ordinary variables."""
+    
+    if config.verbose:
+        sys.stdout.write('purging empty make variables')
+        sys.stdout.flush()
+    
+    vars_to_keep = _getUneliminatableVars()
+    
+    toDel = []
+    for v in [x for x in mk.make_vars if x not in vars_to_keep]:
+        vval=mk.make_vars[v]
+        if vval == '' or vval.isspace():
+            toDel.append(v)
+    
+    if config.verbose:
+        sys.stdout.write(': %i of %i\n' % (len(toDel), len(mk.make_vars)))
+    for v in toDel:
+        del mk.make_vars[v]
+        mk.vars[v] = ''
+    return len(toDel) > 0
 
 def purgeUnusedConditions():
     """Removes unused conditions."""
@@ -329,8 +358,11 @@ def finalize():
     # remove unused conditions:
     purgeUnusedConditions()
     
-    # purge conditional variables that have same value for all conditions:
-    if purgeConstantCondVars():
+    # purge conditional variables that have same value for all conditions
+    # and make variables that are empty:
+    reeval = purgeConstantCondVars()
+    if purgeEmptyMakeVars(): reeval = 1
+    if reeval:
         finalEvaluation()
 
     # purge unused options, cond vars and make vars:
