@@ -95,21 +95,6 @@ Package=<4>
 ###############################################################################
 """
 
-    # add external dsp deps first:
-    extern_deps = []
-    for t in dsw_targets:
-        for d in t.__dsp_deps.split():
-            if d not in extern_deps:
-                extern_deps.append(d)
-    for d in extern_deps:
-        deps = ''
-        d_components = d.split(':')
-        if len(d_components) == 3:
-            for d_dep in d_components[2].split(','):
-                deps += makeDependency(d_dep)
-        dsw += project % (d_components[0],
-                          os.path.splitext(d_components[1])[0], deps)
-
     single_target = (len(dsw_targets) == 1)
     for t in dsw_targets:
         deps = ''
@@ -133,6 +118,24 @@ Package=<4>
         dspfile = (t, os.path.join(dirname, dsp_name+'.dsp'), dsp_name)
         if dspfile not in dsp_list:
             dsp_list.append(dspfile)
+    
+    # add external dsp deps (we put them after bakefile's own targets so
+    # that the active project when you first open the workspace is something
+    # meaningful and not a mere dependency):
+    extern_deps = []
+    for t in dsw_targets:
+        for d in t.__dsp_deps.split():
+            if d not in extern_deps:
+                extern_deps.append(d)
+    for d in extern_deps:
+        deps = ''
+        d_components = d.split(':')
+        if len(d_components) == 3:
+            for d_dep in d_components[2].split(','):
+                deps += makeDependency(d_dep)
+        dsw += project % (d_components[0],
+                          os.path.splitext(d_components[1])[0], deps)
+
     writer.writeFile('%s.dsw' % (os.path.join(dirname,basename)), dsw)
 
 
