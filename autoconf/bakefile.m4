@@ -273,7 +273,7 @@ fi
 #
 # Remove intermediate module
 #
-rm -f master.$$.o
+rm -f master.\$\$.o
 
 exit 0
 EOF
@@ -295,8 +295,8 @@ EOF
             AC_CHECK_PROG(AIX_CXX_LD, makeC++SharedLib,
                           makeC++SharedLib, /usr/lpp/xlC/bin/makeC++SharedLib)
             dnl FIXME - what about makeCSharedLib?            
-            SHARED_LD_CC="$(AIX_CC_LD) -p 0 -o"
-            SHARED_LD_CXX="$(AIX_CXX_LD) -p 0 -o"
+            SHARED_LD_CC="$AIX_CC_LD -p 0 -o"
+            SHARED_LD_CXX="$AIX_CXX_LD -p 0 -o"
         fi
       ;;
 
