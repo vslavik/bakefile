@@ -252,6 +252,10 @@
                 <entry role="varname">PLATFORM_OS2</entry>
                 <entry>OS/2</entry>
               </row>
+              <row>
+                <entry role="varname">PLATFORM_BEOS</entry>
+                <entry>BeOS</entry>
+              </row>
               
             </tbody>
           </tgroup>

@@ -43,6 +43,7 @@
     <option name="PLATFORM_MAC"/>
     <option name="PLATFORM_MACOSX"/>
     <option name="PLATFORM_OS2"/>
+    <option name="PLATFORM_BEOS"/>
     
     <option name="srcdir" never_empty="1"/>
     <option name="top_srcdir"/>

@@ -48,6 +48,7 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
     PLATFORM_MAC=0
     PLATFORM_MACOSX=0
     PLATFORM_OS2=0
+    PLATFORM_BEOS=0
 
     if test "x$BAKEFILE_FORCE_PLATFORM" = "x"; then 
         case "${BAKEFILE_HOST}" in
@@ -63,6 +64,9 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
             powerpc-*-darwin* )
                 PLATFORM_MAC=1
                 PLATFORM_MACOSX=1
+            ;; 
+            *-*-beos* )
+                PLATFORM_BEOS=1
             ;;
             * )
                 PLATFORM_UNIX=1
@@ -86,6 +90,9 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
             unix )
                 PLATFORM_UNIX=1
             ;;
+            beos )
+                PLATFORM_BEOS=1
+            ;;
             * )
                 AC_MSG_ERROR([Unknown platform: $BAKEFILE_FORCE_PLATFORM])
             ;;
@@ -98,6 +105,7 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
     AC_SUBST(PLATFORM_MAC)
     AC_SUBST(PLATFORM_MACOSX)
     AC_SUBST(PLATFORM_OS2)
+    AC_SUBST(PLATFORM_BEOS)
 ])
 
 
@@ -132,6 +140,10 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM_SPECIFICS],
         else
             OS2_LIBEXT="a"
         fi
+        ;;
+      
+      i*86-*-beos* )
+        LDFLAGS="-L/boot/develop/lib/x86 $LDFLAGS"
         ;;
     esac
 ])
@@ -335,8 +347,8 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
       *-*-beos* )
         dnl can't use gcc under BeOS for shared library creation because it
         dnl complains about missing 'main'
-        SHARED_LD_CC="${LD} -shared -o"
-        SHARED_LD_CXX="${LD} -shared -o"
+        SHARED_LD_CC="${LD} -nostart -o"
+        SHARED_LD_CXX="${LD} -nostart -o"
       ;;
 
       *-*-irix* )

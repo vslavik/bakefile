@@ -11,6 +11,7 @@ Version 0.1.5
   as argument to <include> etc.
 - new format: gnu for GNU toolchain on Unix
 - misc portability fixes on Unix (Michael Champigny)
+- added BeOS support (thanks to information by Michael Champigny)
 
 
 Version 0.1.4
