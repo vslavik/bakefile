@@ -17,8 +17,7 @@
 
 @[ for c in cond_vars :@
 @[ for v in c.values :@
-!if @( ' && '.join(['$(%s) == %s' % (x.option.name,x.value) \
-               for x in v.cond.exprs]) )
+!if @utils.condition2string(v.cond, utils.CONDSTR_BORLAND)
 @c.name = @v.value.replace('\n', ' \\\n')
 !endif
 ]@
@@ -32,8 +31,14 @@ all: @BUILDDIR
 
 ### Targets: ###
 @[ for t in targets :
+@[ if t.cond != None :@
+!if @utils.condition2string(t.cond, utils.CONDSTR_BORLAND)
+]@
 @t.__targetdir@t.__targetname: @t.__deps
 @[ for cmd in t.__command.splitlines():@
 @(cmd.strip()=='|' ? '|' : '\t'+cmd.strip())
+]@
+@[ if t.cond != None :@
+!endif
 ]@
 ]@
