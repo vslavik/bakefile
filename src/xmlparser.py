@@ -1,3 +1,9 @@
+#
+# XML loading via either libxml2 (preferred) or Python's builtin minidom
+# module (which uses expat)
+#
+# $Id$
+#
 
 class Element:
     def __init__(self):
@@ -134,7 +140,7 @@ parseString = __parseStringMinidom
 # Use libxml2 if available, it gives us better error checking than
 # xml.dom.minidom (DTD validation, line numbers etc.)
 try:
-    import libxml3
+    import libxml2
     parseFile = __parseFileLibxml2
     libxml2.registerErrorHandler(__libxml2err, "-->")
 except(ImportError):
