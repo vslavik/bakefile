@@ -10,8 +10,9 @@ makefiles (most notably GNU Make and Autoconf formats).
     
     <include file="win32.bkl"/>
     
-    <option name="AR"><default-value>ar</default-value></option>
-    <option name="RANLIB"><default-value>ranlib</default-value></option>
+    <set var="AR">ae</set>
+    <set var="RANLIB">ranlib</set>
+    <set var="RESCOMP">windres --use-temp-file</set>
 
     <set var="OBJEXT">.o</set>
     <set var="LIBEXT">.a</set>
