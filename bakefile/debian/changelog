@@ -1,3 +1,14 @@
+bakefile (0.1.8) unstable; urgency=low
+
+  * gnu format improvements: define PLATFORM_UNIX,
+    implemented dependencies tracking, fixed <module> targets to not have "lib"
+    prefix in name, fixed <threading>multi</threading> to use -pthread or -mthreads
+    for compilation and not only linking (the latter also for mingw format)
+  * msvc* format: use /EHsc instead of /GX, which is deprecated in VC8
+  * added --quiet option
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Mon, 14 Feb 2005 18:42:03 +0100
+
 bakefile (0.1.7-1) unstable; urgency=low
 
   * Initial Release.
