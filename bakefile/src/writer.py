@@ -142,6 +142,22 @@ def __copyMkToVars():
  
     return dict
 
+
+def __openFile(filename):
+    """Opens (or creates) file for read/write access, lock it."""
+    try:
+        f = open(filename, 'r+t')
+    except IOError:
+        f = open(filename, 'w+t')
+    portautils.lock(f)
+    return f
+
+def __closeFile(f):
+    """Closes file, releases lock."""
+    portautils.unlock(f)
+    f.close()
+
+
 def __readFile(filename):
     try:
         f = open(filename, 'rt')
@@ -217,15 +233,8 @@ __output_methods = {}
 def writeFile(filename, data, method = 'replace'):
     if isinstance(data, types.StringType):
         data = [x+'\n' for x in data.split('\n')]
-    if (filename not in __output_files) and (method != 'replace'):
-            __output_files[filename] = __readFile(filename)
     __output_methods[filename] = method
-    if method == 'replace':
-        __output_files[filename] = data
-        return
-    else:
-        __output_files[filename] = eval('%s(__output_files[filename],data)' % method)
-        return
+    __output_files[filename] = data
 
 def write():
     if config.verbose: print 'preparing generator...'
@@ -248,21 +257,24 @@ def write():
         changes_f = None
    
     for file in __output_files:
-        try:
-            f = open(file, 'rt')
-            txt = f.readlines()
-            f.close()
-        except IOError:
-            txt = None
+        # open (or create) file for R/W and lock it:
+        f = __openFile(file)
+        txt = f.readlines()
+        # if old and new content should be combined, do it:
+        if __output_methods[file] != 'replace':
+            __output_files[file] = \
+                eval('%s(txt, __output_files[file])' % method)
+        # write the file out only if changed:
         if __output_files[file] != txt:
-            f = open(file, 'wt')
+            f.seek(0)
             f.writelines(__output_files[file])
-            f.close()
             if changes_f != None:
                 changes_f.write('%s\n' % os.path.abspath(file))
             print 'writing %s' % file
         else:
             print 'no changes in %s' % file
+        __closeFile(f)
+        
         if config.track_deps:
             dependencies.addOutput(mk.vars['INPUT_FILE'], config.format,
                                    os.path.abspath(file),
