@@ -195,6 +195,71 @@ def purgeUnusedConditions():
         del mk.conditions[c]
     return len(toDel) > 0
 
+    
+def eliminateDuplicateCondVars():
+    """Removes duplicate conditional variables, i.e. if there are two
+       cond. variables with exactly same definition, remove them."""
+
+    duplicates = []
+   
+    if config.verbose:
+        sys.stdout.write('eliminating duplicate conditional variables')
+        sys.stdout.flush()
+        before = len(mk.cond_vars)
+    keys = mk.cond_vars.keys()
+    lng = len(keys)    
+    for c1 in range(0,lng):
+        for c2 in range(c1+1,lng):
+            cv1 = mk.cond_vars[keys[c1]]
+            cv2 = mk.cond_vars[keys[c2]]
+            if cv1.equals(cv2):
+                duplicates.append((cv1, cv2))
+                break
+
+    def commonPrefix(s1, s2):
+        prefix = ''
+        for i in range(0, min(len(s1), len(s2))):
+            if s1[i] != s2[i]: break
+            prefix += s1[i]
+        return prefix.rstrip('_')
+
+    def commonSuffix(s1, s2):
+        suffix = ''
+        for i in range(-1, -min(len(s1),len(s2))-1,-1):
+            if s1[i] != s2[i]: break
+            suffix = s1[i] + suffix
+        return suffix.lstrip('_')
+    
+    for c1,c2 in duplicates:
+        s1 = c1.name
+        s2 = c2.name
+        common = commonPrefix(s1, s2)
+        if common == '': common = commonSuffix(s1, s2)
+        if common == '': common = 'VAR'
+        if common == s1 or common == s2:
+            newname = common
+        else:
+            counter = 0
+            newname = common
+            while newname in mk.vars or newname in mk.__vars_opt:
+                newname = '%s_%i' % (common,counter)
+                counter += 1
+        del mk.__vars_opt[c1.name]
+        del mk.__vars_opt[c2.name]
+        del mk.cond_vars[c1.name]
+        del mk.cond_vars[c2.name]
+        if c1.name != newname:
+            mk.vars[c1.name] = '$(%s)' % newname
+        if c2.name != newname:
+            mk.vars[c2.name] = '$(%s)' % newname
+        c1.name = c2.name = newname
+        mk.addCondVar(c1)
+    
+    if config.verbose:
+        sys.stdout.write(': %i -> %i\n' % (before, len(mk.cond_vars)))
+    
+    return len(duplicates) > 0
+
 
 
 def replaceEscapeSequences():
@@ -247,7 +312,10 @@ def finalize():
     # purge unused options, cond vars and make vars:
     while purgeUnusedOptsVars():
         finalEvaluation()
+    
+    # eliminate duplicates in cond vars:
+    if eliminateDuplicateCondVars():
+        finalEvaluation()
 
     # replace \$ with $:
     replaceEscapeSequences()
-
