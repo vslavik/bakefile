@@ -101,6 +101,39 @@ AC_DEFUN(AC_BAKEFILE_PLATFORM,
 ])
 
 
+dnl ---------------------------------------------------------------------------
+dnl AC_BAKEFILE_PLATFORM_SPECIFICS
+dnl
+dnl Sets misc platform-specific settings
+dnl ---------------------------------------------------------------------------
+
+AC_DEFUN(AC_BAKEFILE_PLATFORM_SPECIFICS,
+[
+    AC_ARG_ENABLE([omf], [  --enable-omf            use OMF object format (OS/2)],
+                  [bk_os2_use_omf="$enableval"])
+    
+    case "${BAKEFILE_HOST}" in
+      *-*-darwin* )
+        dnl For Unix to MacOS X porting instructions, see:
+        dnl http://fink.sourceforge.net/doc/porting/porting.html
+        CFLAGS="$CFLAGS -fno-common"
+        CXXFLAGS="$CXXFLAGS -fno-common"
+        ;;
+
+      *-pc-os2_emx | *-pc-os2-emx )
+        if test "x$bk_os2_use_omf" = "xyes" ; then
+            AR=emxomfar
+            RANLIB=:
+            LDFLAGS="-Zomf $LDFLAGS"
+            CFLAGS="-Zomf $CFLAGS"
+            CXXFLAGS="-Zomf $CXXFLAGS"
+            OS2_LIBEXT=".lib"
+        else
+            OS2_LIBEXT=".a"
+        fi
+        ;;
+    esac
+])
 
 dnl ---------------------------------------------------------------------------
 dnl AC_BAKEFILE_SUFFIXES
@@ -114,9 +147,10 @@ AC_DEFUN(AC_BAKEFILE_SUFFIXES,
     SO_SUFFIX="so"
     SO_SUFFIX_MODULE="so"
     EXEEXT=""
-    LIBPREFIX=lib
-    DLLPREFIX=lib
-    DLLPREFIX_MODULE=
+    LIBPREFIX="lib"
+    LIBEXT=".a"
+    DLLPREFIX="lib"
+    DLLPREFIX_MODULE=""
     
     case "${BAKEFILE_HOST}" in
         *-hp-hpux* )
@@ -148,6 +182,7 @@ AC_DEFUN(AC_BAKEFILE_SUFFIXES,
             EXEEXT=".exe"
             DLLPREFIX=""
             LIBPREFIX=""
+            LIBEXT=$OS2_LIBEXT
         ;;
         powerpc-*-darwin* )
             SO_SUFFIX="dylib"
@@ -159,6 +194,7 @@ AC_DEFUN(AC_BAKEFILE_SUFFIXES,
     AC_SUBST(SO_SUFFIX_MODULE)
     AC_SUBST(EXEEXT)
     AC_SUBST(LIBPREFIX)
+    AC_SUBST(LIBEXT)
     AC_SUBST(DLLPREFIX)
     AC_SUBST(DLLPREFIX_MODULE)
 ])
@@ -229,11 +265,6 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
       ;;
 
       *-*-darwin* )
-        dnl For Unix to MacOS X porting instructions, see:
-        dnl http://fink.sourceforge.net/doc/porting/porting.html
-        CFLAGS="$CFLAGS -fno-common"
-        CXXFLAGS="$CXXFLAGS -fno-common"
-        
         dnl Most apps benefit from being fully binded (its faster and static
         dnl variables initialized at startup work).
         dnl This can be done either with the exe linker flag -Wl,-bind_at_load
@@ -754,6 +785,7 @@ AC_DEFUN(AC_BAKEFILE,
     fi
     AC_BAKEFILE_GNUMAKE
     AC_BAKEFILE_PLATFORM
+    AC_BAKEFILE_PLATFORM_SPECIFICS
     AC_BAKEFILE_SUFFIXES
     AC_BAKEFILE_SHARED_LD
     AC_BAKEFILE_SHARED_VERSIONS

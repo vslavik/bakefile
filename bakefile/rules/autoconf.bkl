@@ -11,6 +11,7 @@
     <option name="SHARED_LD_CXX"/>
     <option name="SHARED_LD_MODULE_CC"/>
     <option name="SHARED_LD_MODULE_CXX"/>
+    <option name="LIBEXT"/>
     <option name="LIBPREFIX"/>
     <option name="SO_SUFFIX"/>
     <option name="SO_SUFFIX_MODULE"/>
