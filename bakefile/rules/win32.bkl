@@ -24,6 +24,6 @@
     <set var="INSTALL_DATA">$(INSTALL_PROGRAM)</set>
     <set var="INSTALL_DIR">mkdir</set>
 
-    <set var="RM">-erase</set>
+    <set var="RM">-del</set>
 
 </makefile>
