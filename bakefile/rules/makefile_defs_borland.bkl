@@ -48,7 +48,7 @@
     <set var="__FLAG_MULTI_THREADING"/>
     
     <set var="__MAKEARGS" eval="0">
-        $(' '.join(['-D%s=$(%s)' % (x,x) for x in OPTIONS.split()]))
+        $(' '.join(['-D%s="$(%s)"' % (x,x) for x in OPTIONS.split()]))
     </set>
     <set var="MAKEARGS" make_var="1">$(__MAKEARGS)</set>
     
