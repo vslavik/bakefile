@@ -171,7 +171,7 @@ def makeCondition(cond_str):
                 return None
         condexpr_list.append(Condition.Expr(options[name], value))
 
-    cname = '_'.join(['%s%s' % (e.option.name.upper(),
+    cname = '_'.join(['%s_%s' % (e.option.name.upper(),
                                  str(e.value).upper()) for \
                       e in condexpr_list])
     if cname in conditions:
