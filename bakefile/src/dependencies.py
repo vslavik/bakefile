@@ -23,7 +23,7 @@
 
 import cPickle, os.path, time
 
-DEPS_FORMAT_VERSION = 3
+DEPS_FORMAT_VERSION = 4
 
 class DepsRecord:
     def __init__(self):
@@ -32,6 +32,7 @@ class DepsRecord:
 
 deps_db = {}
 modtimes_db = {}
+cmdlines_db = {}
 
 def addDependency(bakefile, format, dependency_file):
     """Adds file 'dependency_file' as dependency of bakefile being
@@ -50,6 +51,12 @@ def addOutput(bakefile, format, output_file, output_method):
         deps_db[key] = DepsRecord()
     deps_db[key].outputs.append((output_file, output_method))
     modtimes_db[output_file] = int(time.time())
+
+def addCmdLine(bakefile, format, cmdline):
+    """Records that command line arguments `cmdline' were used when
+       generating this bakefile."""
+    key = (bakefile,format)
+    cmdlines_db[key] = cmdline
     
 def save(filename):
     """Saves dependencies database to a file."""
@@ -57,36 +64,42 @@ def save(filename):
     cPickle.dump(DEPS_FORMAT_VERSION, f, 1)
     cPickle.dump(deps_db, f, 1)
     cPickle.dump(modtimes_db, f, 1)
+    cPickle.dump(cmdlines_db, f, 1)
     f.close()
 
 def load(filename):
     """Loads dependencies database from a file."""
     f = open(filename,'rb')
-    global deps_db, modtimes_db
+    global deps_db, modtimes_db, cmdlines_db
     version = cPickle.load(f)
     if version != DEPS_FORMAT_VERSION:
         raise IOError()
-    db = cPickle.load(f)
-    if len(deps_db) == 0:
-        deps_db = db
-    else:
-        for k in db:
-            deps_db[k] = db[k]
-    db = cPickle.load(f)
-    if len(modtimes_db) == 0:
-        modtimes_db = db
-    else:
-        for k in db:
-            modtimes_db[k] = db[k]
-    f.close()
+
+    def __loadDb(f, orig_db):
+        db = cPickle.load(f)
+        if len(orig_db) == 0:
+            return db
+        else:
+            for k in db:
+                orig_db[k] = db[k]
+            return orig_db
+        
+    deps_db = __loadDb(f, deps_db)
+    modtimes_db = __loadDb(f, modtimes_db)
+    cmdlines_db = __loadDb(f, cmdlines_db)
 
 
-def needsUpdate(bakefile, format):
+def needsUpdate(bakefile, format, cmdline):
     """Determines whether the generated makefile in given format from the
-       bakefile needs updating."""
+       bakefile needs updating, assuming bakefile will be called with
+       arguments in `cmdline'."""
     key = (bakefile, format)
-    if key not in deps_db:
-        # no knowledge of deps or output, must regen:
+    if (key not in deps_db) or (key not in cmdlines_db):
+        # no knowledge of deps or output or command line, must regen:
+        return 1
+
+    # bakefile invocation changed, may affect the output:
+    if cmdline != cmdlines_db[key]:
         return 1
 
     bakefile_time = os.stat(bakefile).st_mtime

@@ -4,6 +4,8 @@ Version 0.1.4
 
 - windows makefiles: fixed "clean" target to clean subprojects
 - added <exename> tag
+- changes to bakefile flags in Bakefiles.bkgen are now considered when
+  determining whether a makefile is out of date
 
 
 Version 0.1.3

@@ -229,7 +229,9 @@ def updateTargets(jobs):
     for f in files:
         for fmt in files[f].formats:
             total += 1
-            if dependencies.needsUpdate(os.path.abspath(f), fmt):
+            if dependencies.needsUpdate(os.path.abspath(f),
+                                        fmt,
+                                        cmdline=files[f].flags[fmt]):
                 needUpdate.append((f,fmt))
     if verbose:
         print '    ...%i out of %i will be updated' % (len(needUpdate),total)
@@ -280,6 +282,8 @@ def updateTargets(jobs):
                 try:
                     state.lock.acquire()
                     dependencies.load(tempDeps)
+                    dependencies.addCmdLine(os.path.abspath(f), fmt,
+                                            files[f].flags[fmt])
                     state.modifiedFiles += modLinesCnt
                 finally:
                     state.lock.release()
