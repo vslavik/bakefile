@@ -10,12 +10,27 @@
     <include file="win32.bkl"/>
 
 
-    <define-rule name="__compiled">
+    <define-rule name="__any">
         <template>
+            <set var="__depname">$(id)</set>
             <set var="__deps"/>
+        </template>
+    </define-rule>
+
+    <define-rule name="__compiled" extends="__any">        
+        <template>
             <set var="__sources"/>
+            <set var="__defines"/>
+            <set var="__debug">0</set>
+            <set var="__builddir" eval="0">
+                $(substituteFromDict(__debug,{'0':'Release','1':'Debug'}))
+            </set>
+            <set var="__targetdir"/>
         </template>
         <define-tag name="sources">
+        </define-tag>
+        <define-tag name="define">
+            <set var="__defines" append="1">/D$(value)</set>
         </define-tag>
 
         <define-tag name="install-to"/>
