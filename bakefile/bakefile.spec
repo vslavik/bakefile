@@ -38,7 +38,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc README THANKS doc/html
+%doc README THANKS AUTHORS NEWS doc/html
 %{_bindir}/*
 %dir %{_datadir}/bakefile
 %{_datadir}/bakefile/*
