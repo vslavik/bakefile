@@ -5,6 +5,7 @@ outputdir = $(pkgdatadir)/output
 rulesdir = $(pkgdatadir)/rules
 rulesgettextdir = $(rulesdir)/gettext
 codedir = $(pkgdatadir)/src
+codeempydir = $(codedir)/empy
 codeoptikdir = $(codedir)/optik
 
 aclocal_DATA = autoconf/bakefile.m4
