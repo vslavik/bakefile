@@ -18,18 +18,19 @@
     <option name="RESCOMP"/>
     <option name="SETFILE"/>
     <option name="PIC_FLAG"/>
-    <option name="USE_SOVERSION"><values>0 1</values></option>
-    <option name="USE_SOVERLINUX"><values>0 1</values></option>
-    <option name="USE_SOVERSOLARIS"><values>0 1</values></option>
-    <option name="USE_SOSYMLINKS"><values>0 1</values></option>
-    <option name="USE_MACVERSION"><values>0 1</values></option>
+    <option name="USE_SOVERSION"><values>0,1</values></option>
+    <option name="USE_SOVERLINUX"><values>0,1</values></option>
+    <option name="USE_SOVERSOLARIS"><values>0,1</values></option>
+    <option name="USE_SOSYMLINKS"><values>0,1</values></option>
+    <option name="USE_MACVERSION"><values>0,1</values></option>
     <option name="SONAME_FLAG"/>
     <option name="STRIP"/>
     <option name="INSTALL"/>
     <option name="INSTALL_PROGRAM"/>
     <option name="INSTALL_DATA"/>
     <option name="INSTALL_DIR"/>
-    <option name="DEPS_TRACKING"><values>0 1</values></option>
+    <option name="DEPS_TRACKING"><values>0,1</values></option>
+    <option name="GCC_PCH"><values>0,1</values></option>
 
     <!-- Platforms: -->
     <unset var="PLATFORM_UNIX"/>
@@ -79,7 +80,10 @@
     <set var="__DLL_LINKER_CXX" eval="0">$(SHARED_LD_CXX)</set>
     <set var="__MODULE_LINKER_CC" eval="0">$(SHARED_LD_MODULE_CC)</set>
     <set var="__MODULE_LINKER_CXX" eval="0">$(SHARED_LD_MODULE_CXX)</set>
-    
+
+
+    <!-- List of additional checks that bakefile.m4 should run: -->
+    <set var="AUTOCONF_CHECKS"/>
     
     <!-- =============================================================== -->
     <!--                     C/C++ dependency tracking:                  -->
@@ -97,6 +101,15 @@
     <!-- =============================================================== -->
     <!--                    Load makefile meta-backend:                  -->
     <!-- =============================================================== -->
+
+    <!-- gcc >= 3.4 precompiled headers support, see also below: -->
+    <template id="__autoconf_baset">
+        <set var="__pch_header"/>
+        <set var="__pch_file"/>
+    </template>
+    <set var="__macexe_baset">__autoconf_baset</set>
+    <set var="__dll_baset">__autoconf_baset</set>
+    <set var="__lib_baset">__autoconf_baset</set>
     
     <include file="makefile_macres.bkl"/>
     <set var="__exe_baser">__macexe</set>
@@ -234,6 +247,70 @@
     
     
     <!-- =============================================================== -->
+    <!--              GCC >= 3.4 precompiled headers support:            -->
+    <!-- =============================================================== -->
+
+    <set var="__added_pch_ac_check">0</set>
+
+    <tag-info name="precomp-headers-file"
+              position="before:precomp-headers-header"/>
+    <tag-info name="precomp-headers-header"
+        position="before:precomp-headers"/>
+    
+    <define-tag name="precomp-headers-file" rules="__compiled">
+        <set var="__pch_file">$(value)</set>
+    </define-tag>
+    <define-tag name="precomp-headers-header" rules="__compiled">
+        <set var="__pch_header">$(value)</set>
+    </define-tag>
+
+    <define-tag name="precomp-headers" rules="__compiled">
+        <if cond="value=='on'">
+            <if cond="__added_pch_ac_check=='0'">
+                <set var="__added_pch_ac_check" scope="global">1</set>
+                <set var="AUTOCONF_CHECKS" scope="global" append="1">
+                    AC_BAKEFILE_PRECOMP_HEADERS$(LF)
+                </set>
+            </if>
+            
+            <set var="__gcc_pch_dir">
+                .pch$(addPrefixIfNotEmpty('/', __pch_file))
+            </set>
+            <set var="__gcc_pch_file">
+                $(__gcc_pch_dir)/$(__pch_header).gch
+            </set>
+            <!-- must look into this directory first: -->
+            <set var="PCH_INC">
+                <if cond="GCC_PCH=='1'">-I$(__gcc_pch_dir)</if>
+            </set> 
+            <set var="__cppflags">$(PCH_INC) $(__cppflags)</set>
+
+            <set var="__gcc_pch_cmd" eval="0">
+                $(ifthenelse(__uses_cxx,CXX,CC)+' '+ifthenelse(__uses_cxx,
+                             '$(%s_CXXFLAGS)' % id.upper(),
+                             '$(%s_CFLAGS)' % id.upper()))
+            </set>
+
+            <if cond="__gcc_pch_file not in targets">
+                <add-target target="$(__gcc_pch_file)"
+                            type="action" cond="GCC_PCH=='1'"/>
+                <modify-target target="$(__gcc_pch_file)">
+                    <command>
+                        $(top_builddir)./bk-make-pch $(__gcc_pch_file) $(__pch_header) $(ref("__gcc_pch_cmd",id))
+                    </command>
+                </modify-target>
+            </if> 
+
+            <set var="PCH_DEP">
+                <if cond="GCC_PCH=='1'">$(__gcc_pch_file)</if>
+            </set> 
+            <set var="__deps">$(PCH_DEP) $(__deps)</set>
+        </if>
+    </define-tag>
+    
+    
+    
+    <!-- =============================================================== -->
     <!--                     "make install-strip":                       -->
     <!-- =============================================================== -->
 
@@ -261,7 +338,7 @@
     <action id="clean" template="__phony">
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
         <command>            
-            rm -rf $(__builddir)/.deps
+            rm -rf $(__builddir)/.deps $(__builddir)/.pch
             $(RM) $(__builddir)/*$(OBJEXT)
         </command>
     </action>
@@ -273,8 +350,7 @@
     <action id="distclean" template="__phony">
         <depends>clean</depends>
         <command>
-            $(RM) configure config.cache config.log config.status
-            $(RM) bk-deps shared-ld-sh
+            $(RM) configure config.cache config.log config.status bk-deps bk-make-pch shared-ld-sh Makefile
         </command>
     </action>
 
@@ -285,7 +361,7 @@
     
     <!-- see format_features.bkl for explanation: -->
     <set var="FORMAT_OUTPUT_VARIABLES">
-        __targetdir,__targetname,__deps,__command,__is_phony
+        __targetdir,__targetname,__deps,__command,__is_phony,AUTOCONF_CHECKS
     </set>    
     <set var="FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS">0</set>
 

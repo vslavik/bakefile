@@ -8,7 +8,7 @@
     <!-- =============================================================== -->
 
     <define-rule name="__macexe">
-        <template>
+        <template template="$(__macexe_baset)">
             <set var="__mac_setfile" eval="0">
                 $(SETFILE) -t APPL $(__targetname)
             </set>
