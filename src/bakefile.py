@@ -3,7 +3,7 @@
 
 BAKEFILE_VERSION = "0.1.1"
 
-import sys
+import sys, os.path
 from optik import OptionParser
 import formats
 
@@ -57,7 +57,6 @@ def run(args):
         sys.exit(1)
     
     if options.includes != None:
-        import os.path
         for p in options.includes:
             config.searchPath.append(os.path.normpath(p))
 
