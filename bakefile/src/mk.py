@@ -102,7 +102,7 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
             raise errors.Error("failed to set variable: %s" % e)
     else:
         v = value
-    if append:
+    if append and name in store:
         store[name] = '%s %s' % (store[name], v)
     else:
         store[name] = v
