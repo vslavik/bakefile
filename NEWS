@@ -2,6 +2,7 @@ Version 0.1.8
 -------------
 
 - gnu: define PLATFORM_UNIX
+- gnu: implemented dependencies tracking
 
 
 Version 0.1.7

@@ -1,15 +1,31 @@
 <?xml version="1.0" ?>
 <!-- $Id$ -->
 
-<!-- 
-This file is common to all formats that share Unix way of writing 
-makefiles (most notably GNU Make and Autoconf formats).
--->
-
 <makefile>
     
     <if cond="FORMAT!='mingw'">
         <include file="makefile_defs_unix.bkl"/>
+    
+        <!-- 
+          We define compilation differently for GNU than for generic Unix:
+            * dependencies tracking is used
+            * we can use $< even in non-suffix rules -> smaller makefiles
+          -->
+        <set var="CPPDEPS" make_var="1">
+        -MT$(DOLLAR)@ -MF`echo $(DOLLAR)@ | sed -e 's,\.o$(DOLLAR)$(DOLLAR),.d,'` -MD
+        </set>
+        
+        <template id="__commands_templ_C">
+            <set var="__COMPILE_C_CMD" eval="0">
+                $(CCC) -c -o $@ $(__cflags) $(CPPDEPS) $&lt;
+            </set>
+        </template>
+        <template id="__commands_templ_CXX">
+            <set var="__COMPILE_CXX_CMD" eval="0">
+                $(CXXC) -c -o $@ $(__cxxflags) $(CPPDEPS) $&lt;
+            </set>
+        </template>
+    
     </if>
     
     <set var="AROPTIONS">rcu</set>
