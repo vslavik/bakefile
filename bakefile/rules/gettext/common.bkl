@@ -7,8 +7,13 @@
         
         <template>
             <set var="__srcdir">$(SRCDIR)</set>
-            <set var="linguas"/>
             <set var="catalog">noname</set>
+            
+            <set var="linguas_value"/>
+            <set var="linguas">
+                $(createMakeVar(id, 'linguas_value', 'LINGUAS'))
+            </set>
+            
         </template>
         
         <define-tag name="srcdir">
@@ -20,7 +25,7 @@
         </define-tag>
 
         <define-tag name="linguas">
-            <set var="linguas" append="1">$(value)</set>
+            <set var="linguas_value" append="1">$(value)</set>
         </define-tag>
 
         <!-- only autoconf backend has meaningful 'make install' -->
