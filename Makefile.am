@@ -41,7 +41,6 @@ rules_DATA =  rules/autoconf.bkl \
               rules/msvc.bkl \
               rules/msvc6prj.bkl \
               rules/msvc_common.bkl \
-              rules/msvc_utils.py \
               rules/mingw.bkl \
               rules/watcom.bkl \
               rules/unixlike.bkl \
