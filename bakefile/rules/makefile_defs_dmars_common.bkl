@@ -29,7 +29,7 @@
 
     <!-- basic compiler/linker flags: -->
     <set var="__FLAG_EXE_CONSOLE"></set>
-    <set var="__FLAG_EXE_GUI">/exet:nt/su:windows:4.0</set>
+    <set var="__FLAG_EXE_GUI">/su:windows:4.0</set>
     <set var="__FLAG_DEBUG_ON">-g</set>
     <set var="__FLAG_DEBUG_ON_LINKER">/DEBUG /CODEVIEW</set>
     <set var="__FLAG_DEBUG_OFF"></set>
