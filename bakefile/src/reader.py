@@ -197,6 +197,10 @@ def handleSet(e, target=None, add_dict=None):
         doAppend = 1
     else:
         doAppend = 0
+    if 'prepend' in e.props and e.props['prepend'] == '1':
+        doPrepend = 1
+    else:
+        doPrepend = 0
     store_in = None
     if 'scope' in e.props:
         sc = evalConstExpr(e, e.props['scope'], target=target)
@@ -216,7 +220,7 @@ def handleSet(e, target=None, add_dict=None):
  
     mk.setVar(name, value, eval=doEval, target=target,
               add_dict=add_dict, store_in=store_in,
-              append=doAppend, overwrite=overwrite,
+              append=doAppend, prepend=doPrepend, overwrite=overwrite,
               makevar=isMakeVar, hints=hints)
     errors.popCtx()
 

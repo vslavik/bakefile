@@ -202,7 +202,7 @@ def addFragment(fragment):
     fragments.append(fragment)
 
 def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
-           append=0, overwrite=1, makevar=0, hints=''):
+           append=0, prepend=0, overwrite=1, makevar=0, hints=''):
 
     if hints != '':
         mk.vars_hints[name] = hints.split(',')
@@ -245,6 +245,9 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
             store[name] = '%s %s' % (store[name], v)
         else:
             store[name] = v
+        # note that if prepend=append=1, v is added twice:
+        if prepend:
+            store[name] = '%s %s' % (v, store[name])
 
 def unsetVar(name):
     if name in vars:

@@ -26,7 +26,7 @@
             Sets a variable. There are two forms of the command. The first
             one if for setting variables unconditionally:
             <programlisting><![CDATA[
-<set var="NAME" [append="APP"] [overwrite="OVERWRITE"]
+<set var="NAME" [append="APP"] [prepend="PREP"] [overwrite="OVERWRITE"]
      [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]>
   VALUE
 </set>
@@ -35,7 +35,7 @@
             from C and is used to set the variable to one of possible values
             depending on certain condition:
             <programlisting><![CDATA[
-<set var="NAME" [append="APP"] [overwrite="OVERWRITE"]
+<set var="NAME" [append="APP"] [prepend="PREP"] [overwrite="OVERWRITE"]
      [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]>
   <if cond="COND">VALUE</if>
   [
@@ -79,13 +79,32 @@
                   <listitem>
                       <para>
                           If 1, the value is appended to previous value of the
-                          variable if it is already define (otherwise the
+                          variable if it is already defined (otherwise the
                           command behaves as if append=0).
                           Following two <function>set</function>
                           commands are equivalent:
                           <programlisting><![CDATA[
 <set var="FOO" append="1">something</set>
 <set var="FOO">$(FOO) something</set>
+]]></programlisting>
+                      </para>
+                      <para role="default">
+                          Default value: 0
+                      </para>
+                  </listitem>
+              </varlistentry>
+              <varlistentry>
+                  <term>prepend</term>
+                  <listitem>
+                      <para>
+                          If 1, the value is prepended in front of previous 
+                          value of the variable if it is already defined
+                          (otherwise the command behaves as if prepend=0).
+                          Following two <function>set</function>
+                          commands are equivalent:
+                          <programlisting><![CDATA[
+<set var="FOO" prepend="1">something</set>
+<set var="FOO">something $(FOO)</set>
 ]]></programlisting>
                       </para>
                       <para role="default">
