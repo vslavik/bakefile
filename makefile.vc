@@ -19,6 +19,9 @@ src\bakefile_gen.exe: src\win32scriptwrapper.c
 
 EXTENSION_SRC = src\bottlenecks.c src\bottlenecks_wrap.c
 
+src\bottlenecks_wrap.c: src\bottlenecks.i
+	swig -python src\bottlenecks.i
+
 src\_bottlenecks.pyd: $(EXTENSION_SRC)
 	cl $(CFLAGS) $(LDFLAGS) /LD /Fe$@ $(EXTENSION_SRC)
 
@@ -26,4 +29,5 @@ clean:
 	-erase *.obj
 	-erase src\bakefile.exe
 	-erase src\bakefile_gen.exe
-	-erase src\_bottlenecks.pyd
+	-erase src\_bottlenecks.lib src\_bottlenecks.exp src\_bottlenecks.pyd
+	-erase src\bottlenecks_wrap.c
