@@ -45,7 +45,7 @@
     <set var="__FLAG_WARNINGS_MAX">/W4</set>
     <set var="__FLAG_RTTI_ON">/GR</set>
     <set var="__FLAG_RTTI_OFF"></set>
-    <set var="__FLAG_EXCEPTIONS_ON">/GX</set>
+    <set var="__FLAG_EXCEPTIONS_ON">/EHsc</set>
     <set var="__FLAG_EXCEPTIONS_OFF"></set>
 
     <!-- rules building blocks: -->
