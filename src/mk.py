@@ -6,6 +6,7 @@ vars = {}
 override_vars = {}
 options = {}
 cond_vars = {}
+make_vars = {}
 targets = {}
 templates = {}
 conditions = {}
@@ -93,6 +94,10 @@ def addCondVar(cv):
     cond_vars[cv.name] = cv
     __vars_opt[cv.name] = '$(%s)' % cv.name
 
+def addMakeVar(var, value):
+    make_vars[var] = value
+    vars[var] = '$(%s)' % var
+
 def addTarget(target):
     # add the target:
     targets[target.id] = target
@@ -101,10 +106,13 @@ def addFragment(fragment):
     fragments.append(fragment)
 
 def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
-           append=0, overwrite=1):
+           append=0, overwrite=1, makevar=0):
     if store_in != None: store = store_in
     elif target != None: store = target.vars
     else:                store = vars
+
+    if makevar and vars['FORMAT_HAS_VARIABLES'] != '1':
+        makevar = 0
     
     if (name in override_vars) and (store == vars):
         return # values of user-overriden variables can't be changed
@@ -122,10 +130,13 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
             raise errors.Error("failed to set variable: %s" % e)
     else:
         v = value
-    if append and name in store:
-        store[name] = '%s %s' % (store[name], v)
+    if makevar:
+        addMakeVar(name, v)
     else:
-        store[name] = v
+        if append and name in store:
+            store[name] = '%s %s' % (store[name], v)
+        else:
+            store[name] = v
 
 def unsetVar(name):
     if name in vars:
@@ -158,11 +169,12 @@ def evalCondition(cond):
             try:
                 if evalExpr('$(%s)' % c, use_options=0) == '0':
                     return '0'
-            except NameError: pass        
+            except NameError: pass
         return None
 
 def makeCondition(cond_str):
     cond_list = __splitConjunction(cond_str)
+    cond_list.sort()
     condexpr_list = []
     for cond in cond_list:
         if evalCondition(cond) == '1': continue
@@ -187,12 +199,24 @@ def makeCondition(cond_str):
         return conditions[cname]
     else:
         c = Condition(cname, condexpr_list)
-        conditions[cname] = c
+        addCondition(c)
         return c
+
+def mergeConditions(cond1, cond2):
+    if cond1 == None or len(cond1.exprs) == 0: return cond2
+    if cond2 == None or len(cond2.exprs) == 0: return cond1
+
+    parts1 = [ "%s=='%s'" % (x.option.name,x.value) for x in cond1.exprs ]
+    parts2 = [ "%s=='%s'" % (x.option.name,x.value) for x in cond2.exprs ]
+    for p in parts2:
+        if p not in parts1:
+            parts1.append(p)
+    
+    return makeCondition(' and '.join(parts1))
 
 __curNamespace = {}
 
-def __evalPyExpr(expr, use_options=1, target=None, add_dict=None):
+def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     if use_options:
         vlist = [__vars_opt, vars]
     else:
@@ -215,10 +239,10 @@ def __evalPyExpr(expr, use_options=1, target=None, add_dict=None):
     __curNamespace = oldNS
     return str(val)
 
-def __doEvalExpr(e, varCallb, textCallb,
+def __doEvalExpr(e, varCallb, textCallb, moreArgs,
                  use_options=1, target=None, add_dict=None):
     if textCallb == None:
-        textCallb = lambda x: x
+        textCallb = lambda y,x: x
     lng = len(e)
     i = 0
     txt = ''
@@ -226,7 +250,7 @@ def __doEvalExpr(e, varCallb, textCallb,
     while i < lng-1:
         if e[i] == '$' and e[i+1] == '(' and (i == 0 or e[i-1] != '\\'):
             if txt != '':
-                output += textCallb(txt)
+                output += textCallb(moreArgs, txt)
             txt = ''
             code = ''
             i += 2
@@ -235,7 +259,8 @@ def __doEvalExpr(e, varCallb, textCallb,
                 if e[i] == ')':
                     braces -= 1
                     if braces == 0:
-                        output += varCallb(code, use_options, target, add_dict)
+                        output += varCallb(moreArgs,
+                                           code, use_options, target, add_dict)
                         break
                     else:
                         code += e[i]
@@ -255,12 +280,16 @@ def __doEvalExpr(e, varCallb, textCallb,
         else:
             txt += e[i]
         i += 1
-    output += textCallb(txt + e[i:])
+    output += textCallb(moreArgs, txt + e[i:])
     return output
 
 
 def evalExpr(e, use_options=1, target=None, add_dict=None):    
-    return __doEvalExpr(e, __evalPyExpr, None, use_options, target, add_dict)
+    return __doEvalExpr(e, __evalPyExpr, None,
+                        moreArgs=None,
+                        use_options=use_options, 
+                        target=target, 
+                        add_dict=add_dict)
 
 
 def importPyModule(modname):

@@ -1,5 +1,5 @@
 
-import mk, errors
+import mk, errors, config, sys
 import os
 
 
@@ -35,7 +35,7 @@ def ref(var, target=None):
 
 def makeUniqueCondVarName(name):
     """Creates name for cond. var."""
-    n = nb = '__%s' % (name.replace('-','_'))
+    n = nb = '__%s' % (name.replace('-','_').replace('.','_'))
     i = 1
     while n in mk.cond_vars:
         n = '%s_%i' % (nb, i)
@@ -45,16 +45,16 @@ def makeUniqueCondVarName(name):
 
 substVarNameCounter = 0
 
-def substitute(str, callback, desc=None):
-    """Calls callback to substitute text in str by something else. Works with
-       conditional variables, too."""
+def substitute2(str, callback, desc=None, cond=None):
+    """Same as substitute, but the callbacks takes two arguments (text and
+       condition object) instead of one."""
 
     if desc == None:
         global substVarNameCounter
         desc = '%i' % substVarNameCounter
         substVarNameCounter += 1
     
-    def callbackVar(expr, use_options, target, add_dict):
+    def callbackVar(cnd, expr, use_options, target, add_dict):
         if expr not in mk.cond_vars:
             raise errors.Error("'%s' can't be used in this context, "%expr +
                                "not a conditional variable")
@@ -62,20 +62,29 @@ def substitute(str, callback, desc=None):
         var = mk.CondVar(makeUniqueCondVarName('%s_%s' % (cond.name, desc)))
         mk.addCondVar(var)
         for v in cond.values:
+            cond2 = mk.mergeConditions(cnd, v.cond)
             if '$' in v.value:
-                var.add(v.cond, substitute(v.value, callback, desc))
+                var.add(v.cond, substitute2(v.value, callback, desc, cond2))
             else:
                 if len(v.value) == 0 or v.value.isspace():
                     var.add(v.cond, v.value)
                 else:
-                    var.add(v.cond, callback(v.value))
+                    var.add(v.cond, callback(cond2, v.value))
         return '$(%s)' % var.name
 
-    def callbackTxt(expr):
+    def callbackTxt(cond, expr):
         if len(expr) == 0 or expr.isspace(): return expr
-        return callback(expr)
+        return callback(cond, expr)
     
-    return mk.__doEvalExpr(str, callbackVar, callbackTxt)
+    return mk.__doEvalExpr(str, callbackVar, callbackTxt, cond)
+
+
+def substitute(str, callback, desc=None):
+    """Calls callback to substitute text in str by something else. Works with
+       conditional variables, too."""
+    def callb(cond, s):
+        return callback(s)
+    return substitute2(str, callb, desc)
 
 
 def substituteFromDict(str, dict, desc=None):
@@ -104,8 +113,6 @@ def findSources(filenames):
                       'SOURCEFILES')
 
 
-__src2obj = {}
-
 def sources2objects(sources, target, ext, objSuffix=''):
     """Adds rules to compile object files from source files listed in
        'sources', when compiling target 'target', with object files extension
@@ -124,22 +131,28 @@ def sources2objects(sources, target, ext, objSuffix=''):
     #<makefile>
     #<%s id="%s">
     #    <parent-target>%s</parent-target>
+    #    <dst>%s</dst>
     #    <src>%s</src>
     #</%s>
     #</makefile>"""
     cRoot = xmlparser.Element()
     cTarget = xmlparser.Element()
     cSrc = xmlparser.Element()
+    cDst = xmlparser.Element()
     cParent = xmlparser.Element()
     cRoot.name = 'makefile'
     cRoot.children = [cTarget]
     cRoot.value = ''
-    cTarget.children = [cParent,cSrc]
+    cTarget.children = [cParent,cSrc,cDst]
     cParent.name = 'parent-target'
     cTarget.value = ''
     cSrc.name = 'src'
+    cDst.name = 'dst'
+    cParent.value = target
 
-    def callback(sources):
+    files = {}
+
+    def callback(cond, sources):
         prefix = suffix = ''
         if sources[0].isspace(): prefix=' '
         if sources[-1].isspace(): suffix=' '
@@ -148,31 +161,128 @@ def sources2objects(sources, target, ext, objSuffix=''):
             base, srcext = os.path.splitext(s)
             base = os.path.basename(base)
             objdir = mkPathPrefix(mk.vars['BUILDDIR'])
-            index = (target,s,ext,objSuffix)
-            if index not in __src2obj:
-                obj = '%s%s%s%s' % (objdir, base, objSuffix, ext)
-                if obj in mk.targets:
-                    obj = '%s%s-%s%s%s' % (objdir, mk.targets[target].id, base,
-                                           objSuffix, ext)
-                    num=0
-                    while obj in mk.targets:
-                        num += 1
-                        obj = '%s%s-%s%i%s%s' % (objdir, mk.targets[target].id,
-                                                 base, num, objSuffix, ext)
-                rule = '__%s-to-%s' % (srcext[1:], ext[1:])
-                # 4 lines below are equivalent of:
-                # code2 = code % (rule, obj, target, s, rule)
-                cTarget.name = rule
-                cTarget.props['id'] = obj
-                cParent.value = target
-                cSrc.value = s
-                reader.processXML(cRoot)
-                __src2obj[index] = obj
-            retval.append(__src2obj[index])
+            objname = '%s%s-%s%s%s' % (objdir, mk.targets[target].id, base,
+                                       objSuffix, ext)
+            if objname in files:
+                files[objname].append((s,cond))
+            else:
+                files[objname] = [(s,cond)]
+            retval.append(objname)
         return '%s%s%s' % (prefix, ' '.join(retval), suffix)
+            
+    def addRule(id, obj, src, cond):
+        base, srcext = os.path.splitext(src)
+        rule = '__%s-to-%s' % (srcext[1:], ext[1:])
+        cTarget.name = rule
+        cTarget.props['id'] = id
+        cSrc.value = src
+        cDst.value = obj
+        reader.processXML(cRoot)
+        # CAUTION! A hack to disable creating unneeded variables:
+        #          We don't pass condition as part of target's XML
+        #          specification because that would create __depname
+        #          conditional variable and we don't need it
+        mk.targets[id].cond = cond
 
+    def reduceConditions(cond1, cond2):
+        """Reduces conditions:
+             1) A & B, A & notB  |- A
+             2) A, A & B         |- A
+        """
+
+        all = {}
+        for e in cond1.exprs:
+            all[e.option] = e.value
+        for e in cond2.exprs:
+            if e.option in all:
+                if e.value == all[e.option]:
+                    pass
+                elif e.value != all[e.option] and \
+                     e.option.values != None and len(e.option.values) == 2:
+                    all[e.option] = 0
+                else:
+                    return None
+        ret = []
+        for e in all:
+            if all[e] != 0:
+                ret.append("%s=='%s'" % (e.name, all[e]))
+        if len(ret) == 0:
+            return '1'
+        else:
+            return mk.makeCondition(' and '.join(ret))
+ 
     sources2 = nativePaths(sources)
-    return substitute(sources2, callback, 'OBJECTS')
+    retval = substitute2(sources2, callback, 'OBJECTS')
+    
+
+    if mk.vars['FORMAT_HAS_VARIABLES'] != '0':
+        tg = mk.targets[target]
+        mk.setVar('%s_CFLAGS' % target.upper(),
+                  '%s %s' % (tg.vars['__cppflags'], tg.vars['__cflags']),
+                  target=tg, makevar=1)
+        mk.setVar('%s_CXXFLAGS' % target.upper(),
+                  '%s %s' % (tg.vars['__cppflags'], tg.vars['__cxxflags']),
+                  target=tg, makevar=1)
+    
+    easyFiles = []
+    hardFiles = []
+    for f in files:
+        if len(files[f]) == 1:
+            easyFiles.append(f)
+        else:
+            hardFiles.append(f)
+    if config.verbose:
+        print '  making object rules (%i out of %i hard)' % \
+                  (len(hardFiles), len(hardFiles)+len(easyFiles))
+    
+    # there's only one rule for this object file, therefore we don't care
+    # about its condition, if any:
+    for f in easyFiles:
+        src, cond = files[f][0]
+        addRule(f, f, src, None)
+
+    # these files are compiled from multiple sources, so we must create
+    # conditional compilation rules:
+    for f in hardFiles:
+        srcfiles = {}
+        for x in files[f]:
+            src, cond = x
+            if src not in srcfiles:
+                srcfiles[src] = [cond]
+            else:
+                srcfiles[src].append(cond)
+        i = 1
+        for s in srcfiles:
+            conds = srcfiles[s]
+            if len(conds) > 1:
+                changes = 0
+                #print s, len(conds)
+                #print [ x.name for x in conds ]
+                lng = len(conds)
+                for c1 in range(0,lng):
+                    for c2 in range(c1+1,lng):
+                        r = reduceConditions(conds[c1], conds[c2])
+                        if r != None:
+                            conds[c1] = 0
+                            if r == '1':
+                                conds[c2] = None
+                            else:
+                                conds[c2] = r
+                            changes = 1
+                            break
+                #if changes:
+                #    for c in [ x for x in conds if x != 0 ]:
+                #        if c == None:
+                #            print 'no cond'
+                #        else:
+                #            print 'cond: ',c.name
+            for cond in conds:
+                if cond == 0: continue
+                addRule('%s%i' % (f,i), f, s, cond)
+                i += 1
+            
+
+    return retval
 
 
 def formatIfNotEmpty(fmt, value):
