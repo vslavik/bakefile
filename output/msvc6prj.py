@@ -104,6 +104,9 @@ def genWorkspaces():
     genDSW([t for t in targets if t.__kind == 'project'], dsp_list)
     for t, filename, prjname in dsp_list:
         genDSP(t, filename, prjname)
+    # warn about <action> targets that we can't handle (yet):
+    for t in [t for t in targets if t.__kind == 'action']:
+        print "warning: ignoring action target '%s'" % t.id
 
 
 # ------------------------------------------------------------------------
@@ -122,7 +125,6 @@ def mkFlags(keyword, lines):
 
 
 def genDSP(t, filename, prjname):
-
     # Create header and list of configurations:
     
     default_cfg = t.configs.keys()[0]
@@ -226,6 +228,20 @@ BSC32=bscmake.exe
             if snat not in sources:
                 sources[snat] = None
 
+    # Find files with custom build associated with them and retrieve
+    # custom build's code
+    filesWithCustomBuild = {}
+    for c in t.configs:
+        cbf = t.configs[c].__custom_build_files
+        if len(cbf) == 0 or cbf.isspace(): continue
+        for f in cbf.split():
+            filesWithCustomBuild[f] = {}
+    for f in filesWithCustomBuild:
+        fname = f.replace('.','_').replace('\\','_')
+        for c in t.configs:
+            filesWithCustomBuild[f][c] = \
+                   eval ('t.configs[c].__custom_build_%s' % fname)
+
     # (sort the files into groups)
     groups = ['Source Files', 'Header Files', 'Resource Files']
     group_defs = {
@@ -261,14 +277,22 @@ SOURCE=%s\%s
                 file_flags += '# ADD CPP /Yc"%s"\n' % t.__pch_header
             if src in pchExcluded:
                 file_flags += '# SUBTRACT CPP /YX /Yc /Yu\n'
-            if sources[src] != None:
-                # the file is disabled in some configurations:
+            
+            # the file is either disabled in some configurations or has
+            # custom build step associated with it:
+            if sources[src] != None or src in filesWithCustomBuild:
                 flags = []
+                old_file_flags = file_flags
                 for c in t.configs:
-                    if c not in sources[src]:
+                    if sources[src] != None and c not in sources[src]:
                         file_flags += '# PROP Exclude_From_Build 1\n'
+                    if src in filesWithCustomBuild:
+                        file_flags += \
+                          '# Begin Custom Build - %s\n\n# End Custom Build\n' %\
+                           filesWithCustomBuild[src][c]
                     flags.append('  "$(CFG)" == "%s"' % mkConfigName(t.id, c) +
                                  '\n\n' + file_flags + '\n')
+                    file_flags = old_file_flags
                 dsp += '\n!IF' + '!ELSEIF'.join(flags) + '!ENDIF\n\n'
             else:
                 dsp += file_flags

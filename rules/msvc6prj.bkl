@@ -78,7 +78,17 @@
             <set var="__pch_flags">/YX</set>
             <set var="__pch_generator"/>   <!-- if set generates pch -->
             <set var="__pch_excluded"/> <!-- files that don't use it -->
-            
+
+            <!-- 
+            Support for custom build steps, needed for not-C/C++ files
+            compilation (not yet implemented) and misc. hacks.
+            __custom_build_files variable lists all source files that have
+            associated custom build with them. For every such file, there is
+            __custom_build_FILENAME variable with build commands (FILENAME
+            is file name with ./\ replaced with _):
+            -->
+            <set var="__custom_build_files"/>
+
         </template>
         
         <define-tag name="sources">
