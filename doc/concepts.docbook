@@ -4,7 +4,7 @@
   <section id="concept.target">
     <title>Targets</title>
     <para>
-      Like in tranditional makefiles. Target is single buildable entity,
+      Like in traditional makefiles. Target is a single buildable entity,
       e.g. executable, library or DLL. See <xref linkend="ch.targets"/>
       for details.
     </para>
@@ -13,7 +13,7 @@
   <section id="concept.variables">
     <title>Variables</title>
     <para>
-      You can set and use variables in Bakefile in way very similar to other
+      You can set and use variables in Bakefile in a way very similar to other
       make programs. Variables may be either global or local to the target
       they are bound to.
       Note that variables are expanded by Bakefile and do 
@@ -31,7 +31,7 @@
   <section id="concept.template">
     <title>Templates</title>
     <para>
-      It is often the case that several targets in the makefile share same
+      It is often the case that several targets in the makefile share the same
       properties: for example, they are installed into same directory, use
       same compiler settings or include headers from same directories.
       Templates are a mechanism designed to eliminate such duplication from
@@ -73,7 +73,7 @@
     <para>
       Condition is a boolean expression that is used to conditionally
       determine values of variables and also to conditionally disable or
-      enable parts of the makefile. Conditions are are commonly used to differ
+      enable parts of the makefile. Conditions are commonly used to differ
       generated native makefiles based on output format and user settings of
       <link linkend="concept.option">options</link>.
     </para>
@@ -113,7 +113,7 @@
               The condition may only take the form of simple test for
               equality:
               <programlisting>OPTION=="VALUE"</programlisting>
-              Here, <varname>OPTION</varname> is name of already defined
+              Here, <varname>OPTION</varname> is the name of an already defined
               <link linkend="concept.option">option</link>
               <emphasis>with enumerated possible values</emphasis> and
               <varname>VALUE</varname> is one of the option's values.
@@ -133,7 +133,7 @@
       <programlisting><![CDATA[
 <set var="NUM1">1</set>
 <set var="NUM2">10</set>
-<set var="RESULT_11" cond="NUM1+NUM2==1">yes</set>
+<set var="RESULT_11" cond="NUM1+NUM2==11">yes</set>
         
 <option name="BUILD">
   <values>debug release</values>
