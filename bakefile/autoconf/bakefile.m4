@@ -665,6 +665,8 @@ dnl ---------------------------------------------------------------------------
 
 AC_DEFUN([AC_BAKEFILE],
 [
+    AC_PREREQ(2.58)
+
     if test "x$BAKEFILE_HOST" = "x"; then
         BAKEFILE_HOST="${host}"
     fi
