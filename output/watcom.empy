@@ -56,7 +56,7 @@ WATCOM_CWD = $+ $(%cdrive):$(%cwd) $-
 ### Variables: ###
 
 @[ for v in make_vars :@
-@v = @make_vars[v]
+@v = @v
 ]@
 
 

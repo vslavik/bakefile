@@ -16,7 +16,7 @@ normalOptions = [x for x in options if x.name not in specialOptions]
 ### Variables: ###
 
 @[ for v in make_vars :@
-@v = @make_vars[v]
+@v = @v
 ]@
 
 ### Conditionally set variables: ###
