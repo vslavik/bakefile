@@ -21,9 +21,9 @@
 #  Writes parsed bakefile to a makefile
 #
 
-import types, copy, sys, tempfile, os, os.path, string
+import types, copy, sys, os, os.path, string
 import mk, config, errors, dependencies
-import outmethods
+import outmethods, portautils
 from types import StringType
 
 mergeBlocks = outmethods.mergeBlocks
@@ -171,10 +171,7 @@ def invoke_em(writer, file, method):
     import empy.em
     rulesdir, template = __findWriter(writer)
     
-    filename = tempfile.mktemp('bakefile')
-    # reduce (not eliminate!) the risk of race condition by immediately
-    # creating the file:
-    tmpf = open(filename, 'wb'); tmpf.close()
+    filename = portautils.mktemp('bakefile')
     
     empy.em.invoke(['-I','mk',
                     '-I','writer',

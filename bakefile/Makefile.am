@@ -75,7 +75,8 @@ code_PYTHON = src/config.py \
 			  src/dependencies.py \
               src/outmethods.py \
 			  src/bottlenecks.py \
-			  src/containers.py
+			  src/containers.py \
+			  src/portautils.py
 codeempy_PYTHON = \
               src/empy/__init__.py \
               src/empy/em.py
@@ -95,6 +96,7 @@ _bottlenecks_la_CFLAGS = $(PYTHON_CPPFLAGS)
 EXTRA_DIST = \
     README THANKS \
     autogen.sh chversion.sh \
+	admin/swig.m4 \
     tests doc/images doc bakefile.spec bakefile.iss \
     src/optik/README.txt autoconf output rules \
     src/empy/README src/empy/COPYING \
