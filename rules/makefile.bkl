@@ -277,6 +277,8 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-rule name="__cxx-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
     <define-rule name="__cc-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
     <define-rule name="__C-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
+    <!-- this is Objective-C++, not C++, but c++ can handle it: -->
+    <define-rule name="__mm-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
     
     
     <!-- =============================================================== -->
