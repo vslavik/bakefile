@@ -118,8 +118,16 @@ if __name__ == '__main__':
         sys.stderr.write('error: Bakefile requires at least Python 2.2.2\n')
         sys.exit(1)
 
+    do_profiling = 0 # set to 1 if debugging bottlenecks
+    
     try:
-        run(sys.argv[1:])
+        if do_profiling:
+            import hotshot
+            prof = hotshot.Profile('bakefile.prof')
+            prof.runcall(run, sys.argv[1:])
+            prof.close()
+        else:
+            run(sys.argv[1:])    
     except KeyboardInterrupt:
         sys.stderr.write('\nerror: bakefile cancelled by user\n')
         sys.exit(1)
