@@ -67,7 +67,8 @@
 
     <set var="DLLIMPEXT">
         <if cond="PLATFORM_WIN32=='1'">.a</if>
-        <if cond="PLATFORM_WIN32=='0'">$(DLLEXT)</if>
+        <if cond="PLATFORM_OS2=='1'">.a</if><!-- FIXME: should be .lib -->
+        <if cond="PLATFORM_WIN32=='0' and PLATFORM_OS2=='0'">$(DLLEXT)</if>
     </set>
 
     <option name="LDFLAGS_GUI"/>   
