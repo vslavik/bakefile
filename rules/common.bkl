@@ -20,6 +20,14 @@
     <define-rule name="compilation_rule">
         <define-tag name="src">
             <set var="src">$(findSources(value))</set>
+            <if cond="FORMAT=='mingw'">
+                <!--
+                A dirty hack neeeded because mingw's gcc-2.95 doesn't like
+                \ in filenames. We can't modify DIRSEP because rules not
+                used for C/C++ compilation need correct one:
+                -->
+                <set var="src">$(src.replace('\','/'))</set>
+            </if>
             <set var="__deps" append="1">$(src)</set>
         </define-tag>
         <define-tag name="dst">
