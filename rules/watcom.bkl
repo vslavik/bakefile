@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+
+<makefile>
+    
+    <set var="COMPILER">wat</set>
+    <set var="MAKEFILE_SYNTAX">watcom</set>
+
+    <include file="makefile.bkl"/>
+
+    <!-- =============================================================== -->
+    <!--                         "make clean":                           -->
+    <!-- =============================================================== -->
+
+    <action id="clean" template="__phony">
+        <set var="__builddir" eval="0">$(BUILDDIR)</set>
+        <command>            
+            -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
+            -if exist $(__builddir)\*.res del $(__builddir)\*.res
+            -if exist $(__builddir)\*.lbc del $(__builddir)\*.lbc
+            -if exist $(__builddir)\*.ilk del $(__builddir)\*.ilk
+        </command>
+    </action>
+    
+    
+    <!-- =============================================================== -->
+    <!--                     win32 resources:                            -->
+    <!-- =============================================================== -->
+
+    <define-tag name="win32-res" rules="exe,dll">
+        <set var="__win32res">
+            option resource=$(sources2objects(value, id, '.res'))
+        </set>
+        <set var="__deps" append="1">$(__win32res)</set>
+    </define-tag>
+
+    <!-- compilation rule for .rc files:  -->
+    <define-rule name="__rc-to-res" extends="__any,compilation_rule">
+        <template>
+            <set var="__command" eval="0">
+                brcc32 -32 -r -fo$@ -i\$(BCCDIR)\include $(__win32rc_flags) $**
+            </set>
+        </template>
+        <define-tag name="parent-target">
+            <set var="__win32rc_flags">$(targets[value].__win32rc_flags)</set>
+        </define-tag>
+    </define-rule>
+
+    <!-- includes and defines should propagate to rc compilation, too: -->
+    <define-tag name="include" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('-i',value))</set>
+    </define-tag>
+    <define-tag name="define" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('-d',value))</set>
+    </define-tag>
+
+    
+    <!-- =============================================================== -->
+    <!--                            output:                              -->
+    <!-- =============================================================== -->
+    
+    <!-- see format_features.bkl for explanation: -->
+    <set var="FORMAT_OUTPUT_VARIABLES">
+        __targetdir,__targetname,__deps,__command,__is_phony
+    </set>
+
+    <output file="$(OUTPUT_FILE)" writer="watcom.empy"/>
+
+</makefile>
