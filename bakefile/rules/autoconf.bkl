@@ -97,12 +97,11 @@
         <set var="__linkname2">$(__targetname).$(__soversion1)</set>
         
         <set var="__targetnamesuf">
-                $(DLLPREFIX)$(__dllname)$(DLLEXT)
             <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='0'">
                 $(DLLEXT).$(__soversion1).$(__soversion2).$(__soversion3)
             </if>
             <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='1'">
-                $(__soversion1).$(__soversion2).$(__soversion3)$(DLLEXT)
+                .$(__soversion1).$(__soversion2).$(__soversion3)$(DLLEXT)
             </if>
         </set>
         <set var="__targetname" eval="0">
