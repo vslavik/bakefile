@@ -12,7 +12,7 @@ def dumpMakefile():
 
     print '\nConditions:'
     for c in mk.conditions.values():
-        print '  %-30s (%s=%s)' % (c.name,c.option.name,c.value)
+        print '  %-30s (%s)' % (c.name,c.exprs)
         
     print '\nConditional variables:'
     for v in mk.cond_vars.values():
