@@ -15,11 +15,11 @@ def mergeFile(filename):
     f2 = []
     for i in f:
         i = re.sub(r'\$', r'${D}', i)
+        i = re.sub(r'@([a-zA-Z0-9_]+)@', r'${\1}', i)
         i = re.sub(r'\[', r'@<:@', i)
         i = re.sub(r'\\', r'\\\\', i)
         i = re.sub(r'\]', r'@:>@', i)
         i = re.sub(r'`', r'\`', i)
-        i = re.sub(r'@([a-zA-Z0-9_]+)@', r'${\1}', i)
         f2.append(i)
     return f2
 
