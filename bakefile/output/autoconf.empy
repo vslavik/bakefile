@@ -4,7 +4,7 @@
 @empy.include(os.path.join(RULESDIR, 'autoconf-options.empy'))
 ]@
 @[ if OPTIONS_FILE != '' :
-include @OPTIONS_FILE
+include @OPTIONS_FILE.replace('.in','')
 ]@
 
 @# These are autoconf specials and must be in every Makefile.in:
