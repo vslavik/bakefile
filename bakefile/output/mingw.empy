@@ -30,7 +30,7 @@ def makeCondEnd(c):
 ### Variables: ###
 
 @[ for v in make_vars :@
-@v = @v
+@v.name = @v.value
 ]@
 
 ### Conditionally set variables: ###
