@@ -31,7 +31,7 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <set var="__DEFINE_ARG">-D</set>
     <set var="__INCLUDE_ARG">-I</set>
-    <set var="__LIB_ARG">-l</set>
+    <set var="__LIB_ARG">-l%s</set>
     <set var="__LIBDIR_ARG">-L</set>
 
     <set var="__DEFAULT_CC">cc</set>
@@ -39,6 +39,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__DEFAULT_CFLAGS"></set>
     <set var="__DEFAULT_CPPFLAGS"></set>
     <set var="__DEFAULT_CXXFLAGS"></set>
+    <set var="__DEFAULT_LDFLAGS"></set>
     
     <set var="__LINKER_CC" eval="0">$(CC)</set>
     <set var="__LINKER_CXX" eval="0">$(CXX)</set>
@@ -58,7 +59,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     </template>
     <template id="__commands_templ">
         <set var="__LINK_EXE_CMD" eval="0">
-            $(__linker) -o $@ $(__objects) $(__ldflags)
+            $(__linker) -o $@ $(__objects) $(__ldflags) $(__ldlibs)
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
             $(RM) $@
@@ -66,7 +67,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             $(RANLIB) $@
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) $@ $(__objects) $(__ldflags)
+            $(__dll_linker) $@ $(__objects) $(__ldflags) $(__ldlibs)
         </set>
     </template>
     
