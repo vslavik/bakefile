@@ -17,7 +17,7 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <set var="OBJEXT">.o</set>
     <set var="LIBEXT">.a</set>
-    <set var="LIBPREFIX">lib</set>
+    <set var="LIBPREFIX" overwrite="0">lib</set>
     <set var="EXEEXT" overwrite="0"></set>
     <set var="DLLEXT" overwrite="0">.so</set>
     <set var="DLLEXT_MODULE" overwrite="0">$(DLLEXT)</set>
