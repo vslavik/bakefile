@@ -46,12 +46,16 @@ def __copyMkToVars():
     targets = Container()
 
     mktargets = copy.copy(mk.targets)
+    
+    keys = mktargets.keys()
     priorityTargets = []
     if 'all' in mk.targets:
-        priorityTargets.append(mktargets['all'])
-        del mktargets['all']
-        
-    for tar in priorityTargets + mktargets.values():
+        priorityTargets.append('all')
+        keys.remove('all')
+
+    keys.sort()
+    for tar_i in priorityTargets + keys:
+        tar = mktargets[tar_i]
         t = Struct()
         for v in tar.vars:
             exec('t.%s = """%s"""' % (v, __valueToPy(tar.vars[v].strip())))
@@ -61,7 +65,10 @@ def __copyMkToVars():
 
     # Copy options:
     options = Container()
-    for opt in mk.options.values():
+    keys = mk.options.keys()
+    keys.sort()
+    for opt_i in keys:
+        opt = mk.options[opt_i]
         o = Struct()
         o.name = opt.name
         o.default = opt.default
@@ -76,7 +83,10 @@ def __copyMkToVars():
     
     # Copy conditions:
     conditions = Container()
-    for cond in mk.conditions.values():
+    keys = mk.conditions.keys()
+    keys.sort()
+    for cond_i in keys:
+        cond = mk.conditions[cond_i]
         c = Struct()
         c.name = cond.name
         c.exprs = cond.exprs
@@ -86,7 +96,10 @@ def __copyMkToVars():
 
     # Copy conditional variables:
     cond_vars = Container()
-    for cv in mk.cond_vars.values():
+    keys = mk.cond_vars.keys()
+    keys.sort()
+    for cv_i in keys:
+        cv = mk.cond_vars[cv_i]
         c = Struct()
         c.name = cv.name
         c.values = []
