@@ -416,8 +416,8 @@ def addPrefixToList(prefix, value):
     
     def callback(prefix, cond, sources):
         prf = suf = ''
-        if sources[0].isspace(): prefix=' '
-        if sources[-1].isspace(): suffix=' '
+        if sources[0].isspace(): prf=' '
+        if sources[-1].isspace(): suf=' '
         retval = []
         for s in sources.split():
             retval.append(prefix+s)
