@@ -3,9 +3,15 @@
 #
 # $Id$
 
-def formatDefine(value):
+def formatFlag(value, flag):
     if value == '':
         return ''
     if '=' in value:
-        return '/D %s' % value
-    return '/D "%s"' % value
+        return '%s %s' % (flag, value)
+    return '%s "%s"' % (flag, value)
+
+def formatDefine(value):
+    return formatFlag(value, '/D')
+
+def formatInclude(value):
+    return formatFlag(value, '/I')
