@@ -205,34 +205,46 @@
                 $(substituteFromDict(value,
                 {'console':'"Win32 (x86) Console Application"',
                  'gui':    '"Win32 (x86) Application"'}))
-             </set>
-             <set var="__type_code">
+            </set>
+            <set var="__type_code">
                 $(substituteFromDict(value,
                 {'console':__MSVC_TYPECODE_CONSOLE,
                 'gui':     __MSVC_TYPECODE_GUI}))
-             </set>
+            </set>
+            <ldflags>
+                $(substituteFromDict(value,
+                {'console':'/subsystem:console',
+                'gui':'/subsystem:windows'}))
+            </ldflags>
          </define-tag>
     </define-rule>
     
-    <define-rule name="dll" extends="__compiled">
+    <define-rule name="_dll" extends="__compiled">
         <template>
             <set var="__ldflags">/dll $(__ldflags)</set>
             <set var="__defines" append="1">/D "_USRDLL" /D "DLL_EXPORTS"</set>
             <set var="__type">"Win32 (x86) Dynamic-Link Library"</set>
             <set var="__type_code">$(__MSVC_TYPECODE_DLL)</set>
-            <libname>$(id)</libname>
             <dllname>$(id)</dllname>
+        </template>
+        <define-tag name="dllname">
+            <set var="__name">$(value)</set>
+            <set var="__targetname">$(value).dll</set>
+        </define-tag>
+    </define-rule>
+    
+    <define-rule name="dll" extends="_dll">
+        <template>
+            <libname>$(id)</libname>
         </template>
         <define-tag name="libname">
             <set var="__importlib">$(value).lib</set>
             <set var="__linkname">$(__importlib)</set>
             <ldflags>/implib:"$(__targetdir)$(__linkname)"</ldflags>
         </define-tag>
-        <define-tag name="dllname">
-            <set var="__name">$(value)</set>
-            <set var="__targetname">$(value).dll</set>
-        </define-tag>
     </define-rule>
+    
+    <define-rule name="module" extends="_dll"/>
     
     <define-rule name="lib" extends="__compiled">
         <template>
