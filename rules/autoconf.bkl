@@ -96,7 +96,8 @@
         <set var="__linkname1">$(__linkname)</set>
         <set var="__linkname2">$(__targetname).$(__soversion1)</set>
         
-        <set var="__targetnamereal">
+        <set var="__targetnamesuf">
+                $(DLLPREFIX)$(__dllname)$(DLLEXT)
             <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='0'">
                 $(DLLEXT).$(__soversion1).$(__soversion2).$(__soversion3)
             </if>
@@ -104,7 +105,9 @@
                 $(__soversion1).$(__soversion2).$(__soversion3)$(DLLEXT)
             </if>
         </set>
-        <set var="__targetname">$(__targetnamereal)</set>
+        <set var="__targetname" eval="0">
+            $(DLLPREFIX)$(__dllname)$(__targetnamesuf)
+        </set>
         
         <set var="__soname_flags">
             <if cond="USE_SOVERLINUX=='1'"> <!-- Linux -->
