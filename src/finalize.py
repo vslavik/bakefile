@@ -355,8 +355,11 @@ def replaceEscapeSequences():
             if type(t.vars[v]) is StringType:
                 t.vars[v] = _repl(t.vars[v])
     for o in mk.options.values():
-        if o.default == None: continue
-        o.default = _repl(o.default)
+        if o.default != None:
+            o.default = _repl(o.default)
+        if o.values != None:
+            o.values = [_repl(x) for x in o.values]
+
     for c in mk.cond_vars.values():
         for v in c.values:
             v.value = _repl(v.value)
