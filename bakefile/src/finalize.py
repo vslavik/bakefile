@@ -278,26 +278,30 @@ def eliminateDuplicateCondVars():
 
 
 def replaceEscapeSequences():
-    # Replace all occurences of \$ by $:
+    # Replace all occurences of &dollar; with $:
+
+    def _repl(s):
+        return s.replace('&dollar;', '$')
+
     if config.verbose:
         print 'replacing escape sequences'
     for v in mk.vars:
         if not (type(mk.vars[v]) is InstanceType or
                 type(mk.vars[v]) is DictType):
-            mk.vars[v] = mk.vars[v].replace('\\$', '$')
+            mk.vars[v] = _repl(mk.vars[v])
     for v in mk.make_vars:
-        mk.make_vars[v] = mk.make_vars[v].replace('\\$', '$')
+        mk.make_vars[v] = _repl(mk.make_vars[v])
     for t in mk.targets.values():
         for v in t.vars:
             if not (type(t.vars[v]) is InstanceType or
                     type(t.vars[v]) is DictType):
-                t.vars[v] = t.vars[v].replace('\\$', '$')
+                t.vars[v] = _repl(t.vars[v])
     for o in mk.options.values():
         if o.default == None: continue
-        o.default = o.default.replace('\\$', '$')
+        o.default = _repl(o.default)
     for c in mk.cond_vars.values():
         for v in c.values:
-            v.value = v.value.replace('\\$', '$')
+            v.value = _repl(v.value)
 
 
 
@@ -332,9 +336,9 @@ def finalize():
     if eliminateDuplicateCondVars():
         finalEvaluation()
 
-    # replace \$ with $:
-    replaceEscapeSequences()
-
     if mk.vars['FORMAT_SUPPORTS_CONDITIONS'] != '1':
         import flatten
         flatten.flatten()
+    
+    # replace \$ with $:
+    replaceEscapeSequences()

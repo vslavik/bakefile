@@ -82,10 +82,10 @@
                 <if cond="TOOLSET=='unix'">
                     $(INSTALL_DIR) $(__dstdir)
                     for f in $(__files); do \
-                        if test ! -d $(__dstdir)/`dirname \$\$f` ; then \
-                            $(INSTALL_DIR) $(__dstdir)/`dirname \$\$f`; \
+                        if test ! -d $(__dstdir)/`dirname $(DOLLAR)$(DOLLAR)f` ; then \
+                            $(INSTALL_DIR) $(__dstdir)/`dirname $(DOLLAR)$(DOLLAR)f`; \
                         fi; \
-                        $(__iprg) $(__srcdir)/\$\$f $(__dstdir)/\$\$f; \
+                        $(__iprg) $(__srcdir)/$(DOLLAR)$(DOLLAR)f $(__dstdir)/$(DOLLAR)$(DOLLAR)f; \
                     done
                 </if>
             </set>
@@ -131,8 +131,8 @@
                 <if cond="TOOLSET=='unix'">
                     @mkdir -p $(__dstdir)
                     @for f in $(__files); do \
-                        if test \( ! -s $(__dstdir)/\$\$f \) -o \( $(__srcdir)\$\$f -nt $(__dstdir)/\$\$f  \) ; then \
-                            cp -pRf $(__srcdir)\$\$f $(__dstdir) ; \
+                        if test \( ! -s $(__dstdir)/$(DOLLAR)$(DOLLAR)f \) -o \( $(__srcdir)$(DOLLAR)$(DOLLAR)f -nt $(__dstdir)/$(DOLLAR)$(DOLLAR)f  \) ; then \
+                            cp -pRf $(__srcdir)$(DOLLAR)$(DOLLAR)f $(__dstdir) ; \
                         fi; \
                     done
                 </if>

@@ -224,7 +224,7 @@
     
     <define-tag name="dir" rules="subproject">
         <modify-target target="install-strip">
-            <command>(cd $(value) &amp;&amp; \$(MAKE) install-strip)</command>
+            <command>(cd $(value) &amp;&amp; $(DOLLAR)(MAKE) install-strip)</command>
         </modify-target>
     </define-tag>
     

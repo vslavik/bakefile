@@ -35,7 +35,7 @@
     <define-rule name="__rc-to-res" extends="__any,compilation_rule">
         <template>
             <set var="__command" eval="0">
-                brcc32 -32 -r -fo$@ -i\$(BCCDIR)\include $(__win32rc_flags) $**
+                brcc32 -32 -r -fo$@ -i$(DOLLAR)(BCCDIR)\include $(__win32rc_flags) $**
             </set>
         </template>
         <define-tag name="parent-target">

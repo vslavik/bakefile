@@ -323,7 +323,7 @@ def __doEvalExpr(e, varCallb, textCallb, moreArgs,
     txt = ''
     output = ''
     while i < lng-1:
-        if e[i] == '$' and e[i+1] == '(' and (i == 0 or e[i-1] != '\\'):
+        if e[i] == '$' and e[i+1] == '(':
             if txt != '':
                 output += textCallb(moreArgs, txt)
             txt = ''

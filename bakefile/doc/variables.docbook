@@ -292,6 +292,13 @@
               </row>
               
               <row>
+                <entry role="varname">DOLLAR</entry>
+                <entry>
+                  Dollar sign ($).
+                </entry>
+              </row>
+              
+              <row>
                 <entry role="varname">SPACE</entry>
                 <entry>
                   Space character (" "). Note that <varname>SPACE</varname>

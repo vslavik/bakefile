@@ -19,9 +19,9 @@
             -a4: align to 32bit 
             -g0: don't treat lots of warnings as error
     -->
-    <set var="__DEFAULT_CPPFLAGS">-a4 -g0 -I\$(BCCDIR)\include</set>
+    <set var="__DEFAULT_CPPFLAGS">-a4 -g0 -I$(DOLLAR)(BCCDIR)\include</set>
     <set var="__DEFAULT_CXXFLAGS"></set>
-    <set var="__DEFAULT_LDFLAGS">-L\$(BCCDIR)\lib</set>
+    <set var="__DEFAULT_LDFLAGS">-L$(DOLLAR)(BCCDIR)\lib</set>
     
     <set var="__LINKER_CC" eval="0">ilink32 -Tpe -q</set>
     <set var="__LINKER_CXX" eval="0">ilink32 -Tpe -q</set>
@@ -195,13 +195,13 @@
     
     <template id="__subproject_templ">
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
-            (cd $(__subdir) &amp;&amp; \$(MAKE) $(__subtarget))
+            (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) $(__subtarget))
         </set>
         <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
-            (cd $(__subdir) &amp;&amp; \$(MAKE) install)
+            (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) install)
         </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
-            (cd $(__subdir) &amp;&amp; \$(MAKE) clean)
+            (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) clean)
         </set>
     </template>
 
