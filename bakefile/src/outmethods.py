@@ -4,6 +4,8 @@
 # $Id$
 #
 
+import errors
+
 def mergeBlocks(old, new):
 
     def findBlocks(data):
@@ -40,3 +42,30 @@ def mergeBlocks(old, new):
             used[block] = 1
    
     return out
+
+
+def insertBetweenMarkers(old, new):
+    """Inserts text between markers (= special meaning lines). 'old' must
+       contain firsts and last line of 'new' -- the text between them is
+       replaced with 'new'."""
+
+    begin = new[0]
+    end = new[-1]
+
+    if (begin not in old) or (end not in old):
+        raise errors.Error('markers not present in the file')
+
+    out = []
+    i = 0
+    while i < len(old) and old[i] != begin:
+        out.append(old[i])
+        i += 1
+    while i < len(old) and old[i] != end: i += 1
+    i += 1
+    out += new
+    while i < len(old):
+        out.append(old[i])
+        i += 1
+
+    return out
+

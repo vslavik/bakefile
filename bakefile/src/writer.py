@@ -10,6 +10,7 @@ import outmethods
 from types import StringType
 
 mergeBlocks = outmethods.mergeBlocks
+insertBetweenMarkers = outmethods.insertBetweenMarkers
 
 class Struct: pass
 
