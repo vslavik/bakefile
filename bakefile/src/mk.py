@@ -50,10 +50,11 @@ class CondVar:
 
 class Target:
     class Struct: pass
-    def __init__(self, type, id, condition):
+    def __init__(self, type, id, condition, pseudo):
         self.cond = condition
         self.type = type
         self.id = id
+        self.pseudo = pseudo
         self.vars = {}
         self.vars['id'] = id
         self.vars['type'] = self.type

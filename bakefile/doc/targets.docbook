@@ -78,6 +78,20 @@
     repeatedly with same target.
   </para>
 
+  <note>
+    <title>Pseudo targets</title>
+    <para>
+      Some rules don't declare real targets but so-called
+      <emphasis>pseudo targets</emphasis>. Pseudo targets are processed as
+      standard targets, but they don't appear in the generate makefile, have
+      no action associated with them and can't depend on any other target or
+      be dependency of another target. They are used as user-friendly means of
+      modifying behaviour of other targets. 
+      An example of pseudo target is
+      <xref linkend="rule.datafiles.data-files"/>.
+    </para>
+  </note>
+
 
   <section id="rules">
     <title>Rules</title>
