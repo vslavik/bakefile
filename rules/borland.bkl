@@ -11,7 +11,7 @@
     <!--                         "make clean":                           -->
     <!-- =============================================================== -->
 
-    <action id="clean">
+    <action id="clean" template="__phony">
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
         <command>            
             -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)

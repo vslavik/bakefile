@@ -316,11 +316,12 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
     </define-rule>
 
+    <template id="__phony">
+        <set var="__is_phony">1</set>
+    </template>
     
     <define-rule name="phony" extends="__any">
-        <template>
-            <set var="__is_phony">1</set>
-        </template>
+        <template template="__phony"/>
     </define-rule>
 
 
@@ -392,8 +393,12 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!--                     "make install":                             -->
     <!-- =============================================================== -->
 
+    <define-rule name="inst-action" extends="action">
+        <template template="__phony"/>
+    </define-rule>
+    
     <define-tag name="install-to" rules="exe,dll,lib">
-        <add-target target="install_$(id)" type="action" cond="target"/>
+        <add-target target="install_$(id)" type="inst-action" cond="target"/>
         <modify-target target="install_$(id)">
             <command>$(INSTALL_DIR) $(value)</command>
             <dependency-of>install</dependency-of>
@@ -431,11 +436,11 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!-- =============================================================== -->
 
     <phony id="all"/>
-    <action id="install">
+    <action id="install" template="__phony">
         <depends>all</depends>
     </action>
     
-    <action id="uninstall"/>
+    <action id="uninstall" template="__phony"/>
 
     <include file="makefile_$(MAKEFILE_SYNTAX).bkl" ignore_missing="1"/>
 

@@ -233,7 +233,7 @@
     <!--                         "make clean":                           -->
     <!-- =============================================================== -->
 
-    <action id="clean">
+    <action id="clean" template="__phony">
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
         <command>            
             rm -rf $(__builddir)/.deps
@@ -245,7 +245,7 @@
     <!--                       "make distclean":                         -->
     <!-- =============================================================== -->
 
-    <action id="distclean">
+    <action id="distclean" template="__phony">
         <depends>clean</depends>
         <command>
             $(RM) configure config.cache config.log config.status
