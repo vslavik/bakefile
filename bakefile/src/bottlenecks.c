@@ -176,11 +176,11 @@ const char *doEvalExpr(const char *expr,
         }
         else
         {
+            PyObject *r;
             unsigned textlen;
             int size;
             textlen = strlen(text_begin);
-            PyObject *r =
-                PyObject_CallFunction(textCallb,
+            r = PyObject_CallFunction(textCallb,
                                       "Os#",
                                       moreArgs, text_begin, textlen);
             if (PyErr_Occurred())
