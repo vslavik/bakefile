@@ -13,17 +13,19 @@ man_MANS = doc/man/bakefile.1
 
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
-              output/borland.empy
+              output/borland.empy \
+			  output/_hdr_makefile.empy
 
 rules_DATA =  rules/autoconf.bkl \
               rules/borland.bkl \
               rules/common.bkl \
+              rules/datafiles.bkl \
               rules/dirs.bkl \
               rules/makefile.bkl \
-              rules/makefile_def_borland.bkl \
+              rules/makefile_defs_borland.bkl \
               rules/makefile_defs_unix.bkl \
-              rules/makefile_mingw.bkl
-              rules/makefile_macres.bkl
+              rules/makefile_macres.bkl \
+              rules/makefile_mingw.bkl \
               rules/unixlike.bkl \
               rules/vc5.bkl \
               rules/vc6.bkl \
@@ -44,7 +46,7 @@ code_PYTHON = src/config.py \
               src/outmethods.py
 codeempy_PYTHON = \
               src/empy/__init__.py \
-              src/empy/em.py \
+              src/empy/em.py
 codeoptik_PYTHON = \
               src/optik/__init__.py \
               src/optik/errors.py \
