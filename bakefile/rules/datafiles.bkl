@@ -42,16 +42,20 @@
 
     <define-rule name="data-files" pseudo="1" extends="__data-files-base">
         <template>
-            <modify-target target="install">
-                <command>$(ref('__copy_cmd',id))</command>
-            </modify-target>
+            <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+                <modify-target target="install">
+                    <command>$(ref('__copy_cmd',id))</command>
+                </modify-target>
+            </if>
         </template>
     </define-rule>
 
     <define-rule name="data-files-tg" extends="action,__data-files-base">
         <template>
-            <dependency-of>install</dependency-of>
-            <command>$(__copy_cmd)</command>
+            <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+                <dependency-of>install</dependency-of>
+                <command>$(__copy_cmd)</command>
+            </if>
         </template>
     </define-rule>
     
@@ -85,9 +89,11 @@
                     done
                 </if>
             </set>
-            <modify-target target="install">
-                <command>$(ref('__copy_cmd',id))</command>
-            </modify-target>
+            <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+                <modify-target target="install">
+                    <command>$(ref('__copy_cmd',id))</command>
+                </modify-target>
+            </if>
         </template>
         <define-tag name="install-to">
             <set var="__dstdir">$(value)</set>

@@ -34,6 +34,7 @@ advantage of a particular feature.
     -->
     <set var="FORMAT_OUTPUT_VARIABLES"></set>
 
+    
     <!--
     Whether the output format can handle conditions (i.e. variable values
     depending on conditions and conditionally built targets) at all. Most
@@ -54,6 +55,13 @@ advantage of a particular feature.
     Set to 1 by default, only autoconf overwrites the setting.
     -->
     <set var="FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS">1</set>
+
+
+    <!--
+    Set to 1 if it makes sense to create "make (un)install" target in this
+    format. Unix makefiles do, the rest usually doesn't.
+    -->
+    <set var="FORMAT_HAS_MAKE_INSTALL">0</set>
 
 </makefile>
 
