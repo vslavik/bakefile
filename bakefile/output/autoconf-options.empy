@@ -8,11 +8,3 @@ dontShare = ['srcdir', 'top_srcdir']
 @[ for o in [x for x in options if x.name not in dontShare] :@
 @o.name = @@@o.name@@
 ]@
-
-### Conditionally set variables: ###
-
-@[ for c in cond_vars :@
-@[ for v in c.values :@
-@@COND_@v.cond.name@@@c.name = @v.value.replace('\n',' \\\n@COND_%s@' % v.cond.name)
-]@
-]@
