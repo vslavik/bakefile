@@ -24,6 +24,6 @@ src\_bottlenecks.pyd: $(EXTENSION_SRC)
 
 clean:
 	-erase *.obj
-    -erase src\bakefile.exe
-    -erase src\bakefile_gen.exe
-    -erase src\_bottlenecks.pyd
+	-erase src\bakefile.exe
+	-erase src\bakefile_gen.exe
+	-erase src\_bottlenecks.pyd
