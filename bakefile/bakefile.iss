@@ -15,13 +15,11 @@ DefaultDirName={pf}\Bakefile
 
 DefaultGroupName=Bakefile
 AllowNoIcons=true
-DisableAppendDir=false
 UninstallStyle=modern
-WizardStyle=modern
 
 OutputDir=.
 
-Compression=bzip
+Compression=lzma
 
 WindowShowCaption=true
 WindowStartMaximized=false
@@ -34,9 +32,12 @@ LicenseFile=COPYING
 
 
 SolidCompression=true
+InternalCompressLevel=max
+ShowLanguageDialog=yes
 [Files]
 Source: src\*; DestDir: {app}\src; Flags: recursesubdirs; Components: base
 Source: rules\*; DestDir: {app}\rules; Flags: recursesubdirs; Components: base
+Source: presets\*; DestDir: {app}\presets; Flags: recursesubdirs; Components: base
 Source: output\*; DestDir: {app}\output; Flags: recursesubdirs; Components: base
 Source: tests\*; DestDir: {app}\tests; Flags: recursesubdirs; Components: tests
 Source: doc\*; DestDir: {app}\doc; Flags: recursesubdirs; Components: doc
