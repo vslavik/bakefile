@@ -8,7 +8,7 @@ makefiles (most notably GNU Make and Autoconf formats).
 
 <makefile>
     
-    <set var="HAVE_MAKE_INSTALL">1</set>
+    <set var="FORMAT_HAS_MAKE_INSTALL">1</set>
     
     <option name="AR"><default-value>ar</default-value></option>
     <option name="RANLIB"><default-value>ranlib</default-value></option>

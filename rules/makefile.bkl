@@ -11,8 +11,6 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!-- see format_features.bkl for explanation: -->
     <set var="FORMAT_HAS_VARIABLES">1</set>
     
-    <set var="HAVE_MAKE_INSTALL">0</set>
-
     <include file="makefile_defs_$(MAKEFILE_SYNTAX).bkl"/>
 
     <!-- =============================================================== -->
@@ -332,7 +330,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__is_phony">1</set>
             <set var="__subtarget">all</set>
             <command>$(__MAKE_SUBPROJECT_CMD)</command>
-            <if cond="HAVE_MAKE_INSTALL=='1'">
+            <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
                 <modify-target target="install">
                     <command>$(ref('__INSTALL_SUBPROJECT_CMD',id))</command>
                 </modify-target>
@@ -402,7 +400,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     </define-rule>
     
     <define-tag name="install-to" rules="exe,dll,lib">
-        <if cond="HAVE_MAKE_INSTALL=='1'">
+        <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
             <add-target target="install_$(id)"
                         type="inst-action" cond="target"/>
             <modify-target target="install_$(id)">
@@ -412,7 +410,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         </if>
     </define-tag>
 
-    <if cond="HAVE_MAKE_INSTALL=='1'">
+    <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
         <define-tag name="install-to" rules="exe">
             <modify-target target="install_$(id)">
                 <command>
@@ -446,7 +444,7 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <phony id="all"/>
     
-    <if cond="HAVE_MAKE_INSTALL=='1'">
+    <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
         <action id="install" template="__phony">
             <depends>all</depends>
         </action>
