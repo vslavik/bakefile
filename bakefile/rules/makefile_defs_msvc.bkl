@@ -83,7 +83,7 @@
         <define-tag name="runtime-libs">
             <set var="__rtl_type">
                 $(substituteFromDict(value, 
-                {'static':'$(__rtl_static)',
+                {'static':'$(ref("__rtl_static","%s")' % id,
                 'dynamic':'D'}))
             </set>
         </define-tag>
