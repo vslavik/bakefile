@@ -10,6 +10,8 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <!-- see format_features.bkl for explanation: -->
     <set var="FORMAT_HAS_VARIABLES">1</set>
+    
+    <set var="HAVE_MAKE_INSTALL">0</set>
 
     <include file="makefile_defs_$(MAKEFILE_SYNTAX).bkl"/>
 
@@ -330,12 +332,14 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__is_phony">1</set>
             <set var="__subtarget">all</set>
             <command>$(__MAKE_SUBPROJECT_CMD)</command>
-            <modify-target target="install">
-                <command>$(ref('__INSTALL_SUBPROJECT_CMD',id))</command>
-            </modify-target>
-            <modify-target target="clean">
-                <command>$(ref('__CLEAN_SUBPROJECT_CMD',id))</command>
-            </modify-target>
+            <if cond="HAVE_MAKE_INSTALL=='1'">
+                <modify-target target="install">
+                    <command>$(ref('__INSTALL_SUBPROJECT_CMD',id))</command>
+                </modify-target>
+                <modify-target target="clean">
+                    <command>$(ref('__CLEAN_SUBPROJECT_CMD',id))</command>
+                </modify-target>
+            </if>
         </template>
         <define-tag name="dir">
             <set var="__subdir">$(value)</set>
@@ -398,37 +402,42 @@ makefiles (most notably GNU Make and Autoconf formats).
     </define-rule>
     
     <define-tag name="install-to" rules="exe,dll,lib">
-        <add-target target="install_$(id)" type="inst-action" cond="target"/>
-        <modify-target target="install_$(id)">
-            <command>$(INSTALL_DIR) $(value)</command>
-            <dependency-of>install</dependency-of>
-        </modify-target>
+        <if cond="HAVE_MAKE_INSTALL=='1'">
+            <add-target target="install_$(id)"
+                        type="inst-action" cond="target"/>
+            <modify-target target="install_$(id)">
+                <command>$(INSTALL_DIR) $(value)</command>
+                <dependency-of>install</dependency-of>
+            </modify-target>
+        </if>
     </define-tag>
 
-    <define-tag name="install-to" rules="exe">
-        <modify-target target="install_$(id)">
-            <command>
-                $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
-            </command>
-        </modify-target>
-    </define-tag>
+    <if cond="HAVE_MAKE_INSTALL=='1'">
+        <define-tag name="install-to" rules="exe">
+            <modify-target target="install_$(id)">
+                <command>
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+                </command>
+            </modify-target>
+        </define-tag>
 
-    <define-tag name="install-to" rules="dll">
-        <modify-target target="install_$(id)">
-            <command>
-                $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(value)
-                $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
-            </command>
-        </modify-target>
-    </define-tag>
+        <define-tag name="install-to" rules="dll">
+            <modify-target target="install_$(id)">
+                <command>
+                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(value)
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+                </command>
+            </modify-target>
+        </define-tag>
 
-    <define-tag name="install-to" rules="lib">
-        <modify-target target="install_$(id)">
-            <command>
-                $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
-            </command>
-        </modify-target>
-    </define-tag>
+        <define-tag name="install-to" rules="lib">
+            <modify-target target="install_$(id)">
+                <command>
+                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+                </command>
+            </modify-target>
+        </define-tag>
+    </if>
     
     
     <!-- =============================================================== -->
@@ -436,11 +445,14 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!-- =============================================================== -->
 
     <phony id="all"/>
-    <action id="install" template="__phony">
-        <depends>all</depends>
-    </action>
     
-    <action id="uninstall" template="__phony"/>
+    <if cond="HAVE_MAKE_INSTALL=='1'">
+        <action id="install" template="__phony">
+            <depends>all</depends>
+        </action>
+    
+        <action id="uninstall" template="__phony"/>
+    </if>
 
     <include file="makefile_$(MAKEFILE_SYNTAX).bkl" ignore_missing="1"/>
 
