@@ -23,6 +23,9 @@ Version 0.1.5
 - fixed win32 formats' "make clean" to delete precompiled headers files
 - autoconf: fixed to not accumulate outdated content in autoconf_inc.m4
 - msvc6prj, msevc4prj: don't ignore source files with unrecognized extension
+- autoconf: fixed inclusion of autoconf_inc.m4 so that autoconf is aware of
+  changes made to the included file and regenerates configure even if
+  configure.in didn't change
 
 
 Version 0.1.4
