@@ -15,6 +15,8 @@ Version 0.1.5
 - improved performance for when generating lots of makefiles using
   bakefile_gen by caching parsed XML files
 - autoconf: fixed precompiled headers dependencies in case of multiple targets
+- precompiled headers support for dmars and dmars_smake formats
+  (based on work by Wlodzimierz ABX Skiba)
 
 
 Version 0.1.4

@@ -62,8 +62,10 @@
     
     <template id="__commands_templ_CXX">
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -mn -c -o$@ $(__cxxflags) $**
+            $(CXX) -mn -c -o$@ $(__cxxflags) $(src)
         </set>
+        <!-- FIXME: temporary hack, $(src) should be used only if there are
+                    object-dependencies, otherwise $** should be used -->
     </template>
 
     <define-tag name="runtime-libs" rules="exe,dll,module,lib">
@@ -82,8 +84,82 @@
         <set var="__ldlibs" append="1">$(nativePaths(value))\</set>
     </define-tag>
 
+    <set var="__exe_baser">__dmars_comp</set>
     <set var="__dll_baser">__dmars_dll</set>
-    <define-rule name="__dmars_dll">
+    <set var="__lib_baser">__dmars_comp</set>
+    
+
+    <!-- Precompiled headers support: -->
+    <tag-info name="precomp-headers-header"
+              position="before:precomp-headers-file"/>
+    <tag-info name="precomp-headers-header"
+              position="before:precomp-headers"/>
+    <tag-info name="precomp-headers-file"
+              position="before:precomp-headers"/>
+
+    <define-rule name="__dmars_comp">
+        <template>
+            <set var="__pch_header"/>
+            <set var="__pch_file">hdr</set>
+        </template>
+ 
+        <define-tag name="precomp-headers-file" rules="__compiled">
+            <set var="__pch_file">$(value)</set>
+        </define-tag>
+
+        <define-tag name="precomp-headers-header" rules="__compiled">
+            <set var="__pch_header">$(value)</set>
+        </define-tag>
+
+        <define-tag name="precomp-headers">
+            <if cond="value=='on'">
+                <if cond="__pch_header==''">
+                    <error>
+                    Precompiled header must explicitly be provided using &lt;precomp-headers-header&gt; for DMC.
+                    </error>
+                </if>
+                
+                <!--
+                 DMC generates both .sym file with pch data and .obj file
+                 with code for the header; this object file must be linked in:
+                 -->
+                <set var="__pch_sym_tgt">pch_$(__pch_file).sym</set>
+                <set var="__pch_sym_file">
+                    $(BUILDDIR)$(DIRSEP)$(__pch_sym_tgt)
+                </set>
+                <set var="__pch_obj">pch_$(__pch_file).obj</set>
+ 
+                <set var="__objects" append="1">
+                    $(BUILDDIR)$(DIRSEP)$(__pch_obj)
+                </set>
+                
+                <cppflags> 
+                    $(substituteFromDict(value,
+                            {'on':'-H -HO- -HH$(__pch_sym_file)',
+                             'off':''}))
+                </cppflags>
+
+                <set var="__pch_cmd" eval="0">
+                    $(ifthenelse(__uses_cxx,CXX,CC)+' '+ifthenelse(__uses_cxx,
+                                 '$(%s_CXXFLAGS)' % id.upper(),
+                                 '$(%s_CFLAGS)' % id.upper())) -HF$(__pch_sym_file) -o$(BUILDDIR)$(DIRSEP)$(__pch_obj) $(__pch_header)
+                </set>
+
+                <if cond="__pch_sym_tgt not in targets">
+                    <add-target target="$(__pch_sym_tgt)" type="action"/>
+                    <modify-target target="$(__pch_sym_tgt)">
+                        <set var="__targetname">$(__pch_sym_file)</set>
+                        <command>$(ref("__pch_cmd",id))</command>
+                    </modify-target>
+                </if> 
+
+                <objects-depend>$(__pch_sym_tgt)</objects-depend>
+            </if> <!-- value=on -->
+        </define-tag>
+        
+    </define-rule>
+
+    <define-rule name="__dmars_dll" extends="__dmars_comp">
         <template>
             <cppflags>-WD</cppflags>
             <sys-lib>kernel32</sys-lib>
