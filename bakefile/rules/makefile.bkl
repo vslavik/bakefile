@@ -50,12 +50,21 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!--                     Rules & tags definitions:                   -->
     <!-- =============================================================== -->
 
+    <!-- in case specialized makefile wants to insert something: -->
+    <set var="__exe_baset" overwrite="0"/>
+    <set var="__dll_baset" overwrite="0"/>
+    <set var="__lib_baset" overwrite="0"/>
+    <set var="__exe_baser" overwrite="0"/>
+    <set var="__dll_baser" overwrite="0"/>
+    <set var="__lib_baser" overwrite="0"/>
+
     <define-rule name="__any">
         <template>
             <set var="__targetdir"></set>
             <set var="__is_phony">0</set>
             <set var="__deps"/>
             <set var="__command"/>
+            <set var="__post_command"/>
             <set var="__targetname">$(id)</set>
             <set var="__depname">
                 <if cond="target">
@@ -153,10 +162,13 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     </define-rule>
 
-    <define-rule name="exe" extends="__compiled">
-        <template>
+    <define-rule name="exe" extends="__compiled,$(__exe_baser)">
+        <template template="$(__exe_baset)">
             <set var="__targetname" eval="0">$(id)$(EXEEXT)</set>
-            <set var="__command" eval="0">$(__LINK_EXE_CMD)</set>
+            <set var="__command" eval="0">
+                $(__LINK_EXE_CMD)
+                $(__post_command)
+            </set>
             <dependency-of>all</dependency-of>
             <clean-files>
                 $(ref('__targetdir',id))$(ref('__targetname',id))
@@ -164,8 +176,8 @@ makefiles (most notably GNU Make and Autoconf formats).
         </template>
     </define-rule>
     
-    <define-rule name="lib" extends="__compiled">
-        <template>
+    <define-rule name="lib" extends="__compiled,$(__lib_baser)">
+        <template template="$(__lib_baset)">
             <set var="__command" eval="0">$(__LINK_LIB_CMD)</set>
             <set var="__libname">$(id)</set>
             <set var="__targetname" eval="0">$(LIBPREFIX)$(__libname)$(LIBEXT)</set>
@@ -180,8 +192,8 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
     </define-rule>
 
-    <define-rule name="dll" extends="__compiled">
-        <template>
+    <define-rule name="dll" extends="__compiled,$(__dll_baser)">
+        <template template="$(__dll_baset)">
             <cflags>$(DLL_CFLAGS)</cflags>
             <cxxflags>$(DLL_CFLAGS)</cxxflags>
             <set var="__targetname" eval="0">
@@ -279,13 +291,17 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-rule name="__C-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
     <!-- this is Objective-C++, not C++, but c++ can handle it: -->
     <define-rule name="__mm-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
+    <define-rule name="__M-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
     
     
     <!-- =============================================================== -->
-    <!--                     win32 resources:                            -->
+    <!--                      resources:                                 -->
     <!-- =============================================================== -->
 
-    <define-tag name="rc-file" rules="exe,dll">
+    <define-tag name="win32-res" rules="exe,dll">
+        <!-- do nothing by default -->
+    </define-tag>
+    <define-tag name="mac-res" rules="exe,dll">
         <!-- do nothing by default -->
     </define-tag>
     

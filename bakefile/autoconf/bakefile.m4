@@ -45,6 +45,7 @@ AC_DEFUN(AC_BAKEFILE_PLATFORM,
     PLATFORM_UNIX=0
     PLATFORM_WIN32=0
     PLATFORM_MSDOS=0
+    PLATFORM_MAC=0
     PLATFORM_MACOSX=0
     
     case "${host}" in
@@ -55,6 +56,7 @@ AC_DEFUN(AC_BAKEFILE_PLATFORM,
             PLATFORM_MSDOS=1
         ;;
         powerpc-*-darwin* )
+            PLATFORM_MAC=1
             PLATFORM_MACOSX=1
         ;;
         * )
@@ -65,6 +67,7 @@ AC_DEFUN(AC_BAKEFILE_PLATFORM,
     AC_SUBST(PLATFORM_UNIX)
     AC_SUBST(PLATFORM_WIN32)
     AC_SUBST(PLATFORM_MSDOS)
+    AC_SUBST(PLATFORM_MAC)
     AC_SUBST(PLATFORM_MACOSX)
 ])
 
@@ -431,27 +434,45 @@ AC_DEFUN(AC_BAKEFILE_CHECK_BASIC_STUFF,
             ;;
     esac
     AC_SUBST(INSTALL_DIR)
+])
 
-    dnl Check for win32 resources compiler:
+
+dnl ---------------------------------------------------------------------------
+dnl AC_BAKEFILE_RES_COMPILERS
+dnl
+dnl Checks for presence of resource compilers for win32 or mac
+dnl ---------------------------------------------------------------------------
+
+AC_DEFUN(AC_BAKEFILE_RES_COMPILERS,
+[
+    RESCOMP=
+    DEREZ=
+    SETFILE=
+
     case ${host} in 
         *-*-cygwin* | *-*-mingw32* )
+            dnl Check for win32 resources compiler:
             if test "$build" != "$host" ; then
-                WINDRES=$host_alias-windres
+                RESCOMP=$host_alias-windres
             else
-                AC_CHECK_PROG(WINDRES, windres, windres, windres)
+                AC_CHECK_PROG(RESCOMP, windres, windres, windres)
             fi
-            ;;
-        *)  
-            WINDRES=
-            ;;
+         ;;
+ 
+      *-*-darwin* )
+            AC_CHECK_PROG(RESCOMP, Rez, Rez, /Developer/Tools/Rez)
+            AC_CHECK_PROG(SETFILE, SetFile, SetFile, /Developer/Tools/SetFile)
+        ;;
     esac
-    AC_SUBST(WINDRES)
+
+    AC_SUBST(RESCOMP)
+    AC_SUBST(SETFILE)
 ])
 
 dnl ---------------------------------------------------------------------------
 dnl AC_BAKEFILE
 dnl
-dnl To be used in configure.in of any project using BAKEFILE-generated makefiles.
+dnl To be used in configure.in of any project using Bakefile-generated mks
 dnl ---------------------------------------------------------------------------
 
 AC_DEFUN(AC_BAKEFILE,
@@ -465,6 +486,7 @@ AC_DEFUN(AC_BAKEFILE,
     AC_BAKEFILE_SHARED_LD
     AC_BAKEFILE_SHARED_VERSIONS
     AC_BAKEFILE_DEPS
+    AC_BAKEFILE_RES_COMPILERS
 
     builtin(include, autoconf_inc.m4)
 ])

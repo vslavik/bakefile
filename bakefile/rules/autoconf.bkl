@@ -12,7 +12,8 @@
     <option name="SO_SUFFIX"/>
     <option name="EXEEXT"/>
     <option name="LN_S"/>
-    <option name="WINDRES"/>
+    <option name="RESCOMP"/>
+    <option name="SETFILE"/>
     <option name="PIC_FLAG"/>
     <option name="USE_SOVERSION"><values>0 1</values></option>
     <option name="USE_SOVERLINUX"><values>0 1</values></option>
@@ -33,12 +34,13 @@
     <unset var="PLATFORM_UNIX"/>
     <unset var="PLATFORM_WIN32"/>
     <unset var="PLATFORM_MSDOS"/>
+    <unset var="PLATFORM_MAC"/>
     <unset var="PLATFORM_MACOSX"/>
     <option name="PLATFORM_UNIX"/>
     <option name="PLATFORM_WIN32"/>
     <option name="PLATFORM_MSDOS"/>
+    <option name="PLATFORM_MAC"/>
     <option name="PLATFORM_MACOSX"/>
-    <set var="PLATFORM_MAC">$(PLATFORM_MACOSX)</set> <!-- no autoconf on classic-->
     
     <option name="srcdir"/>
     <option name="top_srcdir"/>
@@ -69,6 +71,9 @@
     <set var="__DLL_LINKER_CC" eval="0">$(SHARED_LD_CC)</set>
     <set var="__DLL_LINKER_CXX" eval="0">$(SHARED_LD_CXX)</set>
 
+    <include file="makefile_macres.bkl"/>
+    <set var="__exe_baser">__macexe</set>
+
     <include file="unixlike.bkl"/>
     <!-- autoconf can be used to compile win32 apps, too: -->
     <include file="makefile_mingw.bkl"/>
@@ -90,15 +95,17 @@
 
         <set var="__linkname1">$(__linkname)</set>
         <set var="__linkname2">$(__targetname).$(__soversion1)</set>
-        <set var="__targetnamesuf">
-            <if cond="USE_SOVERSION=='1'">
-                .$(__soversion1).$(__soversion2).$(__soversion3)
+        
+        <set var="__targetnamereal">
+            <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='0'">
+                $(DLLEXT).$(__soversion1).$(__soversion2).$(__soversion3)
+            </if>
+            <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='1'">
+                $(__soversion1).$(__soversion2).$(__soversion3)$(DLLEXT)
             </if>
         </set>
-        <set var="__targetname">
-            $(__targetname)$(__targetnamesuf)
-        </set>
-
+        <set var="__targetname">$(__targetnamereal)</set>
+        
         <set var="__soname_flags">
             <if cond="USE_SOVERLINUX=='1'"> <!-- Linux -->
                 $(SONAME_FLAG)$(__linkname2)
