@@ -179,15 +179,15 @@ def invoke_em(writer, file, method):
 
 def invoke_py(writer, file, method):
     rulesdir, program = __findWriter(writer)
-    writer_code = ''.join(__readFile(program))
     code = """
 import mk, writer, utils, os, os.path
 globals().update(writer.__preparedMkVars)
 RULESDIR="%s"
 FILE="%s"
 
-%s
-""" % (rulesdir.replace('\\','\\\\'), file.replace('\\','\\\\'), writer_code)
+execfile("%s")
+""" % (rulesdir.replace('\\','\\\\'), file.replace('\\','\\\\'),
+       program.replace('\\','\\\\'))
     global __files
     __files = []
     vars = {}
