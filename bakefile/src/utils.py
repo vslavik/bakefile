@@ -397,7 +397,9 @@ def formatIfNotEmpty(fmt, value):
             if form == '': return ''
             return fmt % value
 
-        if condname in mk.vars and __isNotEmpty(mk.vars[condname]):
+        if condname in mk.vars:
+            form = formatIfNotEmpty(fmt, mk.vars[condname])
+            if form == '': return ''
             return fmt % value
             
     raise errors.Error("formatIfNotEmpty failed: '%s' too complicated" % value)
