@@ -109,7 +109,8 @@ dnl ---------------------------------------------------------------------------
 
 AC_DEFUN([AC_BAKEFILE_PLATFORM_SPECIFICS],
 [
-    AC_ARG_ENABLE([omf], [  --enable-omf            use OMF object format (OS/2)],
+    AC_ARG_ENABLE([omf], AS_HELP_STRING([--enable-omf],
+                                        [use OMF object format (OS/2)]),
                   [bk_os2_use_omf="$enableval"])
     
     case "${BAKEFILE_HOST}" in
@@ -550,7 +551,8 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
 [
 
     AC_ARG_ENABLE([precomp-headers],
-                  [  --disable-precomp-headers  don't use precompiled headers even if compiler can],
+                  AS_HELP_STRING([--disable-precomp-headers],
+                                 [don't use precompiled headers even if compiler can]),
                   [bk_use_pch="$enableval"])
 
     GCC_PCH=0
@@ -575,9 +577,6 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
                 ],
                 [
                     AC_MSG_RESULT([yes])
-                    dnl FIXME - this is temporary, till .gch dependencies 
-                    dnl         are fixed in generated Makefiles
-                    CPPFLAGS="-fpch-deps $CPPFLAGS"
                     GCC_PCH=1
                 ],
                 [
