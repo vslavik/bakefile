@@ -6,6 +6,12 @@
 @o.name = @@@o.name@@
 ]@
 
+### Variables: ###
+
+@[ for v in make_vars :@
+@v = @make_vars[v]
+]@
+
 ### Conditionally set variables: ###
 
 @[ for c in cond_vars :@

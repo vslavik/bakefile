@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<!-- $Id$ -->
 
 <makefile>
     
@@ -45,13 +46,13 @@
     
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -c -P- -o$@ $(__cppflags) $(__cflags) $**
+            $(CC) -c -P- -o$@ $(__cflags) $**
         </set>
     </template>
     
     <template id="__commands_templ_CXX">
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -c -P -o$@ $(__cppflags) $(__cxxflags) $**
+            $(CXX) -c -P -o$@ $(__cxxflags) $**
         </set>
     </template>
     

@@ -353,8 +353,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__command">$(__COMPILE_C_CMD)</set>
         </template>
         <define-tag name="parent-target">
-            <set var="__cflags">$(targets[value].__cflags)</set>
-            <set var="__cppflags">$(targets[value].__cppflags)</set>
+            <set var="__cflags">$('$(%s_CFLAGS)' % __parent.upper())</set>
         </define-tag>
     </define-rule>
     
@@ -364,8 +363,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         </template>
         <define-tag name="parent-target">
             <set var="__uses_cxx" scope="$(__parent)">1</set>
-            <set var="__cxxflags">$(targets[value].__cxxflags)</set>
-            <set var="__cppflags">$(targets[value].__cppflags)</set>
+            <set var="__cxxflags">$('$(%s_CXXFLAGS)' % __parent.upper())</set>
         </define-tag>
     </define-rule>
     <!-- more C++ extensions: -->

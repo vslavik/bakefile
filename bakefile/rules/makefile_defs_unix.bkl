@@ -71,12 +71,12 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CCC) -c -o $@ $(__cppflags) $(__cflags) $&lt;
+            $(CCC) -c -o $@ $(__cflags) $&lt;
         </set>
     </template>
     <template id="__commands_templ_CXX">
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXXC) -c -o $@ $(__cppflags) $(__cxxflags) $&lt;
+            $(CXXC) -c -o $@ $(__cxxflags) $&lt;
         </set>
     </template>
     <template id="__commands_templ">
