@@ -795,9 +795,14 @@ def handleOutput(e):
 def handleFragment(e):
     if e.props['format'] == config.format:
         if 'file' in e.props:
-            f = open(e.props['file'])
+            filename = e.props['file']
+            f = open(filename)
             content = f.read()
             f.close()
+            if config.track_deps:
+                dependencies.addDependency(mk.vars['INPUT_FILE'],
+                                           config.format,
+                                           os.path.abspath(filename))
         else:
             content = e.value
         mk.addFragment(mk.Fragment(content))
