@@ -96,6 +96,7 @@ def run(args):
             xmlparser.cache = shelve.open(options.xml_cache,
                                           protocol=pickle.HIGHEST_PROTOCOL)
         except ImportError: pass
+        except AttributeError: pass # python < 2.3 didn't have HIGHEST_PROTOCOL
         except KeyError: pass # python < 2.3 didn't have protocol argument
 
     formats.loadFormats()
