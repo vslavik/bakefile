@@ -760,15 +760,15 @@ flag_USE_LXLITE=1;
 # basnam, variant of basename, which does _not_ remove the path, _iff_
 #                              second argument (suffix to remove) is given
 basnam(){
-    case ${D}# in
+    case @S|@# in
     1)
-        echo ${D}1 | sed 's/.*\///' | sed 's/.*\\//'
+        echo @S|@1 | sed 's/.*\///' | sed 's/.*\\//'
         ;;
     2)
-        echo ${D}1 | sed 's/'${D}2'${D}//'
+        echo @S|@1 | sed 's/'@S|@2'@S|@//'
         ;;
     *)
-        echo "error in basnam ${D}*"
+        echo "error in basnam @S|@*"
         exit 8
         ;;
     esac
@@ -776,11 +776,11 @@ basnam(){
 
 # Cleanup temporary files and output
 CleanUp() {
-    cd ${D}curDir
-    for i in ${D}inputFiles ; do
-        case ${D}i in
+    cd @S|@curDir
+    for i in @S|@inputFiles ; do
+        case @S|@i in
         *!)
-            rm -rf \`basnam ${D}i !\`
+            rm -rf \`basnam @S|@i !\`
             ;;
         *)
             ;;
@@ -789,18 +789,18 @@ CleanUp() {
 
     # Kill result in case of failure as there is just to many stupid make/nmake
     # things out there which doesn't do this.
-    if [[] ${D}# -eq 0 []]; then
-        rm -f ${D}arcFile ${D}arcFile2 ${D}defFile ${D}dllFile
+    if @<:@ @S|@# -eq 0 @:>@; then
+        rm -f @S|@arcFile @S|@arcFile2 @S|@defFile @S|@dllFile
     fi
 }
 
 # Print usage and exit script with rc=1.
 PrintHelp() {
- echo 'Usage: dllar [[]-o[[]utput[]] output_file[]] [[]-i[[]mport[]] importlib_name[]]'
- echo '       [[]-d[[]escription[]] "dll descrption"[]] [[]-cc "CC"[]] [[]-f[[]lags[]] "CFLAGS"[]]'
- echo '       [[]-ord[[]inals[]][]] -ex[[]clude[]] "symbol(s)"'
- echo '       [[]-libf[[]lags[]] "{INIT|TERM}{GLOBAL|INSTANCE}"[]] [[]-nocrt[[]dll[]][]] [[]-nolxl[[]ite[]][]]'
- echo '       [[]*.o[]] [[]*.a[]]'
+ echo 'Usage: dllar @<:@-o@<:${utput}:>@ output_file@:>@ @<:@-i@<:${mport}:>@ importlib_name@:>@'
+ echo '       @<:@-d@<:${escription}:>@ "dll descrption"@:>@ @<:@-cc "CC"@:>@ @<:@-f@<:${lags}:>@ "CFLAGS"@:>@'
+ echo '       @<:@-ord@<:${inals}:>@@:>@ -ex@<:${clude}:>@ "symbol(s)"'
+ echo '       @<:@-libf@<:${lags}:>@ "{INIT|TERM}{GLOBAL|INSTANCE}"@:>@ @<:@-nocrt@<:${dll}:>@@:>@ @<:@-nolxl@<:${ite}:>@@:>@'
+ echo '       @<:@*.o@:>@ @<:@*.a@:>@'
  echo '*> "output_file" should have no extension.'
  echo '   If it has the .o, .a or .dll extension, it is automatically removed.'
  echo '   The import library name is derived from this and is set to "name".a,'
@@ -813,16 +813,16 @@ PrintHelp() {
  echo '*> "cc" is used to use another GCC executable.   (default: gcc.exe)'
  echo '*> "flags" should be any set of valid GCC flags. (default: -s -Zcrtdll)'
  echo '   These flags will be put at the start of GCC command line.'
- echo '*> -ord[[]inals[]] tells dllar to export entries by ordinals. Be careful.'
- echo '*> -ex[[]clude[]] defines symbols which will not be exported. You can define'
+ echo '*> -ord@<:${inals}:>@ tells dllar to export entries by ordinals. Be careful.'
+ echo '*> -ex@<:${clude}:>@ defines symbols which will not be exported. You can define'
  echo '   multiple symbols, for example -ex "myfunc yourfunc _GLOBAL*".'
  echo '   If the last character of a symbol is "*", all symbols beginning'
  echo '   with the prefix before "*" will be exclude, (see _GLOBAL* above).'
- echo '*> -libf[[]lags[]] can be used to add INITGLOBAL/INITINSTANCE and/or'
+ echo '*> -libf@<:${lags}:>@ can be used to add INITGLOBAL/INITINSTANCE and/or'
  echo '   TERMGLOBAL/TERMINSTANCE flags to the dynamically-linked library.'
- echo '*> -nocrt[[]dll[]] switch will disable linking the library against emx''s'
+ echo '*> -nocrt@<:${dll}:>@ switch will disable linking the library against emx''s'
  echo '   C runtime DLLs.'
- echo '*> -nolxl[[]ite[]] switch will disable running lxlite on the resulting DLL.'
+ echo '*> -nolxl@<:${ite}:>@ switch will disable running lxlite on the resulting DLL.'
  echo '*> All other switches (for example -L./ or -lmylib) will be passed'
  echo '   unchanged to GCC at the end of command line.'
  echo '*> If you create a DLL from a library and you do not specify -o,'
@@ -842,20 +842,20 @@ PrintHelp() {
 # If exit code of the commnad <> 0 CleanUp() is called and we'll exit the script.
 # @Uses    Whatever CleanUp() uses.
 doCommand() {
-    echo "${D}*"
-    eval ${D}*
-    rcCmd=${D}?
+    echo "@S|@*"
+    eval @S|@*
+    rcCmd=@S|@?
 
-    if [[] ${D}rcCmd -ne 0 []]; then
-        echo "command failed, exit code="${D}rcCmd
+    if @<:@ @S|@rcCmd -ne 0 @:>@; then
+        echo "command failed, exit code="@S|@rcCmd
         CleanUp
-        exit ${D}rcCmd
+        exit @S|@rcCmd
     fi
 }
 
 # main routine
 # setup globals
-cmdLine=${D}*
+cmdLine=@S|@*
 outFile=""
 outimpFile=""
 inputFiles=""
@@ -868,50 +868,50 @@ exclude_symbols=""
 library_flags=""
 curDir=\`pwd\`
 curDirS=curDir
-case ${D}curDirS in
+case @S|@curDirS in
 */)
   ;;
 *)
-  curDirS=${D}{curDirS}"/"
+  curDirS=@S|@{curDirS}"/"
   ;;
 esac
 # Parse commandline
 libsToLink=0
-while [[] ${D}1 []]; do
-    case ${D}1 in
+while @<:@ @S|@1 @:>@; do
+    case @S|@1 in
     -ord*)
         EXPORT_BY_ORDINALS=1;
         ;;
     -o*)
 	shift
-        outFile=${D}1
+        outFile=@S|@1
 	;;
     -i*)
         shift
-        outimpFile=${D}1
+        outimpFile=@S|@1
         ;;
     -d*)
         shift
-        description=${D}1
+        description=@S|@1
         ;;
     -f*)
         shift
-        CFLAGS=${D}1
+        CFLAGS=@S|@1
         ;;
     -c*)
         shift
-        CC=${D}1
+        CC=@S|@1
         ;;
     -h*)
         PrintHelp
         ;;
     -ex*)
         shift
-        exclude_symbols=${D}{exclude_symbols}${D}1" "
+        exclude_symbols=@S|@{exclude_symbols}@S|@1" "
         ;;
     -libf*)
         shift
-        library_flags=${D}{library_flags}${D}1" "
+        library_flags=@S|@{library_flags}@S|@1" "
         ;;
     -nocrt*)
         CFLAGS="-s"
@@ -920,28 +920,28 @@ while [[] ${D}1 []]; do
         flag_USE_LXLITE=0
         ;;
     -* | /*)
-        case ${D}1 in
+        case @S|@1 in
         -L* | -l*)
             libsToLink=1
             ;;
         *)
             ;;
         esac
-        EXTRA_CFLAGS=${D}{EXTRA_CFLAGS}" "${D}1
+        EXTRA_CFLAGS=@S|@{EXTRA_CFLAGS}" "@S|@1
         ;;
     *)
         found=0;
-        if [[] ${D}libsToLink -ne 0 []]; then
-            EXTRA_CFLAGS=${D}{EXTRA_CFLAGS}" "${D}1
+        if @<:@ @S|@libsToLink -ne 0 @:>@; then
+            EXTRA_CFLAGS=@S|@{EXTRA_CFLAGS}" "@S|@1
         else
-            for file in ${D}1 ; do
-                if [[] -f ${D}file []]; then
-                    inputFiles="${D}{inputFiles} ${D}file"
+            for file in @S|@1 ; do
+                if @<:@ -f @S|@file @:>@; then
+                    inputFiles="@S|@{inputFiles} @S|@file"
                     found=1
                 fi
             done
-            if [[] ${D}found -eq 0 []]; then
-                echo "ERROR: No file(s) found: "${D}1
+            if @<:@ @S|@found -eq 0 @:>@; then
+                echo "ERROR: No file(s) found: "@S|@1
                 exit 8
             fi
         fi
@@ -951,17 +951,17 @@ while [[] ${D}1 []]; do
 done # iterate cmdline words
 
 #
-if [[] -z "${D}inputFiles" []]; then
+if @<:@ -z "@S|@inputFiles" @:>@; then
     echo "dllar: no input files"
     PrintHelp
 fi
 
 # Now extract all .o files from .a files
 newInputFiles=""
-for file in ${D}inputFiles ; do
-    case ${D}file in
+for file in @S|@inputFiles ; do
+    case @S|@file in
     *.a | *.lib)
-        case ${D}file in
+        case @S|@file in
         *.a)
             suffix=".a"
             AR="ar"
@@ -969,179 +969,179 @@ for file in ${D}inputFiles ; do
         *.lib)
             suffix=".lib"
             AR="emxomfar"
-            EXTRA_CFLAGS="${D}EXTRA_CFLAGS -Zomf"
+            EXTRA_CFLAGS="@S|@EXTRA_CFLAGS -Zomf"
             ;;
         *)
             ;;
         esac
-        dirname=\`basnam ${D}file ${D}suffix\`"_%"
-        mkdir ${D}dirname
-        if [[] ${D}? -ne 0 []]; then
-            echo "Failed to create subdirectory ./${D}dirname"
+        dirname=\`basnam @S|@file @S|@suffix\`"_%"
+        mkdir @S|@dirname
+        if @<:@ @S|@? -ne 0 @:>@; then
+            echo "Failed to create subdirectory ./@S|@dirname"
             CleanUp
             exit 8;
         fi
         # Append '!' to indicate archive
-        newInputFiles="${D}newInputFiles ${D}{dirname}!"
-        doCommand "cd ${D}dirname; ${D}AR x ../${D}file"
-        cd ${D}curDir
+        newInputFiles="@S|@newInputFiles @S|@{dirname}!"
+        doCommand "cd @S|@dirname; @S|@AR x ../@S|@file"
+        cd @S|@curDir
         found=0;
-        for subfile in ${D}dirname/*.o* ; do
-            if [[] -f ${D}subfile []]; then
+        for subfile in @S|@dirname/*.o* ; do
+            if @<:@ -f @S|@subfile @:>@; then
                 found=1
-                if [[] -s ${D}subfile []]; then
+                if @<:@ -s @S|@subfile @:>@; then
 	            # FIXME: This should be: is file size > 32 byte, _not_ > 0!
-                    newInputFiles="${D}newInputFiles ${D}subfile"
+                    newInputFiles="@S|@newInputFiles @S|@subfile"
                 fi
             fi
         done
-        if [[] ${D}found -eq 0 []]; then
-            echo "WARNING: there are no files in archive \'${D}file\'"
+        if @<:@ @S|@found -eq 0 @:>@; then
+            echo "WARNING: there are no files in archive \'@S|@file\'"
         fi
         ;;
     *)
-        newInputFiles="${D}{newInputFiles} ${D}file"
+        newInputFiles="@S|@{newInputFiles} @S|@file"
         ;;
     esac
 done
-inputFiles="${D}newInputFiles"
+inputFiles="@S|@newInputFiles"
 
 # Output filename(s).
 do_backup=0;
-if [[] -z ${D}outFile []]; then
+if @<:@ -z @S|@outFile @:>@; then
     do_backup=1;
-    set outFile ${D}inputFiles; outFile=${D}2
+    set outFile @S|@inputFiles; outFile=@S|@2
 fi
 
 # If it is an archive, remove the '!' and the '_%' suffixes
-case ${D}outFile in
+case @S|@outFile in
 *_%!)
-    outFile=\`basnam ${D}outFile _%!\`
+    outFile=\`basnam @S|@outFile _%!\`
     ;;
 *)
     ;;
 esac
-case ${D}outFile in
+case @S|@outFile in
 *.dll)
-    outFile=\`basnam ${D}outFile .dll\`
+    outFile=\`basnam @S|@outFile .dll\`
     ;;
 *.DLL)
-    outFile=\`basnam ${D}outFile .DLL\`
+    outFile=\`basnam @S|@outFile .DLL\`
     ;;
 *.o)
-    outFile=\`basnam ${D}outFile .o\`
+    outFile=\`basnam @S|@outFile .o\`
     ;;
 *.obj)
-    outFile=\`basnam ${D}outFile .obj\`
+    outFile=\`basnam @S|@outFile .obj\`
     ;;
 *.a)
-    outFile=\`basnam ${D}outFile .a\`
+    outFile=\`basnam @S|@outFile .a\`
     ;;
 *.lib)
-    outFile=\`basnam ${D}outFile .lib\`
+    outFile=\`basnam @S|@outFile .lib\`
     ;;
 *)
     ;;
 esac
-case ${D}outimpFile in
+case @S|@outimpFile in
 *.a)
-    outimpFile=\`basnam ${D}outimpFile .a\`
+    outimpFile=\`basnam @S|@outimpFile .a\`
     ;;
 *.lib)
-    outimpFile=\`basnam ${D}outimpFile .lib\`
+    outimpFile=\`basnam @S|@outimpFile .lib\`
     ;;
 *)
     ;;
 esac
-if [[] -z ${D}outimpFile []]; then
-    outimpFile=${D}outFile
+if @<:@ -z @S|@outimpFile @:>@; then
+    outimpFile=@S|@outFile
 fi
-defFile="${D}{outFile}.def"
-arcFile="${D}{outimpFile}.a"
-arcFile2="${D}{outimpFile}.lib"
-dllFile="${D}outFile"
+defFile="@S|@{outFile}.def"
+arcFile="@S|@{outimpFile}.a"
+arcFile2="@S|@{outimpFile}.lib"
+dllFile="@S|@outFile"
 # Add suffix to dllFile later, first we need a version to use as
 # name in .def file.
 
-if [[] ${D}do_backup -ne 0 []] ; then
-    if [[] -f ${D}arcFile []] ; then
-        doCommand "mv ${D}arcFile ${D}{outFile}_s.a"
+if @<:@ @S|@do_backup -ne 0 @:>@ ; then
+    if @<:@ -f @S|@arcFile @:>@ ; then
+        doCommand "mv @S|@arcFile @S|@{outFile}_s.a"
     fi
-    if [[] -f ${D}arcFile2 []] ; then
-        doCommand "mv ${D}arcFile2 ${D}{outFile}_s.lib"
+    if @<:@ -f @S|@arcFile2 @:>@ ; then
+        doCommand "mv @S|@arcFile2 @S|@{outFile}_s.lib"
     fi
 fi
 
 # Extract public symbols from all the object files.
-tmpdefFile=${D}{defFile}_%
-rm -f ${D}tmpdefFile
-for file in ${D}inputFiles ; do
-    case ${D}file in
+tmpdefFile=@S|@{defFile}_%
+rm -f @S|@tmpdefFile
+for file in @S|@inputFiles ; do
+    case @S|@file in
     *!)
         ;;
     *)
-        doCommand "emxexp -u ${D}file >> ${D}tmpdefFile"
+        doCommand "emxexp -u @S|@file >> @S|@tmpdefFile"
         ;;
     esac
 done
 
 # Create the def file.
-rm -f ${D}defFile
-echo "LIBRARY \`basnam ${D}dllFile\` ${D}library_flags" >> ${D}defFile
-dllFile="${D}dllFile.dll"
-if [[] -n ${D}description []]; then
-    echo "DESCRIPTION  \"${D}{description}\"" >> ${D}defFile
+rm -f @S|@defFile
+echo "LIBRARY \`basnam @S|@dllFile\` @S|@library_flags" >> @S|@defFile
+dllFile="@S|@dllFile.dll"
+if @<:@ -n @S|@description @:>@; then
+    echo "DESCRIPTION  \"@S|@{description}\"" >> @S|@defFile
 fi
-echo "EXPORTS" >> ${D}defFile
+echo "EXPORTS" >> @S|@defFile
 
-doCommand "cat ${D}tmpdefFile | sort.exe | uniq.exe > ${D}{tmpdefFile}%"
-grep -v "^ *;" < ${D}{tmpdefFile}% | grep -v "^ *${D}" >${D}tmpdefFile
+doCommand "cat @S|@tmpdefFile | sort.exe | uniq.exe > @S|@{tmpdefFile}%"
+grep -v "^ *;" < @S|@{tmpdefFile}% | grep -v "^ *@S|@" >@S|@tmpdefFile
 
 # Checks if the export is ok or not.
-for word in ${D}exclude_symbols; do
-    grep -v ${D}word < ${D}tmpdefFile >${D}{tmpdefFile}%
-    mv ${D}{tmpdefFile}% ${D}tmpdefFile
+for word in @S|@exclude_symbols; do
+    grep -v @S|@word < @S|@tmpdefFile >@S|@{tmpdefFile}%
+    mv @S|@{tmpdefFile}% @S|@tmpdefFile
 done
 
 
-if [[] ${D}EXPORT_BY_ORDINALS -ne 0 []]; then
-    sed "=" < ${D}tmpdefFile | \
+if @<:@ @S|@EXPORT_BY_ORDINALS -ne 0 @:>@; then
+    sed "=" < @S|@tmpdefFile | \
     sed '
       N
       : loop
-      s/^\([[]0-9[]]\+\)\([[]^;[]]*\)\(;.*\)\?/\2 @\1 NONAME/
+      s/^\(@<:@0-9@:>@\+\)\(@<:@^;@:>@*\)\(;.*\)\?/\2 @\1 NONAME/
       t loop
-    ' > ${D}{tmpdefFile}%
-    grep -v "^ *${D}" < ${D}{tmpdefFile}% > ${D}tmpdefFile
+    ' > @S|@{tmpdefFile}%
+    grep -v "^ *@S|@" < @S|@{tmpdefFile}% > @S|@tmpdefFile
 else
-    rm -f ${D}{tmpdefFile}%
+    rm -f @S|@{tmpdefFile}%
 fi
-cat ${D}tmpdefFile >> ${D}defFile
-rm -f ${D}tmpdefFile
+cat @S|@tmpdefFile >> @S|@defFile
+rm -f @S|@tmpdefFile
 
 # Do linking, create implib, and apply lxlite.
 gccCmdl="";
-for file in ${D}inputFiles ; do
-    case ${D}file in
+for file in @S|@inputFiles ; do
+    case @S|@file in
     *!)
         ;;
     *)
-        gccCmdl="${D}gccCmdl ${D}file"
+        gccCmdl="@S|@gccCmdl @S|@file"
         ;;
     esac
 done
-doCommand "${D}CC ${D}CFLAGS -Zdll -o ${D}dllFile ${D}defFile ${D}gccCmdl ${D}EXTRA_CFLAGS"
-touch "${D}{outFile}.dll"
+doCommand "@S|@CC @S|@CFLAGS -Zdll -o @S|@dllFile @S|@defFile @S|@gccCmdl @S|@EXTRA_CFLAGS"
+touch "@S|@{outFile}.dll"
 
-doCommand "emximp -o ${D}arcFile ${D}defFile"
-if [[] ${D}flag_USE_LXLITE -ne 0 []]; then
+doCommand "emximp -o @S|@arcFile @S|@defFile"
+if @<:@ @S|@flag_USE_LXLITE -ne 0 @:>@; then
     add_flags="";
-    if [[] ${D}EXPORT_BY_ORDINALS -ne 0 []]; then
+    if @<:@ @S|@EXPORT_BY_ORDINALS -ne 0 @:>@; then
         add_flags="-ynd"
     fi
-    doCommand "lxlite -cs -t: -mrn -mln ${D}add_flags ${D}dllFile"
+    doCommand "lxlite -cs -t: -mrn -mln @S|@add_flags @S|@dllFile"
 fi
-doCommand "emxomf -s -l ${D}arcFile"
+doCommand "emxomf -s -l @S|@arcFile"
 
 # Successful exit.
 CleanUp 1
@@ -1166,45 +1166,45 @@ DEPSMODE=${DEPSMODE}
 DEPSDIR=.deps
 DEPSFLAG_GCC="${DEPSFLAG_GCC}"
 
-mkdir -p ${D}DEPSDIR
+mkdir -p @S|@DEPSDIR
 
-if test ${D}DEPSMODE = gcc ; then
-    ${D}* ${D}{DEPSFLAG_GCC}
-    status=${D}?
-    if test ${D}{status} != 0 ; then
-        exit ${D}{status}
+if test @S|@DEPSMODE = gcc ; then
+    @S|@* @S|@{DEPSFLAG_GCC}
+    status=@S|@?
+    if test @S|@{status} != 0 ; then
+        exit @S|@{status}
     fi
     # move created file to the location we want it in:
-    while test ${D}# -gt 0; do
-        case "${D}1" in
+    while test @S|@# -gt 0; do
+        case "@S|@1" in
             -o )
                 shift
-                objfile=${D}1
+                objfile=@S|@1
             ;;
             -* )
             ;;
             * )
-                srcfile=${D}1
+                srcfile=@S|@1
             ;;
         esac
         shift
     done
-    depfile=\`basename ${D}srcfile | sed -e 's/\..*${D}/.d/g'\`
-    depobjname=\`echo ${D}depfile |sed -e 's/\.d/.o/g'\`
-    if test -f ${D}depfile ; then
-        sed -e "s,${D}depobjname:,${D}objfile:,g" ${D}depfile >${D}{DEPSDIR}/${D}{objfile}.d
-        rm -f ${D}depfile
+    depfile=\`basename @S|@srcfile | sed -e 's/\..*@S|@/.d/g'\`
+    depobjname=\`echo @S|@depfile |sed -e 's/\.d/.o/g'\`
+    if test -f @S|@depfile ; then
+        sed -e "s,@S|@depobjname:,@S|@objfile:,g" @S|@depfile >@S|@{DEPSDIR}/@S|@{objfile}.d
+        rm -f @S|@depfile
     else
-        depfile=\`basename ${D}objfile | sed -e 's/\..*${D}/.d/g'\`
-        if test -f ${D}depfile ; then
-            sed -e "/^${D}objfile/!s,${D}depobjname:,${D}objfile:,g" ${D}depfile >${D}{DEPSDIR}/${D}{objfile}.d
-            rm -f ${D}depfile
+        depfile=\`basename @S|@objfile | sed -e 's/\..*@S|@/.d/g'\`
+        if test -f @S|@depfile ; then
+            sed -e "/^@S|@objfile/!s,@S|@depobjname:,@S|@objfile:,g" @S|@depfile >@S|@{DEPSDIR}/@S|@{objfile}.d
+            rm -f @S|@depfile
         fi
     fi
     exit 0
 else
-    ${D}*
-    exit ${D}?
+    @S|@*
+    exit @S|@?
 fi
 EOF
 dnl ===================== bk-deps ends here =====================
@@ -1229,8 +1229,8 @@ args=""
 objects=""
 linking_flag="-dynamiclib"
 
-while test ${D}# -gt 0; do
-    case ${D}1 in
+while test @S|@# -gt 0; do
+    case @S|@1 in
 
        -v)
         verbose=1
@@ -1238,31 +1238,31 @@ while test ${D}# -gt 0; do
 
        -o|-compatibility_version|-current_version|-framework|-undefined|-install_name)
         # collect these options and values
-        args="${D}{args} ${D}1 ${D}2"
+        args="@S|@{args} @S|@1 @S|@2"
         shift
         ;;
 
        -l*|-L*|-flat_namespace|-headerpad_max_install_names)
         # collect these options
-        args="${D}{args} ${D}1"
+        args="@S|@{args} @S|@1"
         ;;
 
        -dynamiclib|-bundle)
-        linking_flag="${D}1"
+        linking_flag="@S|@1"
         ;;
 
        -*)
-        echo "shared-ld: unhandled option '${D}1'"
+        echo "shared-ld: unhandled option '@S|@1'"
         exit 1
         ;;
 
         *.o | *.a | *.dylib)
         # collect object files
-        objects="${D}{objects} ${D}1"
+        objects="@S|@{objects} @S|@1"
         ;;
 
         *)
-        echo "shared-ld: unhandled argument '${D}1'"
+        echo "shared-ld: unhandled argument '@S|@1'"
         exit 1
         ;;
 
@@ -1273,31 +1273,31 @@ done
 #
 # Link one module containing all the others
 #
-if test ${D}{verbose} = 1; then
-    echo "c++ -r -keep_private_externs -nostdlib ${D}{objects} -o master.${D}${D}.o"
+if test @S|@{verbose} = 1; then
+    echo "c++ -r -keep_private_externs -nostdlib @S|@{objects} -o master.@S|@@S|@.o"
 fi
-c++ -r -keep_private_externs -nostdlib ${D}{objects} -o master.${D}${D}.o
-status=${D}?
-if test ${D}{status} != 0; then
-    exit ${D}{status}
+c++ -r -keep_private_externs -nostdlib @S|@{objects} -o master.@S|@@S|@.o
+status=@S|@?
+if test @S|@{status} != 0; then
+    exit @S|@{status}
 fi
 
 #
 # Link the shared library from the single module created
 #
-if test ${D}{verbose} = 1; then
-    echo "cc ${D}{linking_flag} master.${D}${D}.o ${D}{args}"
+if test @S|@{verbose} = 1; then
+    echo "cc @S|@{linking_flag} master.@S|@@S|@.o @S|@{args}"
 fi
-c++ ${D}{linking_flag} master.${D}${D}.o ${D}{args}
-status=${D}?
-if test ${D}{status} != 0; then
-    exit ${D}{status}
+c++ @S|@{linking_flag} master.@S|@@S|@.o @S|@{args}
+status=@S|@?
+if test @S|@{status} != 0; then
+    exit @S|@{status}
 fi
 
 #
 # Remove intermediate module
 #
-rm -f master.${D}${D}.o
+rm -f master.@S|@@S|@.o
 
 exit 0
 EOF
