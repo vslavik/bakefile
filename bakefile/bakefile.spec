@@ -30,6 +30,8 @@ make
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
 %makeinstall
+ln -sf ../lib/bakefile/bakefile.py $RPM_BUILD_ROOT/usr/bin/bakefile
+ln -sf ../lib/bakefile/bakefile_gen.py $RPM_BUILD_ROOT/usr/bin/bakefile_gen
 
 %clean
 rm -rf $RPM_BUILD_ROOT
