@@ -125,6 +125,7 @@
     <tag-info name="precomp-headers" exclusive="1"/>
     <tag-info name="precomp-headers-file" exclusive="1"/>
     <tag-info name="precomp-headers-header" exclusive="1"/>
+    <tag-info name="precomp-headers-location" exclusive="1"/>
     <tag-info name="precomp-headers-gen" exclusive="1"/>
     
     <tag-info name="cxx-rtti" exclusive="1"/>
