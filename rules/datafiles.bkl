@@ -125,6 +125,7 @@
     
     <define-rule name="copy-files" extends="action">
         <template>
+            <is-phony/>
             <set var="__srcdir"/>
             <set var="__copy_cmd" eval="0">
                 
