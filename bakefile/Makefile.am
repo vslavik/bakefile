@@ -9,7 +9,7 @@ codeempydir = $(codedir)/empy
 codeoptikdir = $(codedir)/optik
 
 aclocal_DATA = autoconf/bakefile.m4
-man_MANS = doc/man/bakefile.1
+#man_MANS = doc/man/bakefile.1
 
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
