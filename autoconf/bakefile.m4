@@ -509,9 +509,9 @@ AC_DEFUN([AC_BAKEFILE_DEPS],
         esac
         AC_MSG_RESULT([gcc])
     elif test "x$MWCC" = "xyes"; then
-        DEPSMODE=gcc
+        DEPSMODE=mwcc
         DEPS_TRACKING=1
-        DEPSFLAG_GCC="-MMD"
+        DEPSFLAG_MWCC="-MM"
         AC_MSG_RESULT([mwcc])
     else
         AC_MSG_RESULT([none])
@@ -1193,6 +1193,7 @@ cat <<EOF >bk-deps
 DEPSMODE=${DEPSMODE}
 DEPSDIR=.deps
 DEPSFLAG_GCC="${DEPSFLAG_GCC}"
+DEPSFLAG_MWCC="${DEPSFLAG_MWCC}"
 
 mkdir -p ${D}DEPSDIR
 
@@ -1229,6 +1230,31 @@ if test ${D}DEPSMODE = gcc ; then
             rm -f ${D}depfile
         fi
     fi
+    exit 0
+elif test ${D}DEPSMODE = mwcc ; then
+    ${D}*
+    status=${D}?
+    if test ${D}{status} != 0 ; then
+        exit ${D}{status}
+    fi
+    # Run mwcc again with -MM and redirect into the dep file we want
+    # NOTE: We can't use shift here because we need ${D}* to be valid
+    prevarg=
+    for arg in ${D}* ; do
+        if test "${D}prevarg" = "-o"; then
+            objfile=${D}arg
+        else
+            case "${D}arg" in
+                -* )
+                ;;
+                * )
+                    srcfile=${D}arg
+                ;;
+            esac
+        fi
+        prevarg="${D}arg"
+    done
+    ${D}* ${D}DEPSFLAG_MWCC >${D}{DEPSDIR}/${D}{objfile}.d
     exit 0
 else
     ${D}*
