@@ -32,6 +32,8 @@ def __stringify(x):
 def __valueToPy(v):
     return v.replace('\\', '\\\\')
 
+__preparedMkVars = None
+
 def __copyMkToVars():
     dict = {}
     
@@ -132,7 +134,7 @@ def invoke(method):
                     '-I','os,os.path',
                     '-B',
                     '-o',filename,
-                    '-E','globals().update(writer.__copyMkToVars())',
+                    '-E','globals().update(writer.__preparedMkVars)',
                     '-D','RULESDIR="%s"' % rulesdir.replace('\\','\\\\'),
                     template])
     txt = __readFile(filename)
@@ -151,7 +153,11 @@ def __saveResult(files, filename, method, data):
         return files
 
 def write():
+    if config.verbose: print 'preparing generator...'
+    global __preparedMkVars
+    __preparedMkVars = __copyMkToVars()
     outs = {}
+    
     for file, writer, method in config.to_output:
         try:
             if config.verbose: print 'generating %s...' % file
