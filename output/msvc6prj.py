@@ -137,7 +137,7 @@ Package=<4>
                     d2 = d
                 deps += self.makeDependency(d2)
 
-            dsw += project % (t.id, dsp_name, deps)
+            dsw += project % (dsp_name, dsp_name, deps)
             dspfile = (t, 
                        os.path.join(self.dirname,
                                     dsp_name + '.' + self.getDspExtension()),
@@ -283,7 +283,7 @@ BSC32=bscmake.exe
         # Create header and list of configurations:
         
         default_cfg = sortedKeys(t.configs)[-1]
-        dsp = self.makeDspHeader(t.id)
+        dsp = self.makeDspHeader(prjname)
         targ_types = []
         for c in t.configs:
             targ = '%s %s' % (t.configs[c]._type, t.configs[c]._type_code)
