@@ -98,7 +98,7 @@
     <set var="__exe_baser">__borland_exe</set>
     <set var="__dll_baser">__borland_dll</set>
     <set var="__lib_baser">__borland_comp</set>
-
+    
     <define-rule name="__borland_comp">
         <template>
             <set var="__rtldll_flag" eval="0"/>
@@ -143,7 +143,7 @@
         </define-tag>
         <define-tag name="precomp-headers-gen">
             <set var="__pch_object">$(getObjectName(value, id, OBJEXT))</set>
-            <set var="__deps" append="1">$(__pch_object)</set>
+            <set var="__deps">$(__pch_object) $(__deps)</set>
             <modify-target target="$(__pch_object)">
                 <set var="__cflags" append="1">-H</set>
                 <set var="__cxxflags" append="1">-H</set>
