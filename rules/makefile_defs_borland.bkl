@@ -190,13 +190,13 @@
         <!-- implib -f: force import by name (rather than ordinal) -->
         <set var="__LINK_DLL_CMD" eval="0">
             $(__dll_linker) $(__ldflags) @&amp;&amp;|
-            $(__startup) $(__objects_var),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
+            $(__startup) $(__objects_var),$@,,$(__ldlibs) import32.lib $(__rtl),,$(__win32res)
             |
             implib -f $(__targetdir)$(__libname) $@
         </set>
         <set var="__LINK_MODULE_CMD" eval="0">
             $(__module_linker) $(__ldflags) @&amp;&amp;|
-            $(__startup) $(__objects_var),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
+            $(__startup) $(__objects_var),$@,,$(__ldlibs) import32.lib $(__rtl),,$(__win32res)
             |
         </set>
     </template>
