@@ -8,6 +8,7 @@
 DEPSMODE=@DEPSMODE@
 DEPSDIR=.deps
 DEPSFLAG_GCC="@DEPSFLAG_GCC@"
+DEPSFLAG_MWCC="@DEPSFLAG_MWCC@"
 
 mkdir -p $DEPSDIR
 
@@ -44,6 +45,31 @@ if test $DEPSMODE = gcc ; then
             rm -f $depfile
         fi
     fi
+    exit 0
+elif test $DEPSMODE = mwcc ; then
+    $*
+    status=$?
+    if test ${status} != 0 ; then
+        exit ${status}
+    fi
+    # Run mwcc again with -MM and redirect into the dep file we want
+    # NOTE: We can't use shift here because we need $* to be valid
+    prevarg=
+    for arg in $* ; do
+        if test "$prevarg" = "-o"; then
+            objfile=$arg
+        else
+            case "$arg" in
+                -* )
+                ;;
+                * )
+                    srcfile=$arg
+                ;;
+            esac
+        fi
+        prevarg="$arg"
+    done
+    $* $DEPSFLAG_MWCC >${DEPSDIR}/${objfile}.d
     exit 0
 else
     $*
