@@ -71,6 +71,14 @@
                 /out:"$(__targetdir)$(__targetname)"
             </set>
             <ldflags>$(__outflag)</ldflags>
+
+            <!-- precompiled headers support (see also msvc_common.bkl): -->
+            <set var="__pch_use_pch">0</set>
+            <set var="__pch_header"/>
+            <set var="__pch_flags">/YX</set>
+            <set var="__pch_generator"/>   <!-- if set generates pch -->
+            <set var="__pch_excluded"/> <!-- files that don't use it -->
+            
         </template>
         
         <define-tag name="sources">
@@ -147,6 +155,18 @@
         
         <define-tag name="msvc-project-files">
             <set var="__more_files" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="precomp-headers-gen">
+            <set var="__pch_generator">$(nativePaths(value))</set>
+        </define-tag>
+        <define-tag name="precomp-headers-exclude">
+            <set var="__pch_excluded" append="1">$(nativePaths(value))</set>
+        </define-tag>    
+        <define-tag name="precomp-headers">
+            <set var="__pch_use_pch"> 
+                $(substituteFromDict(value,{'on':'1', 'off':'0'}))
+            </set>
         </define-tag>
 
     </define-rule>
@@ -235,12 +255,6 @@
     <define-tag name="so_version" rules="dll"/>
     <define-tag name="mac_version" rules="dll"/>
 
-    <!-- FIXME FIXME FIXME -->
-    <define-tag name="precomp-headers" rules="dll,exe,lib"/>
-    <define-tag name="precomp-headers-file" rules="dll,exe,lib"/>
-    <define-tag name="precomp-headers-header" rules="dll,exe,lib"/>
-    <define-tag name="precomp-headers-gen" rules="dll,exe,lib"/>
-    
 
     <include file="msvc_common.bkl"/>
     

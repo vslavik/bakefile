@@ -231,6 +231,9 @@ BSC32=bscmake.exe
     }
     files = filterGroups(groups, group_defs, sources.keys())
 
+    # (some files-related settings:)
+    pchExcluded = t.__pch_excluded.split()
+
     # (write them)
     for group in files:
         lst = files[group]
@@ -248,18 +251,24 @@ BSC32=bscmake.exe
 
 SOURCE=%s\%s
 """ % (SRCDIR,src)
+            file_flags = ''
+            if src == t.__pch_generator:
+                file_flags += '# ADD BASE CPP /Yc"%s"\n' % t.__pch_header
+                file_flags += '# ADD CPP /Yc"%s"\n' % t.__pch_header
+            if src in pchExcluded:
+                file_flags += '# SUBTRACT CPP /YX /Yc /Yu\n'
             if sources[src] != None:
                 # the file is disabled in some configurations:
                 flags = []
                 for c in t.configs:
-                    if c in sources[src]:
-                        file_flags = ''
-                    else:
-                        file_flags = '\n# PROP Exclude_From_Build 1\n'
+                    if c not in sources[src]:
+                        file_flags += '# PROP Exclude_From_Build 1\n'
                     flags.append('  "$(CFG)" == "%s"' % mkConfigName(t.id, c) +
-                                 '\n' + file_flags + '\n')
+                                 '\n\n' + file_flags + '\n')
                 dsp += '\n!IF' + '!ELSEIF'.join(flags) + '!ENDIF\n\n'
-            dsp += '# End  Source File\n'
+            else:
+                dsp += file_flags
+            dsp += '# End Source File\n'
         if group != None:
             dsp += '# End Group\n'
 
