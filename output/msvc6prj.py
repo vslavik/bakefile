@@ -57,9 +57,7 @@ def sortByBasename(files):
 #   DSW file
 # ------------------------------------------------------------------------
 
-def genDSW(dsw_targets, dsp_list, suffix=''):
-    if suffix != '':
-        suffix = '_%s' % suffix
+def genDSW(dsw_targets, dsp_list):
     dsw = """\
 Microsoft Developer Studio Workspace File, Format Version 6.00
 # WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
@@ -93,51 +91,13 @@ End Project Dependency
         dspfile = (t, os.path.join(dirname, dsp_name+'.dsp'), dsp_name)
         if dspfile not in dsp_list:
             dsp_list.append(dspfile)
-    writer.writeFile('%s.dsw' % (os.path.join(dirname,basename+suffix)), dsw)
+    writer.writeFile('%s.dsw' % (os.path.join(dirname,basename)), dsw)
 
 
 
 def genWorkspaces():
-    # VC++ project files can't enable targets only in some configurations,
-    # so we must create multiple .dsw files in case configurations include
-    # different targets:
-    tgall = {}
-    tgsets = {}
-    for c in configs:
-        tgall[c] = [t for t in configs[c][1].keys() \
-                    if targets[t].__kind == 'project']
-        key = str(tgall[c])
-        if key in tgsets:
-            tgsets[key].append(c)
-        else:
-            tgsets[key] = [c]
-    
     dsp_list = []
-
-    if len(tgsets) <= 1:
-        genDSW([t for t in targets if t.__kind == 'project'], dsp_list)
-    else:
-        try:
-            dsw_configs = MSVC_DSW_CONFIGS.split()
-        except NameError:
-            raise errors.Error('some targets are not present in some configurations,\nplease set MSVC_DSW_CONFIGS variable (%s)' % tgall)
-        for dc in dsw_configs:
-            pos = dc.find('=')
-            if pos == -1:
-                raise errors.Error("malformed MSVC_DSW_CONFIGS component: '%s'" % dc)
-            dsw_name = dc[:pos]
-            config = dc[pos+1:].split(',')
-            for set in tgsets:
-                cfg = tgsets[set][0].split()
-                ok = 1
-                for cpart in config:
-                    if cpart not in cfg:
-                        ok = 0
-                        break
-                if ok:
-                    genDSW([targets[x] for x in tgall[tgsets[set][0]]],
-                           dsp_list, dsw_name)
-    
+    genDSW([t for t in targets if t.__kind == 'project'], dsp_list)
     for t, filename, prjname in dsp_list:
         genDSP(t, filename, prjname)
 
