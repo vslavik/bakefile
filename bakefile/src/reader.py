@@ -225,7 +225,7 @@ def handleModifyTarget(e, dict):
 
 
 def _processTargetNodes(list, target, tags, dict):
-    def processCmd(e, target, dict):
+    def processCmd(e, target, dict):        
         if e.name == 'set':
             handleSet(e, target=target, add_dict=dict)
         elif e.name == 'modify-target':

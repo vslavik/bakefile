@@ -323,8 +323,12 @@ makefiles (most notably GNU Make and Autoconf formats).
     <action id="install"/>
     <action id="uninstall"/>
 
+    <set var="__ALWAYS_CLEAN">
+        $(BUILDDIR)$(DIRSEP)*$(OBJEXT)
+    </set>
     <action id="clean">
-        <command>$(RM) $(BUILDDIR)$(DIRSEP)*$(OBJEXT)</command>        
+        <set var="__clean_cmd" eval="0">$(RM) $(__ALWAYS_CLEAN)</set>
+        <command>$(__clean_cmd)</command>
     </action>
 
 </makefile>
