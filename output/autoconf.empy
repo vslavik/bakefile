@@ -11,14 +11,6 @@ include @OPTIONS_FILE.replace('.in','')
 srcdir = @@srcdir@@
 top_srcdir = @@top_srcdir@@
 
-### Conditionally set variables: ###
-
-@[ for c in cond_vars :@
-@[ for v in c.values :@
-@@COND_@v.cond.name@@@c.name = @v.value.replace('\n',' \\\n@COND_%s@' % v.cond.name)
-]@
-]@
-
 ### Targets: ###
 @[ for t in targets :
 @t.__targetdir@t.__targetname: @t.__deps
