@@ -92,7 +92,8 @@ CleanUp() {
 
 # Print usage and exit script with rc=1.
 PrintHelp() {
- echo 'Usage: dllar [-o[utput] output_file] [-i[mport] importlib_name]'
+ echo 'Usage: dllar.sh [-o[utput] output_file] [-i[mport] importlib_name]'
+ echo '       [-name-mangler-script script.sh]'
  echo '       [-d[escription] "dll descrption"] [-cc "CC"] [-f[lags] "CFLAGS"]'
  echo '       [-ord[inals]] -ex[clude] "symbol(s)"'
  echo '       [-libf[lags] "{INIT|TERM}{GLOBAL|INSTANCE}"] [-nocrt[dll]] [-nolxl[ite]]'
@@ -106,6 +107,13 @@ PrintHelp() {
  echo '   This name is used as the import library name and may be longer and'
  echo '   more descriptive than the DLL name which has to follow the old '
  echo '   8.3 convention of FAT.'
+ echo '*> "script.sh may be given to override the output_file name by a'
+ echo '   different name. It is mainly useful if the regular make process'
+ echo '   of some package does not take into account OS/2 restriction of'
+ echo '   DLL name lengths. It takes the importlib name as input and is'
+ echo '   supposed to procude a shorter name as output. The script should'
+ echo '   expect to get importlib_name without extension and should produce'
+ echo '   a (max.) 8 letter name without extension.'
  echo '*> "cc" is used to use another GCC executable.   (default: gcc.exe)'
  echo '*> "flags" should be any set of valid GCC flags. (default: -s -Zcrtdll)'
  echo '   These flags will be put at the start of GCC command line.'
@@ -155,6 +163,7 @@ cmdLine=$*
 outFile=""
 outimpFile=""
 inputFiles=""
+renameScript=""
 description=""
 CC=gcc.exe
 CFLAGS="-s -Zcrtdll"
@@ -173,6 +182,7 @@ case $curDirS in
 esac
 # Parse commandline
 libsToLink=0
+omfLinking=0
 while [ $1 ]; do
     case $1 in
     -ord*)
@@ -185,6 +195,10 @@ while [ $1 ]; do
     -i*)
         shift
         outimpFile=$1
+        ;;
+    -name-mangler-script)
+        shift
+        renameScript=$1
         ;;
     -d*)
         shift
@@ -220,10 +234,21 @@ while [ $1 ]; do
         -L* | -l*)
             libsToLink=1
             ;;
+        -Zomf)
+            omfLinking=1
+            ;;
         *)
             ;;
         esac
         EXTRA_CFLAGS=${EXTRA_CFLAGS}" "$1
+        ;;
+    *.dll)
+        EXTRA_CFLAGS="${EXTRA_CFLAGS} `basnam $1 .dll`"
+        if [ $omfLinking -eq 1 ]; then
+            EXTRA_CFLAGS="${EXTRA_CFLAGS}.lib"
+	else
+            EXTRA_CFLAGS="${EXTRA_CFLAGS}.a"
+        fi
         ;;
     *)
         found=0;
@@ -355,9 +380,13 @@ fi
 defFile="${outFile}.def"
 arcFile="${outimpFile}.a"
 arcFile2="${outimpFile}.lib"
-dllFile="$outFile"
-# Add suffix to dllFile later, first we need a version to use as
-# name in .def file.
+
+#create $dllFile as something matching 8.3 restrictions,
+if [ -z $renameScript ] ; then
+    dllFile="$outFile"
+else
+    dllFile=`$renameScript $outimpFile`
+fi
 
 if [ $do_backup -ne 0 ] ; then
     if [ -f $arcFile ] ; then
@@ -384,8 +413,8 @@ done
 # Create the def file.
 rm -f $defFile
 echo "LIBRARY `basnam $dllFile` $library_flags" >> $defFile
-dllFile="$dllFile.dll"
-if [ -n $description ]; then
+dllFile="${dllFile}.dll"
+if [ ! -z $description ]; then
     echo "DESCRIPTION  \"${description}\"" >> $defFile
 fi
 echo "EXPORTS" >> $defFile
