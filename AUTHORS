@@ -14,5 +14,7 @@ Artur Frysiak <wiget@users.sourceforge.net>
  Reused code:
 --------------
 
-Empy: by Erik Max Francis <software@alcyone.com> 
-      http://www.alcyone.com/pyos/empy
+Empy:  by Erik Max Francis <software@alcyone.com> 
+       http://www.alcyone.com/pyos/empy
+Optik: by Greg Ward <gward@python.net> et al
+       http://optik.sourceforge.net
