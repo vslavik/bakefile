@@ -43,14 +43,17 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__LINKER_CC" eval="0">$(CC)</set>
     <set var="__LINKER_CXX" eval="0">$(CXX)</set>
 
+    <set var="CCC" overwrite="0" eval="0">$(CC)</set>
+    <set var="CXXC" overwrite="0" eval="0">$(CXX)</set>
+
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -c -o $@ $(__cppflags) $(__cflags) $&lt;
+            $(CCC) -c -o $@ $(__cppflags) $(__cflags) $&lt;
         </set>
     </template>
     <template id="__commands_templ_CXX">
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -c -o $@ $(__cppflags) $(__cxxflags) $&lt;
+            $(CXXC) -c -o $@ $(__cppflags) $(__cxxflags) $&lt;
         </set>
     </template>
     <template id="__commands_templ">
