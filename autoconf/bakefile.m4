@@ -596,6 +596,9 @@ AC_DEFUN(AC_BAKEFILE_PRECOMP_HEADERS,
                 ],
                 [
                     AC_MSG_RESULT([yes])
+                    dnl FIXME - this is temporary, till .gch dependencies 
+                    dnl         are fixed in generated Makefiles
+                    CPPFLAGS="-fpch-deps $CPPFLAGS"
                     GCC_PCH=1
                 ],
                 [
