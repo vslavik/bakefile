@@ -118,7 +118,7 @@
                       <para>
                           If present, the variable is set only if the condition
                           is met. If the condition evaluates to 0, the variable
-                          is not set, if it evalues to 1, the variable is set.
+                          is not set, if it evaluates to 1, the variable is set.
                           If condition's value can't be determined at the time
                           of makefile processing, a
                           <link linkend="concept.condvar">conditional variable
@@ -551,9 +551,9 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
 </if>
 ]]></programlisting>
           The condition must be
-          <link linkend="concept.conditions.weak">weak</link>. If it evalues to
+          <link linkend="concept.conditions.weak">weak</link>. If it evaluates to
           1 nodes under <function>if</function> node are processed as if they
-          were toplevel nodes. If it evalues to 0, they are discarded.
+          were toplevel nodes. If it evaluates to 0, they are discarded.
         </para>
       </section>
       
