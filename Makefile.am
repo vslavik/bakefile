@@ -1,10 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
 aclocaldir = $(datadir)/aclocal
-outputdir = $(pkglibdir)/output
-rulesdir = $(pkglibdir)/rules
+outputdir = $(pkgdatadir)/output
+rulesdir = $(pkgdatadir)/rules
 rulesgettextdir = $(rulesdir)/gettext
-codedir = $(pkglibdir)/src
+codedir = $(pkglibdir)
 codeempydir = $(codedir)/empy
 codeoptikdir = $(codedir)/optik
 
@@ -107,9 +107,9 @@ dist-hook:
 
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
-	ln -sf ../lib/bakefile/src/bakefile.py $(DESTDIR)$(bindir)/bakefile
+	ln -sf $(codedir)/bakefile.py $(DESTDIR)$(bindir)/bakefile
 	chmod +x $(DESTDIR)$(codedir)/bakefile.py
-	ln -sf ../lib/bakefile/src/bakefile_gen.py $(DESTDIR)$(bindir)/bakefile_gen
+	ln -sf $(codedir)/bakefile_gen.py $(DESTDIR)$(bindir)/bakefile_gen
 	chmod +x $(DESTDIR)$(codedir)/bakefile_gen.py
 
 ACLOCAL_AMFLAGS = -I admin

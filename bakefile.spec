@@ -37,6 +37,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc README THANKS doc/html
 %{_bindir}/*
+%dir %{_datadir}/bakefile
+%{_datadir}/bakefile/*
 %dir %{_libdir}/bakefile
 %{_libdir}/bakefile/*
 %{_datadir}/aclocal/bakefile.m4
