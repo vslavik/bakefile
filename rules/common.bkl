@@ -3,6 +3,7 @@
 
     <include file="version.bkl"/>
     <include file="dirs.bkl"/>
+    <include file="format_features.bkl"/>
 
 
     <!-- Variables redefined in other (more specific) ruleset files: -->

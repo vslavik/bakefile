@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<!--
+This is a helper file that declares variables that describe optional format
+backend features. All features are set to 0 ("unsupported") here and format
+files such as autoconf.bkl must override the setting if they want to take
+advantage of a particular feature.
+-->
+
+<makefile>
+
+    <!--
+
+    Makefiles generally do, that's why makefile.bkl sets this to 1.
+    -->
+    <set var="FORMAT_HAS_VARIABLES">0</set>
+
+</makefile>
+
