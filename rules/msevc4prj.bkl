@@ -12,7 +12,7 @@
          included. Supported CPU types are listed in variable EVC_ALL_CPUS.
          Special value "all" will include all supported CPUs.
     -->
-    <set var="EVC_CPUS">ARMV4</set>
+    <set var="EVC_CPUS">all</set>
 
     <!-- All supported CPUs: -->
     <set var="EVC_ALL_CPUS">
