@@ -27,17 +27,17 @@
     <!-- =============================================================== -->
 
     <define-tag name="win32-res" rules="exe,dll">
-        <set var="__win32res">
-            option resource=$(sources2objects(value, id, '.res'))
-        </set>
+        <set var="__win32res">$(sources2objects(value, id, '.res'))</set>
+        <set var="__win32res_flag">option resource=$(__win32res)</set>
         <set var="__deps" append="1">$(__win32res)</set>
     </define-tag>
 
     <!-- compilation rule for .rc files:  -->
     <define-rule name="__rc-to-res" extends="__any,compilation_rule">
         <template>
+            <set var="__deps" append="1">.AUTODEPEND</set>
             <set var="__command" eval="0">
-                brcc32 -32 -r -fo$@ -i\$(BCCDIR)\include $(__win32rc_flags) $**
+                wrc -q -ad -bt=nt -r -fo=$^@ $(__win32rc_flags) $&lt;
             </set>
         </template>
         <define-tag name="parent-target">
@@ -48,7 +48,7 @@
     <!-- includes and defines should propagate to rc compilation, too: -->
     <define-tag name="include" rules="exe,dll">
         <set var="__win32rc_flags" append="1">
-            $(addPrefixIfNotEmpty('-i',value))</set>
+            $(addPrefixIfNotEmpty('-i=',nativePaths(value)))</set>
     </define-tag>
     <define-tag name="define" rules="exe,dll">
         <set var="__win32rc_flags" append="1">

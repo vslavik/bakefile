@@ -8,7 +8,7 @@
     <set var="__DEFINE_ARG">-d</set>
     <set var="__INCLUDE_ARG">-i=</set>
     <set var="__LIB_ARG">%s.lib</set>
-    <set var="__LIBDIR_ARG">libpath </set>
+    <set var="__LIBDIR_ARG">libpath$(SPACE)</set>
 
     <set var="__DEFAULT_CC">wcc386</set>
     <set var="__DEFAULT_CXX">wpp386</set>
@@ -23,8 +23,6 @@
     <set var="__DLL_LINKER_CXX" eval="0">wlink</set>
 
     <!-- basic compiler/linker flags: -->
-    <set var="__FLAG_EXE_CONSOLE">system nt</set>
-    <set var="__FLAG_EXE_GUI">system nt_win</set>
     <set var="__FLAG_DEBUG_ON">-d2</set>
     <set var="__FLAG_DEBUG_ON_LINKER">debug all</set>
     <set var="__FLAG_DEBUG_OFF">-d0</set>
@@ -38,6 +36,11 @@
     <set var="__FLAG_ARCH_I686">-6</set>
     <set var="__FLAG_SINGLE_THREADING"/>
     <set var="__FLAG_MULTI_THREADING"/>
+    <!-- NB: we explicitly reference startup function in case it was
+             in a library (e.g. wxWindows) in which case wlink would
+             optimize it out: -->
+    <set var="__FLAG_EXE_CONSOLE">system nt ref 'main_'</set>
+    <set var="__FLAG_EXE_GUI">system nt_win ref '_WinMain@16'</set>
 
     
     <!-- rules building blocks: -->
@@ -102,30 +105,32 @@
     
 
     <template id="__commands_templ">
-        <set var="__win32res"/>
+        <set var="__win32res_flag"/>
+
+        <set var="__lbc_file">$(mkPathPrefix(BUILDDIR))$(id).lbc</set>
         <set var="__LINK_CMD_BASE" eval="0">
-            %create $^*.lbc
-            %append $^*.lbc option quiet
-            %append $^*.lbc name $^@
-            %append $^*.lbc option incremental
-            %append $^*.lbc $(__ldflags)
-            for %i in ($(__objects)) do %append $^*.lbc file %i
-            for %i in ($(__ldlibs)) do %append $^*.lbc library %i
-            %append $^*.lbc $(__win32res)
+            @%create $(__lbc_file)
+            @%append $(__lbc_file) option quiet
+            @%append $(__lbc_file) name $^@
+            @%append $(__lbc_file) option incremental
+            @%append $(__lbc_file) $(__ldflags)
+            @for %i in ($(__objects)) do @%append $(__lbc_file) file %i
+            @for %i in ($(__ldlibs)) do @%append $(__lbc_file) library %i
+            @%append $(__lbc_file) $(__win32res_flag)
         </set>        
         <set var="__LINK_EXE_CMD" eval="0">
             $(__LINK_CMD_BASE)
-            $(__linker) @$^*.lbc
+            $(__linker) @$(__lbc_file)
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
-            %create $^*.lbc
-            for %i in ($(__objects)) do %append $^*.lbc +%i
-            wlib -q -p2048 -n -b $^@ @$^*.lbc
+            @%create $(__lbc_file)
+            @for %i in ($(__objects)) do @%append $(__lbc_file) +%i
+            wlib -q -p2048 -n -b $^@ @$(__lbc_file)
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(__LINK_CMD_BASE)
-            %append $^*.lbc system nt_dll
-            $(__linker) @$^*.lbc
+            @%append $(__lbc_file) system nt_dll
+            $(__linker) @$(__lbc_file)
             wlib -q -n -b $(__targetdir)$(__libname).lib +$^@
         </set>
     </template>
