@@ -40,7 +40,7 @@ def isDeadTarget(target):
 
 def makeUniqueCondVarName(name):
     """Creates name for cond. var."""
-    n = nb = '__%s' % (name.replace('-','_').replace('.','_'))
+    n = nb = '__%s' % (name.replace('-','_').replace('.','_').replace('/','_'))
     i = 1
     while n in mk.cond_vars:
         n = '%s_%i' % (nb, i)
