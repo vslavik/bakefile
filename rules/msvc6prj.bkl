@@ -105,6 +105,12 @@
             <cxx-exceptions>on</cxx-exceptions>
         </template>
         
+        <define-tag name="objects-depend">
+            <depends>$(value)</depends>
+            <!-- FIXME: this is the best we can do, there's no concept of
+                        per-object dependencies in project files -->
+        </define-tag>
+        
         <define-tag name="sources">
             <set var="__sources" append="1">$(value)</set>
         </define-tag>
