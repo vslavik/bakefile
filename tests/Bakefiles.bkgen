@@ -17,7 +17,7 @@
     </input>
     
     <add-formats>
-        autoconf,borland,cbuilderx,dmars,mingw,msevc4prj,msvc,msvc6prj,msevc4prj,watcom
+        autoconf,borland,cbuilderx,dmars,dmars_smake,mingw,msevc4prj,msvc,msvc6prj,msevc4prj,watcom
     </add-formats>
     
     <!-- WinCE can't handle console-only apps: -->
