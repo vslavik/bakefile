@@ -243,11 +243,11 @@ def sources2objects(sources, target, ext, objSuffix=''):
     if mk.vars['FORMAT_HAS_VARIABLES'] != '0':
         tg = mk.targets[target]
         mk.setVar('%s_CFLAGS' % target.upper(),
-                  '%s %s' % (tg.vars['__cppflags'], tg.vars['__cflags']),
-                  target=tg, makevar=1)
+                  "$(ref('__cppflags','%s')) $(ref('__cflags','%s'))" % \
+                  (target, target), target=tg, makevar=1)
         mk.setVar('%s_CXXFLAGS' % target.upper(),
-                  '%s %s' % (tg.vars['__cppflags'], tg.vars['__cxxflags']),
-                  target=tg, makevar=1)
+                  "$(ref('__cppflags','%s')) $(ref('__cxxflags','%s'))" % \
+                  (target, target), target=tg, makevar=1)
     
     easyFiles = []
     hardFiles = []
@@ -361,14 +361,14 @@ def mkPathPrefix(p):
 
 
 CONDSTR_UNIXTEST = 'unixtest' # syntax of 'test' program
-CONDSTR_BORLAND  = 'borland'  # C++-like syntax used by Borland make
+CONDSTR_MSVC     = 'msvc'     # C++-like syntax used by Borland and VC++ make
 def condition2string(cond, format):
     """Converts condition to string expression in given format. This is useful
        for Empy templates that need to output condition strings."""
     if cond == None:
         return ''
-    if format == CONDSTR_BORLAND:
-        return' && '.join(['$(%s) == %s' % (x.option.name,x.value) \
+    if format == CONDSTR_MSVC:
+        return' && '.join(['"$(%s)" == "%s"' % (x.option.name,x.value) \
                            for x in cond.exprs])
     if format == CONDSTR_UNIXTEST:
         return ' -a '.join(['"x$%s" = "x%s"' % (x.option.name,x.value) \
