@@ -53,7 +53,7 @@
         __targetdir __targetname __deps __command __is_phony
     </set>
 
-    <output file="$(OUTPUT_FILE)" writer="mingw.empy"/>
+    <output file="$(OUTPUT_FILE)" writer="gnumake.empy"/>
     
     <if cond="OPTIONS_FILE!='' and WRITE_OPTIONS_FILE=='1'">
     <output file="$(os.path.join(os.path.dirname(OUTPUT_FILE), OPTIONS_FILE))"
