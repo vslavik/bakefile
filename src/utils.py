@@ -449,6 +449,10 @@ def mkPathPrefix(p):
     else:
         return p + '$(DIRSEP)'
 
+def pathPrefixToPath(p):
+    if p == '': return '.'
+    else:       return p
+
 
 CONDSTR_UNIXTEST = 'unixtest' # syntax of 'test' program
 CONDSTR_MSVC     = 'msvc'     # C++-like syntax used by Borland and VC++ make
