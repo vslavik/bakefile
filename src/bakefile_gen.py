@@ -189,6 +189,11 @@ def updateTargets():
     i = 1
     tempDeps = tempfile.mktemp()
     tempChanges = tempfile.mktemp()
+    # reduce (not eliminate!) the risk of race condition by immediately
+    # creating the file:
+    tmpf = open(tempDeps, 'wb'); tmpf.close()
+    tmpf = open(tempChanges, 'wb'); tmpf.close()
+
     try:
         for f,fmt in needUpdate:
             print '[%i/%i] generating %s from %s' % (i, total, fmt, f)        
@@ -203,8 +208,8 @@ def updateTargets():
             dependencies.load(tempDeps)
             modifiedFiles += __countLines(tempChanges)
     finally:
-        if os.path.isfile(tempDeps): os.remove(tempDeps)
-        if os.path.isfile(tempChanges): os.remove(tempChanges)
+        os.remove(tempDeps)
+        os.remove(tempChanges)
         dependencies.save('.bakefile_gen.state')
 
     print '%i files modified' % modifiedFiles
