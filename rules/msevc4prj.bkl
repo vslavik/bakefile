@@ -28,15 +28,17 @@
     <set var="_cpu_option_desc">
         $(','.join(['(WCE %s)' % x for x in _cpu_option_vals.split(',')]))
     </set>    
-    <option name="CPU">
+    <option name="EVC_CPU">
         <values>$(_cpu_option_vals)</values>
         <values-description>$(_cpu_option_desc)</values-description>
     </option>
 
+    <set var="CPU">$(substitute(EVC_CPU,lambda x: x.lower()))</set>
+
     <template id="_evc_config">
         <!-- CPU_ID values from .vcp files for given CPU: -->
         <set var="_CPU_ID">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
                 'ARMV4'     : '{ECBEA43D-CD7B-4852-AD55-D4227B5D624B}',
                 'ARMV4I'    : '{DC70F430-E78B-494F-A9D5-62ADC56443B8}',
                 'ARMV4T'    : '{F52316A9-3B7C-4FE7-A67F-68350B41240D}',
@@ -54,7 +56,7 @@
 
         <!-- compiler executable for given CPU: -->
         <set var="_COMPILER">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
                 'ARMV4'     : 'clarm.exe',
                 'ARMV4I'    : 'clarm.exe',
                 'ARMV4T'    : 'clthumb.exe',
@@ -74,7 +76,7 @@
 
         <set var="_MSVC_TYPECODE_CONSOLE">ERROR_NOT_SUPPORTED</set>
         <set var="_MSVC_TYPECODE_GUI">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
                 'ARMV4'     : '0xa301',
                 'ARMV4I'    : '0xa501',
                 'ARMV4T'    : '0xa401',
@@ -91,7 +93,7 @@
         </set>
         
         <set var="_MSVC_TYPECODE_DLL">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
                 'ARMV4'     : '0xa302',
                 'ARMV4I'    : '0xa502',
                 'ARMV4T'    : '0xa402',
@@ -108,7 +110,7 @@
         </set>
         
         <set var="_MSVC_TYPECODE_LIB">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
                 'ARMV4'     : '0xa304',
                 'ARMV4I'    : '0xa504',
                 'ARMV4T'    : '0xa404',
@@ -126,7 +128,7 @@
         
         <!-- CPU-specific flags: -->
         <set var="_CPU_DEFINES">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
             'ARMV4'     : '/D "ARM" /D "_ARM_" /D "ARMV4"',
             'ARMV4I'    : '/D "ARM" /D "_ARM_" /D "ARMV4I"',
             'ARMV4T'    : 
@@ -147,7 +149,7 @@
             }))
         </set>
         <set var="_CPU_CFLAGS">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
             'ARMV4'     : '',
             'ARMV4I'    : '/QRarch4T /QRinterwork-return',
             'ARMV4T'    : '/QRarch4T /QRinterwork-return',
@@ -163,7 +165,7 @@
             }))
         </set>
         <set var="_CPU_LDFLAGS">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
             'ARMV4'     : '/align:"4096" /MACHINE:ARM',
             'ARMV4I'    : '/MACHINE:THUMB',
             'ARMV4T'    : '/MACHINE:THUMB',
@@ -181,7 +183,7 @@
 
         <!-- CRT flags are different for CPUs, too: -->
         <set var="_CPU_CRT_DBG">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
             'ARMV4'     : '/M$(DOLLAR)(CECrtMTDebug)',
             'ARMV4I'    : '/M$(DOLLAR)(CECrtMTDebug)',
             'ARMV4T'    : '/M$(DOLLAR)(CECrtMTDebug)',
@@ -197,7 +199,7 @@
             }))
         </set>
         <set var="_CPU_CRT_REL">
-            $(substituteFromDict(CPU,{
+            $(substituteFromDict(EVC_CPU,{
             'ARMV4'     : '/M$(DOLLAR)(CECrtMT)',
             'ARMV4I'    : '/M$(DOLLAR)(CECrtMT)',
             'ARMV4T'    : '/M$(DOLLAR)(CECrtMT)',
@@ -222,12 +224,12 @@
     
     <set var="COMPILER">evc</set>
 
-    <set var="_MSVC_CPU_NAME">WCE $(CPU)</set>
+    <set var="_MSVC_CPU_NAME">WCE $(EVC_CPU)</set>
  
     <template id="_compiled_baset" template="_evc_config">
         
         <set var="_default_builddir" eval="0">
-            $(substituteFromDict(_debug,{'0':CPU+'Rel','1':CPU+'Dbg'}))
+            $(substituteFromDict(_debug,{'0':EVC_CPU+'Rel','1':EVC_CPU+'Dbg'}))
         </set>
         
         <set var="_defines"/>
