@@ -59,12 +59,11 @@ def sortByBasename(files):
     files.sort(__sort)
 
 
-
 # ------------------------------------------------------------------------
 #   DSW file
 # ------------------------------------------------------------------------
 
-def genDSW(dsw_targets, dsp_list):
+def genDSW(dsw_targets, dsp_list, deps_translation):
     dsw = """\
 Microsoft Developer Studio Workspace File, Format Version 6.00
 # WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
@@ -85,6 +84,16 @@ Package=<4>
 ###############################################################################
 """
 
+    # add external dsp deps first:
+    extern_deps = []
+    for t in dsw_targets:
+        for d in t.__dsp_deps.split():
+            if d not in extern_deps:
+                extern_deps.append(d)
+    for d in extern_deps:
+        dsw += project % (d.split(':')[0],
+                          os.path.splitext(d.split(':')[1])[0], '')
+
     single_target = (len(dsw_targets) == 1)
     for t in dsw_targets:
         deps = ''
@@ -92,12 +101,22 @@ Package=<4>
             dsp_name = basename
         else:
             dsp_name = '%s_%s' % (basename, t.id)
-        for d in t.__deps.split():
-           deps += """\
+        deplist = t.__deps.split()
+        # add external dsp dependencies:
+        for d in t.__dsp_deps.split():
+            deplist.append(d.split(':')[0])
+        # write dependencies:
+        for d in deplist:
+            if d in deps_translation:
+                d2 = deps_translation[d]
+            else:
+                d2 = d
+            deps += """\
 Begin Project Dependency
 Project_Dep_Name %s
 End Project Dependency
-""" % d     
+""" % d2
+
         dsw += project % (t.id, dsp_name, deps)
         dspfile = (t, os.path.join(dirname, dsp_name+'.dsp'), dsp_name)
         if dspfile not in dsp_list:
@@ -108,9 +127,34 @@ End Project Dependency
 
 def genWorkspaces():
     dsp_list = []
-    genDSW([t for t in targets if t.__kind == 'project'], dsp_list)
+
+    # find all projects. Beware ugly hack here: MSVC6PRJ_MERGED_TARGETS is
+    # used to create fake targets as a merge of two (mutually exclusive)
+    # targets. This is sometimes useful, e.g. when you want to build both
+    # DLL and static lib of something.
+    deps_translation = {}
+    projects = [t for t in targets if t.__kind == 'project']
+    for mergeInfo in MSVC6PRJ_MERGED_TARGETS.split():
+        split1 = mergeInfo.split('=')
+        split2 = split1[1].split('+')
+        tgR = split1[0]
+        tg1 = split2[0]
+        tg2 = split2[1]
+        t = targets[tg1]
+        for c in targets[tg2].configs:
+            t.configs[c] = targets[tg2].configs[c]
+        t.id = tgR
+        projects.remove(targets[tg2])
+        targets.append(tgR, t)
+        del targets[tg1]
+        del targets[tg2]
+        deps_translation[tg1] = tgR
+        deps_translation[tg2] = tgR
+    
+    genDSW(projects, dsp_list, deps_translation)
     for t, filename, prjname in dsp_list:
         genDSP(t, filename, prjname)
+        
     # warn about <action> targets that we can't handle (yet):
     for t in [t for t in targets if t.__kind == 'action']:
         print "warning: ignoring action target '%s'" % t.id
@@ -140,10 +184,17 @@ def genDSP(t, filename, prjname):
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
-# TARGTYPE %s %s
+""" % (t.id)
 
-CFG=%s
-""" % (t.id, t.__type, t.__type_code, mkConfigName(t.id, default_cfg))
+    targ_types = []
+    for c in t.configs:
+        targ = '%s %s' % (t.configs[c].__type, t.configs[c].__type_code)
+        if targ not in targ_types:
+            targ_types.append(targ)
+    for tt in targ_types:
+        dsp += '# TARGTYPE %s\n' % tt
+        
+    dsp += '\nCFG=%s\n' % mkConfigName(t.id, default_cfg)
     dsp += """\
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run

@@ -24,6 +24,8 @@ class Container:
         return iter(self.list)
     def __getitem__(self, key):
         return self.dict[key]
+    def __delitem__(self, key):
+        del self.dict[key]
 
 def __stringify(x):
     if x == None: return ''

@@ -22,6 +22,7 @@
         <template>
             <set var="__depname">$(id)</set>
             <set var="__deps"/>
+            <set var="__dsp_deps"/> <!-- other dsp files we depend on -->
             <set var="__targetdir"/>
             <set var="__targetname">$(id)</set>
         </template>
@@ -40,6 +41,10 @@
             <modify-target target="$(value)">
                 <depends>$(id)</depends>
             </modify-target>
+        </define-tag>
+
+        <define-tag name="depends-on-dsp">
+            <set var="__dsp_deps" append="1">$(value)</set>
         </define-tag>
         
     </define-rule>
@@ -310,6 +315,12 @@
     <!-- =============================================================== -->
     <!--                            output:                              -->
     <!-- =============================================================== -->
+
+    <!-- ugly hacks to customize the output: -->
+
+    <!-- for merging otherwise identical dll and lib targets
+    syntax is whitespace separated list of target=target1+target2 -->
+    <set var="MSVC6PRJ_MERGED_TARGETS"/>
     
     <output file="$(OUTPUT_FILE)" writer="msvc6prj.py"/>
 
