@@ -27,6 +27,7 @@ import outmethods, portautils
 from types import StringType
 
 mergeBlocks = outmethods.mergeBlocks
+mergeBlocksWithFilelist = outmethods.mergeBlocksWithFilelist
 insertBetweenMarkers = outmethods.insertBetweenMarkers
 
 class Struct: pass

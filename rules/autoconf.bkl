@@ -414,7 +414,7 @@
     <if cond="AUTOCONF_MACROS_FILE!=''">
         <output file="$(AUTOCONF_MACROS_FILE)"
                 writer="autoconf-macros.empy"
-                method="mergeBlocks"/>
+                method="mergeBlocksWithFilelist"/>
     </if>
 
 </makefile>

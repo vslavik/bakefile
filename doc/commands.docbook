@@ -781,6 +781,18 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
                       makefiles.
                     </para>
                     <para>
+                      <literal>mergeBlocksWithFilelist</literal> works
+                      similarly to <literal>mergeBlocks</literal>, but it
+                      includes list of input files that generated the block in
+                      the output and ensures that blocks that have no
+                      generator (e.g. because user's bakefiles changed and no
+                      longer cause some piece of code to be generated) are
+                      removed from the output. The list of files is added to
+                      block name like this:
+                      <programlisting>### beging block
+                      <emphasis>BLOCKNAME[file1.bkl,file2.bkl]</emphasis> ###</programlisting>
+                    </para>
+                    <para>
                       <literal>insertBetweenMarkers</literal> takes first and
                       last line of generated output, finds them in the output
                       file (which must exist and must contain them) and
