@@ -353,7 +353,7 @@
               </row>
               
               <row>
-                <entry role="varname">TAG</entry>
+                <entry role="varname">TAB</entry>
                 <entry>
                   Tabelator character (\t in C).
                 </entry>
