@@ -127,9 +127,9 @@ AC_DEFUN(AC_BAKEFILE_PLATFORM_SPECIFICS,
             LDFLAGS="-Zomf $LDFLAGS"
             CFLAGS="-Zomf $CFLAGS"
             CXXFLAGS="-Zomf $CXXFLAGS"
-            OS2_LIBEXT=".lib"
+            OS2_LIBEXT="lib"
         else
-            OS2_LIBEXT=".a"
+            OS2_LIBEXT="a"
         fi
         ;;
     esac
@@ -185,7 +185,7 @@ AC_DEFUN(AC_BAKEFILE_SUFFIXES,
             EXEEXT=".exe"
             DLLPREFIX=""
             LIBPREFIX=""
-            LIBEXT=$OS2_LIBEXT
+            LIBEXT=".$OS2_LIBEXT"
         ;;
         powerpc-*-darwin* )
             SO_SUFFIX="dylib"
