@@ -812,12 +812,13 @@ def handleFragment(e):
 
 
 def handleError(e):
+    text = evalConstExpr(e, e.value)
     sys.stderr.write("""
 -----------------------------------------------------------------------
 %s
 -----------------------------------------------------------------------
 
-""" % e.value)
+""" % text)
     raise ReaderError(e, "an error occured during processing")
 
 
