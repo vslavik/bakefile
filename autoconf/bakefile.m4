@@ -596,49 +596,7 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
                     AC_MSG_RESULT([no])
                 ])
             if test $GCC_PCH = 1 ; then
-                cat <<EOF >bk-make-pch
-#!/bin/sh
-
-# This script is part of Bakefile (http://bakefile.sourceforge.net) autoconf
-# script. It is used to generated precompiled headers.
-#
-# Permission is given to use this file in any way.
-
-outfile="\${1}"
-header="\${2}"
-shift
-shift
-
-compiler=
-headerfile=
-while test \${#} -gt 0; do
-    case "\${1}" in
-        -I* )
-            incdir=\`echo \${1} | sed -e 's/-I\(.*\)/\1/g'\`
-            if test "x\${headerfile}" = "x" -a -f "\${incdir}/\${header}" ; then
-                headerfile="\${incdir}/\${header}"
-            fi
-        ;;
-    esac
-    compiler="\${compiler} \${1}"
-    shift
-done
-
-if test "x\${headerfile}" = "x" ; then
-    echo "error: can't find header \${header} in include paths" >2
-else
-    if test -f \${outfile} ; then
-        rm -f \${outfile}
-    else
-        mkdir -p \`dirname \${outfile}\`
-    fi
-    depsfile=".deps/\`basename \${outfile}\`.d"
-    mkdir -p .deps
-    # can do this because gcc is >= 3.4:
-    \${compiler} -o \${outfile} -MMD -MF "\${depsfile}" "\${headerfile}"
-    exit \${?}
-fi
-EOF
+                AC_BAKEFILE_CREATE_FILE_BK_MAKE_PCH
                 chmod +x bk-make-pch
             fi
         fi
@@ -1301,4 +1259,54 @@ rm -f master.${D}${D}.o
 exit 0
 EOF
 dnl ===================== shared-ld-sh ends here =====================
+])
+
+AC_DEFUN([AC_BAKEFILE_CREATE_FILE_BK_MAKE_PCH],
+[
+dnl ===================== bk-make-pch begins here =====================
+D='$'
+cat <<EOF >bk-make-pch
+#!/bin/sh
+
+# This script is part of Bakefile (http://bakefile.sourceforge.net) autoconf
+# script. It is used to generated precompiled headers.
+#
+# Permission is given to use this file in any way.
+
+outfile="${D}{1}"
+header="${D}{2}"
+shift
+shift
+
+compiler=
+headerfile=
+while test ${D}{#} -gt 0; do
+    case "${D}{1}" in
+        -I* )
+            incdir=\`echo ${D}{1} | sed -e 's/-I\\(.*\\)/\\1/g'\`
+            if test "x${D}{headerfile}" = "x" -a -f "${D}{incdir}/${D}{header}" ; then
+                headerfile="${D}{incdir}/${D}{header}"
+            fi
+        ;;
+    esac
+    compiler="${D}{compiler} ${D}{1}"
+    shift
+done
+
+if test "x${D}{headerfile}" = "x" ; then
+    echo "error: can't find header ${D}{header} in include paths" >2
+else
+    if test -f ${D}{outfile} ; then
+        rm -f ${D}{outfile}
+    else
+        mkdir -p \`dirname ${D}{outfile}\`
+    fi
+    depsfile=".deps/\`echo ${D}{outfile} | tr '/.' '__'\`.d"
+    mkdir -p .deps
+    # can do this because gcc is >= 3.4:
+    ${D}{compiler} -o ${D}{outfile} -MMD -MF "${D}{depsfile}" "${D}{headerfile}"
+    exit ${D}{?}
+fi
+EOF
+dnl ===================== bk-make-pch ends here =====================
 ])
