@@ -230,24 +230,21 @@ dnl ---------------------------------------------------------------------------
 
 AC_DEFUN([AC_BAKEFILE_SHARED_LD],
 [
-    dnl Defaults for GCC and ELF .so shared libs:
-    SHARED_LD_CC="\$(CC) -shared -o"
-    SHARED_LD_CXX="\$(CXX) -shared -o"
-
     dnl the extra compiler flags needed for compilation of shared library
+    PIC_FLAG=""
     if test "x$GCC" = "xyes"; then
         dnl the switch for gcc is the same under all platforms
         PIC_FLAG="-fPIC"
     fi
+    
+    dnl Defaults for GCC and ELF .so shared libs:
+    SHARED_LD_CC="\$(CC) -shared ${PIC_FLAG} -o"
+    SHARED_LD_CXX="\$(CXX) -shared ${PIC_FLAG} -o"
 
     case "${BAKEFILE_HOST}" in
       *-hp-hpux* )
         dnl default settings are good for gcc but not for the native HP-UX
-        if test "x$GCC" = "xyes"; then
-            dnl -o flag must be after PIC flag
-            SHARED_LD_CC="${CC} -shared ${PIC_FLAG} -o"
-            SHARED_LD_CXX="${CXX} -shared ${PIC_FLAG} -o"
-        else
+        if test "x$GCC" != "xyes"; then
             dnl no idea why it wants it, but it does
             LDFLAGS="$LDFLAGS -L/usr/lib"
 
@@ -360,6 +357,8 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
       
       *-*-cygwin* | *-*-mingw32* )
         PIC_FLAG=""
+        SHARED_LD_CC="\$(CC) -shared -o"
+        SHARED_LD_CXX="\$(CXX) -shared -o"
       ;;
 
       *-pc-os2_emx | *-pc-os2-emx )
