@@ -195,6 +195,7 @@ rules = {}
 class Rule:
     def __init__(self, name):
         self.name = name
+        self.pseudo = 0
         self.baserules = []
         self.tags = {}
         self.template = []
@@ -270,6 +271,8 @@ def _processTargetNodes(list, target, tags, dict):
             _processTargetNodes(tags[node.name], target, tags, dict2)
 
 
+_pseudoTargetLastID = 0
+
 def handleTarget(e):
     if e.name not in rules:
         raise ReaderError(e, "unknown target type")
@@ -297,11 +300,17 @@ def handleTarget(e):
     tags = rule.getTagsDict()
     e = applyTemplates(e, rule.getTemplates() + extractTemplates(e, post=0),
                           extractTemplates(e, post=1))
-    id = e.props['id']
+
+    if rule.pseudo and 'id' not in e.props:
+        global _pseudoTargetLastID
+        id = 'pseudotgt%i' % _pseudoTargetLastID
+        _pseudoTargetLastID += 1
+    else:
+        id = e.props['id']
     if id in mk.targets:
         raise ReaderError(e, "duplicate target name '%s'" % id)
     
-    target = mk.Target(e.name, id, cond)
+    target = mk.Target(e.name, id, cond, rule.pseudo)
     mk.addTarget(target)
 
     errors.pushCtx("when processing target at %s" % e.location())
@@ -313,6 +322,9 @@ def handleDefineRule(e):
     rule = Rule(evalConstExpr(e, e.props['name']))
     rules[rule.name] = rule
     HANDLERS[rule.name] = handleTarget
+
+    if 'pseudo' in e.props and e.props['pseudo'] == '1':
+        rule.pseudo = 1
 
     if 'extends' in e.props:
         baserules = [evalConstExpr(e,x) for x in e.props['extends'].split(',')]
@@ -576,6 +588,12 @@ def finalEvaluation():
     if config.verbose: sys.stdout.write('\n')
 
 
+    
+def finalize():
+    finalEvaluation()
+    # delete pseudo targets now:
+    pseudos = [ t for t in mk.targets if mk.targets[t].pseudo ]
+    for t in pseudos: del mk.targets[t]
 
 
 # -------------------------------------------------------------------------
@@ -599,7 +617,7 @@ def read(filename):
         loadModule('common')
         loadModule(config.format)
         processFile(filename)
-        finalEvaluation()
+        finalize()
         return 1
     except errors.ErrorBase, e:
         sys.stderr.write(str(e))
