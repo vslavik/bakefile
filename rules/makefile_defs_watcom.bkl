@@ -105,6 +105,7 @@
         <set var="__win32res"/>
         <set var="__LINK_CMD_BASE" eval="0">
             %create $^*.lbc
+            %append $^*.lbc option quiet
             %append $^*.lbc name $@
             %append $^*.lbc option incremental
             %append $^*.lbc $(__ldflags)
@@ -125,7 +126,7 @@
             $(__LINK_CMD_BASE)
             %append $^*.lbc system nt_dll
             $(__linker) @$^*.lbc
-            wlib $(__targetdir)$(__libname).lib +$@
+            wlib -q -n -b $(__targetdir)$(__libname).lib +$@
         </set>
     </template>
     
