@@ -407,6 +407,7 @@ def _extractTargetNodes(parent, list, target, tags, index):
                 _extractTargetNodes(parent, node.children, target, tags, index)
             elif condType == None:
                 n = TgtCmdNode(parent, TgtCmdNode.IF, node)
+                _removeDuplicates(n)
                 _extractTargetNodes(n, node.children, target, tags, index)
         elif node.name in COMMANDS:
             n = TgtCmdNode(parent, TgtCmdNode.COMMAND, node)
