@@ -3,7 +3,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003,2004 Vaclav Slavik
+#  Copyright (C) 2003-2005 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -21,7 +21,7 @@
 #  $Id$
 #
 
-import sys, os, os.path, glob, fnmatch, threading
+import sys, os, os.path, glob, fnmatch, threading, shutil
 try:
     from optparse import OptionParser
 except ImportError:
@@ -299,9 +299,7 @@ def updateTargets(jobs, pretend=0):
         finally:
             os.remove(tempDeps)
             os.remove(tempChanges)
-            if os.path.isfile(tempXmlCacheFile):
-                os.remove(tempXmlCacheFile)
-            os.rmdir(tempXmlCacheDir)
+            shutil.rmtree(tempXmlCacheDir)
             try:
                 state.lock.acquire()
                 state.activeThreads -= 1
