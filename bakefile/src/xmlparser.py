@@ -83,12 +83,12 @@ def __doParseMinidom(func, src):
     def handleNode(filename, n):
         if n.nodeType != n.ELEMENT_NODE: return None
         e = Element()
-        e.name = n.tagName
+        e.name = str(n.tagName)
         e.filename = filename
 
         if n.hasAttributes():
             for p in n.attributes.keys():
-                e.props[p] = n.getAttribute(p)
+                e.props[p] = str(n.getAttribute(p))
 
         for c in n.childNodes:
             l = handleNode(filename, c)
@@ -96,7 +96,7 @@ def __doParseMinidom(func, src):
                 e.children.append(l)
 
         if n.firstChild != None and n.firstChild.nodeType == n.TEXT_NODE:
-            e.value = n.firstChild.data.strip()
+            e.value = str(n.firstChild.data.strip())
         elif len(e.children) == 0:
             e.value = ''
 
