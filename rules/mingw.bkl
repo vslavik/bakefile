@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <set var="COMPILER">gcc</set>
+    <set var="MAKEFILE_SYNTAX">mingw</set>
+
+    <include file="makefile.bkl"/>
+    
+    <define-tag name="libname" rules="dll">
+        <set var="__importlib">
+            -Wl,--out-implib,$(__targetdir)$(__linkname)
+        </set>
+        <ldflags>$(__importlib)</ldflags>
+    </define-tag>
+
+    <!-- =============================================================== -->
+    <!--                         "make clean":                           -->
+    <!-- =============================================================== -->
+
+    <action id="clean">
+        <set var="__builddir" eval="0">$(BUILDDIR)</set>
+        <command>            
+            -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
+        </command>
+    </action>
+    
+    <!-- =============================================================== -->
+    <!--                            output:                              -->
+    <!-- =============================================================== -->
+    
+    <!-- see format_features.bkl for explanation: -->
+    <set var="FORMAT_OUTPUT_VARIABLES">
+        __targetdir,__targetname,__deps,__command,__is_phony
+    </set>
+
+    <output file="$(OUTPUT_FILE)" writer="mingw.empy"/>
+
+</makefile>

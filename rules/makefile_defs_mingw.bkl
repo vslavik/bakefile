@@ -1,0 +1,100 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<!-- 
+This file is common to all formats that share Unix way of writing 
+makefiles (most notably GNU Make and Autoconf formats).
+-->
+
+<makefile>
+    
+    <include file="win32.bkl"/>
+    
+    <option name="AR"><default-value>ar</default-value></option>
+    <option name="RANLIB"><default-value>ranlib</default-value></option>
+
+    <set var="OBJEXT">.o</set>
+    <set var="LIBEXT">.a</set>
+    <set var="LIBPREFIX">lib</set>
+    <set var="DLLIMPEXT">.a</set>
+    <set var="DLLPREFIX"></set>
+    <set var="DLL_CFLAGS"></set>
+
+    <set var="AROPTIONS">rcu</set>
+
+    <set var="__DEFINE_ARG">-D</set>
+    <set var="__INCLUDE_ARG">-I</set>
+    <set var="__LIB_ARG">-l%s</set>
+    <set var="__LIBDIR_ARG">-L</set>
+
+    <set var="__DEFAULT_CC">gcc</set>
+    <set var="__DEFAULT_CXX">g++</set>
+    <set var="__DEFAULT_CFLAGS"></set>
+    <set var="__DEFAULT_CPPFLAGS"></set>
+    <set var="__DEFAULT_CXXFLAGS"></set>
+    <set var="__DEFAULT_LDFLAGS"></set>
+    
+    <set var="__LINKER_CC" eval="0">$(CC)</set>
+    <set var="__LINKER_CXX" eval="0">$(CXX)</set>
+    <set var="__DLL_LINKER_CC" eval="0">$(CC) -shared -o</set>
+    <set var="__DLL_LINKER_CXX" eval="0">$(CXX) -shared -o</set>
+    
+    <!-- 
+    basic compiler/linker flags (they are left almost empty because
+    it is configure's job to ensure correct cflags):
+    -->
+    <set var="__FLAG_EXE_CONSOLE"></set>
+    <set var="__FLAG_EXE_GUI">-Wl,--subsystem,windows -mwindows</set>
+    <set var="__FLAG_DEBUG_ON">-g</set>
+    <set var="__FLAG_DEBUG_ON_LINKER">-g</set>
+    <set var="__FLAG_DEBUG_OFF"></set>
+    <set var="__FLAG_DEBUG_OFF_LINKER"></set>
+    <set var="__FLAG_OPTIMIZE_OFF">-O0</set>
+    <set var="__FLAG_OPTIMIZE_SIZE">-O2</set>
+    <set var="__FLAG_OPTIMIZE_SPEED">-O2</set>
+    <set var="__FLAG_ARCH_I386">-march=i386</set>
+    <set var="__FLAG_ARCH_I486">-march=i486</set>
+    <set var="__FLAG_ARCH_I586">-march=i586</set>
+    <set var="__FLAG_ARCH_I686">-march=i686</set>
+    <set var="__FLAG_USE_PCH"></set>
+    <set var="__FLAG_PCH_FILE"></set>
+    <set var="__FLAG_SINGLE_THREADING"/>
+    <set var="__FLAG_MULTI_THREADING">-mthreads</set>
+
+    <template id="__commands_templ_C">
+        <set var="__COMPILE_C_CMD" eval="0">
+            $(CC) -c -o $@ $(__cflags) $&lt;
+        </set>
+    </template>
+    <template id="__commands_templ_CXX">
+        <set var="__COMPILE_CXX_CMD" eval="0">
+            $(CXX) -c -o $@ $(__cxxflags) $&lt;
+        </set>
+    </template>
+    <template id="__commands_templ">
+        <set var="__LINK_EXE_CMD" eval="0">
+            $(__linker) -o $@ $(__objects) $(__ldflags) $(__ldlibs)
+        </set>        
+        <set var="__LINK_LIB_CMD" eval="0">
+            if exist $@ del $@
+            $(AR) $(AROPTIONS) $@ $(__objects)
+            $(RANLIB) $@
+        </set>
+        <set var="__LINK_DLL_CMD" eval="0">
+            $(__dll_linker) $@ $(__objects) $(__ldflags) $(__ldlibs)
+        </set>
+    </template>
+    
+    <template id="__subproject_templ">
+        <set var="__MAKE_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; \$(MAKE) $(__subtarget))
+        </set>
+        <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; \$(MAKE) install)
+        </set>
+        <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; \$(MAKE) clean)
+        </set>
+    </template>
+
+</makefile>
