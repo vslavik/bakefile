@@ -109,7 +109,7 @@ def __copyMkToVars():
         c.name = cond.name
         c.exprs = cond.exprs
         conditions.append(c.name, c)
-        exec('conditions.%s = c' % c.name)
+        setattr(conditions, c.name, c)
     dict['conditions'] = conditions
 
     # Copy conditional variables:
@@ -127,7 +127,7 @@ def __copyMkToVars():
             vv.cond = conditions[v.cond.name]
             c.values.append(vv)
         cond_vars.append(c.name, c)
-        exec('cond_vars.%s = c' % c.name)
+        setattr(cond_vars, c.name, c)
     dict['cond_vars'] = cond_vars
     
     # Copy "make variables":
