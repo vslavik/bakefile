@@ -48,7 +48,8 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/version.bkl \
               rules/win32.bkl
 rulesgettext_DATA = \
-              rules/gettext/common.bkl
+              rules/gettext/common.bkl \
+			  rules/gettext/autoconf.bkl
 
 code_PYTHON = src/config.py \
               src/bakefile.py \

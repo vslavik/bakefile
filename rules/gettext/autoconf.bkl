@@ -1,32 +1,25 @@
 <?xml version="1.0" ?>
 <makefile>
 
-    <set var="LOCALEDIR">$(DATADIR)/locale</set>
-
-    <define-rule name="gettext-catalogs" extends="phony" pseudo="1">
+    <define-tag name="install-to" rules="gettext-catalogs">
+        <set var="dstdir">$(value)</set>
+        <add-target target="$(id)_install" type="action" cond="target"/>
+        <modify-target target="$(id)_install">
+            <dependency-of>install</dependency-of>
+            <set var="iter">$(DOLLAR)$(DOLLAR)l</set> <!-- helper -->
+            <command>
+                $(INSTALL_DIR) $(dstdir)
+                for l in $(linguas) ; do \
+                    $(INSTALL_DIR) $(dstdir)/$(iter) ; \
+                    $(INSTALL_DIR) $(dstdir)/$(iter)/LC_MESSAGES ; \
+                    if test -f $(__srcdir)/$(iter).mo ; then \
+                        $(INSTALL_DATA) $(__srcdir)/$(iter).mo $(dstdir)/$(iter)/LC_MESSAGES/$(catalog).mo ; \
+                    fi ; \
+                done 
+            </command>
+        </modify-target>
+    </define-tag>
         
-        <template>
-            <set var="__srcdir">$(SRCDIR)</set>
-            <set var="linguas"/>
-            <set var="catalog">noname</set>
-        </template>
-        
-        <define-tag name="srcdir">
-            <set var="__srcdir">$(value)</set>
-        </define-tag>
-        
-        <define-tag name="catalog-name">
-            <set var="catalog">$(value)</set>
-        </define-tag>
-
-        <define-tag name="linguas">
-            <set var="linguas" append="1">$(value)</set>
-        </define-tag>
-
-        <!-- only autoconf backend has meaningful 'make install' -->
-        <define-tag name="install-to"/>
-        
-    </define-rule>
 
 <!--
     
