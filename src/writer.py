@@ -154,7 +154,9 @@ def __openFile(filename):
 
 def __closeFile(f):
     """Closes file, releases lock."""
-    portautils.unlock(f)
+    # NB: don't unlock, close() does it and win32 won't let us close file by
+    #     another process
+    #portautils.unlock(f)
     f.close()
 
 
