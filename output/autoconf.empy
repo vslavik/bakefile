@@ -2,7 +2,9 @@
 
 @@MAKE_SET@@
 
-@[ for o in options :@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+@[ for o in [x for x in options if x.name != 'prefix'] :@
 @o.name = @@@o.name@@
 ]@
 
