@@ -200,7 +200,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             </set>
         </define-tag>
         <define-tag name="lib-path">
-            <if cond="FORMAT!='dmars' and FORMAT!='smake'">
+            <if cond="FORMAT!='dmars' and FORMAT!='dmars_smake'">
                 <set var="__ldflags" append="1">
                     $(__LIBDIR_ARG)$(nativePaths(value))
                 </set>
