@@ -1,7 +1,7 @@
 Source: bakefile
 Section: devel
 Priority: optional
-Maintainer: Vadim Zeitlin <vadim@wxwidgets.org>
+Maintainer: Vadim Zeitlin <vadim@wxwindows.org>
 Build-Depends: debhelper (>= 4.0.0), autoconf, automake1.7|automake1.8|automake1.9,
  python2.2|python2.3|python2.4, python2.2-dev|python2.3-dev|python2.4-dev,
  libxml2-utils, xsltproc, swig
