@@ -107,7 +107,6 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__cxxflags">$(CXXFLAGS)</set>
             <set var="__ldflags"/>
             <set var="__objects"/>
-            <set var="__deps" append="1">$(ref('__objects',id))</set>
             <set var="__linker" eval="0">
                 $(ifthenelse(__uses_cxx, __LINKER_CXX, __LINKER_CC))
             </set>
@@ -149,9 +148,11 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
 
         <define-tag name="sources">
-            <set var="__objects" append="1">
+            <set var="__objtmp">
                 $(sources2objects(value, id, OBJEXT))
             </set>
+            <set var="__objects" append="1">$(__objtmp)</set>
+            <set var="__deps" append="1">$(__objtmp)</set>
         </define-tag>
 
         <define-tag name="library">
@@ -162,7 +163,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
 
         <define-tag name="dirname">
-            <set var="__targetdir">$(nativePaths(value))/</set>
+            <set var="__targetdir">$(nativePaths(value))$(DIRSEP)</set>
         </define-tag>
 
     </define-rule>
