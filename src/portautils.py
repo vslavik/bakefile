@@ -66,13 +66,23 @@ if os.name == 'nt':
     __overlapped = pywintypes.OVERLAPPED()
 
     def lock(file):
-        hfile = win32file._get_osfhandle(file.fileno())
-        win32file.LockFileEx(hfile, win32con.LOCKFILE_EXCLUSIVE_LOCK,
-                             0, 0x7fffffff, __overlapped)
+        try:
+            hfile = win32file._get_osfhandle(file.fileno())
+            win32file.LockFileEx(hfile, win32con.LOCKFILE_EXCLUSIVE_LOCK,
+                                 0, 0x7fffffff, __overlapped)
+        except pywintypes.error, e:
+            # err 120 is unimplemented call, happens on win9x:
+            if e.args[0] != 120:
+                raise e
 
     def unlock(file):
-        hfile = win32file._get_osfhandle(file.fileno())
-        win32file.UnlockFileEx(hfile, 0, 0x7fffffff, __overlapped)
+        try:
+            hfile = win32file._get_osfhandle(file.fileno())
+            win32file.UnlockFileEx(hfile, 0, 0x7fffffff, __overlapped)
+        except pywintypes.error, e:
+            # err 120 is unimplemented call, happens on win9x:
+            if e.args[0] != 120:
+                raise e
 
 elif os.name == 'posix':
     import fcntl
