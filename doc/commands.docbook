@@ -570,6 +570,49 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
       </section>
 
       
+      
+      <!-- //////////////////     requires       ////////////////// -->
+
+      
+      <section id="cmd.requires" xreflabel="requires">
+        <title>requires</title>
+        <para>
+          Declares bakefile's requirements that the installed bakefile
+          version must meet to be able to correctly generate native makefiles
+          from it.
+          <informaltable>
+            <tgroup cols='3'>
+              <thead>
+                <row>
+                  <entry>Parameter</entry>
+                  <entry>Description</entry>
+                  <entry>Required/Default value</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry role="paramname">version</entry>
+                  <entry>
+                    Minimal required version of Bakefile, e.g.
+                    <literal>0.1.1</literal>.
+                  </entry>
+                  <entry role="default">optional</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+          Example:
+          <programlisting><![CDATA[
+<!-- refuse to run with Bakefile < 0.5.0, it's missing feature foo: -->
+<requires version="0.5.0"/>
+]]></programlisting>
+        </para>
+      </section>
+
+      
+  
+  
+      
   
   
   
