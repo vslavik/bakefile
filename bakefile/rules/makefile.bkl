@@ -237,6 +237,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="precomp-headers-file"/>
         <define-tag name="precomp-headers-header"/>
         <define-tag name="precomp-headers-gen"/>
+        <define-tag name="precomp-headers-exclude"/>
 
         <define-tag name="msvc-project-files"/>
         
