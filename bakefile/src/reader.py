@@ -165,7 +165,10 @@ def handleOption(e):
             desc = c.value
         elif c.name == 'values':
             values = evalConstExpr(e, c.value).split()
-    mk.addOption(mk.Option(name, default, desc, values))
+    o = mk.Option(name, default, desc, values)
+    mk.addOption(o)
+    if 'never_empty' in e.props and e.props['never_empty'] == '1':
+        o.neverEmpty = 1
 
 
 def extractTemplates(e, post):
