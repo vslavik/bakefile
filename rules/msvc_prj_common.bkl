@@ -1,0 +1,486 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <!-- code and settings shared by all msvc project file formats
+         (not .NET, just MSVC6 and eVC): -->
+
+    <include file="win32.bkl"/>
+
+    <set var="COMPILER">vc</set>
+
+    <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+    
+
+    <set var="_MSVC_TYPECODE_CONSOLE">0x0103</set>
+    <set var="_MSVC_TYPECODE_GUI">0x0101</set>
+    <set var="_MSVC_TYPECODE_DLL">0x0102</set>
+    <set var="_MSVC_TYPECODE_LIB">0x0104</set>
+    
+    <tag-info name="dirname"
+              position="before:libname,before:dllname,before:exename"/>
+    <tag-info name="debug-info"
+              position="after:dllname,after:libname,after:exename"/>
+
+    <define-rule name="_any">
+        <template>
+            <set var="_depname">$(id)</set>
+            <set var="_deps"/>
+            <set var="_dsp_deps"/> <!-- other dsp files we depend on -->
+            <set var="_targetdir"/>
+            <set var="_targetname">$(id)</set>
+        </template>
+        
+        <define-tag name="dirname">
+            <set var="_targetdir">$(nativePaths(value))$(DIRSEP)</set>
+        </define-tag>
+
+        <define-tag name="depends">
+            <set var="_deps" append="1">
+                $(substitute(value, lambda x: ifthenelse(isDeadTarget(x),'',ref('_depname', x)), 'DEP'))
+            </set>
+        </define-tag>
+        
+        <define-tag name="dependency-of">
+            <modify-target target="$(value)">
+                <depends>$(id)</depends>
+            </modify-target>
+        </define-tag>
+
+        <define-tag name="depends-on-dsp">
+            <set var="_dsp_deps" append="1">$(value)</set>
+        </define-tag>
+        
+    </define-rule>
+
+    <define-rule name="_compiled" extends="_any">        
+        <template>
+            <set var="_kind">project</set>
+            <set var="_sources"/>
+            <set var="_more_files"/>
+            <set var="_defines">/D "WIN32"</set>
+            <!-- /GR /GX enables C++ exception handling and rtti
+                 (FIXME: make it configurable) -->
+            <set var="_cppflags">/FD /GR /GX</set>
+            <set var="_ldlibs"/>
+            <set var="_ldflags">/machine:i386</set>
+
+            <set var="_win32rc_flags"/>
+ 
+            <set var="_debug">0</set>            
+            <set var="_builddir" eval="0">
+                <if cond="BUILDDIR=='.'">
+                    $(substituteFromDict(_debug,{'0':'Release','1':'Debug'}))                  </if>
+                <if cond="BUILDDIR!='.'">$(nativePaths(BUILDDIR))</if>
+            </set>
+            <set var="_targetdir">$(_builddir)$(DIRSEP)</set>
+            
+            <set var="_rtl_dbg"/>
+            <set var="_rtl_static">L</set>
+            <set var="_rtl_type">D</set>
+            <set var="_rtl" eval="0">/M$(_rtl_type)$(_rtl_dbg)</set>
+            <cppflags>$(_rtl)</cppflags>
+
+            <set var="_outflag" eval="0">
+                /out:"$(_targetdir)$(_targetname)"
+            </set>
+            <ldflags>$(_outflag)</ldflags>
+
+            <!-- precompiled headers support (see also msvc_common.bkl): -->
+            <set var="_pch_use_pch">0</set>
+            <set var="_pch_header"/>
+            <set var="_pch_flags">/YX</set>
+            <set var="_pch_generator"/>   <!-- if set generates pch -->
+            <set var="_pch_excluded"/> <!-- files that don't use it -->
+
+            <!-- 
+            Support for custom build steps, needed for not-C/C++ files
+            compilation (not yet implemented) and misc. hacks.
+            _custom_build_files variable lists all source files that have
+            associated custom build with them. For every such file, there is
+            _custom_build_FILENAME variable with build commands (FILENAME
+            is file name with ./\ replaced with _):
+            -->
+            <set var="_custom_build_files"/>
+
+            <!-- Support for files grouping: -->
+            <set var="_file_groups"/>
+
+            <warnings>default</warnings>
+            <cxx-rtti>on</cxx-rtti>
+            <cxx-exceptions>on</cxx-exceptions>
+        </template>
+        
+        <define-tag name="objects-depend">
+            <depends>$(value)</depends>
+            <!-- FIXME: this is the best we can do, there's no concept of
+                        per-object dependencies in project files -->
+        </define-tag>
+        
+        <define-tag name="sources">
+            <set var="_sources" append="1">$(value)</set>
+        </define-tag>
+
+        <define-tag name="win32-res">
+            <sources>$(value)</sources>
+        </define-tag>
+
+        <define-tag name="res-define"/>
+        <define-tag name="res-include"/>
+        
+        <define-tag name="define">
+            <set var="_defines" append="1">
+                $(addPrefixIfNotEmpty('/D ',value.replace('"', '\"')))
+            </set>
+            <res-define>$(value)</res-define>
+        </define-tag>
+        
+        <define-tag name="include">
+            <cppflags>
+                $(addPrefixIfNotEmpty('/I ',nativePaths(value)))
+            </cppflags>
+            <res-include>$(value)</res-include>
+        </define-tag>
+
+        <define-tag name="cppflags">
+            <set var="_cppflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="cflags">
+            <set var="_cppflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="cxxflags">
+            <set var="_cppflags" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="sys-lib">
+            <set var="_ldlibs" append="1">
+                $(formatIfNotEmpty("%s.lib",value))
+            </set>
+        </define-tag>
+        
+        <define-tag name="ldflags">
+            <set var="_ldflags" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="lib-path">
+            <ldflags>/libpath:"$(nativePaths(value))"</ldflags>
+        </define-tag>
+        
+        <define-tag name="ldlibs">
+            <set var="_ldlibs" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="library">
+            <depends>$(value)</depends>
+            <ldlibs>
+                $(substitute(value, lambda x: ref('_targetdir',x)+ref('_linkname', x), 'LIBR'))
+            </ldlibs>
+        </define-tag>
+        
+        <define-tag name="optimize">
+            <cppflags>
+                $(substituteFromDict(value,
+                      {'off':'/Od', 'speed':'/O1', 'size':'/O2'}))
+            </cppflags>
+        </define-tag>
+        
+        <define-tag name="pic"/> <!-- win32 code is always PIC -->
+        
+        <define-tag name="debug-info">
+            <cppflags>
+                $(substituteFromDict(value, {'on':'/Zi /Gm /GZ', 'off':''}))
+            </cppflags>
+            <ldflags>
+                $(substituteFromDict(value, {'on':'/debug','off':''}))
+            </ldflags>
+            <set var="_debug">
+                $(substituteFromDict(value, {'on':'1','off':'0'}))
+            </set>
+        </define-tag>       
+        
+        <define-tag name="warnings">
+            <cppflags>
+                $(substituteFromDict(value,
+                   {'no':'/w',
+                    'default':'/W1',
+                    'max':'/W4'}))
+            </cppflags>
+        </define-tag>
+            
+            
+        <define-tag name="cxx-rtti">
+            <cxxflags>
+                $(substituteFromDict(value, {'on':'/GR','off':''}))
+            </cxxflags>
+        </define-tag>
+        <define-tag name="cxx-exceptions">
+            <cxxflags>
+                $(substituteFromDict(value, {'on':'/GX','off':''}))
+            </cxxflags>
+        </define-tag>
+
+        <define-tag name="install-to"/>
+        <define-tag name="install-if"/>
+        
+        <define-tag name="msvc-project-files">
+            <set var="_more_files" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="precomp-headers-gen">
+            <set var="_pch_generator">$(nativePaths(value))</set>
+        </define-tag>
+        <define-tag name="precomp-headers-exclude">
+            <set var="_pch_excluded" append="1">$(nativePaths(value))</set>
+        </define-tag>    
+        <define-tag name="precomp-headers">
+            <set var="_pch_use_pch"> 
+                $(substituteFromDict(value,{'on':'1', 'off':'0'}))
+            </set>
+        </define-tag>
+        
+        <!-- Support for files grouping: -->
+        <define-tag name="msvc-file-group">
+            <set var="_file_groups">
+                $(_file_groups)$(LF)$(nativePaths(value))
+            </set>
+        </define-tag>
+
+    </define-rule>
+
+    <define-rule name="exe" extends="_compiled">
+        <template>
+            <app-type>console</app-type>
+            <exename>$(id)</exename>
+        </template>
+        <define-tag name="exename">
+            <set var="_name">$(value)</set>
+            <set var="_targetname">$(value).exe</set>
+        </define-tag>
+        <define-tag name="app-type">
+            <set var="_type">
+                $(substituteFromDict(value,
+                {'console':'"Win32 (x86) Console Application"',
+                 'gui':    '"Win32 (x86) Application"'}))
+            </set>
+            <set var="_type_code">
+                $(substituteFromDict(value,
+                {'console':_MSVC_TYPECODE_CONSOLE,
+                'gui':     _MSVC_TYPECODE_GUI}))
+            </set>
+            <ldflags>
+                $(substituteFromDict(value,
+                {'console':'/subsystem:console',
+                'gui':'/subsystem:windows'}))
+            </ldflags>
+         </define-tag>
+    </define-rule>
+    
+    <define-rule name="_dll" extends="_compiled">
+        <template>
+            <set var="_ldflags">/dll $(_ldflags)</set>
+            <set var="_defines" append="1">/D "_USRDLL" /D "DLL_EXPORTS"</set>
+            <set var="_type">"Win32 (x86) Dynamic-Link Library"</set>
+            <set var="_type_code">$(_MSVC_TYPECODE_DLL)</set>
+            <dllname>$(id)</dllname>
+        </template>
+        <define-tag name="dllname">
+            <set var="_name">$(value)</set>
+            <set var="_targetname">$(value).dll</set>
+        </define-tag>
+    </define-rule>
+    
+    <define-rule name="dll" extends="_dll">
+        <template>
+            <libname>$(id)</libname>
+        </template>
+        <define-tag name="libname">
+            <set var="_importlib">$(value).lib</set>
+            <set var="_linkname">$(_importlib)</set>
+            <ldflags>/implib:"$(_targetdir)$(_linkname)"</ldflags>
+        </define-tag>
+    </define-rule>
+    
+    <define-rule name="module" extends="_dll"/>
+    
+    <define-rule name="lib" extends="_compiled">
+        <template>
+            <set var="_defines" append="1">/D "_LIB"</set>
+            <set var="_type">"Win32 (x86) Static Library"</set>
+            <set var="_type_code">$(_MSVC_TYPECODE_LIB)</set>
+            <libname>$(id)</libname>
+        </template>
+        <define-tag name="libname">
+            <set var="_name">$(value)</set>
+            <set var="_targetname">$(value).lib</set>
+            <set var="_linkname">$(_targetname)</set>
+        </define-tag>
+    </define-rule>
+    
+    
+    <!-- phony targets are used only to track dependencies: -->
+    <define-rule name="phony" extends="_any">
+        <template>
+            <set var="_kind">phony</set>
+            <set var="_depname" eval="0">$(_deps)</set>
+        </template>
+    </define-rule>
+
+    <!-- some fake, never used targets: -->
+    <phony id="all" category="all"/>
+    <phony id="clean"/>
+
+    <!-- 
+    action rules - they are transformed into special target with
+    nmake content:  FIXME FIXME FIXME
+    -->
+    <define-rule name="action" extends="_any">
+        <template>
+            <set var="_kind">action</set>
+        </template>
+        <define-tag name="command">
+        </define-tag>
+        <define-tag name="is-phony">
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="subproject" extends="_any">
+        <template>
+            <set var="_kind">phony</set>
+        </template>
+        <define-tag name="installable"/>
+        <define-tag name="dir"/>
+    </define-rule>
+
+    <define-tag name="version" rules="dll"/>
+    <define-tag name="so_version" rules="dll"/>
+    <define-tag name="mac_version" rules="dll"/>
+    <define-tag name="mac-res" rules="exe"/>
+
+
+    <!-- ======= FIXME: temporary measure: before all makefiles are converted
+                 from using __ to using _ prefix, we need version of
+                 msvc_common.bkl that uses _, included here -->
+    <!-- <include file="msvc_common.bkl"/> -->
+
+
+    <!-- some nontrivial settings shared by all msvc formats: -->
+
+    <tag-info name="threading"
+              position="before:runtime-libs"/>      
+    
+    <define-tag name="runtime-libs" rules="exe,dll,module,lib">
+        <set var="_rtl_type">
+            $(substituteFromDict(value,
+              {'static':_rtl_static, 'dynamic':'D'}))
+        </set>
+    </define-tag>
+    <define-tag name="threading" rules="exe,dll,module,lib">
+        <set var="_rtl_static">
+            $(substituteFromDict(value, {'multi':'T', 'single':'L'}))
+        </set>
+    </define-tag>
+
+    <define-tag name="debug-info" rules="exe,dll,module,lib">
+        <debug-runtime-libs>$(value)</debug-runtime-libs>
+        <set var="_pdbfile" eval="0">$(_targetdir)$(_name).pdb</set>
+        <cppflags>/Fd$(_pdbfile)</cppflags>
+    </define-tag>
+
+    <define-tag name="debug-runtime-libs" rules="exe,dll,module,lib">
+        <define>
+            $(substituteFromDict(value, {'on':'_DEBUG', 'off':''}))
+        </define>
+        <set var="_rtl_dbg">
+            $(substituteFromDict(value, {'on':'d', 'off':''}))
+        </set>
+    </define-tag>
+    
+    <define-tag name="app-type" rules="exe">
+        <define>
+            $(substituteFromDict(value,
+            {'console':'_CONSOLE', 'gui':'_WINDOWS'}))
+        </define>
+    </define-tag>
+
+
+    
+    <!-- includes and defines should propagate to rc compilation, too: -->
+    
+    <define-tag name="res-include" rules="exe,dll,module">
+        <set var="_win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/i ',nativePaths(value)))</set>
+    </define-tag>
+    <define-tag name="res-define" rules="exe,dll,module">
+        <set var="_win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/d ',value))</set>
+    </define-tag>
+
+
+    <!-- precompiled headers: -->
+    <!-- (more things in makefile_defs_msvc.bkl and msvc6prj.bkl) -->
+    
+    <tag-info name="precomp-headers-gen"
+              position="after:precomp-headers-header"/>
+    <tag-info name="precomp-headers-file"
+              position="after:precomp-headers-header,after:precomp-headers-gen"/>
+    <tag-info name="precomp-headers"
+              position="after:precomp-headers-file,after:precomp-headers-header,after:precomp-headers-gen"/>
+
+    <define-tag name="precomp-headers-header" rules="exe,dll,module,lib">
+        <set var="_pch_header">$(value)</set>
+        <set var="_pch_flags">/YX"$(_pch_header)"</set>
+    </define-tag>
+
+    <define-tag name="precomp-headers-gen" rules="exe,dll,module,lib">
+        <set var="_pch_flags">/Yu"$(_pch_header)"</set>
+    </define-tag>
+    
+    <define-tag name="precomp-headers-file" rules="exe,dll,module,lib">
+        <set var="_pch_flags" append="1">
+            $(formatIfNotEmpty('/Fp"%s.pch"', mkPathPrefix(BUILDDIR)+value))
+        </set>
+    </define-tag>
+    
+    <define-tag name="precomp-headers" rules="exe,dll,module,lib">
+            <!-- FIXME: should be cppflags, this is temporary hack to
+            make wxWindows work -->
+        <cxxflags> 
+            $(substituteFromDict(value,{'on':_pch_flags, 'off':''}))
+        </cxxflags>
+    </define-tag>
+
+    
+    <!-- =============================================================== -->
+    <!--                   Compiler-specific tags:                       -->
+    <!-- =============================================================== -->
+    
+    <define-tag name="cppflags-msvc" rules="exe,lib,dll,module">
+        <cppflags>$(value)</cppflags>
+    </define-tag>
+    <define-tag name="cflags-msvc" rules="exe,lib,dll,module">
+        <cflags>$(value)</cflags>
+    </define-tag>
+    <define-tag name="cxxflags-msvc" rules="exe,lib,dll,module">
+        <cxxflags>$(value)</cxxflags>
+    </define-tag>
+    <define-tag name="ldflags-msvc" rules="exe,dll,module">
+        <ldflags>$(value)</ldflags>
+    </define-tag>
+
+
+    <!-- ================ end of included msvc_common.bkl copy ========= -->
+    
+
+    
+    <!-- =============================================================== -->
+    <!--                            output:                              -->
+    <!-- =============================================================== -->
+
+    <!-- ugly hacks to customize the output: -->
+
+    <!-- for merging otherwise identical dll and lib targets
+    syntax is whitespace separated list of target=target1+target2 -->
+    <set var="MSVC6PRJ_MERGED_TARGETS"/>
+
+</makefile>
