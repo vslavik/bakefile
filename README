@@ -1,0 +1,10 @@
+
+
+ Requirements
+--------------
+
+Python >= 2.2 (2.2.2 recommended), including builtin XML modules
+It is highly recommended to install libxml2-python as well, but it is not
+required.
+(In Debian 3.0, these are in python2.2, python2.2-xmlbase and libxml2-python2.2
+packages.)
