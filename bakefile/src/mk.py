@@ -212,9 +212,10 @@ def __splitConjunction(expr):
     else:
         return [expr[:pos]] + __splitConjunction(expr[pos+5:])
 
-def evalCondition(cond):
+def evalCondition(cond, target=None, add_dict=None):
     try:
-        return evalExpr('$(%s)' % cond, use_options=0)
+        return evalExpr('$(%s)' % cond, use_options=0,
+                        target=target, add_dict=add_dict)
     except NameError:
         # it may be a "() and () and ()" statement with some part = 0:
         for c in __splitConjunction(cond):
