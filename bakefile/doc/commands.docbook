@@ -214,6 +214,7 @@
   [<default-value>DEFVALUE</default-value>]
   [<description>DESC</description>]
   [<values>VALUES</values>]
+  [<values-description>VALUES_DESC</values-description>]
 </option>
 ]]></programlisting>
           <varname>NAME</varname> is variable name under which the option is
@@ -243,6 +244,15 @@
           possible values the option can have. It is used by backends that
           don't support options (such as Visual C++ project files) to generate
           all possible configurations. It's use is highly recommended.
+        </para>
+        <para>
+          <varname>VALUES_DESC</varname> is whitespace-separated list of
+          single-word description of corresponding values. It may be used
+          only if <varname>VALUES</varname> were specified and both
+          lists must have same length. These descriptions will show up
+          in formats that don't support conditions, such as Visual C++
+          projects (the project will contain several configurations that
+          will be described using these words).
         </para>
       </section>
 

@@ -20,11 +20,18 @@ fragments = []
 vars['targets'] = {}
 
 class Option:
-    def __init__(self, name, default, desc, values):
+    def __init__(self, name, default, desc, values, values_desc):
         self.name = name
         self.default = default
         self.desc = desc
         self.values = values
+        if self.values != None:
+            if values_desc != None:
+                self.values_desc = values_desc
+            else:
+                self.values_desc = []
+                for v in self.values:
+                    self.values_desc.append('%s_%s' % (self.name, v))
         self.neverEmpty = 0
 
     def isNeverEmpty(self):
