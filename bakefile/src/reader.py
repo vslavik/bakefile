@@ -47,6 +47,7 @@ def handleSet(e, target=None, add_dict=None):
 
     # Handle conditions:
     if isCond:
+        noValueSet = 1
         for e_if in e.children:
             if e_if.name != 'if':
                 raise ReaderError(e_if, "malformed <set> command")
@@ -75,6 +76,8 @@ def handleSet(e, target=None, add_dict=None):
                     raise ReaderError(e, "malformed condition: '%s'" % condstr)
                 cond = mk.makeCondition(condstr)
 
+            noValueSet = 0
+            
             # Real conditions:
             if 'scope' in e.props:
                 raise ReaderError(e, "conditional variable can't have nondefault scope ('%s')" % e.props['scope'])
@@ -103,6 +106,11 @@ def handleSet(e, target=None, add_dict=None):
             else:
                 value = e_if.value
             var.add(cond, value)
+        
+        if noValueSet:
+            isCond = 0
+            value = ''
+        
         if isCond: 
             errors.popCtx()
             return
