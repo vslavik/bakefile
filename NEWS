@@ -5,6 +5,7 @@ Version 0.1.5
 - new format: dmars_smake for DigitalMars's smake (Wlodzimierz ABX Skiba)
 - msvc6prj, msevc4prj: change project names to be same as file names
 - portability fix for datafiles module (Greg Noel)
+- watcom: support <cxx-rtti> (Hans Van Leemputten)
 
 
 Version 0.1.4

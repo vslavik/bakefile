@@ -47,7 +47,7 @@
     <set var="__FLAG_EXE_CONSOLE">system nt ref 'main_'</set>
     <set var="__FLAG_EXE_GUI">system nt_win ref '_WinMain@16'</set>
     
-    <set var="__FLAG_RTTI_ON"></set>
+    <set var="__FLAG_RTTI_ON">-xr</set>
     <set var="__FLAG_RTTI_OFF"></set>
     <set var="__FLAG_EXCEPTIONS_ON">-xs</set>    
     <set var="__FLAG_EXCEPTIONS_OFF"></set>
