@@ -90,7 +90,13 @@ def findSources(filenames):
                       'SOURCEFILES')
 
 
-def sources2objects(sources, target, ext):
+def sources2objects(sources, target, ext, objSuffix=''):
+    """Adds rules to compile object files from source files listed in
+       'sources', when compiling target 'target', with object files extension
+       being 'ext'. Optional 'objSuffix' argument is used to change the name
+       of object file (e.g. to compile foo.c to foo_rc.o instead of foo.o).
+
+       Returns object files list."""
     import os.path
     import reader
 
@@ -114,14 +120,16 @@ def sources2objects(sources, target, ext):
             base, srcext = os.path.splitext(s)
             base = os.path.basename(base)
             objdir = mkPathPrefix(mk.vars['BUILDDIR'])
-            obj = '%s%s%s' % (objdir, base, ext)
+            obj = '%s%s%s%s' % (objdir, base, objSuffix, ext)
             if s in srcs: continue
             srcs.append(s)
             if obj in mk.targets:
-                obj = '%s%s-%s%s' % (objdir, mk.targets[target].id, base, ext)
+                obj = '%s%s-%s%s%s' % (objdir, mk.targets[target].id, base,
+                                       objSuffix, ext)
                 num=0
                 while obj in mk.targets:
-                    obj = '%s%s-%s%i%s' % (objdir, mk.targets[target].id, base, num, ext)
+                    obj = '%s%s-%s%i%s%s' % (objdir, mk.targets[target].id,
+                                             base, num, objSuffix, ext)
             rule = '__%s-to-%s' % (srcext[1:], ext[1:])
             code2 = code % (rule, obj, target, s, rule)
             reader.processString(code2)
