@@ -312,6 +312,9 @@ __curNamespace = {}
 
 False, True = 0, 1
 
+# cache for compiled Python expressions:
+__pyExprPrecompiled = {}
+
 def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     if use_options:
         vlist = [__vars_opt, vars]
@@ -341,10 +344,25 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
    
     v = vlist[0].copy()
     for i in vlist[1:]: v.update(i)
-    global __curNamespace
+    
+    global __curNamespace, __pyExprPrecompiled
     oldNS = __curNamespace
     __curNamespace = v
-    val = eval(expr.replace('\\','\\\\'), globals(), v)
+
+    # NB: Small percentage of py expressions evaluated during bakefile
+    #     processing is evaluated more than once (up to several hundred times).
+    #     We can't cache the results because they're evaluated in different
+    #     contexts, but we can at least spare the compiler repetitive
+    #     translation of Python source code into bytecode by putting compiled
+    #     bytecode for every expression into cache. This gains a little
+    #     performance (~5-10 %).
+    if expr in __pyExprPrecompiled:
+        val = eval(__pyExprPrecompiled[expr], globals(), v)
+    else:
+        c = compile(expr.replace('\\','\\\\'), '<e>', 'eval')
+        __pyExprPrecompiled[expr] = c
+        val = eval(c, globals(), v)
+
     if val == True: val = 1
     elif val == False: val = 0
     __curNamespace = oldNS
@@ -403,7 +421,7 @@ def evalExpr(e, use_options=1, target=None, add_dict=None):
                         target=target, 
                         add_dict=add_dict)
 
-    
+
 def __recordDeps(mod):
     import dependencies
     modfile = '/%s.py' % mod
