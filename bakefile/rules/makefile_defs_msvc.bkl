@@ -123,19 +123,20 @@
     </template>
     
     <template id="__subproject_templ">
+        <set var="__targetname">sub_$(id)</set>
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            $(DOLLAR)(MAKE) /$(DOLLAR)(MAKEFLAGS) $(__subtarget)
+            $(DOLLAR)(MAKE) /$(DOLLAR)(MAKEFLAGS) -f $(os.path.basename(OUTPUT_FILE)) $(__subtarget)
             cd $(DOLLAR)(MAKEDIR)
         </set>
         <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            $(DOLLAR)(MAKE) /$(DOLLAR)(MAKEFLAGS) install
+            $(DOLLAR)(MAKE) /$(DOLLAR)(MAKEFLAGS) -f $(os.path.basename(OUTPUT_FILE)) install
             cd $(DOLLAR)(MAKEDIR)
         </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            $(DOLLAR)(MAKE) /$(DOLLAR)(MAKEFLAGS) clean
+            $(DOLLAR)(MAKE) /$(DOLLAR)(MAKEFLAGS) -f $(os.path.basename(OUTPUT_FILE)) clean
             cd $(DOLLAR)(MAKEDIR)
         </set>
     </template>
