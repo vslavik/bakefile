@@ -5,9 +5,6 @@
     <set var="COMPILER">bcc</set>
     <set var="MAKEFILE_SYNTAX">borland</set>
 
-    <set var="__exe_baser">__borland_exe</set>
-    <set var="__dll_baser">__borland_dll</set>
-    <set var="__lib_baser">__borland_comp</set>
     <include file="makefile.bkl"/>
 
     <!-- =============================================================== -->
