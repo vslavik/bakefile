@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <!-- =============================================================== -->
+    <!--                  OS/2 specific handling:                        -->
+    <!-- =============================================================== -->
+
+    <!-- 
+    <app-type>gui must be processed with emxbind after linking. We want to
+    do it only if the PM toolkit is used (and not e.g. GTK+ for OS/2), hence
+    the check for pmwin.763, which indicates that WinInitialize (763rd symbol
+    from pmwin.dll) is being used and so the toolkit must be PM:
+    -->
+    <define-tag name="app-type" rules="exe">
+        <if cond="value=='gui'">
+            <set var="__os2_emxbindcmd">
+                <if cond="PLATFORM_OS2=='1'">
+                    $(NM) $(__targetdir)$(__targetname) | if grep -q pmwin.763 ; then emxbind -ep $(__targetdir)$(__targetname) ; fi
+                </if>
+            </set>
+            <set var="__post_command" append="1">
+                $(LF)$(__os2_emxbindcmd)
+            </set>
+        </if>
+    </define-tag>
+
+</makefile>

@@ -21,7 +21,7 @@
                 <if cond="PLATFORM_MAC=='1'">$(__mac_rez)</if>
             </set>
             <set var="__macrfiles"/>
-            <set var="__post_command" eval="0">
+            <set var="__post_command" append="1" eval="0">
                 $(__mac_rezcmd)
                 $(__mac_setfilecmd)
             </set>

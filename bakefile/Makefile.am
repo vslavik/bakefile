@@ -38,6 +38,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/makefile_defs_watcom.bkl \
               rules/makefile_defs_unix.bkl \
               rules/makefile_macres.bkl \
+              rules/makefile_os2.bkl \
               rules/makefile_mingw.bkl \
               rules/msvc.bkl \
               rules/msvc6prj.bkl \
