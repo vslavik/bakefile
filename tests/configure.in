@@ -3,12 +3,17 @@ AC_INIT(aclocal.m4)
 
 AC_CANONICAL_SYSTEM
 
-AC_DJINNI
+AC_BAKEFILE
 
 AC_OUTPUT([
            Makefile
+           cond/Makefile
+           cond_install/Makefile
+           dll/Makefile
+           gettext/Makefile
            hello/Makefile
            library/Makefile
-           dll/Makefile
-           cond/Makefile
+           module/Makefile
+           pch/Makefile
+           regressions/Makefile
          ])

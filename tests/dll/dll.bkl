@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<makefile>
+    <dll id="mylib">
+        <sources>libfile.c</sources>
+        <so_version>1.0.3</so_version>
+        <libname>invalidName</libname>
+        <libname>myLibrary</libname>
+        <dllname>myDLL</dllname>
+        <install-to>$(LIBDIR)</install-to>
+    </dll>
+
+    <if cond="FORMAT!='msevc4prj'">
+        <exe id="hello">
+            <sources>hello.c</sources>
+            <library>mylib</library>
+            <install-to>$(BINDIR)</install-to>
+            <pic>on</pic>
+        </exe>
+    </if>
+</makefile>

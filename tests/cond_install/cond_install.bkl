@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <option name="DO_INSTALL">
+        <values>0,1</values>
+    </option>
+    
+    <option name="BUILD_BOTH">
+        <values>0,1</values>
+    </option>
+    
+    <exe id="test">
+        <sources>hello.c</sources>
+        <install-to>$(BINDIR)</install-to>
+        <install-if>DO_INSTALL=='1'</install-if>
+    </exe>
+    
+    
+    <exe id="test2" cond="BUILD_BOTH=='1'">
+        <sources>hello.c</sources>
+        <install-to>$(BINDIR)</install-to>
+        <install-if>DO_INSTALL=='1'</install-if>
+    </exe>
+
+</makefile>

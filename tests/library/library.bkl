@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<makefile>
+    <lib id="mylib">
+        <sources>libfile.c</sources>
+    </lib>
+
+    <if cond="FORMAT!='msevc4prj'">
+        <exe id="hello">
+            <sources>hello.c</sources>
+            <library>mylib</library>
+        </exe>
+    </if>
+</makefile>

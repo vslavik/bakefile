@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <template id="pchbase">
+        <precomp-headers>on</precomp-headers>
+        <precomp-headers-file>mypch</precomp-headers-file>
+        <precomp-headers-gen>pch.cpp</precomp-headers-gen>
+        <precomp-headers-header>precompiled.h</precomp-headers-header>
+    </template>
+    
+    <exe id="pch_test" template_append="pchbase">
+        <dirname>.</dirname>
+        <include>$(SRCDIR)</include>
+        <sources>pch.cpp</sources>
+        <dirname>.</dirname>
+    </exe>
+    
+    <exe id="pch_test2" template_append="pchbase">
+        <include>$(SRCDIR)</include>
+        <sources>pch.cpp</sources>
+        <dirname>.</dirname>
+    </exe>
+    
+</makefile>
