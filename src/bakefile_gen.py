@@ -62,7 +62,7 @@ def loadTargets(filename):
         # match filenames:
         if 'files' in node.props:
             matches1 = []
-            globs = node.props['files'].split(',')
+            globs = node.props['files'].replace('/',os.sep).split(',')
             for g in globs:
                 for f in [x for x in files if _matchesWildcard(x,g)]:
                     matches1.append(files[f])
@@ -90,7 +90,7 @@ def loadTargets(filename):
         print 'scanning directories for bakefiles...'
 
     for cmd in [x for x in root.children if x.name == 'input']:
-        globs = cmd.value.split()
+        globs = cmd.value.replace('/', os.sep).split()
         for g in globs:
             for f in glob.glob(g):
                 files[f] = FileInfo(f)
@@ -256,7 +256,7 @@ def run(args):
     if options.formats != None:
         options.formats = options.formats.split(',')
     if options.bakefiles != None:
-        options.bakefiles = options.bakefiles.split(',')
+        options.bakefiles = options.bakefiles.replace('/',os.sep).split(',')
     
     try:
         loadTargets(os.path.abspath(options.descfile))
