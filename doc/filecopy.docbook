@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+<section id="module.filecopy">
+  <title>filecopy</title>
+
+  <para>
+    This module provides rules for copying files (typically from source to
+    build directory).
+  </para>
+
+  <section id="rule.filecopy.copy-files" xreflabel="copy-files">
+    <title>copy-files</title>
+    <para>
+      Copies file(s) from source directory to destination directory. Creates
+      destionation directory if it doesn't exist.
+      <informaltable>
+        <tgroup cols='2'>
+          <thead>
+            <row>
+              <entry>Tag</entry>
+              <entry>Description</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry role="tagname">srcdir</entry>
+              <entry>
+                <para>
+                  Directory where source files are. This tag is not required
+                  (unlike the other two) -- source directory is empty by
+                  default.
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry role="tagname">files</entry>
+              <entry>
+                <para>
+                  List of files to copy. Names are relative to source
+                  directory.
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry role="tagname">dstdir</entry>
+              <entry>
+                <para>
+                  Directory where to copy the files.
+                </para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </section>
+  
+  <section id="rule.filecopy.copy-file-to-file" xreflabel="copy-file-to-file">
+    <title>copy-file-to-file</title>
+    <para>
+      Copies single file to another file.
+      <informaltable>
+        <tgroup cols='2'>
+          <thead>
+            <row>
+              <entry>Tag</entry>
+              <entry>Description</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry role="tagname">src</entry>
+              <entry>Source file.</entry>
+            </row>
+            <row>
+              <entry role="tagname">dst</entry>
+              <entry>Destination file.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </section>
+
+</section>

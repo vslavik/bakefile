@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- $Id$ -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
 "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 
@@ -6,9 +7,10 @@
 <!ENTITY concepts SYSTEM   "concepts.docbook">
 <!ENTITY targets SYSTEM    "targets.docbook">
 <!ENTITY variables SYSTEM  "variables.docbook">
-<!ENTITY modules SYSTEM    "modules.docbook">
 <!ENTITY commands SYSTEM   "commands.docbook">
 <!ENTITY manpage SYSTEM    "manpage.docbook">
+
+<!ENTITY filecopy SYSTEM   "filecopy.docbook">
 
 ]>
 
@@ -26,7 +28,12 @@
   &targets;
   &commands;
   &variables;
-  &modules;
+
+  <chapter id="ch.modules">
+    <title>Modules</title>
+    &filecopy;
+  </chapter>
+  
   &manpage;
 
 </book>
