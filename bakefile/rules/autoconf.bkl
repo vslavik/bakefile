@@ -238,7 +238,7 @@
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
         <command>            
             rm -rf $(__builddir)/.deps
-            $(RM) -f $(__builddir)/*$(OBJEXT)
+            $(RM) $(__builddir)/*$(OBJEXT)
         </command>
     </action>
     
