@@ -215,7 +215,7 @@ def filterFiles(bakefiles, formats):
 
 
 
-def updateTargets(jobs):
+def updateTargets(jobs, pretend=0):
     """Updates all targets. Run jobs instances of bakefile simultaneously"""
     if verbose:
         print 'determining which makefiles are out of date...'
@@ -252,7 +252,7 @@ def updateTargets(jobs):
             self.totalCount = 0
             self.done = 0
 
-    def _doUpdate(state, job):
+    def _doUpdate(state, job, pretend=0):
         if job == None: threadId = ''
         else: threadId = '(%i)' % job
         tempDeps = portautils.mktemp('bakefile')
@@ -276,6 +276,8 @@ def updateTargets(jobs):
                 if verbose >= 2: cmd += ' -v'
                 if verbose:
                     print cmd
+                if pretend: continue
+
                 if os.system(cmd) != 0:
                     raise errors.Error('bakefile exited with error')
                 modLinesCnt = __countLines(tempChanges)
@@ -313,10 +315,12 @@ def updateTargets(jobs):
     state.lockAllDone = threading.Lock()
     state.activeThreads = jobs
 
+    if pretend: jobs = 1
+
     try:
         state.lockAllDone.acquire()
         if jobs == 1:
-            _doUpdate(state, None)
+            _doUpdate(state, None, pretend=pretend)
         else:
             for i in range(0, jobs-1):
                 t = UpdateThread(state, i)
@@ -328,6 +332,8 @@ def updateTargets(jobs):
             # activeThreads to 0 will release the lock):
             state.lockAllDone.acquire()
             state.lockAllDone.release()
+        if pretend:
+            return
     finally:
         try:
             state.lock.acquire()
@@ -338,7 +344,7 @@ def updateTargets(jobs):
     print '%i files modified' % state.modifiedFiles
 
 
-def cleanTargets():
+def cleanTargets(pretend=0):
     try:
         dependencies.load('.bakefile_gen.state')
     except IOError: pass
@@ -365,8 +371,11 @@ def cleanTargets():
                     if not os.path.isfile(o): continue
                     if method not in ['replace','mergeBlocks']: continue
                     if _isGeneratedBySomethingElse(o): continue
-                    if verbose: print "deleting %s" % o
-                    os.remove(o)
+                    if verbose: print 'deleting %s' % o
+                    if pretend:
+                        print 'rm %s' % o
+                    else:
+                        os.remove(o)
 
 
 def run(args):
@@ -389,6 +398,10 @@ def run(args):
                       action="store", dest='jobs',
                       default='1',
                       help='number of jobs to run simultaneously')
+    parser.add_option('-p', '--pretend',
+                      action="store_true", dest='pretend',
+                      default=0,
+                      help="don't do anything, only display actions that would be performed")
     parser.add_option('-v', '--verbose',
                       action="store_true", dest='verbose', default=0,
                       help='display detailed information')
@@ -416,9 +429,9 @@ def run(args):
         loadTargets(os.path.abspath(options.descfile))
         filterFiles(options.bakefiles, options.formats)
         if options.clean:
-            cleanTargets()
+            cleanTargets(pretend=options.pretend)
         else:
-            updateTargets(jobs=options.jobs)
+            updateTargets(jobs=options.jobs, pretend=options.pretend)
     except errors.ErrorBase, e:
         sys.stderr.write('[bakefile_gen] %s' % str(e))
         sys.exit(1)

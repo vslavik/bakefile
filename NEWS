@@ -12,6 +12,8 @@ Version 0.1.4
 - added <pic> for enabling position-independent code for static libraries
 - autoconf: added bakefilize tool to make packaging easier
 - added <error> command for sanity checking in .bkl files
+- new backend for eMbedded Visual C++ 4 project files
+- added --pretend option to bakefile_gen tool
 
 
 Version 0.1.3
