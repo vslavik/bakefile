@@ -13,8 +13,11 @@
     <set var="__DEFAULT_CC">bcc32</set>
     <set var="__DEFAULT_CXX">bcc32</set>
     <set var="__DEFAULT_CFLAGS"></set>
-    <!-- -a4: align to 32bit -->
-    <set var="__DEFAULT_CPPFLAGS">-a4 -I\$(BCCDIR)\include</set>
+    <!-- 
+            -a4: align to 32bit 
+            -g0: don't treat lots of warnings as error
+    -->
+    <set var="__DEFAULT_CPPFLAGS">-a4 -g0 -I\$(BCCDIR)\include</set>
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
     
