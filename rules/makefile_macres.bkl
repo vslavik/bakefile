@@ -39,7 +39,9 @@
 
         <!-- includes and defines should propagate to rc compilation, too: -->
         <define-tag name="include">
-            <set var="__rez_flags" append="1">-i $(value)</set>
+            <set var="__rez_flags" append="1">
+                $(addPrefixIfNotEmpty('-i ',value))
+            </set>
         </define-tag>
         <define-tag name="define">
             <set var="__rez_flags" append="1">
