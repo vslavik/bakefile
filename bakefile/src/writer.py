@@ -130,7 +130,7 @@ def invoke(method):
                     '-B',
                     '-o',filename,
                     '-E','globals().update(writer.__copyMkToVars())',
-                    '-D','RULESDIR="%s"' % rulesdir,
+                    '-D','RULESDIR="%s"' % rulesdir.replace('\\','\\\\'),
                     template])
     txt = __readFile(filename)
     os.remove(filename)
