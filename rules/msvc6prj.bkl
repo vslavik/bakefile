@@ -58,9 +58,9 @@
             <set var="__builddir" eval="0">
                 <if cond="BUILDDIR=='.'">
                     $(substituteFromDict(__debug,{'0':'Release','1':'Debug'}))                  </if>
-                <if cond="BUILDDIR!='.'">$(BUILDDIR)</if>
+                <if cond="BUILDDIR!='.'">$(nativePaths(BUILDDIR))</if>
             </set>
-            <set var="__targetdir">$(__builddir)</set>
+            <set var="__targetdir">$(__builddir)$(DIRSEP)</set>
             
             <set var="__rtl_dbg"/>
             <set var="__rtl_static">L</set>
