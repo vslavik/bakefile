@@ -395,6 +395,11 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="target">
             <set var="__subtarget">$(value)</set>
         </define-tag>
+        <define-tag name="installable">
+            <if cond="value=='no'">
+                <set var="__INSTALL_SUBPROJECT_CMD"/>
+            </if>
+        </define-tag>
     </define-rule>
     
     

@@ -323,10 +323,17 @@
             <command>$(STRIP) $(value)/$(ref('__targetname',id))</command>
         </modify-target>
     </define-tag>
+
+    <tag-info name="installable" position="before:dir"/>
     
+    <define-tag name="installable" rules="subproject">
+        <set var="__installable">$(value)</set>
+    </define-tag>
     <define-tag name="dir" rules="subproject">
         <modify-target target="install-strip">
-            <command>(cd $(value) &amp;&amp; $(DOLLAR)(MAKE) install-strip)</command>
+            <if cond="__installable!='no'">
+                <command>(cd $(value) &amp;&amp; $(DOLLAR)(MAKE) install-strip)</command>
+            </if>
         </modify-target>
     </define-tag>
     
