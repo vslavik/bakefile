@@ -24,6 +24,13 @@
 import mk, errors, config, sys, os
 import containers
 
+def checkBakefileVersion(version):
+    """Returns true iff current bakefile version is at least 'version'.
+       'version' is string with three numbers separated with dots,
+       e.g. '0.1.4'."""
+    vcur = mk.vars['BAKEFILE_VERSION'].split('.')
+    vreq = version.split('.')
+    return vcur >= vreq
 
 def isoption(name):
     return name in mk.__vars_opt
