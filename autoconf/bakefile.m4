@@ -48,25 +48,49 @@ AC_DEFUN(AC_BAKEFILE_PLATFORM,
     PLATFORM_MAC=0
     PLATFORM_MACOSX=0
     PLATFORM_OS2=0
-    
-    case "${host}" in
-        *-*-cygwin* | *-*-mingw32* )
-            PLATFORM_WIN32=1
-        ;;
-        *-pc-msdosdjgpp )
-            PLATFORM_MSDOS=1
-        ;;
-        *-pc-os2_emx | *-pc-os2-emx )
-            PLATFORM_OS2=1
-        ;;
-        powerpc-*-darwin* )
-            PLATFORM_MAC=1
-            PLATFORM_MACOSX=1
-        ;;
-        * )
-            PLATFORM_UNIX=1
-        ;;
-    esac
+
+    if test "x$BAKEFILE_FORCE_PLATFORM" = "x"; then 
+        case "${BAKEFILE_HOST}" in
+            *-*-cygwin* | *-*-mingw32* )
+                PLATFORM_WIN32=1
+            ;;
+            *-pc-msdosdjgpp )
+                PLATFORM_MSDOS=1
+            ;;
+            *-pc-os2_emx | *-pc-os2-emx )
+                PLATFORM_OS2=1
+            ;;
+            powerpc-*-darwin* )
+                PLATFORM_MAC=1
+                PLATFORM_MACOSX=1
+            ;;
+            * )
+                PLATFORM_UNIX=1
+            ;;
+        esac
+    else
+        case "$BAKEFILE_FORCE_PLATFORM" in
+            win32 )
+                PLATFORM_WIN32=1
+            ;;
+            msdos )
+                PLATFORM_MSDOS=1
+            ;;
+            os2 )
+                PLATFORM_OS2=1
+            ;;
+            darwin )
+                PLATFORM_MAC=1
+                PLATFORM_MACOSX=1
+            ;;
+            unix )
+                PLATFORM_UNIX=1
+            ;;
+            * )
+                AC_MSG_ERROR([Unknown platform: $BAKEFILE_FORCE_PLATFORM])
+            ;;
+        esac
+    fi
 
     AC_SUBST(PLATFORM_UNIX)
     AC_SUBST(PLATFORM_WIN32)
@@ -94,7 +118,7 @@ AC_DEFUN(AC_BAKEFILE_SUFFIXES,
     DLLPREFIX=lib
     DLLPREFIX_MODULE=
     
-    case "${host}" in
+    case "${BAKEFILE_HOST}" in
         *-hp-hpux* )
             SO_SUFFIX="sl"
             SO_SUFFIX_MODULE="sl"
@@ -157,7 +181,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
         PIC_FLAG="-fPIC"
     fi
 
-    case "${host}" in
+    case "${BAKEFILE_HOST}" in
       *-hp-hpux* )
         dnl default settings are good for gcc but not for the native HP-UX
         if test "x$GCC" = "xyes"; then
@@ -380,7 +404,7 @@ EOF
       ;;
 
       *)
-        AC_MSG_ERROR(unknown system type $host.)
+        AC_MSG_ERROR(unknown system type $BAKEFILE_HOST.)
     esac
 
     if test "x$SHARED_LD_MODULE_CC" = "x" ; then
@@ -413,7 +437,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_VERSIONS,
     USE_MACVERSION=0
     SONAME_FLAG=
 
-    case "${host}" in
+    case "${BAKEFILE_HOST}" in
       *-*-linux* )
         SONAME_FLAG="-Wl,-soname,"
         USE_SOVERSION=1
@@ -458,7 +482,7 @@ AC_DEFUN(AC_BAKEFILE_DEPS,
     if test "x$GCC" = "xyes"; then
         DEPSMODE=gcc
         DEPS_TRACKING=1
-        case "${host}" in
+        case "${BAKEFILE_HOST}" in
             powerpc-*-darwin* )
                 dnl -cpp-precomp (the default) conflicts with -MMD option
                 dnl used by bk-deps (see also http://developer.apple.com/documentation/Darwin/Conceptual/PortingUnix/compiling/chapter_4_section_3.html)
@@ -553,7 +577,7 @@ AC_DEFUN(AC_BAKEFILE_CHECK_BASIC_STUFF,
     AC_CHECK_TOOL(STRIP, strip, :)
     AC_CHECK_TOOL(NM, nm, :)
 
-    case ${host} in
+    case ${BAKEFILE_HOST} in
         *-hp-hpux* )
             INSTALL_DIR="mkdir"
             ;;
@@ -563,7 +587,7 @@ AC_DEFUN(AC_BAKEFILE_CHECK_BASIC_STUFF,
     AC_SUBST(INSTALL_DIR)
 
     LDFLAGS_GUI=
-    case ${host} in
+    case ${BAKEFILE_HOST} in
         *-*-cygwin* | *-*-mingw32* )
         LDFLAGS_GUI="-Wl,--subsystem,windows -mwindows"
     esac
@@ -582,7 +606,7 @@ AC_DEFUN(AC_BAKEFILE_RES_COMPILERS,
     RESCOMP=
     SETFILE=
 
-    case ${host} in 
+    case ${BAKEFILE_HOST} in 
         *-*-cygwin* | *-*-mingw32* )
             dnl Check for win32 resources compiler:
             if test "$build" != "$host" ; then
@@ -703,10 +727,21 @@ dnl ---------------------------------------------------------------------------
 dnl AC_BAKEFILE
 dnl
 dnl To be used in configure.in of any project using Bakefile-generated mks
+dnl
+dnl Behaviour can be modified by setting following variables:
+dnl    BAKEFILE_CHECK_BASICS    set to "no" if you don't want bakefile to
+dnl                             to perform check for basic tools like ranlib
+dnl    BAKEFILE_HOST            set this to override host detection, defaults
+dnl                             to ${host}
+dnl    BAKEFILE_FORCE_PLATFORM  set to override platform detection
 dnl ---------------------------------------------------------------------------
 
 AC_DEFUN(AC_BAKEFILE,
 [
+    if test "x$BAKEFILE_HOST" = "x"; then
+        BAKEFILE_HOST="${host}"
+    fi
+
     if test "x$BAKEFILE_CHECK_BASICS" != "xno"; then
         AC_BAKEFILE_CHECK_BASIC_STUFF
     fi
