@@ -152,9 +152,10 @@
 
         <set var="__so_symlinks_cmd">
             <if cond="USE_SOSYMLINKS=='1'">
-                $(RM) $(__targetdir)$(__linkname1) $(__targetdir)$(__linkname2);
-                $(LN_S) $(__targetname) $(__targetdir)$(__linkname2);
-                $(LN_S) $(__linkname2) $(__targetdir)$(__linkname1)
+                (cd $(__targetdir);
+                $(RM) $(__linkname1) $(__linkname2);
+                $(LN_S) $(__targetname) $(__linkname2);
+                $(LN_S) $(__linkname2) $(__linkname1))
             </if>
         </set>
         <set var="__so_symlinks_inst_cmd">
