@@ -10,7 +10,7 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <!-- see format_features.bkl for explanation: -->
     <set var="FORMAT_HAS_VARIABLES">1</set>
-    
+
     <include file="makefile_defs_$(MAKEFILE_SYNTAX).bkl"/>
 
     <!-- =============================================================== -->

@@ -20,5 +20,18 @@ advantage of a particular feature.
     -->
     <set var="FORMAT_HAS_VARIABLES">0</set>
 
+    <!--
+    Comma separated list of variables (both global and target) used by output
+    writer. Output Empy template then can only use variables from this list.
+    This does not affect conditional or make variables or options - they are
+    always all available.  
+
+    This list can be used to speed up finalization phase of Bakefile processing
+    and it improves efficiency of unused variables purging as well.
+    
+    If the list is empty then all variables are treated as used by the writer.
+    -->
+    <set var="FORMAT_OUTPUT_VARIABLES"></set>
+
 </makefile>
 

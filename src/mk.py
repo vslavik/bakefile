@@ -1,3 +1,8 @@
+#
+# Makefile variables, conditions etc. and evaluation code are located here
+#
+# $Id$
+#
 
 import utils, errors, config
 from utils import *
@@ -229,7 +234,7 @@ def __resetUsageTracker(reset_coverage):
     __usageTracker.pyexprs = 0            # other python expressions
     __usageTracker.refs = 0               # utils.ref() calls
     if reset_coverage:
-        __usageTracker.usage = {}         # 1 for every option, makevar or
+        __usageTracker.map = {}           # 1 for every option, makevar or
                                           # condvar used
 
 __curNamespace = {}
@@ -250,10 +255,10 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
             if __trackUsage:
                 if d is __vars_opt:
                     __usageTracker.optionsAndCondVars += 1
-                    __usageTracker.usage[expr] = 1
+                    __usageTracker.map[expr] = 1
                 elif d is vars and expr in make_vars:
                     __usageTracker.makevars += 1
-                    __usageTracker.usage[expr] = 1
+                    __usageTracker.map[expr] = 1
                 else:
                     __usageTracker.vars += 1
             return d[expr]
