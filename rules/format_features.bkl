@@ -39,9 +39,19 @@ advantage of a particular feature.
     Whether the output format can handle conditions (i.e. variable values
     depending on conditions and conditionally built targets) at all. Most
     make-tools do, but e.g. MSVC project files can't do it. If set to 0, then
-    the targets and variables are "flattened" = 
+    the targets and variables are "flattened" = expanded into multiple
+    'configurations' as in many IDEs.
     -->
     <set var="FORMAT_SUPPORTS_CONDITIONS">1</set>
+
+    <!--
+    Whether it is at least possible to have multiple configurations if
+    conditions are not supported (such as in IDEs). Meaningless if
+    FORMAT_SUPPORTS_CONDITIONS=1. If both FORMAT_SUPPORTS_CONDITIONS and
+    FORMAT_SUPPORTS_CONFIGURATIONS are 0, then we're in deep trouble and
+    we can only generate makefiles that are not configurable.
+    -->
+    <set var="FORMAT_SUPPORTS_CONFIGURATIONS">1</set>
 
 
     <!--
