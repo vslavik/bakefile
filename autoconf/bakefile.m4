@@ -699,6 +699,8 @@ dnl ---------------------------------------------------------------------------
 AC_DEFUN([AC_BAKEFILE_CREATE_FILE_DLLAR_SH],
 [
 dnl ===================== dllar.sh begins here =====================
+dnl    (Created by merge-scripts.py from dllar.sh
+dnl     file do not edit here!)
 D='$'
 cat <<EOF >dllar.sh
 #!/bin/sh
@@ -1181,6 +1183,8 @@ dnl ===================== dllar.sh ends here =====================
 AC_DEFUN([AC_BAKEFILE_CREATE_FILE_BK_DEPS],
 [
 dnl ===================== bk-deps begins here =====================
+dnl    (Created by merge-scripts.py from bk-deps
+dnl     file do not edit here!)
 D='$'
 cat <<EOF >bk-deps
 #!/bin/sh
@@ -1193,7 +1197,6 @@ cat <<EOF >bk-deps
 DEPSMODE=${DEPSMODE}
 DEPSDIR=.deps
 DEPSFLAG_GCC="${DEPSFLAG_GCC}"
-DEPSFLAG_MWCC="${DEPSFLAG_MWCC}"
 
 mkdir -p ${D}DEPSDIR
 
@@ -1231,31 +1234,6 @@ if test ${D}DEPSMODE = gcc ; then
         fi
     fi
     exit 0
-elif test ${D}DEPSMODE = mwcc ; then
-    ${D}*
-    status=${D}?
-    if test ${D}{status} != 0 ; then
-        exit ${D}{status}
-    fi
-    # Run mwcc again with -MM and redirect into the dep file we want
-    # NOTE: We can't use shift here because we need ${D}* to be valid
-    prevarg=
-    for arg in ${D}* ; do
-        if test "${D}prevarg" = "-o"; then
-            objfile=${D}arg
-        else
-            case "${D}arg" in
-                -* )
-                ;;
-                * )
-                    srcfile=${D}arg
-                ;;
-            esac
-        fi
-        prevarg="${D}arg"
-    done
-    ${D}* ${D}DEPSFLAG_MWCC >${D}{DEPSDIR}/${D}{objfile}.d
-    exit 0
 else
     ${D}*
     exit ${D}?
@@ -1267,6 +1245,8 @@ dnl ===================== bk-deps ends here =====================
 AC_DEFUN([AC_BAKEFILE_CREATE_FILE_SHARED_LD_SH],
 [
 dnl ===================== shared-ld-sh begins here =====================
+dnl    (Created by merge-scripts.py from shared-ld-sh
+dnl     file do not edit here!)
 D='$'
 cat <<EOF >shared-ld-sh
 #!/bin/sh
@@ -1361,6 +1341,8 @@ dnl ===================== shared-ld-sh ends here =====================
 AC_DEFUN([AC_BAKEFILE_CREATE_FILE_BK_MAKE_PCH],
 [
 dnl ===================== bk-make-pch begins here =====================
+dnl    (Created by merge-scripts.py from bk-make-pch
+dnl     file do not edit here!)
 D='$'
 cat <<EOF >bk-make-pch
 #!/bin/sh
