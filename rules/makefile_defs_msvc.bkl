@@ -85,7 +85,7 @@
 
         <define-tag name="precomp-headers-gen">
             <set var="__pch_object">$(getObjectName(value, id, OBJEXT))</set>
-            <set var="__deps" append="1">$(__pch_object)</set>
+            <set var="__deps">$(__pch_object) $(__deps)</set>
             <modify-target target="$(__pch_object)">
                 <set var="__cflags" append="1">
                     /Yc$(ref('__pch_header',id))
