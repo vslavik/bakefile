@@ -5,6 +5,8 @@
     
     <set var="COMPILER">gcc</set>
     <set var="MAKEFILE_SYNTAX">gnu</set>
+    
+    <set var="PLATFORM_UNIX">1</set>
     <set var="TOOLSET">unix</set>
 
     
