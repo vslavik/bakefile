@@ -57,8 +57,7 @@
     <set var="LIBDIR">$(libdir)</set>
     <set var="DATADIR">$(datadir)</set>
     <set var="INCLUDEDIR">$(includedir)</set>
-    <option name="DESTDIR"/>
-    
+
     <set var="SRCDIR">$(srcdir)</set>
 
     <set var="DLLEXT">.$(SO_SUFFIX)</set>
@@ -118,6 +117,9 @@
     <include file="makefile_mingw.bkl"/>    
     <!-- and OS/2 as well: -->
     <include file="makefile_os2.bkl"/>    
+
+
+    <set var="DESTDIR" make_var="1"></set>
     
     <!-- =============================================================== -->
     <!--                   Compiler-specific tags:                       -->
@@ -369,7 +371,8 @@
     
     <!-- see format_features.bkl for explanation: -->
     <set var="FORMAT_OUTPUT_VARIABLES">
-        __targetdir,__targetname,__deps,__command,__is_phony,AUTOCONF_CHECKS
+        __targetdir,__targetname,__deps,__command,__is_phony,
+        AUTOCONF_CHECKS,DESTDIR
     </set>    
     <set var="FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS">0</set>
 
