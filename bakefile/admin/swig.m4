@@ -89,7 +89,7 @@ AC_DEFUN([PYTHON_DEVEL],[
 	AC_MSG_CHECKING([for Python include path])
 	python_path=${PYTHON%/bin*}
 	for i in "$python_path/include/python$PYTHON_VERSION/" "$python_path/include/python/" "$python_path/" ; do
-		python_path=`find $i -type f -name Python.h -print`
+		python_path=`find $i -type f -name Python.h -print 2>/dev/null`
 		if test -n "$python_path" ; then
 			break
 		fi
@@ -108,7 +108,7 @@ AC_DEFUN([PYTHON_DEVEL],[
 	AC_MSG_CHECKING([for Python library path])
 	python_path=${PYTHON%/bin*}
 	for i in "$python_path/lib/python$PYTHON_VERSION/config/" "$python_path/lib/python$PYTHON_VERSION/" "$python_path/lib/python/config/" "$python_path/lib/python/" "$python_path/" ; do
-		python_path=`find $i -type f -name libpython$PYTHON_VERSION.* -print`
+		python_path=`find $i -type f -name "libpython$PYTHON_VERSION.*" -print | head -n 1 2>/dev/null`
 		if test -n "$python_path" ; then
 			break
 		fi
