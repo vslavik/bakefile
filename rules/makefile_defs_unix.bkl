@@ -24,7 +24,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="DLLIMPEXT" overwrite="0">$(DLLEXT)</set>
     <set var="DLLPREFIX" overwrite="0">$(LIBPREFIX)</set>
     <set var="DLLPREFIX_MODULE" overwrite="0">$(DLLPREFIX)</set>
-    <set var="PIC_CFLAGS" overwrite="0">-fPIC</set>
+    <set var="PIC_CFLAGS" overwrite="0">-fPIC -DPIC</set>
 
     <set var="INSTALL_PROGRAM" overwrite="0">install -c</set>
     <set var="INSTALL_DATA" overwrite="0">$(INSTALL) -m 644</set>

@@ -369,6 +369,10 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
         AC_MSG_ERROR(unknown system type $BAKEFILE_HOST.)
     esac
 
+    if test "x$PIC_FLAG" != "x" ; then
+        PIC_FLAG="$PIC_FLAG -DPIC"
+    fi
+
     if test "x$SHARED_LD_MODULE_CC" = "x" ; then
         SHARED_LD_MODULE_CC="$SHARED_LD_CC"
     fi

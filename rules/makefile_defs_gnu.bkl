@@ -40,7 +40,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__FLAG_DEBUG_OFF"></set>
     <set var="__FLAG_DEBUG_OFF_LINKER"></set>
     <set var="__FLAG_OPTIMIZE_OFF">-O0</set>
-    <set var="__FLAG_OPTIMIZE_SIZE">-O2</set>
+    <set var="__FLAG_OPTIMIZE_SIZE">-Os</set>
     <set var="__FLAG_OPTIMIZE_SPEED">-O2</set>
     <set var="__FLAG_ARCH_I386">-march=i386</set>
     <set var="__FLAG_ARCH_I486">-march=i486</set>
@@ -49,10 +49,10 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__FLAG_USE_PCH"></set>
     <set var="__FLAG_PCH_FILE"></set>
     <set var="__FLAG_SINGLE_THREADING"/>
-    <set var="__FLAG_MULTI_THREADING">-mthreads</set>
+    <set var="__FLAG_MULTI_THREADING">-D_REENTRANT -D_THREAD_SAFE -pthread</set>
     <set var="__FLAG_WARNINGS_NO"/>
     <set var="__FLAG_WARNINGS_DEFAULT"/>
-    <set var="__FLAG_WARNINGS_MAX">-Wall</set>
+    <set var="__FLAG_WARNINGS_MAX">-W -Wall</set>
     
     <set var="__FLAG_RTTI_ON"></set>
     <set var="__FLAG_RTTI_OFF">-fno-rtti</set>

@@ -10,6 +10,7 @@ Version 0.1.5
 - added category=path hint to options to make it possible to use options
   as argument to <include> etc.
 - new format: gnu for GNU toolchain on Unix
+- misc portability fixes on Unix (exillis@exillis.com)
 
 
 Version 0.1.4
