@@ -3,6 +3,7 @@ Version 0.1.8
 
 - gnu: define PLATFORM_UNIX
 - gnu: implemented dependencies tracking
+- msvc*: use /EHsc instead of /GX, which is deprecated in VC 2005
 
 
 Version 0.1.7
