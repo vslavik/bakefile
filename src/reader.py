@@ -537,7 +537,9 @@ def processFile(filename):
         raise ReaderError(None, "file '%s' doesn't exist" % filename)
     if config.verbose:
         print 'loading %s...' % filename
-    sys.path.append(os.path.dirname(os.path.abspath(filename)))
+    newdir = os.path.dirname(os.path.abspath(filename))
+    if newdir not in sys.path:
+        sys.path.append(newdir)
     __doProcess(file=filename)
 
 def processFileIfExists(filename):
