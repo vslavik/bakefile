@@ -18,7 +18,7 @@
 
   <include file="presets/simple.bkl"/>
   
-  <exe name="hello" template="simple">
+  <exe id="hello" template="simple">
     <sources>hello.c</sources>
   </exe>
 
