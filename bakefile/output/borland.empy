@@ -3,15 +3,10 @@
 BCCDIR = $(MAKEDIR)\..
 !endif
 
-# -------------------------------------------------------------------------
-# These are configurable options:
-# -------------------------------------------------------------------------
-
-@[ for o in options :@
-# @o.descStr.replace('\n','\n#') @o.valuesStr
-!ifndef @o.name
-@o.name = @o.defaultStr
-!endif
+@[if OPTIONS_FILE != '':!include @OPTIONS_FILE
+]@
+@[if OPTIONS_FILE == '':@
+@empy.include(os.path.join(RULESDIR, 'borland-opts.empy'))
 ]@
 
 # -------------------------------------------------------------------------

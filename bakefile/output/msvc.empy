@@ -1,12 +1,8 @@
 @empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
-
-# -------------------------------------------------------------------------
-# These are configurable options:
-# -------------------------------------------------------------------------
-
-@[ for o in options :@
-# @o.descStr.replace('\n','\n#') @o.valuesStr
-@o.name = @o.defaultStr
+@[if OPTIONS_FILE != '':!include <@OPTIONS_FILE>
+]@
+@[if OPTIONS_FILE == '':@
+@empy.include(os.path.join(RULESDIR, 'watcom-opts.empy'))
 ]@
 
 # -------------------------------------------------------------------------

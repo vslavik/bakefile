@@ -66,5 +66,9 @@
     </set>
 
     <output file="$(OUTPUT_FILE)" writer="msvc.empy"/>
+    
+    <if cond="OPTIONS_FILE!='' and WRITE_OPTIONS_FILE=='1'">
+        <output file="$(OPTIONS_FILE)" writer="msvc-opts.empy"/>
+    </if>
 
 </makefile>
