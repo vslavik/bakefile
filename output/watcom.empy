@@ -43,7 +43,7 @@ WATCOM_CWD = $+ $(%cdrive):$(%cwd) $-
 @c.name =
 @[ for v in c.values :@
 @makeCondBegin(v.cond)
-@c.name = @v.value.replace('\n', ' &\n')
+@utils.wrapLongLine('%s = ' % c.name, v.value, ' &', variable=c.name)
 @makeCondEnd(v.cond)
 ]@
 ]@
@@ -51,7 +51,7 @@ WATCOM_CWD = $+ $(%cdrive):$(%cwd) $-
 ### Variables: ###
 
 @[ for v in make_vars :@
-@v.name = @v.value
+@utils.wrapLongLine('%s = ' % v.name, v.value, ' &', variable=v.name)
 ]@
 
 
