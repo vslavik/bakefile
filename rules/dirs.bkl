@@ -14,5 +14,6 @@
     <set var="BINDIR">$(PREFIX)/bin</set>
     <set var="LIBDIR">$(PREFIX)/lib</set>
     <set var="INCLUDEDIR">$(PREFIX)/include</set>
+    <set var="DATADIR">$(PREFIX)/share</set>
 
 </makefile>
