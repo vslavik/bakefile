@@ -16,7 +16,7 @@
 
     <!-- All supported CPUs: -->
     <set var="EVC_ALL_CPUS">
-        ARMV4,ARMV4I,ARMV4T,MIPS16,MIPSII,MIPSII_FP,MIPSIV,MIPSIV_FP,SH3,SH4,x86
+        ARM,ARMV4,ARMV4I,ARMV4T,MIPS16,MIPSII,MIPSII_FP,MIPSIV,MIPSIV_FP,SH3,SH4,x86
     </set>
 
 
@@ -39,6 +39,7 @@
         <!-- CPU_ID values from .vcp files for given CPU: -->
         <set var="_CPU_ID">
             $(substituteFromDict(EVC_CPU,{
+                'ARM'       : '{D6518FFC-710F-11D3-99F2-00105A0DF099}',
                 'ARMV4'     : '{ECBEA43D-CD7B-4852-AD55-D4227B5D624B}',
                 'ARMV4I'    : '{DC70F430-E78B-494F-A9D5-62ADC56443B8}',
                 'ARMV4T'    : '{F52316A9-3B7C-4FE7-A67F-68350B41240D}',
@@ -57,6 +58,7 @@
         <!-- compiler executable for given CPU: -->
         <set var="_COMPILER">
             $(substituteFromDict(EVC_CPU,{
+                'ARM'       : 'clarm.exe',
                 'ARMV4'     : 'clarm.exe',
                 'ARMV4I'    : 'clarm.exe',
                 'ARMV4T'    : 'clthumb.exe',
@@ -77,6 +79,7 @@
         <set var="_MSVC_TYPECODE_CONSOLE">ERROR_NOT_SUPPORTED</set>
         <set var="_MSVC_TYPECODE_GUI">
             $(substituteFromDict(EVC_CPU,{
+                'ARM'       : '0x8501',
                 'ARMV4'     : '0xa301',
                 'ARMV4I'    : '0xa501',
                 'ARMV4T'    : '0xa401',
@@ -94,6 +97,7 @@
         
         <set var="_MSVC_TYPECODE_DLL">
             $(substituteFromDict(EVC_CPU,{
+                'ARM'       : '0x8502',
                 'ARMV4'     : '0xa302',
                 'ARMV4I'    : '0xa502',
                 'ARMV4T'    : '0xa402',
@@ -111,6 +115,7 @@
         
         <set var="_MSVC_TYPECODE_LIB">
             $(substituteFromDict(EVC_CPU,{
+                'ARM'       : '0x8504',
                 'ARMV4'     : '0xa304',
                 'ARMV4I'    : '0xa504',
                 'ARMV4T'    : '0xa404',
@@ -129,6 +134,7 @@
         <!-- CPU-specific flags: -->
         <set var="_CPU_DEFINES">
             $(substituteFromDict(EVC_CPU,{
+            'ARM'       : '/D "ARM" /D "_ARM_"',
             'ARMV4'     : '/D "ARM" /D "_ARM_" /D "ARMV4"',
             'ARMV4I'    : '/D "ARM" /D "_ARM_" /D "ARMV4I"',
             'ARMV4T'    : 
@@ -150,6 +156,7 @@
         </set>
         <set var="_CPU_CFLAGS">
             $(substituteFromDict(EVC_CPU,{
+            'ARM'       : '',
             'ARMV4'     : '',
             'ARMV4I'    : '/QRarch4T /QRinterwork-return',
             'ARMV4T'    : '/QRarch4T /QRinterwork-return',
@@ -166,6 +173,7 @@
         </set>
         <set var="_CPU_LDFLAGS">
             $(substituteFromDict(EVC_CPU,{
+            'ARM'       : '/align:"4096" /MACHINE:ARM',
             'ARMV4'     : '/align:"4096" /MACHINE:ARM',
             'ARMV4I'    : '/MACHINE:THUMB',
             'ARMV4T'    : '/MACHINE:THUMB',
@@ -184,6 +192,7 @@
         <!-- CRT flags are different for CPUs, too: -->
         <set var="_CPU_CRT_DBG">
             $(substituteFromDict(EVC_CPU,{
+            'ARM'       : '/M$(DOLLAR)(CECrtMTDebug)',
             'ARMV4'     : '/M$(DOLLAR)(CECrtMTDebug)',
             'ARMV4I'    : '/M$(DOLLAR)(CECrtMTDebug)',
             'ARMV4T'    : '/M$(DOLLAR)(CECrtMTDebug)',
@@ -200,6 +209,7 @@
         </set>
         <set var="_CPU_CRT_REL">
             $(substituteFromDict(EVC_CPU,{
+            'ARM'       : '/M$(DOLLAR)(CECrtMT)',
             'ARMV4'     : '/M$(DOLLAR)(CECrtMT)',
             'ARMV4I'    : '/M$(DOLLAR)(CECrtMT)',
             'ARMV4T'    : '/M$(DOLLAR)(CECrtMT)',
