@@ -276,13 +276,13 @@
           for use in comments.
         </para>
         <para>
-          <varname>VALUES</varname> is whitespace-separated list of all
+          <varname>VALUES</varname> is comma-separated list of all
           possible values the option can have. It is used by backends that
           don't support options (such as Visual C++ project files) to generate
           all possible configurations. It's use is highly recommended.
         </para>
         <para>
-          <varname>VALUES_DESC</varname> is whitespace-separated list of
+          <varname>VALUES_DESC</varname> is comma-separated list of
           single-word description of corresponding values. It may be used
           only if <varname>VALUES</varname> were specified and both
           lists must have same length. These descriptions will show up
