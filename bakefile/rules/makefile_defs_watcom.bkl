@@ -1,0 +1,148 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <include file="win32.bkl"/>
+    
+    <set var="__DEFINE_ARG">-d</set>
+    <set var="__INCLUDE_ARG">-i=</set>
+    <set var="__LIB_ARG">%s.lib</set>
+    <set var="__LIBDIR_ARG">libpath </set>
+
+    <set var="__DEFAULT_CC">wcc386</set>
+    <set var="__DEFAULT_CXX">wpp386</set>
+    <set var="__DEFAULT_CFLAGS"></set>
+    <set var="__DEFAULT_CPPFLAGS"></set>
+    <set var="__DEFAULT_CXXFLAGS"></set>
+    <set var="__DEFAULT_LDFLAGS"></set>
+    
+    <set var="__LINKER_CC" eval="0">wlink</set>
+    <set var="__LINKER_CXX" eval="0">wlink</set>
+    <set var="__DLL_LINKER_CC" eval="0">wlink</set>
+    <set var="__DLL_LINKER_CXX" eval="0">wlink</set>
+
+    <!-- basic compiler/linker flags: -->
+    <set var="__FLAG_EXE_CONSOLE">system nt</set>
+    <set var="__FLAG_EXE_GUI">system nt_win</set>
+    <set var="__FLAG_DEBUG_ON">-d2</set>
+    <set var="__FLAG_DEBUG_ON_LINKER">debug dwarf all</set>
+    <set var="__FLAG_DEBUG_OFF">-d0</set>
+    <set var="__FLAG_DEBUG_OFF_LINKER"></set>
+    <set var="__FLAG_OPTIMIZE_OFF">-od</set>
+    <set var="__FLAG_OPTIMIZE_SIZE">-os</set>
+    <set var="__FLAG_OPTIMIZE_SPEED">-ot -ox</set>
+    <set var="__FLAG_ARCH_I386">-3</set>
+    <set var="__FLAG_ARCH_I486">-4</set>
+    <set var="__FLAG_ARCH_I586">-5</set>
+    <set var="__FLAG_ARCH_I686">-6</set>
+    <set var="__FLAG_SINGLE_THREADING"/>
+    <set var="__FLAG_MULTI_THREADING"/>
+
+    
+    <!-- rules building blocks: -->
+    
+    <template id="__commands_templ_C">
+        <set var="__COMPILE_C_CMD" eval="0">
+            $(CC) -zq -fo=$@ $(__cflags) $&lt;
+        </set>
+    </template>
+    
+    <template id="__commands_templ_CXX">
+        <set var="__COMPILE_CXX_CMD" eval="0">
+            $(CXX) -zq -fo=$@ $(__cxxflags) $&lt;
+        </set>
+    </template>
+
+    <set var="__exe_baser">__watcom_comp</set>
+    <set var="__dll_baser">__watcom_comp</set>
+    <set var="__dll_baset">__watcom_dll</set>
+    <set var="__lib_baser">__watcom_comp</set>
+
+    <template id="__watcom_dll">
+        <cppflags>-bd</cppflags> <!-- DLL target -->
+    </template>
+
+    <define-rule name="__watcom_comp">
+        <template>
+            <set var="__libpath"/>
+            <set var="__pch_flag"/>
+            <!-- FIXME: get rid of this once tag ordering works!: -->
+            <set var="__pch_cppflags" eval="0">$(__pch_flag)</set>
+            <cppflags>$(__pch_cppflags)</cppflags>
+        </template>
+        
+        <define-tag name="threading">
+            <cppflags>
+                $(substituteFromDict(value,{'multi':'-bm','single':''}))
+            </cppflags>
+        </define-tag>
+        
+        <define-tag name="lib-path">
+            <set var="__libpath" append="1">;$(value)</set>
+        </define-tag>
+        
+        <define-tag name="runtime-libs">
+            <cppflags>
+                $(substituteFromDict(value, {'static':'', 'dynamic':'-br'}))
+            </cppflags>
+        </define-tag>
+        
+        <define-tag name="precomp-headers">
+            <set var="__pch_flag">/fh</set>
+        </define-tag>
+        <define-tag name="precomp-headers-file">
+            <set var="__pch_flag">
+                $(formatIfNotEmpty('/fh=%s.pch', mkPathPrefix(BUILDDIR)+value))
+            </set>
+        </define-tag>
+    </define-rule>
+    
+
+    <template id="__commands_templ">
+        <set var="__win32res"/>
+        <set var="__LINK_CMD_BASE" eval="0">
+            %create $^*.lbc
+            %append $^*.lbc name $@
+            %append $^*.lbc option incremental
+            %append $^*.lbc $(__ldflags)
+            for %i in ($(__objects)) do %append $^*.lbc file %i
+            for %i in ($(__ldlibs)) do %append $^*.lbc library %i
+            %append $^*.lbc $(__win32res)
+        </set>        
+        <set var="__LINK_EXE_CMD" eval="0">
+            $(__LINK_CMD_BASE)
+            $(__linker) @$^*.lbc
+        </set>        
+        <set var="__LINK_LIB_CMD" eval="0">
+            %create $^*.lbc
+            for %i in ($(__objects)) do %append $^*.lbc +%i
+            wlib -q -p2048 -n -b $@ @$^*.lbc
+        </set>
+        <set var="__LINK_DLL_CMD" eval="0">
+            $(__LINK_CMD_BASE)
+            %append $^*.lbc system nt_dll
+            $(__linker) @$^*.lbc
+            wlib $(__targetdir)$(__libname).lib +$@
+        </set>
+    </template>
+    
+    <template id="__subproject_templ">
+        <set var="__MAKE_SUBPROJECT_CMD" eval="0">
+            cd $(__subdir)
+            wmake \$(__MAKEOPTS__) $(__subtarget)
+            cd \$(WATCOM_CWD)
+        </set>
+        <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
+            cd $(__subdir)
+            wmake \$(__MAKEOPTS__) install
+            cd \$(WATCOM_CWD)
+        </set>
+        <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
+            cd $(__subdir)
+            wmake \$(__MAKEOPTS__) clean
+            cd \$(WATCOM_CWD)
+        </set>
+    </template>
+
+</makefile>
