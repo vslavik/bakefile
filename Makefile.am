@@ -84,7 +84,7 @@ EXTRA_DIST = \
     src/optik/README.txt autoconf output rules \
     src/empy/README src/empy/COPYING \
 	src/win32scriptwrapper.c \
-	src/bakefile.exe
+	src/bakefile.exe \
 	src/bakefile_gen.exe
 
 dist-hook:
