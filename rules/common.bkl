@@ -1,4 +1,6 @@
 <?xml version="1.0" ?>
+<!-- $Id$ -->
+
 <makefile>
 
     <include file="version.bkl"/>
@@ -27,6 +29,9 @@
         <define-tag name="src">
             <set var="src">$(findSources(value))</set>
             <set var="__deps">$(src)</set>
+        </define-tag>
+        <define-tag name="dst">
+            <set var="__targetname">$(value)</set>
         </define-tag>
         <define-tag name="parent-target">
             <set var="__parent">$(value)</set>

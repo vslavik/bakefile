@@ -11,7 +11,11 @@ advantage of a particular feature.
 <makefile>
 
     <!--
-
+    This boolean flag indicates whether the output format supports variables.
+    If it does, then some space and time optimization are possible and long
+    Bakefile variables that would otherwise be expanded into literals are left
+    as variables in generated makefile/project.
+    
     Makefiles generally do, that's why makefile.bkl sets this to 1.
     -->
     <set var="FORMAT_HAS_VARIABLES">0</set>
