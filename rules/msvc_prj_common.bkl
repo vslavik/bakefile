@@ -201,6 +201,7 @@
                 $(substituteFromDict(value,{'on':'1', 'off':'0'}))
             </set>
         </define-tag>
+        <define-tag name="precomp-headers-location"/>
         
         <!-- Support for files grouping: -->
         <define-tag name="msvc-file-group">
