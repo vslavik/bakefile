@@ -41,8 +41,10 @@
     <set var="__FLAG_ARCH_I486">-4</set>
     <set var="__FLAG_ARCH_I586">-5</set>
     <set var="__FLAG_ARCH_I686">-6</set>
-    <set var="__FLAG_SINGLE_THREADING"/>
-    <set var="__FLAG_MULTI_THREADING"/>
+    <set var="__FLAG_SINGLE_THREADING_LD"/>
+    <set var="__FLAG_MULTI_THREADING_LD"/>
+    <set var="__FLAG_SINGLE_THREADING_CPP"/>
+    <set var="__FLAG_MULTI_THREADING_CPP"/>
     <set var="__FLAG_WARNINGS_NO">-w</set>
     <set var="__FLAG_WARNINGS_DEFAULT"/>
     <set var="__FLAG_WARNINGS_MAX">-w-</set>

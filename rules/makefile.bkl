@@ -306,9 +306,14 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="threading">
             <ldflags>
                 $(substituteFromDict(value,
-                      {'multi':__FLAG_MULTI_THREADING,
-                       'single':__FLAG_SINGLE_THREADING}))
+                      {'multi':__FLAG_MULTI_THREADING_LD,
+                       'single':__FLAG_SINGLE_THREADING_LD}))
             </ldflags>
+            <cppflags>
+                $(substituteFromDict(value,
+                      {'multi':__FLAG_MULTI_THREADING_CPP,
+                       'single':__FLAG_SINGLE_THREADING_CPP}))
+            </cppflags>
         </define-tag>
         
         <define-tag name="warnings">
