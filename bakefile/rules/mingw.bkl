@@ -50,7 +50,7 @@
     
     <!-- see format_features.bkl for explanation: -->
     <set var="FORMAT_OUTPUT_VARIABLES">
-        __targetdir,__targetname,__deps,__command,__is_phony
+        __targetdir __targetname __deps __command __is_phony
     </set>
 
     <output file="$(OUTPUT_FILE)" writer="mingw.empy"/>

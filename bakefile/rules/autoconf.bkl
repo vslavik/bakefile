@@ -368,8 +368,8 @@
     
     <!-- see format_features.bkl for explanation: -->
     <set var="FORMAT_OUTPUT_VARIABLES">
-        __targetdir,__targetname,__deps,__command,__is_phony,
-        AUTOCONF_CHECKS,DESTDIR
+        __targetdir __targetname __deps __command __is_phony 
+        AUTOCONF_CHECKS DESTDIR
     </set>    
     <set var="FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS">0</set>
 
