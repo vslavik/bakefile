@@ -74,7 +74,9 @@
             <set var="__pch_flag"/>
             <!-- FIXME: get rid of this once tag ordering works!: -->
             <set var="__pch_cppflags" eval="0">$(__pch_flag)</set>
-            <cppflags>$(__pch_cppflags)</cppflags>
+            <!-- FIXME: should be cppflags, temporary fix to make wxWin
+                   working!! -->
+            <cxxflags>$(__pch_cppflags)</cxxflags>
         </template>
         
         <define-tag name="threading">
