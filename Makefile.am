@@ -67,7 +67,8 @@ rulesgettext_DATA = \
 			  rules/gettext/autoconf.bkl
 
 presets_DATA = \
-              presets/fake.bkl
+              presets/fake.bkl \
+			  presets/simple.bkl
 
 code_PYTHON = src/config.py \
               src/bakefile.py \

@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<!--
+
+Simple build type: only one option is used, which switches between debug and
+release builds.
+
+Usage: use template "simple" for your targets:
+
+  <include file="presets/simple.bkl"/>
+  <exe id="myapp" template="simple">
+    <sources>myapp.cpp</sources>
+  </exe>
+
+-->
+
+<makefile>
+
+    <option name="DEBUG">
+        <values>0,1</values>
+        <values-description>Release,Debug</values-description>
+        <description>Set to 1 to build debug version</description>
+    </option>
+
+    <template id="simple">
+        <define>
+            $(substituteFromDict(DEBUG,{'1':'','0':'NDEBUG'}))
+        </define>
+        <optimize>
+            $(substituteFromDict(DEBUG,{'1':'off','0':'speed'}))
+        </optimize>
+        <debug-info>
+            $(substituteFromDict(DEBUG,{'1':'on','0':'off'}))
+        </debug-info>
+    </template>
+   
+</makefile>
