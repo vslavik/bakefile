@@ -79,6 +79,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-rule name="__any">
         <template>
             <set var="__targetdir"></set>
+            <set var="__targetdir_dironly">.</set>
             <set var="__is_phony">0</set>
             <set var="__deps"/>
             <set var="__command"/>
@@ -123,6 +124,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__post_command"/>
             <set var="__install_if_cond"/>
             <set var="__targetdir">$(mkPathPrefix(BUILDDIR))</set>
+            <set var="__targetdir_dironly">$(BUILDDIR)</set>
             <set var="__uses_cxx">0</set>
             <set var="__ldflags">$(LDFLAGS)</set>
             <set var="__ldlibs"/>
@@ -238,13 +240,24 @@ makefiles (most notably GNU Make and Autoconf formats).
 
         <define-tag name="library">
             <depends>$(value)</depends>
-            <ldlibs>
-                $(substitute(value, lambda x: ref('__targetdir',x)+ref('__linkname', x), 'LIBR'))
-            </ldlibs>
+            <!-- 
+             This doesn't work on BSD Unix where the linker doesn't like
+             being given shared library as e.g. lib/foo.so - it's then recorded
+             as lib/foo.so instead of foo.so in ELF binary. We implement a
+             solution that works on BSD in autoconf.bkl.
+             -->
+            <if cond="FORMAT!='autoconf'">
+                <ldlibs>
+                    $(substitute(value,
+                                 lambda x: ref('__targetdir',x)+ref('__linkname', x),
+                                 'LIBR'))
+                </ldlibs>
+            </if>
         </define-tag>
 
         <define-tag name="dirname">
-            <set var="__targetdir">$(nativePaths(value))$(DIRSEP)</set>
+            <set var="__targetdir_dironly">$(nativePaths(value))</set>
+            <set var="__targetdir">$(__targetdir_dironly)$(DIRSEP)</set>
         </define-tag>
         
         <define-tag name="optimize">
