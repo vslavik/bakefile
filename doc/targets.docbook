@@ -500,7 +500,6 @@
                 <entry role="availability">exe, dll, module, lib</entry>
               </row>
               
-              
               <row id="tags.lib.dirname">
                 <entry role="tagname">dirname</entry>
                 <entry>
@@ -932,6 +931,16 @@
               </row>
         
       
+              <row id="tag.uid" xreflabel="uid">
+                <entry role="tagname">uid</entry>
+                <entry>
+                  Defines target's unique ID number for formats that need it.
+                  <emphasis>FIXME: currently not implemented in any format;
+                  document use of type=symbian1 etc. once it is used by
+                  something</emphasis>
+                </entry>
+                <entry role="availability">exe, dll, module</entry>
+              </row>
       
             </tbody>
           </tgroup>
