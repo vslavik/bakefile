@@ -68,24 +68,28 @@
     <define-tag name="cppflags-mingw" rules="exe,lib,dll,module"/>
     <define-tag name="cppflags-msvc" rules="exe,lib,dll,module"/>
     <define-tag name="cppflags-watcom" rules="exe,lib,dll,module"/>
+    <define-tag name="cppflags-dmars" rules="exe,lib,dll,module"/>
     
     <define-tag name="cflags-borland" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-unix" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-mingw" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-msvc" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-watcom" rules="exe,lib,dll,module"/>
+    <define-tag name="cflags-dmars" rules="exe,lib,dll,module"/>
     
     <define-tag name="cxxflags-borland" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-unix" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-mingw" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-msvc" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-watcom" rules="exe,lib,dll,module"/>
+    <define-tag name="cxxflags-dmars" rules="exe,lib,dll,module"/>
     
     <define-tag name="ldflags-borland" rules="exe,dll,module"/>
     <define-tag name="ldflags-unix" rules="exe,dll,module"/>
     <define-tag name="ldflags-mingw" rules="exe,dll,module"/>
     <define-tag name="ldflags-msvc" rules="exe,dll,module"/>
     <define-tag name="ldflags-watcom" rules="exe,dll,module"/>
+    <define-tag name="ldflags-dmars" rules="exe,dll,module"/>
 
     <!-- =============================================================== -->
     <!--                     Common tags description:                    -->
