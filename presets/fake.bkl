@@ -53,6 +53,7 @@ some unexpected way.
         <define-tag name="precomp-headers"/>
         <define-tag name="precomp-headers-gen"/>
         <define-tag name="precomp-headers-header"/>        
+        <define-tag name="precomp-headers-location"/>
         <define-tag name="precomp-headers-file"/>
         <define-tag name="precomp-headers-exclude"/>
         <define-tag name="version"/>
@@ -66,6 +67,7 @@ some unexpected way.
         <define-tag name="mac-res"/>
         <define-tag name="win32-res"/>
         <define-tag name="is-phony"/>
+        <define-tag name="uid"/>
 
         <define-tag name="__fake_hook"/>
     </define-rule>
