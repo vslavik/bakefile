@@ -7,6 +7,7 @@
 import types, copy, sys, tempfile, os, os.path, string
 import mk, config, errors
 import outmethods
+from types import StringType
 
 mergeBlocks = outmethods.mergeBlocks
 
@@ -39,10 +40,10 @@ def __copyMkToVars():
     # Copy variables:
     for v in mk.vars:
         if v == 'targets': continue
-        if v == 'configs':
-            dict[v] = mk.vars[v]
-        else:
+        if type(mk.vars[v]) is StringType:
             dict[v] = mk.vars[v].strip()
+        else:
+            dict[v] = mk.vars[v]
 
     # Copy targets information:
     targets = Container()
@@ -69,7 +70,10 @@ def __copyMkToVars():
             elif v == 'distinctConfigs':
                 t.distinctConfigs = tar.vars['distinctConfigs']
             else:
-                exec('t.%s = """%s"""' % (v, __valueToPy(tar.vars[v].strip())))
+                if type(tar.vars[v]) is StringType:
+                    exec('t.%s = """%s"""' % (v, __valueToPy(tar.vars[v].strip())))
+                else:
+                    exec('t.%s = tar.vars[v]' % v)
         t.cond = tar.cond
         targets.append(t.id, t)
     dict['targets'] = targets

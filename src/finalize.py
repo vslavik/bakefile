@@ -8,7 +8,7 @@
 #
 
 import sys, string
-from types import InstanceType, DictType
+from types import StringType
 import mk, errors, config, utils
 
 
@@ -53,8 +53,7 @@ def finalEvaluation(outputVarsOnly=1):
                 list.append((mk.vars,v,None))
     else:
         for v in mk.vars:
-            if not (type(mk.vars[v]) is InstanceType or
-                    type(mk.vars[v]) is DictType):
+            if type(mk.vars[v]) is StringType:
                 if '$' in mk.vars[v]:
                     list.append((mk.vars,v,None))
    
@@ -66,8 +65,7 @@ def finalEvaluation(outputVarsOnly=1):
     else:
         for t in mk.targets.values():
             for v in t.vars:
-                if not (type(t.vars[v]) is InstanceType or 
-                        type(t.vars[v]) is DictType):
+                if type(t.vars[v]) is StringType:
                     if '$' in t.vars[v]:
                         list.append((t.vars,v,t))
 
@@ -291,15 +289,13 @@ def replaceEscapeSequences():
     if config.verbose:
         print 'replacing escape sequences'
     for v in mk.vars:
-        if not (type(mk.vars[v]) is InstanceType or
-                type(mk.vars[v]) is DictType):
+        if type(mk.vars[v]) is StringType:
             mk.vars[v] = _repl(mk.vars[v])
     for v in mk.make_vars:
         mk.make_vars[v] = _repl(mk.make_vars[v])
     for t in mk.targets.values():
         for v in t.vars:
-            if not (type(t.vars[v]) is InstanceType or
-                    type(t.vars[v]) is DictType):
+            if type(t.vars[v]) is StringType:
                 t.vars[v] = _repl(t.vars[v])
     for o in mk.options.values():
         if o.default == None: continue
