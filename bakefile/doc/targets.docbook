@@ -700,6 +700,21 @@
               </row>
 
 
+              <row id="tag.pic" xreflabel="pic">
+                <entry role="tagname">pic</entry>
+                <entry>
+                  Tells the compiler whether to generate position-independent
+                  code or not. The default is to use PIC for DLLs and
+                  <emphasis>not</emphasis> use it for executables and static
+                  libraries, but you may want to change it if your static
+                  library may be linked into a DLL.
+                  Accepted values are
+                  <literal>on</literal> and <literal>off</literal>.
+                </entry>
+                <entry role="availability">exe, lib</entry>
+              </row>
+
+
               <row id="tag.threading" xreflabel="threading">
                 <entry role="tagname">threading</entry>
                 <entry>

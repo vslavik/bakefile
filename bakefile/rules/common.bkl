@@ -115,6 +115,7 @@
     <tag-info name="threading" exclusive="1"/>
     <tag-info name="warnings" exclusive="1"/>
     <tag-info name="runtime-libs" exclusive="1"/>
+    <tag-info name="pic" exclusive="1"/>
 
     <tag-info name="precomp-headers" exclusive="1"/>
     <tag-info name="precomp-headers-file" exclusive="1"/>

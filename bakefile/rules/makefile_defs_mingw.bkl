@@ -19,7 +19,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="LIBPREFIX">lib</set>
     <set var="DLLIMPEXT">.a</set>
     <set var="DLLPREFIX"></set>
-    <set var="DLL_CFLAGS"></set>
+    <set var="PIC_CFLAGS"></set>
 
     <set var="AROPTIONS">rcu</set>
 
