@@ -20,7 +20,7 @@ BCCDIR = $(MAKEDIR)\..
 ### Variables: ###
 
 @[ for v in make_vars :@
-@utils.wrapLongLine('%s = %s' % (v.name, v.value), ' \\')
+@utils.wrapLongLine('%s = ' % v.name, v.value, ' \\', variable=v.name)
 ]@
 
 ### Conditionally set variables: ###
@@ -28,7 +28,7 @@ BCCDIR = $(MAKEDIR)\..
 @[ for c in cond_vars :@
 @[ for v in c.values :@
 !if @utils.condition2string(v.cond, utils.CONDSTR_MSVC)
-@utils.wrapLongLine('%s = %s' % (c.name, v.value), ' \\')
+@utils.wrapLongLine('%s = ' % c.name, v.value, ' \\', variable=c.name)
 !endif
 ]@
 ]@
