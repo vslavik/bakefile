@@ -20,8 +20,8 @@ output_DATA = output/autoconf.empy \
               output/borland.empy \
               output/borland-opts.empy \
               output/dmars.empy \
+              output/dmars_smake.empy \
               output/dmars-opts.empy \
-              output/dmars.empy \
               output/msvc.empy \
               output/msvc-opts.empy \
               output/msvc6prj.py \
@@ -38,6 +38,8 @@ rules_DATA =  rules/FORMATS.bkmanifest \
 			  rules/cbuilderx.bkl \
               rules/borland.bkl \
               rules/dmars.bkl \
+              rules/dmars_smake.bkl \
+              rules/dmars_common.bkl \
               rules/common.bkl \
               rules/format_features.bkl \
               rules/datafiles.bkl \
@@ -45,6 +47,8 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/makefile.bkl \
               rules/makefile_defs_borland.bkl \
               rules/makefile_defs_dmars.bkl \
+              rules/makefile_defs_dmars_common.bkl \
+              rules/makefile_defs_dmars_smake.bkl \
               rules/makefile_defs_msvc.bkl \
               rules/makefile_defs_mingw.bkl \
               rules/makefile_defs_watcom.bkl \
