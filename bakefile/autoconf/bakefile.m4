@@ -205,8 +205,8 @@ verbose=0
 args=""
 objects=""
 
-while test \$# -gt 0; do
-    case \$1 in
+while test \${#} -gt 0; do
+    case \${1} in
 
        -v)
         verbose=1
@@ -214,13 +214,13 @@ while test \$# -gt 0; do
 
        -o|-compatibility_version|-current_version|-framework|-undefined|-install_name)
         # collect these options and values
-        args="\$args \$1 \$2"
+        args="\${args} \${1} \${2}"
         shift
         ;;
 
        -l*|-L*|-flat_namespace)
         # collect these options
-        args="\$args \$1"
+        args="\${args} \${1}"
         ;;
 
        -dynamiclib)
@@ -228,17 +228,17 @@ while test \$# -gt 0; do
         ;;
 
        -*)
-        echo "shared-ld: unhandled option '\$1'"
+        echo "shared-ld: unhandled option '\${1}'"
         exit 1
         ;;
 
-        *.o)
+        *.o | *.a)
         # collect object files
-        objects="\$objects \$1"
+        objects="\${objects} \${1}"
         ;;
 
         *)
-        echo "shared-ld: unhandled argument '\$1'"
+        echo "shared-ld: unhandled argument '\${1}'"
         exit 1
         ;;
 
@@ -249,25 +249,25 @@ done
 #
 # Link one module containing all the others
 #
-if test \$verbose = 1; then
-    echo "c++ -r -keep_private_externs -nostdlib \$objects -o master.\$\$.o"
+if test \${verbose} = 1; then
+    echo "c++ -r -keep_private_externs -nostdlib \${objects} -o master.\$\$.o"
 fi
-c++ -r -keep_private_externs -nostdlib \$objects -o master.\$\$.o
-status=\$?
-if test \$status != 0; then
-    exit \$status
+c++ -r -keep_private_externs -nostdlib \${objects} -o master.\$\$.o
+{status}=\$?
+if test \${status} != 0; then
+    exit \${status}
 fi
 
 #
 # Link the shared library from the single module created
 #
-if test \$verbose = 1; then
-    echo "cc -dynamiclib master.\$\$.o \$args"
+if test \${verbose} = 1; then
+    echo "cc -dynamiclib master.\$\$.o \${args}"
 fi
-c++ -dynamiclib master.\$\$.o \$args
+c++ -dynamiclib master.\$\$.o \${args}
 status=\$?
-if test \$status != 0; then
-    exit \$status
+if test \${status} != 0; then
+    exit \${status}
 fi
 
 #
