@@ -243,12 +243,20 @@ BSC32=bscmake.exe
                    eval ('t.configs[c].__custom_build_%s' % fname)
 
     # (sort the files into groups)
-    groups = ['Source Files', 'Header Files', 'Resource Files']
+    groups = []
+    groups_default= ['Source Files', 'Header Files', 'Resource Files']
     group_defs = {
         'Source Files'   : '*.cpp *.c *.cxx *.rc *.def *.r *.odl *.idl *.hpj *.bat',
         'Header Files'   : '*.h *.hpp *.hxx *.hm *.inl',
         'Resource Files' : '*.ico *.cur *.bmp *.dlg *.rc2 *.rct *.bin *.rgs *.gif *.jpg *.jpeg *.jpe',
     }
+    if t.__file_groups != '' and not t.__file_groups.isspace():
+        for gr in t.__file_groups.split('\n'):
+            grdef = gr.split(':')
+            groups.append(grdef[0])
+            group_defs[grdef[0]] = grdef[1]
+    groups += groups_default
+    
     files = filterGroups(groups, group_defs, sources.keys())
 
     # (some files-related settings:)
