@@ -15,7 +15,7 @@ def makeCondEnd(c):
 @[if OPTIONS_FILE != '']include @OPTIONS_FILE
 @[end if]@
 @[if OPTIONS_FILE == '']@
-@empy.include(os.path.join(RULESDIR, 'mingw-opts.empy'))
+@empy.include(os.path.join(RULESDIR, 'gnumake-opts.empy'))
 @[end if]@
 
 # -------------------------------------------------------------------------
