@@ -65,8 +65,9 @@ def __copyMkToVars():
                 for x in tar.vars[v]:
                     t.configs[x] = Struct()
                     for y in tar.vars[v][x]:
-                        if y == 'configs': continue
                         exec('t.configs["%s"].%s = """%s"""' % (x, y, __valueToPy(tar.vars[v][x][y].strip())))
+            elif v == 'distinctConfigs':
+                t.distinctConfigs = tar.vars['distinctConfigs']
             else:
                 exec('t.%s = """%s"""' % (v, __valueToPy(tar.vars[v].strip())))
         t.cond = tar.cond
