@@ -1,0 +1,217 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <!-- ============================================================== -->
+    <!--                      CPUs configuration                        -->
+    <!-- ============================================================== -->
+
+    <!-- Set this variable to comma-separated list of CPUs you want to
+         target in generated project files. x86 emulator is always
+         included. Supported CPU types are listed in variable EVC_ALL_CPUS.
+         Special value "all" will include all supported CPUs.
+    -->
+    <set var="EVC_CPUS">ARMV4</set>
+
+    <!-- All supported CPUs: -->
+    <set var="EVC_ALL_CPUS">
+        ARMV4,ARMV4I,ARMV4T,MIPS16,MIPSII,MIPSII_FP,MIPSIV,MIPSIV_FP,SH3,SH4,x86
+    </set>
+
+
+    <!-- This code ensures that configurations for all CPUs are made: -->
+    <set var="_cpu_option_vals">
+        <if cond="EVC_CPUS=='all'">$(EVC_ALL_CPUS),emulator</if>
+        <if cond="EVC_CPUS!='all'">$(EVC_CPUS),emulator</if>
+    </set>
+    <set var="_cpu_option_desc">
+        $(','.join(['(WCE %s)' % x for x in _cpu_option_vals.split(',')]))
+    </set>    
+    <option name="CPU">
+        <values>$(_cpu_option_vals)</values>
+        <values-description>$(_cpu_option_desc)</values-description>
+    </option>
+
+    <template id="_evc_config">
+        <!-- CPU_ID values from .vcp files for given CPU: -->
+        <set var="_CPU_ID">
+            $(substituteFromDict(CPU,{
+                'ARMV4'     : '{ECBEA43D-CD7B-4852-AD55-D4227B5D624B}',
+                'ARMV4I'    : '{DC70F430-E78B-494F-A9D5-62ADC56443B8}',
+                'ARMV4T'    : '{F52316A9-3B7C-4FE7-A67F-68350B41240D}',
+                'MIPS16'    : '{D6519013-710F-11D3-99F2-00105A0DF099}',
+                'MIPSII'    : '{689DDC64-9D9D-11D5-96F8-00207802C01C}',
+                'MIPSII_FP' : '{D8AC856C-B213-4895-9E83-9EC51A55201E}',
+                'MIPSIV'    : '{0B2FE524-26C5-4194-8CEF-B1582DEB5A98}',
+                'MIPSIV_FP' : '{046A430D-7770-48AB-89B5-24C2D300B03F}',
+                'SH3'       : '{D6519020-710F-11D3-99F2-00105A0DF099}',
+                'SH4'       : '{D6519021-710F-11D3-99F2-00105A0DF099}',
+                'x86'       : '{D6518FF3-710F-11D3-99F2-00105A0DF099}',
+                'emulator'  : '{32E52003-403E-442D-BE48-DE10F8C6131D}',
+            }))
+        </set>
+
+        <!-- compiler executable for given CPU: -->
+        <set var="_COMPILER">
+            $(substituteFromDict(CPU,{
+                'ARMV4'     : 'clarm.exe',
+                'ARMV4I'    : 'clarm.exe',
+                'ARMV4T'    : 'clthumb.exe',
+                'MIPS16'    : 'clmips.exe',
+                'MIPSII'    : 'clmips.exe',
+                'MIPSII_FP' : 'clmips.exe',
+                'MIPSIV'    : 'clmips.exe',
+                'MIPSIV_FP' : 'clmips.exe',
+                'SH3'       : 'shcl.exe',
+                'SH4'       : 'shcl.exe',
+                'x86'       : 'cl.exe',
+                'emulator'  : 'cl.exe',
+            }))
+        </set>
+
+        <!-- Typecodes: -->
+
+        <set var="_MSVC_TYPECODE_CONSOLE">ERROR_NOT_SUPPORTED</set>
+        <set var="_MSVC_TYPECODE_GUI">
+            $(substituteFromDict(CPU,{
+                'ARMV4'     : '0xa301',
+                'ARMV4I'    : '0xa501',
+                'ARMV4T'    : '0xa401',
+                'MIPS16'    : '0x8901',
+                'MIPSII'    : '0xa101',
+                'MIPSII_FP' : '0xa201',
+                'MIPSIV'    : '0x9601',
+                'MIPSIV_FP' : '0x9201',
+                'SH3'       : '0x8101',
+                'SH4'       : '0x8601',
+                'x86'       : '0x8301',
+                'emulator'  : '0xa601',
+            }))
+        </set>
+        
+        <set var="_MSVC_TYPECODE_DLL">0x0102</set>
+        <set var="_MSVC_TYPECODE_LIB">0x0104</set>
+        
+        <!-- CPU-specific flags: -->
+        <set var="_CPU_DEFINES">
+            $(substituteFromDict(CPU,{
+            'ARMV4'     : '/D "ARM" /D "_ARM_" /D "ARMV4"',
+            'ARMV4I'    : '/D "ARM" /D "_ARM_" /D "ARMV4I"',
+            'ARMV4T'    : 
+                '/D "ARM" /D "_ARM_" /D "THUMB" /D "_THUMB_" /D "ARMV4T"',
+            'MIPS16'    : 
+                '/D "MIPS" /D "_MIPS_" /D "R4000" /D "MIPSII" /D "MIPS16" /D "_MIPS16_" /D "MIPS16SUPPORT"',
+            'MIPSII'    : '/D "MIPS" /D "_MIPS_" /D "R4000" /D "MIPSII"',
+            'MIPSII_FP' : 
+                '/D "MIPS" /D "_MIPS_" /D "R4000" /D "MIPSII" /D "MIPSII_FP"',
+            'MIPSIV'    : 
+                '/D "MIPS" /D "_MIPS_" /D "_MIPS64" /D "R4000" /D "MIPSIV"',
+            'MIPSIV_FP' : 
+                '/D "MIPS" /D "_MIPS_" /D "_MIPS64" /D "R4000" /D "MIPSIV" /D "MIPSIV_FP"',
+            'SH3'       : '/D "SHx" /D "SH3" /D "_SH3_"',
+            'SH4'       : '/D "SHx" /D "SH4" /D "_SH4_"',
+            'x86'       : '/D "_i386_" /D "i_386_" /D "_X86_" /D "x86"',
+            'emulator'  : '/D "i_386_" /D "_X86_" /D "x86"',
+            }))
+        </set>
+        <set var="_CPU_CFLAGS">
+            $(substituteFromDict(CPU,{
+            'ARMV4'     : '',
+            'ARMV4I'    : '/QRarch4T /QRinterwork-return',
+            'ARMV4T'    : '/QRarch4T /QRinterwork-return',
+            'MIPS16'    : '/QMmips16',
+            'MIPSII'    : '/QMmips2 /QMFPE',
+            'MIPSII_FP' : '/QMmips2 /QMFPE-',
+            'MIPSIV'    : '/QMmips4 /QMn32 /QMFPE',
+            'MIPSIV_FP' : '/QMmips4 /QMn32 /QMFPE-',
+            'SH3'       : '',
+            'SH4'       : '/Qsh4',
+            'x86'       : '/Gs8192 /GF',
+            'emulator'  : '/Gs8192 /GF',
+            }))
+        </set>
+        <set var="_CPU_LDFLAGS">
+            $(substituteFromDict(CPU,{
+            'ARMV4'     : '/align:"4096" /MACHINE:ARM',
+            'ARMV4I'    : '/MACHINE:THUMB',
+            'ARMV4T'    : '/MACHINE:THUMB',
+            'MIPS16'    : '/MACHINE:MIPS16 /ALIGN:4096',
+            'MIPSII'    : '/MACHINE:MIPS',
+            'MIPSII_FP' : '/MACHINE:MIPS',
+            'MIPSIV'    : '/MACHINE:MIPSFPU',
+            'MIPSIV_FP' : '/MACHINE:MIPSFPU',
+            'SH3'       : '/MACHINE:SH3 /align:4096',
+            'SH4'       : '/MACHINE:SH4',
+            'x86'       : '$(DOLLAR)(CEx86Corelibc) /MACHINE:IX86 /nodefaultlib:"OLDNAMES.lib"',
+            'emulator'  : '$(DOLLAR)(CEx86Corelibc) /MACHINE:IX86 /nodefaultlib:"OLDNAMES.lib"',
+            }))
+        </set>
+    </template>
+
+    
+    <!-- ============================================================== -->
+    <!--                           Other code                           -->
+    <!-- ============================================================== -->
+    
+    <set var="COMPILER">evc</set>
+
+    <set var="_MSVC_CPU_NAME">WCE $(CPU)</set>
+ 
+    <template id="_compiled_baset" template="_evc_config">
+        
+        <set var="_default_builddir" eval="0">
+            $(substituteFromDict(_debug,{'0':CPU+'Rel','1':CPU+'Dbg'}))
+        </set>
+        
+        <set var="_defines"/>
+        <set var="_ldflags">
+            /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(DOLLAR)(CENoDefaultLib)" /subsystem:$(DOLLAR)(CESubsystem) $(_CPU_LDFLAGS)
+        </set>
+        <set var="_ldlibs">coredll.lib</set>
+        <set var="_win32rc_flags">/l 0x409</set>
+        <set var="_cppflags"/>
+
+        <define>UNDER_CE=$(DOLLAR)(CEVersion)</define>
+        <define>_WIN32_WCE=$(DOLLAR)(CEVersion)</define>
+        <!-- Windows CE is Unicode-only OS: -->
+        <define>UNICODE</define>
+        <define>_UNICODE</define>
+        <define>$(DOLLAR)(CePlatform)</define>
+        
+        <cppflags>$(_CPU_DEFINES) $(_CPU_CFLAGS)</cppflags>
+        <set var="_win32rc_flags" append="1">
+            $(_CPU_DEFINES.replace('/D','/d'))
+        </set>
+
+        <debug-runtime-libs>off</debug-runtime-libs>
+    </template>
+
+    <define-rule name="_compiled_specific">
+        <template/>
+        <define-tag name="debug-runtime-libs">
+            <define>
+                $(substituteFromDict(value, {'on':'DEBUG', 'off':''}))
+            </define>            
+            <cppflags>
+                $(substituteFromDict(value,
+                    {'on':'/M$(DOLLAR)(CECrtMTDebug)',
+                     'off':'/M$(DOLLAR)(CECrtMT)'}))
+            </cppflags>
+        </define-tag>
+    </define-rule>
+
+    <!-- Load common code and run it: -->
+    <include file="msvc_prj_common.bkl"/>
+
+    <!-- Windows CE can't do console applications: -->
+    <define-tag name="app-type" rules="exe">
+        <if cond="value=='console'">
+            <error>Windows CE doesn't support console applications.</error>
+        </if>
+    </define-tag>
+
+    <!-- Output the projects: -->
+    <output file="$(OUTPUT_FILE)" writer="msevc4prj.py"/>
+
+</makefile>
