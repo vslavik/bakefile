@@ -48,6 +48,7 @@ code_PYTHON = src/config.py \
               src/bakefile.py \
               src/errors.py \
               src/finalize.py \
+              src/flatten.py \
               src/mk.py \
               src/mk_dump.py \
               src/reader.py \
