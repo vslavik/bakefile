@@ -1,5 +1,10 @@
+#
+# Writes parsed bakefile to a makefile
+#
+# $Id$
+#
 
-import sys, tempfile, os, os.path, string
+import copy, sys, tempfile, os, os.path, string
 import mk, config, errors
 import empy.em
 
@@ -35,12 +40,13 @@ def __copyMkToVars():
     # Copy targets information:
     targets = Container()
 
+    mktargets = copy.copy(mk.targets)
     priorityTargets = []
     if 'all' in mk.targets:
-        priorityTargets.append(mk.targets['all'])
-        del mk.targets['all']
+        priorityTargets.append(mktargets['all'])
+        del mktargets['all']
         
-    for tar in priorityTargets + mk.targets.values():
+    for tar in priorityTargets + mktargets.values():
         t = Struct()
         for v in tar.vars:
             exec('t.%s = """%s"""' % (v, __valueToPy(tar.vars[v].strip())))
@@ -83,6 +89,7 @@ def __copyMkToVars():
     return dict
 
 def invoke(method):
+    print len(mk.targets)
     found = 0
     for p in config.searchPath:
         template = os.path.join(p, method)
