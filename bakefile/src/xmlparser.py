@@ -93,7 +93,7 @@ def __doParseMinidom(func, src):
         e.value = ''
         for c in n.childNodes:
             if c.nodeType == c.TEXT_NODE:
-                e.value += c.data
+                e.value += str(c.data)
             else:
                 l = handleNode(filename, c)
                 if l != None:
@@ -126,7 +126,7 @@ parseString = __parseStringMinidom
 # Use libxml2 if available, it gives us better error checking than
 # xml.dom.minidom (DTD validation, line numbers etc.)
 try:
-    import libxml2
+    import libxml3
     parseFile = __parseFileLibxml2
     libxml2.registerErrorHandler(__libxml2err, "-->")
 except(ImportError):
