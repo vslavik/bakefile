@@ -209,13 +209,15 @@ def sources2objects(sources, target, ext, objSuffix=''):
         """
 
         all = {}
+        values = {}
         for e in cond1.exprs:
-            all[e.option] = e.value
+            all[e.option] = e
         for e in cond2.exprs:
             if e.option in all:
-                if e.value == all[e.option]:
-                    pass
-                elif e.value != all[e.option] and \
+                if e.value == all[e.option].value:
+                    values[e.option] = all[e.option].value
+                    all[e.option] = 1
+                elif e.value != all[e.option].value and \
                      e.option.values != None and len(e.option.values) == 2:
                     all[e.option] = 0
                 else:
@@ -224,8 +226,12 @@ def sources2objects(sources, target, ext, objSuffix=''):
                 return None
         ret = []
         for e in all:
-            if all[e] != 0:
-                ret.append("%s=='%s'" % (e.name, all[e]))
+            if all[e] == 0:
+                pass
+            elif all[e] == 1:
+                ret.append("%s=='%s'" % (e.name, values[e]))
+            else:
+                return None                
         if len(ret) == 0:
             return '1'
         else:
@@ -283,6 +289,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
                         if conds[c1] == None: continue
                         #print conds[c1].name, conds[c2].name
                         r = reduceConditions(conds[c1], conds[c2])
+                        #print 'reduction:',r
                         if r != None:
                             conds[c1] = 0
                             if r == '1':
