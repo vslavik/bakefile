@@ -337,6 +337,7 @@ EOF
       *-*-sunos4* | \
       *-*-osf* | \
       *-*-dgux5* | \
+      *-pc-os2-emx | \
       *-*-sysv5* )
         dnl defaults are ok
       ;;
