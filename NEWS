@@ -14,6 +14,8 @@ Version 0.1.4
 - added <error> command for sanity checking in .bkl files
 - new backend for eMbedded Visual C++ 4 project files
 - added --pretend option to bakefile_gen tool
+- added -D option to bakefile_gen that lets the user further customize
+  the output by defining additional variables
 
 
 Version 0.1.3
