@@ -1,0 +1,64 @@
+@{
+# helper functions:
+def makeCondBegin(c):
+    s = ''
+    for e in c.exprs:
+        s += 'ifeq ($(%s),%s)\n' % (e.option.name, e.value)
+    return s.strip()
+def makeCondEnd(c):
+    s = ''
+    for e in range(0,len(c.exprs)):
+        s += 'endif\n'
+    return s.strip()
+}@
+
+@empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
+
+# -------------------------------------------------------------------------
+# These are configurable options:
+# -------------------------------------------------------------------------
+
+@[ for o in options :@
+# @o.descStr.replace('\n','\n#') @o.valuesStr
+@o.name = @o.defaultStr
+]@
+
+# -------------------------------------------------------------------------
+# Do not modify the rest of this file!
+# -------------------------------------------------------------------------
+
+### Variables: ###
+
+@[ for v in make_vars :@
+@v = @make_vars[v]
+]@
+
+### Conditionally set variables: ###
+
+@[ for c in cond_vars :@
+@[ for v in c.values :@
+@makeCondBegin(v.cond)
+@c.name = @v.value.replace('\n', ' \\\n')
+@makeCondEnd(v.cond)
+]@
+]@
+
+@[ if BUILDDIR != '.' :
+all: @BUILDDIR
+@BUILDDIR:
+@\t-if not exist @BUILDDIR mkdir @BUILDDIR
+]@
+
+### Targets: ###
+@[ for t in targets :
+@[ if t.cond != None :@makeCondBegin(t.cond)
+]@
+@t.__targetdir@t.__targetname: @t.__deps
+@[ for cmd in t.__command.splitlines():@
+@(cmd.strip()=='|' ? '|' : '\t'+cmd.strip())
+]@
+@[ if t.cond != None :@makeCondEnd(t.cond)
+]@
+]@
+
+.PHONY: @(' '.join([t.__targetdir+t.__targetname for t in targets if t.__is_phony=='1']))
