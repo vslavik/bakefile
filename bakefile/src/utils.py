@@ -57,14 +57,13 @@ def addSubstituteCallback(varname, function):
        This callback is used if (and _only_ if) other methods of substitution
        fail, in particular when an option is found during substitution.
        
-       'function' takes two arguments: (callback, option)
+       'function' takes two arguments: (callback, varname)
        where 'callback' is the original callback function that was passed as
-       substitute()'s argument and 'option' is mk.Option instance that was
-       encountered and can't be evaluated.
+       substitute()'s argument and 'varname' is variable name.
     """
     __substituteCallbacks[varname] = function
 
-def substitute2(str, callback, desc=None, cond=None):
+def substitute2(str, callback, desc=None, cond=None, hints=''):
     """Same as substitute, but the callbacks takes two arguments (text and
        condition object) instead of one."""
 
@@ -77,11 +76,12 @@ def substitute2(str, callback, desc=None, cond=None):
         if expr in mk.cond_vars:
             cond = mk.cond_vars[expr]
             var = mk.CondVar(makeUniqueCondVarName('%s_%s' % (cond.name, desc)))
-            mk.addCondVar(var)
+            mk.addCondVar(var, hints)
             for v in cond.values:
                 cond2 = mk.mergeConditions(cnd, v.cond)
                 if '$' in v.value:
-                    var.add(v.cond, substitute2(v.value, callback, desc, cond2))
+                    var.add(v.cond,
+                            substitute2(v.value, callback, desc, cond2, hints))
                 else:
                     if len(v.value) == 0 or v.value.isspace():
                         var.add(v.cond, v.value)
@@ -92,19 +92,19 @@ def substitute2(str, callback, desc=None, cond=None):
         if expr in mk.options and mk.options[expr].values != None:
             opt = mk.options[expr]
             var = mk.CondVar(makeUniqueCondVarName('%s_%s' % (opt.name, desc)))
-            mk.addCondVar(var)
+            mk.addCondVar(var, hints)
             for v in opt.values:
                 cond = mk.makeCondition("%s=='%s'" % (opt.name, v))
                 cond2 = mk.mergeConditions(cnd, cond)
                 if '$' in v:
-                    var.add(cond, substitute2(v, callback, desc, cond2))
+                    var.add(cond, substitute2(v, callback, desc, cond2, hints))
                 else:
                     if len(v) == 0 or v.isspace(): var.add(cond, v)
                     else: var.add(cond, callback(cond2, v))
             return '$(%s)' % var.name
-        
+
         if expr in __substituteCallbacks:
-            return __substituteCallbacks[expr](callback, mk.options[expr])
+            return __substituteCallbacks[expr](callback, expr)
         else:
             raise errors.Error("'%s' can't be used in this context, "%expr +
                      "not a conditional variable or option with listed values")
@@ -116,12 +116,12 @@ def substitute2(str, callback, desc=None, cond=None):
     return mk.__doEvalExpr(str, callbackVar, callbackTxt, cond)
 
 
-def substitute(str, callback, desc=None):
+def substitute(str, callback, desc=None, hints=''):
     """Calls callback to substitute text in str by something else. Works with
        conditional variables, too."""
     def callb(cond, s):
         return callback(s)
-    return substitute2(str, callb, desc)
+    return substitute2(str, callb, desc, hints=hints)
 
 
 def substituteFromDict(str, dict, desc=None):
@@ -171,7 +171,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
 
        Returns object files list."""
     import reader, xmlparser
-
+    
     # It's a bit faster (about 10% on wxWindows makefiles) to not parse XML
     # but construct the elements tree by hand. We construc the tree for this
     # code:
@@ -265,7 +265,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
             return mk.makeCondition(' and '.join(ret))
  
     sources2 = nativePaths(sources)
-    retval = substitute2(sources2, callback, 'OBJECTS')
+    retval = substitute2(sources2, callback, 'OBJECTS', hints='files')
 
     if mk.vars['FORMAT_HAS_VARIABLES'] != '0':
         tg = mk.targets[target]
@@ -351,7 +351,8 @@ def __containsLiteral(expr):
     return counter.c > 0
 
 def formatIfNotEmpty(fmt, value):
-    """Return fmt % value (prefix: e.g. "%s"), unless value is empty string.
+    """Return fmt % value (prefix: e.g. "%s"), unless value is empty string
+       (in which case it returns empty string).
        Can handle following forms of 'value':
            - empty string
            - anything beginning with literal
@@ -385,12 +386,33 @@ def formatIfNotEmpty(fmt, value):
             for v in cond.values:
                 var.add(v.cond, formatIfNotEmpty(fmt, v.value))
             return '$(%s)' % var.name
+
+        if condname in mk.make_vars:
+            form = formatIfNotEmpty(fmt, mk.make_vars[condname])
+            if form == '': return ''
+            return fmt % value
+            
     raise errors.Error("formatIfNotEmpty failed: '%s' too complicated" % value)
 
 def addPrefixIfNotEmpty(prefix, value):
     """Prefixes value with prefix, unless value is empty. 
        See formatIfNotEmpty for more details."""
     return formatIfNotEmpty(prefix+'%s', value)
+    
+
+def addPrefixToList(prefix, value):
+    """Adds prefix to every item in 'value' interpreted as
+       whitespace-separated list."""
+    
+    def callback(prefix, cond, sources):
+        prf = suf = ''
+        if sources[0].isspace(): prefix=' '
+        if sources[-1].isspace(): suffix=' '
+        retval = []
+        for s in sources.split():
+            retval.append(prefix+s)
+        return '%s%s%s' % (prf, ' '.join(retval), suf)
+    return substitute2(value, lambda c,s: callback(prefix,c,s))
 
 
 def mkPathPrefix(p):
@@ -414,15 +436,37 @@ def condition2string(cond, format):
         return ' -a '.join(['"x$%s" = "x%s"' % (x.option.name,x.value) \
                            for x in cond.exprs])
     raise errors.Error('unknown format')
+                
+
+def createMakeVar(target, var, makevar, hints=''):
+    """Creates make variable called 'makevar' with same value as 'var' and
+       returns reference to it in the form of $(makevar)."""
+    tg = mk.targets[target]
+    mk.setVar('%s_%s' % (target.upper(), makevar),
+              "$(ref('%s','%s'))" % (var, target),
+              target=tg, makevar=1, hints=hints)
+    return '$(%s_%s)' % (target.upper(), makevar)
 
 
-def wrapLongLine(line, continuation, indent='\t', maxChars=75):
+def wrapLongLine(prefix, line,
+                 continuation, indent='\t', maxChars=75, variable=None):
     """Wraps the line so that it does not exceed 'maxChars' characters.
        'continuation' is string appended to the end of unfinished line
        that continues on the next line. 'indent' is the string inserted
        before new line. The line is broken only at whitespaces.
        It also discards whitespaces and replaces them with single ' '.
+       'variable' is a hint telling the function what variable's content is it
+       processing (if any). If the variable has "files" hint set, then only
+       one entry per line is written
     """
+    if variable != None and variable in mk.vars_hints and \
+                            'files' in mk.vars_hints[variable]:
+        s = prefix
+        for w in line.split():
+            s += '%s\n%s%s' % (continuation, indent, w)
+        return s
+        
+    line = prefix+line
     if len(line) <= maxChars:
         return line.replace('\n', '%s\n%s' % (continuation, indent))
     always_len = len(continuation) + len(indent)
