@@ -1,0 +1,40 @@
+@empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
+
+# -------------------------------------------------------------------------
+# These are configurable options:
+# -------------------------------------------------------------------------
+
+@[ for o in options :@
+# @o.descStr @o.valuesStr
+@o.name = @o.defaultStr
+]@
+
+# -------------------------------------------------------------------------
+# Do not modify the rest of this file!
+# -------------------------------------------------------------------------
+
+### Conditionally set variables: ###
+
+@[ for c in cond_vars :@
+@[ for v in c.values :@
+!if "$(@v.cond.option)" == "@v.cond.value"
+@c.name = @v.value.replace('\n', ' \\\n')
+!endif
+]@
+]@
+
+
+@[ if BUILDDIR != '.' :
+all: $(BUILDDIR)
+$(BUILDDIR):
+@\tmkdir $(BUILDDIR)
+]@
+
+
+### Targets: ###
+@[ for t in targets :
+@t.__targetdir@t.__targetname: @t.__deps
+@[ for cmd in t.__command.splitlines():@
+@\t@cmd.strip()
+]@
+]@

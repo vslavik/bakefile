@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+
+<makefile>
+
+    <set var="COMPILER">bcc</set>
+    <set var="MAKEFILE_SYNTAX">borland</set>
+
+    <include file="makefile.bakefile"/>
+    
+    <output file="$(OUTPUT_FILE)" writer="borland.empy"/>
+
+</makefile>

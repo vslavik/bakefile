@@ -1,0 +1,33 @@
+@empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
+
+@[ if OPTIONS_FILE == '' :
+@empy.include(os.path.join(RULESDIR, 'autoconf-options.empy'))
+]@
+@[ if OPTIONS_FILE != '' :
+include @OPTIONS_FILE
+]@
+
+@# These are autoconf specials and must be in every Makefile.in:
+srcdir = @@srcdir@@
+top_srcdir = @@top_srcdir@@
+
+### Conditionally set variables: ###
+
+@[ for c in cond_vars :@
+@[ for v in c.values :@
+@@COND_@v.cond.name@@@c.name = @v.value.replace('\n',' \\\n@COND_%s@' % v.cond.name)
+]@
+]@
+
+### Targets: ###
+@[ for t in targets :
+@t.__targetdir@t.__targetname: @t.__deps
+@[ for cmd in t.__command.splitlines():@
+@\t@cmd.strip()
+]@
+]@
+
+# Include dependency info, if present:
+@@IF_GNU_MAKE@@-include *.d
+
+.PHONY: @(' '.join([t.__targetdir+t.__targetname for t in targets if t.__is_phony=='1']))

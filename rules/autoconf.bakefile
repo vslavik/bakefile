@@ -1,0 +1,178 @@
+<?xml version="1.0" ?>
+
+<makefile>
+    
+    <!-- =============================================================== -->
+    <!--                       Configuration:                            -->
+    <!-- =============================================================== -->
+
+    <option name="SHARED_LD_CC"/>
+    <option name="SHARED_LD_CXX"/>
+    <option name="SO_SUFFIX"/>
+    <option name="EXEEXT"/>
+    <option name="LN_S"/>
+    <option name="PIC_FLAG"/>
+    <option name="USE_SOVERSION"><values>0 1</values></option>
+    <option name="USE_SOVERLINUX"><values>0 1</values></option>
+    <option name="USE_SOVERSOLARIS"><values>0 1</values></option>
+    <option name="USE_SOSYMLINKS"><values>0 1</values></option>
+    <option name="USE_MACVERSION"><values>0 1</values></option>
+    <option name="SONAME_FLAG"/>
+    <option name="STRIP"/>
+    <option name="INSTALL"/>
+    <option name="INSTALL_PROGRAM"/>
+    <option name="INSTALL_DATA"/>
+    <option name="INSTALL_DIR"/>
+
+    <!-- Platforms: -->
+    <unset var="PLATFORM_UNIX"/>
+    <unset var="PLATFORM_WIN32"/>
+    <unset var="PLATFORM_MSDOS"/>
+    <unset var="PLATFORM_MACOSX"/>
+    <option name="PLATFORM_UNIX"/>
+    <option name="PLATFORM_WIN32"/>
+    <option name="PLATFORM_MSDOS"/>
+    <option name="PLATFORM_MACOSX"/>
+    
+    <option name="srcdir"/>
+    <option name="top_srcdir"/>
+
+    <option name="prefix"/>
+    <option name="exec_prefix"/>
+    <option name="bindir"/>
+    <option name="libdir"/>
+    <option name="datadir"/>
+    <set var="PREFIX">$(prefix)</set>
+    <set var="BINDIR">$(bindir)</set>
+    <set var="LIBDIR">$(libdir)</set>
+    <set var="DATADIR">$(datadir)</set>
+    
+    <set var="srcprefix">
+        <if cond="SRCDIR=='.'">\$(srcdir)</if>
+        <if cond="SRCDIR!='.'">\$(srcdir)/$(SRCDIR)</if>
+    </set>
+
+    <set var="DLLEXT">.$(SO_SUFFIX)</set>
+    <option name="DLLPREFIX"/>
+
+    <set var="DLLIMPEXT">
+        <if cond="PLATFORM_WIN32=='1'">.a</if>
+        <if cond="PLATFORM_WIN32=='0'">$(DLLEXT)</if>
+    </set>
+
+    <set var="DLL_CFLAGS">$(PIC_FLAG)</set>
+    <set var="__DLL_LINKER_CC" eval="0">$(SHARED_LD_CC)</set>
+    <set var="__DLL_LINKER_CXX" eval="0">$(SHARED_LD_CXX)</set>
+
+    <include file="unixlike.bakefile"/>
+    
+    
+    
+    <!-- =============================================================== -->
+    <!--               Shared libs/DLLs handling:                        -->
+    <!-- =============================================================== -->
+
+    <set var="__so_symlinks_cmd"/> <!-- default value -->
+    <set var="__so_symlinks_inst_cmd"/> <!-- default value -->
+
+    <define-tag name="so_version" rules="dll">
+        <set var="__soversion1">$(value.split('.')[0])</set>
+        <set var="__soversion2">$(value.split('.')[1])</set>
+        <set var="__soversion3">$(value.split('.')[2])</set>
+
+        <set var="__linkname1">$(__linkname)</set>
+        <set var="__linkname2">$(__targetname).$(__soversion1)</set>
+        <set var="__targetnamesuf">
+            <if cond="USE_SOVERSION=='1'">
+                .$(__soversion1).$(__soversion2).$(__soversion3)
+            </if>
+        </set>
+        <set var="__targetname">
+            $(__targetname)$(__targetnamesuf)
+        </set>
+
+        <set var="__soname_flags">
+            <if cond="USE_SOVERLINUX=='1'"> <!-- Linux -->
+                $(SONAME_FLAG)$(__linkname2)
+            </if>
+            <if cond="USE_SOVERSOLARIS=='1'"> <!-- Solaris -->
+                $(SONAME_FLAG)$(__targetname)
+            </if>
+        </set>
+        <ldflags>$(__soname_flags)</ldflags>
+
+        <set var="__so_symlinks_cmd">
+            <if cond="USE_SOSYMLINKS=='1'">
+                $(RM) $(__targetdir)$(__linkname1) $(__targetdir)$(__linkname2);
+                $(LN_S) $(__targetname) $(__targetdir)$(__linkname2);
+                $(LN_S) $(__linkname2) $(__targetdir)$(__linkname1)
+            </if>
+        </set>
+        <set var="__so_symlinks_inst_cmd">
+            <if cond="USE_SOSYMLINKS=='1'">
+                $(RM) $(__linkname1) $(__linkname2);
+                $(LN_S) $(__targetname) $(__linkname2);
+                $(LN_S) $(__linkname2) $(__linkname1)
+            </if>
+        </set>
+        <__command>$(LF)$(__so_symlinks_cmd)</__command>
+   
+        <clean-files>
+            $(ref('__targetdir',id))$(ref('__linkname1', id)) $(ref('__targetdir',id))$(ref('__linkname2', id))
+        </clean-files>       
+    </define-tag>
+
+    <define-tag name="install-to" rules="dll">
+        <modify-target target="install_$(id)">
+            <command>(cd $(value) ; $(ref('__so_symlinks_inst_cmd',id)))</command>
+        </modify-target>
+    </define-tag>
+    
+    <define-tag name="libname" rules="dll">        
+        <set var="__importlib">
+            <if cond="PLATFORM_WIN32=='1'">-Wl,--out-implib,$(__targetdir)$(__linkname)</if>
+        </set>
+        <ldflags>$(__importlib)</ldflags>
+    </define-tag>
+    
+    
+    <!-- =============================================================== -->
+    <!--                     "make install-strip":                       -->
+    <!-- =============================================================== -->
+
+    <action id="install-strip">
+        <depends>install</depends>
+    </action>
+   
+    <define-tag name="install-to" rules="dll,exe">
+        <modify-target target="install-strip">
+            <command>$(STRIP) $(value)/$(ref('__targetname',id))</command>
+        </modify-target>
+    </define-tag>
+    
+    <define-tag name="dir" rules="subproject">
+        <modify-target target="install-strip">
+            <command>(cd $(value) &amp;&amp; \$(MAKE) install-strip)</command>
+        </modify-target>
+    </define-tag>
+    
+    
+    <!-- =============================================================== -->
+    <!--                       Generate output:                          -->
+    <!-- =============================================================== -->
+
+    <set var="AUTOCONF_MACROS_FILE">
+        $(os.path.join(os.path.dirname(OUTPUT_FILE),'autoconf_inc.m4'))
+    </set>
+
+    <if cond="OPTIONS_FILE!='' and WRITE_OPTIONS_FILE=='1'">
+        <output file="$(os.path.join(os.path.dirname(OUTPUT_FILE),OPTIONS_FILE))" writer="autoconf-options.empy"/>
+    </if>    
+    
+    <output file="$(OUTPUT_FILE)" writer="autoconf.empy"/>
+
+    <if cond="AUTOCONF_MACROS_FILE!=''">
+        <output file="$(AUTOCONF_MACROS_FILE)" writer="autoconf-macros.empy"/>
+    </if>
+
+</makefile>

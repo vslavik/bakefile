@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <!-- Version information: -->
+    <set var="BAKEFILE_VERSION">0.1.0</set>
+
+</makefile>
+

@@ -1,0 +1,328 @@
+<?xml version="1.0" ?>
+
+<!-- 
+This file is common to all formats that share Unix way of writing 
+makefiles (most notably GNU Make and Autoconf formats).
+-->
+
+<makefile>
+
+    <include file="makefile_$(MAKEFILE_SYNTAX).bakefile"/>
+
+    <!-- =============================================================== -->
+    <!--                       Compiler options:                         -->
+    <!-- =============================================================== -->
+
+    <option name="CC">
+        <default-value>$(__DEFAULT_CC)</default-value>
+        <description>
+            C compiler
+        </description>
+    </option>
+    <option name="CXX">
+        <default-value>$(__DEFAULT_CXX)</default-value>
+        <description>
+            C++ compiler
+        </description>
+    </option>
+    <option name="CFLAGS">
+        <default-value>$(__DEFAULT_CFLAGS)</default-value>
+        <description>
+            Standard flags for CC
+        </description>
+    </option>
+    <option name="CXXFLAGS">
+        <default-value>$(__DEFAULT_CXXFLAGS)</default-value>
+        <description>
+            Standard flags for C++
+        </description>
+    </option>
+    <option name="CPPFLAGS">
+        <default-value>$(__DEFAULT_CPPFLAGS)</default-value>
+        <description>
+            Standard preprocessor flags (common for CC and CXX)
+        </description>
+    </option>
+
+
+    <!-- =============================================================== -->
+    <!--                     Rules & tags definitions:                   -->
+    <!-- =============================================================== -->
+
+    <define-rule name="__any">
+        <template>
+            <set var="__targetdir"></set>
+            <set var="__is_phony">0</set>
+            <set var="__deps"/>
+            <set var="__command"/>
+            <set var="__targetname">$(id)</set>
+            <set var="__depname">
+                <if cond="target">
+                    $(ref('__targetdir',id))$(ref('__targetname',id))
+                </if>
+            </set>
+        </template>
+        <define-tag name="depends">
+            <set var="__deps" append="1">
+                $(substitute(value, lambda x: ref('__depname', x), 'DEP'))
+            </set>
+        </define-tag>
+        <define-tag name="dependency-of">
+            <modify-target target="$(value)">
+                <depends>$(id)</depends>
+            </modify-target>
+        </define-tag>
+        <define-tag name="clean-files">
+            <modify-target target="clean">
+                <command>$(RM) $(value)</command>
+            </modify-target>
+        </define-tag>
+        
+        <define-tag name="__command">
+            <set var="__command" append="1">$(value)$(LF)</set>
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="__compiled" extends="__any">
+    
+        <template template="__commands_templ">
+            <set var="__targetdir">$(mkPathPrefix(BUILDDIR))</set>
+            <set var="__uses_cxx">0</set>
+            <set var="__cppflags">$(CPPFLAGS)</set>
+            <set var="__cflags">$(CFLAGS)</set>
+            <set var="__cxxflags">$(CXXFLAGS)</set>
+            <set var="__ldflags"/>
+            <set var="__objects"/>
+            <set var="__linker" eval="0">
+                $(ifthenelse(__uses_cxx, __LINKER_CXX, __LINKER_CC))
+            </set>
+            <set var="__dll_linker" eval="0">
+                $(ifthenelse(__uses_cxx, __DLL_LINKER_CXX, __DLL_LINKER_CC))
+            </set>
+        </template>
+
+        <define-tag name="define">
+            <set var="__cppflags" append="1">$(__DEFINE_ARG)$(value)</set>
+        </define-tag>
+        <define-tag name="include">
+            <set var="__cppflags" append="1">$(__INCLUDE_ARG)$(value)</set>
+        </define-tag>
+
+        <define-tag name="sys-lib">
+            <set var="__ldflags" append="1">$(__LIB_ARG)$(value)</set>
+        </define-tag>
+        <define-tag name="lib-path">
+            <set var="__ldflags" append="1">$(__LIBDIR_ARG)$(value)</set>
+        </define-tag>
+        
+        <define-tag name="cflags">
+            <set var="__cflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="cxxflags">
+            <set var="__cxxflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="cppflags">
+            <set var="__cppflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="ldflags">
+            <set var="__ldflags" append="1">$(value)</set>
+        </define-tag>
+
+        <define-tag name="sources">
+            <set var="__objects" append="1">
+                $(sources2objects(value, id, OBJEXT))
+            </set>
+            <set var="__deps" append="1">$(__objects)</set>
+        </define-tag>
+
+        <define-tag name="library">
+            <depends>$(value)</depends>
+            <ldflags>                
+                $(substitute(value, lambda x: ref('__targetdir',x)+ref('__linkname', x), 'LIBR'))
+            </ldflags>
+        </define-tag>
+
+        <define-tag name="dirname">
+            <set var="__targetdir">$(value)/</set>
+        </define-tag>
+
+    </define-rule>
+
+    <define-rule name="exe" extends="__compiled">
+        <template>
+            <set var="__targetname" eval="0">$(id)$(EXEEXT)</set>
+            <set var="__command" eval="0">$(__LINK_EXE_CMD)</set>
+            <dependency-of>all</dependency-of>
+            <clean-files>
+                $(ref('__targetdir',id))$(ref('__targetname',id))
+            </clean-files>
+        </template>
+    </define-rule>
+    
+    <define-rule name="lib" extends="__compiled">
+        <template>
+            <set var="__command" eval="0">$(__LINK_LIB_CMD)</set>
+            <set var="__libname">$(id)</set>
+            <set var="__targetname" eval="0">$(LIBPREFIX)$(__libname)$(LIBEXT)</set>
+            <set var="__linkname" eval="0">$(LIBPREFIX)$(__libname)$(LIBEXT)</set>
+            <dependency-of>all</dependency-of>
+            <clean-files>
+                $(ref('__targetdir',id))$(ref('__targetname',id))
+            </clean-files>
+        </template>
+        <define-tag name="libname">
+            <set var="__libname">$(value)</set>
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="dll" extends="__compiled">
+        <template>
+            <cflags>$(DLL_CFLAGS)</cflags>
+            <cxxflags>$(DLL_CFLAGS)</cxxflags>
+            <set var="__targetname" eval="0">
+                $(DLLPREFIX)$(__dllname)$(DLLEXT)
+            </set>
+            <set var="__linkname" eval="0">
+                $(LIBPREFIX)$(__libname)$(DLLIMPEXT)
+            </set>
+            <set var="__command" eval="0">$(__LINK_DLL_CMD)</set>
+            <libname>$(id)</libname>
+            <dllname>$(id)</dllname>
+            <dependency-of>all</dependency-of>
+            <clean-files>
+                $(ref('__targetdir',id))$(ref('__targetname',id)) $(ref('__targetdir',id))$(ref('__linkname',id))
+            </clean-files>
+        </template>
+        <define-tag name="version"/>
+        <define-tag name="so_version"/>
+        <define-tag name="mac_version"/>
+        <define-tag name="libname">
+            <set var="__libname">$(value)</set>
+        </define-tag>
+        <define-tag name="dllname">
+            <set var="__dllname">$(value)</set>
+        </define-tag>
+    </define-rule>
+
+    
+    <define-rule name="action" extends="__any">
+        <template>
+            <set var="__command"/>
+            <set var="__targetname">$(id)</set>
+        </template>
+        <define-tag name="command">
+            <__command>$(value)</__command>
+        </define-tag>
+    </define-rule>
+
+    
+    <define-rule name="phony" extends="__any">
+        <template>
+            <set var="__is_phony">1</set>
+        </template>
+    </define-rule>
+
+
+    <define-rule name="subproject" extends="action">
+        <template template="__subproject_templ">
+            <set var="__is_phony">1</set>
+            <set var="__subtarget">all</set>
+            <command>$(__MAKE_SUBPROJECT_CMD)</command>
+            <modify-target target="install">
+                <command>$(ref('__INSTALL_SUBPROJECT_CMD',id))</command>
+            </modify-target>
+            <modify-target target="clean">
+                <command>$(ref('__CLEAN_SUBPROJECT_CMD',id))</command>
+            </modify-target>
+        </template>
+        <define-tag name="dir">
+            <set var="__subdir">$(value)</set>
+        </define-tag>
+        <define-tag name="target">
+            <set var="__subtarget">$(value)</set>
+        </define-tag>
+    </define-rule>
+    
+    
+    <!-- =============================================================== -->
+    <!--                  Sources compilation rules:                     -->
+    <!-- =============================================================== -->
+
+    <define-rule name="__c-to-$(OBJEXT[1:])" extends="__any,compilation_rule">
+        <template template="__commands_templ_C">
+            <set var="__command">$(__COMPILE_C_CMD)</set>
+        </template>
+        <define-tag name="parent-target">
+            <set var="__cflags">$(targets[value].__cflags)</set>
+            <set var="__cppflags">$(targets[value].__cppflags)</set>
+        </define-tag>
+    </define-rule>
+    
+    <define-rule name="__cpp-to-$(OBJEXT[1:])" extends="__any,compilation_rule">
+        <template template="__commands_templ_CXX">
+            <set var="__command">$(__COMPILE_CXX_CMD)</set>
+        </template>
+        <define-tag name="parent-target">
+            <set var="__uses_cxx" scope="$(__parent)">1</set>
+            <set var="__cxxflags">$(targets[value].__cxxflags)</set>
+            <set var="__cppflags">$(targets[value].__cppflags)</set>
+        </define-tag>
+    </define-rule>
+    <!-- more C++ extensions: -->
+    <define-rule name="__cxx-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
+    <define-rule name="__cc-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
+    <define-rule name="__C-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
+    
+    
+    
+    <!-- =============================================================== -->
+    <!--                     "make install":                             -->
+    <!-- =============================================================== -->
+
+    <define-tag name="install-to" rules="exe,dll,lib">
+        <add-target target="install_$(id)" type="action" cond="target"/>
+        <modify-target target="install_$(id)">
+            <command>$(INSTALL_DIR) $(value)</command>
+            <dependency-of>install</dependency-of>
+        </modify-target>
+    </define-tag>
+
+    <define-tag name="install-to" rules="exe">
+        <modify-target target="install_$(id)">
+            <command>
+                $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+            </command>
+        </modify-target>
+    </define-tag>
+
+    <define-tag name="install-to" rules="dll">
+        <modify-target target="install_$(id)">
+            <command>
+                $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(value)
+                $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+            </command>
+        </modify-target>
+    </define-tag>
+
+    <define-tag name="install-to" rules="lib">
+        <modify-target target="install_$(id)">
+            <command>
+                $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+            </command>
+        </modify-target>
+    </define-tag>
+    
+    
+    <!-- =============================================================== -->
+    <!--                 Standard makefile targets:                      -->
+    <!-- =============================================================== -->
+
+    <phony id="all"/>
+    <action id="install"/>
+    <action id="uninstall"/>
+
+    <action id="clean">
+        <command>$(RM) $(BUILDDIR)$(DIRSEP)*$(OBJEXT)</command>        
+    </action>
+
+</makefile>

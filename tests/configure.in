@@ -1,0 +1,14 @@
+AC_PREREQ(2.53)
+AC_INIT(aclocal.m4)
+
+AC_CANONICAL_SYSTEM
+
+AC_DJINNI
+
+AC_OUTPUT([
+           Makefile
+           hello/Makefile
+           library/Makefile
+           dll/Makefile
+           cond/Makefile
+         ])

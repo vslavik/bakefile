@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <define-rule name="gettext-catalogs" extends="phony">
+        
+        <template>
+            <set var="po_files"/>
+            <set var="mo_files"/>
+            <add-target target="$(id)mo" type="phony" cond="target"/>
+            <depends>$(id)mo</depends>
+        </template>
+        
+        <define-tag name="files">
+            <set var="po_files" append="1">$(value)</set>
+            <set var="mo_files" append="1">
+                $(sources2objects(value, id, '.mo'))
+            </set>
+        </define-tag>
+        
+        <define-tag name="install-to">
+            <modify-target target="install_$(id)">
+                <command>
+                    $(INSTALL_DATA) $(ref('mo_files',id)) $(value)
+                </command>
+            </modify-target>
+        </define-tag>
+        
+    </define-rule>
+    
+
+    <!-- Rule for compiling catalogs: -->
+    <define-rule name="__po-to-mo" extends="compilation_rule,action">
+        <template>
+            <set var="cnt">0</set>
+        </template>
+
+        <define-tag name="src">
+            <set var="cnt">$(int(cnt)+1)</set>
+            <command>msgfmt -o $(__targetname) $(value)</command>
+        </define-tag>
+        <define-tag name="parent-target">
+            <dependency-of>$(value)mo</dependency-of>
+        </define-tag>
+    </define-rule>
+
+</makefile>
+
