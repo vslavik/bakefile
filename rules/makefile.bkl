@@ -252,6 +252,15 @@ makefiles (most notably GNU Make and Autoconf formats).
                        'single':__FLAG_SINGLE_THREADING}))
             </ldflags>
         </define-tag>
+        
+        <define-tag name="warnings">
+            <cppflags>
+                $(substituteFromDict(value,
+                      {'no':__FLAG_WARNINGS_NO,
+                       'default':__FLAG_WARNINGS_DEFAULT,
+                       'max':__FLAG_WARNINGS_MAX}))
+            </cppflags>
+        </define-tag>
 
         <define-tag name="runtime-libs"/>
 

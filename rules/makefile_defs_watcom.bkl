@@ -38,6 +38,9 @@
     <set var="__FLAG_ARCH_I686">-6</set>
     <set var="__FLAG_SINGLE_THREADING"/>
     <set var="__FLAG_MULTI_THREADING"/>
+    <set var="__FLAG_WARNINGS_NO"/>
+    <set var="__FLAG_WARNINGS_DEFAULT"/>
+    <set var="__FLAG_WARNINGS_MAX"/>
     <!-- NB: we explicitly reference startup function in case it was
              in a library (e.g. wxWindows) in which case wlink would
              optimize it out: -->
