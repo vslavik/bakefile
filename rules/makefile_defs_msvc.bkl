@@ -67,15 +67,12 @@
         /MT      static multithreaded
         /MTd     ditto debug
     -->
-
-    <tag-info name="threading" position="before:runtime-libs"/>
-    
+ 
     <define-rule name="__msvc_comp">
         <template>
             <set var="__win32rc_flags"/>
             <set var="__pch_header"/>
-            <set var="__pch_useflag" eval="0">/YX$(__pch_header)</set>
-            <set var="__pch_flags" eval="0">$(__pch_useflag)</set>
+            <set var="__pch_flags">/YX</set>
             <set var="__rtl_dbg"/>
             <set var="__rtl_static">L</set>
             <set var="__rtl_type">D</set>
@@ -84,30 +81,19 @@
             <define>WIN32</define>
         </template>
 
-        <define-tag name="precomp-headers">
-                <!-- FIXME: should be cppflags, this is temporary hack to
-                make wxWindows work -->
-            <cxxflags> 
-                $(substituteFromDict(value,{'on':__pch_flags, 'off':''}))
-            </cxxflags>
-        </define-tag>
-        <define-tag name="precomp-headers-file">
-            <cppflags>
-                $(formatIfNotEmpty('/Fp%s.pch', mkPathPrefix(BUILDDIR)+value))
-            </cppflags>
-        </define-tag>
-        <define-tag name="precomp-headers-header">
-            <set var="__pch_header">$(value)</set>
-        </define-tag>
         <define-tag name="precomp-headers-gen">
             <set var="__pch_object">$(getObjectName(value, id, OBJEXT))</set>
             <set var="__deps" append="1">$(__pch_object)</set>
             <modify-target target="$(__pch_object)">
-                <set var="__cflags" append="1">/Yc$(ref('__pch_header',id))</set>
-                <set var="__cxxflags" append="1">/Yc$(ref('__pch_header',id))</set>
+                <set var="__cflags" append="1">
+                    /Yc$(ref('__pch_header',id))
+                </set>
+                <set var="__cxxflags" append="1">
+                    /Yc$(ref('__pch_header',id))
+                </set>
             </modify-target>
-            <set var="__pch_useflag" eval="0">/Yu$(__pch_header)</set>
         </define-tag>
+
     </define-rule>
     
     <template id="__commands_templ">

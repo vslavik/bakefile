@@ -11,6 +11,9 @@
         </define>
     </define-tag>
     
+    <tag-info name="threading"
+              position="before:runtime-libs"/>      
+    
     <define-tag name="runtime-libs" rules="exe,dll,lib">
         <set var="__rtl_type">
             $(substituteFromDict(value,
@@ -48,6 +51,40 @@
     <define-tag name="define" rules="exe,dll">
         <set var="__win32rc_flags" append="1">
             $(addPrefixIfNotEmpty('/d ',value))</set>
+    </define-tag>
+
+
+    <!-- precompiled headers: -->
+    <!-- (more things in makefile_defs_msvc.bkl and msvc6prj.bkl) -->
+    
+    <tag-info name="precomp-headers-gen"
+              position="after:precomp-headers-header"/>
+    <tag-info name="precomp-headers-file"
+              position="after:precomp-headers-header,after:precomp-headers-gen"/>
+    <tag-info name="precomp-headers"
+              position="after:precomp-headers-file,after:precomp-headers-header,after:precomp-headers-gen"/>
+
+    <define-tag name="precomp-headers-header" rules="exe,dll,lib">
+        <set var="__pch_header">$(value)</set>
+        <set var="__pch_flags">/YX"$(__pch_header)"</set>
+    </define-tag>
+
+    <define-tag name="precomp-headers-gen" rules="exe,dll,lib">
+        <set var="__pch_flags">/Yu"$(__pch_header)"</set>
+    </define-tag>
+    
+    <define-tag name="precomp-headers-file" rules="exe,dll,lib">
+        <set var="__pch_flags" append="1">
+            $(formatIfNotEmpty('/Fp"%s.pch"', mkPathPrefix(BUILDDIR)+value))
+        </set>
+    </define-tag>
+    
+    <define-tag name="precomp-headers" rules="exe,dll,lib">
+            <!-- FIXME: should be cppflags, this is temporary hack to
+            make wxWindows work -->
+        <cxxflags> 
+            $(substituteFromDict(value,{'on':__pch_flags, 'off':''}))
+        </cxxflags>
     </define-tag>
 
 
