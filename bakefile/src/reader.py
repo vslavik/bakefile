@@ -409,7 +409,11 @@ def handleInclude(e):
 def handleOutput(e):
     file = mk.evalExpr(e.props['file'], use_options=0)
     writer = mk.evalExpr(e.props['writer'], use_options=0)
-    config.to_output.append((file, writer))
+    if 'method' in e.props:
+        method = mk.evalExpr(e.props['method'], use_options=0)
+    else:
+        method = 'replace'
+    config.to_output.append((file, writer, method))
     
 
 
