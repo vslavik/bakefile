@@ -17,6 +17,8 @@ class FileInfo:
 files = {}
 files_all = files
 
+disabled_formats = []
+
 def _matchesWildcard(filename, wildcard, absolutize=0):
     """Returns whether the file matches wildcard (glob)."""
     if absolutize:
@@ -103,15 +105,29 @@ def loadTargets(filename):
         print 'building rules...'
     
     for cmd in root.children:
-        if cmd.name == 'add-formats':
+        if cmd.name == 'disable-formats':
             formats = cmd.value.split(',')
+            for f in formats:
+                if f not in disabled_formats:
+                    disabled_formats.append(f)
+        elif cmd.name == 'enable-formats':
+            formats = cmd.value.split(',')
+            for f in formats:
+                if f in disabled_formats:
+                    disabled_formats.remove(f)
+    
+    for cmd in root.children:
+        if cmd.name == 'add-formats':
+            formats = [x for x in cmd.value.split(',') 
+                               if x not in disabled_formats]
             for file, fl in _findMatchingFiles(cmd):
                 for f in formats:
                     if f not in file.formats:
                         file.formats.append(f)
                         file.flags[f] = ''
         elif cmd.name == 'del-formats':
-            formats = cmd.value.split(',')
+            formats = [x for x in cmd.value.split(',') 
+                               if x not in disabled_formats]
             for file, fl in _findMatchingFiles(cmd):
                 for f in formats:
                     if f in file.formats:
