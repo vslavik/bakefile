@@ -17,9 +17,8 @@ class ErrorBase(Exception):
         self.desc = desc
     def __str__(self):
         s = ''
-        _readerContext.reverse()
-        for ctx in _readerContext:
-            s += "    %s\n" % ctx
+        for ctx in range(len(_readerContext)-1,-1,-1):
+            s += "    %s\n" % _readerContext[ctx]
         return s
 
 class Error(ErrorBase):
