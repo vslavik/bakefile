@@ -33,6 +33,10 @@ def ref(var, target=None):
         else:
             return "$(ref('%s', '%s'))" % (var,target)
 
+deadTargets = []
+def isDeadTarget(target):
+    return target in deadTargets
+
 
 def makeUniqueCondVarName(name):
     """Creates name for cond. var."""
