@@ -28,6 +28,11 @@
         <default-filename>makefile.vc</default-filename>
     </format>
     
+    <format id="dmars">
+        <description>Digital Mars makefiles</description>
+        <default-filename>makefile.dmc</default-filename>
+    </format>
+    
     <format id="msvc6prj">
         <description>Visual C++ 6.0 project files</description>
         <default-filename>

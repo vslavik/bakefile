@@ -1,0 +1,58 @@
+@{
+# Order make variables so that vars used to define values of other vars
+# are before the vars dependent on them:
+#
+# FIXME: this algorithm is O(n^2), it can easily be O(n*m) where m
+#        is max number of references to other variables in var definition
+
+def orderByDeps(vars):
+    d = {}
+    for v in make_vars:
+        d[v] = []
+    for v in make_vars:
+        ref = '$(%s)' % v.name
+        for v2 in make_vars:
+            if v2.value.find(ref) != -1:
+                d[v2].append(v)
+
+    def stream(list, v):
+        if d[v] != None:
+            for u in d[v]:
+                stream(list, u)
+            d[v] = None
+            list.append(v)
+
+    list = []
+    for v in make_vars:
+        stream(list, v)
+    return list
+}@
+@empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
+
+# -------------------------------------------------------------------------
+# These are configurable options:
+# -------------------------------------------------------------------------
+
+@[for o in options]@
+# @o.descStr.replace('\n','\n# ') @o.valuesStr
+@o.name = @o.defaultStr
+
+@[end for]@
+
+# -------------------------------------------------------------------------
+# Do not modify the rest of this file!
+# -------------------------------------------------------------------------
+
+### Variables: ###
+
+@[for v in orderByDeps(make_vars)]@
+@utils.wrapLongLine('%s = ' % v.name, v.value, ' \\', variable=v.name)
+@[end for]@
+
+### Targets: ###
+@[for t in targets]
+@t.__targetdir@t.__targetname : @t.__deps
+@[for cmd in t.__command.splitlines()]@
+@('\t'+cmd.strip())
+@[end for]@
+@[end for]@

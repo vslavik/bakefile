@@ -15,6 +15,7 @@ output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
               output/borland.empy \
               output/borland-opts.empy \
+              output/dmarg.empy \
               output/msvc.empy \
               output/msvc-opts.empy \
               output/msvc6prj.py \
@@ -27,12 +28,14 @@ output_DATA = output/autoconf.empy \
 rules_DATA =  rules/FORMATS.bkmanifest \
               rules/autoconf.bkl \
               rules/borland.bkl \
+              rules/dmars.bkl \
               rules/common.bkl \
               rules/format_features.bkl \
               rules/datafiles.bkl \
               rules/dirs.bkl \
               rules/makefile.bkl \
               rules/makefile_defs_borland.bkl \
+              rules/makefile_defs_dmars.bkl \
               rules/makefile_defs_msvc.bkl \
               rules/makefile_defs_mingw.bkl \
               rules/makefile_defs_watcom.bkl \
