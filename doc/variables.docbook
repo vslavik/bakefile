@@ -82,6 +82,16 @@
                 </entry>
                 <entry role="default">(empty)</entry>
               </row>
+              
+              <row id="var.LIB_PAGESIZE">
+                <entry role="varname">LIB_PAGESIZE</entry>
+                <entry>
+                  Set this variable to a large power of two if your linker
+                  (on Windows) complains that page size is too small when
+                  building static library.
+                </entry>
+                <entry role="default"><literal>4096</literal></entry>
+              </row>
 
             </tbody>
           </tgroup>

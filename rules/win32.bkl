@@ -28,4 +28,7 @@
 
     <set var="RM">-del</set>
 
+    <!-- for static libraries: -->
+    <set var="LIB_PAGESIZE" overwrite="0">4096</set>
+    
 </makefile>

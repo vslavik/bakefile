@@ -5,8 +5,6 @@
     
     <include file="win32.bkl"/>
     
-    <set var="__LIB_PAGESIZE">2048</set>
-
     <set var="__DEFINE_ARG">-D</set>
     <set var="__INCLUDE_ARG">-I</set>
     <set var="__LIB_ARG">%s.lib</set>
@@ -97,7 +95,7 @@
             $(__linker) $(__ldflags) $(__objects_var),$@,$(__mapfile),$(__ldlibs),,$(__win32res)
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
-            lib -p$(__LIB_PAGESIZE) -c -n $@ $(__objects_var)
+            lib -p$(LIB_PAGESIZE) -c -n $@ $(__objects_var)
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(__dll_linker) $(__ldflags) /IMPLIB:$(__targetdir)$(__libname).lib $(__objects_var),$@,$(__mapfile),$(__ldlibs),,$(__win32res)

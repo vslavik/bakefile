@@ -137,7 +137,7 @@
         <set var="__LINK_LIB_CMD" eval="0">
             @%create $(__lbc_file)
             @for %i in ($(__objects_var)) do @%append $(__lbc_file) +%i
-            wlib -q -p2048 -n -b $^@ @$(__lbc_file)
+            wlib -q -p$(LIB_PAGESIZE) -n -b $^@ @$(__lbc_file)
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(__LINK_CMD_BASE)
