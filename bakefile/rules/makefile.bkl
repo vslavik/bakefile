@@ -82,7 +82,6 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__is_phony">0</set>
             <set var="__deps"/>
             <set var="__command"/>
-            <set var="__post_command"/>
             <set var="__targetname">$(id)</set>
             <set var="__libname"/>
             <set var="__depname">
@@ -121,6 +120,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-rule name="__compiled" extends="__any">
     
         <template template="__commands_templ">
+            <set var="__post_command"/>
             <set var="__install_if_cond"/>
             <set var="__targetdir">$(mkPathPrefix(BUILDDIR))</set>
             <set var="__uses_cxx">0</set>
@@ -281,6 +281,10 @@ makefiles (most notably GNU Make and Autoconf formats).
             </clean-files>
         </define-tag>
         
+        <define-tag name="postlink-command">
+            <set var="__post_command" append="1">$(value)$(LF)</set>
+        </define-tag>
+        
     </define-rule>
 
     <define-rule name="exe" extends="__compiled,$(__exe_baser)">
@@ -307,7 +311,10 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-rule name="lib" extends="__compiled,$(__lib_baser)">
         <template template="$(__lib_baset)">
             <set var="__name" eval="0">$(__libname)</set>
-            <set var="__command" eval="0">$(__LINK_LIB_CMD)</set>
+            <set var="__command" eval="0">
+                $(__LINK_LIB_CMD)
+                $(__post_command)
+            </set>
             <set var="__libname">$(id)</set>
             <set var="__targetname" eval="0">$(LIBPREFIX)$(__libname)$(LIBEXT)</set>
             <set var="__linkname" eval="0">$(LIBPREFIX)$(__libname)$(LIBEXT)</set>
@@ -339,7 +346,10 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__linkname" eval="0">
                 $(LIBPREFIX)$(__libname)$(DLLIMPEXT)
             </set>
-            <set var="__command" eval="0">$(__LINK_DLL_CMD)</set>
+            <set var="__command" eval="0">
+                $(__LINK_DLL_CMD)
+                $(__post_command)
+            </set>
             <libname>$(id)</libname>
             <clean-files>
                 $(ref('__targetdir',id))$(ref('__linkname',id))
@@ -357,7 +367,10 @@ makefiles (most notably GNU Make and Autoconf formats).
         <template>
             <set var="DLLEXT">$(DLLEXT_MODULE)</set>
             <set var="DLLPREFIX">$(DLLPREFIX_MODULE)</set>
-            <set var="__command" eval="0">$(__LINK_MODULE_CMD)</set>
+            <set var="__command" eval="0">
+                $(__LINK_MODULE_CMD)
+                $(__post_command)
+            </set>
         </template>
     </define-rule>
 
