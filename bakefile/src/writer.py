@@ -213,11 +213,13 @@ def invoke(writer, file, method):
 
 
 __output_files = {}
+__output_methods = {}
 def writeFile(filename, data, method = 'replace'):
     if isinstance(data, types.StringType):
         data = [x+'\n' for x in data.split('\n')]
     if (filename not in __output_files) and (method != 'replace'):
             __output_files[filename] = __readFile(filename)
+    __output_methods[filename] = method
     if method == 'replace':
         __output_files[filename] = data
         return
@@ -256,5 +258,6 @@ def write():
             print 'no changes in %s' % file
         if config.track_deps:
             dependencies.addOutput(mk.vars['INPUT_FILE'], config.format,
-                                   os.path.abspath(file))
+                                   os.path.abspath(file),
+                                   __output_methods[file])
     return 1

@@ -205,8 +205,8 @@ def cleanTargets():
             formats = files_all[f].formats
             absf = os.path.abspath(f)
             for fmt in formats:
-               if output in dependencies.deps_db[(absf,fmt)].outputs:
-                   return 1
+               for o,m in dependencies.deps_db[(absf,fmt)].outputs:
+                   if output == o: return 1
         return 0
 
     for f in files:
@@ -215,8 +215,9 @@ def cleanTargets():
             if key not in dependencies.deps_db:
                 sys.stderr.write("ERROR: don't know how to clean %s generated from %s\n" % (fmt, f))
             else:
-                for o in dependencies.deps_db[key].outputs:
+                for o, method in dependencies.deps_db[key].outputs:
                     if not os.path.isfile(o): continue
+                    if method not in ['replace','mergeBlocks']: continue
                     if _isGeneratedBySomethingElse(o): continue
                     if verbose: print "deleting %s" % o
                     os.remove(o)

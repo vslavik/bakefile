@@ -6,12 +6,12 @@
 
 import cPickle, os.path, time
 
-DEPS_FORMAT_VERSION = 2
+DEPS_FORMAT_VERSION = 3
 
 class DepsRecord:
     def __init__(self):
         self.deps = []
-        self.outputs = []
+        self.outputs = [] # (filename,method) tuples
 
 deps_db = {}
 modtimes_db = {}
@@ -25,13 +25,13 @@ def addDependency(bakefile, format, dependency_file):
         deps_db[key] = DepsRecord()
     deps_db[key].deps.append(dependency_file)
 
-def addOutput(bakefile, format, output_file):
+def addOutput(bakefile, format, output_file, output_method):
     """Adds file 'output_file' as output created by the bakefile being
        processed."""
     key = (bakefile,format)
     if key not in deps_db:
         deps_db[key] = DepsRecord()
-    deps_db[key].outputs.append(output_file)
+    deps_db[key].outputs.append((output_file, output_method))
     modtimes_db[output_file] = int(time.time())
     
 def save(filename):
@@ -76,7 +76,7 @@ def needsUpdate(bakefile, format):
 
     info = deps_db[key]
     oldest_output = None
-    for f in info.outputs:
+    for f, method in info.outputs:
         if not os.path.isfile(f):
             # one of generate files is missing, we must regen:
             return 1
