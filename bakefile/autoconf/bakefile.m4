@@ -282,7 +282,8 @@ EOF
         SHARED_LD_CC="`pwd`/shared-ld-sh -undefined suppress -flat_namespace -o"
         SHARED_LD_CXX="$SHARED_LD_CC"
         PIC_FLAG="-dynamic -fPIC"
-        dnl FIXME - what about C libs?
+        dnl FIXME - what about C libs? Gilles says to use c++ because it doesn't
+        dnl         matter for C projects and matters for C++ ones
         dnl FIXME - newer devel tools have linker flag to do this, the script
         dnl         is not necessary - detect!
       ;;
