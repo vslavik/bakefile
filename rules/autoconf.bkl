@@ -34,12 +34,6 @@
     <option name="GCC_PCH"><values>0,1</values></option>
 
     <!-- Platforms: -->
-    <unset var="PLATFORM_UNIX"/>
-    <unset var="PLATFORM_WIN32"/>
-    <unset var="PLATFORM_MSDOS"/>
-    <unset var="PLATFORM_MAC"/>
-    <unset var="PLATFORM_MACOSX"/>
-    <unset var="PLATFORM_OS2"/>
     <option name="PLATFORM_UNIX"/>
     <option name="PLATFORM_WIN32"/>
     <option name="PLATFORM_MSDOS"/>

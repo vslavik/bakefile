@@ -187,10 +187,15 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
         if name in store:
             return
         if store == vars and ((name in options) or (name in cond_vars)):
-            if name in options:
-                delOption(name)
-            else:
-                delCondVar(name)
+            return
+
+    if store == vars and ((name in options) or (name in cond_vars)):
+        if name in options:
+            delOption(name)
+        else:
+            delCondVar(name)
+        if config.debug:
+            print "[dbg] overwriting option/condvar %s" % name
 
     if eval:
         try:
