@@ -5,6 +5,9 @@
     <set var="COMPILER">bcc</set>
     <set var="MAKEFILE_SYNTAX">borland</set>
 
+    <set var="__exe_baser">__borland_exe</set>
+    <set var="__dll_baser">__borland_dll</set>
+    <set var="__lib_baser">__borland_comp</set>
     <include file="makefile.bkl"/>
 
     <!-- =============================================================== -->
@@ -25,18 +28,17 @@
     <!-- =============================================================== -->
 
     <define-tag name="win32-res" rules="exe,dll">
-        <set var="__win32rc" append="1">
+        <set var="__win32res" append="1">
             $(sources2objects(value, id, '.res'))
         </set>
-        <set var="__deps" append="1">$(__win32rc)</set>
-        <__command>brc32 $(__win32rc) $(__targetdir)$(__targetname)</__command>
+        <set var="__deps" append="1">$(__win32res)</set>
     </define-tag>
 
     <!-- compilation rule for .rc files:  -->
     <define-rule name="__rc-to-res" extends="__any,compilation_rule">
         <template>
             <set var="__command" eval="0">
-                brc32 -32 -r -fo$@ -i\$(BCCDIR)\include $(__win32rc_flags) $**
+                brcc32 -32 -r -fo$@ -i\$(BCCDIR)\include $(__win32rc_flags) $**
             </set>
         </template>
         <define-tag name="parent-target">
