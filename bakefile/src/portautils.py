@@ -44,11 +44,27 @@ def __mktemp_insecure(prefix):
     os.chmod(filename, 0600)
     return filename
 
+def __mktempdir_secure(prefix):
+    """Uses tempfile.mkdtemp() to atomically create named directory, but works
+       only with Python 2.3+."""
+    return tempfile.mkdtemp(prefix=prefix)
+
+def __mktempdir_insecure(prefix):
+    """Fallback version for older Python."""
+    filename = tempfile.mktemp(prefix)
+    # reduce (not eliminate!) the risk of race condition by immediately
+    # creating the directory:
+    os.mkdir(filename, 0700)
+    return filename
+    
+
 try:
     mktemp = tempfile.mkstemp # triggers exception if not available
     mktemp = __mktemp_secure
+    mktempdir = __mktempdir_secure
 except AttributeError:
     mktemp = __mktemp_insecure
+    mktempdir = __mktempdir_insecure
 
 
 #
