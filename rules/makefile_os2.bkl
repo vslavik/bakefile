@@ -20,9 +20,7 @@
                     $(NM) $(__targetdir)$(__targetname) | if grep -q pmwin.763 ; then emxbind -ep $(__targetdir)$(__targetname) ; fi
                 </if>
             </set>
-            <set var="__post_command" append="1">
-                $(LF)$(__os2_emxbindcmd)
-            </set>
+            <postlink-command>$(__os2_emxbindcmd)</postlink-command>
         </if>
     </define-tag>
 

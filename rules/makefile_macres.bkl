@@ -23,7 +23,7 @@
             <set var="__macrfiles"/>
             <set var="__post_command" append="1" eval="0">
                 $(__mac_rezcmd)
-                $(__mac_setfilecmd)
+                $(__mac_setfilecmd)$(LF)
             </set>
         </template>
         
