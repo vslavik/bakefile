@@ -70,25 +70,40 @@ def substitute2(str, callback, desc=None, cond=None):
         substVarNameCounter += 1
     
     def callbackVar(cnd, expr, use_options, target, add_dict):
-        if expr not in mk.cond_vars:
-            if expr in __substituteCallbacks:
-                return __substituteCallbacks[expr](callback, mk.options[expr])
-            else:
-                raise errors.Error("'%s' can't be used in this context,"%expr +
-                                   "not a conditional variable")
-        cond = mk.cond_vars[expr]
-        var = mk.CondVar(makeUniqueCondVarName('%s_%s' % (cond.name, desc)))
-        mk.addCondVar(var)
-        for v in cond.values:
-            cond2 = mk.mergeConditions(cnd, v.cond)
-            if '$' in v.value:
-                var.add(v.cond, substitute2(v.value, callback, desc, cond2))
-            else:
-                if len(v.value) == 0 or v.value.isspace():
-                    var.add(v.cond, v.value)
+        if expr in mk.cond_vars:
+            cond = mk.cond_vars[expr]
+            var = mk.CondVar(makeUniqueCondVarName('%s_%s' % (cond.name, desc)))
+            mk.addCondVar(var)
+            for v in cond.values:
+                cond2 = mk.mergeConditions(cnd, v.cond)
+                if '$' in v.value:
+                    var.add(v.cond, substitute2(v.value, callback, desc, cond2))
                 else:
-                    var.add(v.cond, callback(cond2, v.value))
-        return '$(%s)' % var.name
+                    if len(v.value) == 0 or v.value.isspace():
+                        var.add(v.cond, v.value)
+                    else:
+                        var.add(v.cond, callback(cond2, v.value))
+            return '$(%s)' % var.name
+
+        if expr in mk.options and mk.options[expr].values != None:
+            opt = mk.options[expr]
+            var = mk.CondVar(makeUniqueCondVarName('%s_%s' % (opt.name, desc)))
+            mk.addCondVar(var)
+            for v in opt.values:
+                cond = mk.makeCondition("%s=='%s'" % (opt.name, v))
+                cond2 = mk.mergeConditions(cnd, cond)
+                if '$' in v:
+                    var.add(cond, substitute2(v, callback, desc, cond2))
+                else:
+                    if len(v) == 0 or v.isspace(): var.add(cond, v)
+                    else: var.add(cond, callback(cond2, v))
+            return '$(%s)' % var.name
+        
+        if expr in __substituteCallbacks:
+            return __substituteCallbacks[expr](callback, mk.options[expr])
+        else:
+            raise errors.Error("'%s' can't be used in this context, "%expr +
+                     "not a conditional variable or option with listed values")
 
     def callbackTxt(cond, expr):
         if len(expr) == 0 or expr.isspace(): return expr
