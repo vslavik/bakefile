@@ -568,11 +568,17 @@ def finalEvaluation():
                 sys.stdout.flush()
             modified.v = 0
             for v in mk.vars:
+                if v in mk.make_vars: continue
                 if not (type(mk.vars[v]) is InstanceType or
                         type(mk.vars[v]) is DictType):
                     if '$' in mk.vars[v]:
                         mk.vars[v] = modify(mk.vars[v], mk.evalExpr(mk.vars[v]),
                                             modified)
+            for v in mk.make_vars:
+                if '$' in mk.make_vars[v]:
+                    mk.make_vars[v] = modify(mk.make_vars[v],
+                                             mk.evalExpr(mk.make_vars[v]),
+                                             modified)
             for t in mk.targets.values():
                 for v in t.vars:
                     if not (type(t.vars[v]) is InstanceType or 
@@ -597,12 +603,17 @@ def finalEvaluation():
     iterateModifications()
     utils.__refEval = 1
     iterateModifications()
+    if config.verbose: sys.stdout.write('\n')
 
     # Replace all occurences of \$ by $:
+    if config.verbose:
+        print 'removing escape sequences'
     for v in mk.vars:
         if not (type(mk.vars[v]) is InstanceType or
                 type(mk.vars[v]) is DictType):
             mk.vars[v] = mk.vars[v].replace('\\$', '$')
+    for v in mk.make_vars:
+        mk.make_vars[v] = mk.make_vars[v].replace('\\$', '$')
     for t in mk.targets.values():
         for v in t.vars:
             if not (type(t.vars[v]) is InstanceType or
@@ -614,10 +625,6 @@ def finalEvaluation():
     for c in mk.cond_vars.values():
         for v in c.values:
             v.value = v.value.replace('\\$', '$')
-    
-    if config.verbose: sys.stdout.write('\n')
-
-
     
 def finalize():
     finalEvaluation()
