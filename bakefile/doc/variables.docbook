@@ -292,6 +292,13 @@
               </row>
               
               <row>
+                <entry role="varname">TAG</entry>
+                <entry>
+                  Tabelator character (\t in C).
+                </entry>
+              </row>
+              
+              <row>
                 <entry role="varname">DOLLAR</entry>
                 <entry>
                   Dollar sign ($).
