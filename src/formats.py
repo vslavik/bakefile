@@ -35,7 +35,7 @@ def loadManifestFile(filename):
             else:
                 raise errors.ReaderError(node, 'invalid format description')
         if info.name == None or info.desc == None or info.defaultFile == None:
-            raise erorrs.ReaderError(fmt, 'format not fully described')
+            raise errors.ReaderError(fmt, 'format not fully described')
         formats[info.name] = info
 
 def loadFormats():
