@@ -288,7 +288,6 @@ static PyDictEntry *proxydict_ma_lookup(PyDictObject *mp,
 {
     ProxyDictData *data;
     
-    //printf("proxy_ma_lookup=%p(%p,%p,%i)\n", proxydict_ma_lookup,mp,key,hash);
     for (data = gs_proxyDict; data; data = data->next)
     {
         if ((PyDictObject*)data->dict == mp)
@@ -297,10 +296,7 @@ static PyDictEntry *proxydict_ma_lookup(PyDictObject *mp,
             PyDictEntry *ret;
             for (slave = data->slaves; slave; slave = slave->next)
             {
-                //printf("dict %p\n", slave->dict);
-                //printf("lookup fce=%p: %p\n",(void*) slave->dict->ma_lookup,slave->dict);
                 ret = slave->dict->ma_lookup(slave->dict, key, hash);
-                //printf("  ret %p (v %p)\n", ret, ret->me_value);
                 if (ret->me_value)
                     return ret;
             }
@@ -346,12 +342,10 @@ void proxydict_release(void *d)
     }
     
     free(data);
-    //printf("proxydict released\n");
 }
 
 PyObject *proxydict_create(void)
 {
-    //printf("creating proxydict\n");
     ProxyDictData *data = malloc(sizeof(ProxyDictData));
     data->ma_lookup_orig = NULL;
     data->dict = NULL;
@@ -382,5 +376,4 @@ void proxydict_add(PyObject *data, PyObject *dict)
     slave->next = d->slaves;
     d->slaves = slave;
     Py_INCREF(dict);
-    //printf("added slave dict %p\n", asdict);
 }
