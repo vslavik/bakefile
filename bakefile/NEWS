@@ -3,6 +3,7 @@ Version 0.1.5
 -------------
 
 - new format: dmars_smake for DigitalMars's smake (Wlodzimierz ABX Skiba)
+- msvc6prj, msevc4prj: change project names to be same as file names
 
 
 Version 0.1.4
