@@ -19,6 +19,7 @@
     
     <option name="BUILD">
         <values>debug release</values>
+        <values-description>Debug Release</values-description>
         <default-value>release</default-value>
         <description>
             Type of compiled binaries
