@@ -129,6 +129,7 @@ def getHints(var):
 def addOption(opt):
     options[opt.name] = opt
     __vars_opt[opt.name] = '$(%s)' % opt.name
+    vars['OPTIONS'] = ' '.join(mk.options.keys())
 
 def addCondition(cond):
     conditions[cond.name] = cond
