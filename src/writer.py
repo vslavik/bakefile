@@ -26,6 +26,8 @@ class Container:
         return self.dict[key]
     def __delitem__(self, key):
         del self.dict[key]
+    def __len__(self):
+        return len(self.list)
 
 def __stringify(x):
     if x == None: return ''
