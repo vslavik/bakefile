@@ -1,0 +1,116 @@
+<!-- $Id$ -->
+<chapter>
+  <title>Tutorial</title>
+
+  <section>
+    <title>Hello, world</title>
+
+    <para>
+      By far the simplest way to generate makefiles using Bakefile is to use
+      so-called <emphasis>presets</emphasis> which are prepared skeletons of
+      bakefiles that get you started quickly. Let's see how it works on an
+      example of the famous <emphasis>Hello, world</emphasis> program written
+      in C and implemented in <filename>hello.c</filename> file. Here is how
+      our bakefile would look like:
+      <programlisting><![CDATA[
+<?xml version="1.0"?>
+<bakefile>
+
+  <include file="presets/simple.bkl"/>
+  
+  <exe name="hello" template="simple">
+    <sources>hello.c</sources>
+  </exe>
+
+</bakefile>
+]]></programlisting>
+    </para>
+    <para>
+      Presets are included by means of using the
+      <xref linkend="cmd.include"/> command to include file named
+      <filename>presets/NAME-OF-PRESET.bkl</filename>. In general, you can
+      combine several presents, but in practice you must be careful when doing
+      so and it's always good idea to check what the preset does in its code.
+      The "simple" preset we include here defines a <varname>DEBUG</varname>
+      <link linkend="concept.option">option</link> and
+      a <link linkend="concept.template">template</link>
+      <literal>simple</literal>. Generated makefiles will allow the user to
+      build all targets that are based on this template as either debug or
+      release build.
+    </para>
+    <para>
+      Let's generate some makefiles now. The <command>bakefile</command>
+      command is used to do it. For example:
+    </para>
+    <para>
+      <prompt>$ </prompt>
+      <userinput>bakefile -f msvc hello.bkl</userinput>
+    </para>
+    <para>
+      That's all.
+      This will creates VC++ makefile <filename>makefile.vc</filename>. Of
+      course, you can change the name of output file if you don't like the
+      default:
+    </para>
+    <para>
+      <prompt>$ </prompt>
+      <userinput>bakefile -f msvc -o makefile hello.bkl</userinput>
+    </para>
+    <para>
+      It's more complicated when using the Autoconf format. Autoconf uses
+      <filename>Makefile.in</filename> files that are templates for makefiles
+      and <filename>configure.in</filename> script that checks if the system
+      has all required libraries and software installed. Bakefile is makefiles
+      generator, it takes care of creating <filename>Makefile.in</filename>s,
+      but <filename>configure.in</filename> remains your responsibility
+      (except for a few things that Bakefile generates). 
+    </para>
+    <para>
+      Autoconf format generates more than one file -- in addition to
+      <filename>Makefile.in</filename> there's also file called
+      <filename>autoconf_inc.m4</filename> which must be included
+      in <filename>configure.in</filename> to
+      ensure proper function of Bakefile-generated makefiles. This is done by
+      the <literal>AC_BAKEFILE</literal> macro. A minimal
+      <filename>configure.in</filename> script for our example program would
+      look like this:
+      <programlisting><![CDATA[
+AC_PREREQ(2.53)
+AC_INIT(aclocal.m4)
+AC_CANONICAL_SYSTEM
+DEBUG=0
+AC_BAKEFILE
+AC_OUTPUT([Makefile])
+]]></programlisting>
+    </para>
+    <para>
+      Note the part that sets <varname>DEBUG</varname> variable. If you use
+      options in your bakefile (as you do when you use the simple preset), you
+      must set their values before calling <literal>AC_BAKEFILE</literal>.
+      Debug build is always disabled in the example above, proper handling
+      would be a little more complicated:
+      <programlisting><![CDATA[
+AC_PREREQ(2.53)
+AC_INIT(aclocal.m4)
+AC_CANONICAL_SYSTEM
+
+AC_ARG_ENABLE(debug,
+              [  --enable-debug          Enable debugging information],
+              USE_DEBUG="$enableval", USE_DEBUG="no")
+
+if test $USE_DEBUG = yes ; then 
+  DEBUG=1
+  dnl Bakefile doesn't touch {C,CPP,CXX,LD}FLAGS in autoconf format, we
+  dnl have to do it ourselves. (Incorrectly) assuming GCC here:
+  CFLAGS="$CFLAGS -g"
+else
+  DEBUG=0
+fi
+
+AC_BAKEFILE
+AC_OUTPUT([Makefile])
+]]></programlisting>
+    </para>
+  </section>
+
+</chapter>
