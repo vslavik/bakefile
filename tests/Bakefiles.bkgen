@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<bakefile-gen>
+
+    <input>
+        root.bkl
+        cond/hello.bkl
+        cond_install/cond_install.bkl
+        dll/dll.bkl
+        gettext/gettext.bkl
+        hello/hello.bkl
+        library/library.bkl
+        module/module.bkl
+        pch/pch.bkl
+        regressions/regressions.bkl
+    </input>
+    
+    <add-formats>
+        autoconf,borland,cbuilderx,dmars,mingw,msevc4prj,msvc,msvc6prj,msevc4prj,watcom
+    </add-formats>
+    
+    <!-- WinCE can't handle console-only apps: -->
+    <del-formats files="cond/*.bkl">msevc4prj</del-formats>
+    <del-formats files="cond_install/*.bkl">msevc4prj</del-formats>
+    <del-formats files="regressions/*.bkl">msevc4prj</del-formats>
+    <del-formats files="pch/*.bkl">msevc4prj</del-formats>
+
+    <!-- DigitalMars' make can't handle conditions: -->
+    <del-formats files="cond*/*.bkl">dmars</del-formats>
+  
+    <!-- Project files don't make sense for root makefile: -->
+    <del-formats files="root.bkl">msevc4prj,msvc6prj,cbuilderx</del-formats>
+    <del-formats files="gettext/*.bkl">msevc4prj,msvc6prj,cbuilderx</del-formats>
+
+  
+    <!-- Format specific settings: -->
+    <add-flags formats="autoconf">
+        -DAUTOCONF_MACROS_FILE=./autoconf_inc.m4
+    </add-flags>
+
+</bakefile-gen>
