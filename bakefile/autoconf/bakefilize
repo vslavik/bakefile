@@ -1,0 +1,107 @@
+#!/bin/sh
+
+# This script copies support files required by Autoconf if used with
+# bakefile from Automake (don't ask...) directory.
+#
+# $Id$
+
+
+# ------------------------------------------------------------------
+# configuration
+# ------------------------------------------------------------------
+
+AUTOMAKE_DIRS="/usr/local/share /usr/share"
+NEEDED_FILES="INSTALL config.guess config.sub install-sh"
+
+# ------------------------------------------------------------------
+# script code
+# ------------------------------------------------------------------
+
+# Handle command line arguments:
+
+symlink=1
+dry_run=0
+force=0
+verbose=0
+
+for arg in $* ; do
+    case "$arg" in
+        --help | -h )
+            cat <<END
+Usage: bakefilize [OPTION]...
+
+Prepare a package to use Autoconf+Bakefile.
+
+-c, --copy            copy files rather than symlinking them
+-n, --dry-run         print commands rather than running them
+-f, --force           replace existing files
+-v, --verbose         be verbose
+    --help            display this message and exit
+
+You must 'cd' to the top directory of your package before you run
+'bakefilize'.
+END
+            exit 0
+        ;;
+        --copy | -c )
+            symlink=0
+        ;;
+        --dry-run | -n )
+            dry_run=1
+        ;;
+        --force | -f )
+            force=1
+        ;;
+        --verbose | -v )
+            verbose=1
+        ;;
+    esac
+done
+
+
+# Find Automake directory:
+
+automake=""
+for dir in $AUTOMAKE_DIRS ; do
+    if test -n $automake ; then
+        latest=`ls $dir | grep '^automake' | sort -r | head -n 1`
+        if test -n $latest ; then
+            automake=$dir/$latest
+        fi
+    fi
+done
+if test -z $automake ; then
+    echo "Couldn't find automake files, aborting." >&2
+    echo "Searched in: $AUTOMAKE_DIRS" >&2
+    exit 1
+fi
+if test $verbose = 1 ; then
+    echo "using automake from $automake"
+fi
+
+
+# Copy files:
+
+for f in $NEEDED_FILES ; do
+    if test -f $f -a $force = 0 ; then
+        if test $verbose = 1 ; then
+            echo "file $f exists, skipping"
+        fi
+    else
+        if test $verbose = 1 ; then
+            echo "copying file $automake/$f to $f"
+        fi
+        if test $symlink = 1 ; then
+            cmd="ln -s $automake/$f $f"
+        else
+            cmd="cp $automake/$f $f"
+        fi
+        if test $dry_run = 1 ; then
+            echo rm -f $f
+            echo $cmd
+        else
+            rm -f $f
+            $cmd
+        fi
+    fi
+done
