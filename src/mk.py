@@ -133,6 +133,12 @@ def addOption(opt):
     __vars_opt[opt.name] = '$(%s)' % opt.name
     vars['OPTIONS'] = ' '.join(mk.options.keys())
 
+def delOption(optname):
+    del options[optname]
+    options_order.remove(optname)
+    del __vars_opt[optname]
+    vars['OPTIONS'] = ' '.join(mk.options.keys())
+
 def addCondition(cond):
     conditions[cond.name] = cond
 
@@ -141,6 +147,10 @@ def addCondVar(cv, hints=''):
     __vars_opt[cv.name] = '$(%s)' % cv.name
     if hints != '':
         mk.vars_hints[cv.name] = hints.split(',')
+
+def delCondVar(cvname):
+    del cond_vars[cvname]
+    del __vars_opt[cvname]
 
 def addMakeVar(var, value):
     make_vars[var] = value
@@ -172,9 +182,12 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
     if not overwrite:
         if name in store:
             return
-        if store == vars and (name in options) or (name in cond_vars):
-            return
-    
+        if store == vars and ((name in options) or (name in cond_vars)):
+            if name in options:
+                delOption(name)
+            else:
+                delCondVar(name)
+
     if eval:
         try:
             v = evalExpr(value, target=target, add_dict=add_dict)
