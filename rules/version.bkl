@@ -3,7 +3,20 @@
 
 <makefile>
 
-    <!-- Version information: -->
-    <set var="BAKEFILE_VERSION">0.1.1</set>
+    <!-- 
+    Version information:
+    -->
+    <set var="BAKEFILE_VERSION_FULL">0.1.1</set>
 
+    <!-- 
+    Version string suitable for putting into generated makefiles,
+    changes less often than BAKEFILE_VERSION_FULL. The versions are usually
+    identical, but they are not identical e.g. when using automatically
+    generated snapshots whose version is changed to contain date, e.g.
+    "0.1.1.20030719". BAKEFILE_VERSION does not contain the date part.
+    -->
+    <set var="BAKEFILE_VERSION">
+        $('.'.join(BAKEFILE_VERSION_FULL.split('.')[0:3]))
+    </set>
+    
 </makefile>
