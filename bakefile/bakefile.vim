@@ -22,7 +22,7 @@ syn match bakefileVariable "$([^)]*)" contained
 
 syn keyword bakefileKeyword makefile set unset using option include contained
 syn keyword bakefileKeyword command phony action dll exe lib contained
-syn keyword bakefileKeyword template description output contained
+syn keyword bakefileKeyword template description output fragment contained
 syn match   bakefileKeyword "define-rule" contained
 syn match   bakefileKeyword "define-tag" contained
 syn match   bakefileKeyword "default-value" contained

@@ -9,6 +9,7 @@ cond_vars = {}
 targets = {}
 templates = {}
 conditions = {}
+fragments = []
 
 vars['targets'] = {}
 
@@ -61,6 +62,12 @@ class Target:
         vars['targets'][id] = xxx
 
 
+class Fragment:
+    """Part of native makefile copied as-is into generated output."""
+    def __init__(self, content):
+        self.content = content
+
+
 # Like mk.vars, but for mk.options (i.e. not "real" variables). It's only
 # purpose is to make Python code evaluation easier:
 __vars_opt = {}
@@ -79,6 +86,9 @@ def addCondVar(cv):
 def addTarget(target):
     # add the target:
     targets[target.id] = target
+
+def addFragment(fragment):
+    fragments.append(fragment)
 
 def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
            append=0, overwrite=1):
