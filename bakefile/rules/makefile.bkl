@@ -240,6 +240,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="precomp-headers-exclude"/>
 
         <define-tag name="msvc-project-files"/>
+        <define-tag name="msvc-file-group"/>
         
     </define-rule>
 

@@ -89,6 +89,8 @@
             -->
             <set var="__custom_build_files"/>
 
+            <!-- Support for files grouping: -->
+            <set var="__file_groups"/>
         </template>
         
         <define-tag name="sources">
@@ -180,6 +182,13 @@
         <define-tag name="precomp-headers">
             <set var="__pch_use_pch"> 
                 $(substituteFromDict(value,{'on':'1', 'off':'0'}))
+            </set>
+        </define-tag>
+        
+        <!-- Support for files grouping: -->
+        <define-tag name="msvc-file-group">
+            <set var="__file_groups">
+                $(__file_groups)$(LF)$(nativePaths(value))
             </set>
         </define-tag>
 
