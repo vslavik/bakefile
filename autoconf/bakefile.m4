@@ -235,7 +235,7 @@ while test \${#} -gt 0; do
         exit 1
         ;;
 
-        *.o | *.a)
+        *.o | *.a | *.dylib)
         # collect object files
         objects="\${objects} \${1}"
         ;;
