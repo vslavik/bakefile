@@ -349,7 +349,10 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!-- =============================================================== -->
 
     <phony id="all"/>
-    <action id="install"/>
+    <action id="install">
+        <depends>all</depends>
+    </action>
+    
     <action id="uninstall"/>
 
     <set var="__ALWAYS_CLEAN">

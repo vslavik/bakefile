@@ -27,6 +27,6 @@
 ]@
 
 # Include dependency info, if present:
-@@IF_GNU_MAKE@@-include *.d
+@@IF_GNU_MAKE@@-include .deps/*.d
 
 .PHONY: @(' '.join([t.__targetdir+t.__targetname for t in targets if t.__is_phony=='1']))
