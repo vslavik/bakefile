@@ -8,6 +8,7 @@ Version 0.1.4
   determining whether a makefile is out of date
 - borland: fixed subdirs handling for directories that begin with ..
   (idea by Hans Van Leemputten)
+- autoconf: OS/2 fixes (Stefan Neis)
 
 
 Version 0.1.3
