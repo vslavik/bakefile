@@ -117,7 +117,10 @@ def __copyMkToVars():
     keys = mk.make_vars.keys()
     keys.sort()
     for mv in keys:
-        make_vars.append(mv, mk.make_vars[mv])
+        mvv = Struct()
+        mvv.name = mv
+        mvv.value = mk.make_vars[mv]
+        make_vars.append(mv, mvv)
     dict['make_vars'] = make_vars
 
     # Copy fragments:
