@@ -1,6 +1,6 @@
 
 Name:          bakefile
-Version:       0.1.3
+Version:       0.1.4
 Release:       1
 Source:        %{name}-%{version}.tar.gz
 

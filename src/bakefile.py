@@ -21,7 +21,7 @@
 #  $Id$
 #
 
-BAKEFILE_VERSION = "0.1.3"
+BAKEFILE_VERSION = "0.1.4"
 
 import sys, os.path
 from optik import OptionParser
