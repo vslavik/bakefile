@@ -347,6 +347,7 @@
                 <entry role="tagname">include</entry>
                 <entry>
                   Add directory where the compiler should look for headers.
+                  The value may be empty, in which case no flag is added.
                 </entry>
                 <entry role="availability">exe, dll, lib</entry>
               </row>
@@ -356,6 +357,7 @@
                 <entry role="tagname">define</entry>
                 <entry>
                   Define C preprocessor macro.
+                  The value may be empty, in which case no flag is added.
                 </entry>
                 <entry role="availability">exe, dll, lib</entry>
               </row>
