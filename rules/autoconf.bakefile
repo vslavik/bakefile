@@ -50,10 +50,7 @@
     <set var="LIBDIR">$(libdir)</set>
     <set var="DATADIR">$(datadir)</set>
     
-    <set var="srcprefix">
-        <if cond="SRCDIR=='.'">\$(srcdir)</if>
-        <if cond="SRCDIR!='.'">\$(srcdir)/$(SRCDIR)</if>
-    </set>
+    <set var="SRCDIR">$(srcdir)</set>
 
     <set var="DLLEXT">.$(SO_SUFFIX)</set>
     <option name="DLLPREFIX"/>

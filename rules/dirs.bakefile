@@ -5,7 +5,6 @@
     <!-- Source dirs: -->
     
     <set var="SRCDIR">.</set>
-    <set var="srcprefix">$(SRCDIR)</set>
     <set var="BUILDDIR">.</set> <!-- to be overwritten by backend: -->
 
 
