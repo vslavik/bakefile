@@ -128,6 +128,8 @@ def getHints(var):
     else: return ','.join(vars_hints[var])
 
 def addOption(opt):
+    if opt.name in vars:
+        del vars[opt.name]
     options[opt.name] = opt
     options_order.append(opt.name)
     __vars_opt[opt.name] = '$(%s)' % opt.name
@@ -143,6 +145,8 @@ def addCondition(cond):
     conditions[cond.name] = cond
 
 def addCondVar(cv, hints=''):
+    if cv.name in vars:
+        del vars[cv.name]
     cond_vars[cv.name] = cv
     __vars_opt[cv.name] = '$(%s)' % cv.name
     if hints != '':
