@@ -299,7 +299,8 @@ def updateTargets(jobs, pretend=0):
         finally:
             os.remove(tempDeps)
             os.remove(tempChanges)
-            os.remove(tempXmlCacheFile)
+            if os.path.isfile(tempXmlCacheFile):
+                os.remove(tempXmlCacheFile)
             os.rmdir(tempXmlCacheDir)
             try:
                 state.lock.acquire()
