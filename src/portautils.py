@@ -23,6 +23,10 @@
 
 import os, tempfile
 
+#
+# Secure temporary file creation:
+#
+
 def __mktemp_secure(prefix):
     """Uses tempfile.mkstemp() to atomically create named file, but works
        only with Python 2.3+."""
@@ -45,3 +49,40 @@ try:
     mktemp = __mktemp_secure
 except AttributeError:
     mktemp = __mktemp_insecure
+
+
+#
+# Cross-platform file locking:
+# (based on portalocker Python Cookbook recipe
+# by John Nielsen <nielsenjf@my-deja.com>:
+# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65203
+#
+
+if os.name == 'nt':
+    import win32con
+    import win32file
+    import pywintypes
+    # is there any reason not to reuse the following structure?
+    __overlapped = pywintypes.OVERLAPPED()
+
+    def lock(file):
+        hfile = win32file._get_osfhandle(file.fileno())
+        win32file.LockFileEx(hfile, win32con.LOCKFILE_EXCLUSIVE_LOCK,
+                             0, 0x7fffffff, __overlapped)
+
+    def unlock(file):
+        hfile = win32file._get_osfhandle(file.fileno())
+        win32file.UnlockFileEx(hfile, 0, 0x7fffffff, __overlapped)
+
+elif os.name == 'posix':
+    import fcntl
+    
+    def lock(file):
+        fcntl.flock(file.fileno(), fcntl.LOCK_EX)
+
+    def unlock(file):
+        fcntl.flock(file.fileno(), fcntl.LOCK_UN)
+
+else:
+    def lock(file): pass
+    def unlock(file): pass

@@ -3,6 +3,8 @@ Version 0.1.3
 -------------
 
 - use mkstemp() to create temporary files if available
+- lock output files so that it is possible to run multiple instances of
+  bakefile on same tree
 
 
 Version 0.1.2
