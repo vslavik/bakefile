@@ -1,8 +1,8 @@
 # MS Visual C++ projects generator script
 # $Id$
 
-import fnmatch
-import errors
+import fnmatch, re
+import errors, utils
 
 basename = os.path.splitext(os.path.basename(FILE))[0]
 dirname = os.path.dirname(FILE)
@@ -35,6 +35,22 @@ def filterGroups(groups, groupDefs, files):
         if f in used: continue
         ret[None].append(f)
     return ret
+
+def fixFlagsQuoting(text):
+    """Replaces e.g. /DFOO with /D "FOO" and /DFOO=X with /D FOO=X."""
+    return re.sub(r'\/([DIid]) ([^ \"=]+)([ $])', r'/\1 "\2"\3',
+           re.sub(r'\/([DIid]) ([^ \"=]+)=([^ \"]*)([ $])', r'/\1 \2=\3\4', text))
+    
+
+def sortByBasename(files):
+    def __sort(x1, x2):
+        f1 = os.path.basename(x1)
+        f2 = os.path.basename(x2)
+        if f1 == f2: return 0
+        elif f1 < f2: return -1
+        else: return 1
+    files.sort(__sort)
+
 
 
 # ------------------------------------------------------------------------
@@ -77,7 +93,7 @@ End Project Dependency
         dspfile = (t, os.path.join(dirname, dsp_name+'.dsp'), dsp_name)
         if dspfile not in dsp_list:
             dsp_list.append(dspfile)
-    writer.writeFile('%s%s.dsw' % (basename, suffix), dsw)
+    writer.writeFile('%s.dsw' % (os.path.join(dirname,basename+suffix)), dsw)
 
 
 
@@ -88,7 +104,8 @@ def genWorkspaces():
     tgall = {}
     tgsets = {}
     for c in configs:
-        tgall[c] = configs[c][1].keys()
+        tgall[c] = [t for t in configs[c][1].keys() \
+                    if targets[t].__kind == 'project']
         key = str(tgall[c])
         if key in tgsets:
             tgsets[key].append(c)
@@ -98,7 +115,7 @@ def genWorkspaces():
     dsp_list = []
 
     if len(tgsets) <= 1:
-        genDSW(targets, dsp_list)
+        genDSW([t for t in targets if t.__kind == 'project'], dsp_list)
     else:
         try:
             dsw_configs = MSVC_DSW_CONFIGS.split()
@@ -132,12 +149,11 @@ def genWorkspaces():
 def mkFlags(keyword, lines):
     result = []
     splitted = lines.splitlines();
-    for l in splitted:
-        l2 = ' '.join(l.split())
-        result.append('# %s BASE %s' % (keyword, l2))
-    for l in splitted:
-        l2 = ' '.join(l.split())
-        result.append('# %s %s' % (keyword, l2))
+    splitted2 = [fixFlagsQuoting(' '.join(x.split())) for x in splitted]
+    for l in splitted2:
+        result.append('# %s BASE %s' % (keyword, l))
+    for l in splitted2:
+        result.append('# %s %s' % (keyword, l))
     return '\n'.join(result)+'\n'
 
 
@@ -213,7 +229,7 @@ BSC32=bscmake.exe
             fl += 'LIB32=link.exe -lib\n'
             fl += mkFlags('ADD','LIB32 /nologo %s' % cfg.__outflag)
         fl += '\n'
-    flags.append(fl)
+        flags.append(fl)
     dsp += '!IF' + '!ELSEIF'.join(flags) + '!ENDIF'
 
     dsp += '\n\n# Begin Target\n\n'
@@ -228,10 +244,11 @@ BSC32=bscmake.exe
     sources = {}
     for c in t.configs:
         for s in t.configs[c].__sources.split():
-            if s not in sources:
-                sources[s] = [c]
+            snat = utils.nativePaths(s)
+            if snat not in sources:
+                sources[snat] = [c]
             else:
-                sources[s].append(c)
+                sources[snat].append(c)
     for s in sources:
         if len(sources[s]) == len(t.configs):
             sources[s] = None
@@ -248,6 +265,7 @@ BSC32=bscmake.exe
     # (write them)
     for group in files:
         lst = files[group]
+        sortByBasename(lst)
         if len(lst) == 0: continue
         if group != None:
             dsp += """\
@@ -259,8 +277,8 @@ BSC32=bscmake.exe
             dsp += """\
 # Begin Source File
 
-SOURCE=%s
-""" % src
+SOURCE=%s\%s
+""" % (SRCDIR,src)
             if sources[src] != None:
                 # the file is disabled in some configurations:
                 flags = []
