@@ -4,6 +4,7 @@ aclocaldir = $(datadir)/aclocal
 outputdir = $(pkgdatadir)/output
 rulesdir = $(pkgdatadir)/rules
 rulesgettextdir = $(rulesdir)/gettext
+presetsdir = $(pkgdatadir)/presets
 codedir = $(pkglibdir)
 codeempydir = $(codedir)/empy
 codeoptikdir = $(codedir)/optik
@@ -60,6 +61,9 @@ rules_DATA =  rules/FORMATS.bkmanifest \
 rulesgettext_DATA = \
               rules/gettext/common.bkl \
 			  rules/gettext/autoconf.bkl
+
+presets_DATA = \
+              presets/fake.bkl
 
 code_PYTHON = src/config.py \
               src/bakefile.py \
