@@ -288,6 +288,13 @@
         </define-tag>
     </define-rule>
 
+    <define-rule name="subproject" extends="__any">
+        <template>
+            <set var="__kind">phony</set>
+        </template>
+        <define-tag name="installable"/>
+        <define-tag name="dir"/>
+    </define-rule>
 
     <define-tag name="version" rules="dll"/>
     <define-tag name="so_version" rules="dll"/>
