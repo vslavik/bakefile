@@ -42,7 +42,7 @@ def __copyMkToVars():
         if v == 'configs':
             dict[v] = mk.vars[v]
         else:
-            dict[v] = __valueToPy(mk.vars[v].strip())
+            dict[v] = mk.vars[v].strip()
 
     # Copy targets information:
     targets = Container()
