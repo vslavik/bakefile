@@ -81,6 +81,10 @@
             <set var="__rtl" eval="0">/M$(__rtl_type)$(__rtl_dbg)</set>
             <cppflags>$(__rtl)</cppflags>
             <define>WIN32</define>
+
+            <!-- enable C++ exception handling and rtti
+                 (FIXME: make it configurable) -->
+            <cxxflags>/GR /GX</cxxflags>
         </template>
 
         <define-tag name="precomp-headers-gen">
