@@ -15,8 +15,45 @@
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
         <command>            
             -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
+            -if exist $(__builddir)\*.res del $(__builddir)\*.res
         </command>
     </action>
+    
+    
+    <!-- =============================================================== -->
+    <!--                     win32 resources:                            -->
+    <!-- =============================================================== -->
+
+    <define-tag name="win32-res" rules="exe,dll">
+        <set var="__win32rc" append="1">
+            $(sources2objects(value, id, '.res'))
+        </set>
+        <set var="__deps" append="1">$(__win32rc)</set>
+        <__command>brc32 $(__win32rc) $(__targetdir)$(__targetname)</__command>
+    </define-tag>
+
+    <!-- compilation rule for .rc files:  -->
+    <define-rule name="__rc-to-res" extends="__any,compilation_rule">
+        <template>
+            <set var="__command" eval="0">
+                brc32 -32 -r -fo$@ -i\$(BCCDIR)\include $(__win32rc_flags) $**
+            </set>
+        </template>
+        <define-tag name="parent-target">
+            <set var="__win32rc_flags">$(targets[value].__win32rc_flags)</set>
+        </define-tag>
+    </define-rule>
+
+    <!-- includes and defines should propagate to rc compilation, too: -->
+    <define-tag name="include" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('-i',value))</set>
+    </define-tag>
+    <define-tag name="define" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('-d',value))</set>
+    </define-tag>
+
     
     <!-- =============================================================== -->
     <!--                            output:                              -->
