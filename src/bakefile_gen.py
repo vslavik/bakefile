@@ -15,13 +15,29 @@ class FileInfo:
         self.formats = []
 
 files = {}
+files_all = files
+
+def _matchesWildcard(filename, wildcard):
+    """Returns whether the file matches wildcard (glob)."""
+    name = filename.split(os.sep)
+    wild = wildcard.split(os.sep)
+    if len(name) != len(wild):
+        return 0
+    for i in range(0,len(name)):
+        if name[i] == wild[i]: continue
+        if not fnmatch.fnmatch(name[i], wild[i]):
+            return 0
+    return 1
 
 def loadTargets(filename):
 
     def _loadFile(filename):
         if verbose:
             print 'loading task description from %s...' % filename
-        root = xmlparser.parseFile(filename)
+        try:
+            root = xmlparser.parseFile(filename)
+        except xmlparser.ParsingError:
+            raise errors.Error("can't load file '%s'" % filename)
         ret = []
         for cmd in root.children:
             if cmd.name == 'include':
@@ -37,18 +53,6 @@ def loadTargets(filename):
                 ret.append(cmd)
         root.children = ret
         return root
-
-    def _matchesWildcard(filename, wildcard):
-        """Returns whether the file matches wildcard (glob)."""
-        name = filename.split(os.sep)
-        wild = wildcard.split(os.sep)
-        if len(name) != len(wild):
-            return 0
-        for i in range(0,len(name)):
-            if name[i] == wild[i]: continue
-            if not fnmatch.fnmatch(name[i], wild[i]):
-                return 0
-        return 1
 
     def _findMatchingFiles(node):
         """Returns list of FileInfo objects from 'files' variable that match
@@ -127,6 +131,27 @@ def loadTargets(filename):
                     file.flags[fmt] = file.flags[fmt].replace(cmd.value,'')
 
 
+
+def filterFiles(bakefiles, formats):
+    global files, files_all
+    files_all = files
+    if bakefiles == None:
+        files1 = files
+    else:
+        files1 = {}
+        for f in files:
+            for wildcard in bakefiles:
+                if _matchesWildcard(f, wildcard):
+                    files1[f] = files[f]
+                    break
+    files = files1
+    
+    if formats != None:
+        for f in files.values():
+            f.formats = [x for x in f.formats if x in formats]
+
+
+
 def updateTargets():
     """Updates all targets."""
     if verbose:
@@ -167,11 +192,52 @@ def updateTargets():
         dependencies.save('.bakefile_gen.state')
 
 
+def cleanTargets():
+    try:
+        dependencies.load('.bakefile_gen.state')
+    except IOError: pass
+
+    def _isGeneratedBySomethingElse(output):
+        """Returns true if the file is output of some file in files_all
+           that is not part of files."""
+        for f in files_all:
+            if f in files: continue
+            formats = files_all[f].formats
+            absf = os.path.abspath(f)
+            for fmt in formats:
+               if output in dependencies.deps_db[(absf,fmt)].outputs:
+                   return 1
+        return 0
+
+    for f in files:
+        for fmt in files[f].formats:
+            key = (os.path.abspath(f), fmt)
+            if key not in dependencies.deps_db:
+                sys.stderr.write("ERROR: don't know how to clean %s generated from %s\n" % (fmt, f))
+            else:
+                for o in dependencies.deps_db[key].outputs:
+                    if not os.path.isfile(o): continue
+                    if _isGeneratedBySomethingElse(o): continue
+                    if verbose: print "deleting %s" % o
+                    os.remove(o)
+
+
 def run(args):
     parser = OptionParser()
-    parser.add_option('-f', '--format',
-                      action="store", dest='format',
-                      help='format of generated makefile')
+    parser.add_option('-f', '--formats',
+                      action="store", dest='formats',
+                      help='only generate makefiles in these formats (comma-separated list)')
+    parser.add_option('-b', '--bakefiles',
+                      action="store", dest='bakefiles',
+                      help='only generate makefiles from bakefiles that are matched by these wildcards (comma-separated list)')
+    parser.add_option('-d', '--desc',
+                      action="store", dest='descfile',
+                      default='Bakefiles.bkgen',
+                      help='load description from DESCFILE instead of from Bakefiles.bkgen')
+    parser.add_option('-c', '--clean',
+                      action="store_true", dest='clean',
+                      default=0,
+                      help='clean generated files, don\'t create them')
     parser.add_option('-v', '--verbose',
                       action="store_true", dest='verbose', default=0,
                       help='display detailed information')
@@ -181,19 +247,24 @@ def run(args):
 
     options, args = parser.parse_args(args)
 
-    if len(args) != 1:
-        parser.error('exactly 1 Makefiles.xml file required')
-        sys.exit(1)
-
     global verbose
     if options.very_verbose:
         verbose = 2
     elif options.verbose:
         verbose = 1
+
+    if options.formats != None:
+        options.formats = options.formats.split(',')
+    if options.bakefiles != None:
+        options.bakefiles = options.bakefiles.split(',')
     
     try:
-        loadTargets(os.path.abspath(args[0]))
-        updateTargets()
+        loadTargets(os.path.abspath(options.descfile))
+        filterFiles(options.bakefiles, options.formats)
+        if options.clean:
+            cleanTargets()
+        else:
+            updateTargets()
     except errors.ErrorBase, e:
         sys.stderr.write('[bakefile_gen] %s' % str(e))
         sys.exit(1)
