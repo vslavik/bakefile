@@ -113,7 +113,12 @@ def __copyMkToVars():
     dict['cond_vars'] = cond_vars
     
     # Copy "make variables":
-    dict['make_vars'] = mk.make_vars
+    make_vars = Container()
+    keys = mk.make_vars.keys()
+    keys.sort()
+    for mv in keys:
+        make_vars.append(mv, mk.make_vars[mv])
+    dict['make_vars'] = make_vars
 
     # Copy fragments:
     dict['fragments'] = mk.fragments
