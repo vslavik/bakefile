@@ -131,7 +131,7 @@ def handleSet(e, target=None, add_dict=None):
                 if (not overwrite) and (name in target.vars):
                     errors.popCtx()
                     return
-                name = '__%s_%s' % (target.id.replace('-','_').replace('.','_'),
+                name = '__%s_%s' % (target.id.replace('-','_').replace('.','_').replace('/','_'),
                                     name)
                 mk.setVar(e.props['var'], '$(%s)' % name,
                              eval=0, target=target,
