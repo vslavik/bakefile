@@ -129,7 +129,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
     SHARED_LD_CXX="\$(CXX) -shared -o"
 
     dnl the extra compiler flags needed for compilation of shared library
-    if test "$GCC" = "yes"; then
+    if test "x$GCC" = "xyes"; then
         dnl the switch for gcc is the same under all platforms
         PIC_FLAG="-fPIC"
     fi
@@ -137,7 +137,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
     case "${host}" in
       *-hp-hpux* )
         dnl default settings are good for gcc but not for the native HP-UX
-        if test "$GCC" = "yes"; then
+        if test "x$GCC" = "xyes"; then
             dnl -o flag must be after PIC flag
             SHARED_LD_CC="${CC} -shared ${PIC_FLAG} -o"
             SHARED_LD_CXX="${CXX} -shared ${PIC_FLAG} -o"
@@ -152,7 +152,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
       ;;
 
       *-*-linux* )
-        if test "$GCC" != "yes"; then
+        if test "x$GCC" != "xyes"; then
             AC_CACHE_CHECK([for Intel compiler], bakefile_cv_prog_icc,
             [
                 AC_TRY_COMPILE([],
@@ -172,7 +172,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
       ;;
 
       *-*-solaris2* )
-        if test "$GCC" != yes ; then
+        if test "x$GCC" != xyes ; then
             SHARED_LD_CC="${CC} -G -o"
             SHARED_LD_CXX="${CXX} -G -o"
             PIC_FLAG="-KPIC"
@@ -194,7 +194,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
 
       *-*-aix* )
         dnl default settings are ok for gcc
-        if test "$GCC" != "yes"; then
+        if test "x$GCC" != "xyes"; then
             dnl the abs path below used to be hardcoded here so I guess it must
             dnl be some sort of standard location under AIX?
             AC_CHECK_PROG(AIX_CXX_LD, makeC++SharedLib,
@@ -214,7 +214,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
 
       *-*-irix* )
         dnl default settings are ok for gcc
-        if test "$GCC" != "yes"; then
+        if test "x$GCC" != "xyes"; then
             PIC_FLAG="-KPIC"
         fi
       ;;
@@ -291,6 +291,22 @@ AC_DEFUN(AC_BAKEFILE_SHARED_VERSIONS,
 
 
 dnl ---------------------------------------------------------------------------
+dnl AC_BAKEFILE_DEPS
+dnl
+dnl Detects available C/C++ dependency tracking options
+dnl ---------------------------------------------------------------------------
+
+AC_DEFUN(AC_BAKEFILE_DEPS,
+[
+    DEPS_TYPE=no
+    if test "x$GCC" = "xyes"; then
+        DEPS_TYPE=gcc
+    fi
+    
+    AC_SUBST(DEPS_TYPE)
+])
+
+dnl ---------------------------------------------------------------------------
 dnl AC_BAKEFILE_CHECK_BASIC_STUFF
 dnl
 dnl Checks for presence of basic programs, such as C and C++ compiler, "ranlib"
@@ -340,6 +356,7 @@ AC_DEFUN(AC_BAKEFILE,
     AC_BAKEFILE_SUFFIXES
     AC_BAKEFILE_SHARED_LD
     AC_BAKEFILE_SHARED_VERSIONS
+    AC_BAKEFILE_DEPS
 
     builtin(include, autoconf_inc.m4)
 ])

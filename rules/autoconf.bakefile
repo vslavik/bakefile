@@ -23,6 +23,9 @@
     <option name="INSTALL_PROGRAM"/>
     <option name="INSTALL_DATA"/>
     <option name="INSTALL_DIR"/>
+    <option name="DEPS_TYPE">
+        <values>no gcc</values>
+    </option>
 
     <!-- Platforms: -->
     <unset var="PLATFORM_UNIX"/>
@@ -156,6 +159,23 @@
         </modify-target>
     </define-tag>
     
+    
+    <!-- =============================================================== -->
+    <!--                     C/C++ dependency tracking:                  -->
+    <!-- =============================================================== -->
+
+    <set var="DEPS_FLAG">
+        <if cond="DEPS_TYPE=='gcc'">
+            -MMD -MT\$@ -MF\$@.d
+        </if>
+    </set>
+
+    <define-tag name="src" rules="__c-to-o,__cpp-to-o">
+        <set var="__cppflags" append="1">$(DEPS_FLAG)</set>
+    </define-tag>
+    
+    <set var="__ALWAYS_CLEAN" append="1">$(BUILDDIR)$(DIRSEP)*.d</set>
+
     
     <!-- =============================================================== -->
     <!--                       Generate output:                          -->

@@ -97,8 +97,8 @@ def sources2objects(sources, target, ext):
     code = """
     <makefile>
     <%s id="%s">
-        <src>%s</src>
         <parent-target>%s</parent-target>
+        <src>%s</src>
     </%s>
     </makefile>
     """
@@ -123,7 +123,7 @@ def sources2objects(sources, target, ext):
                 while obj in mk.targets:
                     obj = '%s%s-%s%i%s' % (objdir, mk.targets[target].id, base, num, ext)
             rule = '__%s-to-%s' % (srcext[1:], ext[1:])
-            code2 = code % (rule, obj, s, target, rule)
+            code2 = code % (rule, obj, target, s, rule)
             reader.processString(code2)
             retval.append(obj)
         return '%s%s%s' % (prefix, ' '.join(retval), suffix)
