@@ -2,6 +2,7 @@ Version 0.1.7
 -------------
 
 - fixed running under Python 2.2 (Francesco Montorsi)
+- fixed handling of "prepend" attribute on <set> command
 
 
 Version 0.1.6
