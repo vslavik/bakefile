@@ -179,7 +179,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
             base, srcext = os.path.splitext(s)
             base = os.path.basename(base)
             objdir = mkPathPrefix(mk.vars['BUILDDIR'])
-            objname = '%s%s-%s%s%s' % (objdir, mk.targets[target].id, base,
+            objname = '%s%s_%s%s%s' % (objdir, mk.targets[target].id, base,
                                        objSuffix, ext)
             if objname in files:
                 files[objname].append((s,cond))
@@ -251,7 +251,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
         else:
             hardFiles.append(f)
     if config.verbose:
-        print '  making object rules (%i out of %i hard)' % \
+        print '  making object rules (%i of %i hard)' % \
                   (len(hardFiles), len(hardFiles)+len(easyFiles))
     
     # there's only one rule for this object file, therefore we don't care
