@@ -288,7 +288,10 @@ def _processTargetNodes(list, target, tags, dict):
         return 1
     
     for node in list:
-        if not processCmd(node, target, dict):
+        if node.name == 'if':
+            if evalWeakCondition(node):
+                _processTargetNodes(node.children, target, tags, dict)
+        elif not processCmd(node, target, dict):
             if node.name not in tags:
                 raise ReaderError(node,
                                       "unknown target tag '%s'" % node.name)
