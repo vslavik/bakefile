@@ -146,6 +146,8 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__module_linker" eval="0">
                 $(ifthenelse(__uses_cxx, __MODULE_LINKER_CXX, __MODULE_LINKER_CC))
             </set>
+            
+            <__clean-target-files/>
         </template>
 
         <define-tag name="define">
@@ -264,6 +266,12 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="msvc-project-files"/>
         <define-tag name="msvc-file-group"/>
         
+        <define-tag name="__clean-target-files">
+            <clean-files>
+                $(ref('__targetdir',id))$(ref('__targetname',id))
+            </clean-files>
+        </define-tag>
+        
     </define-rule>
 
     <define-rule name="exe" extends="__compiled,$(__exe_baser)">
@@ -275,9 +283,6 @@ makefiles (most notably GNU Make and Autoconf formats).
                 $(__post_command)
             </set>
             <dependency-of>all</dependency-of>
-            <clean-files>
-                $(ref('__targetdir',id))$(ref('__targetname',id))
-            </clean-files>
         </template>
 
         <define-tag name="app-type">

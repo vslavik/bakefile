@@ -36,6 +36,24 @@
         </command>
     </action>
     
+    <define-tag name="__clean-target-files" rules="exe,dll,module">
+        <clean-files>
+            $(ref('__targetdir',id))$(ref('__name',id)).tds
+        </clean-files>
+        <clean-files>
+            $(ref('__targetdir',id))$(ref('__name',id)).ilc
+        </clean-files>
+        <clean-files>
+            $(ref('__targetdir',id))$(ref('__name',id)).ild
+        </clean-files>
+        <clean-files>
+            $(ref('__targetdir',id))$(ref('__name',id)).ilf
+        </clean-files>
+        <clean-files>
+            $(ref('__targetdir',id))$(ref('__name',id)).ils
+        </clean-files>
+    </define-tag>
+    
     
     <!-- =============================================================== -->
     <!--                     win32 resources:                            -->
