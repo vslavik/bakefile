@@ -38,6 +38,7 @@
     <option name="PLATFORM_WIN32"/>
     <option name="PLATFORM_MSDOS"/>
     <option name="PLATFORM_MACOSX"/>
+    <set var="PLATFORM_MAC">$(PLATFORM_MACOSX)</set> <!-- no autoconf on classic-->
     
     <option name="srcdir"/>
     <option name="top_srcdir"/>
