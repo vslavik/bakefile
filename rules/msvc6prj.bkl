@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <set var="COMPILER">vc</set>
+
+    <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+
+    <include file="win32.bkl"/>
+
+
+    <define-rule name="__compiled">
+        <template>
+            <set var="__deps"/>
+            <set var="__sources"/>
+        </template>
+        <define-tag name="sources">
+        </define-tag>
+
+        <define-tag name="install-to"/>
+    </define-rule>
+
+    <define-rule name="exe" extends="__compiled">
+        <template>
+            <set var="__type">exe</set>
+        </template>
+    </define-rule>
+    
+    <define-rule name="dll" extends="__compiled">
+        <template>
+            <set var="__type">dll</set>
+        </template>
+    </define-rule>
+    
+    <define-rule name="lib" extends="__compiled">
+        <template>
+            <set var="__type">lib</set>
+        </template>
+    </define-rule>
+    
+    <!-- =============================================================== -->
+    <!--                            output:                              -->
+    <!-- =============================================================== -->
+    
+    <output file="$(OUTPUT_FILE)" writer="msvc6prj.py"/>
+
+</makefile>
