@@ -46,6 +46,20 @@ def makeUniqueCondVarName(name):
 
 substVarNameCounter = 0
 
+__substituteCallbacks = {}
+
+def addSubstituteCallback(varname, function):
+    """Register callback for substitute() and substitute2() functions.
+       This callback is used if (and _only_ if) other methods of substitution
+       fail, in particular when an option is found during substitution.
+       
+       'function' takes two arguments: (callback, option)
+       where 'callback' is the original callback function that was passed as
+       substitute()'s argument and 'option' is mk.Option instance that was
+       encountered and can't be evaluated.
+    """
+    __substituteCallbacks[varname] = function
+
 def substitute2(str, callback, desc=None, cond=None):
     """Same as substitute, but the callbacks takes two arguments (text and
        condition object) instead of one."""
@@ -57,8 +71,11 @@ def substitute2(str, callback, desc=None, cond=None):
     
     def callbackVar(cnd, expr, use_options, target, add_dict):
         if expr not in mk.cond_vars:
-            raise errors.Error("'%s' can't be used in this context, "%expr +
-                               "not a conditional variable")
+            if expr in __substituteCallbacks:
+                return __substituteCallbacks[expr](callback, mk.options[expr])
+            else:
+                raise errors.Error("'%s' can't be used in this context,"%expr +
+                                   "not a conditional variable")
         cond = mk.cond_vars[expr]
         var = mk.CondVar(makeUniqueCondVarName('%s_%s' % (cond.name, desc)))
         mk.addCondVar(var)
