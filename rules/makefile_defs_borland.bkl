@@ -37,24 +37,23 @@
     <set var="__FLAG_ARCH_I586">-5</set>
     <set var="__FLAG_ARCH_I686">-6</set>
     <set var="__FLAG_USE_PCH">-H -Hs</set>
-    <set var="__FLAG_PCH_FILE" eval="0">-H=%s.csm</set>
+    <set var="__FLAG_PCH_FILE">-H=%s.csm</set>
     <set var="__FLAG_SINGLE_THREADING"/>
     <set var="__FLAG_MULTI_THREADING">-tWM</set>
+    <!-- FIXME: -tWR sets -tW as well, so it must be before -tC !! -->
 
 
     <!-- rules building blocks: -->
     
     <template id="__commands_templ_C">
-        <set var="__rtldll_flag"/>
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -c -P- -o$@ $(__rtldll_flag) $(__cflags) $**
+            $(CC) -c -P- -o$@ $(__cflags) $**
         </set>
     </template>
     
     <template id="__commands_templ_CXX">
-        <set var="__rtldll_flag"/>
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -c -P -o$@ $(__rtldll_flag) $(__cxxflags) $**
+            $(CXX) -c -P -o$@ $(__cxxflags) $**
         </set>
     </template>
 
@@ -83,14 +82,20 @@
                 so we currently ignore it. Wide char support stuff is not
                 used either, it doesn't seem to make a difference.
     -->
+    
+    <set var="__exe_baser">__borland_exe</set>
+    <set var="__dll_baser">__borland_dll</set>
+    <set var="__lib_baser">__borland_comp</set>
 
     <define-rule name="__borland_comp">
         <template>
+            <set var="__rtldll_flag" eval="0"/>
             <set var="__startup_obj_type">x</set> <!-- console app -->
             <set var="__rtl_i"/>
             <set var="__rtl_mt"/>
             <set var="__startup" eval="0">c0$(__startup_obj_type)32.obj</set>
             <set var="__rtl" eval="0">cw32$(__rtl_mt)$(__rtl_i).lib</set>
+            <cppflags>$(__rtldll_flag)</cppflags>
         </template>
         <define-tag name="runtime-libs">
             <set var="__rtldll_flag">
