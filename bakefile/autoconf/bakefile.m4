@@ -368,8 +368,8 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
       ;;
 
       *-pc-os2_emx | *-pc-os2-emx )
-        SHARED_LD_CC="`pwd`/dllar.sh -o"
-        SHARED_LD_CXX="`pwd`/dllar.sh -o"
+        SHARED_LD_CC="`pwd`/dllar.sh -libf INITINSTANCE -libf TERMINSTANCE -o"
+        SHARED_LD_CXX="`pwd`/dllar.sh -libf INITINSTANCE -libf TERMINSTANCE -o"
         PIC_FLAG=""
         AC_BAKEFILE_CREATE_FILE_DLLAR_SH
         chmod +x dllar.sh
