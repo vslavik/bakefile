@@ -358,7 +358,8 @@ def buildModulesList():
         else:
             dircomp = []
         for n in names:
-            if os.path.splitext(n)[1] != '.bakefile': continue
+            ext =os.path.splitext(n)[1]
+            if ext != '.bakefile' and ext != '.bkl': continue
             i = ModuleInfo()
             i.file = os.path.join(dirname,n)
             i.modules = dircomp + os.path.splitext(n)[0].split('-')
