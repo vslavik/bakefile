@@ -151,10 +151,10 @@
             <command>$(__copy_cmd)</command>
         </template>
         <define-tag name="dstdir">
-            <set var="__dstdir">$(value)</set>
+            <set var="__dstdir">$(nativePaths(value))</set>
         </define-tag>
         <define-tag name="srcdir">
-            <set var="__srcdir">$(value)$(DIRSEP)</set>
+            <set var="__srcdir">$(nativePaths(value))$(DIRSEP)</set>
         </define-tag>
         <define-tag name="files">
             <set var="__files">$(' '.join(value.split()))</set>
