@@ -89,7 +89,6 @@ def __copyMkToVars():
     return dict
 
 def invoke(method):
-    print len(mk.targets)
     found = 0
     for p in config.searchPath:
         template = os.path.join(p, method)
