@@ -10,7 +10,7 @@
 <!ENTITY commands SYSTEM   "commands.docbook">
 <!ENTITY manpage SYSTEM    "manpage.docbook">
 
-<!ENTITY filecopy SYSTEM   "filecopy.docbook">
+<!ENTITY datafiles SYSTEM  "datafiles.docbook">
 
 ]>
 
@@ -31,7 +31,7 @@
 
   <chapter id="ch.modules">
     <title>Modules</title>
-    &filecopy;
+    &datafiles;
   </chapter>
   
   &manpage;
