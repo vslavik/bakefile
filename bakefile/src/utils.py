@@ -410,3 +410,29 @@ def condition2string(cond, format):
         return ' -a '.join(['"x$%s" = "x%s"' % (x.option.name,x.value) \
                            for x in cond.exprs])
     raise errors.Error('unknown format')
+
+
+def wrapLongLine(line, continuation, indent='\t', maxChars=72):
+    """Wraps the line so that it does not exceed 'maxChars' characters.
+       'continuation' is string appended to the end of unfinished line
+       that continues on the next line. 'indent' is the string inserted
+       before new line. The line is broken only at whitespaces.
+       It also discards whitespaces and replaces them with single ' '.
+    """
+    if len(line) <= maxChars:
+        return line.replace('\n', '%s\n%s' % (continuation, indent))
+    s = ''
+    always_len = len(continuation) + len(indent) + 1
+    lng = always_len
+    for w in line.split():
+        wlen = len(w)
+        if lng + wlen > maxChars:
+            s += '%s\n%s' % (continuation, indent)
+            lng = always_len
+        if s == '':
+            s = w
+        else:
+            s = '%s %s' % (s, w)
+        lng += wlen
+    return s
+
