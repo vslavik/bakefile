@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <set var="foo">1</set>
+    
+    <if cond="foo=='1'">
+        <error>'foo' can't be one</error>
+    </if>
+
+</makefile>
