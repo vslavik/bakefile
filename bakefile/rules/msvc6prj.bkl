@@ -284,6 +284,8 @@
         </template>
         <define-tag name="command">
         </define-tag>
+        <define-tag name="is-phony">
+        </define-tag>
     </define-rule>
 
 
