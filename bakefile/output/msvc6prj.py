@@ -99,7 +99,6 @@ Package=<4>
             if d not in extern_deps:
                 extern_deps.append(d)
     for d in extern_deps:
-        print d
         deps = ''
         d_components = d.split(':')
         if len(d_components) == 3:
