@@ -176,19 +176,19 @@
         <set var="__win32res"/>
         <set var="__LINK_EXE_CMD" eval="0">
             $(__linker) $(__ldflags) @&amp;&amp;|
-            $(__startup) $(__objects),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
+            $(__startup) $(__objects_var),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
             |
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
             if exist $@ del $@
             tlib /a /p$(__TLIB_PAGESIZE) $@ @&amp;&amp;|
-            $(__objects)
+            $(__objects_var)
             |
         </set>
         <!-- implib -f: force import by name (rather than ordinal) -->
         <set var="__LINK_DLL_CMD" eval="0">
             $(__dll_linker) $(__ldflags) @&amp;&amp;|
-            $(__startup) $(__objects),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
+            $(__startup) $(__objects_var),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
             |
             implib -f $(__targetdir)$(__libname) $@
         </set>

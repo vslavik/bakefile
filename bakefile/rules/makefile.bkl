@@ -119,7 +119,14 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__cxxflags">$(CXXFLAGS)</set>
             <set var="__ldflags">$(LDFLAGS)</set>
             <set var="__ldlibs"/>
+
             <set var="__objects"/>
+            <!-- access __objects as global make variable: -->
+            <set var="__objects_var">
+                $(createMakeVar(id, '__objects', 'OBJECTS', hints='files'))
+            </set>
+            <set var="__deps" append="1">$(__objects_var)</set>
+            
             <set var="__linker" eval="0">
                 $(ifthenelse(__uses_cxx, __LINKER_CXX, __LINKER_CC))
             </set>
@@ -169,8 +176,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__objtmp">
                 $(sources2objects(value, id, OBJEXT))
             </set>
-            <set var="__objects" append="1">$(__objtmp)</set>
-            <set var="__deps" append="1">$(__objtmp)</set>
+            <set var="__objects" append="1">$(__objtmp)</set>            
         </define-tag>
 
         <define-tag name="library">
@@ -231,6 +237,8 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="precomp-headers-file"/>
         <define-tag name="precomp-headers-header"/>
         <define-tag name="precomp-headers-gen"/>
+
+        <define-tag name="msvc-project-files"/>
         
     </define-rule>
 
