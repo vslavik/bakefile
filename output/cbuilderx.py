@@ -1,7 +1,7 @@
 #
 # Borland C++ Builder X projects generator script
 #  
-# Development of this format was sponsored by Borland.
+# Development of this format was sponsored by Borland, thanks!
 #
 # $Id$
 
