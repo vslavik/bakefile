@@ -19,6 +19,7 @@
             </if>
         </set>
         <set var="__objects" append="1">$(__win32rc)</set>
+        <set var="__deps" append="1">$(__win32rc)</set>
     </define-tag>
 
     <!-- includes and defines should propagate to rc compilation, too: -->
