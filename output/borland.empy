@@ -1,4 +1,7 @@
 @empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
+!ifndef BCCDIR
+BCCDIR = $(MAKEDIR)\..
+!endif
 
 # -------------------------------------------------------------------------
 # These are configurable options:
@@ -14,10 +17,6 @@
 # -------------------------------------------------------------------------
 # Do not modify the rest of this file!
 # -------------------------------------------------------------------------
-
-!ifndef BCCDIR
-BCCDIR=$(MAKEDIR)\..
-!endif
 
 !if "$(BCCDIR)" == "\.."
 !error Your Borland compiler does not define MAKEDIR. Please define the BCCDIR variable, e.g. BCCDIR=d:\bc4
