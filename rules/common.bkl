@@ -70,7 +70,7 @@
     <define-tag name="cppflags-unix" rules="exe,lib,dll,module"/>
     <define-tag name="cppflags-mingw" rules="exe,lib,dll,module"/>
     <define-tag name="cppflags-gcc" rules="exe,lib,dll,module"/>
-    <define-tag name="cppflags-msvc" rules="exe,lib,dll,module"/>
+    <define-tag name="cppflags-vc" rules="exe,lib,dll,module"/>
     <define-tag name="cppflags-watcom" rules="exe,lib,dll,module"/>
     <define-tag name="cppflags-dmars" rules="exe,lib,dll,module"/>
     
@@ -78,7 +78,7 @@
     <define-tag name="cflags-unix" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-mingw" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-gcc" rules="exe,lib,dll,module"/>
-    <define-tag name="cflags-msvc" rules="exe,lib,dll,module"/>
+    <define-tag name="cflags-vc" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-watcom" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-dmars" rules="exe,lib,dll,module"/>
     
@@ -86,7 +86,7 @@
     <define-tag name="cxxflags-unix" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-mingw" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-gcc" rules="exe,lib,dll,module"/>
-    <define-tag name="cxxflags-msvc" rules="exe,lib,dll,module"/>
+    <define-tag name="cxxflags-vc" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-watcom" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-dmars" rules="exe,lib,dll,module"/>
     
@@ -94,7 +94,7 @@
     <define-tag name="ldflags-unix" rules="exe,dll,module"/>
     <define-tag name="ldflags-mingw" rules="exe,dll,module"/>
     <define-tag name="ldflags-gcc" rules="exe,dll,module"/>
-    <define-tag name="ldflags-msvc" rules="exe,dll,module"/>
+    <define-tag name="ldflags-vc" rules="exe,dll,module"/>
     <define-tag name="ldflags-watcom" rules="exe,dll,module"/>
     <define-tag name="ldflags-dmars" rules="exe,dll,module"/>
 
