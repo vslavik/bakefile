@@ -1,3 +1,8 @@
+#
+# Misc utility functions
+#
+# $Id$
+#
 
 import mk, errors, config, sys
 import os
@@ -146,7 +151,8 @@ def nativePaths(filenames):
 def findSources(filenames):
     """Adds source filename prefix to files."""
     return substitute(filenames,
-                      lambda x: '%s$(DIRSEP)%s' % (mk.vars['SRCDIR'], x),
+                      lambda x: '%s%s%s' % \
+                             (mk.vars['SRCDIR'], mk.vars['DIRSEP'], x),
                       'SOURCEFILES')
 
 

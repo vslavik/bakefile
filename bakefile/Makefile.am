@@ -63,6 +63,7 @@ code_PYTHON = src/config.py \
               src/utils.py \
               src/writer.py \
               src/xmlparser.py \
+			  src/dependencies.py \
               src/outmethods.py
 codeempy_PYTHON = \
               src/empy/__init__.py \

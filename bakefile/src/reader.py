@@ -12,6 +12,7 @@ import errors
 from errors import ReaderError
 import config
 import finalize
+import dependencies
 
 def reraise():
     raise sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2]
@@ -812,7 +813,10 @@ def processFile(filename):
         raise ReaderError(None, "file '%s' doesn't exist" % filename)
     if config.verbose:
         print 'loading %s...' % filename
-    newdir = os.path.dirname(os.path.abspath(filename))
+    filename = os.path.abspath(filename)
+    if config.track_deps:
+        dependencies.addDependency(mk.vars['INPUT_FILE'], filename)
+    newdir = os.path.dirname(filename)
     if newdir not in sys.path:
         sys.path.append(newdir)
     __doProcess(file=filename)
@@ -839,7 +843,7 @@ def setStdVars(filename):
     mk.setVar('SPACE', '$(" ")', eval=0)
     mk.setVar('DOLLAR', '&dollar;')
     
-    mk.setVar('INPUT_FILE', filename)
+    mk.setVar('INPUT_FILE', os.path.abspath(filename))
     mk.setVar('OUTPUT_FILE', config.output_file)
     mk.setVar('FORMAT', config.format)    
 

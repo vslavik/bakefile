@@ -1,3 +1,8 @@
+#
+# Configuration holder
+#
+# $Id$
+#
 
 import os, os.path, sys
 
@@ -22,3 +27,9 @@ format = None
 
 # List of parsed output directives ((file,writer) tuples):
 to_output = []
+
+# Track dependencies (generated and used files)?:
+track_deps = 0
+
+# File to store dependencies into:
+deps_file = None

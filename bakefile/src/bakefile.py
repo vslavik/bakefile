@@ -39,6 +39,9 @@ def run(args):
     parser.add_option('-v', '--verbose',
                       action="store_true", dest='verbose', default=0,
                       help='display detailed information')
+    parser.add_option('', '--output-deps',
+                      action="store", dest='deps_file', metavar='DEPSFILE',
+                      help="output dependencies information for bakefile_gen")
     parser.add_option('', '--debug',
                       action="store_true", dest='debug', default=0,
                       help="show debugging information (you don't want this)")
@@ -64,6 +67,10 @@ def run(args):
     config.format = options.format
     if not formats.isValidFormat(config.format):
         parser.error('invalid format\n\n' + formats.showFormats())
+
+    if options.deps_file != None:
+        config.track_deps = 1
+        config.deps_file = options.deps_file
     
     if options.outfile != None:
         config.output_file = options.outfile
@@ -95,6 +102,10 @@ def run(args):
     else: 
         if not writer.write():
             sys.exit(1)
+
+    if config.track_deps:
+        import dependencies
+        dependencies.save(config.deps_file)
 
 if __name__ == '__main__':
     try:
