@@ -178,7 +178,7 @@ Use_Debug_Libraries """ + cfg.__debug + """
 Output_Dir "%s"
 Intermediate_Dir "%s\\%s"
 Target_Dir ""
-""" % (cfg.__targetdir, cfg.__builddir, t.id)) +  \
+""" % (cfg.__targetdir[:-1], cfg.__builddir, t.id)) +  \
               mkFlags('ADD','CPP /nologo %s %s /c' % (cfg.__cppflags, cfg.__defines))
         if cfg.__type_code in [__MSVC_TYPECODE_GUI,__MSVC_TYPECODE_DLL]:
             fl += mkFlags('ADD','MTL /nologo %s /mktyplib203 /win32' % cfg.__defines)
