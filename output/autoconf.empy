@@ -1,15 +1,10 @@
 @empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
 
-@[ if OPTIONS_FILE == '' :
-@empy.include(os.path.join(RULESDIR, 'autoconf-options.empy'))
-]@
-@[ if OPTIONS_FILE != '' :
-include @OPTIONS_FILE.replace('.in','')
-]@
+@@MAKE_SET@@
 
-@# These are autoconf specials and must be in every Makefile.in:
-srcdir = @@srcdir@@
-top_srcdir = @@top_srcdir@@
+@[ for o in options :@
+@o.name = @@@o.name@@
+]@
 
 ### Conditionally set variables: ###
 
