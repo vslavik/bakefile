@@ -250,12 +250,33 @@ CPP=cl.exe
 
     def makeSettingsRSC(self, cfg):
         return self.mkFlags('ADD', 'RSC %s' % cfg._win32rc_flags)
+    
+    def makeSettingsBSC(self, cfg):
+        return """\
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+"""
+    def makeSettingsLIB(self, cfg):
+            txt = 'LIB32=link.exe -lib\n'
+            txt += self.mkFlags('ADD','LIB32 /nologo %s' % cfg._outflag)
+            return txt
+    
+    def makeSettingsLINK(self, cfg):
+            txt = 'LINK32=link.exe\n'
+            txt += self.mkFlags('ADD','LINK32 %s /nologo %s' % (cfg._ldlibs, cfg._ldflags))
+            return txt
 
-    def makeSettingsCPP_MTL_RSC(self, cfg):
+    def makeSettingsCPP_MTL_RSC_BSC_LINK(self, cfg):
         txt = self.makeSettingsCPP(cfg)
         if cfg._type_nick in ['gui','dll']:
             txt += self.makeSettingsMTL(cfg)
         txt += self.makeSettingsRSC(cfg)
+        txt += self.makeSettingsBSC(cfg)
+        if cfg._type_nick != 'lib':
+            txt += self.makeSettingsLINK(cfg)
+        else:
+            txt += self.makeSettingsLIB(cfg)
         return txt
 
     def genDSP(self, t, filename, prjname):
@@ -311,18 +332,7 @@ Intermediate_Dir "%s\\%s"
 %sTarget_Dir ""
 """ % (cfg._targetdir[:-1], cfg._builddir, t.id,
        self.makeCpuPlatformID(cfg)))
-            fl += self.makeSettingsCPP_MTL_RSC(cfg)
-            fl += """\
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-"""
-            if cfg._type_nick != 'lib':
-                fl += 'LINK32=link.exe\n'
-                fl += self.mkFlags('ADD','LINK32 %s /nologo %s' % (cfg._ldlibs, cfg._ldflags))
-            else:
-                fl += 'LIB32=link.exe -lib\n'
-                fl += self.mkFlags('ADD','LIB32 /nologo %s' % cfg._outflag)
+            fl += self.makeSettingsCPP_MTL_RSC_BSC_LINK(cfg)
             fl += '\n'
             flags.append(fl)
         dsp += '!IF' + '!ELSEIF'.join(flags) + '!ENDIF'

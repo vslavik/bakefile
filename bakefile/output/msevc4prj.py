@@ -61,11 +61,19 @@ Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
         return ('RSC=rc.exe\n' +
                 self.mkFlags('ADD', 'RSC %s /r' % cfg._win32rc_flags))
 
-    def makeSettingsCPP_MTL_RSC(self, cfg):
-        txt = self.makeSettingsRSC(cfg)
+    def makeSettingsCPP_MTL_RSC_BSC_LINK(self, cfg):
+        txt = ''
+        if cfg._type_nick in ['gui','dll']:
+            txt += self.makeSettingsRSC(cfg)
         txt += self.makeSettingsCPP(cfg)
         if cfg._type_nick in ['gui','dll']:
             txt += self.makeSettingsMTL(cfg)
+        if cfg._type_nick != 'lib':
+            txt += self.makeSettingsBSC(cfg)
+            txt += self.makeSettingsLINK(cfg)
+        else:
+            txt += self.makeSettingsLIB(cfg)
+            txt += self.makeSettingsBSC(cfg)
         return txt
 
 def run():
