@@ -86,7 +86,7 @@ def nativePaths(filenames):
 def findSources(filenames):
     """Adds source filename prefix to files."""
     return substitute(filenames,
-                      lambda x: '%s$(DIRSEP)%s' % (mk.vars['srcprefix'], x),
+                      lambda x: '%s$(DIRSEP)%s' % (mk.vars['SRCDIR'], x),
                       'SOURCEFILES')
 
 
