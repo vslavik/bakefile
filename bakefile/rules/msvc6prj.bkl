@@ -3,14 +3,21 @@
 
 <makefile>
 
+    <include file="win32.bkl"/>
     <using module="msvc_utils"/>
 
     <set var="COMPILER">vc</set>
 
     <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+    
 
-    <include file="win32.bkl"/>
-
+    <set var="__MSVC_TYPECODE_CONSOLE">0x0103</set>
+    <set var="__MSVC_TYPECODE_GUI">0x0101</set>
+    <set var="__MSVC_TYPECODE_DLL">0x0102</set>
+    <set var="__MSVC_TYPECODE_LIB">0x0104</set>
+    
+    <tag-info name="dirname" position="before:libname,before:dllname"/>
+    <tag-info name="debug-info" position="after:dllname,after:libname"/>
 
     <define-rule name="__any">
         <template>
@@ -23,6 +30,18 @@
         <define-tag name="dirname">
             <set var="__targetdir">$(nativePaths(value))$(DIRSEP)</set>
         </define-tag>
+
+        <define-tag name="depends">
+            <set var="__deps" append="1">
+                $(substitute(value, lambda x: ref('__depname', x), 'DEP'))
+            </set>
+        </define-tag>
+        
+        <define-tag name="dependency-of">
+            <modify-target target="$(value)">
+                <depends>$(id)</depends>
+            </modify-target>
+        </define-tag>
         
     </define-rule>
 
@@ -33,13 +52,20 @@
             <set var="__cppflags"/>
             <set var="__ldlibs"/>
             <set var="__ldflags">/machine:i386</set>
+            <set var="__win32rc_flags"/>
             <set var="__debug">0</set>            
             <set var="__builddir" eval="0">
                 $(substituteFromDict(__debug,{'0':'Release','1':'Debug'}))
             </set>
+            
+            <set var="__rtl_dbg"/>
+            <set var="__rtl_static">L</set>
+            <set var="__rtl_type">D</set>
+            <set var="__rtl" eval="0">/M$(__rtl_type)$(__rtl_dbg)</set>
+            <cppflags>$(__rtl)</cppflags>
 
             <set var="__outflag" eval="0">
-                /out:$(__targetdir)$(__targetname)
+                /out:"$(__targetdir)$(__targetname)"
             </set>
             <ldflags>$(__outflag)</ldflags>
         </template>
@@ -54,6 +80,22 @@
             </set>
         </define-tag>
         
+        <define-tag name="include">
+            <cppflags>
+                $(substitute(value, msvc_utils.formatInclude))
+            </cppflags>
+        </define-tag>
+
+        <define-tag name="cppflags">
+            <set var="__cppflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="cflags">
+            <set var="__cppflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="cxxflags">
+            <set var="__cppflags" append="1">$(value)</set>
+        </define-tag>
+        
         <define-tag name="sys-lib">
             <set var="__ldlibs" append="1">
                 $(formatIfNotEmpty("%s.lib",value))
@@ -64,9 +106,36 @@
             <set var="__ldflags" append="1">$(value)</set>
         </define-tag>
         
+        <define-tag name="lib-path">
+            <ldflags>/LIBPATH:$(value)</ldflags>
+        </define-tag>
+        
         <define-tag name="ldlibs">
             <set var="__ldlibs" append="1">$(value)</set>
         </define-tag>
+        
+        <define-tag name="library">
+            <depends>$(value)</depends>
+            <ldlibs>
+                $(substitute(value, lambda x: ref('__targetdir',x)+ref('__linkname', x), 'LIBR'))
+            </ldlibs>
+        </define-tag>
+        
+        <define-tag name="optimize">
+            <cppflags>
+                $(substituteFromDict(value,
+                      {'off':'/Od', 'speed':'/O1', 'size':'/O2'}))
+            </cppflags>
+        </define-tag>
+        
+        <define-tag name="debug-info">
+            <cppflags>
+                $(substituteFromDict(value, {'on':'/Zi', 'off':''}))
+            </cppflags>
+            <ldflags>
+                $(substituteFromDict(value, {'on':'/DEBUG','off':''}))
+            </ldflags>
+        </define-tag>       
 
         <define-tag name="install-to"/>
     </define-rule>
@@ -75,6 +144,7 @@
         <template>
             <app-type>console</app-type>
             <set var="__targetname">$(id).exe</set>
+            <set var="__name">$(id)</set>
         </template>
         <define-tag name="app-type">
             <set var="__type">
@@ -84,28 +154,82 @@
              </set>
              <set var="__type_code">
                 $(substituteFromDict(value,
-                {'console':'0x0103',
-                 'gui':    '0x0101'}))
+                {'console':__MSVC_TYPECODE_CONSOLE,
+                'gui':     __MSVC_TYPECODE_GUI}))
              </set>
          </define-tag>
     </define-rule>
     
     <define-rule name="dll" extends="__compiled">
         <template>
+            <set var="__ldflags">/dll $(__ldflags)</set>
+            <set var="__defines" append="1">/D "_USRDLL" /D "DLL_EXPORTS"</set>
             <set var="__type">"Win32 (x86) Dynamic-Link Library"</set>
-            <set var="__type_code">0x0102</set>
+            <set var="__type_code">$(__MSVC_TYPECODE_DLL)</set>
+            <libname>$(id)</libname>
+            <dllname>$(id)</dllname>
         </template>
+        <define-tag name="libname">
+            <set var="__importlib">$(value).lib</set>
+            <set var="__linkname">$(__importlib)</set>
+            <ldflags>/implib:"$(__targetdir)$(__linkname)"</ldflags>
+        </define-tag>
+        <define-tag name="dllname">
+            <set var="__name">$(value)</set>
+            <set var="__targetname">$(value).dll</set>
+        </define-tag>
     </define-rule>
     
     <define-rule name="lib" extends="__compiled">
         <template>
+            <set var="__defines" append="1">/D "_LIB"</set>
             <set var="__type">"Win32 (x86) Static Library"</set>
-            <set var="__type_code">0x0104</set>
+            <set var="__type_code">$(__MSVC_TYPECODE_LIB)</set>
+            <libname>$(id)</libname>
+        </template>
+        <define-tag name="libname">
+            <set var="__name">$(value)</set>
+            <set var="__targetname">$(value).lib</set>
+            <set var="__linkname">$(__targetname)</set>
+        </define-tag>
+    </define-rule>
+    
+    
+    <!-- phony targets are used only to track dependencies: -->
+    <define-rule name="phony" extends="__any">
+        <template>
+            <set var="__depname" eval="0">$(__deps)</set>
         </template>
     </define-rule>
 
+    <!-- some fake, never used targets: -->
+    <phony id="all"/>
+    <phony id="clean"/>
+
+    <!-- 
+    action rules - they are transformed into special target with
+    nmake content:  FIXME FIXME FIXME
+    -->
+    <define-rule name="action" extends="__any">
+        <define-tag name="command">
+        </define-tag>
+    </define-rule>
+
+
+    <define-tag name="version" rules="dll"/>
+    <define-tag name="so_version" rules="dll"/>
+    <define-tag name="mac_version" rules="dll"/>
+
+    <!-- FIXME FIXME FIXME -->
+    <define-tag name="precomp-headers" rules="dll,exe,lib"/>
+    <define-tag name="precomp-headers-file" rules="dll,exe,lib"/>
+    <define-tag name="precomp-headers-header" rules="dll,exe,lib"/>
+    <define-tag name="precomp-headers-gen" rules="dll,exe,lib"/>
+    
 
     <include file="msvc_common.bkl"/>
+    
+
     
     <!-- =============================================================== -->
     <!--                            output:                              -->

@@ -2,6 +2,7 @@
 # $Id$
 
 import fnmatch
+import errors
 
 basename = os.path.splitext(os.path.basename(FILE))[0]
 dirname = os.path.dirname(FILE)
@@ -40,7 +41,9 @@ def filterGroups(groups, groupDefs, files):
 #   DSW file
 # ------------------------------------------------------------------------
 
-def genDSW():
+def genDSW(dsw_targets, dsp_list, suffix=''):
+    if suffix != '':
+        suffix = '_%s' % suffix
     dsw = """\
 Microsoft Developer Studio Workspace File, Format Version 6.00
 # WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
@@ -61,7 +64,7 @@ Package=<4>
 ###############################################################################
 """
 
-    for t in targets:
+    for t in dsw_targets:
         deps = ''
         dsp_name = '%s_%s' % (basename, t.id)
         for d in t.__deps.split():
@@ -71,9 +74,55 @@ Project_Dep_Name %s
 End Project Dependency
 """ % d     
         dsw += project % (t.id, dsp_name, deps)
-        genDSP(t, os.path.join(dirname, dsp_name+'.dsp'), dsp_name)
-    writer.writeFile(FILE, dsw)
+        dspfile = (t, os.path.join(dirname, dsp_name+'.dsp'), dsp_name)
+        if dspfile not in dsp_list:
+            dsp_list.append(dspfile)
+    writer.writeFile('%s%s.dsw' % (basename, suffix), dsw)
 
+
+
+def genWorkspaces():
+    # VC++ project files can't enable targets only in some configurations,
+    # so we must create multiple .dsw files in case configurations include
+    # different targets:
+    tgall = {}
+    tgsets = {}
+    for c in configs:
+        tgall[c] = configs[c][1].keys()
+        key = str(tgall[c])
+        if key in tgsets:
+            tgsets[key].append(c)
+        else:
+            tgsets[key] = [c]
+    
+    dsp_list = []
+
+    if len(tgsets) <= 1:
+        genDSW(targets, dsp_list)
+    else:
+        try:
+            dsw_configs = MSVC_DSW_CONFIGS.split()
+        except NameError:
+            raise errors.Error('some targets are not present in some configurations,\nplease set MSVC_DSW_CONFIGS variable (%s)' % tgall)
+        for dc in dsw_configs:
+            pos = dc.find('=')
+            if pos == -1:
+                raise errors.Error("malformed MSVC_DSW_CONFIGS component: '%s'" % dc)
+            dsw_name = dc[:pos]
+            config = dc[pos+1:].split(',')
+            for set in tgsets:
+                cfg = tgsets[set][0].split()
+                ok = 1
+                for cpart in config:
+                    if cpart not in cfg:
+                        ok = 0
+                        break
+                if ok:
+                    genDSW([targets[x] for x in tgall[tgsets[set][0]]],
+                           dsp_list, dsw_name)
+    
+    for t, filename, prjname in dsp_list:
+        genDSP(t, filename, prjname)
 
 
 # ------------------------------------------------------------------------
@@ -84,9 +133,11 @@ def mkFlags(keyword, lines):
     result = []
     splitted = lines.splitlines();
     for l in splitted:
-        result.append('# %s BASE %s' % (keyword, l))
+        l2 = ' '.join(l.split())
+        result.append('# %s BASE %s' % (keyword, l2))
     for l in splitted:
-        result.append('# %s %s' % (keyword, l))
+        l2 = ' '.join(l.split())
+        result.append('# %s %s' % (keyword, l2))
     return '\n'.join(result)+'\n'
 
 
@@ -128,32 +179,41 @@ CFG=%s
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-RSC=rc.exe
-
 """
+    if t.__type_code in [__MSVC_TYPECODE_GUI,__MSVC_TYPECODE_DLL]:
+        dsp += 'MTL=midl.exe\n'
+
+    dsp += 'RSC=rc.exe\n\n'
 
     # Output settings for all configurations:
     flags = []
     for c in t.configs:
         cfg = t.configs[c]
-        flags.append('  "$(CFG)" == "%s"' % mkConfigName(t.id, c) + '\n\n' +
-                mkFlags('PROP',"""\
+        fl = '  "$(CFG)" == "%s"' % mkConfigName(t.id, c) + '\n\n'
+        fl += mkFlags('PROP',"""\
 Use_MFC 0
 Use_Debug_Libraries """ + cfg.__debug + """
 Output_Dir "%s"
 Intermediate_Dir "%s\\%s"
 Target_Dir ""
-""" % (cfg.__targetdir, cfg.__builddir, t.id)) + 
-                mkFlags('ADD','CPP /nologo %s %s' % (cfg.__cppflags, cfg.__defines))+"""\
-# ADD BASE RSC /l 0x405 /d "NDEBUG"
-# ADD RSC /l 0x405 /d "NDEBUG"
+""" % (cfg.__targetdir, cfg.__builddir, t.id)) +  \
+              mkFlags('ADD','CPP /nologo %s %s /c' % (cfg.__cppflags, cfg.__defines))
+        if cfg.__type_code in [__MSVC_TYPECODE_GUI,__MSVC_TYPECODE_DLL]:
+            fl += mkFlags('ADD','MTL /nologo %s /mktyplib203 /win32' % cfg.__defines)
+        fl += mkFlags('ADD', 'RSC /l 0x405 %s' % cfg.__win32rc_flags)
+        fl += """\
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=link.exe
-""" + mkFlags('ADD','LINK32 %s /nologo %s' % (cfg.__ldlibs, cfg.__ldflags)) + """\
-
-""")
+"""
+        if cfg.__type_code != __MSVC_TYPECODE_LIB:
+            fl += 'LINK32=link.exe\n'
+            fl += mkFlags('ADD','LINK32 %s /nologo %s' % (cfg.__ldlibs, cfg.__ldflags))
+        else:
+            fl += 'LIB32=link.exe -lib\n'
+            fl += mkFlags('ADD','LIB32 /nologo %s' % cfg.__outflag)
+        fl += '\n'
+    flags.append(fl)
     dsp += '!IF' + '!ELSEIF'.join(flags) + '!ENDIF'
 
     dsp += '\n\n# Begin Target\n\n'
@@ -224,4 +284,5 @@ SOURCE=%s
 
     writer.writeFile(filename, dsp)
 
-genDSW()
+
+genWorkspaces()
