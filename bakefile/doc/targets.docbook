@@ -97,7 +97,7 @@
     <para>
       Some rules don't declare real targets but so-called
       <emphasis>pseudo targets</emphasis>. Pseudo targets are processed as
-      standard targets, but they don't appear in the generate makefile, have
+      standard targets, but they don't appear in the generated makefile, have
       no action associated with them and can't depend on any other target or
       be dependency of another target. They are used as user-friendly means of
       modifying behaviour of other targets. 
