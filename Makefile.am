@@ -52,8 +52,9 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/makefile_os2.bkl \
               rules/makefile_mingw.bkl \
               rules/msvc.bkl \
-              rules/msvc6prj.bkl \
               rules/msvc_common.bkl \
+              rules/msvc_prj_common.bkl \
+              rules/msvc6prj.bkl \
               rules/mingw.bkl \
               rules/watcom.bkl \
               rules/unixlike.bkl \
