@@ -58,7 +58,7 @@ def __parseFileLibxml2(filename):
 
         if len(e.children) == 0:
             e.value = n.content.strip()
-       
+
         return e
    
     try:
@@ -97,7 +97,8 @@ def __doParseMinidom(func, src):
 
         if n.firstChild != None and n.firstChild.nodeType == n.TEXT_NODE:
             e.value = n.firstChild.data.strip()
-            if e.value == '': e.value = None
+        elif len(e.children) == 0:
+            e.value = ''
 
         return e
    
