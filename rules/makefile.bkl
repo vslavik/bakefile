@@ -232,7 +232,8 @@ makefiles (most notably GNU Make and Autoconf formats).
                 $(formatIfNotEmpty(__FLAG_PCH_FILE, mkPathPrefix(BUILDDIR)+value))
             </cppflags>
         </define-tag>
-        
+        <define-tag name="precomp-headers-header"/>
+
         <define-tag name="runtime-libs"/>
         
     </define-rule>
@@ -240,6 +241,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-rule name="exe" extends="__compiled,$(__exe_baser)">
         <template template="$(__exe_baset)">
             <set var="__targetname" eval="0">$(id)$(EXEEXT)</set>
+            <set var="__name">$(id)</set>
             <set var="__command" eval="0">
                 $(__LINK_EXE_CMD)
                 $(__post_command)
@@ -262,6 +264,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     
     <define-rule name="lib" extends="__compiled,$(__lib_baser)">
         <template template="$(__lib_baset)">
+            <set var="__name" eval="0">$(__libname)</set>
             <set var="__command" eval="0">$(__LINK_LIB_CMD)</set>
             <set var="__libname">$(id)</set>
             <set var="__targetname" eval="0">$(LIBPREFIX)$(__libname)$(LIBEXT)</set>
@@ -278,6 +281,7 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <define-rule name="dll" extends="__compiled,$(__dll_baser)">
         <template template="$(__dll_baset)">
+            <set var="__name" eval="0">$(__dllname)</set>
             <cflags>$(DLL_CFLAGS)</cflags>
             <cxxflags>$(DLL_CFLAGS)</cxxflags>
             <set var="__targetname" eval="0">
