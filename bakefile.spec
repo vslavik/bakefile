@@ -9,7 +9,7 @@ Summary:       Cross-platform makefiles generator
 License:       GPL
 Group:         Development/Other
 URL:           http://bakefile.sourceforge.net
-Packager:      Vaclav Slavik <vaclav.slavik@matfyz.cz>
+Packager:      Vaclav Slavik <vslavik@fastmail.fm>
 BuildRoot:     /var/tmp/%{name}-%{version}-root
 
 Requires:      python >= 2.2.2
