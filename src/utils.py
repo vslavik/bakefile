@@ -79,15 +79,26 @@ def addSubstituteCallback(varname, function):
        This callback is used if (and _only_ if) other methods of substitution
        fail, in particular when an option is found during substitution.
        
-       'function' takes two arguments: (callback, varname)
+       'function' takes four arguments: (varname, callback, caller)
        where 'callback' is the original callback function that was passed as
-       substitute()'s argument and 'varname' is variable name.
-    """
-    __substituteCallbacks[varname] = function
+       substitute()'s argument, 'cond' is 'cond' argument passed to substitue2,
+       'varname' is variable name and 'caller' is same as 'caller' passed to
+       substitute(2).
 
-def substitute2(str, callback, desc=None, cond=None, hints=''):
+       If the function returns None, next function in the chain is called;
+       otherwise returned string is used as substitution result.
+    """
+    if varname in __substituteCallbacks:
+        __substituteCallbacks[varname] = [function] + __substituteCallbacks[varname]
+    else:
+        __substituteCallbacks[varname] = [function]
+
+def substitute2(str, callback, desc=None, cond=None, hints='', caller=None):
     """Same as substitute, but the callbacks takes two arguments (text and
        condition object) instead of one."""
+
+    if caller == None:
+        caller = 'substitute2'
 
     if desc == None:
         global substVarNameCounter
@@ -126,10 +137,12 @@ def substitute2(str, callback, desc=None, cond=None, hints=''):
             return '$(%s)' % var.name
 
         if expr in __substituteCallbacks:
-            return __substituteCallbacks[expr](callback, expr)
-        else:
-            raise errors.Error("'%s' can't be used in this context, "%expr +
-                     "not a conditional variable or option with listed values")
+            for func in __substituteCallbacks[expr]:
+                rval = func(expr, callback, caller)
+                if rval != None:
+                    return rval
+        raise errors.Error("'%s' can't be used in this context, "%expr +
+                 "not a conditional variable or option with listed values")
 
     def callbackTxt(cond, expr):
         if len(expr) == 0 or expr.isspace(): return expr
@@ -142,12 +155,14 @@ def substitute2(str, callback, desc=None, cond=None, hints=''):
                            None) # add_dict
 
 
-def substitute(str, callback, desc=None, hints=''):
+def substitute(str, callback, desc=None, hints='', caller='substitute'):
     """Calls callback to substitute text in str by something else. Works with
        conditional variables, too."""
     def callb(cond, s):
         return callback(s)
-    return substitute2(str, callb, desc, hints=hints)
+    if caller == None:
+        caller = 'substitute'
+    return substitute2(str, callb, desc, hints=hints, caller=caller)
 
 
 def substituteFromDict(str, dict, desc=None):
@@ -167,7 +182,8 @@ def nativePaths(filenames):
     else:
         return substitute(filenames,
                           lambda x: x.replace('/', mk.vars['DIRSEP']),
-                          'FILENAMES')
+                          'FILENAMES',
+                          caller='nativePaths')
 
 def findSources(filenames):
     """Adds source filename prefix to files."""
