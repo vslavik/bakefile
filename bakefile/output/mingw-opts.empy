@@ -4,8 +4,8 @@
 # These are configurable options:
 # -------------------------------------------------------------------------
 
-@[ for o in options :@
+@[for o in options]@
 # @o.descStr.replace('\n','\n# ') @o.valuesStr
 @o.name = @o.defaultStr
 
-]@
+@[end for]@

@@ -1,9 +1,9 @@
 @empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
-@[if OPTIONS_FILE != '':!include <@OPTIONS_FILE>
-]@
-@[if OPTIONS_FILE == '':@
+@[if OPTIONS_FILE != '']!include <@OPTIONS_FILE>
+@[end if]@
+@[if OPTIONS_FILE == '']@
 @empy.include(os.path.join(RULESDIR, 'watcom-opts.empy'))
-]@
+@[end if]@
 
 # -------------------------------------------------------------------------
 # Do not modify the rest of this file!
@@ -11,36 +11,36 @@
 
 ### Variables: ###
 
-@[ for v in make_vars :@
+@[for v in make_vars]@
 @utils.wrapLongLine('%s = ' % v.name, v.value, ' \\', variable=v.name)
-]@
+@[end for]@
 
 ### Conditionally set variables: ###
 
-@[ for c in cond_vars :@
-@[ for v in c.values :@
+@[for c in cond_vars]@
+@[for v in c.values]@
 !if @utils.condition2string(v.cond, utils.CONDSTR_MSVC)
 @utils.wrapLongLine('%s = ' % c.name, v.value, ' \\', variable=c.name)
 !endif
-]@
-]@
+@[end for]@
+@[end for]@
 
-@[ if BUILDDIR != '.' :
+@[if BUILDDIR != '.']
 all: @BUILDDIR
 @BUILDDIR:
 @\t-if not exist @BUILDDIR mkdir @BUILDDIR
-]@
+@[end if]@
 
 ### Targets: ###
-@[ for t in targets :
-@[ if t.cond != None :@
+@[for t in targets]
+@[if t.cond != None]@
 !if @utils.condition2string(t.cond, utils.CONDSTR_MSVC)
-]@
+@[end if]@
 @t.__targetdir@t.__targetname: @t.__deps
-@[ for cmd in t.__command.splitlines():@
+@[for cmd in t.__command.splitlines()]@
 @(cmd.strip()[:2]=='<<' ? '<<' : '\t'+cmd.strip())
-]@
-@[ if t.cond != None :@
+@[end for]@
+@[if t.cond != None]@
 !endif
-]@
-]@
+@[end if]@
+@[end for]@
