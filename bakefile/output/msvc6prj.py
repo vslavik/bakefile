@@ -360,6 +360,9 @@ Intermediate_Dir "%s\\%s"
         for s in sources:
             if len(sources[s]) == len(t.configs):
                 sources[s] = None
+        # make copy of the sources specified using <sources>, so that we include
+        # them even when they don't match any file group (see below):
+        realSources = sources.keys()
 
         # Add more files that are part of the project but are not built (e.g. 
         # headers, READMEs etc.). They are included unconditionally to save some
@@ -400,6 +403,11 @@ Intermediate_Dir "%s\\%s"
         groups += groups_default
         
         files = filterGroups(groups, group_defs, sources.keys())
+        # files that didn't match any group and were specified using <sources>
+        # should be added to 'Source Files' group:
+        for sf in files[None]:
+            if sf in realSources:
+                files['Source Files'].append(sf)
 
         # (some files-related settings:)
         pchExcluded = t._pch_excluded.split()
