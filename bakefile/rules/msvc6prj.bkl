@@ -60,6 +60,7 @@
                     $(substituteFromDict(__debug,{'0':'Release','1':'Debug'}))                  </if>
                 <if cond="BUILDDIR!='.'">$(BUILDDIR)</if>
             </set>
+            <set var="__targetdir">$(__builddir)</set>
             
             <set var="__rtl_dbg"/>
             <set var="__rtl_static">L</set>
