@@ -26,13 +26,13 @@
             Sets a variable. There are two forms of the command. The first
             one if for setting variables unconditionally:
             <programlisting><![CDATA[
-  <set var="NAME" [append="APP"] [overwrite="OVERWRITE"]>VALUE</set>
+  <set var="NAME" [append="APP"] [overwrite="OVERWRITE"] [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]>VALUE</set>
   ]]></programlisting>
             The other one resembles <emphasis>switch</emphasis> statement known
             from C and is used to set the variable to one of possible values
             depending on certain condition:
             <programlisting><![CDATA[
-  <set var="NAME" [append="APP"] [overwrite="OVERWRITE"]>
+  <set var="NAME" [append="APP"] [overwrite="OVERWRITE"] [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]>
     <if cond="COND">VALUE</if>
     [
     <if cond="COND">VALUE</if>
@@ -147,6 +147,42 @@
                     <para role="default">
                       Default value: local
                     </para>
+                  </listitem>
+              </varlistentry>
+              <varlistentry>
+                  <term>make_var</term>
+                  <listitem>
+                      <para>
+                          If set to <literal>1</literal>, then the variable
+                          is preserved in the makefile instead of being
+                          substituted by Bakefile. This happens only if the
+                          output format supports it
+                          (<varname>FORMAT_HAS_VARIABLES</varname> is set to
+                          <literal>1</literal>). This settings is useful
+                          together with frequently used variables with long
+                          values, it helps reduce size of generated makefiles.
+                      </para>
+                      <para role="default">
+                          0
+                      </para>
+                  </listitem>
+              </varlistentry>
+              <varlistentry>
+                  <term>hints</term>
+                  <listitem>
+                      <para>
+                          Comma-separated list of hint keywords. These hints
+                          are optional and Bakefile can (but doesn't have to)
+                          use them to better format generated makefiles. So
+                          far only <literal>files</literal> hint is supported.
+                          It tells Bakefile that the variable holds list of
+                          files and if it is either make or conditional
+                          variable, it is formatted in such way that only
+                          one file per line is written to the output (and
+                          therefore adding or removing files does only cause
+                          small differences).
+                      </para>
+                      <para role="default"></para>
                   </listitem>
               </varlistentry>
           </variablelist>
