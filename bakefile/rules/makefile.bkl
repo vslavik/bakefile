@@ -7,7 +7,7 @@ makefiles (most notably GNU Make and Autoconf formats).
 
 <makefile>
 
-    <include file="makefile_$(MAKEFILE_SYNTAX).bakefile"/>
+    <include file="makefile_$(MAKEFILE_SYNTAX).bkl"/>
 
     <!-- =============================================================== -->
     <!--                       Compiler options:                         -->

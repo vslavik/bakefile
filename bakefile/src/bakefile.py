@@ -11,7 +11,7 @@ def run(args):
     from optik import OptionParser
 
     parser = OptionParser(version='Bakefile %s' % BAKEFILE_VERSION,
-                          usage='usage: %prog [options] inputfile.bakefile')
+                          usage='usage: %prog [options] inputfile.bkl')
     parser.add_option('-f', '--format',
                       action="store", dest='format',
                       help='format of generated makefile')

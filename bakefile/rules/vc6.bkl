@@ -2,5 +2,5 @@
 
 <makefile>
     <set var="MSVC_VER">6</set>
-    <include file="msvc-common.bakefile"/>
+    <include file="msvc-common.bkl"/>
 </makefile>
