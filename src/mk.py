@@ -409,7 +409,8 @@ def __recordDeps(mod):
     modfile = '/%s.py' % mod
     for path in sys.path:
         if os.path.isfile(path+modfile):
-            dependencies.addDependency(vars['INPUT_FILE'], path+modfile)
+            dependencies.addDependency(vars['INPUT_FILE'], config.format,
+                                       path+modfile)
             return
 
 def importPyModule(modname):

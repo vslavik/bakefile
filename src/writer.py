@@ -250,10 +250,10 @@ def write():
             f = open(file, 'wt')
             f.writelines(__output_files[file])
             f.close()
-            if config.track_deps:
-                dependencies.addOutput(mk.vars['INPUT_FILE'],
-                                       os.path.abspath(file))
             print 'writing %s' % file
         else:
             print 'no changes in %s' % file
+        if config.track_deps:
+            dependencies.addOutput(mk.vars['INPUT_FILE'], config.format,
+                                   os.path.abspath(file))
     return 1
