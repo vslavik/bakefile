@@ -17,7 +17,9 @@ Requirements: installed Python (including headers).
 
 On Windows, either download installer package or compile it by running
 nmake -f makefile.vc (you will need MSVC++ 6 and Python installed in directory
-specified at the beginning of makefile.vc).
+specified at the beginning of makefile.vc). Note that makefile.vc builds
+bakefile.exe and bakefile_gen.exe binaries that work only if you have 
+Python installed in the same directory where they are!
 
 
  Building from CVS
