@@ -41,7 +41,11 @@ def makeCondEnd(c):
 @[if BUILDDIR != '.']
 all: @BUILDDIR
 @BUILDDIR:
+@[if PLATFORM_WIN32 == '1']@
 @\t-if not exist @BUILDDIR mkdir @BUILDDIR
+@[else]@
+@\t@@mkdir -p @BUILDDIR
+@[end if]@
 @[end if]@
 
 ### Targets: ###
