@@ -338,6 +338,21 @@ AC_DEFUN(AC_BAKEFILE_CHECK_BASIC_STUFF,
             ;;
     esac
     AC_SUBST(INSTALL_DIR)
+
+    dnl Check for win32 resources compiler:
+    case ${host} in 
+        *-*-cygwin* | *-*-mingw32* )
+            if test "$build" != "$host" ; then
+                WINDRES=$host_alias-windres
+            else
+                AC_CHECK_PROG(WINDRES, windres, windres, windres)
+            fi
+            ;;
+        *)  
+            WINDRES=
+            ;;
+    esac
+    AC_SUBST(WINDRES)
 ])
 
 dnl ---------------------------------------------------------------------------

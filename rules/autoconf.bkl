@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<!-- $Id$ -->
 
 <makefile>
     
@@ -11,6 +12,7 @@
     <option name="SO_SUFFIX"/>
     <option name="EXEEXT"/>
     <option name="LN_S"/>
+    <option name="WINDRES"/>
     <option name="PIC_FLAG"/>
     <option name="USE_SOVERSION"><values>0 1</values></option>
     <option name="USE_SOVERLINUX"><values>0 1</values></option>
@@ -65,6 +67,8 @@
     <set var="__DLL_LINKER_CXX" eval="0">$(SHARED_LD_CXX)</set>
 
     <include file="unixlike.bkl"/>
+    <!-- autoconf can be used to compile win32 apps, too: -->
+    <include file="makefile_mingw.bkl"/>
     
     
     

@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<!-- 
+This file is common to all formats that share Unix way of writing 
+makefiles (most notably GNU Make and Autoconf formats).
+-->
+
+<makefile>
+    
+    <!-- =============================================================== -->
+    <!--                     win32 resources:                            -->
+    <!-- =============================================================== -->
+
+    <!-- Only GCC can handle the resources, but gcc is the only unix-like
+    compiler that works when PLATFORM_WIN32==1 anyway. GCC uses windres
+    compiler to produce .o file from .rc, so we treat the resource as another
+    source file. -->
+
+    <define-tag name="rc-file" rules="exe,dll">
+        <set var="__win32rc">
+            <if cond="PLATFORM_WIN32=='1'">
+                $(sources2objects(value, id, OBJEXT, '_rc'))
+            </if>
+        </set>
+        <set var="__objects" append="1">$(__win32rc)</set>
+    </define-tag>
+
+    <!-- includes and defines should propagate to rc compilation, too: -->
+    <define-tag name="include" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">--include-dir $(value)</set>
+    </define-tag>
+    <define-tag name="define" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">--define $(value)</set>
+    </define-tag>
+
+    <!-- compilation rule for .rc files:  -->
+    <define-rule name="__rc-to-$(OBJEXT[1:])" extends="__any,compilation_rule">
+        <template>
+            $(CXX) -c -o $@ $(__cppflags) $(__cxxflags) $&lt;
+            <set var="__command" eval="0">
+                $(WINDRES) -i$&lt; -o$@ $(__win32rc_flags)
+            </set>
+        </template>
+        <define-tag name="parent-target">
+            <set var="__win32rc_flags">$(targets[value].__win32rc_flags)</set>
+        </define-tag>
+    </define-rule>
+
+</makefile>

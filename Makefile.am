@@ -14,20 +14,21 @@ output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
               output/borland.empy
 
-rules_DATA =  rules/autoconf.bakefile \
-              rules/borland.bakefile \
-              rules/common.bakefile \
-              rules/dirs.bakefile \
-              rules/makefile.bakefile \
-              rules/makefile_borland.bakefile \
-              rules/makefile_unix.bakefile \
-              rules/unixlike.bakefile \
-              rules/vc5.bakefile \
-              rules/vc6.bakefile \
-              rules/version.bakefile \
-              rules/win32.bakefile
+rules_DATA =  rules/autoconf.bkl \
+              rules/borland.bkl \
+              rules/common.bkl \
+              rules/dirs.bkl \
+              rules/makefile.bkl \
+              rules/makefile_borland.bkl \
+              rules/makefile_defs_unix.bkl \
+              rules/makefile_mingw.bkl
+              rules/unixlike.bkl \
+              rules/vc5.bkl \
+              rules/vc6.bkl \
+              rules/version.bkl \
+              rules/win32.bkl
 rulesgettext_DATA = \
-              rules/gettext/common.bakefile
+              rules/gettext/common.bkl
 
 code_PYTHON = src/config.py \
               src/bakefile.py \
