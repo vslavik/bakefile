@@ -66,6 +66,8 @@ some unexpected way.
         <define-tag name="command"/>
         <define-tag name="mac-res"/>
         <define-tag name="win32-res"/>
+        <define-tag name="res-include"/>
+        <define-tag name="res-define"/>
         <define-tag name="is-phony"/>
         <define-tag name="uid"/>
 
