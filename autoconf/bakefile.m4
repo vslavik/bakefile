@@ -13,7 +13,7 @@ dnl
 dnl Detects GNU make
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_GNUMAKE,
+AC_DEFUN([AC_BAKEFILE_GNUMAKE],
 [
     dnl does make support "-include" (only GNU make does AFAIK)?
     AC_CACHE_CHECK([if make is GNU make], bakefile_cv_prog_makeisgnu,
@@ -40,7 +40,7 @@ dnl
 dnl Detects platform and sets PLATFORM_XXX variables accordingly
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_PLATFORM,
+AC_DEFUN([AC_BAKEFILE_PLATFORM],
 [
     PLATFORM_UNIX=0
     PLATFORM_WIN32=0
@@ -107,7 +107,7 @@ dnl
 dnl Sets misc platform-specific settings
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_PLATFORM_SPECIFICS,
+AC_DEFUN([AC_BAKEFILE_PLATFORM_SPECIFICS],
 [
     AC_ARG_ENABLE([omf], [  --enable-omf            use OMF object format (OS/2)],
                   [bk_os2_use_omf="$enableval"])
@@ -142,7 +142,7 @@ dnl Detects shared various suffixes for shared libraries, libraries, programs,
 dnl plugins etc.
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_SUFFIXES,
+AC_DEFUN([AC_BAKEFILE_SUFFIXES],
 [
     SO_SUFFIX="so"
     SO_SUFFIX_MODULE="so"
@@ -215,7 +215,7 @@ dnl Detects command for making shared libraries, substitutes SHARED_LD_CC
 dnl and SHARED_LD_CXX.
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_SHARED_LD,
+AC_DEFUN([AC_BAKEFILE_SHARED_LD],
 [
     dnl Defaults for GCC and ELF .so shared libs:
     SHARED_LD_CC="\$(CC) -shared -o"
@@ -390,7 +390,7 @@ dnl
 dnl Detects linker options for attaching versions (sonames) to shared  libs.
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_SHARED_VERSIONS,
+AC_DEFUN([AC_BAKEFILE_SHARED_VERSIONS],
 [
     USE_SOVERSION=0
     USE_SOVERLINUX=0
@@ -436,7 +436,7 @@ dnl
 dnl Detects available C/C++ dependency tracking options
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_DEPS,
+AC_DEFUN([AC_BAKEFILE_DEPS],
 [
     AC_MSG_CHECKING([for dependency tracking method])
     DEPS_TRACKING=0
@@ -474,7 +474,7 @@ dnl Checks for presence of basic programs, such as C and C++ compiler, "ranlib"
 dnl or "install"
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_CHECK_BASIC_STUFF,
+AC_DEFUN([AC_BAKEFILE_CHECK_BASIC_STUFF],
 [
     AC_PROG_RANLIB
     AC_PROG_INSTALL
@@ -511,7 +511,7 @@ dnl
 dnl Checks for presence of resource compilers for win32 or mac
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_RES_COMPILERS,
+AC_DEFUN([AC_BAKEFILE_RES_COMPILERS],
 [
     RESCOMP=
     SETFILE=
@@ -542,7 +542,7 @@ dnl
 dnl Check for precompiled headers support (GCC >= 3.4)
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_PRECOMP_HEADERS,
+AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
 [
 
     AC_ARG_ENABLE([precomp-headers],
@@ -646,7 +646,7 @@ dnl                             to ${host}
 dnl    BAKEFILE_FORCE_PLATFORM  set to override platform detection
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE,
+AC_DEFUN([AC_BAKEFILE],
 [
     if test "x$BAKEFILE_HOST" = "x"; then
         BAKEFILE_HOST="${host}"
@@ -672,7 +672,7 @@ dnl ---------------------------------------------------------------------------
 dnl              Embedded copies of helper scripts follow:
 dnl ---------------------------------------------------------------------------
 
-AC_DEFUN(AC_BAKEFILE_CREATE_FILE_DLLAR_SH,
+AC_DEFUN([AC_BAKEFILE_CREATE_FILE_DLLAR_SH],
 [
 dnl ===================== dllar.sh begins here =====================
 D='$'
@@ -1125,7 +1125,7 @@ EOF
 dnl ===================== dllar.sh ends here =====================
 ])
 
-AC_DEFUN(AC_BAKEFILE_CREATE_FILE_BK_DEPS,
+AC_DEFUN([AC_BAKEFILE_CREATE_FILE_BK_DEPS],
 [
 dnl ===================== bk-deps begins here =====================
 D='$'
@@ -1185,7 +1185,7 @@ EOF
 dnl ===================== bk-deps ends here =====================
 ])
 
-AC_DEFUN(AC_BAKEFILE_CREATE_FILE_SHARED_LD_SH,
+AC_DEFUN([AC_BAKEFILE_CREATE_FILE_SHARED_LD_SH],
 [
 dnl ===================== shared-ld-sh begins here =====================
 D='$'
