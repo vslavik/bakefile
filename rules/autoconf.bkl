@@ -57,6 +57,7 @@
     <set var="LIBDIR">$(libdir)</set>
     <set var="DATADIR">$(datadir)</set>
     <set var="INCLUDEDIR">$(includedir)</set>
+    <option name="DESTDIR"/>
     
     <set var="SRCDIR">$(srcdir)</set>
 
@@ -234,7 +235,7 @@
         <ldflags>$(__macinstnamecmd)</ldflags>
 
         <modify-target target="install_$(id)">
-            <command>(cd $(value) ; $(ref('__so_symlinks_inst_cmd',id)))</command>
+            <command>(cd $(DESTDIR)$(value) ; $(ref('__so_symlinks_inst_cmd',id)))</command>
         </modify-target>
     </define-tag>
     
@@ -320,7 +321,7 @@
    
     <define-tag name="install-to" rules="dll,exe,module">
         <modify-target target="install-strip">
-            <command>$(STRIP) $(value)/$(ref('__targetname',id))</command>
+            <command>$(STRIP) $(DESTDIR)$(value)/$(ref('__targetname',id))</command>
         </modify-target>
     </define-tag>
 

@@ -16,4 +16,9 @@
     <set var="INCLUDEDIR">$(PREFIX)/include</set>
     <set var="DATADIR">$(PREFIX)/share</set>
 
+    <!-- override directory for 'make install' - files installed into directory
+         FOO are copied into $(DESTDIR)FOO instead of into FOO. This makes
+         compilation of RPM etc. packages a bit easier. -->
+    <set var="DESTDIR"></set>
+
 </makefile>
