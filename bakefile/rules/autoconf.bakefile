@@ -165,14 +165,12 @@
         $(os.path.join(os.path.dirname(OUTPUT_FILE),'autoconf_inc.m4'))
     </set>
 
-    <if cond="OPTIONS_FILE!='' and WRITE_OPTIONS_FILE=='1'">
-        <output file="$(os.path.join(os.path.dirname(OUTPUT_FILE),OPTIONS_FILE))" writer="autoconf-options.empy"/>
-    </if>    
-    
     <output file="$(OUTPUT_FILE)" writer="autoconf.empy"/>
 
     <if cond="AUTOCONF_MACROS_FILE!=''">
-        <output file="$(AUTOCONF_MACROS_FILE)" writer="autoconf-macros.empy"/>
+        <output file="$(AUTOCONF_MACROS_FILE)"
+                writer="autoconf-macros.empy"
+                method="mergeBlocks"/>
     </if>
 
 </makefile>
