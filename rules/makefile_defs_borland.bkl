@@ -37,12 +37,12 @@
             $(__linker) -e$@ $(__objects) $(__ldflags)
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
-            $(RM) $(__targetname)
-            tlib /a $(__targetname) $(__objects)
+            $(RM) $@
+            tlib /a $@ $(__objects)
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(__dll_linker) -e$@ $(__objects) $(__ldflags)
-            implib $(__libname) $@
+            implib $(__targetdir)$(__libname) $@
         </set>
     </template>
     
