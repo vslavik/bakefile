@@ -135,24 +135,30 @@ def purgeUnusedOptsVars():
 
     vars_to_keep = _getUneliminatableVars()
 
-    if mk.vars['FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS'] != '0':
-        usedOpts = []
-        for c in mk.conditions.values():
-            usedOpts += [x.option.name for x in c.exprs]
-        for o in mk.options:
-            if (o not in mk.__usageTracker.map) and (o not in usedOpts) and \
-                     (o not in vars_to_keep):
-                toKill.append((mk.options, mk.__vars_opt, o))
-    else:
-        for o in mk.options:
-            if o not in mk.__usageTracker.map and o not in vars_to_keep:
-                toKill.append((mk.options, mk.__vars_opt, o))
+    # only purge options if we are not writing config file (if we are, an
+    # option may be used by another makefile that shares same options file
+    # even though the makefile used to generate the options doesn't use it):
+    if (mk.vars['WRITE_OPTIONS_FILE'] != '1' or mk.vars['OPTIONS_FILE'] == ''):
+        if mk.vars['FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS'] != '0':
+            usedOpts = []
+            for c in mk.conditions.values():
+                usedOpts += [x.option.name for x in c.exprs]
+            for o in mk.options:
+                if ((o not in mk.__usageTracker.map) and (o not in usedOpts)
+                    and (o not in vars_to_keep)):
+                    toKill.append((mk.options, mk.__vars_opt, o))
+        else:
+            for o in mk.options:
+                if o not in mk.__usageTracker.map and o not in vars_to_keep:
+                    toKill.append((mk.options, mk.__vars_opt, o))
+
     for v in mk.cond_vars:
         if v not in mk.__usageTracker.map and v not in vars_to_keep:
             toKill.append((mk.cond_vars, mk.__vars_opt, v))
     for v in mk.make_vars:
         if v not in mk.__usageTracker.map and v not in vars_to_keep:
             toKill.append((mk.make_vars, mk.vars, v))
+    
     if config.verbose:
         sys.stdout.write(': %i of %i\n' % (len(toKill),
                          len(mk.options)+len(mk.cond_vars)+len(mk.make_vars)))
