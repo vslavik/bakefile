@@ -38,8 +38,9 @@ Source: rules\*; DestDir: {app}\rules; Flags: recursesubdirs; Components: base
 Source: output\*; DestDir: {app}\output; Flags: recursesubdirs; Components: base
 Source: tests\*; DestDir: {app}\tests; Flags: recursesubdirs; Components: tests
 Source: doc\*; DestDir: {app}\doc; Flags: recursesubdirs; Components: doc
-Source: ..\minipython\*; DestDir: {app}; Flags: recursesubdirs; Components: base
-Source: ..\minipython\scriptwrapper.exe; DestDir: {app}; DestName: bakefile.exe
+Source: ..\minipython\*; DestDir: {app}\src; Flags: recursesubdirs; Components: base
+Source: README; DestDir: {app}; DestName: README
+Source: THANKS; DestDir: {app}; DestName: THANKS
 
 [Registry]
 
