@@ -1,8 +1,9 @@
 <?xml version="1.0" ?>
+<!-- $Id -->
+
 <makefile>
 
     <!-- Version information: -->
-    <set var="BAKEFILE_VERSION">0.1.0</set>
+    <set var="BAKEFILE_VERSION">0.1.1</set>
 
 </makefile>
-
