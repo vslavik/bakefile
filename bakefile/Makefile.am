@@ -11,7 +11,6 @@ aclocal_DATA = autoconf/bakefile.m4
 man_MANS = doc/man/bakefile.1
 
 output_DATA = output/autoconf.empy \
-              output/autoconf-options.empy \
               output/autoconf-macros.empy \
               output/borland.empy
 
@@ -38,7 +37,8 @@ code_PYTHON = src/config.py \
               src/reader.py \
               src/utils.py \
               src/writer.py \
-              src/xmlparser.py
+              src/xmlparser.py \
+              src/outmethods.py
 codeempy_PYTHON = \
               src/empy/__init__.py \
               src/empy/em.py \
