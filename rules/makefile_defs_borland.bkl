@@ -217,20 +217,23 @@
     </template>
     
     <template id="__subproject_templ">
+        <set var="__MAKE_SUBPROJECT_BATFILE">
+            $(mkPathPrefix(BUILDDIR))$(id).bat
+        </set>
+        <set var="__MAKE_SUBPROJECT_TEMPLATE" eval="0">
+            @echo cd $(__subdir) &gt;$(__MAKE_SUBPROJECT_BATFILE)
+            @echo $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) @@@ &gt;&gt;$(__MAKE_SUBPROJECT_BATFILE)
+            call $(__MAKE_SUBPROJECT_BATFILE)
+            @del $(__MAKE_SUBPROJECT_BATFILE)
+        </set>
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
-            cd $(__subdir)
-            $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) $(__subtarget)
-            cd $(DIRSEP.join(['..' for x in __subdir.split(DIRSEP)]))
+            $(__MAKE_SUBPROJECT_TEMPLATE.replace('@@@',__subtarget))
         </set>
-        <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
-            cd $(__subdir)
-            $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) install
-            cd $(DIRSEP.join(['..' for x in __subdir.split(DIRSEP)]))
+        <set var="__INSTALL_SUBPROJECT_CMD">
+            $(__MAKE_SUBPROJECT_TEMPLATE.replace('@@@','install'))
         </set>
-        <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
-            cd $(__subdir)
-            $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) clean
-            cd $(DIRSEP.join(['..' for x in __subdir.split(DIRSEP)]))
+        <set var="__CLEAN_SUBPROJECT_CMD">
+            $(__MAKE_SUBPROJECT_TEMPLATE.replace('@@@','clean'))
         </set>
     </template>
 
