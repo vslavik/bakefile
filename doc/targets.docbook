@@ -803,12 +803,26 @@
                 </entry>
                 <entry role="availability">exe, dll, module, lib</entry>
               </row>
+              
+              
+              
+              <row id="tag.postlink-command" xreflabel="postlink-command">
+                <entry role="tagname">postlink-command</entry>
+                <entry>
+                  Use this tag to specify command(s) that must be executed
+                  after the target is linked. This can be used to e.g. add
+                  resources or strip debugging information.
+                </entry>
+                <entry role="availability">exe, dll, module, lib</entry>
+              </row>
+        
       
       
             </tbody>
           </tgroup>
         </informaltable>
-        
+              
+              
         
         
         <note>
