@@ -69,7 +69,8 @@
     <action id="clean" template="__phony">
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
         <command>            
-            $(RM) $(__builddir)/*$(OBJEXT)
+            $(RM) $(__builddir)/*$(OBJEXT) 
+            $(RM) $(__builddir)/*.d
         </command>
     </action>
     

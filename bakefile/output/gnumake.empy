@@ -65,3 +65,8 @@ all: @BUILDDIR
 @[for f in fragments]
 @f.content
 @[end for]@
+
+@[if FORMAT == 'gnu']@
+# Dependencies tracking:
+-include @BUILDDIR/*.d
+@[end if]@
