@@ -46,6 +46,28 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <set var="CCC" overwrite="0" eval="0">$(CC)</set>
     <set var="CXXC" overwrite="0" eval="0">$(CXX)</set>
+    
+    <!-- 
+    basic compiler/linker flags (they are left almost empty because
+    it is configure's job to ensure correct cflags):
+    -->
+    <set var="__FLAG_EXE_CONSOLE"></set>
+    <set var="__FLAG_EXE_GUI" overwrite="0"></set>
+    <set var="__FLAG_DEBUG_ON"></set>
+    <set var="__FLAG_DEBUG_ON_LINKER"></set>
+    <set var="__FLAG_DEBUG_OFF"></set>
+    <set var="__FLAG_DEBUG_OFF_LINKER"></set>
+    <set var="__FLAG_OPTIMIZE_OFF"></set>
+    <set var="__FLAG_OPTIMIZE_SIZE"></set>
+    <set var="__FLAG_OPTIMIZE_SPEED"></set>
+    <set var="__FLAG_ARCH_I386"></set>
+    <set var="__FLAG_ARCH_I486"></set>
+    <set var="__FLAG_ARCH_I586"></set>
+    <set var="__FLAG_ARCH_I686"></set>
+    <set var="__FLAG_USE_PCH"></set>
+    <set var="__FLAG_PCH_FILE"></set>
+    <set var="__FLAG_SINGLE_THREADING"/>
+    <set var="__FLAG_MULTI_THREADING"/>
 
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
