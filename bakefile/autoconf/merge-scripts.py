@@ -32,6 +32,8 @@ while i < len(bk):
     if (line.startswith(MARK_IDENT) and line.strip().endswith(MARK_BEGINS)):
         filename = line[len(MARK_IDENT):-len(MARK_BEGINS)-1]
         print 'merging %s...' % filename
+        bk2.append("dnl    (Created by merge-scripts.py from %s\n" % filename)
+        bk2.append("dnl     file do not edit here!)\n")
         bk2.append("D='$'\n")
         bk2.append('cat <<EOF >%s\n' % filename)
         bk2 += mergeFile(filename)
