@@ -466,15 +466,18 @@ HANDLERS = {
     }
 
 
-def __doProcess(file=None, strdata=None):
-    # FIXME: validity checking
-    try:
-        if file != None:
-            m = xmlparser.parseFile(file)
-        else:
-            m = xmlparser.parseString(strdata)
-    except xmlparser.ParsingError:
-        raise ReaderError(None, "file '%s' is invalid" % file)
+def __doProcess(file=None, strdata=None, xmldata=None):
+    if xmldata != None:
+        m = xmldata
+    else:
+        # FIXME: validity checking
+        try:
+            if file != None:
+                m = xmlparser.parseFile(file)
+            else:
+                m = xmlparser.parseString(strdata)
+        except xmlparser.ParsingError:
+            raise ReaderError(None, "file '%s' is invalid" % file)
 
     def processNodes(list):
         for e in list:
@@ -513,6 +516,9 @@ def processFileIfExists(filename):
 
 def processString(data):
     __doProcess(strdata=data)
+
+def processXML(data):
+    __doProcess(xmldata=data)
 
 from types import InstanceType, DictType
 
