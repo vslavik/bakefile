@@ -19,6 +19,7 @@ Usage: use template "simple" for your targets:
 
     <option name="DEBUG">
         <values>0,1</values>
+        <default-value>0</default-value>
         <values-description>Release,Debug</values-description>
         <description>Set to 1 to build debug version</description>
     </option>
