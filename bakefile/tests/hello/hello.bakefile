@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <set var="BUILDDIR">
+        <if cond="WIN32_TOOLSET=='1'">build-$(COMPILER)</if>
+    </set>
+    
+    <exe id="hello">
+        <sources>hello.c</sources>
+    </exe>
+    <exe id="hello_cxx">
+        <sources>hello.cpp</sources>
+    </exe>
+</makefile>

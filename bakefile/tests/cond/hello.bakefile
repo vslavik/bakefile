@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<makefile>
+    <exe id="hello">
+        <sources>hello.c</sources>
+        <install-to>$(BINDIR)</install-to>
+    </exe>
+    <exe id="hello_win32" cond="PLATFORM_WIN32=='1'">
+        <sources>hello.c</sources>
+        <install-to>$(BINDIR)</install-to>
+    </exe>
+</makefile>

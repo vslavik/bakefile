@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+
+<!-- 
+This file is common to all formats that share Unix way of writing 
+makefiles (most notably GNU Make and Autoconf formats).
+-->
+
+<makefile>
+
+    <set var="TOOLSET">unix</set>
+
+    <set var="MAKEFILE_SYNTAX">unix</set>
+    <include file="makefile.bakefile"/>
+
+</makefile>

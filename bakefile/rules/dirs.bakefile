@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<makefile>
+
+    <!-- Source dirs: -->
+    
+    <set var="SRCDIR">.</set>
+    <set var="srcprefix">$(SRCDIR)</set>
+    <set var="BUILDDIR">.</set> <!-- to be overwritten by backend: -->
+
+
+
+    <!-- Install dirs: -->
+    <set var="PREFIX">/usr/local</set>
+    <set var="BINDIR">$(PREFIX)/bin</set>
+    <set var="LIBDIR">$(PREFIX)/lib</set>
+    <set var="INCLUDEDIR">$(PREFIX)/include</set>
+
+</makefile>

@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+
+<!-- 
+This file is common to all formats that share Unix way of writing 
+makefiles (most notably GNU Make and Autoconf formats).
+-->
+
+<makefile>
+    
+    <option name="AR"><default-value>ar</default-value></option>
+    <option name="RANLIB"><default-value>ranlib</default-value></option>
+
+    <set var="DIRSEP">/</set>
+
+    <set var="OBJEXT">.o</set>
+    <set var="LIBEXT">.a</set>
+    <set var="LIBPREFIX">lib</set>
+    <set var="EXEEXT" overwrite="0"></set>
+    <set var="DLLEXT" overwrite="0">.so</set>
+    <set var="DLLIMPEXT" overwrite="0">$(DLLEXT)</set>
+    <set var="DLLPREFIX" overwrite="0">$(LIBPREFIX)</set>
+    <set var="DLL_CFLAGS" overwrite="0">-fPIC</set>
+
+    <set var="INSTALL_PROGRAM" overwrite="0">install -c</set>
+    <set var="INSTALL_DATA" overwrite="0">$(INSTALL) -m 644</set>
+    <set var="INSTALL_DIR" overwrite="0">$(INSTALL) -d</set>
+
+    <set var="AROPTIONS">rcu</set>
+    <set var="RM">rm -f</set>
+
+    <set var="__DEFINE_ARG">-D</set>
+    <set var="__INCLUDE_ARG">-I</set>
+    <set var="__LIB_ARG">-l</set>
+    <set var="__LIBDIR_ARG">-L</set>
+
+    <set var="__DEFAULT_CC">cc</set>
+    <set var="__DEFAULT_CXX">c++</set>
+    <set var="__DEFAULT_CFLAGS"></set>
+    <set var="__DEFAULT_CPPFLAGS"></set>
+    <set var="__DEFAULT_CXXFLAGS"></set>
+    
+    <set var="__LINKER_CC" eval="0">$(CC)</set>
+    <set var="__LINKER_CXX" eval="0">$(CXX)</set>
+
+    <template id="__commands_templ_C">
+        <set var="__COMPILE_C_CMD" eval="0">
+            $(CC) -c -o $@ $(__cppflags) $(__cflags) $&lt;
+        </set>
+    </template>
+    <template id="__commands_templ_CXX">
+        <set var="__COMPILE_CXX_CMD" eval="0">
+            $(CXX) -c -o $@ $(__cppflags) $(__cxxflags) $&lt;
+        </set>
+    </template>
+    <template id="__commands_templ">
+        <set var="__LINK_EXE_CMD" eval="0">
+            $(__linker) -o $@ $(__objects) $(__ldflags)
+        </set>        
+        <set var="__LINK_LIB_CMD" eval="0">
+            $(RM) $@
+            $(AR) $(AROPTIONS) $@ $(__objects)
+            $(RANLIB) $@
+        </set>
+        <set var="__LINK_DLL_CMD" eval="0">
+            $(__dll_linker) $@ $(__objects) $(__ldflags)
+        </set>
+    </template>
+    
+    <template id="__subproject_templ">
+        <set var="__MAKE_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; \$(MAKE) $(__subtarget))
+        </set>
+        <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; \$(MAKE) install)
+        </set>
+        <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; \$(MAKE) clean)
+        </set>
+    </template>
+
+</makefile>

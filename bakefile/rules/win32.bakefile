@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+
+<makefile>
+    
+    <!-- =============================================================== -->
+    <!--            Common settings for Windows compilers:               -->
+    <!-- =============================================================== -->
+
+    
+    <set var="PLATFORM_WIN32">1</set>
+    <set var="TOOLSET">win32</set>
+    <set var="DIRSEP">\</set>
+    
+    <set var="OBJEXT">.obj</set>
+    <set var="LIBEXT">.lib</set>
+    <set var="LIBPREFIX"></set>
+    <set var="EXEEXT">.exe</set>
+    <set var="DLLEXT">.dll</set>
+    <set var="DLLIMPEXT">$(LIBEXT)</set>
+    <set var="DLLPREFIX"></set>
+    <set var="DLL_CFLAGS"></set>
+
+    <set var="INSTALL_PROGRAM">copy /Y</set>
+    <set var="INSTALL_DATA">$(INSTALL_PROGRAM)</set>
+    <set var="INSTALL_DIR">mkdir</set>
+
+    <set var="RM">-erase</set>
+
+</makefile>

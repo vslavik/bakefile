@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+
+<makefile>
+    
+    <include file="win32.bakefile"/>
+    
+    <set var="__DEFINE_ARG">-D</set>
+    <set var="__INCLUDE_ARG">-I</set>
+    <set var="__LIB_ARG">-l</set>
+    <set var="__LIBDIR_ARG">-L</set>
+
+    <set var="__DEFAULT_CC">bcc32</set>
+    <set var="__DEFAULT_CXX">bcc32</set>
+    <set var="__DEFAULT_CFLAGS"></set>
+    <set var="__DEFAULT_CPPFLAGS"></set>
+    <set var="__DEFAULT_CXXFLAGS"></set>
+    
+    <set var="__LINKER_CC" eval="0">$(CC)</set>
+    <set var="__LINKER_CXX" eval="0">$(CXX)</set>
+    <set var="__DLL_LINKER_CC" eval="0">xxx</set>
+    <set var="__DLL_LINKER_CXX" eval="0">xxx</set>
+
+    <template id="__commands_templ">
+        <set var="__COMPILE_C_CMD" eval="0">
+            $(CC) -c -o$@ $(__cppflags) $(__cflags) $**
+        </set>
+        <set var="__COMPILE_CXX_CMD" eval="0">
+            $(CXX) -c -P -o$@ $(__cppflags) $(__cxxflags) $**
+        </set>
+        <set var="__LINK_EXE_CMD" eval="0">
+            $(__linker) -e$@ $(__objects) $(__ldflags)
+        </set>        
+        <set var="__LINK_LIB_CMD" eval="0">
+            $(RM) $(__targetname)
+            tlib /a $(__targetname) $(__objects)
+        </set>
+        <set var="__LINK_DLL_CMD" eval="0">
+            $(__dll_linker) $@ $(__objects) $(__ldflags)
+        </set>
+    </template>
+    
+    <template id="__subproject_templ">
+        <set var="__MAKE_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; \$(MAKE) $(__subtarget))
+        </set>
+        <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; \$(MAKE) install)
+        </set>
+        <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; \$(MAKE) clean)
+        </set>
+    </template>
+
+</makefile>

@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <using module="gettext"/>
+
+    <gettext-catalogs id="locale">
+        <dependency-of>all</dependency-of>
+        <files>
+            cs.po
+            de.po
+            zh_CN.po
+        </files>
+    </gettext-catalogs>
+
+</makefile>

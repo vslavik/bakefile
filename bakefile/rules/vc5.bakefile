@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+
+<makefile>
+    <set var="MSVC_VER">5</set>
+    <include file="msvc-common.bakefile"/>
+</makefile>
