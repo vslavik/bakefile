@@ -177,7 +177,7 @@ div.informaltable th
   font-style: italic;
 }
 
-td.varname, td.tagname
+td.varname, td.tagname, td.paramname
 {
   font-weight: bold;
   vertical-align: top;

@@ -375,6 +375,7 @@
   <sys-lib>z</sys-lib>
 </exe>
 ]]></programlisting>
+                  Library name may be empty.
                   See also <xref linkend="tag.lib-path"/>.
                 </entry>
                 <entry role="availability">exe, dll</entry>

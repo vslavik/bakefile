@@ -495,7 +495,75 @@
         <para></para>
       </section>
 
-  
+      
+            
+      <!-- //////////////////       output       ////////////////// -->
+
+      
+      <section id="cmd.output" xreflabel="output">
+        <title>output</title>
+        <para>
+          Bakefile uses this command to specify what files a format produces.
+          Output is generated only as the result of
+          <function>output</function> command's presence in ruleset.
+          <informaltable>
+            <tgroup cols='3'>
+              <thead>
+                <row>
+                  <entry>Parameter</entry>
+                  <entry>Description</entry>
+                  <entry>Required/Default value</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry role="paramname">file</entry>
+                  <entry>
+                    The file where output goes. Commontly used
+                    value is <literal>$(OUTPUT_FILE)</literal>.
+                  </entry>
+                  <entry role="default">required</entry>
+                </row>
+                <row>
+                  <entry role="paramname">writer</entry>
+                  <entry>
+                    Name of Empy template that is used to generated the
+                    output.
+                  </entry>
+                  <entry role="default">required</entry>
+                </row>
+                <row>
+                  <entry role="paramname">method</entry>
+                  <entry>
+                    <para>
+                      Method of combining generated output with existing
+                      content of the file. The default is
+                      <literal>replace</literal>, which overwrites the file.
+                    </para>
+                    <para>
+                      <literal>mergeBlocks</literal> divides both the old and
+                      the new file's content into blocks that begin with block
+                      signature like this:
+                      <programlisting>### beging block <emphasis>BLOCKNAME</emphasis> ###</programlisting>
+                      Blocks of the new content are copied over to the file,
+                      replacing old copies of the blocks, but blocks that are
+                      not present in new content are preserved. This can be used
+                      e.g. to merge configuration settings from several
+                      makefiles.
+                    </para>
+                  </entry>
+                  <entry role="default">
+                    <literal>replace</literal>
+                  </entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+        </para>
+      </section>
+
+
+      
     </section>
         
 </chapter>
