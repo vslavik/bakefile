@@ -4,10 +4,10 @@
 # These are configurable options:
 # -------------------------------------------------------------------------
 
-@[ for o in options :@
+@[for o in options]@
 # @o.descStr.replace('\n','\n# ') @o.valuesStr
 !ifndef @o.name
 @o.name = @o.defaultStr
 !endif
 
-]@
+@[end for]@
