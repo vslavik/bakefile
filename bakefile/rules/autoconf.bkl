@@ -304,10 +304,7 @@
                 </modify-target>
             </if> 
 
-            <set var="PCH_DEP">
-                <if cond="GCC_PCH=='1'">$(__gcc_pch_file)</if>
-            </set> 
-            <set var="__deps">$(PCH_DEP) $(__deps)</set>
+            <objects-depend>$(__gcc_pch_file)</objects-depend>
         </if>
     </define-tag>
     
