@@ -24,7 +24,7 @@ dnl TODO: Maybe this should wrap the call to AC_PROG_CC and be used instead.
 AC_DEFUN([AC_BAKEFILE_PROG_MWCC],
 [AC_LANG_PUSH(C)
 _AC_BAKEFILE_LANG_COMPILER_MWERKS
-MWCC=`test $bakefile_compiler_mwerks = yes && echo yes`
+MWCC=`test $bakefile_cv_c_compiler_mwerks = yes && echo yes`
 AC_LANG_POP(C)
 ])
 
@@ -33,7 +33,7 @@ dnl TODO: Maybe this should wrap the call to AC_PROG_CXX and be used instead.
 AC_DEFUN([AC_BAKEFILE_PROG_MWCXX],
 [AC_LANG_PUSH(C++)
 _AC_BAKEFILE_LANG_COMPILER_MWERKS
-MWCXX=`test $bakefile_compiler_mwerks = yes && echo yes`
+MWCXX=`test $bakefile_cv_cxx_compiler_mwerks = yes && echo yes`
 AC_LANG_POP(C++)
 ])
 
