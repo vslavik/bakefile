@@ -360,15 +360,16 @@ def formatIfNotEmpty(fmt, value):
            - $(cv) where cv is conditional variable
     """
 
+    def __isNotEmpty(value):
+        return ((value[0] != '$') or
+                (value[-1] != ')' and not value[-1].isspace()) or
+                __containsLiteral(value))
+
     if fmt == '': return ''
     value = value.strip()
     if value == '' or value.isspace():
         return ''
-    if value[0] != '$':
-        return fmt % value
-    if value[-1] != ')' and not value[-1].isspace():
-        return fmt % value
-    if __containsLiteral(value):
+    if __isNotEmpty(value):
         return fmt % value
     
     if value.startswith('$(') and value[-1] == ')':
@@ -390,6 +391,9 @@ def formatIfNotEmpty(fmt, value):
         if condname in mk.make_vars:
             form = formatIfNotEmpty(fmt, mk.make_vars[condname])
             if form == '': return ''
+            return fmt % value
+
+        if condname in mk.vars and __isNotEmpty(mk.vars[condname]):
             return fmt % value
             
     raise errors.Error("formatIfNotEmpty failed: '%s' too complicated" % value)
