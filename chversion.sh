@@ -21,3 +21,5 @@ replace_ver src/bakefile.py \
             '\(BAKEFILE_VERSION = "\).*\("\)' "\1$VER\2"
 replace_ver rules/version.bkl \
             '\(>\).*\(<\)' "\1$VER\2"
+replace_ver autoconf/bakefile.m4 \
+            '\(BAKEFILE_BAKEFILE_M4_VERSION="*\).*\("\)' "\1$VER\2"

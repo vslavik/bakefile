@@ -664,7 +664,13 @@ AC_DEFUN([AC_BAKEFILE],
     AC_BAKEFILE_DEPS
     AC_BAKEFILE_RES_COMPILERS
 
+    BAKEFILE_BAKEFILE_M4_VERSION="0.1.4"
+    
     builtin(include, autoconf_inc.m4)
+    
+    if test "$BAKEFILE_BAKEFILE_M4_VERSION" != "$BAKEFILE_AUTOCONF_INC_M4_VERSION" ; then
+        AC_MSG_ERROR([Versions of Bakefile used to generate makefiles ($BAKEFILE_AUTOCONF_INC_M4_VERSION) and configure ($BAKEFILE_BAKEFILE_M4_VERSION) do not match.])
+    fi
 ])
         
 
