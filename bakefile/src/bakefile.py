@@ -38,6 +38,14 @@ def run(args):
         parser.error('incorrect number of arguments')
         sys.exit(1)
 
+    if options.format == None:
+        parser.error('you must specify output format')
+        sys.exit(1)
+    
+    if options.outfile == None:
+        parser.error('you must specify output file')
+        sys.exit(1)
+
     config.verbose = options.verbose
     config.debug = options.debug
     config.format = options.format # FIXME -- check for validity
