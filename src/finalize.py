@@ -105,9 +105,18 @@ def purgeUnusedOptsVars():
         sys.stdout.write('purging unused variables')
         sys.stdout.flush()
     toKill = []
-    for o in mk.options:
-        if o not in mk.__usageTracker.map:
-            toKill.append((mk.options, mk.__vars_opt, o))
+
+    if mk.vars['FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS'] != '0':
+        usedOpts = []
+        for c in mk.conditions.values():
+            usedOpts += [x.option.name for x in c.exprs]
+        for o in mk.options:
+            if (o not in mk.__usageTracker.map) and (o not in usedOpts):
+                toKill.append((mk.options, mk.__vars_opt, o))
+    else:
+        for o in mk.options:
+            if o not in mk.__usageTracker.map:
+                toKill.append((mk.options, mk.__vars_opt, o))
     for v in mk.cond_vars:
         if v not in mk.__usageTracker.map:
             toKill.append((mk.cond_vars, mk.__vars_opt, v))
