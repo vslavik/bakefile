@@ -475,7 +475,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!--                  Sources compilation rules:                     -->
     <!-- =============================================================== -->
             
-    <define-tag name="parent-target" rules="compilation_rule">
+    <define-tag name="src" rules="compilation_rule">
         <set var="__deps" append="1">
             $(targets[__parent].__objects_deps_var)
         </set>
