@@ -239,6 +239,7 @@ def handleOption(e):
     desc = None
     values = None
     values_desc = None
+    category = mk.Option.CATEGORY_UNSPECIFICED
     for c in e.children:
         if c.name == 'default-value':
             default = evalConstExpr(e, c.value)
@@ -250,8 +251,23 @@ def handleOption(e):
             values_desc = evalConstExpr(e, c.value).split(',')
     o = mk.Option(name, default, desc, values, values_desc)
     mk.addOption(o)
+    
     if 'never_empty' in e.props and e.props['never_empty'] == '1':
         o.neverEmpty = 1
+
+    if 'category' in e.props:
+        category = e.props['category']
+        if category == mk.Option.CATEGORY_PATH:
+            o.category = category
+            o.neverEmpty = 1
+            def __pathOptionCallb(var, func, caller):
+                if caller == 'nativePaths':
+                    return '$(%s)' % var
+                else:
+                    return None
+            utils.addSubstituteCallback(o.name, __pathOptionCallb)
+        else:
+            raise ReaderError(e, "unknown category '%s'" % category)
 
 
 def extractTemplates(e, post):

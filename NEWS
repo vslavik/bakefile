@@ -7,6 +7,8 @@ Version 0.1.5
 - portability fix for datafiles module (Greg Noel)
 - watcom: support <cxx-rtti> (Hans Van Leemputten)
 - added <fragment> support to all makefile-based formats
+- added category=path hint to options to make it possible to use options
+  as argument to <include> etc.
 
 
 Version 0.1.4
