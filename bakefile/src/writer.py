@@ -176,7 +176,12 @@ def __findWriter(writer):
 def invoke_em(writer, file, method):
     import empy.em
     rulesdir, template = __findWriter(writer)
-    filename = tempfile.mktemp('bakefile')   
+    
+    filename = tempfile.mktemp('bakefile')
+    # reduce (not eliminate!) the risk of race condition by immediately
+    # creating the file:
+    tmpf = open(filename, 'wb'); tmpf.close()
+    
     empy.em.invoke(['-I','mk',
                     '-I','writer',
                     '-I','utils',
