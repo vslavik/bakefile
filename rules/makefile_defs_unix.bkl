@@ -108,7 +108,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     </template>
     
     <template id="__subproject_templ">
-        <set var="__installable">no</set>
+        <set var="__installable">yes</set>
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
             (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) $(__subtarget))
         </set>
