@@ -1,6 +1,69 @@
-from distutils.fancy_getopt import wrap_text
-
 __revision__ = "$Id$"
+
+# ----------- this is copied from distutils.fancy_getopt to eliminate
+#             dependency on python-dev package in Debian:
+import string, re
+
+WS_TRANS = string.maketrans(string.whitespace, ' ' * len(string.whitespace))
+def wrap_text (text, width):
+    """wrap_text(text : string, width : int) -> [string]
+
+    Split 'text' into multiple lines of no more than 'width' characters
+    each, and return the list of strings that results.
+    """
+
+    if text is None:
+        return []
+    if len(text) <= width:
+        return [text]
+
+    text = string.expandtabs(text)
+    text = string.translate(text, WS_TRANS)
+    chunks = re.split(r'( +|-+)', text)
+    chunks = filter(None, chunks)      # ' - ' results in empty strings
+    lines = []
+
+    while chunks:
+
+        cur_line = []                   # list of chunks (to-be-joined)
+        cur_len = 0                     # length of current line
+
+        while chunks:
+            l = len(chunks[0])
+            if cur_len + l <= width:    # can squeeze (at least) this chunk in
+                cur_line.append(chunks[0])
+                del chunks[0]
+                cur_len = cur_len + l
+            else:                       # this line is full
+                # drop last chunk if all space
+                if cur_line and cur_line[-1][0] == ' ':
+                    del cur_line[-1]
+                break
+
+        if chunks:                      # any chunks left to process?
+
+            # if the current line is still empty, then we had a single
+            # chunk that's too big too fit on a line -- so we break
+            # down and break it up at the line width
+            if cur_len == 0:
+                cur_line.append(chunks[0][0:width])
+                chunks[0] = chunks[0][width:]
+
+            # all-whitespace chunks at the end of a line can be discarded
+            # (and we know from the re.split above that if a chunk has
+            # *any* whitespace, it is *all* whitespace)
+            if chunks[0][0] == ' ':
+                del chunks[0]
+
+        # and store this line in the list-of-all-lines -- as a single
+        # string, of course!
+        lines.append(string.join(cur_line, ''))
+
+    # while chunks
+
+    return lines
+
+# wrap_text ()
 
 
 class HelpFormatter:
