@@ -2,7 +2,7 @@
 import os, os.path, sys
 
 # Be verbose:
-verbose = False
+verbose = 0
 
 # Directories where makefiles are looked for:
 searchPath = os.getenv('BAKEFILE_PATHS', '').split(os.pathsep)
