@@ -33,6 +33,7 @@
         <command>            
             -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
             -if exist $(__builddir)\*.res del $(__builddir)\*.res
+            -if exist $(__builddir)\*.csm del $(__builddir)\*.csm
         </command>
     </action>
 
