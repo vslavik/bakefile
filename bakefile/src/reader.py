@@ -824,9 +824,7 @@ def handleError(e):
 
 def handleRequires(e):
     if 'version' in e.props:
-        vcur = mk.vars['BAKEFILE_VERSION'].split('.')
-        vreq = e.props['version'].split('.')
-        if vcur < vreq:
+        if not utils.checkBakefileVersion(e.props['version']):
             sys.stderr.write("""
 -----------------------------------------------------------------------
 This file cannot be processed with Bakefile version older than %s.
