@@ -37,8 +37,6 @@ rules_DATA =  rules/autoconf.bkl \
               rules/mingw.bkl \
               rules/watcom.bkl \
               rules/unixlike.bkl \
-              rules/vc5.bkl \
-              rules/vc6.bkl \
               rules/version.bkl \
               rules/win32.bkl
 rulesgettext_DATA = \
