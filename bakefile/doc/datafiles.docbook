@@ -1,0 +1,193 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+<section id="module.datafiles">
+  <title>datafiles</title>
+
+  <para>
+    This module provides rules for installing data files during
+    <userinput>make install</userinput> phase. It also defines two rules for
+    copying files during build process (typically from source to build
+    directory).
+
+    <note>
+      <title>Implementation Note</title>
+      <para>
+        This module currently works only with the <literal>autoconf</literal>
+        format.
+      </para>
+    </note>
+  </para>
+  
+  
+  <!--                         Installing files:                     -->
+
+
+  
+  <section id="rule.datafiles.data-files" xreflabel="data-files">
+    <title>data-files</title>
+    <para>
+      <link linkend="pseudotargets">Pseudo target</link> that declares
+      installable data files. Note that <emphasis>all</emphasis> files are
+      installed into target directory, their relative directories are
+      <emphasis>not</emphasis> preserved.
+      <informaltable>
+        <tgroup cols='2'>
+          <thead>
+            <row>
+              <entry>Tag</entry>
+              <entry>Description</entry>
+              <entry>Default</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry role="tagname">srcdir</entry>
+              <entry>
+                <para>
+                  Directory where source files are.
+                </para>
+              </entry>
+              <entry role="default">$(SRCDIR)</entry>
+            </row>
+            <row>
+              <entry role="tagname">files</entry>
+              <entry>
+                <para>
+                  List of files to copy. Names are relative to source
+                  directory. May be used more than once.
+                </para>
+              </entry>
+              <entry role="default">at least one use required</entry>
+            </row>
+            <row>
+              <entry role="tagname">install-to</entry>
+              <entry>
+                <para>
+                  Directory where to install the files.
+                </para>
+              </entry>
+              <entry role="default">required</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </section>
+  
+  
+  <section id="rule.datafiles.data-files-ng" xreflabel="data-files-ng">
+    <title>data-files-ng</title>
+    <para>
+      Same as <xref linkend="rule.datafiles.data-files"/>, except that
+      <command>data-files-ng</command> is real target and not pseudo target.
+      This has two consequences: the target must have <varname>id</varname>
+      set and it can be conditional.
+    </para>
+  </section>
+  
+  <section id="rule.datafiles.script-files" xreflabel="script-files">
+    <title>script-files</title>
+    <para>
+      Same as <xref linkend="rule.datafiles.data-files"/>, but installed
+      files have executable permissions on Unix.
+    </para>
+  </section>
+  
+  <section id="rule.datafiles.script-files-ng" xreflabel="script-files-ng">
+    <title>script-files-ng</title>
+    <para>
+      Same as <xref linkend="rule.datafiles.data-files-ng"/>, but installed
+      files have executable permissions on Unix.
+    </para>
+  </section>
+  
+  
+  <section id="rule.datafiles.data-files-tree" xreflabel="data-files-tree">
+    <title>data-files-tree</title>
+    <para>
+      Unlike <xref linkend="rule.datafiles.data-files"/>, this rule preserves
+      directory structure of installed files. Available tags are same and
+      have same meaning as <xref linkend="rule.datafiles.data-files"/> tags.
+    </para>
+  </section>
+
+
+
+  <!--                    Copying files during build process:           -->
+
+  <section id="rule.datafiles.copy-files" xreflabel="copy-files">
+    <title>copy-files</title>
+    <para>
+      Copies file(s) from source directory to destination directory. Creates
+      destionation directory if it doesn't exist.
+      <informaltable>
+        <tgroup cols='2'>
+          <thead>
+            <row>
+              <entry>Tag</entry>
+              <entry>Description</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry role="tagname">srcdir</entry>
+              <entry>
+                <para>
+                  Directory where source files are. This tag is not required
+                  (unlike the other two) -- source directory is empty by
+                  default.
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry role="tagname">files</entry>
+              <entry>
+                <para>
+                  List of files to copy. Names are relative to source
+                  directory.
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry role="tagname">dstdir</entry>
+              <entry>
+                <para>
+                  Directory where to copy the files.
+                </para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </section>
+  
+  <section id="rule.datafiles.copy-file-to-file" xreflabel="copy-file-to-file">
+    <title>copy-file-to-file</title>
+    <para>
+      Copies single file to another file.
+      <informaltable>
+        <tgroup cols='2'>
+          <thead>
+            <row>
+              <entry>Tag</entry>
+              <entry>Description</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry role="tagname">src</entry>
+              <entry>Source file.</entry>
+            </row>
+            <row>
+              <entry role="tagname">dst</entry>
+              <entry>Destination file.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </section>
+  
+
+</section>

@@ -78,7 +78,7 @@
     repeatedly with same target.
   </para>
 
-  <note>
+  <note id="pseudotargets">
     <title>Pseudo targets</title>
     <para>
       Some rules don't declare real targets but so-called
@@ -89,6 +89,11 @@
       modifying behaviour of other targets. 
       An example of pseudo target is
       <xref linkend="rule.datafiles.data-files"/>.
+    </para>
+    <para>
+      The advantage of pseudo targets is that the <varname>id</varname>
+      attribute is not required. The disadvantage is that they can't be
+      conditional.
     </para>
   </note>
 
