@@ -5,6 +5,7 @@
 
 PYTHONDIR=c:\python23
 PYTHONVERSION=23
+SWIG=swig
 
 CFLAGS=/nologo /O2 /I$(PYTHONDIR)\include /MD
 LDFLAGS=$(PYTHONDIR)\libs\python$(PYTHONVERSION).lib
@@ -20,7 +21,7 @@ src\bakefile_gen.exe: src\win32scriptwrapper.c
 EXTENSION_SRC = src\bottlenecks.c src\bottlenecks_wrap.c
 
 src\bottlenecks_wrap.c: src\bottlenecks.i
-	swig -python src\bottlenecks.i
+	$(SWIG) -python src\bottlenecks.i
 
 src\_bottlenecks.pyd: $(EXTENSION_SRC)
 	cl $(CFLAGS) $(LDFLAGS) /LD /Fe$@ $(EXTENSION_SRC)
