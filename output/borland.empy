@@ -25,9 +25,9 @@
 
 
 @[ if BUILDDIR != '.' :
-all: $(BUILDDIR)
-$(BUILDDIR):
-@\tmkdir $(BUILDDIR)
+all: @BUILDDIR
+@BUILDDIR:
+@\tmkdir @BUILDDIR
 ]@
 
 
