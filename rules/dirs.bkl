@@ -11,10 +11,10 @@
 
     <!-- Install dirs: -->
     <set var="PREFIX">/usr/local</set>
-    <set var="BINDIR">$(PREFIX)/bin</set>
-    <set var="LIBDIR">$(PREFIX)/lib</set>
-    <set var="INCLUDEDIR">$(PREFIX)/include</set>
-    <set var="DATADIR">$(PREFIX)/share</set>
+    <set var="BINDIR" eval="0">$(PREFIX)/bin</set>
+    <set var="LIBDIR" eval="0">$(PREFIX)/lib</set>
+    <set var="INCLUDEDIR" eval="0">$(PREFIX)/include</set>
+    <set var="DATADIR" eval="0">$(PREFIX)/share</set>
 
     <!-- override directory for 'make install' - files installed into directory
          FOO are copied into $(DESTDIR)FOO instead of into FOO. This makes

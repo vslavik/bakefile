@@ -50,6 +50,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/makefile_defs_dmars_common.bkl \
               rules/makefile_defs_dmars_smake.bkl \
               rules/makefile_defs_msvc.bkl \
+              rules/makefile_defs_gnu.bkl \
               rules/makefile_defs_mingw.bkl \
               rules/makefile_defs_watcom.bkl \
               rules/makefile_defs_unix.bkl \
@@ -62,6 +63,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/msvc6prj.bkl \
               rules/msevc4prj.bkl \
               rules/mingw.bkl \
+              rules/gnu.bkl \
               rules/watcom.bkl \
               rules/unixlike.bkl \
               rules/version.bkl \

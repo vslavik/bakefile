@@ -4,34 +4,35 @@
 <makefile>
     
     <set var="COMPILER">gcc</set>
-    <set var="MAKEFILE_SYNTAX">mingw</set>
+    <set var="MAKEFILE_SYNTAX">gnu</set>
+    <set var="TOOLSET">unix</set>
 
-    <include file="makefile.bkl"/>
-
-    <tag-info name="libname" position="after:dirname"/> 
-    <define-tag name="libname" rules="dll">
-        <set var="__importlib">
-            -Wl,--out-implib,$(__targetdir)$(__linkname)
-        </set>
-        <ldflags>$(__importlib)</ldflags>
-    </define-tag>
     
+    <option name="INSTALL">
+        <default-value>install</default-value>
+        <description>'install' program location</description>
+    </option>
+ 
+    <option name="prefix">
+        <default-value>/usr/local</default-value>
+        <description>
+            Location where the package is installed by 'make install'
+        </description>
+    </option>
+
+    <set var="PREFIX">$(prefix)</set>
+    
+    <include file="makefile.bkl"/>
+    
+    <!-- We don't support sonames here, so libname==dllname: -->
+    <tag-info name="libname" position="after:dllname"/> 
+    <define-tag name="libname" rules="dll">
+        <set var="__dllname">$(value)</set>
+    </define-tag>
+
     <!-- =============================================================== -->
     <!--                   Compiler-specific tags:                       -->
     <!-- =============================================================== -->
-    
-    <define-tag name="cppflags-mingw" rules="exe,lib,dll,module">
-        <cppflags>$(value)</cppflags>
-    </define-tag>
-    <define-tag name="cflags-mingw" rules="exe,lib,dll,module">
-        <cflags>$(value)</cflags>
-    </define-tag>
-    <define-tag name="cxxflags-mingw" rules="exe,lib,dll,module">
-        <cxxflags>$(value)</cxxflags>
-    </define-tag>
-    <define-tag name="ldflags-mingw" rules="exe,dll,module">
-        <ldflags>$(value)</ldflags>
-    </define-tag>
     
     <define-tag name="cppflags-gcc" rules="exe,lib,dll,module">
         <cppflags>$(value)</cppflags>
@@ -45,6 +46,19 @@
     <define-tag name="ldflags-gcc" rules="exe,dll,module">
         <ldflags>$(value)</ldflags>
     </define-tag>
+    
+    <define-tag name="cppflags-unix" rules="exe,lib,dll,module">
+        <cppflags>$(value)</cppflags>
+    </define-tag>
+    <define-tag name="cflags-unix" rules="exe,lib,dll,module">
+        <cflags>$(value)</cflags>
+    </define-tag>
+    <define-tag name="cxxflags-unix" rules="exe,lib,dll,module">
+        <cxxflags>$(value)</cxxflags>
+    </define-tag>
+    <define-tag name="ldflags-unix" rules="exe,dll,module">
+        <ldflags>$(value)</ldflags>
+    </define-tag>
 
     <!-- =============================================================== -->
     <!--                         "make clean":                           -->
@@ -53,7 +67,7 @@
     <action id="clean" template="__phony">
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
         <command>            
-            -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
+            $(RM) $(__builddir)/*$(OBJEXT)
         </command>
     </action>
     
