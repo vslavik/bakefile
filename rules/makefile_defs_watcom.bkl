@@ -45,14 +45,14 @@
     <template id="__commands_templ_C">
         <set var="__deps" append="1">.AUTODEPEND</set>
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -zq -fo=$@ $(__cflags) $&lt;
+            $(CC) -zq -fo=$^@ $(__cflags) $&lt;
         </set>
     </template>
     
     <template id="__commands_templ_CXX">
         <set var="__deps" append="1">.AUTODEPEND</set>
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -zq -fo=$@ $(__cxxflags) $&lt;
+            $(CXX) -zq -fo=$^@ $(__cxxflags) $&lt;
         </set>
     </template>
 
@@ -106,7 +106,7 @@
         <set var="__LINK_CMD_BASE" eval="0">
             %create $^*.lbc
             %append $^*.lbc option quiet
-            %append $^*.lbc name $@
+            %append $^*.lbc name $^@
             %append $^*.lbc option incremental
             %append $^*.lbc $(__ldflags)
             for %i in ($(__objects)) do %append $^*.lbc file %i
@@ -120,13 +120,13 @@
         <set var="__LINK_LIB_CMD" eval="0">
             %create $^*.lbc
             for %i in ($(__objects)) do %append $^*.lbc +%i
-            wlib -q -p2048 -n -b $@ @$^*.lbc
+            wlib -q -p2048 -n -b $^@ @$^*.lbc
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(__LINK_CMD_BASE)
             %append $^*.lbc system nt_dll
             $(__linker) @$^*.lbc
-            wlib -q -n -b $(__targetdir)$(__libname).lib +$@
+            wlib -q -n -b $(__targetdir)$(__libname).lib +$^@
         </set>
     </template>
     
