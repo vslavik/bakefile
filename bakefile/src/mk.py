@@ -19,6 +19,15 @@ class Option:
         self.default = default
         self.desc = desc
         self.values = values
+        self.neverEmpty = 0
+
+    def isNeverEmpty(self):
+        if self.neverEmpty: return 1
+        if len(self.values) > 0:
+            for v in self.values:
+                if len(v.strip()) == 0: return 0
+            return 1
+        return 0
 
 
 class Condition:
@@ -202,7 +211,7 @@ def __evalPyExpr(expr, use_options=1, target=None, add_dict=None):
     global __curNamespace
     oldNS = __curNamespace
     __curNamespace = v
-    val = eval(expr, globals(), v)
+    val = eval(expr.replace('\\','\\\\'), globals(), v)
     __curNamespace = oldNS
     return str(val)
 
