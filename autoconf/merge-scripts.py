@@ -14,8 +14,9 @@ def mergeFile(filename):
     f = open(filename, 'rt').readlines()
     f2 = []
     for i in f:
-        i = re.sub(r'\$', r'@S|@', i)
+        i = re.sub(r'\$', r'${D}', i)
         i = re.sub(r'\[', r'@<:@', i)
+        i = re.sub(r'\\', r'\\\\', i)
         i = re.sub(r'\]', r'@:>@', i)
         i = re.sub(r'`', r'\`', i)
         i = re.sub(r'@([a-zA-Z0-9_]+)@', r'${\1}', i)
