@@ -90,15 +90,15 @@ def __doParseMinidom(func, src):
             for p in n.attributes.keys():
                 e.props[p] = str(n.getAttribute(p))
 
+        e.value = ''
         for c in n.childNodes:
-            l = handleNode(filename, c)
-            if l != None:
-                e.children.append(l)
-
-        if n.firstChild != None and n.firstChild.nodeType == n.TEXT_NODE:
-            e.value = str(n.firstChild.data.strip())
-        elif len(e.children) == 0:
-            e.value = ''
+            if c.nodeType == c.TEXT_NODE:
+                e.value += c.data
+            else:
+                l = handleNode(filename, c)
+                if l != None:
+                    e.children.append(l)
+        e.value = e.value.strip()
 
         return e
    
