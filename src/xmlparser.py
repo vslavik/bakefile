@@ -169,9 +169,7 @@ def __initParseFileXML():
     except(ImportError):
         parseFileXML = __parseFileMinidom
         global xml
-        import xml.sax, xml.dom, xml.dom.minidom
-        import xml.parsers.expat
-        import sys
+        import sys, xml.sax, xml.dom, xml.dom.minidom, xml.parsers.expat
         sys.stderr.write("Warning: libxml2 missing, will not show line numbers on errors\n")
 
 def __parseFileXMLStub(filename):
@@ -188,7 +186,6 @@ def parseFile(filename):
         if filename in cache:
             return cache[filename]
         else:
-            print '*** MISS',filename
             data = parseFileXML(filename)
             cache[filename] = data
             return data
