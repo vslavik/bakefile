@@ -20,8 +20,10 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="LIBPREFIX">lib</set>
     <set var="EXEEXT" overwrite="0"></set>
     <set var="DLLEXT" overwrite="0">.so</set>
+    <set var="DLLEXT_MODULE" overwrite="0">$(DLLEXT)</set>
     <set var="DLLIMPEXT" overwrite="0">$(DLLEXT)</set>
     <set var="DLLPREFIX" overwrite="0">$(LIBPREFIX)</set>
+    <set var="DLLPREFIX_MODULE" overwrite="0">$(DLLPREFIX)</set>
     <set var="DLL_CFLAGS" overwrite="0">-fPIC</set>
 
     <set var="INSTALL_PROGRAM" overwrite="0">install -c</set>
@@ -92,6 +94,9 @@ makefiles (most notably GNU Make and Autoconf formats).
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(__dll_linker) $@ $(__objects_var) $(__ldflags) $(__ldlibs)
+        </set>
+        <set var="__LINK_MODULE_CMD" eval="0">
+            $(__module_linker) $@ $(__objects_var) $(__ldflags) $(__ldlibs)
         </set>
     </template>
     

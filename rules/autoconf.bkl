@@ -9,7 +9,10 @@
 
     <option name="SHARED_LD_CC"/>
     <option name="SHARED_LD_CXX"/>
+    <option name="SHARED_LD_MODULE_CC"/>
+    <option name="SHARED_LD_MODULE_CXX"/>
     <option name="SO_SUFFIX"/>
+    <option name="SO_SUFFIX_MODULE"/>
     <option name="EXEEXT"/>
     <option name="LN_S"/>
     <option name="RESCOMP"/>
@@ -59,7 +62,9 @@
     <set var="SRCDIR">$(srcdir)</set>
 
     <set var="DLLEXT">.$(SO_SUFFIX)</set>
+    <set var="DLLEXT_MODULE">.$(SO_SUFFIX_MODULE)</set>
     <option name="DLLPREFIX"/>
+    <option name="DLLPREFIX_MODULE"/>
 
     <set var="DLLIMPEXT">
         <if cond="PLATFORM_WIN32=='1'">.a</if>
@@ -72,6 +77,8 @@
     <set var="DLL_CFLAGS">$(PIC_FLAG)</set>
     <set var="__DLL_LINKER_CC" eval="0">$(SHARED_LD_CC)</set>
     <set var="__DLL_LINKER_CXX" eval="0">$(SHARED_LD_CXX)</set>
+    <set var="__MODULE_LINKER_CC" eval="0">$(SHARED_LD_MODULE_CC)</set>
+    <set var="__MODULE_LINKER_CXX" eval="0">$(SHARED_LD_MODULE_CXX)</set>
     
     
     <!-- =============================================================== -->
@@ -217,7 +224,7 @@
         <depends>install</depends>
     </action>
    
-    <define-tag name="install-to" rules="dll,exe">
+    <define-tag name="install-to" rules="dll,exe,module">
         <modify-target target="install-strip">
             <command>$(STRIP) $(value)/$(ref('__targetname',id))</command>
         </modify-target>

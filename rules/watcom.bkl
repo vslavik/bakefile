@@ -26,7 +26,7 @@
     <!--                     win32 resources:                            -->
     <!-- =============================================================== -->
 
-    <define-tag name="win32-res" rules="exe,dll">
+    <define-tag name="win32-res" rules="exe,dll,module">
         <set var="__win32res">$(sources2objects(value, id, '.res'))</set>
         <set var="__win32res_flag">option resource=$(__win32res)</set>
         <set var="__deps" append="1">$(__win32res)</set>
@@ -46,11 +46,11 @@
     </define-rule>
 
     <!-- includes and defines should propagate to rc compilation, too: -->
-    <define-tag name="include" rules="exe,dll">
+    <define-tag name="include" rules="exe,dll,module">
         <set var="__win32rc_flags" append="1">
             $(addPrefixIfNotEmpty('-i=',nativePaths(value)))</set>
     </define-tag>
-    <define-tag name="define" rules="exe,dll">
+    <define-tag name="define" rules="exe,dll,module">
         <set var="__win32rc_flags" append="1">
             $(addPrefixIfNotEmpty('-d',value))</set>
     </define-tag>

@@ -133,6 +133,9 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__dll_linker" eval="0">
                 $(ifthenelse(__uses_cxx, __DLL_LINKER_CXX, __DLL_LINKER_CC))
             </set>
+            <set var="__module_linker" eval="0">
+                $(ifthenelse(__uses_cxx, __MODULE_LINKER_CXX, __MODULE_LINKER_CC))
+            </set>
         </template>
 
         <define-tag name="define">
@@ -287,7 +290,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
     </define-rule>
 
-    <define-rule name="dll" extends="__compiled,$(__dll_baser)">
+    <define-rule name="_dll" extends="__compiled,$(__dll_baser)">
         <template template="$(__dll_baset)">
             <set var="__name" eval="0">$(__dllname)</set>
             <cflags>$(DLL_CFLAGS)</cflags>
@@ -295,16 +298,24 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__targetname" eval="0">
                 $(DLLPREFIX)$(__dllname)$(DLLEXT)
             </set>
-            <set var="__linkname" eval="0">
-                $(LIBPREFIX)$(__libname)$(DLLIMPEXT)
-            </set>
-            <set var="__command" eval="0">$(__LINK_DLL_CMD)</set>
-            <libname>$(id)</libname>
             <dllname>$(id)</dllname>
             <dependency-of>all</dependency-of>
             <clean-files>
                 $(ref('__targetdir',id))$(ref('__targetname',id))
             </clean-files>
+        </template>
+        <define-tag name="dllname">
+            <set var="__dllname">$(value)</set>
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="dll" extends="_dll">
+        <template>
+            <set var="__linkname" eval="0">
+                $(LIBPREFIX)$(__libname)$(DLLIMPEXT)
+            </set>
+            <set var="__command" eval="0">$(__LINK_DLL_CMD)</set>
+            <libname>$(id)</libname>
             <clean-files>
                 $(ref('__targetdir',id))$(ref('__linkname',id))
             </clean-files>
@@ -315,9 +326,14 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="libname">
             <set var="__libname">$(value)</set>
         </define-tag>
-        <define-tag name="dllname">
-            <set var="__dllname">$(value)</set>
-        </define-tag>
+    </define-rule>
+
+    <define-rule name="module" extends="_dll">
+        <template>
+            <set var="DLLEXT">$(DLLEXT_MODULE)</set>
+            <set var="DLLPREFIX">$(DLLPREFIX_MODULE)</set>
+            <set var="__command" eval="0">$(__LINK_MODULE_CMD)</set>
+        </template>
     </define-rule>
 
     
@@ -398,10 +414,10 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!--                      resources:                                 -->
     <!-- =============================================================== -->
 
-    <define-tag name="win32-res" rules="exe,dll">
+    <define-tag name="win32-res" rules="exe,dll,module">
         <!-- do nothing by default -->
     </define-tag>
-    <define-tag name="mac-res" rules="exe,dll">
+    <define-tag name="mac-res" rules="exe,dll,module">
         <!-- do nothing by default -->
     </define-tag>
     
@@ -414,7 +430,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         <template template="__phony"/>
     </define-rule>
     
-    <define-tag name="install-to" rules="exe,dll,lib">
+    <define-tag name="install-to" rules="exe,dll,lib,module">
         <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
             <add-target target="install_$(id)"
                         type="inst-action" cond="target"/>
@@ -438,6 +454,14 @@ makefiles (most notably GNU Make and Autoconf formats).
             <modify-target target="install_$(id)">
                 <command>
                     $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(value)
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+                </command>
+            </modify-target>
+        </define-tag>
+        
+        <define-tag name="install-to" rules="module">
+            <modify-target target="install_$(id)">
+                <command>
                     $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
                 </command>
             </modify-target>
