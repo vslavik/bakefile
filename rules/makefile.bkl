@@ -132,7 +132,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
         <define-tag name="include">
             <set var="__cppflags" append="1">
-                $(addPrefixIfNotEmpty(__INCLUDE_ARG,value))</set>
+                $(addPrefixIfNotEmpty(__INCLUDE_ARG,nativePaths(value)))</set>
         </define-tag>
 
         <define-tag name="sys-lib">
