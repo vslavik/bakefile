@@ -33,8 +33,6 @@ BCCDIR = $(MAKEDIR)\..
 ]@
 ]@
 
-MAKEARGS = @(' '.join(['-D%s=$(%s)' % (x.name,x.name) for x in options]))
-
 @[ if BUILDDIR != '.' :
 all: @BUILDDIR
 @BUILDDIR:

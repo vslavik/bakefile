@@ -147,17 +147,17 @@
     <template id="__subproject_templ">
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            wmake $(DOLLAR)(__MAKEOPTS__) -f $(os.path.basename(OUTPUT_FILE)) $(DOLLAR)(MAKEARGS) $(__subtarget)
+            wmake $(DOLLAR)(__MAKEOPTS__) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) $(__subtarget)
             cd $(DOLLAR)(WATCOM_CWD)
         </set>
         <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            wmake $(DOLLAR)(__MAKEOPTS__) -f $(os.path.basename(OUTPUT_FILE)) $(DOLLAR)(MAKEARGS) install
+            wmake $(DOLLAR)(__MAKEOPTS__) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) install
             cd $(DOLLAR)(WATCOM_CWD)
         </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            wmake $(DOLLAR)(__MAKEOPTS__) -f $(os.path.basename(OUTPUT_FILE)) $(DOLLAR)(MAKEARGS) clean
+            wmake $(DOLLAR)(__MAKEOPTS__) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) clean
             cd $(DOLLAR)(WATCOM_CWD)
         </set>
     </template>
