@@ -56,8 +56,10 @@
     
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -mn -c -o$@ $(__cflags) $**
+            $(CC) -mn -c -o$@ $(__cflags) $(src)
         </set>
+        <!-- FIXME: temporary hack, $(src) should be used only if there are
+                    object-dependencies, otherwise $** should be used -->
     </template>
     
     <template id="__commands_templ_CXX">
