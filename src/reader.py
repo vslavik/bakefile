@@ -307,8 +307,8 @@ class TgtCmdNode:
         if self.parent != None:
             self.position = \
                 self.parent.position + [self.parent.children.index(self)]
-            for c in self.children:
-                c.updatePosition()
+        for c in self.children:
+            c.updatePosition()
 
 
 def _extractTargetNodes(parent, list, target, tags, index):
@@ -320,13 +320,44 @@ def _extractTargetNodes(parent, list, target, tags, index):
         n.parent.children.remove(n)
         for c in n.parent.children:
             c.updatePosition()
-        
-    def _addToList(n, todo):
-        todo.append(n)
-        for c in n.children:
-            _addToList(c, todo)
+    
+    def _removeDuplicates(n):
+        # Eliminate duplicates of exclusive tags:
+        name = n.node.name
+        if name not in index:
+            index[name] = [n]
+        else:
+            if n.exclusive:
+                if config.debug:
+                    n2 = index[name][0]
+                    print '[dbg] (thrown away <%s> @%s in favour of @%s)' % \
+                                        (name, n2.node.location(), n.node.location())
+                _removeNode(index[name][0])
+                index[name] = [n]
+            else:
+                index[name].append(n)
+    
+    for node in list:
+        if node.name == 'if':
+            if evalWeakCondition(node):
+                _extractTargetNodes(parent, node.children, target, tags, index)
+        elif node.name in COMMANDS:
+            n = TgtCmdNode(parent, TgtCmdNode.COMMAND, node)
+            _removeDuplicates(n)
+        else:
+            if node.name not in tags:
+                raise ReaderError(node,
+                                      "unknown target tag '%s'" % node.name)
+            if evalWeakCondition(node) == 0:
+                continue
+            n = TgtCmdNode(parent, TgtCmdNode.TAG, node)
+            _removeDuplicates(n)
+            _extractTargetNodes(n, tags[node.name], target, tags, index)
 
-    def _reorderNodes(first, second, todo):
+
+def _reorderTargetNodes(node, index):
+
+    def _reorderNodes(first, second):
         if config.debug:
             print '[dbg] (reordering <%s> @%s <=> <%s> @%s)' % \
                        (first.node.name, first.node.location(),
@@ -346,71 +377,27 @@ def _extractTargetNodes(parent, list, target, tags, index):
         idxInPos = len(parent.position)
         idx1 = first.position[idxInPos]
         idx2 = second.position[idxInPos]
-        parent.children[idx1] = second
-        parent.children[idx2] = first
-        parent.children[idx1].updatePosition()
-        parent.children[idx2].updatePosition()
-        _addToList(parent.children[idx2], todo)
+        ch1 = parent.children[idx1]
+        ch2 = parent.children[idx2]
+        parent.children.insert(idx2+1, ch1)
+        del parent.children[idx1]
+        parent.updatePosition()
 
     def _fixOrder(n):
-        next_iteration = []
+        needsMoreIterations = 0
         for aftername in n.stayBefore:
             if aftername not in index: continue
             for after in index[aftername]:
                 if n.position > after.position:
-                    _reorderNodes(after, n, next_iteration)
-        if len(next_iteration) > 0:
-            for x in next_iteration:
-                _fixOrder(x)
-            _fixOrder(n)
-    
-    def _alterTreeAfterAddingNode(n):
-        """
-           This function alters the tree after adding new node. Two things are
-           done: 
-           
-           First, if the tag is exclusive, then previous instance of it
-           is deleted from the tree *and* from tags index. 
-           
-           Second, if there are some order constraints on tags and some
-           previous tag must not be before this tag, then its subtree is moved
-           just behind this tag. This is done by finding nearest parent node
-           shared by both tags and swaping children order.
-        """
-        
-        name = n.node.name
-        # Eliminate duplicates of exclusive tags:
-        if name not in index:
-            index[name] = [n]
-        else:
-            if n.exclusive:
-                if config.debug:
-                    print '[dbg] (thrown away <%s> @%s)' % \
-                                        (name, n.node.location())
-                _removeNode(index[name][0])
-                index[name] = [n]
-            else:
-                index[name].append(n)
+                    _reorderNodes(after, n)
+                    needsMoreIterations = 1
+        for c in n.children:
+            if _fixOrder(c):
+                needsMoreIterations = 1
+        return needsMoreIterations
 
-        # Reorder tags whose order is wrong:
-        _fixOrder(n)
-    
-    for node in list:
-        if node.name == 'if':
-            if evalWeakCondition(node):
-                _extractTargetNodes(parent, node.children, target, tags, index)
-        elif node.name in COMMANDS:
-            n = TgtCmdNode(parent, TgtCmdNode.COMMAND, node)
-            _alterTreeAfterAddingNode(n)
-        else:
-            if node.name not in tags:
-                raise ReaderError(node,
-                                      "unknown target tag '%s'" % node.name)
-            if evalWeakCondition(node) == 0:
-                continue
-            n = TgtCmdNode(parent, TgtCmdNode.TAG, node)
-            _alterTreeAfterAddingNode(n)
-            _extractTargetNodes(n, tags[node.name], target, tags, index)
+    while _fixOrder(node):
+        pass
 
 
 def _processTargetNodes(node, target, tags, dict):
@@ -451,6 +438,8 @@ def _processTargetNodes(node, target, tags, dict):
     root.dict = dict
     index = {}
     _extractTargetNodes(root, node.children, target, tags, index)
+    _reorderTargetNodes(root, index)
+
 
     if config.debug:
         def dumpTgtNode(n, level):
