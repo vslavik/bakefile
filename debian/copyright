@@ -1,0 +1,17 @@
+This package was debianized by Vadim Zeitlin <vadim@wxwidgets.org> on
+Mon, 14 Feb 2005 18:42:03 +0100.
+
+It was downloaded from http://bakefile.sourceforge.net/download.php
+
+Copyright:
+
+Upstream Author(s): Vaclav Slavik <vaclav@wxwidgets.org>
+
+License:
+
+Bakefile is copyright (c) 2003-2005 Vaclav Slavik.
+
+You are free to distribute this software under the terms of the GNU General
+Public License.
+On Debian systems, the complete text of the GNU General Public License can be
+found in the file `/usr/share/common-licenses/GPL'.
