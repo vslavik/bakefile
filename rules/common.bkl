@@ -49,6 +49,32 @@
          (but don't do it by default): -->
     <set var="OPTIONS_FILE"/>
     <set var="WRITE_OPTIONS_FILE">1</set>
+    
+
+    
+    <!-- =============================================================== -->
+    <!--                    Common tags description:                     -->
+    <!-- =============================================================== -->
+
+    <!-- Exclusive tags: -->
+    <tag-info name="libname" exclusive="1"/>
+    <tag-info name="dllname" exclusive="1"/>
+    <tag-info name="version" exclusive="1"/>
+    <tag-info name="so_version" exclusive="1"/>
+    <tag-info name="mac_version" exclusive="1"/>
+    <tag-info name="dirname" exclusive="1"/>
+
+    <tag-info name="app-type" exclusive="1"/>
+    <tag-info name="debug-info" exclusive="1"/>
+    <tag-info name="optimize" exclusive="1"/>
+    <tag-info name="arch" exclusive="1"/>
+    <tag-info name="threading" exclusive="1"/>
+    <tag-info name="runtime-libs" exclusive="1"/>
+
+    <tag-info name="precomp-headers" exclusive="1"/>
+    <tag-info name="precomp-headers-file" exclusive="1"/>
+    <tag-info name="precomp-headers-header" exclusive="1"/>
+    <tag-info name="precomp-headers-gen" exclusive="1"/>
 
 </makefile>
 

@@ -222,6 +222,11 @@ def handleTemplate(e):
                                       extractTemplates(e, post=1)).children
 
 
+tagInfos = {}
+class TagInfo:
+    def __init__(self):
+        self.exclusive = 0
+        self.before = []
 
 rules = {}
 class Rule:
@@ -288,6 +293,12 @@ class ValueRecord:
         return self.evaluated
 
 
+class CmdListEntry:
+    def __init__(self, node, value, parents):
+        self.node = node
+        self.value = value
+        self.parents = parents
+
 def _extractTargetNodes(out_list, list, target, tags,
                         valueRecord, parentTags):
     """Expand all rules in list of target nodes and returns a list of
@@ -300,7 +311,7 @@ def _extractTargetNodes(out_list, list, target, tags,
                 _extractTargetNodes(out_list, node.children, target,
                                     tags, valueRecord, parentTags)
         elif node.name in COMMANDS:
-            out_list.append((node, valueRecord, parentTags))
+            out_list.append(CmdListEntry(node, valueRecord, parentTags))
         else:
             if node.name not in tags:
                 raise ReaderError(node,
@@ -309,9 +320,30 @@ def _extractTargetNodes(out_list, list, target, tags,
                 continue
             value = ValueRecord(valueRecord, node.value)
             _extractTargetNodes(out_list, tags[node.name], target,
-                                tags, value, parentTags + [node.name])
+                                tags, value, parentTags + [node])
 
 
+def _filterTargetNodes(cmd_list):
+    """Removes duplicate exclusive tags (e.g. <app-type>) and orders tags
+       if they must have some specific order."""
+    map = {}
+    # cmd_list contains (node, valueR, parentTags)
+    for entry in cmd_list:
+        for tag in entry.parents:
+            if tag.name not in map:
+                map[tag.name] = [(tag, entry)]
+            else:
+                map[tag.name].append((tag, entry))
+    
+    # remove all but the last exclusive tags if there are duplicates:
+    for tagname in map:
+        if (tagname in tagInfos) and (tagInfos[tagname].exclusive):
+            tagToPreserve = map[tagname][-1][0]
+            for tag, entry in \
+                    [x for x in map[tagname][:-1] if x[0] != tagToPreserve]:
+                entry.node = None
+
+            
 def _processTargetNodes(list, target, tags, dict):
 
     def processCmd(e, target, dict):
@@ -343,13 +375,27 @@ def _processTargetNodes(list, target, tags, dict):
 
     cmd_list = []
     _extractTargetNodes(cmd_list, list, target, tags, None, [])
-    for node, valueR, parentTags in cmd_list:
-        if valueR == None:
+    _filterTargetNodes(cmd_list)
+
+    if config.debug:
+        print '[dbg] -------------------------'
+        print '[dbg] Filtered tags for target %s:' % target.id
+        print '[dbg] -------------------------'
+        for entry in cmd_list:
+            parlist = [x.name for x in entry.parents]
+            if entry.node == None:
+                print '[dbg] %s || removed duplicate' % parlist
+            else:
+                print '[dbg] %s || %s [%s]' % (parlist, entry.node.name, entry.node.props)
+
+    for entry in cmd_list:
+        if entry.node == None: continue
+        if entry.value == None:
             dict2 = dict
         else:
-            val = valueR.evalValue(target, dict)
+            val = entry.value.evalValue(target, dict)
             dict2 = {'value':val}
-        processCmd(node, target, dict2)
+        processCmd(entry.node, target, dict2)
 
 
 _pseudoTargetLastID = 0
@@ -448,6 +494,15 @@ def handleDefineTag(e, rule=None):
             r.tags[name] = copy.copy(e.children)
         r.cacheTagsDict = None
 
+
+def handleTagInfo(e):
+    name = e.props['name']
+    info = TagInfo()
+    if 'exclusive':
+        info.exclusive = e.props['exclusive'] == '1'
+    tagInfos[name] = info
+
+
 loadedModules = []
 availableFiles = []
 
@@ -544,6 +599,7 @@ HANDLERS = {
     'include':       handleInclude,
     'define-rule':   handleDefineRule,
     'define-tag':    handleDefineTag,
+    'tag-info':      handleTagInfo,
     'output':        handleOutput,
     'fragment':      handleFragment,
     }
