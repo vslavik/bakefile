@@ -98,15 +98,22 @@
               position="before:precomp-headers"/>
     <tag-info name="precomp-headers-file"
               position="before:precomp-headers"/>
+    <tag-info name="precomp-headers-location"
+              position="before:precomp-headers"/>
 
     <define-rule name="__dmars_comp">
         <template>
             <set var="__pch_header"/>
+            <set var="__pch_location">$(SRCDIR)$(DIRSEP)</set>
             <set var="__pch_file">hdr</set>
         </template>
  
         <define-tag name="precomp-headers-file" rules="__compiled">
             <set var="__pch_file">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="precomp-headers-location" rules="__compiled">
+            <set var="__pch_location">$(SRCDIR)$(DIRSEP)$(nativePaths(value))$(DIRSEP)</set>
         </define-tag>
 
         <define-tag name="precomp-headers-header" rules="__compiled">
@@ -151,7 +158,7 @@
                 <set var="__pch_cmd" eval="0">
                     $(ifthenelse(__uses_cxx,CXX,CC)+' '+ifthenelse(__uses_cxx,
                                  '$(%s_CXXFLAGS)' % id.upper(),
-                                 '$(%s_CFLAGS)' % id.upper())) -mn $(ifthenelse(__uses_cxx,'-cpp',''))  -HF$(__pch_sym_file) -o$(BUILDDIR)$(DIRSEP)$(__pch_obj) $(__pch_header)
+                                 '$(%s_CFLAGS)' % id.upper())) -mn $(ifthenelse(__uses_cxx,'-cpp',''))  -HF$(__pch_sym_file) -o$(BUILDDIR)$(DIRSEP)$(__pch_obj) $(__pch_location)$(nativePaths(__pch_header))
                 </set>
 
                 <if cond="__pch_sym_tgt not in targets">
