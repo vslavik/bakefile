@@ -13,6 +13,7 @@ Packager:      Vaclav Slavik <vaclav.slavik@matfyz.cz>
 BuildRoot:     /var/tmp/%{name}-%{version}-root
 
 Requires:      python >= 2.2.2
+BuildRequires: python-devel
 
 %description
 Bakefile is makefiles generator that generates native makefiles for
