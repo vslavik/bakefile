@@ -15,6 +15,14 @@
 # Do not modify the rest of this file!
 # -------------------------------------------------------------------------
 
+!ifndef BCCDIR
+BCCDIR=$(MAKEDIR)\..
+!endif
+
+!if "$(BCCDIR)" == "\.."
+!error Your Borland compiler does not define MAKEDIR. Please define the BCCDIR variable, e.g. BCCDIR=d:\bc4
+!endif
+
 ### Variables: ###
 
 @[ for v in make_vars :@
