@@ -488,7 +488,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                         type="inst-action"
                cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
             <modify-target target="install_$(id)">
-                <command>$(INSTALL_DIR) $(value)</command>
+                <command>$(INSTALL_DIR) $(DESTDIR)$(value)</command>
                 <dependency-of>install</dependency-of>
             </modify-target>
         </if>
@@ -498,7 +498,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="install-to" rules="exe">
             <modify-target target="install_$(id)">
                 <command>
-                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
                 </command>
             </modify-target>
         </define-tag>
@@ -506,8 +506,8 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="install-to" rules="dll">
             <modify-target target="install_$(id)">
                 <command>
-                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(value)
-                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(DESTDIR)$(value)
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
                 </command>
             </modify-target>
         </define-tag>
@@ -515,7 +515,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="install-to" rules="module">
             <modify-target target="install_$(id)">
                 <command>
-                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
                 </command>
             </modify-target>
         </define-tag>
@@ -523,7 +523,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="install-to" rules="lib">
             <modify-target target="install_$(id)">
                 <command>
-                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__targetname',id)) $(value)
+                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
                 </command>
             </modify-target>
         </define-tag>

@@ -2,7 +2,7 @@
 <makefile>
 
     <define-tag name="install-to" rules="gettext-catalogs">
-        <set var="dstdir">$(value)</set>
+        <set var="dstdir">$(DESTDIR)$(value)</set>
         <add-target target="$(id)_install" type="action" cond="target"/>
         <modify-target target="$(id)_install">
             <dependency-of>install</dependency-of>
