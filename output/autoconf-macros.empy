@@ -15,10 +15,8 @@ dnl Do not modify, all changes will be overwritten!
 @[ for cond in usedConditions :@
 dnl ### begin block COND_@cond.name ###
     COND_@cond.name="#"
-    if test @( ' -a \\\n            '.\
-               join(['"x$%s" = "x%s"' % (x.option.name,x.value) \
-               for x in cond.exprs]) ) ; then
-        COND_@cond.name=
+    if test @utils.condition2string(cond, utils.CONDSTR_UNIXTEST) ; then
+        COND_@cond.name=""
     fi
     AC_SUBST(COND_@cond.name)
 ]@

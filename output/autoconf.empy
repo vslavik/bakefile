@@ -16,9 +16,13 @@
 
 ### Targets: ###
 @[ for t in targets :
-@t.__targetdir@t.__targetname: @t.__deps
+@{
+if t.cond == None: condstr=''
+else: condstr='@COND_%s@' % t.cond.name
+}@
+@condstr@t.__targetdir@t.__targetname: @t.__deps
 @[ for cmd in t.__command.splitlines():@
-@\t@cmd.strip()
+@condstr@\t@cmd.strip()
 ]@
 ]@
 
