@@ -22,6 +22,7 @@ Version 0.1.5
 - msvc6prj: <optimize>speed optimized for size and vice versa, fixed
 - fixed win32 formats' "make clean" to delete precompiled headers files
 - autoconf: fixed to not accumulate outdated content in autoconf_inc.m4
+- msvc6prj, msevc4prj: don't ignore source files with unrecognized extension
 
 
 Version 0.1.4
