@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <!-- =============================================================== -->
+    <!--                        Mac OS resources:                        -->
+    <!-- =============================================================== -->
+
+    <define-rule name="__macexe">
+        <template>
+            <set var="__mac_setfile" eval="0">
+                $(SETFILE) -t APPL $(__targetname)
+            </set>
+            <set var="__mac_setfilecmd" eval="0">
+                <if cond="PLATFORM_MAC=='1'">$(__mac_setfile)</if>
+            </set>
+            <set var="__mac_rez"/>
+            <set var="__rez_flags">-d __DARWIN__ -t APPL</set>
+            <set var="__mac_rezcmd" eval="0">
+                <if cond="PLATFORM_MAC=='1'">$(__mac_rez)</if>
+            </set>
+            <set var="__macrfiles"/>
+            <set var="__post_command" eval="0">
+                $(__mac_rezcmd)
+                $(__mac_setfilecmd)
+            </set>
+        </template>
+        
+        <define-tag name="mac-res">
+            <set var="__macrfiles" append="1">$(value)</set>
+            <!-- FIXME: this is incorrect assumption that every .r file contains
+                        an icon! -->
+            <set var="__mac_setfile" eval="0">$(SETFILE) -a C $(__targetname)</set>
+            <set var="__mac_rez" eval="0">
+                $(addPrefixIfNotEmpty('%s %s -o %s' % (RESCOMP,__rez_flags,__targetname), __macrfiles))
+            </set>            
+        </define-tag>
+
+        <!-- includes and defines should propagate to rc compilation, too: -->
+        <define-tag name="include">
+            <set var="__rez_flags" append="1">-i $(value)</set>
+        </define-tag>
+        <define-tag name="define">
+            <set var="__rez_flags" append="1">-d $(value)</set>
+        </define-tag>
+        
+    </define-rule>
+
+
+</makefile>
