@@ -116,7 +116,7 @@
             @%append $(__lbc_file) name $^@
             @%append $(__lbc_file) option incremental
             @%append $(__lbc_file) $(__ldflags)
-            @for %i in ($(__objects)) do @%append $(__lbc_file) file %i
+            @for %i in ($(__objects_var)) do @%append $(__lbc_file) file %i
             @for %i in ($(__ldlibs)) do @%append $(__lbc_file) library %i
             @%append $(__lbc_file) $(__win32res_flag)
         </set>        
@@ -126,7 +126,7 @@
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
             @%create $(__lbc_file)
-            @for %i in ($(__objects)) do @%append $(__lbc_file) +%i
+            @for %i in ($(__objects_var)) do @%append $(__lbc_file) +%i
             wlib -q -p2048 -n -b $^@ @$(__lbc_file)
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
