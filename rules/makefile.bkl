@@ -222,19 +222,12 @@ makefiles (most notably GNU Make and Autoconf formats).
             </ldflags>
         </define-tag>
 
-        <define-tag name="precomp-headers">
-            <cppflags>
-                $(substituteFromDict(value, {'on':__FLAG_USE_PCH, 'off':''}))
-            </cppflags>
-        </define-tag>
-        <define-tag name="precomp-headers-file">
-            <cppflags>
-                $(formatIfNotEmpty(__FLAG_PCH_FILE, mkPathPrefix(BUILDDIR)+value))
-            </cppflags>
-        </define-tag>
-        <define-tag name="precomp-headers-header"/>
-
         <define-tag name="runtime-libs"/>
+
+        <define-tag name="precomp-headers"/>
+        <define-tag name="precomp-headers-file"/>
+        <define-tag name="precomp-headers-header"/>
+        <define-tag name="precomp-headers-gen"/>
         
     </define-rule>
 

@@ -36,8 +36,6 @@
     <set var="__FLAG_ARCH_I486">/G4</set>
     <set var="__FLAG_ARCH_I586">/G5</set>
     <set var="__FLAG_ARCH_I686">/G6</set>
-    <set var="__FLAG_USE_PCH"/> <!-- NB: DON'T set this, see below! -->
-    <set var="__FLAG_PCH_FILE">/Fp%s.pch</set>
     <set var="__FLAG_SINGLE_THREADING"></set>
     <set var="__FLAG_MULTI_THREADING"></set>
 
@@ -73,6 +71,8 @@
     <define-rule name="__msvc_comp">
         <template>
             <set var="__pch_header"/>
+            <set var="__pch_useflag" eval="0">/YX$(__pch_header)</set>
+            <set var="__pch_flags" eval="0">$(__pch_useflag)</set>
             <set var="__rtl_dbg"/>
             <set var="__rtl_static" eval="0">L</set>
             <set var="__rtl_type" eval="0">D</set>
@@ -101,10 +101,28 @@
         </define-tag>
 
         <define-tag name="precomp-headers">
-            <cppflags>/YX$(__pch_header)</cppflags>
+                <!-- FIXME: should be cppflags, this is temporary hack to
+                make wxWindows work -->
+            <cxxflags> 
+                $(substituteFromDict(value,{'on':__pch_flags, 'off':''}))
+            </cxxflags>
+        </define-tag>
+        <define-tag name="precomp-headers-file">
+            <cppflags>
+                $(formatIfNotEmpty('/Fp%s.pch', mkPathPrefix(BUILDDIR)+value))
+            </cppflags>
         </define-tag>
         <define-tag name="precomp-headers-header">
             <set var="__pch_header">$(value)</set>
+        </define-tag>
+        <define-tag name="precomp-headers-gen">
+            <set var="__pch_object">$(getObjectName(value, id, OBJEXT))</set>
+            <set var="__deps" append="1">$(__pch_object)</set>
+            <modify-target target="$(__pch_object)">
+                <set var="__cflags" append="1">/Yc$(ref('__pch_header',id))</set>
+                <set var="__cxxflags" append="1">/Yc$(ref('__pch_header',id))</set>
+            </modify-target>
+            <set var="__pch_useflag" eval="0">/Yu$(__pch_header)</set>
         </define-tag>
     </define-rule>
     
