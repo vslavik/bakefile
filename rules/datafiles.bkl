@@ -151,15 +151,31 @@
                         cp -pf $(__file) $(__dest)
                     fi; \
                 </if>
+                <if cond="TOOLSET=='win32'">
+                    if not exist $(__dest) copy $(__file) $(__dest)
+                </if>
             </set>
             <command>$(__copy_cmd)</command>
         </template>
         <define-tag name="dst">
-            <set var="__dest">$(value)</set>
+            <set var="__dest">$(nativePaths(value))</set>
+            <set var="__targetname">$(__dest)</set>
         </define-tag>
         <define-tag name="src">
-            <set var="__file">$(value)</set>
-            <set var="__targetname">$(file)</set>
+            <set var="__file">$(nativePaths(value))</set>
+        </define-tag>
+    </define-rule>
+
+
+    <define-rule name="mkdir" extends="action">
+        <define-tag name="dir">
+            <set var="__targetname">$(nativePaths(value))</set>
+            <command cond="TOOLSET=='unix'">
+                @mkdir -p $(__targetname)
+            </command>
+            <command cond="TOOLSET=='win32'">
+                if not exist $(__targetname) mkdir $(__targetname)
+            </command>
         </define-tag>
     </define-rule>
 
