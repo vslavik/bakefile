@@ -25,6 +25,7 @@ output_DATA = output/autoconf.empy \
               output/msvc.empy \
               output/msvc-opts.empy \
               output/msvc6prj.py \
+              output/msevc6prj.py \
               output/gnumake.empy \
               output/gnumake-opts.empy \
               output/watcom.empy \
@@ -55,6 +56,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/msvc_common.bkl \
               rules/msvc_prj_common.bkl \
               rules/msvc6prj.bkl \
+              rules/msevc6prj.bkl \
               rules/mingw.bkl \
               rules/watcom.bkl \
               rules/unixlike.bkl \
