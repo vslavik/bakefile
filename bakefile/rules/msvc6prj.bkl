@@ -21,7 +21,7 @@
         <set var="_ldlibs"/>
         <set var="_defines">/D "WIN32"</set>
         <set var="_ldflags">/machine:i386</set>
-        <set var="_win32rc_flags">/l 0x405</set>
+        <set var="_win32rc_flags">/l 0x409</set> <!-- US English locale -->
         <set var="_cppflags">/FD</set> <!-- /FD: minimal rebuild -->
         
         <!-- choice of C runtime library: -->
