@@ -1,5 +1,5 @@
 # 
-# Reading and _interpreting_ the makefiles
+# Reading and interpreting the makefiles
 #
 # $Id$
 #
@@ -273,98 +273,148 @@ def handleModifyTarget(e, dict):
         raise ReaderError(e, "unknown target '%s'" % tg)
     target = mk.targets[tg]
     tags = rules[target.type].getTagsDict()
-    _processTargetNodes(e.children, target, tags, dict)
+    _processTargetNodes(e, target, tags, dict)
 
 
 COMMANDS = ['set', 'modify-target', 'add-target']
 
-class ValueRecord:
-    def __init__(self, parent, value):
-        self.value = value
-        self.evaluated = None
+class TgtCmdNode:
+    # node types:
+    TARGET  = 0
+    TAG     = 1
+    COMMAND = 2
+    
+    def __init__(self, parent, type, node):
         self.parent = parent
-    def evalValue(self, target, dict):
-        if self.evaluated == None:
-            if self.parent == None:
-                d = dict
-            else:
-                d = {}
-                if dict != None:
-                    d.update(dict)
-                d['value'] = self.parent.evalValue(target, d)                
-            self.evaluated = mk.evalExpr(self.value,
-                                         target=target, add_dict=d)
-        return self.evaluated
-
-
-class CmdListEntry:
-    def __init__(self, node, value, parents):
+        if parent != None:
+            self.position = parent.position + [len(parent.children)]
+            parent.children.append(self)
+        else:
+            self.position = []
+        self.type = type
         self.node = node
-        self.value = value
-        self.parents = parents
-        self.mustProcessBefore = 0
-        self.mustProcessAfter = []
-        self.executionDelayed = 0
+        self.dict = None
+        self.children = []
+        if node.name in tagInfos:
+            tinfo = tagInfos[node.name]
+            self.exclusive = tinfo.exclusive
+            self.stayBefore = tinfo.before
+        else:
+            self.exclusive = 0
+            self.stayBefore = []
 
-def _extractTargetNodes(out_list, list, target, tags,
-                        valueRecord, parentTags):
-    """Expand all rules in list of target nodes and returns a list of
-       elementary commands to be executed on the target. The list contains
-       tuples (node, value_record, parent_tags)."""
+    def updatePosition(self):
+        if self.parent != None:
+            self.position = \
+                self.parent.position + [self.parent.children.index(self)]
+            for c in self.children:
+                c.updatePosition()
+
+
+def _extractTargetNodes(parent, list, target, tags, index):
+    
+    def _removeNode(n):
+        for c in n.children:
+            _removeNode(c)
+        index[n.node.name].remove(n)
+        n.parent.children.remove(n)
+        for c in n.parent.children:
+            c.updatePosition()
+        
+    def _addToList(n, todo):
+        todo.append(n)
+        for c in n.children:
+            _addToList(c, todo)
+
+    def _reorderNodes(first, second, todo):
+        if config.debug:
+            print '[dbg] (reordering <%s> @%s <=> <%s> @%s)' % \
+                       (first.node.name, first.node.location(),
+                        second.node.name, second.node.location())
+
+        # find nearest shared parent:
+        parents1 = []
+        x = first.parent
+        while x != None:
+            parents1.append(x)
+            x = x.parent
+        parent = second.parent
+        while parent not in parents1:
+            parent = parent.parent
+
+        # swap its children:
+        idxInPos = len(parent.position)
+        idx1 = first.position[idxInPos]
+        idx2 = second.position[idxInPos]
+        parent.children[idx1] = second
+        parent.children[idx2] = first
+        parent.children[idx1].updatePosition()
+        parent.children[idx2].updatePosition()
+        _addToList(parent.children[idx2], todo)
+
+    def _fixOrder(n):
+        next_iteration = []
+        for aftername in n.stayBefore:
+            if aftername not in index: continue
+            for after in index[aftername]:
+                if n.position > after.position:
+                    _reorderNodes(after, n, next_iteration)
+        if len(next_iteration) > 0:
+            for x in next_iteration:
+                _fixOrder(x)
+            _fixOrder(n)
+    
+    def _alterTreeAfterAddingNode(n):
+        """
+           This function alters the tree after adding new node. Two things are
+           done: 
+           
+           First, if the tag is exclusive, then previous instance of it
+           is deleted from the tree *and* from tags index. 
+           
+           Second, if there are some order constraints on tags and some
+           previous tag must not be before this tag, then its subtree is moved
+           just behind this tag. This is done by finding nearest parent node
+           shared by both tags and swaping children order.
+        """
+        
+        name = n.node.name
+        # Eliminate duplicates of exclusive tags:
+        if name not in index:
+            index[name] = [n]
+        else:
+            if n.exclusive:
+                if config.debug:
+                    print '[dbg] (thrown away <%s> @%s)' % \
+                                        (name, n.node.location())
+                _removeNode(index[name][0])
+                index[name] = [n]
+            else:
+                index[name].append(n)
+
+        # Reorder tags whose order is wrong:
+        _fixOrder(n)
     
     for node in list:
         if node.name == 'if':
             if evalWeakCondition(node):
-                _extractTargetNodes(out_list, node.children, target,
-                                    tags, valueRecord, parentTags)
+                _extractTargetNodes(parent, node.children, target, tags, index)
         elif node.name in COMMANDS:
-            out_list.append(CmdListEntry(node, valueRecord, parentTags))
+            n = TgtCmdNode(parent, TgtCmdNode.COMMAND, node)
+            _alterTreeAfterAddingNode(n)
         else:
             if node.name not in tags:
                 raise ReaderError(node,
                                       "unknown target tag '%s'" % node.name)
             if evalWeakCondition(node) == 0:
                 continue
-            value = ValueRecord(valueRecord, node.value)
-            _extractTargetNodes(out_list, tags[node.name], target,
-                                tags, value, parentTags + [node])
+            n = TgtCmdNode(parent, TgtCmdNode.TAG, node)
+            _alterTreeAfterAddingNode(n)
+            _extractTargetNodes(n, tags[node.name], target, tags, index)
 
 
-def _filterTargetNodes(cmd_list):
-    """Removes duplicate exclusive tags (e.g. <app-type>) and orders tags
-       if they must have some specific order."""
-    map = {}
-    # cmd_list contains (node, valueR, parentTags)
-    for entry in cmd_list:
-        for tag in entry.parents:
-            if tag.name not in map:
-                map[tag.name] = [(tag, entry)]
-            else:
-                map[tag.name].append((tag, entry))
+def _processTargetNodes(node, target, tags, dict):
     
-    for tagname in map:
-        # remove all but the last exclusive tags if there are duplicates:
-        if (tagname in tagInfos) and (tagInfos[tagname].exclusive):
-            tagToPreserve = map[tagname][-1][0]
-            for tag, entry in \
-                    [x for x in map[tagname][:-1] if x[0] != tagToPreserve]:
-                entry.node = None
-    
-        # reorder tags if neccessary:
-        if tagname in tagInfos:
-            for btag in tagInfos[tagname].before:
-                if btag in map:
-                    for tag, entry in map[btag]:
-                        if entry.node == None: continue
-                        for atag, aentry in map[tagname]:
-                            if aentry.node != None:
-                                aentry.mustProcessAfter.append(entry)
-                                entry.mustProcessBefore += 1
-        
-
-            
-def _processTargetNodes(list, target, tags, dict):
-
     def processCmd(e, target, dict):
         if e.name == 'set':
             handleSet(e, target=target, add_dict=dict)
@@ -391,44 +441,45 @@ def _processTargetNodes(list, target, tags, dict):
         else:
             return 0
         return 1
-
-    cmd_list = []
-    _extractTargetNodes(cmd_list, list, target, tags, None, [])
-    _filterTargetNodes(cmd_list)
-
+    
     if config.debug:
         print '[dbg] -----------------------------------------'
-        print '[dbg] * tag commands for target %s:' % target.id
+        print '[dbg] * tags tree for target %s:' % target.id
         print '[dbg] -----------------------------------------'
 
-    def _processEntry(entry, target, dict):
-        if entry.mustProcessBefore > 0:
-            entry.executionDelayed = 1
-            return
-        if entry.node == None: return
-        for e in entry.mustProcessAfter:
-            e.mustProcessBefore -= 1
-            # only run it now if we already tried to run it but wasn't able
-            # to do it because mustProcessBefore was >0:
-            if e.executionDelayed:
-                _processEntry(e, target, dict)
-        
-        if config.debug:
-            parlist = [x.name for x in entry.parents]
-            print '[dbg] %s || %s [%s] @%s:%s' % \
-                  (parlist, entry.node.name, entry.node.props,
-                   entry.node.filename, entry.node.lineno)
-        
-        if entry.value == None:
-            dict2 = dict
-        else:
-            val = entry.value.evalValue(target, dict)
-            dict2 = {'value':val}
-        processCmd(entry.node, target, dict2)
-        entry.node = None # mark it as processed
+    root = TgtCmdNode(None, TgtCmdNode.TARGET, node)
+    root.dict = dict
+    index = {}
+    _extractTargetNodes(root, node.children, target, tags, index)
 
-    for entry in cmd_list:
-        _processEntry(entry, target, dict)
+    if config.debug:
+        def dumpTgtNode(n, level):
+            indent = ''.join(['  ' for i in range(0,level)])
+            if n.type != TgtCmdNode.TARGET:
+                if n.node.value != None: value = '"%s"' % n.node.value
+                else: value = ''
+                props = ''
+                if len(n.node.props) > 0:
+                    for p in n.node.props:
+                        props += " %s='%s'" % (p, n.node.props[p])
+                print '[dbg] %s<%s%s> %s' % (indent, n.node.name, props, value)
+            for c in n.children:
+                dumpTgtNode(c, level+1)
+        dumpTgtNode(root, -1)
+
+    def _processEntry(entry, target, dict):
+        if entry.type == TgtCmdNode.COMMAND:
+            processCmd(entry.node, target, dict)
+        else:
+            if entry.type == TgtCmdNode.TAG and entry.node.value != None:
+                dict2 = {'value':mk.evalExpr(entry.node.value,
+                                             target=target, add_dict=dict)}
+            else:
+                dict2 = dict
+            for c in entry.children:
+                _processEntry(c, target, dict2)
+
+    _processEntry(root, target, dict)
 
 
 _pseudoTargetLastID = 0
@@ -476,7 +527,7 @@ def handleTarget(e):
     mk.addTarget(target)
 
     errors.pushCtx("when processing target at %s" % e.location())
-    _processTargetNodes(e.children, target, tags, None)
+    _processTargetNodes(e, target, tags, None)
     errors.popCtx()
 
 
