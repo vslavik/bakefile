@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<!--
+Copies file(s) specified with <src> tag to either file specified with
+<destfile> or to directory set with <destdir> (will be created if
+it doesn't exist).
+-->
+
+<makefile>
+
+    <define-rule name="copy-files" extends="action">
+        <template>
+            <set var="__srcdir"/>
+            <set var="__copy_cmd" eval="0">
+                <if cond="TOOLSET=='unix'">
+                    @mkdir -p $(__dstdir)
+                    @for f in $(__files); do \
+                        if test \( ! -s $(__dstdir)/\$\$f \) -o \( $(__srcdir)\$\$f -nt $(__dstdir)/\$\$f  \) ; then \
+                            cp -pRf $(__srcdir)\$\$f $(__dstdir) ; \
+                        fi; \
+                    done
+                </if>
+            </set>
+            <command>$(__copy_cmd)</command>
+        </template>
+        <define-tag name="dstdir">
+            <set var="__dstdir">$(value)</set>
+        </define-tag>
+        <define-tag name="srcdir">
+            <set var="__srcdir">$(value)$(DIRSEP)</set>
+        </define-tag>
+        <define-tag name="files">
+            <set var="__files">$(' '.join(value.split()))</set>
+        </define-tag>
+    </define-rule>
+        
+    <define-rule name="copy-file-to-file" extends="action">
+        <template>
+            <set var="__copy_cmd" eval="0">
+                <if cond="TOOLSET=='unix'">
+                    @if test \( ! -s $(__dest) \) -o \( $(__file) -nt $(__dest) \) ; then \
+                        cp -pRf $(__file) $(__dest)
+                    fi; \
+                </if>
+            </set>
+            <command>$(__copy_cmd)</command>
+        </template>
+        <define-tag name="dst">
+            <set var="__dest">$(value)</set>
+        </define-tag>
+        <define-tag name="src">
+            <set var="__file">$(value)</set>
+        </define-tag>
+    </define-rule>
+
+</makefile>
