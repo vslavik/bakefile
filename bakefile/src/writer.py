@@ -29,18 +29,20 @@ def __stringify(x):
     return str(x)
 
 def __valueToPy(v):
-    return v.replace('\\', '\\\\')
+    return v.replace('\\', '\\\\').replace('"','\\"')
 
 __preparedMkVars = None
 
 def __copyMkToVars():
     dict = {}
-    
+
     # Copy variables:
     for v in mk.vars:
         if v == 'targets': continue
-        if v == 'configurations': continue
-        dict[v] = __valueToPy(mk.vars[v].strip())
+        if v == 'configs':
+            dict[v] = mk.vars[v]
+        else:
+            dict[v] = __valueToPy(mk.vars[v].strip())
 
     # Copy targets information:
     targets = Container()
@@ -58,7 +60,15 @@ def __copyMkToVars():
         tar = mktargets[tar_i]
         t = Struct()
         for v in tar.vars:
-            exec('t.%s = """%s"""' % (v, __valueToPy(tar.vars[v].strip())))
+            if v == 'configs':
+                t.configs = {}
+                for x in tar.vars[v]:
+                    t.configs[x] = Struct()
+                    for y in tar.vars[v][x]:
+                        if y == 'configs': continue
+                        exec('t.configs["%s"].%s = """%s"""' % (x, y, __valueToPy(tar.vars[v][x][y].strip())))
+            else:
+                exec('t.%s = """%s"""' % (v, __valueToPy(tar.vars[v].strip())))
         t.cond = tar.cond
         targets.append(t.id, t)
     dict['targets'] = targets

@@ -47,6 +47,14 @@ def makeConfigs():
         else:
             cfgs = expandCfgs(cfgs, o)
     return cfgs
+    
+
+def __cfg2str(c):
+    list = [mk.options[x].values_desc[c[x]] for x in c]
+    if len(list) == 0:
+        return 'Default'
+    else:
+        return ' '.join(list)
 
 
 def flattenConfig(cfg):
@@ -81,6 +89,24 @@ def flattenConfig(cfg):
             break
 
     finalize.finalEvaluation()
+
+    # Remove targets that are not part of this configuration:
+    toDel = []
+    for t in mk.targets:
+        tar = mk.targets[t]
+        if tar.cond == None:
+            use = '1'
+        else:
+            use = mk.evalCondition(tar.cond.tostr())
+        assert use != None
+        if use == '0':
+            toDep.append(t)
+        else:
+            orig_targets[t].vars['configs'][__cfg2str(cfg)] = tar.vars
+
+    for t in toDel:
+        del mk.targets[t]
+
     myvars = mk.vars
     mytgt = mk.targets
     
@@ -92,7 +118,7 @@ def flattenConfig(cfg):
     return (myvars, mytgt)
 
 
-def flatten():
+def flatten():        
     cfgs = [x.values for x in makeConfigs()]
     if config.verbose:
         print '%i configurations' % len(cfgs)
@@ -103,9 +129,12 @@ def flatten():
         if opt.values == None:
             mk.vars[opt.name] = opt.default
 
+    # add target.configs dictionary:
+    for t in mk.targets.values():
+        t.vars['configs'] = {}
+
     # expand or configurations:
     configs = {}
     for c in cfgs:
-        print c
-        configs[repr(c)] = flattenConfig(c)
-    mk.vars['configurations'] = configs
+        configs[__cfg2str(c)] = flattenConfig(c)
+    mk.vars['configs'] = configs

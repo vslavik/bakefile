@@ -26,12 +26,14 @@ class Option:
         self.desc = desc
         self.values = values
         if self.values != None:
+            self.values_desc = {}
             if values_desc != None:
-                self.values_desc = values_desc
+                for i in range(0,len(self.values)):
+                    self.values_desc[self.values[i]] = values_desc[i]
             else:
-                self.values_desc = []
-                for v in self.values:
-                    self.values_desc.append('%s_%s' % (self.name, v))
+                for i in range(0,len(self.values)):
+                    self.values_desc[self.values[i]] = \
+                        '%s_%s' % (self.name, self.values[i])
         self.neverEmpty = 0
 
     def isNeverEmpty(self):
