@@ -96,6 +96,9 @@ def __copyMkToVars():
         cond_vars.append(c.name, c)
         exec('cond_vars.%s = c' % c.name)
     dict['cond_vars'] = cond_vars
+
+    # Copy fragments:
+    dict['fragments'] = mk.fragments
  
     return dict
 

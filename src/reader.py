@@ -427,7 +427,17 @@ def handleOutput(e):
     else:
         method = 'replace'
     config.to_output.append((file, writer, method))
-    
+
+
+def handleFragment(e):
+    if e.props['format'] == config.format:
+        if 'file' in e.props:
+            f = open(e.props['file'])
+            content = f.read()
+            f.close()
+        else:
+            content = e.value
+        mk.addFragment(mk.Fragment(content))
 
 
 HANDLERS = {
@@ -440,6 +450,7 @@ HANDLERS = {
     'define-rule':   handleDefineRule,
     'define-tag':    handleDefineTag,
     'output':        handleOutput,
+    'fragment':      handleFragment,
     }
 
 
