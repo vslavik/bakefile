@@ -1,0 +1,241 @@
+<chapter>
+  <title>Bakefile Concepts</title>
+
+  <section id="concept.target">
+    <title>Targets</title>
+    <para>
+      Like in tranditional makefiles. Target is single buildable entity,
+      e.g. executable, library or DLL. See <xref linkend="ch.targets"/>
+      for details.
+    </para>
+  </section>
+  
+  <section id="concept.variables">
+    <title>Variables</title>
+    <para>
+      You can set and use variables in Bakefile in way very similar to other
+      make programs. Variables may be either global or local to the target
+      they are bound to.
+      Note that variables are expanded by Bakefile and do 
+      <emphasis>not</emphasis> appear as variables in generated native
+      makefiles (compare with <link linkend="concept.option">options</link>).
+    </para>
+    <para>
+      Variables are expanded by typing <command>$(var)</command> (for some
+      variable <varname>var</varname>) in makefile text. Same syntax is used
+      to expand <link linkend="concept.option">options</link> and
+      <link linkend="concept.condvar">conditional variables</link>, too.
+    </para>
+  </section>
+
+  <section id="concept.template">
+    <title>Templates</title>
+    <para>
+      It is often the case that several targets in the makefile share same
+      properties: for example, they are installed into same directory, use
+      same compiler settings or include headers from same directories.
+      Templates are a mechanism designed to eliminate such duplication from
+      makefiles. In Bakefile, you simply declare that a target
+      <emphasis>derives</emphasis> from template (or templates) and it will
+      inherit all its properties. See description of <link
+        linkend="cmd.template">template command</link>.
+    </para>
+  </section>
+  
+  <section id="concept.option">
+    <title>Options</title>
+    <para>
+      It is desirable that generated makefiles are configurable to some
+      degree (especially with the <literal>autoconf</literal> backend). Bakefile
+      makes it possible to declare so-called <emphasis>options</emphasis>
+      using <xref linkend="cmd.option"/> command. Each format backend has its
+      own way of presenting options and some formats may fail to support them
+      at all. Some formats (such as Visual C++ project files backend) have
+      only limited support of options. Typically, options are translated into
+      variables in native makefiles and can be modified by the user.
+    </para>
+    <para>
+      This is how setting an option may look with <literal>autoconf</literal>:
+    </para>
+    <para>
+      <prompt>$ </prompt><userinput>./configure --enable-debug</userinput>
+    </para>
+    <para>
+      Or with VC++ makefiles:
+    </para>
+    <para>
+      <prompt>C:\> </prompt><userinput>nmake DEBUG=1</userinput>
+    </para>
+  </section>
+  
+  <section id="concept.conditions">
+    <title>Conditions</title>        
+    <para>
+      Condition is a boolean expression that is used to conditionally
+      determine values of variables and also to conditionally disable or
+      enable parts of the makefile. Conditions are are commonly used to differ
+      generated native makefiles based on output format and user settings of
+      <link linkend="concept.option">options</link>.
+    </para>
+    <para>
+      There are two types of conditions:
+      <variablelist id="concept.conditions.types">
+
+        <varlistentry id="concept.conditions.weak">
+          <term>Weak</term>
+          <listitem>
+            <para>
+              The condition may be any Python expression that only uses
+              variables defined with the <xref linkend="cmd.set"/> command
+              and Python helper functions from available modules. The
+              expression must evaluate to either 0 (false) or 1 (true).
+            </para>
+            <para>
+              If it evaluates to 0, then the statement that has the condition
+              associated with it is not processed. If it evalues to 1, that
+              the statement is processed as if it had no condition.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry id="concept.conditions.strong">
+          <term>Strong</term>
+          <listitem>
+            <para>
+              These conditions depend on the value of an
+              <link linkend="concept.option">option</link>. Their syntax is
+              very limited compared to weak conditions, because the
+              decisition (condition evaluation) is postponed until make-time 
+              -- i.e. generated native makefile contains the condition
+              in some form.
+            </para>
+            <para>
+              The condition may only take the form of simple test for
+              equality:
+              <programlisting>OPTION=="VALUE"</programlisting>
+              Here, <varname>OPTION</varname> is name of already defined
+              <link linkend="concept.option">option</link>
+              <emphasis>with enumerated possible values</emphasis> and
+              <varname>VALUE</varname> is one of the option's values.
+            </para>
+            <para>
+              If a strong conditions is used with the
+              <xref linkend="cmd.set"/> command, a
+              <link linkend="concept.condvar">conditional variable</link> is
+              created.
+            </para>
+          </listitem>
+        </varlistentry>
+
+      </variablelist>
+
+      Examples of valid conditions:
+      <programlisting><![CDATA[
+<set var="NUM1">1</set>
+<set var="NUM2">10</set>
+<set var="RESULT_11" cond="NUM1+NUM2==1">yes</set>
+        
+<option name="BUILD">
+  <values>debug release</values>
+  <default-value>release</default-value>
+</option>
+
+<set var="USE_DEBUG" cond="BUILD=='debug'">1</set>
+<set var="USE_DEBUG" cond="BUILD=='release'">0</set>
+]]></programlisting>
+
+      Examples of invalid conditions:
+      <programlisting><![CDATA[
+<option name="NUM1">
+  <default-value>1</default-value>
+</option>
+</set>
+<set var="NUM2">10</set>
+<set var="RESULT_11" cond="NUM1+NUM2==1">yes</set>
+        
+<option name="BUILD">
+  <values>R D</values>
+</option>
+
+<set var="USE_DEBUG" cond="BUILD=='debug'">1</set>
+     <!-- not in the list of values -->
+
+<option name="BUILD2"></option>
+
+<set var="USE_DEBUG2" cond="BUILD2=='debug'">1</set>
+     <!-- not option with enumeration -->
+
+<option name="BUILD3">
+  <values>release debug</values>
+</option>
+
+<set var="USE_DEBUG3" cond="BUILD!='debug'">1</set>
+     <!-- not equality test -->
+]]></programlisting>
+      
+    </para> 
+    <para>
+      See also:
+      <xref linkend="concept.condvar"/>,
+      <xref linkend="cmd.set"/>
+    </para>    
+  </section>
+  
+  <section id="concept.condvar">
+    <title>Conditional Variables</title>
+    <para>
+      Conditional variables are variables whose value differs depending on
+      a condition. They are created by using the conditional form of
+      <xref linkend="cmd.set"/> command. Unlike options, they can't be
+      directly modified by user of native makefile. Unlike variables, they
+      are not evaluated by Bakefile during processing (the value depends on
+      values of options).
+    </para>
+    <para>
+      Summary of differences between options, variables and conditional
+      variables:
+      <informaltable>
+        <tgroup cols='3'>
+          <thead>
+            <row>
+              <entry>Type</entry>
+              <entry>Value</entry>
+              <entry>Set by user</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>variable</entry>
+              <entry>constant</entry>
+              <entry>no</entry>
+            </row>
+            <row>
+              <entry>option</entry>
+              <entry>variable</entry>
+              <entry>yes</entry>
+            </row>
+            <row>
+              <entry>conditional variable</entry>
+              <entry>variable (derived from some option)</entry>
+              <entry>no</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </section>
+  
+  <section id="concept.modules">
+    <title>Modules</title>
+    <para>
+      <emphasis>Modules</emphasis> extend Bakefile with additional abilities.
+      For example, standard configuration of Bakefile can't build Python
+      modules. You must explicitly load <literal>python</literal> module which
+      will add, among other things, <function>python-module</function> rule.
+      Functionality is divided into modules so that generated makefiles are
+      not cluttered with unused options and to avoid unnecessary
+      <emphasis>configure</emphasis> checks.
+    </para>
+  </section>
+
+</chapter>

@@ -1,0 +1,17 @@
+<chapter>
+  <title>Introduction</title>
+
+  <para>
+    FIXME - to be written
+    <!-- FEATURES LIST -->
+  </para>
+
+  <section>
+    <title>Flow</title>
+    <para>
+      FIXME: XML makefile -> ruleset -> variables expansion ->
+             output writer
+    </para>
+  </section>
+
+</chapter>

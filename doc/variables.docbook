@@ -1,0 +1,304 @@
+<chapter id="ch.variables">
+  <title>Variables defined by Bakefile</title>
+  <para>
+    Bakefile rulesets define lots of variables; this chapter provides brief
+    summary of variables that are available for makefile writers.
+  </para>
+
+  <section>
+    <title>Format independent variables</title>
+
+    <!-- =============================================================== -->
+    <!--                   Changing Bakefile behaviour                   -->
+    <!-- =============================================================== -->
+
+    <section>
+      <title>Changing Bakefile behaviour</title>
+      <para>
+        These variables are meant to be changed using <literal>-D</literal>
+        command line argument
+        (see <link linkend="man.bakefile">manual page</link> for details).
+        <informaltable>
+          <tgroup cols='3'>
+            <thead>
+              <row>
+                <entry>Variable name</entry>
+                <entry>Description</entry>
+                <entry>Default</entry>
+              </row>
+            </thead>
+            <tbody>
+
+              <row id="var.OPTIONS_FILE">
+                <entry role="varname">OPTIONS_FILE</entry>
+                <entry>
+                  If set, then user-configurable part of generated makefile
+                  (i.e. <link linkend="concept.option">options</link> list)
+                  is written into another file instead that the makefile will
+                  include. <varname>OPTIONS_FILE</varname> value must be
+                  relative to <varname>OUTPUT_FILE</varname>.
+                </entry>
+                <entry role="default">(not set, empty)</entry>
+              </row>
+
+              <row>
+                <entry role="varname">WRITE_OPTIONS_FILE</entry>
+                <entry>
+                  If <varname>OPTIONS_FILE</varname> is set and
+                  <varname>WRITE_OPTIONS_FILE</varname> is 1, then
+                  file <varname>OPTIONS_FILE</varname> is created. If 0, then
+                  it is not, but it is still included by the main makefile.
+                  This allows you to generate options file shared by lots of
+                  subproject makefiles and don't repeatedly generate it.
+                </entry>
+                <entry role="default">1</entry>
+              </row>
+              
+            </tbody>
+          </tgroup>
+        </informaltable>
+
+      </para>
+    </section>
+    
+  
+    <!-- =============================================================== -->
+    <!--                        Directories                              -->
+    <!-- =============================================================== -->
+    
+    <section>
+      <title>Directories</title>
+
+      <para>
+        <informaltable>
+          <tgroup cols='3'>
+            <thead>
+              <row>
+                <entry>Variable name</entry>
+                <entry>Description</entry>
+                <entry>Default</entry>
+              </row>
+            </thead>
+            <tbody>
+
+              <row>
+                <entry role="varname">SRCDIR</entry>
+                <entry>
+                  Directory to which names of source files are relative to.
+                  This value is relative to <xref linkend="var.OUTPUT_FILE"/>.
+                </entry>
+                <entry role="default">.</entry>
+              </row>
+
+              <row>
+                <entry role="varname">BUILDDIR</entry>
+                <entry>
+                  Directory where object files and executables are built.
+                  This value is relative to <xref linkend="var.OUTPUT_FILE"/>.
+                </entry>
+                <entry role="default">(depends on format)</entry>
+              </row>
+              
+            </tbody>
+          </tgroup>
+        </informaltable>
+
+      </para>
+      
+      <section>
+        <title>Installation Directories</title>
+
+        <para>
+          These are standard installation directories as used on Unix (most
+          notably in Autoconf). They are used by <command>install</command>
+          target if the backend supports it. They are defined on all platforms.
+          You can change their values freely (unless you are using Autoconf
+          backend).
+          <informaltable>
+            <tgroup cols='3'>
+              <thead>
+                <row>
+                  <entry>Variable name</entry>
+                  <entry>Description</entry>
+                  <entry>Default</entry>
+                </row>
+              </thead>
+              <tbody>
+                
+                <row>
+                  <entry role="varname">PREFIX</entry>
+                  <entry>Base directory for installed files.</entry>
+                  <entry role="default">/usr/local on Unix</entry>
+                </row>
+                
+                <row>
+                  <entry role="varname">BINDIR</entry>
+                  <entry>Directory where programs are installed.</entry>
+                  <entry role="default">$(PREFIX)/bin on Unix</entry>
+                </row>
+                
+                <row>
+                  <entry role="varname">LIBDIR</entry>
+                  <entry>Directory where libraries are installed.</entry>
+                  <entry role="default">$(PREFIX)/lib on Unix</entry>
+                </row>
+                
+                <row>
+                  <entry role="varname">INCLUDEDIR</entry>
+                  <entry>Directory where C and C++ headers are installed.</entry>
+                  <entry role="default">$(PREFIX)/include on Unix</entry>
+                </row>
+                
+                <row>
+                  <entry role="varname">DATADIR</entry>
+                  <entry>Directory where data files are installed.</entry>
+                  <entry role="default">$(PREFIX)/share on Unix</entry>
+                </row>
+                
+                
+              </tbody>
+            </tgroup>
+          </informaltable>
+        </para>
+      </section>
+      
+
+    </section>
+    
+    
+    
+    
+    <!-- =============================================================== -->
+    <!--                        Miscellaneous                            -->
+    <!-- =============================================================== -->
+
+    <section>
+      <title>Miscellaneous</title>
+
+      <para>
+        <informaltable>
+          <tgroup cols='2'>
+            <thead>
+              <row>
+                <entry>Variable name</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+
+              <row>
+                <entry role="varname">BAKEFILE_VERSION</entry>
+                <entry>
+                  String with Bakefile version number. The version is formed from
+                  three numbers delimined by period. Read only.
+                </entry>
+              </row>
+
+              <row id="var.OUTPUT_FILE" xreflabel="OUTPUT_FILE">
+                <entry role="varname">OUTPUT_FILE</entry>
+                <entry>
+                  Name of the file where generated native makefile will be
+                  written. Read only.
+                </entry>
+              </row>
+              
+              <row>
+                <entry role="varname">FORMAT</entry>
+                <entry>
+                  Format of makefile currently being generated, e.g.
+                  <literal>autoconf</literal>. Always constant expression.
+                </entry>
+              </row>
+              
+              <row>
+                <entry role="varname">COMPILER</entry>
+                <entry>
+                  Short identifier of used compiler (e.g. "bcc" or "vc6"). This
+                  variable is only defined for Windows compilers and is
+                  guaranteed to evaluate to constant expression.
+                </entry>
+              </row>
+              
+              <row>
+                <entry role="varname">TOOLSET</entry>
+                <entry>
+                  What kind of tools the makefile uses. Use this to determine
+                  what commands to put into
+                  <xref linkend="tags.action.command"/> tags.
+                  Can be one of <literal>win32</literal>,
+                  <literal>unix</literal>. Always a constanst expression.
+                </entry>
+              </row>
+              
+              <row>
+                <entry role="varname">LF</entry>
+                <entry>
+                  Line feed character (\n in C).
+                </entry>
+              </row>
+              
+              <row>
+                <entry role="varname">DIRSEP</entry>
+                <entry>
+                  Character used to separate directory components in paths on
+                  target platform (/ on Unix, \ on Windows).
+                </entry>
+              </row>
+              
+            </tbody>
+          </tgroup>
+        </informaltable>
+
+      </para>
+
+    </section>
+
+
+
+  </section>
+  
+  
+  
+  
+  <section>    
+    <title>Format specific variables</title>
+
+
+    <section>
+      <title>autoconf</title>
+      <para>
+        <informaltable>
+          <tgroup cols='3'>
+            <thead>
+              <row>
+                <entry>Variable name</entry>
+                <entry>Description</entry>
+                <entry>Default</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry role="varname">AUTOCONF_MACROS_FILE</entry>
+                <entry>
+                  Where <filename>configure.in</filename> macros for setting
+                  options and conditional variables (mostly
+                  <function>AC_SUBST</function>
+                  calls) are written. This file <emphasis>must</emphasis> be
+                  included by your <filename>configure.in</filename> script.
+                  Set it to empty string to disable creation of this file
+                  (e.g. for subprojects of main project, see also 
+                  <link  linkend="var.OPTIONS_FILE">
+                    <varname>OPTIONS_FILE</varname>
+                  </link>).
+                </entry>
+                <entry role="default">autoconf_inc.m4</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </para>
+    </section>
+    
+  </section>
+
+</chapter>

@@ -1,0 +1,456 @@
+<chapter id="ch.targets">
+  <title>Targets</title>
+  <para id="targets">
+    Bakefile targets correspond to native makefiles targets, they are compiled
+    programs, libraries or more complex actions such as "install" or "dist"
+    (which makes "make dist" command possible). Target syntax is similar to
+    <link linkend="ch.commands">commands syntax</link>:
+    <programlisting><![CDATA[
+<RULE id="NAME" [template="TEMPLATE,..."] [cond="CONDITION"]>
+  SPECIFICATION
+</RULE>
+]]></programlisting>
+    There are five elementary rules (types of targets):
+    <xref linkend="rule.exe"/>,
+    <xref linkend="rule.dll"/>,
+    <xref linkend="rule.lib"/>,
+    <xref linkend="rule.phony"/> and
+    <xref linkend="rule.action"/>. 
+    More target types can be defined in ruleset (or even in the makefile) using
+    <xref linkend="cmd.define-rule"/> command. Such new rules only extend
+    one of elementary rules, though.
+  </para>
+  <para>
+    Target has unique <varname>id</varname>. This ID is usually present in
+    generated makefile (so you can type <userinput>make myprogram</userinput>
+    if you have target with ID <literal>myprogram</literal>). Name of the
+    generated file is based on the ID, too. </para>
+  <para>
+    <varname>template</varname> is optional comma-separated list of
+    IDs of <link linkend="cmd.template">templates</link> that the target is
+    derived from.
+  </para>
+  <para>
+    If <varname>cond</varname> attribute was given then the target is only
+    compiled if given
+    <link linkend="concept.conditions">condition was met</link> (the decision
+    may be done either by Bakefile if the condition is weak or by generated
+    makefile).
+  </para>
+  <para>
+    In addition to the ID, every target can have
+    <link linkend="concept.variables">variables</link> attached to it.
+    These variables are only effective for the target (unlike global variables
+    that affect all targets). They can be used to override global default
+    (for example <varname>DLLEXT</varname> variable is <literal>.dll</literal>
+    for Windows makefiles but you can override the variable locally for
+    <literal>sharpen_plugin</literal> target to be <literal>.plugin</literal>).
+  </para>
+  <para>
+    Target is described using <varname>SPECIFICATION</varname>, which is a
+    list of <xref linkend="cmd.set"/>
+    command and so-called <emphasis>tags</emphasis>. Tags are rule-specific
+    constructs that provide simple way to e.g. list source files for an
+    executable, set include directories or define compiler flags. Unlike
+    <function>set</function> they don't set any specific variable, but rather
+    set various variables in <emphasis>generator-specific way</emphasis>.
+    Tag syntax is almost identical to <function>set</function> function, but
+    without variable name:
+  <programlisting><![CDATA[<TAGNAME>VALUE</TAGNAME></RULE>]]></programlisting>
+    Common tags are described in
+    <link linkend="rules">the section bellow</link>, tags specific to
+    particular modules are described in <xref linkend="ch.modules"/>.
+    A small example of using tags:
+    <programlisting><![CDATA[
+<exe id="myprogram">
+  <!-- set target-specific variable: -->
+  <set var="SOME_VAR">value</set>
+  <!-- three tags: -->
+  <sources>file1.c myprogram.c utils.c</sources>
+  <include>./includes</include>
+  <define>USE_UNICODE</define>
+</exe>
+]]></programlisting>
+    Unless the documentation says otherwise, you can use the same tag
+    repeatedly with same target.
+  </para>
+
+
+  <section id="rules">
+    <title>Rules</title>
+    <para>
+      Description of builtin rules and their tags follows. Additional rules
+      and tags are defined by modules, see <xref linkend="ch.modules"/>.
+    </para>
+
+    <section id="rule.exe" xreflabel="exe">
+      <title>exe</title>
+      <para>
+        Builds a program.
+      </para>
+    </section>
+    
+    
+    
+    <!-- =============================================================== -->
+    <!--                               lib                               -->
+    <!-- =============================================================== -->
+
+    <section id="rule.lib" xreflabel="lib">
+      <title>lib</title>
+      <para>
+        <informaltable>
+          <tgroup cols='2'>
+            <thead>
+              <row>
+                <entry>Tag</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+
+              <row id="tags.lib.libname">
+                <entry role="tagname">libname</entry>
+                <entry>
+                  Set name of the library. By default, the name is same as
+                  <varname>id</varname>, but it is sometimes useful to use
+                  different name to identify the library in makefiles
+                  (<varname>id</varname>) and for created library file
+                  (<varname>libname</varname>). This tag does
+                  <emphasis>not</emphasis> set physical filename -- that is
+                  derived from <varname>libname</varname> and other
+                  generator-specific variables.
+                  <programlisting><![CDATA[
+<lib id="foo">
+  <libname>foo$(COMPILER)_$(DBGFLAG)</depends>
+  <sources>foo.c bar.c</sources>
+</exe>
+]]></programlisting>
+                </entry>
+              </row>
+              
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </para>
+    </section>
+
+
+    <!-- =============================================================== -->
+    <!--                               dll                               -->
+    <!-- =============================================================== -->
+    
+    <section id="rule.dll" xreflabel="dll">
+      <title>dll</title>
+      <para>
+        
+        <informaltable>
+          <tgroup cols='2'>
+            <thead>
+              <row>
+                <entry>Tag</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+
+              <row id="tags.dll.dllname" xreflabel="dllname">
+                <entry role="tagname">dllname</entry>                
+                <entry>
+                  Similar to <link linkend="tags.lib.libname">libname tag on
+                    dll</link>, but it affects the name of shared library/DLL.
+                </entry>
+              </row>
+              
+              <row id="tags.dll.libname" xreflabel="libname">
+                <entry role="tagname">libname</entry>
+                <entry>
+                  Similar to <xref linkend="tags.dll.dllname"/>, but used for
+                  import library on Windows and .so symlink on Unix.
+                </entry>
+              </row>
+              
+              <row id="tags.dll.version" xreflabel="version">
+                <entry role="tagname">version</entry>
+                <entry>
+                </entry>
+              </row>
+              
+              <row id="tags.dll.so_version" xreflabel="so_version">
+                <entry role="tagname">so_version</entry>
+                <entry>
+                </entry>
+              </row>
+              
+              <row id="tags.dll.mac_version" xreflabel="mac_version">
+                <entry role="tagname">mac_version</entry>
+                <entry>
+                </entry>
+              </row>
+              
+              
+            </tbody>
+          </tgroup>
+        </informaltable>
+
+      </para>
+    </section>
+
+    <section id="rule.phony" xreflabel="phony">
+      <title>phony</title>
+      <para>
+        This type of target does nothing. It is usually used as convenience
+        target together with <link linkend="tag.depends">depends</link> tag to
+        easily build set of targets. Standard target <literal>all</literal>
+        is an example of phony target.
+      </para>
+    </section>
+
+    <section id="rule.action" xreflabel="action">
+      <title>action</title>
+      <para>
+        This is most generic rule. It allows you to execute arbitrary sequence
+        of commands when building the target and can therefore be used to
+        extend Bakefile with custom build rules. Note that this rule is not
+        platform- and compiler-independent as the rest of rules.
+        <informaltable>
+          <tgroup cols='2'>
+            <thead>
+              <row>
+                <entry>Tag</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row id="tags.action.command" xreflabel="command">
+                <entry role="tagname">command</entry>
+                <entry>
+                  <para>
+                    Adds command to list of commands to be executed when
+                    building the target.
+                    <programlisting><![CDATA[
+<action id="manual.html">
+  <command>docbook2html manual.xml manual.html</command>
+</action>
+]]></programlisting>
+                  </para>
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </para>
+    </section>
+    
+    <section>
+      <title>Common tags</title>
+      <para>
+        These tags are always available, it is not neccessary to load any
+        <link linkend="ch.modules">module</link> to use them.
+
+        <informaltable>
+          <tgroup cols='3'>
+            <thead>
+              <row>
+                <entry>Tag</entry>
+                <entry>Description</entry>
+                <entry>Availability</entry>
+              </row>
+            </thead>
+            <tbody>
+        
+              <row id="tag.depends" xreflabel="libname">
+                <entry role="tagname">depends</entry>
+                <entry>
+                  <para>
+                    This tag is used to express target's dependency on other
+                    targets. All targets in <function>depends</function> tag
+                    must be built prior to building this target. The value is
+                    whitespace-separated list of target IDs. It is an error to
+                    specify nonexistent target here.
+                  </para>
+                  <para>
+                    Note that <xref linkend="tag.library"/> tag implies
+                    <function>depends</function>.
+                  </para>
+                  <programlisting><![CDATA[
+<copy-file id="setup">
+  <source>setup0.h</source>
+  <dest>setup.h</dest>
+</copy-file>
+
+<exe id="app">
+  <depends>setup</depends>
+  <sources>app.c</sources>
+  <define>USE_SETUP_H</define>
+</exe>
+]]></programlisting>
+                </entry>
+                <entry role="availability">all rules</entry>
+              </row>
+              
+              
+              <row id="tags.lib.dirname">
+                <entry role="tagname">dirname</entry>
+                <entry>
+                  Set name of directory where the target will be created.
+                  <varname>BUILDDIR</varname> is used by default.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+              
+              
+              <row id="tag.dependency-of" xreflabel="dependency-of">
+                <entry role="tagname">dependency-of</entry>
+                <entry>
+                  Mark the target as dependency of target specified in tag's
+                  value. The value must be ID of existing target. This tag
+                  is opposite of <xref linkend="tag.depends"/>. Following two
+                  examples have identical effect:
+                  <programlisting><![CDATA[
+<exe id="setup"></exe>
+<exe id="app">
+  <depends>setup</depends>
+</exe>
+]]></programlisting><programlisting><![CDATA[
+<exe id="app"></exe>
+<exe id="setup">
+  <dependency-of>app</dependency-of>
+</exe>
+]]></programlisting>
+                </entry>
+                <entry role="availability">all</entry>
+              </row>
+
+
+              
+              <row id="tag.sources" xreflabel="sources">
+                <entry role="tagname">sources</entry>
+                <entry>
+                  Specify source files used to build the target.
+                  <programlisting><![CDATA[
+<exe id="app">
+  <sources>app.c</sources>
+  <sources>utils.c utils2.c</sources>
+</exe>
+]]></programlisting>
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+
+      
+      
+              <row id="tag.include" xreflabel="include">
+                <entry role="tagname">include</entry>
+                <entry>
+                  Add directory where the compiler should look for headers.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+      
+      
+              <row id="tag.define" xreflabel="define">
+                <entry role="tagname">define</entry>
+                <entry>
+                  Define C preprocessor macro.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+      
+      
+              <row id="tag.sys-lib" xreflabel="sys-lib">
+                <entry role="tagname">sys-lib</entry>
+                <entry>
+                  Link against specified library installed in the system. Note
+                  that this is <emphasis>not</emphasis> meant for linking in
+                  libraries that were built by the same makefile, use
+                  <xref linkend="tag.library"/> for that. This command links
+                  against a library installed in the system or provided by the
+                  compiler and corresponds to <literal>-l</literal> switch
+                  of Unix compilers.
+              <programlisting><![CDATA[
+<exe id="png2bmp">
+  <sources>png2bmp.c</sources>
+  <sys-lib>png</sys-lib>
+  <sys-lib>z</sys-lib>
+</exe>
+]]></programlisting>
+                  See also <xref linkend="tag.lib-path"/>.
+                </entry>
+                <entry role="availability">exe, dll</entry>
+              </row>
+
+              
+              
+              <row id="tag.lib-path" xreflabel="lib-path">
+                <entry role="tagname">lib-path</entry>
+                <entry>
+                  Add directory where to look for
+                  <link linkend="tag.sys-lib">system libraries</link>.
+                </entry>
+                <entry role="availability">exe, dll</entry>
+              </row>
+      
+              
+              
+              
+              <row id="tag.library" xreflabel="library">
+                <entry role="tagname">library</entry>
+                <entry>
+                  Link against library compiled by this makefile. The value
+                  passed to this tag must be name of existing target. Compare
+                  <xref linkend="tag.sys-lib"/>.
+                  <programlisting><![CDATA[
+<lib id="mylib">
+  <sources>lib1.c lib2.c</sources>
+</lib>
+<exe id="myapp">
+  <sources>main.c</sources>
+  <library>mylib</library>
+  <sys-lib>X11</sys-lib>
+  <sys-lib>GL</sys-lib>
+</exe>
+]]></programlisting>
+                </entry>
+                <entry role="availability">exe, dll</entry>
+              </row>
+      
+              
+              
+              <row>
+                <entry role="tagname">
+                  <para id="tag.cflags">cflags</para>
+                  <para id="tag.cxxflags">cxxflags</para>
+                  <para id="tag.cppflags">cppflags</para>
+                  <para id="tag.ldflags">ldflags</para>
+                </entry>
+                <entry>
+                  Add <emphasis>compiler dependent</emphasis> compilation
+                  flags to compiler flags.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+              
+              
+              
+              <row id="tag.clean-files" xreflabel="clean-files">
+                <entry role="tagname">clean-files</entry>
+                <entry>
+                  Adds files to list of files that are cleaned when
+                  <command>make clean</command> is run -- i.e. files created
+                  while building the target.
+                </entry>
+                <entry role="availability">all</entry>
+              </row>
+      
+      
+            </tbody>
+          </tgroup>
+        </informaltable>
+
+      </para>
+
+    </section>  
+  </section>
+  
+</chapter>

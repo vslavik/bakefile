@@ -1,0 +1,176 @@
+<reference>
+  <title>Running Bakefile</title>
+
+  <refentry id="man.bakefile">
+    <refmeta>
+      <refentrytitle>bakefile</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </refmeta>
+    <refnamediv>
+      <refname>bakefile</refname>
+      <refpurpose>native makefiles generator</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>bakefile</command>
+        <arg choice="opt">
+          <option>--version</option>
+        </arg>
+        <arg choice="opt">
+          <option>--help</option>
+        </arg>
+        <arg choice="plain">
+          <option>-f</option><replaceable class="parameter">FORMAT</replaceable>
+        </arg>
+        <arg choice="plain">
+          <option>-o</option><replaceable class="parameter">OUTFILE</replaceable>
+        </arg>        
+        <arg choice="opt" rep="repeat">
+          <option>-D</option><replaceable
+            class="parameter">VAR</replaceable>=<replaceable class="parameter">VALUE</replaceable>
+        </arg>
+        <arg choice="opt">
+          <option>-v</option>
+        </arg>        
+        <arg choice="opt">
+          <option>--dump</option>
+        </arg>        
+        <arg choice="plain">
+          <replaceable class="parameter">file.bakefile</replaceable>
+        </arg>
+      </cmdsynopsis>
+    </refsynopsisdiv>
+    
+    <refsect1>
+      <title>Description</title>
+      <para>
+        FIXME FIXME
+      </para>
+    </refsect1>
+
+    <refsect1>
+      <title>Command Line Options</title>
+      <para>
+        <variablelist>
+
+          <varlistentry>
+            <term>
+              <option>--version</option>
+            </term>
+            <listitem>
+              <para>
+                Display Bakefile version and exit.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry>
+            <term>
+              <option>-h</option>, <option>--help</option>
+            </term>
+            <listitem>
+              <para>
+                Display usage information and exit.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry>
+            <term>
+              <option>-f</option><replaceable
+                class="parameter">FORMAT</replaceable>, 
+              <option>--format</option>=<replaceable
+                class="parameter">FORMAT</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Specify format of generated makefile (what compiler it is
+                for), e.g. <literal>autoconf</literal> or 
+                <literal>borland</literal>.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry>
+            <term>
+              <option>-o</option><replaceable
+                class="parameter">OUTFILE</replaceable>, 
+              <option>--output</option>=<replaceable
+                class="parameter">OUTFILE</replaceable>
+            </term>
+            <listitem>
+              <para>
+                File to write generated makefile to. Note that some backends
+                generate more than one file, this option specifies name of the
+                main makefile.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          
+          <varlistentry>
+            <term>
+              <option>-D</option><replaceable
+            class="parameter">VAR</replaceable>=<replaceable class="parameter">VALUE</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Define Bakefile variable. This definition overrides any
+                definition from the ruleset or input makefile. You can use it
+                to customize generated output.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry>
+            <term>
+              <option>-v</option>
+            </term>
+            <listitem>
+              <para>Be verbose.</para>
+            </listitem>
+          </varlistentry>
+          
+          
+          <varlistentry>
+            <term>
+              <option>--dump</option>
+            </term>
+            <listitem>
+              <para>
+                Dump all Bakefile variables and targets to standard output
+                instead of generating output. This is only useful for
+                debugging Bakefile or ill-behaving makefiles.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+
+        </variablelist>
+      </para>
+    </refsect1>
+    
+    <refsect1>
+      <title>Environment Variables</title>
+      <para>
+        <variablelist>
+          <varlistentry id="searchpaths">
+            <term>BAKEFILE_PATHS</term>
+            <listitem>
+              <para>
+                List of directories where ruleset files are looked for (syntax
+                is same as in <varname>PATH</varname>). Bakefile's data
+                directory is always searched in addition to paths listed in
+                <varname>BAKEFILE_PATHS</varname>, but
+                <varname>BAKEFILE_PATHS</varname> has higher priority.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </para>
+    </refsect1>
+
+  </refentry>
+
+</reference>
