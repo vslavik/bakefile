@@ -109,6 +109,35 @@
       <title>exe</title>
       <para>
         Builds a program.
+        <informaltable>
+          <tgroup cols='2'>
+            <thead>
+              <row>
+                <entry>Tag</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+
+              <row id="tags.exe.app-type">
+                <entry role="tagname">app-type</entry>
+                <entry>
+                  Use this tag to specify whether the executable is console
+                  application (<literal>console</literal>) or windowed one
+                  (<literal>gui</literal>). These two kinds of applications
+                  are linked differently on Windows.
+                  <programlisting><![CDATA[
+<exe id="foo">
+  <app-type>gui</app-type>
+  <sources>foo.c bar.c</sources>
+</exe>
+]]></programlisting>
+                </entry>
+              </row>
+              
+            </tbody>
+          </tgroup>
+        </informaltable>
       </para>
     </section>
     
@@ -440,6 +469,84 @@
               </row>
       
               
+              <row id="tag.optimize" xreflabel="optimize">
+                <entry role="tagname">optimize</entry>
+                <entry>
+                  Set compiler's optimization level. May be one of
+                  <literal>off</literal> (no optimization),
+                  <literal>speed</literal> (generate fastest code) or
+                  <literal>size</literal> (smallest code).
+                  <programlisting><![CDATA[
+<set var="OPTIMIZE_FLAG">
+  <if cond="BUILD=='release'">speed</if>
+  <if cond="BUILD=='debug'">off</if>
+</set>
+<exe id="myapp">
+  <optimize>$(OPTIMIZE_FLAG)</optimize>
+  <sources>main.c</sources>
+  <sys-lib>GL</sys-lib>
+</exe>
+]]></programlisting>
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+              
+              <row id="tag.debug-info" xreflabel="debug-info">
+                <entry role="tagname">debug-info</entry>
+                <entry>
+                  Enable or disable debugging information. Can be either
+                  <literal>on</literal> or <literal>off</literal>.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+              
+              
+              <row id="tag.arch" xreflabel="arch">
+                <entry role="tagname">arch</entry>
+                <entry>
+                  Set target CPU architecture. Note that this is not portable
+                  and should be avoided if possible. Accepted values are
+                  <literal>i[3456]86</literal>.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+
+
+              <row id="tag.threading" xreflabel="threading">
+                <entry role="tagname">threading</entry>
+                <entry>
+                  Use <literal>multi</literal> to enable and
+                  <literal>single</literal> to disable multithreading in the
+                  application. This affects what libraries are linked into
+                  executable on some platforms.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+
+
+              <row id="tag.precomp-headers" xreflabel="precomp-headers">
+                <entry role="tagname">precomp-headers</entry>
+                <entry>
+                  Can be <literal>on</literal> or <literal>off</literal>,
+                  enables or disables use of precompiled headers with
+                  compilers that support them.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+              
+              
+              <row id="tag.precomp-headers-file"
+                xreflabel="precomp-headers-file">
+                <entry role="tagname">precomp-headers-file</entry>
+                <entry>
+                  Use this tag to fine-tune where precompiled headers are
+                  stored. The compiler must support this and the value passed
+                  to <function>precomp-headers-file</function> can be modified
+                  by Bakefile, e.g. by apending <literal>.pch</literal>
+                  extension to it.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
               
               <row>
                 <entry role="tagname">
@@ -508,6 +615,19 @@
             </tbody>
           </tgroup>
         </informaltable>
+        
+        
+        
+        <note>
+          <title>Autoconf Note</title>
+          <para>
+            Many configuration options listed above are not supported by the
+            Autoconf format (e.g. <xref linkend="tag.optimize"/>,
+            <xref linkend="tag.debug-info"/> or <xref linkend="tag.arch"/>.
+            This is because <filename>configure</filename> is used to find
+            appropriate compiler flags.
+          </para>
+        </note>
 
       </para>
 
