@@ -131,9 +131,13 @@
                     done
                 </if>
 
-                <if cond="TOOLSET=='win32'">
+                <if cond="TOOLSET=='win32' and FORMAT!='mingw'">
                     if not exist $(__dstdir) mkdir $(__dstdir)
                     for %f in ($(__files)) do if not exist $(__dstdir)\%f copy $(__srcdir)%f $(__dstdir)
+                </if>
+                <if cond="TOOLSET=='win32' and FORMAT=='mingw'">
+                    if not exist $(__dstdir) mkdir $(__dstdir)
+                    for %%f in ($(__files)) do if not exist $(__dstdir)\%%f copy $(__srcdir)%%f $(__dstdir)
                 </if>
                 
             </set>
