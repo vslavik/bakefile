@@ -46,16 +46,6 @@
         </define-tag>
     </define-rule>
 
-    <!-- includes and defines should propagate to rc compilation, too: -->
-    <define-tag name="include" rules="exe,dll">
-        <set var="__win32rc_flags" append="1">
-            $(addPrefixIfNotEmpty('/i',nativePaths(value)))</set>
-    </define-tag>
-    <define-tag name="define" rules="exe,dll">
-        <set var="__win32rc_flags" append="1">
-            $(addPrefixIfNotEmpty('/d',value))</set>
-    </define-tag>
-
     
     <!-- =============================================================== -->
     <!--                            output:                              -->

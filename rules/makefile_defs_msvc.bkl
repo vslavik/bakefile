@@ -72,6 +72,7 @@
     
     <define-rule name="__msvc_comp">
         <template>
+            <set var="__win32rc_flags"/>
             <set var="__pch_header"/>
             <set var="__pch_useflag" eval="0">/YX$(__pch_header)</set>
             <set var="__pch_flags" eval="0">$(__pch_useflag)</set>
@@ -82,25 +83,6 @@
             <cppflags>$(__rtl)</cppflags>
             <define>WIN32</define>
         </template>
-
-        <define-tag name="runtime-libs">
-            <set var="__rtl_type">
-                $(substituteFromDict(value,
-                  {'static':__rtl_static, 'dynamic':'D'}))
-            </set>
-        </define-tag>
-        <define-tag name="threading">
-            <set var="__rtl_static">
-                $(substituteFromDict(value, {'multi':'T', 'single':'L'}))
-            </set>
-        </define-tag>
-        <define-tag name="debug-info">
-            <set var="__rtl_dbg">
-                $(substituteFromDict(value, {'on':'d', 'off':''}))
-            </set>
-            <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
-            <cppflags>/Fd$(__pdbfile)</cppflags>
-        </define-tag>
 
         <define-tag name="precomp-headers">
                 <!-- FIXME: should be cppflags, this is temporary hack to

@@ -3,10 +3,31 @@
 
 <makefile>
 
+    <!-- some nontrivial settings shared by all msvc formats: -->
+
     <define-tag name="debug-info" rules="exe,dll,lib">
         <define>
             $(substituteFromDict(value, {'on':'_DEBUG', 'off':'NDEBUG'}))
         </define>
+    </define-tag>
+    
+    <define-tag name="runtime-libs" rules="exe,dll,lib">
+        <set var="__rtl_type">
+            $(substituteFromDict(value,
+              {'static':__rtl_static, 'dynamic':'D'}))
+        </set>
+    </define-tag>
+    <define-tag name="threading" rules="exe,dll,lib">
+        <set var="__rtl_static">
+            $(substituteFromDict(value, {'multi':'T', 'single':'L'}))
+        </set>
+    </define-tag>
+    <define-tag name="debug-info" rules="exe,dll,lib">
+        <set var="__rtl_dbg">
+            $(substituteFromDict(value, {'on':'d', 'off':''}))
+        </set>
+        <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
+        <cppflags>/Fd$(__pdbfile)</cppflags>
     </define-tag>
     
     <define-tag name="app-type" rules="exe">
@@ -15,5 +36,19 @@
             {'console':'_CONSOLE', 'gui':'_WINDOWS'}))
         </define>
     </define-tag>
+
+
+    
+    <!-- includes and defines should propagate to rc compilation, too: -->
+    
+    <define-tag name="include" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/i',nativePaths(value)))</set>
+    </define-tag>
+    <define-tag name="define" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/d',value))</set>
+    </define-tag>
+
 
 </makefile>
