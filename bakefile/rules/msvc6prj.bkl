@@ -4,7 +4,6 @@
 <makefile>
 
     <include file="win32.bkl"/>
-    <using module="msvc_utils"/>
 
     <set var="COMPILER">vc</set>
 
@@ -33,7 +32,7 @@
 
         <define-tag name="depends">
             <set var="__deps" append="1">
-                $(substitute(value, lambda x: ref('__depname', x), 'DEP'))
+                $(substitute(value, lambda x: ifthenelse(isDeadTarget(x),'',ref('__depname', x)), 'DEP'))
             </set>
         </define-tag>
         
@@ -47,6 +46,7 @@
 
     <define-rule name="__compiled" extends="__any">        
         <template>
+            <set var="__kind">project</set>
             <set var="__sources"/>
             <set var="__defines">/D "WIN32"</set>
             <set var="__cppflags"/>
@@ -55,7 +55,9 @@
             <set var="__win32rc_flags"/>
             <set var="__debug">0</set>            
             <set var="__builddir" eval="0">
-                $(substituteFromDict(__debug,{'0':'Release','1':'Debug'}))
+                <if cond="BUILDDIR=='.'">
+                    $(substituteFromDict(__debug,{'0':'Release','1':'Debug'}))                  </if>
+                <if cond="BUILDDIR!='.'">$(BUILDDIR)</if>
             </set>
             
             <set var="__rtl_dbg"/>
@@ -76,13 +78,13 @@
         
         <define-tag name="define">
             <set var="__defines" append="1">
-                $(substitute(value, msvc_utils.formatDefine))
+                $(addPrefixIfNotEmpty('/D ',value))
             </set>
         </define-tag>
         
         <define-tag name="include">
             <cppflags>
-                $(substitute(value, msvc_utils.formatInclude))
+                $(addPrefixIfNotEmpty('/I ',nativePaths(value)))
             </cppflags>
         </define-tag>
 
@@ -107,7 +109,7 @@
         </define-tag>
         
         <define-tag name="lib-path">
-            <ldflags>/LIBPATH:$(value)</ldflags>
+            <ldflags>/libpath:"$(nativePaths(value))"</ldflags>
         </define-tag>
         
         <define-tag name="ldlibs">
@@ -198,6 +200,7 @@
     <!-- phony targets are used only to track dependencies: -->
     <define-rule name="phony" extends="__any">
         <template>
+            <set var="__kind">phony</set>
             <set var="__depname" eval="0">$(__deps)</set>
         </template>
     </define-rule>
@@ -211,6 +214,9 @@
     nmake content:  FIXME FIXME FIXME
     -->
     <define-rule name="action" extends="__any">
+        <template>
+            <set var="__kind">action</set>
+        </template>
         <define-tag name="command">
         </define-tag>
     </define-rule>
