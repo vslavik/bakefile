@@ -52,7 +52,11 @@ def makeConfigs():
 configDefs = {}
 
 def __cfg2str(c):
-    list = [mk.options[x].values_desc[c[x]] for x in c]
+    list = []
+    for x in mk.options_order:
+        if x in c:
+            v = mk.options[x].values_desc[c[x]]
+            if v != '': list.append(v)
     if len(list) == 0:
         return 'Default'
     else:
@@ -171,7 +175,16 @@ def findDistinctConfigs(t):
     
 
 def flatten():        
+    def __configCompare(c1, c2):
+        for x in mk.options_order:
+            if x not in c1: continue
+            i1 = mk.options[x].values.index(c1[x])
+            i2 = mk.options[x].values.index(c2[x])
+            if i1 != i2:
+                return i1-i2
+        return 0
     cfgs = [x.values for x in makeConfigs()]
+    cfgs.sort(__configCompare)
     if len(cfgs) == 0:
         cfgs = [{}]
 
@@ -192,11 +205,14 @@ def flatten():
 
     # expand or configurations:
     configs = {}
+    configs_order = []
     for c in cfgs:
         name = __cfg2str(c)
         configDefs[name] = c
         configs[name] = flattenConfig(c)
-    mk.vars['configs'] = configs    
+        configs_order.append(name)
+    mk.vars['configs'] = configs
+    mk.vars['configs_order'] = configs_order
 
     # reduce number of configurations on targets:
     for t in mk.targets.values():

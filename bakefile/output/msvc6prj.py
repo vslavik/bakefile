@@ -12,6 +12,13 @@ dirname = os.path.dirname(FILE)
 #   helpers
 # ------------------------------------------------------------------------
 
+def sortedKeys(dic):
+    l = []
+    for c in configs_order:
+        if c in dic:
+            l.append(c)
+    return l
+
 def mkConfigName(target, config):
     return '%s - Win32 %s' % (target, config)
 
@@ -151,7 +158,7 @@ CFG=%s
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 """ % (prjname, prjname, mkConfigName(t.id, default_cfg))
-    for c in t.configs:
+    for c in sortedKeys(t.configs):
         dsp += '!MESSAGE "%s" (based on %s)\n' % (mkConfigName(t.id, c), t.configs[c].__type)
     dsp += """\
 !MESSAGE 
@@ -169,7 +176,7 @@ CPP=cl.exe
 
     # Output settings for all configurations:
     flags = []
-    for c in t.configs:
+    for c in sortedKeys(t.configs):
         cfg = t.configs[c]
         fl = '  "$(CFG)" == "%s"' % mkConfigName(t.id, c) + '\n\n'
         fl += mkFlags('PROP',"""\
@@ -201,14 +208,14 @@ BSC32=bscmake.exe
     dsp += '\n\n# Begin Target\n\n'
 
     # Output list of configs one more:
-    for c in t.configs:
+    for c in sortedKeys(t.configs):
         dsp += '# Name "%s"\n' % mkConfigName(t.id, c)
     
     # Write source files:
 
     # (find files from all configs, identify files not in all configs)
     sources = {}
-    for c in t.configs:
+    for c in sortedKeys(t.configs):
         for s in t.configs[c].__sources.split():
             snat = utils.nativePaths(s)
             if snat not in sources:
@@ -222,7 +229,7 @@ BSC32=bscmake.exe
     # Add more files that are part of the project but are not built (e.g. 
     # headers, READMEs etc.). They are included unconditionally to save some
     # space.
-    for c in t.configs:
+    for c in sortedKeys(t.configs):
         for s in t.configs[c].__more_files.split():
             snat = utils.nativePaths(s)
             if snat not in sources:
@@ -231,14 +238,14 @@ BSC32=bscmake.exe
     # Find files with custom build associated with them and retrieve
     # custom build's code
     filesWithCustomBuild = {}
-    for c in t.configs:
+    for c in sortedKeys(t.configs):
         cbf = t.configs[c].__custom_build_files
         if len(cbf) == 0 or cbf.isspace(): continue
         for f in cbf.split():
             filesWithCustomBuild[f] = {}
     for f in filesWithCustomBuild:
         fname = f.replace('.','_').replace('\\','_')
-        for c in t.configs:
+        for c in sortedKeys(t.configs):
             filesWithCustomBuild[f][c] = \
                    eval ('t.configs[c].__custom_build_%s' % fname)
 
@@ -291,7 +298,7 @@ SOURCE=%s\%s
             if sources[src] != None or src in filesWithCustomBuild:
                 flags = []
                 old_file_flags = file_flags
-                for c in t.configs:
+                for c in sortedKeys(t.configs):
                     if sources[src] != None and c not in sources[src]:
                         file_flags += '# PROP Exclude_From_Build 1\n'
                     if src in filesWithCustomBuild:
