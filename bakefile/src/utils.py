@@ -18,7 +18,7 @@
 #
 #  $Id$
 #
-#  Misc utility functions
+#  Misc utility functions for use in Bakefiles
 #
 
 import mk, errors, config, sys, os
