@@ -367,11 +367,6 @@ AC_DEFUN(AC_BAKEFILE_SHARED_VERSIONS,
       ;;
 
       *-*-darwin* )
-        dnl library installation base name and wxMac resources file base name
-        dnl must be identical in order for the resource file to be found at
-        dnl run time in src/mac/app.cpp
-        SONAME_FLAG="-compatibility_version ${WX_RELEASE} -current_version ${WX_VERSION} -install_name \$(libdir)/${WX_LIBRARY_LINK1}"
-        dnl FIXME -- broken
         USE_MACVERSION=1
         USE_SOVERSION=1
       ;;      
