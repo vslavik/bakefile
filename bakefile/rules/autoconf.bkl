@@ -40,7 +40,7 @@
     <option name="PLATFORM_MAC"/>
     <option name="PLATFORM_MACOSX"/>
     
-    <option name="srcdir"/>
+    <option name="srcdir" never_empty="1"/>
     <option name="top_srcdir"/>
     <option name="top_builddir"/>
 
@@ -65,6 +65,9 @@
         <if cond="PLATFORM_WIN32=='1'">.a</if>
         <if cond="PLATFORM_WIN32=='0'">$(DLLEXT)</if>
     </set>
+
+    <option name="LDFLAGS_GUI"/>   
+    <set var="__FLAG_EXE_GUI">$(LDFLAGS_GUI)</set>
 
     <set var="DLL_CFLAGS">$(PIC_FLAG)</set>
     <set var="__DLL_LINKER_CC" eval="0">$(SHARED_LD_CC)</set>
