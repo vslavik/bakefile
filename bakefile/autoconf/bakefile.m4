@@ -446,7 +446,6 @@ dnl ---------------------------------------------------------------------------
 AC_DEFUN(AC_BAKEFILE_RES_COMPILERS,
 [
     RESCOMP=
-    DEREZ=
     SETFILE=
 
     case ${host} in 
