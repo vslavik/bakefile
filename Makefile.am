@@ -15,6 +15,8 @@ output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
               output/borland.empy \
               output/msvc.empy \
+              output/mingw.empy \
+              output/watcom.empy \
               output/_hdr_makefile.empy
 
 rules_DATA =  rules/autoconf.bkl \
@@ -26,10 +28,14 @@ rules_DATA =  rules/autoconf.bkl \
               rules/makefile.bkl \
               rules/makefile_defs_borland.bkl \
               rules/makefile_defs_msvc.bkl \
+              rules/makefile_defs_mingw.bkl \
+              rules/makefile_defs_watcom.bkl \
               rules/makefile_defs_unix.bkl \
               rules/makefile_macres.bkl \
               rules/makefile_mingw.bkl \
               rules/msvc.bkl \
+              rules/mingw.bkl \
+              rules/watcom.bkl \
               rules/unixlike.bkl \
               rules/vc5.bkl \
               rules/vc6.bkl \
