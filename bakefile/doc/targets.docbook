@@ -149,6 +149,19 @@
                 </entry>
               </row>
               
+              <row id="tags.lib.exename">
+                <entry role="tagname">exename</entry>
+                <entry>
+                  Set name of the executable. By default, the name is same as
+                  <varname>id</varname>, but it is sometimes useful to use
+                  different name to identify the executable in makefiles
+                  (<varname>id</varname>) and for created program file
+                  (<varname>exename</varname>). Physical filename is
+                  deriver from <varname>exename</varname> and format-specific
+                  extension (e.g. <literal>.exe</literal> on Windows).
+                </entry>
+              </row>
+              
             </tbody>
           </tgroup>
         </informaltable>

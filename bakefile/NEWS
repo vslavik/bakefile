@@ -3,6 +3,7 @@ Version 0.1.4
 -------------
 
 - windows makefiles: fixed "clean" target to clean subprojects
+- added <exename> tag
 
 
 Version 0.1.3

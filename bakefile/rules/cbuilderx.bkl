@@ -228,12 +228,15 @@
         <template>
             <set var="__type">exeproject</set>
             <app-type>console</app-type>
-            <set var="__targetname">$(id).exe</set>
-            <set var="__name">$(id)</set>
+            <exename>$(id)</exename>
             <set var="__app_type">console</set>
         </template>
         <define-tag name="app-type">
             <set var="__app_type">$(value)</set>
+        </define-tag>
+        <define-tag name="exename">
+            <set var="__name">$(value)</set>
+            <set var="__targetname">$(value).exe</set>
         </define-tag>
     </define-rule>
     

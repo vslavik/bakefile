@@ -15,8 +15,10 @@
     <set var="__MSVC_TYPECODE_DLL">0x0102</set>
     <set var="__MSVC_TYPECODE_LIB">0x0104</set>
     
-    <tag-info name="dirname" position="before:libname,before:dllname"/>
-    <tag-info name="debug-info" position="after:dllname,after:libname"/>
+    <tag-info name="dirname"
+              position="before:libname,before:dllname,before:exename"/>
+    <tag-info name="debug-info"
+              position="after:dllname,after:libname,after:exename"/>
 
     <define-rule name="__any">
         <template>
@@ -242,9 +244,12 @@
     <define-rule name="exe" extends="__compiled">
         <template>
             <app-type>console</app-type>
-            <set var="__targetname">$(id).exe</set>
-            <set var="__name">$(id)</set>
+            <exename>$(id)</exename>
         </template>
+        <define-tag name="exename">
+            <set var="__name">$(value)</set>
+            <set var="__targetname">$(value).exe</set>
+        </define-tag>
         <define-tag name="app-type">
             <set var="__type">
                 $(substituteFromDict(value,
