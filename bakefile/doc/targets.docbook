@@ -200,7 +200,7 @@
                   generator-specific variables.
                   <programlisting><![CDATA[
 <lib id="foo">
-  <libname>foo$(COMPILER)_$(DBGFLAG)</depends>
+  <libname>foo$(COMPILER)_$(DBGFLAG)</libname>
   <sources>foo.c bar.c</sources>
 </lib>
 ]]></programlisting>
