@@ -1,10 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
 aclocaldir = $(datadir)/aclocal
-outputdir = $(pkgdatadir)/output
-rulesdir = $(pkgdatadir)/rules
+outputdir = $(pkglibdir)/output
+rulesdir = $(pkglibdir)/rules
 rulesgettextdir = $(rulesdir)/gettext
-codedir = $(pkgdatadir)/src
+codedir = $(pkglibdir)/src
 codeempydir = $(codedir)/empy
 codeoptikdir = $(codedir)/optik
 
@@ -73,7 +73,8 @@ code_PYTHON = src/config.py \
               src/writer.py \
               src/xmlparser.py \
 			  src/dependencies.py \
-              src/outmethods.py
+              src/outmethods.py \
+			  src/bottlenecks.py
 codeempy_PYTHON = \
               src/empy/__init__.py \
               src/empy/em.py
@@ -84,6 +85,11 @@ codeoptik_PYTHON = \
               src/optik/option.py \
               src/optik/option_parser.py
 
+code_LTLIBRARIES = _bottlenecks.la
+
+_bottlenecks_la_SOURCES = src/bottlenecks.c src/bottlenecks_wrap.c
+_bottlenecks_la_LDFLAGS = -module -avoid-version
+_bottlenecks_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
 
 EXTRA_DIST = \
     README THANKS \
@@ -91,6 +97,7 @@ EXTRA_DIST = \
     tests doc/images doc bakefile.spec bakefile.iss \
     src/optik/README.txt autoconf output rules \
     src/empy/README src/empy/COPYING \
+	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
 	src/bakefile.exe \
 	src/bakefile_gen.exe
@@ -101,9 +108,9 @@ dist-hook:
 
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
-	ln -sf ../share/bakefile/src/bakefile.py $(DESTDIR)$(bindir)/bakefile
+	ln -sf ../lib/bakefile/src/bakefile.py $(DESTDIR)$(bindir)/bakefile
 	chmod +x $(DESTDIR)$(codedir)/bakefile.py
-	ln -sf ../share/bakefile/src/bakefile_gen.py $(DESTDIR)$(bindir)/bakefile_gen
+	ln -sf ../lib/bakefile/src/bakefile_gen.py $(DESTDIR)$(bindir)/bakefile_gen
 	chmod +x $(DESTDIR)$(codedir)/bakefile_gen.py
 
 ACLOCAL_AMFLAGS = -I admin

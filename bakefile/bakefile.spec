@@ -11,7 +11,6 @@ Group:         Development/Other
 URL:           http://bakefile.sourceforge.net
 Packager:      Vaclav Slavik <vaclav.slavik@matfyz.cz>
 BuildRoot:     /var/tmp/%{name}-%{version}-root
-BuildArch:     noarch
 
 Requires:      python >= 2.2.2
 
@@ -38,7 +37,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc README THANKS doc/html
 %{_bindir}/*
-%dir %{_datadir}/bakefile
-%{_datadir}/bakefile/*
+%dir %{_libdir}/bakefile
+%{_libdir}/bakefile/*
 %{_datadir}/aclocal/bakefile.m4
 %{_mandir}/*/*

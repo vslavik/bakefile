@@ -118,7 +118,11 @@ def substitute2(str, callback, desc=None, cond=None, hints=''):
         if len(expr) == 0 or expr.isspace(): return expr
         return callback(cond, expr)
     
-    return mk.__doEvalExpr(str, callbackVar, callbackTxt, cond)
+    return mk.__doEvalExpr(str, callbackVar, callbackTxt,
+                           cond, # moreArgs
+                           1,    # use_options
+                           None, # target
+                           None) # add_dict
 
 
 def substitute(str, callback, desc=None, hints=''):
@@ -344,7 +348,10 @@ def __containsLiteral(expr):
     def textCb(counter, txt):
         if len(txt) > 0: counter.c = 1
         return ''
-    mk.__doEvalExpr(expr, lambda a,b,c,d,e: '', textCb, counter)
+    mk.__doEvalExpr(expr, lambda a,b,c,d,e: '', textCb, counter,
+                           1,    # use_options
+                           None, # target
+                           None) # add_dict
     return counter.c > 0
 
 def formatIfNotEmpty(fmt, value):
