@@ -153,6 +153,12 @@ makefiles (most notably GNU Make and Autoconf formats).
             </set>
             <set var="__deps" append="1">$(__objects_var)</set>
             
+            <!-- it makes sense to make <objects-depend> use make var, too: -->
+            <set var="__objects_deps"/>
+            <set var="__objects_deps_var">
+                $(createMakeVar(id, '__objects_deps', 'ODEP'))
+            </set>
+            
             <set var="__linker" eval="0">
                 $(ifthenelse(__uses_cxx, __LINKER_CXX, __LINKER_CC))
             </set>
@@ -210,6 +216,12 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
         <define-tag name="ldlibs">
             <set var="__ldlibs" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="objects-depend">
+            <set var="__objects_deps" append="1">
+                $(substitute(value, lambda x: ref('__depname', x), 'DEP'))
+            </set>
         </define-tag>
 
         <define-tag name="sources">
@@ -462,6 +474,12 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!-- =============================================================== -->
     <!--                  Sources compilation rules:                     -->
     <!-- =============================================================== -->
+            
+    <define-tag name="parent-target" rules="compilation_rule">
+        <set var="__deps" append="1">
+            $(targets[__parent].__objects_deps_var)
+        </set>
+    </define-tag>
 
     <define-rule name="__c-to-$(OBJEXT[1:])" extends="__any,compilation_rule">
         <template template="__commands_templ_C">
