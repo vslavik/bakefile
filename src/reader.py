@@ -287,8 +287,6 @@ def handleTarget(e):
     tags = rule.getTagsDict()
     e = applyTemplates(e, rule.getTemplates() + extractTemplates(e))
     id = e.props['id']
-    if config.verbose:
-        print "processing %s..." % id
     if id in mk.targets:
         raise ReaderError(e, "duplicate target name '%s'" % id)
     
@@ -463,6 +461,7 @@ def processFile(filename):
         raise ReaderError(None, "file '%s' doesn't exist" % filename)
     if config.verbose:
         print 'loading %s...' % filename
+    sys.path.append(os.path.dirname(os.path.abspath(filename)))
     __doProcess(file=filename)
 
 def processFileIfExists(filename):
@@ -565,7 +564,6 @@ def setOverrideVars():
     
 
 def read(filename):
-    sys.path.append(os.path.dirname(os.path.abspath(filename)))
     try:
         setStdVars()
         setOverrideVars()
