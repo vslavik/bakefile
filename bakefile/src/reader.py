@@ -560,6 +560,7 @@ def processXML(data):
 
 def setStdVars():
     mk.setVar('LF', '\n')
+    mk.setVar('SPACE', '$(" ")', eval=0)
     mk.setVar('OUTPUT_FILE', config.output_file)
     mk.setVar('FORMAT', config.format)
 
