@@ -12,37 +12,62 @@ from types import InstanceType, DictType
 import mk, errors, config, utils
 
 
-def finalEvaluation():
+def finalEvaluation(outputVarsOnly = 1):
     """Evaluates all variables, so that unneccessary $(...) parts are
-       removed in cases when <set eval="0" ...> was used"""
+       removed in cases when <set eval="0" ...> was used.
+
+       Noteworthy effect is that after calling this function all variables
+       are fully evaluated except for conditional and make vars and options,
+       meaning that outputVarsOnly=0 is only needed when running
+       finalEvaluation for the first time, because no ordinary variable depends
+       (by using $(varname)) on another ordinary variable in subsequent runs.
+    """
 
     mk.__trackUsage = 1
     mk.__resetUsageTracker(reset_coverage=1)
 
     refs = []
     list = []
-    
-    for v in mk.vars:
-        if not (type(mk.vars[v]) is InstanceType or
-                type(mk.vars[v]) is DictType):
-            if '$' in mk.vars[v]:
-                list.append((mk.vars,v,None))
-    
+
+    if outputVarsOnly:
+        interestingVars = mk.vars['FORMAT_OUTPUT_VARIABLES'].strip().split(',')
+        optimizeVars = len(interestingVars) > 0
+    else:
+        optimizeVars = 0
+
     for v in mk.make_vars:
         if '$' in mk.make_vars[v]:
             list.append((mk.make_vars,v,None))
     
-    for t in mk.targets.values():
-        for v in t.vars:
-            if not (type(t.vars[v]) is InstanceType or 
-                    type(t.vars[v]) is DictType):
-                if '$' in t.vars[v]:
-                    list.append((t.vars,v,t))
-            
     for c in mk.cond_vars.values():
         for v in c.values:
             if '$' in v.value:
                 list.append((None,v,c.target))
+
+    if optimizeVars:
+        for v in interestingVars:
+            if v in mk.vars and '$' in mk.vars[v]:
+                list.append((mk.vars,v,None))
+    else:
+        for v in mk.vars:
+            if not (type(mk.vars[v]) is InstanceType or
+                    type(mk.vars[v]) is DictType):
+                if '$' in mk.vars[v]:
+                    list.append((mk.vars,v,None))
+   
+    if optimizeVars:
+        for t in mk.targets.values():
+            for v in interestingVars:
+                if v in t.vars and '$' in t.vars[v]:
+                    list.append((t.vars,v,t))
+    else:
+        for t in mk.targets.values():
+            for v in t.vars:
+                if not (type(t.vars[v]) is InstanceType or 
+                        type(t.vars[v]) is DictType):
+                    if '$' in t.vars[v]:
+                        list.append((t.vars,v,t))
+            
     
     def iterateModifications(list):
         while len(list) > 0:
@@ -82,6 +107,31 @@ def finalEvaluation():
         iterateModifications(refs)
         if config.verbose: sys.stdout.write('\n')
         
+
+def purgeUnusedOptsVars():
+    """Removes unused options, conditional variables and make variables. This
+       relies on previous call to finalEvaluation() that fills usage maps
+       in mk.__usageTracker.map!"""
+    if config.verbose:
+        sys.stdout.write('purging unused variables')
+        sys.stdout.flush()
+    toKill = []
+    for o in mk.options:
+        if o not in mk.__usageTracker.map:
+            toKill.append((mk.options, mk.__vars_opt, o))
+    for v in mk.cond_vars:
+        if v not in mk.__usageTracker.map:
+            toKill.append((mk.cond_vars, mk.__vars_opt, v))
+    for v in mk.make_vars:
+        if v not in mk.__usageTracker.map:
+            toKill.append((mk.make_vars, mk.vars, v))
+    if config.verbose:
+        sys.stdout.write(': %i of %i\n' % (len(toKill),
+                         len(mk.options)+len(mk.cond_vars)+len(mk.make_vars)))
+    for dict1, dict2, key in toKill:
+        del dict1[key]
+        del dict2[key]
+    return len(toKill) > 0
 
 
 def purgeConstantCondVars():
@@ -188,7 +238,7 @@ def finalize():
         mk.__vars_opt[v] = config.variableSyntax % v
 
     # evaluate variables:
-    finalEvaluation()
+    finalEvaluation(outputVarsOnly=0)
 
     # delete pseudo targets now:
     pseudos = [ t for t in mk.targets if mk.targets[t].pseudo ]
@@ -199,6 +249,10 @@ def finalize():
     
     # purge conditional variables that have same value for all conditions:
     if purgeConstantCondVars():
+        finalEvaluation()
+
+    # purge unused options, cond vars and make vars:
+    while purgeUnusedOptsVars():
         finalEvaluation()
 
     # replace \$ with $:
