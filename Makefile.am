@@ -11,7 +11,9 @@ codeoptikdir = $(codedir)/optik
 
 bin_SCRIPTS = autoconf/bakefilize
 
-aclocal_DATA = autoconf/bakefile.m4
+aclocal_DATA = autoconf/bakefile.m4 \
+               autoconf/bakefile-lang.m4
+
 man_MANS = doc/man/bakefile.1
 
 output_DATA = output/autoconf.empy \
