@@ -13,7 +13,7 @@
     <set var="__DEFAULT_CC">bcc32</set>
     <set var="__DEFAULT_CXX">bcc32</set>
     <set var="__DEFAULT_CFLAGS"></set>
-    <set var="__DEFAULT_CPPFLAGS"></set>
+    <set var="__DEFAULT_CPPFLAGS">-I\$(BCCDIR)\include</set>
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
     
