@@ -44,3 +44,7 @@ all: @BUILDDIR
 !endif
 @[end if]@
 @[end for]@
+
+@[for f in fragments]
+@f.content
+@[end for]@

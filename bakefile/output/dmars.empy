@@ -51,3 +51,7 @@ def orderByDeps(vars):
 @('\t'+cmd.strip())
 @[end for]@
 @[end for]@
+
+@[for f in fragments]
+@f.content
+@[end for]@

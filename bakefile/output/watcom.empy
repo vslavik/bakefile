@@ -71,3 +71,7 @@ all : @BUILDDIR
 @[if t.cond != None]@makeCondEnd(t.cond)
 @[end if]@
 @[end for]@
+
+@[for f in fragments]
+@f.content
+@[end for]@
