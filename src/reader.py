@@ -554,8 +554,16 @@ def _processTargetNodes(node, target, tags, dict):
                     _processEntry(c, target, dict)
         else:
             if entry.type == TgtCmdNode.TAG and entry.node.value != None:
+                # $(value) expands to the thing passed as tag's text value:
                 dict2 = {'value':mk.evalExpr(entry.node.value,
                                              target=target, add_dict=dict)}
+                # tag's attributes are available as $(attributes['foo']):
+                if len(entry.node.props) > 0:
+                    attr = {}
+                    for a in entry.node.props:
+                        attr[a] = mk.evalExpr(entry.node.props[a],
+                                              target=target, add_dict=dict)
+                    dict2['attributes'] = attr
             else:
                 dict2 = dict
             for c in entry.children:
