@@ -81,7 +81,7 @@ def mergeBlocksWithFilelist(old, new):
        zero."""
     import re
     import mk
-    filename = mk.vars['INPUT_FILE_ARG']
+    filename = mk.vars['INPUT_FILE_ARG'].replace('\\', '/') # unix path
     
     def parseFilelist(hdr):
         # the header/name has format "name[list,of,files]" where the list is
