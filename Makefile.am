@@ -8,6 +8,8 @@ codedir = $(pkglibdir)
 codeempydir = $(codedir)/empy
 codeoptikdir = $(codedir)/optik
 
+bin_SCRIPTS = autoconf/bakefilize
+
 aclocal_DATA = autoconf/bakefile.m4
 man_MANS = doc/man/bakefile.1
 
