@@ -12,6 +12,7 @@
     <set var="MAKEARGS" make_var="1">$(__MAKEARGS)</set>
 
     <template id="__subproject_templ">
+        <set var="__targetname">sub_$(id)</set>
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
             $(DOLLAR)(MAKE) /NOLOGO /F $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) $(__subtarget)
