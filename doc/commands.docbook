@@ -74,8 +74,9 @@
                   <listitem>
                       <para>
                           If 1, the value is appended to previous value of the
-                          variable (the variable must be defined prior to
-                          appending). Following two <function>set</function>
+                          variable if it is already define (otherwise the
+                          command behaves as if append=0).
+                          Following two <function>set</function>
                           commands are equivalent:
                           <programlisting><![CDATA[
   <set var="FOO" append="1">something</set>
