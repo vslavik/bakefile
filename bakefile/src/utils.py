@@ -43,9 +43,16 @@ def makeUniqueCondVarName(name):
     return n
 
 
-def substitute(str, callback, desc):
+substVarNameCounter = 0
+
+def substitute(str, callback, desc=None):
     """Calls callback to substitute text in str by something else. Works with
        conditional variables, too."""
+
+    if desc == None:
+        global substVarNameCounter
+        desc = '%i' % substVarNameCounter
+        substVarNameCounter += 1
     
     def callbackVar(expr, use_options, target, add_dict):
         if expr not in mk.cond_vars:
@@ -124,6 +131,31 @@ def sources2objects(sources, target, ext):
     sources2 = nativePaths(sources)
     retval = substitute(sources2, callback, 'OBJECTS')
     return retval
+
+
+def addPrefixIfNotEmpty(prefix, value):
+    """Adds prefix before 'value', unless value is empty string. Can handle
+       following forms of 'value':
+           - empty string
+           - anything beginning with literal
+           - $(cv) where cv is conditional variable
+    """
+
+    if value == '':
+        return ''
+    if value[0] != '$':
+        return '%s%s' % (prefix,value)
+    if value.startswith('$(') and value[-1] == ')':
+        condname = value[2:-1]
+        if condname in mk.cond_vars:
+            cond = mk.cond_vars[condname]
+            var = mk.CondVar(makeUniqueCondVarName('%s_p' % cond.name))
+            mk.addCondVar(var)
+            for v in cond.values:
+                var.add(v.cond, addPrefixIfNotEmpty(prefix, v.value))
+            return '$(%s)' % var.name
+    raise errors.Error("addPrefixIfNotEmpty failed: '%s' too complicated" % value)
+
 
 
 def mkPathPrefix(p):
