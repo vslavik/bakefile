@@ -183,9 +183,9 @@ def handleOption(e):
         elif c.name == 'description':
             desc = c.value
         elif c.name == 'values':
-            values = evalConstExpr(e, c.value).split()
+            values = evalConstExpr(e, c.value).split(',')
         elif c.name == 'values-description':
-            values_desc = evalConstExpr(e, c.value).split()
+            values_desc = evalConstExpr(e, c.value).split(',')
     o = mk.Option(name, default, desc, values, values_desc)
     mk.addOption(o)
     if 'never_empty' in e.props and e.props['never_empty'] == '1':
