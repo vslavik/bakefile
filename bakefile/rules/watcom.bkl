@@ -35,6 +35,7 @@
             -if exist $(__builddir)\*.res del $(__builddir)\*.res
             -if exist $(__builddir)\*.lbc del $(__builddir)\*.lbc
             -if exist $(__builddir)\*.ilk del $(__builddir)\*.ilk
+            -if exist $(__builddir)\*.pch del $(__builddir)\*.pch
         </command>
     </action>
     

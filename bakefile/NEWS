@@ -20,6 +20,7 @@ Version 0.1.5
 - autoconf: BSD make fixes in the format
 - msvc6prj: fixed dependencies in project files 
 - msvc6prj: <optimize>speed optimized for size and vice versa, fixed
+- fixed win32 formats' "make clean" to delete precompiled headers files
 
 
 Version 0.1.4
