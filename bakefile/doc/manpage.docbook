@@ -30,6 +30,9 @@
           <option>-D</option><replaceable
             class="parameter">VAR</replaceable>=<replaceable class="parameter">VALUE</replaceable>
         </arg>
+        <arg choice="opt" rep="repeat">
+          <option>-I</option><replaceable class="parameter">PATH</replaceable>
+        </arg>
         <arg choice="opt">
           <option>-v</option>
         </arg>        
@@ -119,6 +122,19 @@
                 Define Bakefile variable. This definition overrides any
                 definition from the ruleset or input makefile. You can use it
                 to customize generated output.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          
+          <varlistentry>
+            <term>
+              <option>-I</option><replaceable class="parameter">PATH</replaceable>            
+            </term>
+            <listitem>
+              <para>
+                Add path to the list of directories where Bakefile looks for
+                rules and output templates.
               </para>
             </listitem>
           </varlistentry>
