@@ -25,6 +25,7 @@ import os, os.path, sys
 
 # Be verbose:
 verbose = 0
+quiet = 0
 
 # Directories where makefiles are looked for:
 #   1. BAKEFILE_PATHS environment variable
