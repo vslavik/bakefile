@@ -97,4 +97,8 @@ def run(args):
             sys.exit(1)
 
 if __name__ == '__main__':
-    run(sys.argv[1:])
+    try:
+        run(sys.argv[1:])
+    except KeyboardInterrupt:
+        sys.stderr.write('\nerror: bakefile cancelled by user\n')
+        sys.exit(1)
