@@ -178,6 +178,41 @@
             'emulator'  : '$(DOLLAR)(CEx86Corelibc) /MACHINE:IX86 /nodefaultlib:"OLDNAMES.lib"',
             }))
         </set>
+
+        <!-- CRT flags are different for CPUs, too: -->
+        <set var="_CPU_CRT_DBG">
+            $(substituteFromDict(CPU,{
+            'ARMV4'     : '/M$(DOLLAR)(CECrtMTDebug)',
+            'ARMV4I'    : '/M$(DOLLAR)(CECrtMTDebug)',
+            'ARMV4T'    : '/M$(DOLLAR)(CECrtMTDebug)',
+            'MIPS16'    : '/M$(DOLLAR)(CECrtMTDebug)',
+            'MIPSII'    : '/M$(DOLLAR)(CECrtMTDebug)',
+            'MIPSII_FP' : '/M$(DOLLAR)(CECrtMTDebug)',
+            'MIPSIV'    : '/M$(DOLLAR)(CECrtMTDebug)',
+            'MIPSIV_FP' : '/M$(DOLLAR)(CECrtMTDebug)',
+            'SH3'       : '/M$(DOLLAR)(CECrtMTDebug)',
+            'SH4'       : '/M$(DOLLAR)(CECrtMTDebug)',
+            'x86'       : '',
+            'emulator'  : '',
+            }))
+        </set>
+        <set var="_CPU_CRT_REL">
+            $(substituteFromDict(CPU,{
+            'ARMV4'     : '/M$(DOLLAR)(CECrtMT)',
+            'ARMV4I'    : '/M$(DOLLAR)(CECrtMT)',
+            'ARMV4T'    : '/M$(DOLLAR)(CECrtMT)',
+            'MIPS16'    : '/M$(DOLLAR)(CECrtMT)',
+            'MIPSII'    : '/M$(DOLLAR)(CECrtMT)',
+            'MIPSII_FP' : '/M$(DOLLAR)(CECrtMT)',
+            'MIPSIV'    : '/M$(DOLLAR)(CECrtMT)',
+            'MIPSIV_FP' : '/M$(DOLLAR)(CECrtMT)',
+            'SH3'       : '/M$(DOLLAR)(CECrtMT)',
+            'SH4'       : '/M$(DOLLAR)(CECrtMT)',
+            'x86'       : '',
+            'emulator'  : '',
+            }))
+        </set>
+
     </template>
 
     
@@ -229,11 +264,10 @@
         <define-tag name="debug-runtime-libs">
             <define>
                 $(substituteFromDict(value, {'on':'DEBUG', 'off':''}))
-            </define>            
+            </define>
             <cppflags>
                 $(substituteFromDict(value,
-                    {'on':'/M$(DOLLAR)(CECrtMTDebug)',
-                     'off':'/M$(DOLLAR)(CECrtMT)'}))
+                                     {'on':_CPU_CRT_DBG,'off':_CPU_CRT_REL}))
             </cppflags>
         </define-tag>
         
