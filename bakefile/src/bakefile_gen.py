@@ -184,6 +184,8 @@ def loadTargets(filename):
                         os.path.basename(file.filename))
                 flags = flags.replace('$(INPUT_FILE_BASENAME_NOEXT)',
                         os.path.splitext(os.path.basename(file.filename))[0])
+                flags = flags.replace('$(INPUT_FILE_DIR)',
+                        os.path.dirname(file.filename))
                 for fmt in formats:
                     file.flags[fmt] = '%s %s' % (file.flags[fmt], flags)
         elif cmd.name == 'del-flags':
