@@ -79,7 +79,8 @@ def run(args):
         if fmt.defaultFile == None or fmt.defaultFile == '':
             parser.error('you must specify output file (use -o option)')
         else:
-            config.output_file = fmt.defaultFile
+            config.output_file = \
+                os.path.join(os.path.dirname(args[0]), fmt.defaultFile)
 
     config.verbose = options.verbose
     config.debug = options.debug

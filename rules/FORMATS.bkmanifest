@@ -31,7 +31,7 @@
     <format id="msvc6prj">
         <description>Visual C++ 6.0 project files</description>
         <default-filename>
-            $(os.path.splitext(INPUT_FILE)[0]).dsw
+            $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).dsw
         </default-filename>
     </format>
     
