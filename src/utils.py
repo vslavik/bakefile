@@ -172,7 +172,8 @@ def addPrefixIfNotEmpty(prefix, value):
            - $(cv) where cv is conditional variable
     """
 
-    if value == '':
+    value = value.strip()
+    if value == '' or value.isspace():
         return ''
     if value[0] != '$':
         return '%s%s' % (prefix,value)
