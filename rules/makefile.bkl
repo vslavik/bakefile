@@ -172,6 +172,9 @@ makefiles (most notably GNU Make and Autoconf formats).
             <__clean-target-files/>
         </template>
 
+        <define-tag name="res-define"/>
+        <define-tag name="res-include"/>
+        
         <define-tag name="define">
             <if cond="FORMAT=='watcom'">
                 <set var="__cppflags" append="1">
@@ -183,10 +186,12 @@ makefiles (most notably GNU Make and Autoconf formats).
                     $(addPrefixIfNotEmpty(__DEFINE_ARG,value.replace('"', '\"')))
                 </set>
             </if>
+            <res-define>$(value)</res-define>
         </define-tag>
         <define-tag name="include">
             <set var="__cppflags" append="1">
                 $(addPrefixIfNotEmpty(__INCLUDE_ARG,nativePaths(value)))</set>
+            <res-include>$(value)</res-include>
         </define-tag>
 
         <define-tag name="sys-lib">
