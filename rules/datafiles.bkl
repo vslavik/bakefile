@@ -127,6 +127,20 @@
         <template>
             <is-phony/>
             <set var="__srcdir"/>
+
+            <!--
+              DigitalMars' smake has problems with long command lines, so we
+              have to work around it. More details here:
+              http://sourceforge.net/mailarchive/message.php?msg_id=9595825
+              -->
+            <if cond="TOOLSET=='win32' and FORMAT=='dmars_smake'">
+                <set var="__copy_depends" eval="0">
+                    $(''.join(['$(__srcdir)%s ' % (x) for x in __files.split()]))
+                </set>
+                <set var="__deps" append="1">$(__copy_depends)</set>
+                <set var="__copy_script_name">$(FORMAT)_copy_$(id).bat</set>
+            </if>
+
             <set var="__copy_cmd" eval="0">
                 
                 <if cond="TOOLSET=='unix'">
@@ -142,9 +156,15 @@
                     done
                 </if>
 
-                <if cond="TOOLSET=='win32' and FORMAT!='mingw'">
+                <if cond="TOOLSET=='win32' and FORMAT!='mingw' and FORMAT!='dmars_smake'">
                     if not exist $(__dstdir) mkdir $(__dstdir)
                     for %f in ($(__files)) do if not exist $(__dstdir)\%f copy $(__srcdir)%f $(__dstdir)
+                </if>
+                <if cond="TOOLSET=='win32' and FORMAT=='dmars_smake'">
+                    if not exist $(__dstdir) mkdir $(__dstdir)
+                    echo copy $(__srcdir)%%1 $(__dstdir)\%%1 &gt; $(__copy_script_name)
+                    !$(__copy_script_name) $**
+                    del $(__copy_script_name)
                 </if>
                 <if cond="TOOLSET=='win32' and FORMAT=='mingw'">
                     if not exist $(__dstdir) mkdir $(__dstdir)
