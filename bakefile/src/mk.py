@@ -52,16 +52,40 @@ class Condition:
 
 class CondVar:
     class Value:
-        pass
+        def __cmp__(self, other):
+            if self.cond.name < other.cond.name: return -1
+            if self.cond.name == other.cond.name: return 0
+            return 1
+
     def __init__(self, name, target=None):
         self.name = name
         self.values = []
+        self.__sorted = 1
         self.target = target
+
     def add(self, cond, value):
         v = CondVar.Value()
         v.cond = cond
         v.value = value
         self.values.append(v)
+        self.__sorted = 0
+
+    def equals(self, other):
+        # NB: can only be called _after_ finalize.finalEvaluation, i.e. when
+        #     self.target is no longer meaningful
+        if len(self.values) != len(other.values):
+            return 0
+        if not self.__sorted:
+            self.values.sort()
+            self.__sorted = 1
+        if not other.__sorted:
+            other.values.sort()
+            other.__sorted = 1
+        for i in range(0,len(self.values)):
+            if self.values[i].cond != other.values[i].cond or \
+               self.values[i].value != other.values[i].value:
+                return 0
+        return 1
 
 class Target:
     class Struct: pass
