@@ -6,7 +6,7 @@
     <!-- 
     Version information:
     -->
-    <set var="BAKEFILE_VERSION_FULL">0.1.1</set>
+    <set var="BAKEFILE_VERSION_FULL">0.1.2</set>
 
     <!-- 
     Version string suitable for putting into generated makefiles,
