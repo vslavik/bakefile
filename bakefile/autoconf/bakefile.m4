@@ -770,18 +770,18 @@ CleanUp() {
 
     # Kill result in case of failure as there is just to many stupid make/nmake
     # things out there which doesn't do this.
-    if [ ${D}# -eq 0 ]; then
+    if [[] ${D}# -eq 0 []]; then
         rm -f ${D}arcFile ${D}arcFile2 ${D}defFile ${D}dllFile
     fi
 }
 
 # Print usage and exit script with rc=1.
 PrintHelp() {
- echo 'Usage: dllar [-o[utput] output_file] [-i[mport] importlib_name]'
- echo '       [-d[escription] "dll descrption"] [-cc "CC"] [-f[lags] "CFLAGS"]'
- echo '       [-ord[inals]] -ex[clude] "symbol(s)"'
- echo '       [-libf[lags] "{INIT|TERM}{GLOBAL|INSTANCE}"] [-nocrt[dll]] [-nolxl[ite]]'
- echo '       [*.o] [*.a]'
+ echo 'Usage: dllar [[]-o[[]utput[]] output_file[]] [[]-i[[]mport[]] importlib_name[]]'
+ echo '       [[]-d[[]escription[]] "dll descrption"[]] [[]-cc "CC"[]] [[]-f[[]lags[]] "CFLAGS"[]]'
+ echo '       [[]-ord[[]inals[]][]] -ex[[]clude[]] "symbol(s)"'
+ echo '       [[]-libf[[]lags[]] "{INIT|TERM}{GLOBAL|INSTANCE}"[]] [[]-nocrt[[]dll[]][]] [[]-nolxl[[]ite[]][]]'
+ echo '       [[]*.o[]] [[]*.a[]]'
  echo '*> "output_file" should have no extension.'
  echo '   If it has the .o, .a or .dll extension, it is automatically removed.'
  echo '   The import library name is derived from this and is set to "name".a,'
@@ -794,16 +794,16 @@ PrintHelp() {
  echo '*> "cc" is used to use another GCC executable.   (default: gcc.exe)'
  echo '*> "flags" should be any set of valid GCC flags. (default: -s -Zcrtdll)'
  echo '   These flags will be put at the start of GCC command line.'
- echo '*> -ord[inals] tells dllar to export entries by ordinals. Be careful.'
- echo '*> -ex[clude] defines symbols which will not be exported. You can define'
+ echo '*> -ord[[]inals[]] tells dllar to export entries by ordinals. Be careful.'
+ echo '*> -ex[[]clude[]] defines symbols which will not be exported. You can define'
  echo '   multiple symbols, for example -ex "myfunc yourfunc _GLOBAL*".'
  echo '   If the last character of a symbol is "*", all symbols beginning'
  echo '   with the prefix before "*" will be exclude, (see _GLOBAL* above).'
- echo '*> -libf[lags] can be used to add INITGLOBAL/INITINSTANCE and/or'
+ echo '*> -libf[[]lags[]] can be used to add INITGLOBAL/INITINSTANCE and/or'
  echo '   TERMGLOBAL/TERMINSTANCE flags to the dynamically-linked library.'
- echo '*> -nocrt[dll] switch will disable linking the library against emx''s'
+ echo '*> -nocrt[[]dll[]] switch will disable linking the library against emx''s'
  echo '   C runtime DLLs.'
- echo '*> -nolxl[ite] switch will disable running lxlite on the resulting DLL.'
+ echo '*> -nolxl[[]ite[]] switch will disable running lxlite on the resulting DLL.'
  echo '*> All other switches (for example -L./ or -lmylib) will be passed'
  echo '   unchanged to GCC at the end of command line.'
  echo '*> If you create a DLL from a library and you do not specify -o,'
@@ -827,7 +827,7 @@ doCommand() {
     eval ${D}*
     rcCmd=${D}?
 
-    if [ ${D}rcCmd -ne 0 ]; then
+    if [[] ${D}rcCmd -ne 0 []]; then
         echo "command failed, exit code="${D}rcCmd
         CleanUp
         exit ${D}rcCmd
@@ -858,7 +858,7 @@ case ${D}curDirS in
 esac
 # Parse commandline
 libsToLink=0
-while [ ${D}1 ]; do
+while [[] ${D}1 []]; do
     case ${D}1 in
     -ord*)
         EXPORT_BY_ORDINALS=1;
@@ -912,16 +912,16 @@ while [ ${D}1 ]; do
         ;;
     *)
         found=0;
-        if [ ${D}libsToLink -ne 0 ]; then
+        if [[] ${D}libsToLink -ne 0 []]; then
             EXTRA_CFLAGS=${D}{EXTRA_CFLAGS}" "${D}1
         else
             for file in ${D}1 ; do
-                if [ -f ${D}file ]; then
+                if [[] -f ${D}file []]; then
                     inputFiles="${D}{inputFiles} ${D}file"
                     found=1
                 fi
             done
-            if [ ${D}found -eq 0 ]; then
+            if [[] ${D}found -eq 0 []]; then
                 echo "ERROR: No file(s) found: "${D}1
                 exit 8
             fi
@@ -932,7 +932,7 @@ while [ ${D}1 ]; do
 done # iterate cmdline words
 
 #
-if [ -z "${D}inputFiles" ]; then
+if [[] -z "${D}inputFiles" []]; then
     echo "dllar: no input files"
     PrintHelp
 fi
@@ -957,7 +957,7 @@ for file in ${D}inputFiles ; do
         esac
         dirname=\`basnam ${D}file ${D}suffix\`"_%"
         mkdir ${D}dirname
-        if [ ${D}? -ne 0 ]; then
+        if [[] ${D}? -ne 0 []]; then
             echo "Failed to create subdirectory ./${D}dirname"
             CleanUp
             exit 8;
@@ -968,15 +968,15 @@ for file in ${D}inputFiles ; do
         cd ${D}curDir
         found=0;
         for subfile in ${D}dirname/*.o* ; do
-            if [ -f ${D}subfile ]; then
+            if [[] -f ${D}subfile []]; then
                 found=1
-                if [ -s ${D}subfile ]; then
+                if [[] -s ${D}subfile []]; then
 	            # FIXME: This should be: is file size > 32 byte, _not_ > 0!
                     newInputFiles="${D}newInputFiles ${D}subfile"
                 fi
             fi
         done
-        if [ ${D}found -eq 0 ]; then
+        if [[] ${D}found -eq 0 []]; then
             echo "WARNING: there are no files in archive \'${D}file\'"
         fi
         ;;
@@ -989,7 +989,7 @@ inputFiles="${D}newInputFiles"
 
 # Output filename(s).
 do_backup=0;
-if [ -z ${D}outFile ]; then
+if [[] -z ${D}outFile []]; then
     do_backup=1;
     set outFile ${D}inputFiles; outFile=${D}2
 fi
@@ -1034,7 +1034,7 @@ case ${D}outimpFile in
 *)
     ;;
 esac
-if [ -z ${D}outimpFile ]; then
+if [[] -z ${D}outimpFile []]; then
     outimpFile=${D}outFile
 fi
 defFile="${D}{outFile}.def"
@@ -1044,11 +1044,11 @@ dllFile="${D}outFile"
 # Add suffix to dllFile later, first we need a version to use as
 # name in .def file.
 
-if [ ${D}do_backup -ne 0 ] ; then
-    if [ -f ${D}arcFile ] ; then
+if [[] ${D}do_backup -ne 0 []] ; then
+    if [[] -f ${D}arcFile []] ; then
         doCommand "mv ${D}arcFile ${D}{outFile}_s.a"
     fi
-    if [ -f ${D}arcFile2 ] ; then
+    if [[] -f ${D}arcFile2 []] ; then
         doCommand "mv ${D}arcFile2 ${D}{outFile}_s.lib"
     fi
 fi
@@ -1070,7 +1070,7 @@ done
 rm -f ${D}defFile
 echo "LIBRARY \`basnam ${D}dllFile\` ${D}library_flags" >> ${D}defFile
 dllFile="${D}dllFile.dll"
-if [ -n ${D}description ]; then
+if [[] -n ${D}description []]; then
     echo "DESCRIPTION  \"${D}{description}\"" >> ${D}defFile
 fi
 echo "EXPORTS" >> ${D}defFile
@@ -1085,12 +1085,12 @@ for word in ${D}exclude_symbols; do
 done
 
 
-if [ ${D}EXPORT_BY_ORDINALS -ne 0 ]; then
+if [[] ${D}EXPORT_BY_ORDINALS -ne 0 []]; then
     sed "=" < ${D}tmpdefFile | \
     sed '
       N
       : loop
-      s/^\([0-9]\+\)\([^;]*\)\(;.*\)\?/\2 @\1 NONAME/
+      s/^\([[]0-9[]]\+\)\([[]^;[]]*\)\(;.*\)\?/\2 @\1 NONAME/
       t loop
     ' > ${D}{tmpdefFile}%
     grep -v "^ *${D}" < ${D}{tmpdefFile}% > ${D}tmpdefFile
@@ -1115,9 +1115,9 @@ doCommand "${D}CC ${D}CFLAGS -Zdll -o ${D}dllFile ${D}defFile ${D}gccCmdl ${D}EX
 touch "${D}{outFile}.dll"
 
 doCommand "emximp -o ${D}arcFile ${D}defFile"
-if [ ${D}flag_USE_LXLITE -ne 0 ]; then
+if [[] ${D}flag_USE_LXLITE -ne 0 []]; then
     add_flags="";
-    if [ ${D}EXPORT_BY_ORDINALS -ne 0 ]; then
+    if [[] ${D}EXPORT_BY_ORDINALS -ne 0 []]; then
         add_flags="-ynd"
     fi
     doCommand "lxlite -cs -t: -mrn -mln ${D}add_flags ${D}dllFile"
