@@ -67,17 +67,7 @@ def __copyMkToVars():
     # Copy targets information:
     targets = Container()
 
-    mktargets = copy.copy(mk.targets)
-    
-    keys = mktargets.keys()
-    priorityTargets = []
-    if 'all' in mk.targets:
-        priorityTargets.append('all')
-        keys.remove('all')
-
-    keys.sort()
-    for tar_i in priorityTargets + keys:
-        tar = mktargets[tar_i]
+    for tar in mk.targets.values():
         t = Struct()
         for v in tar.vars:
             if v == 'configs':
@@ -100,10 +90,7 @@ def __copyMkToVars():
 
     # Copy options:
     options = Container()
-    keys = mk.options.keys()
-    keys.sort()
-    for opt_i in keys:
-        opt = mk.options[opt_i]
+    for opt in mk.options.values():
         o = Struct()
         o.name = opt.name
         o.default = opt.default
@@ -118,10 +105,7 @@ def __copyMkToVars():
     
     # Copy conditions:
     conditions = Container()
-    keys = mk.conditions.keys()
-    keys.sort()
-    for cond_i in keys:
-        cond = mk.conditions[cond_i]
+    for cond in mk.conditions.values():
         c = Struct()
         c.name = cond.name
         c.exprs = cond.exprs
@@ -131,10 +115,7 @@ def __copyMkToVars():
 
     # Copy conditional variables:
     cond_vars = Container()
-    keys = mk.cond_vars.keys()
-    keys.sort()
-    for cv_i in keys:
-        cv = mk.cond_vars[cv_i]
+    for cv in mk.cond_vars.values():
         c = Struct()
         c.name = cv.name
         c.values = []
@@ -149,9 +130,7 @@ def __copyMkToVars():
     
     # Copy "make variables":
     make_vars = Container()
-    keys = mk.make_vars.keys()
-    keys.sort()
-    for mv in keys:
+    for mv in mk.make_vars:
         mvv = Struct()
         mvv.name = mv
         mvv.value = mk.make_vars[mv]

@@ -70,7 +70,7 @@ configDefs = {}
 
 def __cfg2str(c):
     list = []
-    for x in mk.options_order:
+    for x in mk.options:
         if x in c:
             v = mk.options[x].values_desc[c[x]]
             if v != '': list.append(v)
@@ -193,7 +193,7 @@ def findDistinctConfigs(t):
 
 def flatten():        
     def __configCompare(c1, c2):
-        for x in mk.options_order:
+        for x in mk.options:
             if x not in c1: continue
             i1 = mk.options[x].values.index(c1[x])
             i2 = mk.options[x].values.index(c2[x])

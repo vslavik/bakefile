@@ -21,8 +21,8 @@
 #  Misc utility functions
 #
 
-import mk, errors, config, sys
-import os
+import mk, errors, config, sys, os
+import containers
 
 
 def isoption(name):
@@ -205,7 +205,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
     #
     #code = """
     #<makefile>
-    #<%s id="%s">
+    #<%s id="%s" category="automatic">
     #    <parent-target>%s</parent-target>
     #    <dst>%s</dst>
     #    <src>%s</src>
@@ -213,6 +213,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
     #</makefile>"""
     cRoot = xmlparser.Element()
     cTarget = xmlparser.Element()
+    cTarget.props['category'] = 'automatic'
     cSrc = xmlparser.Element()
     cDst = xmlparser.Element()
     cParent = xmlparser.Element()
@@ -226,7 +227,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
     cDst.name = 'dst'
     cParent.value = target
 
-    files = {}
+    files = containers.OrderedDict()
 
     def callback(cond, sources):
         prefix = suffix = ''
@@ -262,7 +263,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
              2) A, A & B         |- A
         """
 
-        all = {}
+        all = containers.OrderedDict()
         values = {}
         for e in cond1.exprs:
             all[e.option] = e
@@ -314,7 +315,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
     # these files are compiled from multiple sources, so we must create
     # conditional compilation rules:
     for f in hardFiles:
-        srcfiles = {}
+        srcfiles = containers.OrderedDict()
         for x in files[f]:
             src, cond = x
             if src not in srcfiles:

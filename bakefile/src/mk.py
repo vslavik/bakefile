@@ -1,22 +1,38 @@
 #
-# Makefile variables, conditions etc. and evaluation code are located here
+#  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-# $Id$
+#  Copyright (C) 2003,2004 Vaclav Slavik
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License version 2 as
+#  published by the Free Software Foundation.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#  $Id$
+#
+#  Makefile variables, conditions etc. and evaluation code are located here
 #
 
-import utils, errors, config
+import utils, errors, config, containers
 import bottlenecks
 from utils import *
 
-vars = {}
+vars = containers.OrderedDict()
 override_vars = {}
-options = {}
-options_order = []
-cond_vars = {}
-make_vars = {}
-targets = {}
+options = containers.OrderedDict()
+cond_vars = containers.OrderedDict()
+make_vars = containers.OrderedDict()
+# targets = {} ... declared below, needs Target class
 templates = {}
-conditions = {}
+conditions = containers.OrderedDict()
 fragments = []
 vars_hints = {}
 
@@ -99,19 +115,33 @@ class CondVar:
                 return 0
         return 1
 
+
 class Target:
     class Struct: pass
-    def __init__(self, type, id, condition, pseudo):
+    
+    # Targets clasification, for purposes of sorting
+    CATEG_ALL       = 0 # target is the 'all' target
+    CATEG_NORMAL    = 1 # normal target (exe, lib, dll, phony, ...)
+    CATEG_AUTOMATIC = 2 # 'automatic' target (not explicitly specified in
+                        # bakefiles, e.g. c-to-obj rules, last in makefiles)
+    CATEG_MAX       = 3
+
+    def __init__(self, type, id, condition, pseudo, category):
         self.cond = condition
         self.type = type
         self.id = id
         self.pseudo = pseudo
+        self.category = category
         self.vars = {}
         self.vars['id'] = id
         self.vars['type'] = self.type
         xxx = Target.Struct()
         xxx.__dict__ = self.vars
         vars['targets'][id] = xxx
+
+targets = containers.OrderedDictWithClasification(
+                                Target.CATEG_MAX,
+                                lambda x : x.category)
 
 
 class Fragment:
@@ -132,13 +162,11 @@ def addOption(opt):
     if opt.name in vars:
         del vars[opt.name]
     options[opt.name] = opt
-    options_order.append(opt.name)
     __vars_opt[opt.name] = '$(%s)' % opt.name
     vars['OPTIONS'] = ' '.join(mk.options.keys())
 
 def delOption(optname):
     del options[optname]
-    options_order.remove(optname)
     del __vars_opt[optname]
     vars['OPTIONS'] = ' '.join(mk.options.keys())
 

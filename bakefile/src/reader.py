@@ -586,8 +586,21 @@ def handleTarget(e):
         id = e.props['id']
     if id in mk.targets:
         raise ReaderError(e, "duplicate target name '%s'" % id)
+
+    if 'category' in e.props:
+        try:
+            cats = {
+                'all'       : mk.Target.CATEG_ALL,
+                'normal'    : mk.Target.CATEG_NORMAL,
+                'automatic' : mk.Target.CATEG_AUTOMATIC
+                }
+            category = cats[e.props['category']]
+        except KeyError:
+            raise ReaderError(e, "unknown category '%s'" % e.props['category'])
+    else:
+        category = mk.Target.CATEG_NORMAL
     
-    target = mk.Target(e.name, id, cond, rule.pseudo)
+    target = mk.Target(e.name, id, cond, rule.pseudo, category)
     mk.addTarget(target)
 
     errors.pushCtx("when processing target at %s" % e.location())

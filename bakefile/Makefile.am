@@ -74,7 +74,8 @@ code_PYTHON = src/config.py \
               src/xmlparser.py \
 			  src/dependencies.py \
               src/outmethods.py \
-			  src/bottlenecks.py
+			  src/bottlenecks.py \
+			  src/containers.py
 codeempy_PYTHON = \
               src/empy/__init__.py \
               src/empy/em.py

@@ -310,7 +310,7 @@
     </define-rule>
 
     <!-- some fake, never used targets: -->
-    <phony id="all"/>
+    <phony id="all" category="all"/>
     <phony id="clean"/>
 
     <!-- 
