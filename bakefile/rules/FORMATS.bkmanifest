@@ -58,5 +58,10 @@
             $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).bpgr
         </default-filename>
     </format>
+
+    <format id="gnu">
+        <description>GNU toolchain makefiles (Unix)</description>
+        <default-filename>GNUmakefile</default-filename>
+    </format>
     
 </bakefile-manifest>
