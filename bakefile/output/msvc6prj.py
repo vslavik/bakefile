@@ -270,7 +270,7 @@ BSC32=bscmake.exe
     pchExcluded = t.__pch_excluded.split()
 
     # (write them)
-    for group in files:
+    for group in [g for g in groups if g in files]:
         lst = files[group]
         sortByBasename(lst)
         if len(lst) == 0: continue
