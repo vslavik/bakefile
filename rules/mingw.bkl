@@ -7,10 +7,10 @@
     <set var="MAKEFILE_SYNTAX">mingw</set>
 
     <include file="makefile.bkl"/>
-    
+
+    <tag-info name="libname" position="after:dirname"/> 
     <define-tag name="libname" rules="dll">
-        <!-- FIXME: needs tag ordering to guarantee only one occurence -->
-        <set var="__importlib" eval="0">
+        <set var="__importlib">
             -Wl,--out-implib,$(__targetdir)$(__linkname)
         </set>
         <ldflags>$(__importlib)</ldflags>

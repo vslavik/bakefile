@@ -148,18 +148,18 @@
     <template id="__subproject_templ">
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            \$(MAKE) /\$(MAKEFLAGS) $(__subtarget)
-            cd \$(MAKEDIR)
+            $(DOLLAR)(MAKE) /$(DOLLAR)(MAKEFLAGS) $(__subtarget)
+            cd $(DOLLAR)(MAKEDIR)
         </set>
         <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            \$(MAKE) /\$(MAKEFLAGS) install
-            cd \$(MAKEDIR)
+            $(DOLLAR)(MAKE) /$(DOLLAR)(MAKEFLAGS) install
+            cd $(DOLLAR)(MAKEDIR)
         </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            \$(MAKE) /\$(MAKEFLAGS) clean
-            cd \$(MAKEDIR)
+            $(DOLLAR)(MAKE) /$(DOLLAR)(MAKEFLAGS) clean
+            cd $(DOLLAR)(MAKEDIR)
         </set>
     </template>
 

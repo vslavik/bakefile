@@ -107,6 +107,8 @@ def flattenConfig(cfg):
     for t in toDel:
         del mk.targets[t]
 
+    finalize.replaceEscapeSequences()
+
     myvars = mk.vars
     mytgt = mk.targets
     
