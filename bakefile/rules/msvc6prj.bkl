@@ -104,7 +104,7 @@
         
         <define-tag name="define">
             <set var="__defines" append="1">
-                $(addPrefixIfNotEmpty('/D ',value))
+                $(addPrefixIfNotEmpty('/D ',value.replace('"', '\"')))
             </set>
         </define-tag>
         
