@@ -213,6 +213,15 @@ BSC32=bscmake.exe
         if len(sources[s]) == len(t.configs):
             sources[s] = None
 
+    # Add more files that are part of the project but are not built (e.g. 
+    # headers, READMEs etc.). They are included unconditionally to save some
+    # space.
+    for c in t.configs:
+        for s in t.configs[c].__more_files.split():
+            snat = utils.nativePaths(s)
+            if snat not in sources:
+                sources[snat] = None
+
     # (sort the files into groups)
     groups = ['Source Files', 'Header Files', 'Resource Files']
     group_defs = {
