@@ -4,7 +4,7 @@
 # $Id$
 #
 
-import copy, sys, tempfile, os, os.path, string
+import types, copy, sys, tempfile, os, os.path, string
 import mk, config, errors
 import outmethods
 
@@ -205,6 +205,8 @@ def invoke(writer, file, method):
 
 __output_files = {}
 def writeFile(filename, data, method = 'replace'):
+    if isinstance(data, types.StringType):
+        data = [x+'\n' for x in data.split('\n')]
     if (filename not in __output_files) and (method != 'replace'):
             __output_files[filename] = __readFile(filename)
     if method == 'replace':
