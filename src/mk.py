@@ -368,58 +368,15 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     __curNamespace = oldNS
     return str(val)
 
-
-def __doEvalExpr(e, varCallb, textCallb, moreArgs,
-                 use_options=1, target=None, add_dict=None):
-    if textCallb == None:
-        textCallb = lambda y,x: x
-    lng = len(e)
-    i = 0
-    txt = ''
-    output = ''
-    while i < lng-1:
-        if e[i] == '$' and e[i+1] == '(':
-            if txt != '':
-                output += textCallb(moreArgs, txt)
-            txt = ''
-            code = ''
-            i += 2
-            braces = 1
-            while i < lng:
-                if e[i] == ')':
-                    braces -= 1
-                    if braces == 0:
-                        output += varCallb(moreArgs,
-                                           code, use_options, target, add_dict)
-                        break
-                    else:
-                        code += e[i]
-                elif e[i] == '(':
-                    braces += 1
-                    code += e[i]
-                elif e[i] == "'" or e[i] == '"':
-                    what = e[i]
-                    code += e[i]
-                    while i < lng:
-                        i += 1
-                        code += e[i]
-                        if e[i] == what: break
-                else:
-                    code += e[i]
-                i += 1
-        else:
-            txt += e[i]
-        i += 1
-    output += textCallb(moreArgs, txt + e[i:])
-    return output
-
+import bottlenecks
+__doEvalExpr = bottlenecks.doEvalExpr
 
 def evalExpr(e, use_options=1, target=None, add_dict=None):    
     return __doEvalExpr(e, __evalPyExpr, None,
-                        moreArgs=None,
-                        use_options=use_options, 
-                        target=target, 
-                        add_dict=add_dict)
+                        None, # moreArgs
+                        use_options,
+                        target, 
+                        add_dict)
 
 
 def __recordDeps(mod):
