@@ -298,7 +298,9 @@ class CmdListEntry:
         self.node = node
         self.value = value
         self.parents = parents
-        self.mustProcessBefore = []
+        self.mustProcessBefore = 0
+        self.mustProcessAfter = []
+        self.executionDelayed = 0
 
 def _extractTargetNodes(out_list, list, target, tags,
                         valueRecord, parentTags):
@@ -349,7 +351,11 @@ def _filterTargetNodes(cmd_list):
             for btag in tagInfos[tagname].before:
                 if btag in map:
                     for tag, entry in map[btag]:
-                        entry.mustProcessBefore.append(map[tagname])
+                        if entry.node == None: continue
+                        for atag, aentry in map[tagname]:
+                            if aentry.node != None:
+                                aentry.mustProcessAfter.append(entry)
+                                entry.mustProcessBefore += 1
         
 
             
@@ -392,15 +398,22 @@ def _processTargetNodes(list, target, tags, dict):
         print '[dbg] -----------------------------------------'
 
     def _processEntry(entry, target, dict):
+        if entry.mustProcessBefore > 0:
+            entry.executionDelayed = 1
+            return
         if entry.node == None: return
-        for lst in entry.mustProcessBefore:
-            for tag, e in lst:
+        for e in entry.mustProcessAfter:
+            e.mustProcessBefore -= 1
+            # only run it now if we already tried to run it but wasn't able
+            # to do it because mustProcessBefore was >0:
+            if e.executionDelayed:
                 _processEntry(e, target, dict)
         
         if config.debug:
             parlist = [x.name for x in entry.parents]
-            print '[dbg] %s || %s [%s]' % \
-                  (parlist, entry.node.name, entry.node.props)
+            print '[dbg] %s || %s [%s] @%s:%s' % \
+                  (parlist, entry.node.name, entry.node.props,
+                   entry.node.filename, entry.node.lineno)
         
         if entry.value == None:
             dict2 = dict
