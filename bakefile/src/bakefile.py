@@ -24,6 +24,9 @@ def run(args):
     parser.add_option('-v', '--verbose',
                       action="store_true", dest='verbose', default=0,
                       help='display detailed information')
+    parser.add_option('', '--debug',
+                      action="store_true", dest='debug', default=0,
+                      help="show debugging information (you don't want this)")
     parser.add_option('', '--dump',
                       action="store_true", dest='dump', default=0,
                       help='dump parsed makefile content instead of '+
@@ -36,6 +39,7 @@ def run(args):
         sys.exit(1)
 
     config.verbose = options.verbose
+    config.debug = options.debug
     config.format = options.format # FIXME -- check for validity
     config.output_file = options.outfile
     config.defines = {}

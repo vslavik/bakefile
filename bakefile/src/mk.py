@@ -365,3 +365,10 @@ def importPyModule(modname):
         if config.verbose:
             print 'imported python module %s' % modname
     except ImportError: pass
+    if config.debug:
+        print '[dbg] --- after importing module %s --' % modname
+        print '[dbg] sys.path=%s' % sys.path
+        if modname in sys.modules:
+            print '[dbg] sys.modules[%s]=%s' % (modname,sys.modules[modname])
+        else:
+            print '[dbg] module not loaded!'
