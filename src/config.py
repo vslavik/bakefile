@@ -43,6 +43,7 @@ if ((os.path.normpath(
     datadir = os.path.join(progdir, '..')
 searchPath.append(os.path.normpath(os.path.join(datadir, 'rules')))
 searchPath.append(os.path.normpath(os.path.join(datadir, 'output')))
+searchPath.append(os.path.normpath(datadir))
 
 
 # The way target makefiles quote variables:
