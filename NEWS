@@ -3,6 +3,8 @@ Version 0.1.6
 
 - autoconf: MetroWerks compiler support (David Elliott)
 - fixed 'fake' preset to define <precomp-headers-location>
+- workaround for a bug in aclocal that causes it to die when processing
+  AC_BAKEFILE definition in bakefile.m4
 
 
 Version 0.1.5

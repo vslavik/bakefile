@@ -3,7 +3,7 @@ AC_INIT(aclocal.m4)
 
 AC_CANONICAL_SYSTEM
 
-AC_BAKEFILE
+AC_BAKEFILE([m4_include(autoconf_inc.m4)])
 
 AC_OUTPUT([
            Makefile
