@@ -47,6 +47,11 @@
     <set var="__FLAG_SINGLE_THREADING"/>
     <set var="__FLAG_MULTI_THREADING"/>
     
+    <set var="__MAKEARGS" eval="0">
+        $(' '.join(['-D%s=$(%s)' % (x,x) for x in OPTIONS.split()]))
+    </set>
+    <set var="MAKEARGS" make_var="1">$(__MAKEARGS)</set>
+    
     <!-- -tWR sets -tW as well, so it must be before -tC !! -->
     <tag-info name="runtime-libs" position="before:app-type"/>
 
@@ -204,17 +209,17 @@
     <template id="__subproject_templ">
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(DOLLAR)(MAKEARGS) $(__subtarget)
+            $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) $(__subtarget)
             cd $(DIRSEP.join(['..' for x in __subdir.split(DIRSEP)]))
         </set>
         <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(DOLLAR)(MAKEARGS) install
+            $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) install
             cd $(DIRSEP.join(['..' for x in __subdir.split(DIRSEP)]))
         </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(DOLLAR)(MAKEARGS) clean
+            $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) clean
             cd $(DIRSEP.join(['..' for x in __subdir.split(DIRSEP)]))
         </set>
     </template>
