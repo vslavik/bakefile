@@ -19,9 +19,10 @@ rules_DATA =  rules/autoconf.bkl \
               rules/common.bkl \
               rules/dirs.bkl \
               rules/makefile.bkl \
-              rules/makefile_borland.bkl \
+              rules/makefile_def_borland.bkl \
               rules/makefile_defs_unix.bkl \
               rules/makefile_mingw.bkl
+              rules/makefile_macres.bkl
               rules/unixlike.bkl \
               rules/vc5.bkl \
               rules/vc6.bkl \
