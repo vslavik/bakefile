@@ -17,19 +17,18 @@
 
 @[ for c in cond_vars :@
 @[ for v in c.values :@
-!if "$(@v.cond.option)" == "@v.cond.value"
+!if @( ' && '.join(['$(%s) == %s' % (x.option.name,x.value) \
+               for x in v.cond.exprs]) )
 @c.name = @v.value.replace('\n', ' \\\n')
 !endif
 ]@
 ]@
 
-
 @[ if BUILDDIR != '.' :
 all: @BUILDDIR
 @BUILDDIR:
-@\tmkdir @BUILDDIR
+@\t-if not exist @BUILDDIR mkdir @BUILDDIR
 ]@
-
 
 ### Targets: ###
 @[ for t in targets :

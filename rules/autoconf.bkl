@@ -94,8 +94,6 @@
     <include file="unixlike.bkl"/>
     <!-- autoconf can be used to compile win32 apps, too: -->
     <include file="makefile_mingw.bkl"/>    
-
-    <set var="__ALWAYS_CLEAN" append="1">$(BUILDDIR)/.deps/*</set>    
     
 
     <!-- =============================================================== -->
@@ -225,6 +223,18 @@
         </modify-target>
     </define-tag>
     
+    
+    <!-- =============================================================== -->
+    <!--                         "make clean":                           -->
+    <!-- =============================================================== -->
+
+    <action id="clean">
+        <set var="__builddir" eval="0">$(BUILDDIR)</set>
+        <command>            
+            rm -rf $(__builddir)/.deps
+            $(RM) -f $(__builddir)/*$(OBJEXT)
+        </command>
+    </action>
     
     <!-- =============================================================== -->
     <!--                       "make distclean":                         -->
