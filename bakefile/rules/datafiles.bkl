@@ -1,0 +1,165 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<!--
+
+1) Declaration of data files for the purpose of installing them with
+   "make install".
+
+2) Copies file(s) specified with <src> tag to either file specified with
+   <destfile> or to directory set with <destdir> (will be created if
+   it doesn't exist).
+   
+-->
+
+<makefile>
+
+    <!-- Copy files to flat destination directory, i.e. do *not* preserve
+         directory tree: -->
+    
+    <define-rule name="__data-files-base">
+        <template>
+            <set var="__iprg">$(INSTALL_DATA)</set>
+            <set var="__srcdir">$(SRCDIR)</set>
+            <set var="__files"/>
+            <set var="__copy_cmd" eval="0">
+                <if cond="TOOLSET=='unix'">
+                    $(INSTALL_DIR) $(__dstdir)
+                    (cd $(__srcdir) ; $(__iprg) $(__files) $(__dstdir))
+                </if>
+            </set>
+        </template>
+        <define-tag name="install-to">
+            <set var="__dstdir">$(value)</set>
+        </define-tag>
+        <define-tag name="srcdir">
+            <set var="__srcdir">$(value)$(DIRSEP)</set>
+        </define-tag>
+        <define-tag name="files">
+            <set var="__files" append="1">$(' '.join(value.split()))</set>
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="data-files" pseudo="1" extends="__data-files-base">
+        <template>
+            <modify-target target="install">
+                <command>$(ref('__copy_cmd',id))</command>
+            </modify-target>
+        </template>
+    </define-rule>
+
+    <define-rule name="data-files-tg" extends="action,__data-files-base">
+        <template>
+            <dependency-of>install</dependency-of>
+            <command>$(__copy_cmd)</command>
+        </template>
+    </define-rule>
+    
+    <define-rule name="script-files" extends="data-files" pseudo="1">
+        <template>
+            <set var="__iprg">$(INSTALL_PROGRAM)</set>
+        </template>
+    </define-rule>
+    
+    <define-rule name="script-files-tg" extends="data-files-tg">
+        <template>
+            <set var="__iprg">$(INSTALL_PROGRAM)</set>
+        </template>
+    </define-rule>
+
+
+    <!-- Copy files while preserving their directory structure: -->
+
+    <define-rule name="data-files-tree" pseudo="1">
+        <template>
+            <set var="__iprg">$(INSTALL_DATA)</set>
+            <set var="__srcdir"/>
+            <set var="__copy_cmd" eval="0">
+                <if cond="TOOLSET=='unix'">
+                    $(INSTALL_DIR) $(__dstdir)
+                    for f in $(__files); do \
+                        if test ! -d $(__dstdir)/`dirname \$\$f` ; then \
+                            $(INSTALL_DIR) $(__dstdir)/`dirname \$\$f`; \
+                        fi; \
+                        $(__iprg) $(__srcdir)/\$\$f $(__dstdir)/\$\$f; \
+                    done
+                </if>
+            </set>
+            <modify-target target="install">
+                <command>$(ref('__copy_cmd',id))</command>
+            </modify-target>
+        </template>
+        <define-tag name="install-to">
+            <set var="__dstdir">$(value)</set>
+        </define-tag>
+        <define-tag name="srcdir">
+            <set var="__srcdir">$(value)$(DIRSEP)</set>
+        </define-tag>
+        <define-tag name="files">
+            <set var="__files">$(' '.join(value.split()))</set>
+        </define-tag>
+    </define-rule>
+
+
+    <!-- Convenience rule for C/C++ header files to be installed: -->
+    
+    <define-rule name="headers" extends="data-files-tree" pseudo="1">
+        <template>
+            <srcdir>$(SRCDIR)</srcdir>
+            <install-to>$(INCLUDEDIR)</install-to>
+        </template>
+    </define-rule>
+    
+    
+    
+    
+    
+    
+    <!-- Copying files around as part of the build process: -->
+    
+    <define-rule name="copy-files" extends="action">
+        <template>
+            <set var="__srcdir"/>
+            <set var="__copy_cmd" eval="0">
+                <if cond="TOOLSET=='unix'">
+                    @mkdir -p $(__dstdir)
+                    @for f in $(__files); do \
+                        if test \( ! -s $(__dstdir)/\$\$f \) -o \( $(__srcdir)\$\$f -nt $(__dstdir)/\$\$f  \) ; then \
+                            cp -pRf $(__srcdir)\$\$f $(__dstdir) ; \
+                        fi; \
+                    done
+                </if>
+            </set>
+            <command>$(__copy_cmd)</command>
+        </template>
+        <define-tag name="dstdir">
+            <set var="__dstdir">$(value)</set>
+        </define-tag>
+        <define-tag name="srcdir">
+            <set var="__srcdir">$(value)$(DIRSEP)</set>
+        </define-tag>
+        <define-tag name="files">
+            <set var="__files">$(' '.join(value.split()))</set>
+        </define-tag>
+    </define-rule>
+        
+    <define-rule name="copy-file-to-file" extends="action">
+        <template>
+            <set var="__copy_cmd" eval="0">
+                <if cond="TOOLSET=='unix'">
+                    @if test \( ! -s $(__dest) \) -o \( $(__file) -nt $(__dest) \) ; then \
+                        cp -pf $(__file) $(__dest)
+                    fi; \
+                </if>
+            </set>
+            <command>$(__copy_cmd)</command>
+        </template>
+        <define-tag name="dst">
+            <set var="__dest">$(value)</set>
+        </define-tag>
+        <define-tag name="src">
+            <set var="__file">$(value)</set>
+        </define-tag>
+    </define-rule>
+
+</makefile>
