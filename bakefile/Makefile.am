@@ -19,6 +19,7 @@ output_DATA = output/autoconf.empy \
 rules_DATA =  rules/autoconf.bkl \
               rules/borland.bkl \
               rules/common.bkl \
+			  rules/format_features.bkl \
               rules/datafiles.bkl \
               rules/dirs.bkl \
               rules/makefile.bkl \
