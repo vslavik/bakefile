@@ -16,6 +16,9 @@
       </para>
     </note>
   </para>
+  <para>
+    The following targets are defined in <literal>datafiles</literal> module:
+  </para>
   
   
   <!--                         Installing files:                     -->
