@@ -212,7 +212,7 @@
     </define-rule>
 
     <define-rule name="exe" extends="_compiled,_compiled_specific">
-        <template>
+        <template template="_exe_baset">
             <app-type>console</app-type>
             <exename>$(id)</exename>
         </template>
@@ -241,7 +241,7 @@
     </define-rule>
     
     <define-rule name="_dll" extends="_compiled,_compiled_specific">
-        <template>
+        <template template="_dll_baset">
             <set var="_ldflags">/dll $(_ldflags)</set>
             <set var="_defines" append="1">/D "_USRDLL" /D "DLL_EXPORTS"</set>
             <set var="_type">

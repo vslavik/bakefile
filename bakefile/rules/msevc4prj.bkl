@@ -197,7 +197,7 @@
         
         <set var="_defines"/>
         <set var="_ldflags">
-            /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(DOLLAR)(CENoDefaultLib)" /subsystem:$(DOLLAR)(CESubsystem) $(_CPU_LDFLAGS)
+            /base:"0x00010000" /stack:0x10000,0x1000 /nodefaultlib:"$(DOLLAR)(CENoDefaultLib)" /subsystem:$(DOLLAR)(CESubsystem) $(_CPU_LDFLAGS)
         </set>
         <set var="_ldlibs">coredll.lib</set>
         <set var="_win32rc_flags">/l 0x409</set>
@@ -242,6 +242,15 @@
         <define-tag name="cxx-exceptions"/>
 
     </define-rule>
+    
+    
+    <template id="_exe_baset">
+        <ldflags>/entry:"WinMainCRTStartup"</ldflags>
+    </template>
+    
+    <template id="_dll_baset">
+        <ldflags>/entry:"_DllMainCRTStartup"</ldflags>
+    </template>
 
     <!-- Load common code and run it: -->
     <include file="msvc_prj_common.bkl"/>

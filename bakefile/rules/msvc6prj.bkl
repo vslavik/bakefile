@@ -32,6 +32,9 @@
         <cppflags>$(_rtl)</cppflags>
     </template>
     
+    <template id="_exe_baset"/>
+    <template id="_dll_baset"/>
+    
     <define-rule name="_compiled_specific">
         <define-tag name="debug-info">
             <cppflags>
