@@ -50,7 +50,7 @@
         </define-tag>
         <define-tag name="cxx-exceptions">
             <cxxflags>
-                $(substituteFromDict(value, {'on':'/GX','off':''}))
+                $(substituteFromDict(value, {'on':'/EHsc','off':''}))
             </cxxflags>
         </define-tag>
     </define-rule>
