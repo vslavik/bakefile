@@ -298,6 +298,7 @@ class CmdListEntry:
         self.node = node
         self.value = value
         self.parents = parents
+        self.mustProcessBefore = []
 
 def _extractTargetNodes(out_list, list, target, tags,
                         valueRecord, parentTags):
@@ -335,13 +336,21 @@ def _filterTargetNodes(cmd_list):
             else:
                 map[tag.name].append((tag, entry))
     
-    # remove all but the last exclusive tags if there are duplicates:
     for tagname in map:
+        # remove all but the last exclusive tags if there are duplicates:
         if (tagname in tagInfos) and (tagInfos[tagname].exclusive):
             tagToPreserve = map[tagname][-1][0]
             for tag, entry in \
                     [x for x in map[tagname][:-1] if x[0] != tagToPreserve]:
                 entry.node = None
+    
+        # reorder tags if neccessary:
+        if tagname in tagInfos:
+            for btag in tagInfos[tagname].before:
+                if btag in map:
+                    for tag, entry in map[btag]:
+                        entry.mustProcessBefore.append(map[tagname])
+        
 
             
 def _processTargetNodes(list, target, tags, dict):
@@ -378,24 +387,31 @@ def _processTargetNodes(list, target, tags, dict):
     _filterTargetNodes(cmd_list)
 
     if config.debug:
-        print '[dbg] -------------------------'
-        print '[dbg] Filtered tags for target %s:' % target.id
-        print '[dbg] -------------------------'
-        for entry in cmd_list:
-            parlist = [x.name for x in entry.parents]
-            if entry.node == None:
-                print '[dbg] %s || removed duplicate' % parlist
-            else:
-                print '[dbg] %s || %s [%s]' % (parlist, entry.node.name, entry.node.props)
+        print '[dbg] -----------------------------------------'
+        print '[dbg] * tag commands for target %s:' % target.id
+        print '[dbg] -----------------------------------------'
 
-    for entry in cmd_list:
-        if entry.node == None: continue
+    def _processEntry(entry, target, dict):
+        if entry.node == None: return
+        for lst in entry.mustProcessBefore:
+            for tag, e in lst:
+                _processEntry(e, target, dict)
+        
+        if config.debug:
+            parlist = [x.name for x in entry.parents]
+            print '[dbg] %s || %s [%s]' % \
+                  (parlist, entry.node.name, entry.node.props)
+        
         if entry.value == None:
             dict2 = dict
         else:
             val = entry.value.evalValue(target, dict)
             dict2 = {'value':val}
         processCmd(entry.node, target, dict2)
+        entry.node = None # mark it as processed
+
+    for entry in cmd_list:
+        _processEntry(entry, target, dict)
 
 
 _pseudoTargetLastID = 0
@@ -497,9 +513,34 @@ def handleDefineTag(e, rule=None):
 
 def handleTagInfo(e):
     name = e.props['name']
-    info = TagInfo()
-    if 'exclusive':
+    if name in tagInfos:
+        info = tagInfos[name]
+    else:
+        info = TagInfo()
+
+    if 'exclusive' in e.props:
         info.exclusive = e.props['exclusive'] == '1'
+    if 'position' in e.props:
+        tokens = e.props['position'].split(',')
+        for token in tokens:
+            pos = token.find(':')
+            if pos == -1:
+                keyword = token
+            else:
+                keyword = token[:pos]
+                param = token[pos+1:]
+
+            if keyword == 'before':
+                if param not in info.before:
+                    info.before.append(param)
+            elif keyword == 'after':
+                if param not in tagInfos:
+                    tagInfos[param] = TagInfo()
+                if name not in tagInfos[param].before:
+                    tagInfos[param].before.append(name)
+            else:
+                raise ReaderError(e, "unrecognized position token '%s'" % token)
+        
     tagInfos[name] = info
 
 
@@ -667,6 +708,7 @@ def processXML(data):
 def setStdVars():
     mk.setVar('LF', '\n')
     mk.setVar('SPACE', '$(" ")', eval=0)
+    mk.setVar('DOLLAR', '&dollar;')
     mk.setVar('OUTPUT_FILE', config.output_file)
     mk.setVar('FORMAT', config.format)
 
