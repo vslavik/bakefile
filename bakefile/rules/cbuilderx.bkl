@@ -128,6 +128,15 @@
         <define-tag name="include">
             <set var="__include_paths" append="1">$(value)</set>
         </define-tag>
+       
+        <!-- FIXME: what if I want a define to be for resources but *not*
+                    sources? -->
+        <define-tag name="res-define">
+            <set var="__defines" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="res-include">
+            <set var="__include_paths" append="1">$(value)</set>
+        </define-tag>
 
         <define-tag name="cppflags">
             <set var="__cppflags" append="1">$(value)</set>

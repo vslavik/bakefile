@@ -71,11 +71,11 @@
     </define-rule>
 
     <!-- includes and defines should propagate to rc compilation, too: -->
-    <define-tag name="include" rules="exe,dll,module">
+    <define-tag name="res-include" rules="exe,dll,module">
         <set var="__win32rc_flags" append="1">
             $(addPrefixIfNotEmpty('-I',nativePaths(value)))</set>
     </define-tag>
-    <define-tag name="define" rules="exe,dll,module">
+    <define-tag name="res-define" rules="exe,dll,module">
         <set var="__win32rc_flags" append="1">
             $(addPrefixIfNotEmpty('-D',value))</set>
     </define-tag>

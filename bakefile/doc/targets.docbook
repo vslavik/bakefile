@@ -542,6 +542,7 @@
                 <entry role="tagname">include</entry>
                 <entry>
                   Add directory where the compiler should look for headers.
+                  Calls <xref linkend="tag.res-include"/> with same value.
                 </entry>
                 <entry role="availability">exe, dll, module, lib</entry>
               </row>
@@ -552,6 +553,7 @@
                 <entry>
                   Define C preprocessor macro.
                   The value may be empty, in which case no flag is added.
+                  Calls <xref linkend="tag.res-define"/> with same value.
                 </entry>
                 <entry role="availability">exe, dll, module, lib</entry>
               </row>
@@ -796,7 +798,10 @@
                   The tag does nothing on platforms other than Windows.
                   Compilation of the resource respects 
                   <xref linkend="tag.define"/> and 
-                  <xref linkend="tag.include"/> tags on the target.
+                  <xref linkend="tag.include"/> tags on the target,
+                  as well as their resource specific counterparts
+                  <xref linkend="tag.res-define"/> and
+                  <xref linkend="tag.res-include"/>.
                 </entry>
                 <entry role="availability">exe, dll, module</entry>
               </row>
@@ -809,11 +814,35 @@
                   The tag does nothing on platforms other than Mac.
                   Compilation of the resource respects 
                   <xref linkend="tag.define"/> and 
-                  <xref linkend="tag.include"/> tags on the target.
+                  <xref linkend="tag.include"/> tags on the target,
+                  as well as their resource specific counterparts
+                  <xref linkend="tag.res-define"/> and
+                  <xref linkend="tag.res-include"/>.
                 </entry>
                 <entry role="availability">exe, dll, module</entry>
               </row>
               
+              
+              <row id="tag.res-include" xreflabel="res-include">
+                <entry role="tagname">res-include</entry>
+                <entry>
+                  Similar to <xref linkend="tag.include"/>, but applies only
+                  to resources (<xref linkend="tag.mac-res"/>,
+                  <xref linkend="tag.win32-res"/>) and not to C/C++ sources.
+                </entry>
+                <entry role="availability">exe, dll, module</entry>
+              </row>
+      
+      
+              <row id="tag.res-define" xreflabel="res-define">
+                <entry role="tagname">res-define</entry>
+                <entry>
+                  Similar to <xref linkend="tag.define"/>, but applies only
+                  to resources (<xref linkend="tag.mac-res"/>,
+                  <xref linkend="tag.win32-res"/>) and not to C/C++ sources.
+                </entry>
+                <entry role="availability">exe, dll, module</entry>
+              </row>
               
               
               <row id="tag.clean-files" xreflabel="clean-files">

@@ -118,17 +118,22 @@
         <define-tag name="win32-res">
             <sources>$(value)</sources>
         </define-tag>
+
+        <define-tag name="res-define"/>
+        <define-tag name="res-include"/>
         
         <define-tag name="define">
             <set var="__defines" append="1">
                 $(addPrefixIfNotEmpty('/D ',value.replace('"', '\"')))
             </set>
+            <res-define>$(value)</res-define>
         </define-tag>
         
         <define-tag name="include">
             <cppflags>
                 $(addPrefixIfNotEmpty('/I ',nativePaths(value)))
             </cppflags>
+            <res-include>$(value)</res-include>
         </define-tag>
 
         <define-tag name="cppflags">

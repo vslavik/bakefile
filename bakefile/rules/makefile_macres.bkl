@@ -38,12 +38,12 @@
         </define-tag>
 
         <!-- includes and defines should propagate to rc compilation, too: -->
-        <define-tag name="include">
+        <define-tag name="res-include">
             <set var="__rez_flags" append="1">
                 $(addPrefixIfNotEmpty('-i ',value))
             </set>
         </define-tag>
-        <define-tag name="define">
+        <define-tag name="res-define">
             <set var="__rez_flags" append="1">
                 $(addPrefixIfNotEmpty('-d ',value))
             </set>

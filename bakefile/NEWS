@@ -8,6 +8,8 @@ Version 0.1.3
 - added -j flag to bakefile_gen for simultaneous execution of more bakefile
   instances on multiprocessor systems
 - msvc6prj: don't output external dependencies as first projects in workspace
+- added <res-define> and <res-include> tags to specify flags for resource
+  compilers but not C/C++ compilers
 
 
 Version 0.1.2

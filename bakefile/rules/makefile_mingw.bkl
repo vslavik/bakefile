@@ -23,11 +23,11 @@
     </define-tag>
 
     <!-- includes and defines should propagate to rc compilation, too: -->
-    <define-tag name="include" rules="exe,dll">
+    <define-tag name="res-include" rules="exe,dll">
         <set var="__win32rc_flags" append="1">
             $(addPrefixIfNotEmpty('--include-dir ',value))</set>
     </define-tag>
-    <define-tag name="define" rules="exe,dll">
+    <define-tag name="res-define" rules="exe,dll">
         <set var="__win32rc_flags" append="1">
             $(addPrefixIfNotEmpty('--define ',value))</set>
     </define-tag>
