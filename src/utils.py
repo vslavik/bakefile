@@ -65,7 +65,10 @@ def substitute(str, callback, desc=None):
             if '$' in v.value:
                 var.add(v.cond, substitute(v.value, callback, desc))
             else:
-                var.add(v.cond, callback(v.value))
+                if len(v.value) == 0 or v.value.isspace():
+                    var.add(v.cond, v.value)
+                else:
+                    var.add(v.cond, callback(v.value))
         return '$(%s)' % var.name
 
     def callbackTxt(expr):
@@ -128,6 +131,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
                                        objSuffix, ext)
                 num=0
                 while obj in mk.targets:
+                    num += 1
                     obj = '%s%s-%s%i%s%s' % (objdir, mk.targets[target].id,
                                              base, num, objSuffix, ext)
             rule = '__%s-to-%s' % (srcext[1:], ext[1:])
