@@ -207,15 +207,20 @@ def invoke_em(writer, file, method):
 
 def invoke_py(writer, file, method):
     rulesdir, program = __findWriter(writer)
+    program = os.path.splitext(os.path.basename(program))[0]
     code = """
-import mk, writer, utils, os, os.path
+import mk, writer, utils, os, os.path, sys
 globals().update(writer.__preparedMkVars)
 RULESDIR="%s"
 FILE="%s"
-
-execfile("%s")
+oldpath = sys.path
+sys.path = [RULESDIR] + sys.path
+import %s
+%s.__dict__.update(globals())
+%s.run()
+sys.path = oldpath
 """ % (rulesdir.replace('\\','\\\\'), file.replace('\\','\\\\'),
-       program.replace('\\','\\\\'))
+       program, program, program)
     global __files
     __files = []
     vars = {}
