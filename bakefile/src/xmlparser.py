@@ -163,7 +163,7 @@ def __initParseFileXML():
     global parseFileXML
     try:
         global libxml2
-        import libxml3
+        import libxml2
         parseFileXML = __parseFileLibxml2
         libxml2.registerErrorHandler(__libxml2err, "-->")
     except(ImportError):
