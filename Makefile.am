@@ -89,7 +89,7 @@ code_LTLIBRARIES = _bottlenecks.la
 
 _bottlenecks_la_SOURCES = src/bottlenecks.c src/bottlenecks_wrap.c
 _bottlenecks_la_LDFLAGS = -module -avoid-version
-_bottlenecks_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
+_bottlenecks_la_CFLAGS = $(PYTHON_CPPFLAGS)
 
 EXTRA_DIST = \
     README THANKS \
