@@ -159,6 +159,7 @@
         </define-tag>
         <define-tag name="src">
             <set var="__file">$(value)</set>
+            <set var="__targetname">$(file)</set>
         </define-tag>
     </define-rule>
 
