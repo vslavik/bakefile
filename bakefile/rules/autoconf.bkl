@@ -39,11 +39,13 @@
     <unset var="PLATFORM_MSDOS"/>
     <unset var="PLATFORM_MAC"/>
     <unset var="PLATFORM_MACOSX"/>
+    <unset var="PLATFORM_OS2"/>
     <option name="PLATFORM_UNIX"/>
     <option name="PLATFORM_WIN32"/>
     <option name="PLATFORM_MSDOS"/>
     <option name="PLATFORM_MAC"/>
     <option name="PLATFORM_MACOSX"/>
+    <option name="PLATFORM_OS2"/>
     
     <option name="srcdir" never_empty="1"/>
     <option name="top_srcdir"/>
