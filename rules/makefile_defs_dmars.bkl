@@ -3,6 +3,9 @@
 
 <makefile>
     
+    <!-- the value in win32.bkl is too high for DMC: -->
+    <set var="LIB_PAGESIZE" overwrite="0">512</set>
+    
     <include file="win32.bkl"/>
     
     <set var="__DEFINE_ARG">-D</set>
@@ -94,10 +97,8 @@
         <set var="__LINK_EXE_CMD" eval="0">
             $(__linker) $(__ldflags) $(__objects_var),$@,$(__mapfile),$(__ldlibs),,$(__win32res)
         </set>
-        <!-- NB: we don't use -p$(LIB_PAGESIZE) here because dmc doesn't
-                 like pagesize > 512 -->
         <set var="__LINK_LIB_CMD" eval="0">
-            lib -c -n $@ $(__objects_var)
+            lib -p$(LIB_PAGESIZE) -c -n $@ $(__objects_var)
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(__dll_linker) $(__ldflags) /IMPLIB:$(__targetdir)$(__libname).lib $(__objects_var),$@,$(__mapfile),$(__ldlibs),,$(__win32res)
