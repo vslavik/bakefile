@@ -25,7 +25,7 @@ output_DATA = output/autoconf.empy \
               output/msvc.empy \
               output/msvc-opts.empy \
               output/msvc6prj.py \
-              output/msevc6prj.py \
+              output/msevc4prj.py \
               output/gnumake.empy \
               output/gnumake-opts.empy \
               output/watcom.empy \
