@@ -34,6 +34,6 @@ all: @BUILDDIR
 @[ for t in targets :
 @t.__targetdir@t.__targetname: @t.__deps
 @[ for cmd in t.__command.splitlines():@
-@\t@cmd.strip()
+@(cmd.strip()=='|' ? '|' : '\t'+cmd.strip())
 ]@
 ]@
