@@ -63,6 +63,9 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__FLAG_PCH_FILE"></set>
     <set var="__FLAG_SINGLE_THREADING"/>
     <set var="__FLAG_MULTI_THREADING">-mthreads</set>
+    <set var="__FLAG_WARNINGS_NO"/>
+    <set var="__FLAG_WARNINGS_DEFAULT"/>
+    <set var="__FLAG_WARNINGS_MAX">-Wall</set>
 
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">

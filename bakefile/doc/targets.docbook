@@ -657,6 +657,17 @@
                 </entry>
                 <entry role="availability">exe, dll, module, lib</entry>
               </row>
+              
+              
+              <row id="tag.warnings" xreflabel="warnings">
+                <entry role="tagname">warnings</entry>
+                <entry>
+                  Sets warnings level for C/C++ compiler. Possible values
+                  are <literal>no</literal>, <literal>default</literal>
+                  and <literal>max</literal>.
+                </entry>
+                <entry role="availability">exe, dll, module, lib</entry>
+              </row>
 
 
               <row id="tag.precomp-headers" xreflabel="precomp-headers">

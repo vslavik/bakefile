@@ -57,7 +57,7 @@
             <set var="__defines">/D "WIN32"</set>
             <!-- /GR /GX enables C++ exception handling and rtti
                  (FIXME: make it configurable) -->
-            <set var="__cppflags">/FD /W4 /GR /GX</set>
+            <set var="__cppflags">/FD /GR /GX</set>
             <set var="__ldlibs"/>
             <set var="__ldflags">/machine:i386</set>
             <set var="__win32rc_flags"/>
@@ -99,6 +99,9 @@
 
             <!-- Support for files grouping: -->
             <set var="__file_groups"/>
+
+
+            <warnings>default</warnings>
         </template>
         
         <define-tag name="sources">
@@ -174,6 +177,15 @@
                 $(substituteFromDict(value, {'on':'1','off':'0'}))
             </set>
         </define-tag>       
+        
+        <define-tag name="warnings">
+            <cppflags>
+                $(substituteFromDict(value,
+                   {'no':'/w',
+                    'default':'/W1',
+                    'max':'/W4'}))
+            </cppflags>
+        </define-tag>
 
         <define-tag name="install-to"/>
         <define-tag name="install-if"/>

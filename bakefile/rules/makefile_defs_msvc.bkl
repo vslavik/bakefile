@@ -40,6 +40,9 @@
     <set var="__FLAG_ARCH_I686">/G6</set>
     <set var="__FLAG_SINGLE_THREADING"></set>
     <set var="__FLAG_MULTI_THREADING"></set>
+    <set var="__FLAG_WARNINGS_NO">/w</set>
+    <set var="__FLAG_WARNINGS_DEFAULT"></set>
+    <set var="__FLAG_WARNINGS_MAX">/W4</set>
 
 
     <!-- rules building blocks: -->
