@@ -191,7 +191,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
         dnl or with a double stage link in order to create a single module
         dnl "-init _wxWindowsDylibInit" not useful with lazy linking solved
 
-        cat <<EOF
+        cat <<EOF >shared-ld-sh
 #!/bin/sh
 #-----------------------------------------------------------------------------
 #-- Name:        distrib/mac/shared-ld-sh
@@ -276,7 +276,7 @@ fi
 rm -f master.$$.o
 
 exit 0
-EOF >shared-ld-sh
+EOF
         chmod +x shared-ld-sh
 
         SHARED_LD_CC="`pwd`/shared-ld-sh -undefined suppress -flat_namespace -o"
