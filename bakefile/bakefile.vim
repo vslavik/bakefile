@@ -1,6 +1,6 @@
 " Vim syntax file
 " Language:	Bakefile makefile
-" Maintainer:	Vaclav Slavik <vaclav.slavik@matfyz.cz>
+" Maintainer:	Vaclav Slavik <vslavik@fastmail.fm>
 "
 " Based on Docbook syntax file by Devin Weaver <ktohg@tritarget.com>
 "
