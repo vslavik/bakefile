@@ -423,11 +423,27 @@
                   <para id="tag.cflags">cflags</para>
                   <para id="tag.cxxflags">cxxflags</para>
                   <para id="tag.cppflags">cppflags</para>
-                  <para id="tag.ldflags">ldflags</para>
                 </entry>
                 <entry>
                   Add <emphasis>compiler dependent</emphasis> compilation
                   flags to compiler flags.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+              
+              
+              <row>
+                <entry role="tagname">
+                  <para id="tag.ldflags">ldflags</para>
+                  <para id="tag.ldflags-end">ldflags-end</para>
+                </entry>
+                <entry>
+                  Add <emphasis>linker dependent</emphasis>
+                  flags for the linker. <command>ldflags-end</command> is same
+                  as <command>ldflags</command>, except that the flags are
+                  added after any other linker flags (this is generally not
+                  needed, but is sometimes useful e.g. with GCC where order of
+                  arguments matters). 
                 </entry>
                 <entry role="availability">exe, dll, lib</entry>
               </row>
