@@ -132,9 +132,13 @@
                 <if cond="TOOLSET=='unix'">
                     @mkdir -p $(__dstdir)
                     @for f in $(__files); do \
-                        if test \( ! -s $(__dstdir)/$(DOLLAR)$(DOLLAR)f \) -o \( $(__srcdir)$(DOLLAR)$(DOLLAR)f -nt $(__dstdir)/$(DOLLAR)$(DOLLAR)f  \) ; then \
-                            cp -pRf $(__srcdir)$(DOLLAR)$(DOLLAR)f $(__dstdir) ; \
-                        fi; \
+                        if test ! -e $(__dstdir)/$(DOLLAR)$(DOLLAR)f ; \
+			then x=yep ; \
+			else x=`find $(__srcdir)$(DOLLAR)$(DOLLAR)f -newer $(__dstdir)/$(DOLLAR)$(DOLLAR)f -print` ; \
+			fi; \
+			case "$(DOLLAR)$(DOLLAR)x" in ?*) \
+                            cp -pRf $(__srcdir)$(DOLLAR)$(DOLLAR)f $(__dstdir) ;; \
+                        esac; \
                     done
                 </if>
 
