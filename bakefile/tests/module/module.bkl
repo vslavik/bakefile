@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<makefile>
+    <module id="plugin">
+        <sources>libfile.c</sources>
+        <dllname>myDLL</dllname>
+        <install-to>$(LIBDIR)</install-to>
+    </module>
+</makefile>

@@ -4,12 +4,9 @@
     <using module="gettext"/>
 
     <gettext-catalogs id="locale">
-        <dependency-of>all</dependency-of>
-        <files>
-            cs.po
-            de.po
-            zh_CN.po
-        </files>
+        <catalog-name>bakefile_test</catalog-name>
+        <linguas>cs de zh_CN</linguas>
+        <install-to>$(LOCALEDIR)</install-to>
     </gettext-catalogs>
 
 </makefile>

@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<makefile>
+    <set var="FILE">
+        <if cond="PLATFORM_UNIX=='1'">file.c</if>
+        <if cond="PLATFORM_MACOSX=='1'">file.c</if>
+        <if cond="PLATFORM_WIN32=='1'">file.c</if>
+    </set>
+
+    <exe id="onefilemultipleconds">
+        <sources>$(FILE)</sources>
+    </exe>
+</makefile>

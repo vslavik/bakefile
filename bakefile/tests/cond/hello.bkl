@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <option name="TOOLKIT">
+       <values>GTK MGL MAC OS2 MOTIF MSW</values>
+    </option>
+    
+    <set var="FOO_1">
+        <if cond="PLATFORM_WIN32=='1'">win32.c</if>
+        <if cond="PLATFORM_UNIX=='1'">unix.c</if>
+    </set>
+    <set var="FOO_2">
+        <if cond="TOOLKIT=='GTK'">gtk.c</if>
+        <if cond="TOOLKIT=='MGL'">mgl.c</if>
+        <if cond="TOOLKIT=='MAC'">mac.c</if>
+        <if cond="TOOLKIT=='OS2'">os2.c</if>
+        <if cond="TOOLKIT=='MOTIF'">motif.c</if>
+        <if cond="TOOLKIT=='MSW'">msw.c</if>
+    </set>
+    
+    <exe id="hello">
+        <app-type>gui</app-type>
+        <sources>hello.c</sources>
+        <install-to>$(BINDIR)</install-to>
+        <sources>$(FOO_2)</sources>
+        <app-type>console</app-type>
+    </exe>
+    <exe id="hello_win32" cond="PLATFORM_WIN32=='1'">
+        <sources>hello.c</sources>
+        <install-to>$(BINDIR)</install-to>
+    </exe>
+</makefile>
