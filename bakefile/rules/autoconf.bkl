@@ -134,6 +134,7 @@
             <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='1'">
                 .$(__soversion1).$(__soversion2).$(__soversion3)$(DLLEXT)
             </if>
+            <if cond="USE_SOVERSION=='0'">$(DLLEXT)</if>
         </set>
         <set var="__targetname" eval="0">
             $(DLLPREFIX)$(__dllname)$(__targetsuf3)
