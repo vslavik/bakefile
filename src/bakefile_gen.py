@@ -19,8 +19,8 @@ files_all = files
 
 def _matchesWildcard(filename, wildcard):
     """Returns whether the file matches wildcard (glob)."""
-    name = filename.split(os.sep)
-    wild = wildcard.split(os.sep)
+    name = os.path.abspath(filename).split(os.sep)
+    wild = os.path.abspath(wildcard).split(os.sep)
     if len(name) != len(wild):
         return 0
     for i in range(0,len(name)):
