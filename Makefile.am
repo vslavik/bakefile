@@ -77,7 +77,9 @@ EXTRA_DIST = \
     autogen.sh chversion.sh \
     tests doc/images doc bakefile.spec bakefile.iss \
     src/optik/README.txt autoconf output rules \
-    src/empy/README src/empy/COPYING
+    src/empy/README src/empy/COPYING \
+	src/win32scriptwrapper.c \
+	src/bakefile.exe
 
 dist-hook:
 	(cd $(distdir)/doc ; ./process.sh)
