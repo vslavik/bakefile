@@ -14,12 +14,12 @@ man_MANS = doc/man/bakefile.1
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
               output/borland.empy \
-			  output/_hdr_makefile.empy
+              output/_hdr_makefile.empy
 
 rules_DATA =  rules/autoconf.bkl \
               rules/borland.bkl \
               rules/common.bkl \
-			  rules/format_features.bkl \
+              rules/format_features.bkl \
               rules/datafiles.bkl \
               rules/dirs.bkl \
               rules/makefile.bkl \
