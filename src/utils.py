@@ -124,19 +124,19 @@ def sources2objects(sources, target, ext, objSuffix=''):
             base = os.path.basename(base)
             objdir = mkPathPrefix(mk.vars['BUILDDIR'])
             obj = '%s%s%s%s' % (objdir, base, objSuffix, ext)
-            if s in srcs: continue
-            srcs.append(s)
-            if obj in mk.targets:
-                obj = '%s%s-%s%s%s' % (objdir, mk.targets[target].id, base,
-                                       objSuffix, ext)
-                num=0
-                while obj in mk.targets:
-                    num += 1
-                    obj = '%s%s-%s%i%s%s' % (objdir, mk.targets[target].id,
-                                             base, num, objSuffix, ext)
-            rule = '__%s-to-%s' % (srcext[1:], ext[1:])
-            code2 = code % (rule, obj, target, s, rule)
-            reader.processString(code2)
+            if s not in srcs:
+                srcs.append(s)
+                if obj in mk.targets:
+                    obj = '%s%s-%s%s%s' % (objdir, mk.targets[target].id, base,
+                                           objSuffix, ext)
+                    num=0
+                    while obj in mk.targets:
+                        num += 1
+                        obj = '%s%s-%s%i%s%s' % (objdir, mk.targets[target].id,
+                                                 base, num, objSuffix, ext)
+                rule = '__%s-to-%s' % (srcext[1:], ext[1:])
+                code2 = code % (rule, obj, target, s, rule)
+                reader.processString(code2)
             retval.append(obj)
         return '%s%s%s' % (prefix, ' '.join(retval), suffix)
 
