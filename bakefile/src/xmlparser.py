@@ -108,9 +108,17 @@ def __doParseMinidom(func, src):
         t = handleNode(src, dom.documentElement)
         dom.unlink()
         return t
-    except xml.dom.DOMException:
+    except xml.dom.DOMException, e:
+        print e
         raise ParsingError()
-    except xml.sax.SAXException:
+    except xml.sax.SAXException, e:
+        print e
+        raise ParsingError()
+    except xml.parsers.expat.ExpatError, e:
+        print e
+        raise ParsingError()
+    except IOError, e:
+        print e
         raise ParsingError()
 
 def __parseFileMinidom(filename):
@@ -126,10 +134,11 @@ parseString = __parseStringMinidom
 # Use libxml2 if available, it gives us better error checking than
 # xml.dom.minidom (DTD validation, line numbers etc.)
 try:
-    import libxml2
+    import libxml3
     parseFile = __parseFileLibxml2
     libxml2.registerErrorHandler(__libxml2err, "-->")
 except(ImportError):
     parseFile = __parseFileMinidom
+    import xml.parsers.expat
     import sys
     sys.stderr.write("Warning: libxml2 missing, will not show line numbers on errors\n")
