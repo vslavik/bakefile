@@ -26,18 +26,23 @@
             Sets a variable. There are two forms of the command. The first
             one if for setting variables unconditionally:
             <programlisting><![CDATA[
-  <set var="NAME" [append="APP"] [overwrite="OVERWRITE"] [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]>VALUE</set>
+<set var="NAME" [append="APP"] [overwrite="OVERWRITE"]
+     [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]>
+  VALUE
+</set>
   ]]></programlisting>
             The other one resembles <emphasis>switch</emphasis> statement known
             from C and is used to set the variable to one of possible values
             depending on certain condition:
             <programlisting><![CDATA[
-  <set var="NAME" [append="APP"] [overwrite="OVERWRITE"] [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]>
-    <if cond="COND">VALUE</if>
-    [
-    <if cond="COND">VALUE</if>
-    ...]
-  </set>
+<set var="NAME" [append="APP"] [overwrite="OVERWRITE"]
+     [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]>
+  <if cond="COND">VALUE</if>
+  [
+  <if cond="COND">VALUE</if>
+  ...
+  ]
+</set>
   ]]></programlisting>
             If the second from is used then the variable is set to value from
             the first <function>if</function> node whose condition is met, or
@@ -79,9 +84,9 @@
                           Following two <function>set</function>
                           commands are equivalent:
                           <programlisting><![CDATA[
-  <set var="FOO" append="1">something</set>
-  <set var="FOO">$(FOO) something</set>
-  ]]></programlisting>
+<set var="FOO" append="1">something</set>
+<set var="FOO">$(FOO) something</set>
+]]></programlisting>
                       </para>
                       <para role="default">
                           Default value: 0
@@ -102,11 +107,11 @@
                           See <xref linkend="concept.conditions"/> for more
                           details.
                           <programlisting><![CDATA[
-  <set var="FILES">
-    <if cond="BUILD=='debug'">foo_dbg.c</if>
-    <if cond="BUILD=='release'">foo.c</if>
-  </set>
-  ]]></programlisting>
+<set var="FILES">
+  <if cond="BUILD=='debug'">foo_dbg.c</if>
+  <if cond="BUILD=='release'">foo.c</if>
+</set>
+]]></programlisting>
                           The condition can also value special value
                           <literal>target</literal>, which can only be used
                           within <link linkend="concept.target">target</link>
@@ -189,9 +194,9 @@
           <para role="example">
               Example:
               <programlisting><![CDATA[
-  <set var="APP_VERSION">1.0.3</set>
-  <set var="TAR_NAME">app-$(APP_VERSION).tar.gz</set>
-  ]]></programlisting>
+<set var="APP_VERSION">1.0.3</set>
+<set var="TAR_NAME">app-$(APP_VERSION).tar.gz</set>
+]]></programlisting>
           </para>
           <para role="seealso">
               See also: <xref linkend="cmd.unset"/>
@@ -215,7 +220,7 @@
               an <link linkend="concept.option">option</link> or 
               <link linkend="concept.condvar">conditional variable</link>.
               <programlisting><![CDATA[
-  <unset var="NAME"/>]]>
+<unset var="NAME"/>]]>
   </programlisting>
           </para>
           <variablelist id="cmd.unset.params">
@@ -305,9 +310,9 @@
         <para>
           Defines new <link linkend="concept.template">template</link>.
           <programlisting><![CDATA[
-  <template id="NAME" [template="TEMPLATE,..."]>
-    SPECIFICATION
-  </template>]]>
+<template id="NAME" [template="TEMPLATE,..."]>
+  SPECIFICATION
+</template>]]>
   </programlisting>
           Template definition is syntactically identical to
           <link linkend="targets">target definition</link>.
@@ -318,33 +323,33 @@
         </para>
         <para>
           Content of <function>template</function> node is
-          <emphasis>not</emphasis> processed by Bakefile when it is encountered in
-          makefile. It is stored in templates dictionary instead. When a target
-          that derives from the template is encountered, the template is
-          inserted before target's content.
+          <emphasis>not</emphasis> processed by Bakefile when it is encountered
+          in makefile. It is stored in templates dictionary instead. When a
+          target that derives from the template is encountered, the template
+          is inserted before target's content.
         </para>
         <para>
           For example consider this makefile fragment:
           <programlisting><![CDATA[
-  <template id="t1">
-    <define>NAME=$(id)</define>
-  </template>
-  <template id="t2">
-    <include>../headers</include>
-  </template>
+<template id="t1">
+  <define>NAME=$(id)</define>
+</template>
+<template id="t2">
+  <include>../headers</include>
+</template>
 
-  <exe id="app" template="t1,t2">
-    <sources>hello.c</sources>
-  </exe>
-  ]]></programlisting>
+<exe id="app" template="t1,t2">
+  <sources>hello.c</sources>
+</exe>
+]]></programlisting>
           It looks like this after templates expansion:
           <programlisting><![CDATA[
-  <exe id="app" template="t1,t2">
-    <define>NAME=$(id)</define>
-    <include>../headers</include>
-    <sources>hello.c</sources>
-  </exe>
-  ]]></programlisting>
+<exe id="app" template="t1,t2">
+  <define>NAME=$(id)</define>
+  <include>../headers</include>
+  <sources>hello.c</sources>
+</exe>
+]]></programlisting>
         </para>
       </section>
 
@@ -361,7 +366,7 @@
         This commands is used to declare what modules the makefile requires.
         See more about modules in <xref linkend="concept.modules"/>.
               <programlisting><![CDATA[
-  <using module="MODULE1[,MODULE2[,...]]"/>]]>
+<using module="MODULE1[,MODULE2[,...]]"/>]]>
   </programlisting>
       </para>
       <para>
@@ -378,26 +383,26 @@
       <para>
         Consider this structure of ruleset files:
         <programlisting>
-  python/common.bakefile        # python,common
-  python/cxx.bakefile           # python,cxx
-  cxx-common.bakefile           # cxx,common
-  cxx-qt.bakefile               # cxx,qt
-  qt/python.bakefile            # qt,python
-  qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
+python/common.bakefile        # python,common
+python/cxx.bakefile           # python,cxx
+cxx-common.bakefile           # cxx,common
+cxx-qt.bakefile               # cxx,qt
+qt/python.bakefile            # qt,python
+qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
         Anotated makefile fragment illustrates order of modules loading:
         <programlisting><![CDATA[
-  <using module="python"/>
-  <!-- python/common.bakefile loaded -->
+<using module="python"/>
+<!-- python/common.bakefile loaded -->
 
-  <using module="cxx"/>
-  <!-- cxx-common.bakefile loaded -->
-  <!-- python/cxx.bakefile loaded -->
+<using module="cxx"/>
+<!-- cxx-common.bakefile loaded -->
+<!-- python/cxx.bakefile loaded -->
 
-  <using module="qt"/>
-  <!-- qt/python.bakefile loaded -->
-  <!-- cxx-qt.bakefile loaded -->
-  <!-- qt/cxx-python.bakefile loaded -->
-  ]]></programlisting>
+<using module="qt"/>
+<!-- qt/python.bakefile loaded -->
+<!-- cxx-qt.bakefile loaded -->
+<!-- qt/cxx-python.bakefile loaded -->
+]]></programlisting>
       </para>
       <para>
         (Note that module "common" and module named after the target format are
@@ -424,9 +429,9 @@
         <para>
           In this example the makefile uses Gettext, Python and Pascal modules:
           <programlisting><![CDATA[
-  <using module="gettext,python"/>
-  <using module="pascal"/>
-  ]]></programlisting>
+<using module="gettext,python"/>
+<using module="pascal"/>
+]]></programlisting>
         </para>
     </section>
 
@@ -440,14 +445,15 @@
     <section id="cmd.include" xreflabel="include">
       <title>include</title>
       <para>
-        Includes Bakefile file. This is done by loading the file and processing it
-        immediately after <function>include</function> command is encountered
-        during parsing. The effect of using <function>include</function> is
-        identical to including content of the file in place of the
+        Includes Bakefile file. This is done by loading the file and
+        processing it immediately after <function>include</function> command
+        is encountered during parsing. The effect of using
+        <function>include</function> is identical to including content of the
+        file in place of the
         <function>include</function> command.
         <programlisting><![CDATA[
-  <include file="FILENAME" [ignore_missing="0|1"]/>
-  ]]></programlisting>
+<include file="FILENAME" [ignore_missing="0|1"]/>
+]]></programlisting>
       </para>
       <variablelist>
         <title>Parameters:</title>
@@ -490,10 +496,10 @@
         <para>
           Conditionally process part of the makefile.
           <programlisting><![CDATA[
-  <if cond="WEAKCONDITION">
-    ...statements...
-  </if>
-  ]]></programlisting>
+<if cond="WEAKCONDITION">
+  ...statements...
+</if>
+]]></programlisting>
           The condition must be
           <link linkend="concept.conditions.weak">weak</link>. If it evalues to
           1 nodes under <function>if</function> node are processed as if they
