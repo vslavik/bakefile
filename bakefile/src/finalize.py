@@ -12,7 +12,7 @@ from types import InstanceType, DictType
 import mk, errors, config, utils
 
 
-def finalEvaluation(outputVarsOnly = 1):
+def finalEvaluation(outputVarsOnly=1):
     """Evaluates all variables, so that unneccessary $(...) parts are
        removed in cases when <set eval="0" ...> was used.
 
@@ -26,7 +26,6 @@ def finalEvaluation(outputVarsOnly = 1):
     mk.__trackUsage = 1
     mk.__resetUsageTracker(reset_coverage=1)
 
-    refs = []
     list = []
 
     if outputVarsOnly:
@@ -67,7 +66,7 @@ def finalEvaluation(outputVarsOnly = 1):
                         type(t.vars[v]) is DictType):
                     if '$' in t.vars[v]:
                         list.append((t.vars,v,t))
-            
+
     
     def iterateModifications(list):
         while len(list) > 0:
@@ -86,11 +85,9 @@ def finalEvaluation(outputVarsOnly = 1):
                     if dict == None: obj.value = new
                     else: dict[obj] = new
                 if (mk.__usageTracker.vars + 
-                    mk.__usageTracker.pyexprs -  mk.__usageTracker.refs > 0) \
+                    mk.__usageTracker.pyexprs - mk.__usageTracker.refs > 0) \
                            and ('$' in new):
                     newList.append((dict,obj,target))
-                if mk.__usageTracker.refs > 0:
-                    refs.append((dict,obj,target))
             list = newList
     
     if config.verbose:
@@ -98,14 +95,6 @@ def finalEvaluation(outputVarsOnly = 1):
         sys.stdout.flush()
     iterateModifications(list)
     if config.verbose: sys.stdout.write('\n')
-        
-    if len(refs) > 0:
-        if config.verbose:
-            sys.stdout.write('eliminating references ')
-            sys.stdout.flush()
-        utils.__refEval = 1
-        iterateModifications(refs)
-        if config.verbose: sys.stdout.write('\n')
         
 
 def purgeUnusedOptsVars():
@@ -239,6 +228,10 @@ def finalize():
 
     # evaluate variables:
     finalEvaluation(outputVarsOnly=0)
+
+    # eliminate references: 
+    utils.__refEval = 1
+    finalEvaluation()
 
     # delete pseudo targets now:
     pseudos = [ t for t in mk.targets if mk.targets[t].pseudo ]
