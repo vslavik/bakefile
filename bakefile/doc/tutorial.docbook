@@ -79,7 +79,7 @@ AC_PREREQ(2.53)
 AC_INIT(aclocal.m4)
 AC_CANONICAL_SYSTEM
 DEBUG=0
-AC_BAKEFILE
+AC_BAKEFILE([m4_include(autoconf_inc.m4)])
 AC_OUTPUT([Makefile])
 ]]></programlisting>
     </para>
@@ -107,7 +107,7 @@ else
   DEBUG=0
 fi
 
-AC_BAKEFILE
+AC_BAKEFILE([m4_include(autoconf_inc.m4)])
 AC_OUTPUT([Makefile])
 ]]></programlisting>
     </para>

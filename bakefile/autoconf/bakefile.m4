@@ -650,7 +650,7 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
 
 
 dnl ---------------------------------------------------------------------------
-dnl AC_BAKEFILE
+dnl AC_BAKEFILE([autoconf_inc.m4 inclusion])
 dnl
 dnl To be used in configure.in of any project using Bakefile-generated mks
 dnl
@@ -660,6 +660,14 @@ dnl                             to perform check for basic tools like ranlib
 dnl    BAKEFILE_HOST            set this to override host detection, defaults
 dnl                             to ${host}
 dnl    BAKEFILE_FORCE_PLATFORM  set to override platform detection
+dnl
+dnl Example usage:
+dnl
+dnl   AC_BAKEFILE([FOO(autoconf_inc.m4)])
+dnl
+dnl (replace FOO with m4_include above, aclocal would die otherwise)
+dnl (yes, it's ugly, but thanks to a bug in aclocal, it's the only thing
+dnl we can do...)
 dnl ---------------------------------------------------------------------------
 
 AC_DEFUN([AC_BAKEFILE],
@@ -683,8 +691,9 @@ AC_DEFUN([AC_BAKEFILE],
     AC_BAKEFILE_RES_COMPILERS
 
     BAKEFILE_BAKEFILE_M4_VERSION="0.1.5"
-    
-    m4_include([autoconf_inc.m4])
+   
+    dnl includes autoconf_inc.m4:
+    $1
     
     if test "$BAKEFILE_BAKEFILE_M4_VERSION" != "$BAKEFILE_AUTOCONF_INC_M4_VERSION" ; then
         AC_MSG_ERROR([Versions of Bakefile used to generate makefiles ($BAKEFILE_AUTOCONF_INC_M4_VERSION) and configure ($BAKEFILE_BAKEFILE_M4_VERSION) do not match.])
