@@ -506,7 +506,9 @@ AC_DEFUN([AC_BAKEFILE_CHECK_BASIC_STUFF],
 
     case ${BAKEFILE_HOST} in
         *-hp-hpux* )
-            INSTALL_DIR="mkdir"
+            dnl HP-UX install doesn't handle the "-d" switch so don't
+            dnl use it there
+            INSTALL_DIR="mkdir -p"
             ;;
         *)  INSTALL_DIR="$INSTALL -d"
             ;;
