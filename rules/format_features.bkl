@@ -3,7 +3,7 @@
 
 <!--
 This is a helper file that declares variables that describe optional format
-backend features. All features are set to 0 ("unsupported") here and format
+backend features. All features are set to meaningful defaults here and format
 files such as autoconf.bkl must override the setting if they want to take
 advantage of a particular feature.
 -->
@@ -20,6 +20,7 @@ advantage of a particular feature.
     -->
     <set var="FORMAT_HAS_VARIABLES">0</set>
 
+    
     <!--
     Comma separated list of variables (both global and target) used by output
     writer. Output Empy template then can only use variables from this list.
@@ -32,6 +33,19 @@ advantage of a particular feature.
     If the list is empty then all variables are treated as used by the writer.
     -->
     <set var="FORMAT_OUTPUT_VARIABLES"></set>
+
+
+    <!--
+    Whether the output format needs to have options that are used by
+    conditions listed in the output file. This is true in majority of cases
+    because the conditions take form such as "!if $(OPT) == value" and OPT must
+    be defined, but there's one exception: autoconf. It decides on whether
+    the condition is true or false in autoconf_inc.m4 and Makefile.in does not
+    need the variables, so we can safely purge them and save some space.
+
+    Set to 1 by default, only autoconf overwrites the setting.
+    -->
+    <set var="FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS">1</set>
 
 </makefile>
 
