@@ -16,6 +16,7 @@ Version 0.1.4
 - added --pretend option to bakefile_gen tool
 - added -D option to bakefile_gen that lets the user further customize
   the output by defining additional variables
+- support for DigitalMars's smake (dmars_smake format)
 
 
 Version 0.1.3

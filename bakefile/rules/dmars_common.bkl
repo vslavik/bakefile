@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <include file="makefile.bkl"/>
+    
+    <!-- =============================================================== -->
+    <!--                   Compiler-specific tags:                       -->
+    <!-- =============================================================== -->
+    
+    <define-tag name="cppflags-dmars" rules="exe,lib,dll,module">
+        <cppflags>$(value)</cppflags>
+    </define-tag>
+    <define-tag name="cflags-dmars" rules="exe,lib,dll,module">
+        <cflags>$(value)</cflags>
+    </define-tag>
+    <define-tag name="cxxflags-dmars" rules="exe,lib,dll,module">
+        <cxxflags>$(value)</cxxflags>
+    </define-tag>
+    <define-tag name="ldflags-dmars" rules="exe,dll,module">
+        <ldflags>$(value)</ldflags>
+    </define-tag>
+
+    <!-- =============================================================== -->
+    <!--                         "make clean":                           -->
+    <!-- =============================================================== -->
+
+    <action id="clean" template="__phony">
+        <set var="__builddir" eval="0">$(BUILDDIR)</set>
+        <command>            
+            -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
+            -if exist $(__builddir)\*.res del $(__builddir)\*.res
+        </command>
+    </action>
+
+    <define-tag name="__clean-target-files" rules="exe,dll,module">
+        <clean-files>
+            $(ref('__targetdir',id))$(ref('__name',id)).map
+        </clean-files>
+    </define-tag>
+    
+    <!-- =============================================================== -->
+    <!--                     win32 resources:                            -->
+    <!-- =============================================================== -->
+
+    <define-tag name="win32-res" rules="exe,dll,module">
+        <set var="__win32res" append="1">
+            $(sources2objects(value, id, '.res'))
+        </set>
+        <set var="__deps" append="1">$(__win32res)</set>
+    </define-tag>
+
+    <!-- compilation rule for .rc files:  -->
+    <define-rule name="__rc-to-res" extends="__any,compilation_rule">
+        <template>
+            <set var="__command" eval="0">
+                rcc $** -o$@ $(__win32rc_flags) -32 -v-
+            </set>
+        </template>
+        <define-tag name="parent-target">
+            <set var="__win32rc_flags">$(targets[value].__win32rc_flags)</set>
+        </define-tag>
+    </define-rule>
+
+    <!-- includes and defines should propagate to rc compilation, too: -->
+    <define-tag name="res-include" rules="exe,dll,module">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('-I',nativePaths(value)))</set>
+    </define-tag>
+    <define-tag name="res-define" rules="exe,dll,module">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('-D',value))</set>
+    </define-tag>
+
+    <!-- =============================================================== -->
+    <!--                            output:                              -->
+    <!-- =============================================================== -->
+
+    <!-- see format_features.bkl for explanation: -->
+    <set var="FORMAT_OUTPUT_VARIABLES">
+        __targetdir __targetname __deps __command
+    </set>
+
+    <if cond="OPTIONS_FILE!='' and WRITE_OPTIONS_FILE=='1'">
+    <output file="$(os.path.join(os.path.dirname(OUTPUT_FILE), OPTIONS_FILE))"
+            writer="dmars-opts.empy"/>
+    </if>
+
+</makefile>

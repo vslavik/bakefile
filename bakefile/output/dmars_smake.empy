@@ -1,0 +1,60 @@
+@{
+# helper functions:
+def makeCondBegin(c):
+    s = ''
+    for e in c.exprs:
+        s += '!if "$(%s)" == "%s"\n' % (e.option.name, e.value)
+    return s.strip()
+def makeCondEnd(c):
+    s = ''
+    for e in range(0,len(c.exprs)):
+        s += '!endif\n'
+    return s.strip()
+}@
+@empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
+.LONGCOMMANDLINE: dmc link lib smake
+
+@[if OPTIONS_FILE != '']!include @OPTIONS_FILE
+@[end if]@
+@[if OPTIONS_FILE == '']@
+@empy.include(os.path.join(RULESDIR, 'dmars-opts.empy'))
+@[end if]@
+
+# -------------------------------------------------------------------------
+# Do not modify the rest of this file!
+# -------------------------------------------------------------------------
+
+### Conditionally set variables: ###
+
+@[for c in cond_vars]@
+@[for v in c.values]@
+@makeCondBegin(v.cond)
+@utils.wrapLongLine('%s = ' % c.name, v.value, ' \\', variable=c.name)
+@makeCondEnd(v.cond)
+@[end for]@
+@[end for]@
+
+### Variables: ###
+
+@[for v in make_vars]@
+@('%s = %s' % (v.name, v.value))
+@[end for]@
+
+@[if BUILDDIR != '.']
+all : @BUILDDIR
+@BUILDDIR :
+@\t-if not exist @BUILDDIR mkdir @BUILDDIR
+@[end if]@
+
+### Targets: ###
+
+@[for t in targets]
+@[if t.cond != None]@makeCondBegin(t.cond)
+@[end if]@
+@t.__targetdir@t.__targetname : @[if t.__is_phony=='1']@[end if] @t.__deps
+@[for cmd in t.__command.splitlines()]@
+@(cmd.strip()=='|' ? '|' : '\t'+cmd.strip())
+@[end for]@
+@[if t.cond != None]@makeCondEnd(t.cond)
+@[end if]@
+@[end for]@

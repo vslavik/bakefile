@@ -3,12 +3,11 @@
 
 <makefile>
     
-    <set var="COMPILER">dmc</set>
-    <set var="MAKEFILE_SYNTAX">dmars</set>
+    <!-- SMAKE is additional make tool of DMC so it -->
+    <!-- shares some settings with free make of DMC -->
 
-    <!-- DMC make is brain-dead -->
-    <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
-    <set var="FORMAT_SUPPORTS_CONFIGURATIONS">0</set>
+    <set var="COMPILER">dmc</set>
+    <set var="MAKEFILE_SYNTAX">dmars_smake</set>
 
     <include file="dmars_common.bkl"/>
 
@@ -16,6 +15,6 @@
     <!--                            output:                              -->
     <!-- =============================================================== -->
 
-    <output file="$(OUTPUT_FILE)" writer="dmars.empy"/>
+    <output file="$(OUTPUT_FILE)" writer="dmars_smake.empy"/>
     
 </makefile>

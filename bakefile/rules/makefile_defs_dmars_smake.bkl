@@ -5,20 +5,26 @@
     
     <include file="makefile_defs_dmars_common.bkl"/>
     
+    <!-- how to pass options to subproject's make -->
+    <set var="__MAKEARGS" eval="0">
+        $(' '.join(['"%s=$(DOLLAR)(%s)"' % (x,x) for x in OPTIONS.split()]))
+    </set>
+    <set var="MAKEARGS" make_var="1">$(__MAKEARGS)</set>
+
     <template id="__subproject_templ">
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            make -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) $(__subtarget)
+            smake /NOLOGO /F $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) $(__subtarget)
             cd $(DIRSEP.join(['..' for x in __subdir.split(DIRSEP)]))
         </set>
         <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            make -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) install
+            smake /NOLOGO /F $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) install
             cd $(DIRSEP.join(['..' for x in __subdir.split(DIRSEP)]))
         </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
-            make -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) clean
+            smake /NOLOGO /F $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) clean
             cd $(DIRSEP.join(['..' for x in __subdir.split(DIRSEP)]))
         </set>
     </template>
