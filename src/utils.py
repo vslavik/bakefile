@@ -103,16 +103,30 @@ def sources2objects(sources, target, ext, objSuffix=''):
 
        Returns object files list."""
     import os.path
-    import reader
+    import reader, xmlparser
 
-    code = """
-    <makefile>
-    <%s id="%s">
-        <parent-target>%s</parent-target>
-        <src>%s</src>
-    </%s>
-    </makefile>
-    """
+    # It's a bit faster (about 10% on wxWindows makefiles) to not parse XML
+    # but construct the elements tree by hand. We construc the tree for this
+    # code:
+    #
+    #code = """
+    #<makefile>
+    #<%s id="%s">
+    #    <parent-target>%s</parent-target>
+    #    <src>%s</src>
+    #</%s>
+    #</makefile>"""
+    cRoot = xmlparser.Element()
+    cTarget = xmlparser.Element()
+    cSrc = xmlparser.Element()
+    cParent = xmlparser.Element()
+    cRoot.name = 'makefile'
+    cRoot.children = [cTarget]
+    cRoot.value = ''
+    cTarget.children = [cParent,cSrc]
+    cParent.name = 'parent-target'
+    cTarget.value = ''
+    cSrc.name = 'src'
 
     def callback(sources):
         prefix = suffix = ''
@@ -135,8 +149,13 @@ def sources2objects(sources, target, ext, objSuffix=''):
                         obj = '%s%s-%s%i%s%s' % (objdir, mk.targets[target].id,
                                                  base, num, objSuffix, ext)
                 rule = '__%s-to-%s' % (srcext[1:], ext[1:])
-                code2 = code % (rule, obj, target, s, rule)
-                reader.processString(code2)
+                # 4 lines below are equivalent of:
+                # code2 = code % (rule, obj, target, s, rule)
+                cTarget.name = rule
+                cTarget.props['id'] = obj
+                cParent.value = target
+                cSrc.value = s
+                reader.processXML(cRoot)
                 __src2obj[index] = obj
             retval.append(__src2obj[index])
         return '%s%s%s' % (prefix, ' '.join(retval), suffix)
@@ -178,3 +197,4 @@ def mkPathPrefix(p):
         return ''
     else:
         return p + '$(DIRSEP)'
+
