@@ -29,6 +29,10 @@ class ParsingError(Exception):
     def __init__(self):
         pass
 
+def __libxml2err(ctx, str):
+    print str
+    raise ParsingError()
+
 def __parseFileLibxml2(filename):
     
     def handleNode(filename, n):
@@ -123,6 +127,7 @@ parseString = __parseStringMinidom
 try:
     import libxml2
     parseFile = __parseFileLibxml2
+    libxml2.registerErrorHandler(__libxml2err, "-->")
 except(ImportError):
     parseFile = __parseFileMinidom
     import sys
