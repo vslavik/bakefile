@@ -44,6 +44,12 @@ makefiles (most notably GNU Make and Autoconf formats).
             Standard preprocessor flags (common for CC and CXX)
         </description>
     </option>
+    <option name="LDFLAGS">
+        <default-value>$(__DEFAULT_LDFLAGS)</default-value>
+        <description>
+            Standard linker flags
+        </description>
+    </option>
 
 
     <!-- =============================================================== -->
@@ -105,7 +111,8 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__cppflags">$(CPPFLAGS)</set>
             <set var="__cflags">$(CFLAGS)</set>
             <set var="__cxxflags">$(CXXFLAGS)</set>
-            <set var="__ldflags"/>
+            <set var="__ldflags">$(LDFLAGS)</set>
+            <set var="__ldlibs"/>
             <set var="__objects"/>
             <set var="__linker" eval="0">
                 $(ifthenelse(__uses_cxx, __LINKER_CXX, __LINKER_CC))
@@ -126,8 +133,8 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
 
         <define-tag name="sys-lib">
-            <set var="__ldflags" append="1">
-                $(addPrefixIfNotEmpty(__LIB_ARG,value))
+            <set var="__ldlibs" append="1">
+                $(formatIfNotEmpty(__LIB_ARG,value))
             </set>
         </define-tag>
         <define-tag name="lib-path">
@@ -165,7 +172,59 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="dirname">
             <set var="__targetdir">$(nativePaths(value))$(DIRSEP)</set>
         </define-tag>
+        
+        <define-tag name="optimize">
+            <cppflags>
+                $(substituteFromDict(value,
+                      {'off':__FLAG_OPTIMIZE_OFF,
+                       'speed':__FLAG_OPTIMIZE_SPEED,
+                       'size':__FLAG_OPTIMIZE_SIZE}))
+            </cppflags>
+        </define-tag>
+        
+        <define-tag name="arch">
+            <cppflags>
+                $(substituteFromDict(value,
+                      {'i386':__FLAG_ARCH_I386,
+                       'i486':__FLAG_ARCH_I486,
+                       'i586':__FLAG_ARCH_I586,
+                       'i686':__FLAG_ARCH_I686,
+                       }))
+            </cppflags>
+        </define-tag>
+        
+        <define-tag name="debug-info">
+            <cppflags>
+                $(substituteFromDict(value,
+                      {'on':__FLAG_DEBUG_ON,
+                       'off':__FLAG_DEBUG_OFF}))
+            </cppflags>
+            <ldflags>
+                $(substituteFromDict(value,
+                      {'on':__FLAG_DEBUG_ON_LINKER,
+                       'off':__FLAG_DEBUG_OFF_LINKER}))
+            </ldflags>
+        </define-tag>       
+        
+        <define-tag name="threading">
+            <ldflags>
+                $(substituteFromDict(value,
+                      {'multi':__FLAG_MULTI_THREADING,
+                       'single':__FLAG_SINGLE_THREADING}))
+            </ldflags>
+        </define-tag>       
 
+        <define-tag name="precomp-headers">
+            <cppflags>
+                $(substituteFromDict(value, {'on':__FLAG_USE_PCH, 'off':''}))
+            </cppflags>
+        </define-tag>
+        <define-tag name="precomp-headers-file">
+            <cppflags>
+                $(__FLAG_PCH_FILE % (mkPathPrefix(BUILDDIR)+value))
+            </cppflags>
+        </define-tag>
+        
     </define-rule>
 
     <define-rule name="exe" extends="__compiled,$(__exe_baser)">
@@ -180,6 +239,15 @@ makefiles (most notably GNU Make and Autoconf formats).
                 $(ref('__targetdir',id))$(ref('__targetname',id))
             </clean-files>
         </template>
+
+        <define-tag name="app-type">
+            <ldflags>
+                $(substituteFromDict(value,
+                      {'console':__FLAG_EXE_CONSOLE,
+                       'gui':__FLAG_EXE_GUI}))
+            </ldflags>
+        </define-tag>
+
     </define-rule>
     
     <define-rule name="lib" extends="__compiled,$(__lib_baser)">

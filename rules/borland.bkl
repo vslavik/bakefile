@@ -7,9 +7,6 @@
 
     <include file="makefile.bkl"/>
 
-    <set var="__ALWAYS_CLEAN" eval="0" append="1">$(BUILDDIR)\*.tds</set>
-
-    
     <!-- =============================================================== -->
     <!--                         "make clean":                           -->
     <!-- =============================================================== -->
@@ -18,7 +15,6 @@
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
         <command>            
             -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
-            -if exist $(__builddir)\*.tds del $(__builddir)\*.tds
         </command>
     </action>
     

@@ -6,7 +6,7 @@
     
     <set var="__DEFINE_ARG">-D</set>
     <set var="__INCLUDE_ARG">-I</set>
-    <set var="__LIB_ARG">-l</set>
+    <set var="__LIB_ARG">%s.lib</set>
     <set var="__LIBDIR_ARG">-L</set>
 
     <set var="__DEFAULT_CC">bcc32</set>
@@ -14,15 +14,38 @@
     <set var="__DEFAULT_CFLAGS"></set>
     <set var="__DEFAULT_CPPFLAGS"></set>
     <set var="__DEFAULT_CXXFLAGS"></set>
+    <set var="__DEFAULT_LDFLAGS"></set>
     
     <set var="__LINKER_CC" eval="0">$(CC)</set>
     <set var="__LINKER_CXX" eval="0">$(CXX)</set>
     <set var="__DLL_LINKER_CC" eval="0">$(CC) -tWD</set>
     <set var="__DLL_LINKER_CXX" eval="0">$(CXX) -tWD</set>
 
+    <!-- basic compiler/linker flags: -->
+    <set var="__FLAG_EXE_CONSOLE">-tWC</set>
+    <set var="__FLAG_EXE_GUI">-tW</set>
+    <set var="__FLAG_DEBUG_ON">-v</set>
+    <set var="__FLAG_DEBUG_ON_LINKER">-v</set>
+    <set var="__FLAG_DEBUG_OFF">-v-</set>
+    <set var="__FLAG_DEBUG_OFF_LINKER">-v-</set>
+    <set var="__FLAG_OPTIMIZE_OFF">-Od</set>
+    <set var="__FLAG_OPTIMIZE_SIZE">-O1</set>
+    <set var="__FLAG_OPTIMIZE_SPEED">-O2</set>
+    <set var="__FLAG_ARCH_I386">-3</set>
+    <set var="__FLAG_ARCH_I486">-4</set>
+    <set var="__FLAG_ARCH_I586">-5</set>
+    <set var="__FLAG_ARCH_I686">-6</set>
+    <set var="__FLAG_USE_PCH">-H -Hs</set>
+    <set var="__FLAG_PCH_FILE" eval="0">-H=%s.csm</set>
+    <set var="__FLAG_SINGLE_THREADING"/>
+    <set var="__FLAG_MULTI_THREADING">-tWM</set>
+
+
+    <!-- rules building blocks: -->
+    
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -c -o$@ $(__cppflags) $(__cflags) $**
+            $(CC) -c -P- -o$@ $(__cppflags) $(__cflags) $**
         </set>
     </template>
     
@@ -33,15 +56,34 @@
     </template>
     
     <template id="__commands_templ">
+        <!-- 
+        NB: Borland make has builtin support for response files in the form of
+            "&&|content of response file|" (where | can be any character).
+            Borland tools use "@responsefile" syntax to use resp. file. This
+            explains somehow cryptic syntax below.
+
+            Note that there must be linefeed after first | and the second |
+            must be alone on and at the beginning of the line (borland.empy
+            takes care of this part).
+            
+            (We have to use response file because of windows command
+            line length limitation.)
+        -->
         <set var="__LINK_EXE_CMD" eval="0">
-            $(__linker) -e$@ $(__objects) $(__ldflags)
+            $(__linker) -e$@ $(__ldflags) $(__ldlibs) @&amp;&amp;|
+            $(__objects)
+            |
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
-            $(RM) $@
-            tlib /a $@ $(__objects)
+            if exist $@ del $@
+            tlib /a $@ @&amp;&amp;|
+            $(__objects)
+            |
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) -e$@ $(__objects) $(__ldflags)
+            $(__dll_linker) -e$@ $(__ldflags) $(__ldlibs) @&amp;&amp;|
+            $(__objects)
+            |
             implib $(__targetdir)$(__libname) $@
         </set>
     </template>
