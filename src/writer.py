@@ -279,9 +279,9 @@ def write():
             f.writelines(__output_files[file])
             if changes_f != None:
                 changes_f.write('%s\n' % os.path.abspath(file))
-            print 'writing %s' % file
+            if not config.quiet: print 'writing %s' % file
         else:
-            print 'no changes in %s' % file
+            if not config.quiet: print 'no changes in %s' % file
         __closeFile(f)
         
         if config.track_deps:

@@ -163,14 +163,16 @@ def __initParseFileXML():
     global parseFileXML
     try:
         global libxml2
-        import libxml2
+        import libxml3
         parseFileXML = __parseFileLibxml2
         libxml2.registerErrorHandler(__libxml2err, "-->")
     except(ImportError):
         parseFileXML = __parseFileMinidom
         global xml
         import sys, xml.sax, xml.dom, xml.dom.minidom, xml.parsers.expat
-        sys.stderr.write("Warning: libxml2 missing, will not show line numbers on errors\n")
+        import config
+        if not config.quiet:
+            sys.stderr.write("Warning: libxml2 missing, will not show line numbers on errors\n")
 
 def __parseFileXMLStub(filename):
     global parseFileXML

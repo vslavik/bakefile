@@ -37,6 +37,9 @@
           <option>-v</option>
         </arg>        
         <arg choice="opt">
+          <option>-q</option>
+        </arg>        
+        <arg choice="opt">
           <option>--dump</option>
         </arg>        
         <arg choice="plain">
@@ -145,6 +148,15 @@
             </term>
             <listitem>
               <para>Be verbose.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-q</option>
+            </term>
+            <listitem>
+              <para>Supress all output except for errors.</para>
             </listitem>
           </varlistentry>
           
