@@ -23,10 +23,10 @@
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS">-L\$(BCCDIR)\lib</set>
     
-    <set var="__LINKER_CC" eval="0">ilink32 -Tpe</set>
-    <set var="__LINKER_CXX" eval="0">ilink32 -Tpe</set>
-    <set var="__DLL_LINKER_CC" eval="0">ilink32 -Tpd</set>
-    <set var="__DLL_LINKER_CXX" eval="0">ilink32 -Tpd</set>
+    <set var="__LINKER_CC" eval="0">ilink32 -Tpe -q</set>
+    <set var="__LINKER_CXX" eval="0">ilink32 -Tpe -q</set>
+    <set var="__DLL_LINKER_CC" eval="0">ilink32 -Tpd -q</set>
+    <set var="__DLL_LINKER_CXX" eval="0">ilink32 -Tpd -q</set>
 
     <!-- basic compiler/linker flags: -->
     <set var="__FLAG_EXE_CONSOLE" eval="0">-ap</set> <!-- -tC -->
