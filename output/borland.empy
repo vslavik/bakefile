@@ -1,4 +1,6 @@
 @empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
+.autodepend
+
 !ifndef BCCDIR
 BCCDIR = $(MAKEDIR)\..
 !endif
