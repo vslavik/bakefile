@@ -299,7 +299,9 @@ AC_DEFUN(AC_BAKEFILE_SHARED_LD,
            )
         ])
         if test "$wx_cv_gcc31" = "no"; then
-            cat <<EOF >shared-ld-sh
+dnl ===================== shared-ld-sh begins here =====================
+D='$'
+cat <<EOF >shared-ld-sh
 #!/bin/sh
 #-----------------------------------------------------------------------------
 #-- Name:        distrib/mac/shared-ld-sh
@@ -314,8 +316,8 @@ args=""
 objects=""
 linking_flag="-dynamiclib"
 
-while test \${#} -gt 0; do
-    case \${1} in
+while test ${D}# -gt 0; do
+    case ${D}1 in
 
        -v)
         verbose=1
@@ -323,31 +325,31 @@ while test \${#} -gt 0; do
 
        -o|-compatibility_version|-current_version|-framework|-undefined|-install_name)
         # collect these options and values
-        args="\${args} \${1} \${2}"
+        args="${D}{args} ${D}1 ${D}2"
         shift
         ;;
 
        -l*|-L*|-flat_namespace|-headerpad_max_install_names)
         # collect these options
-        args="\${args} \${1}"
+        args="${D}{args} ${D}1"
         ;;
 
        -dynamiclib|-bundle)
-        linking_flag="\${1}"
+        linking_flag="${D}1"
         ;;
 
        -*)
-        echo "shared-ld: unhandled option '\${1}'"
+        echo "shared-ld: unhandled option '${D}1'"
         exit 1
         ;;
 
         *.o | *.a | *.dylib)
         # collect object files
-        objects="\${objects} \${1}"
+        objects="${D}{objects} ${D}1"
         ;;
 
         *)
-        echo "shared-ld: unhandled argument '\${1}'"
+        echo "shared-ld: unhandled argument '${D}1'"
         exit 1
         ;;
 
@@ -358,34 +360,35 @@ done
 #
 # Link one module containing all the others
 #
-if test \${verbose} = 1; then
-    echo "c++ -r -keep_private_externs -nostdlib \${objects} -o master.\$\$.o"
+if test ${D}{verbose} = 1; then
+    echo "c++ -r -keep_private_externs -nostdlib ${D}{objects} -o master.${D}${D}.o"
 fi
-c++ -r -keep_private_externs -nostdlib \${objects} -o master.\$\$.o
-status=\$?
-if test \${status} != 0; then
-    exit \${status}
+c++ -r -keep_private_externs -nostdlib ${D}{objects} -o master.${D}${D}.o
+status=${D}?
+if test ${D}{status} != 0; then
+    exit ${D}{status}
 fi
 
 #
 # Link the shared library from the single module created
 #
-if test \${verbose} = 1; then
-    echo "cc \${linking_flag} master.\$\$.o \${args}"
+if test ${D}{verbose} = 1; then
+    echo "cc ${D}{linking_flag} master.${D}${D}.o ${D}{args}"
 fi
-c++ \${linking_flag} master.\$\$.o \${args}
-status=\$?
-if test \${status} != 0; then
-    exit \${status}
+c++ ${D}{linking_flag} master.${D}${D}.o ${D}{args}
+status=${D}?
+if test ${D}{status} != 0; then
+    exit ${D}{status}
 fi
 
 #
 # Remove intermediate module
 #
-rm -f master.\$\$.o
+rm -f master.${D}${D}.o
 
 exit 0
 EOF
+dnl ===================== shared-ld-sh ends here =====================
             chmod +x shared-ld-sh
 
             dnl Use the shared-ld-sh helper script
@@ -544,7 +547,9 @@ AC_DEFUN(AC_BAKEFILE_DEPS,
     fi
 
     if test $DEPS_TRACKING = 1 ; then
-        cat <<EOF >bk-deps
+dnl ===================== bk-deps begins here =====================
+D='$'
+cat <<EOF >bk-deps
 #!/bin/sh
 
 # This script is part of Bakefile (http://bakefile.sourceforge.net) autoconf
@@ -552,51 +557,52 @@ AC_DEFUN(AC_BAKEFILE_DEPS,
 #
 # Permission is given to use this file in any way.
 
-DEPSMODE=$DEPSMODE
+DEPSMODE=${DEPSMODE}
 DEPSDIR=.deps
-DEPSFLAG_GCC="$DEPSFLAG_GCC"
+DEPSFLAG_GCC="${DEPSFLAG_GCC}"
 
-mkdir -p \$DEPSDIR
+mkdir -p ${D}DEPSDIR
 
-if test \$DEPSMODE = gcc ; then
-    \${*} \${DEPSFLAG_GCC}
-    status=\${?}
-    if test \${status} != 0 ; then
-        exit \${status}
+if test ${D}DEPSMODE = gcc ; then
+    ${D}* ${D}{DEPSFLAG_GCC}
+    status=${D}?
+    if test ${D}{status} != 0 ; then
+        exit ${D}{status}
     fi
     # move created file to the location we want it in:
-    while test \${#} -gt 0; do
-        case "\${1}" in
+    while test ${D}# -gt 0; do
+        case "${D}1" in
             -o )
                 shift
-                objfile=\${1}
+                objfile=${D}1
             ;;
             -* )
             ;;
             * )
-                srcfile=\${1}
+                srcfile=${D}1
             ;;
         esac
         shift
     done
-    depfile=\`basename \$srcfile | sed -e 's/\..*$/.d/g'\`
-    depobjname=\`echo \$depfile |sed -e 's/\.d/.o/g'\`
-    if test -f \$depfile ; then
-        sed -e "s,\$depobjname:,\$objfile:,g" \$depfile >\${DEPSDIR}/\${objfile}.d
-        rm -f \$depfile
+    depfile=\`basename ${D}srcfile | sed -e 's/\..*${D}/.d/g'\`
+    depobjname=\`echo ${D}depfile |sed -e 's/\.d/.o/g'\`
+    if test -f ${D}depfile ; then
+        sed -e "s,${D}depobjname:,${D}objfile:,g" ${D}depfile >${D}{DEPSDIR}/${D}{objfile}.d
+        rm -f ${D}depfile
     else
-        depfile=\`basename \$objfile | sed -e 's/\..*$/.d/g'\`
-        if test -f \$depfile ; then
-            sed -e "/^\$objfile/!s,\$depobjname:,\$objfile:,g" \$depfile >\${DEPSDIR}/\${objfile}.d
-            rm -f \$depfile
+        depfile=\`basename ${D}objfile | sed -e 's/\..*${D}/.d/g'\`
+        if test -f ${D}depfile ; then
+            sed -e "/^${D}objfile/!s,${D}depobjname:,${D}objfile:,g" ${D}depfile >${D}{DEPSDIR}/${D}{objfile}.d
+            rm -f ${D}depfile
         fi
     fi
     exit 0
 else
-    \${*}
-    exit \${?}
+    ${D}*
+    exit ${D}?
 fi
 EOF
+dnl ===================== bk-deps ends here =====================
         chmod +x bk-deps
     fi
     
