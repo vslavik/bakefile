@@ -19,9 +19,9 @@
             -a4: align to 32bit 
             -g0: don't treat lots of warnings as error
     -->
-    <set var="__DEFAULT_CPPFLAGS">-a8 -g0 -I$(DOLLAR)(BCCDIR)\include</set>
+    <set var="__DEFAULT_CPPFLAGS">-a8 -g0</set>
     <set var="__DEFAULT_CXXFLAGS"></set>
-    <set var="__DEFAULT_LDFLAGS">-L$(DOLLAR)(BCCDIR)\lib</set>
+    <set var="__DEFAULT_LDFLAGS"></set>
     
     <set var="__LINKER_CC" eval="0">ilink32 -Tpe -q</set>
     <set var="__LINKER_CXX" eval="0">ilink32 -Tpe -q</set>
@@ -109,6 +109,8 @@
             <set var="__rtl" eval="0">cw32$(__rtl_mt)$(__rtl_i).lib</set>
             <set var="__rtldll_cppflags" eval="0">$(__rtldll_flag)</set>
             <cppflags>$(__rtldll_cppflags)</cppflags>
+            <cppflags>-I$(DOLLAR)(BCCDIR)\include</cppflags>
+            <ldflags>-L$(DOLLAR)(BCCDIR)\lib</ldflags>
         </template>
         <define-tag name="runtime-libs">
             <set var="__rtldll_flag">
