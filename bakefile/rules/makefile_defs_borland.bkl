@@ -19,7 +19,7 @@
             -a4: align to 32bit 
             -g0: don't treat lots of warnings as error
     -->
-    <set var="__DEFAULT_CPPFLAGS">-a4 -g0 -I$(DOLLAR)(BCCDIR)\include</set>
+    <set var="__DEFAULT_CPPFLAGS">-a8 -g0 -I$(DOLLAR)(BCCDIR)\include</set>
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS">-L$(DOLLAR)(BCCDIR)\lib</set>
     
