@@ -121,6 +121,7 @@
         <template>
             <set var="__srcdir"/>
             <set var="__copy_cmd" eval="0">
+                
                 <if cond="TOOLSET=='unix'">
                     @mkdir -p $(__dstdir)
                     @for f in $(__files); do \
@@ -129,6 +130,12 @@
                         fi; \
                     done
                 </if>
+
+                <if cond="TOOLSET=='win32'">
+                    if not exist $(__dstdir) mkdir $(__dstdir)
+                    for %f in ($(__files)) do if not exist $(__dstdir)\%f copy $(__srcdir)%f $(__dstdir)
+                </if>
+                
             </set>
             <command>$(__copy_cmd)</command>
         </template>
