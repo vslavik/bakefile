@@ -13,9 +13,12 @@ from errors import ReaderError
 import config
 import finalize
 
-def evalConstExpr(e, str, target=None):
+def reraise():
+    raise sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2]
+
+def evalConstExpr(e, str, target=None, add_dict=None):
     try:
-        return mk.evalExpr(str, use_options=0, target=target)
+        return mk.evalExpr(str, use_options=0, target=target, add_dict=add_dict)
     except NameError, err:
         raise ReaderError(e, "can't use options or conditional variables in this context (%s)" % err)
 
@@ -47,6 +50,30 @@ def evalWeakCondition(e, target=None, add_dict=None):
                         e.props['cond'])
     else:
         return x
+            
+    
+def translateSpecialCondition(e, condstr, target=None):
+    """If the condition is of form 'target' or 'target and something',
+       make it a normal condition by extracting condition from
+       target's description."""       
+    if condstr.startswith('target and '):
+        if target == None:
+            raise ReaderError(e, "'target' condition can't be used at global scope")
+        if target.cond != None:
+            condstr = '%s and %s' % (target.cond.tostr(),
+                                     condstr[len('target and '):])
+        else:
+            condstr = condstr[len('target and '):]
+        return condstr
+    elif condstr == 'target':
+        if target == None:
+            raise ReaderError(e, "'target' condition can't be used at global scope")
+        if target.cond == None:
+            return '1'
+        else:
+            return target.cond.tostr()
+    else:
+        return condstr
 
 
 def handleSet(e, target=None, add_dict=None):
@@ -74,30 +101,24 @@ def handleSet(e, target=None, add_dict=None):
                 raise ReaderError(e_if, "malformed <set> command")
         
             # Preprocess always true or always false conditions:
-            condstr = e_if.props['cond']
-            if condstr == 'target':
-                if target == None:
-                    raise ReaderError(e_if, "'target' condition can't be used at global scope")
-                cond = target.cond
-                if cond == None:
-                    noValueSet = 0
-                    isCond = 0
-                    value = e_if.value
-                    break
-            else:
-                typ = mk.evalCondition(condstr)
-                # Condition never met when generating this target:
-                if typ == '0':
-                    continue
-                # Condition always met:
-                elif typ == '1':
-                    noValueSet = 0
-                    isCond = 0
-                    value = e_if.value
-                    break
-                elif typ != None:
-                    raise ReaderError(e, "malformed condition: '%s'" % condstr)
-                cond = mk.makeCondition(condstr)
+
+            condstr = evalConstExpr(e_if, e_if.props['cond'],
+                                    target=target, add_dict=add_dict)
+            condstr = translateSpecialCondition(e_if, condstr, target)
+                
+            typ = mk.evalCondition(condstr)
+            # Condition never met when generating this target:
+            if typ == '0':
+                continue
+            # Condition always met:
+            elif typ == '1':
+                noValueSet = 0
+                isCond = 0
+                value = e_if.value
+                break
+            elif typ != None:
+                raise ReaderError(e, "malformed condition: '%s'" % condstr)
+            cond = mk.makeCondition(condstr)
 
             noValueSet = 0
             
@@ -434,11 +455,14 @@ def _processTargetNodes(node, target, tags, dict):
                                          target=target, add_dict=dict)
             del e2.props['target']
             e2.name = e2.props['type']
-            if 'cond' in e2.props and e2.props['cond'] == 'target':
-                if target.cond == None:
+            if 'cond' in e2.props and e2.props['cond'].startswith('target'):
+                condstr = evalConstExpr(e2, e2.props['cond'],
+                                        target=target, add_dict=dict)
+                condstr = translateSpecialCondition(e2, condstr, target)
+                if condstr == '1':
                     del e2.props['cond']
                 else:
-                    e2.props['cond'] = target.cond.tostr()
+                    e2.props['cond'] = condstr
             handleTarget(e2)
         else:
             return 0
@@ -500,7 +524,7 @@ def handleTarget(e):
     if 'cond' in e.props:
         isCond = 1
         # Handle conditional targets:
-        condstr = e.props['cond']
+        condstr = evalConstExpr(e, e.props['cond'])
         typ = mk.evalCondition(condstr)
         # Condition never met, ignore the target:
         if typ == '0':
@@ -777,8 +801,8 @@ def __doProcess(file=None, strdata=None, xmldata=None):
     
     try:
         processNodes(m.children)
-    except ReaderError, ex:
-        raise ex
+    except ReaderError:
+        reraise()
     # FIXME: enable this code when finished programming:
     #except Exception, ex:
     #    raise ReaderError(e, ex)
@@ -837,5 +861,7 @@ def read(filename):
         finalize.finalize()
         return 1
     except errors.ErrorBase, e:
+        if config.debug:
+            reraise()
         sys.stderr.write(str(e))
         return 0

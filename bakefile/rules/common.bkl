@@ -98,4 +98,7 @@
 
     <tag-info name="win32-res" exclusive="1"/>
 
+    <tag-info name="install-to" exclusive="1"/>
+    <tag-info name="install-if" exclusive="1"/>
+
 </makefile>

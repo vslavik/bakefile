@@ -759,6 +759,39 @@
                 </entry>
                 <entry role="availability">all</entry>
               </row>
+              
+              
+              
+              <row id="tag.install-to" xreflabel="install-to">
+                <entry role="tagname">install-to</entry>
+                <entry>
+                  If used, then the target is installed into directory
+                  specified as tag's value by <command>make install</command>.
+                </entry>
+                <entry role="availability">exe, dll, module, lib</entry>
+              </row>
+              
+              
+              <row id="tag.install-if" xreflabel="install-if">
+                <entry role="tagname">install-if</entry>
+                <entry>
+                  Install (see <xref linkend="tag.install-to"/>
+                  the target conditionally. The value must be well-formed
+                  condition.
+                  <programlisting><![CDATA[
+<option name="INSTALL_HELLO">
+  <values>0,1</values>
+  <default-value>1</default-value>
+</option>
+<exe id="hello">
+  <sources>hello.c</sources>
+  <install-to>$(BINDIR)</install-to>
+  <install-if>INSTALL_HELLO=='1'</install-if>
+</exe>
+]]></programlisting>
+                </entry>
+                <entry role="availability">exe, dll, module, lib</entry>
+              </row>
       
       
             </tbody>

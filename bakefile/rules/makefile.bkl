@@ -121,6 +121,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-rule name="__compiled" extends="__any">
     
         <template template="__commands_templ">
+            <set var="__install_if_cond"/>
             <set var="__targetdir">$(mkPathPrefix(BUILDDIR))</set>
             <set var="__uses_cxx">0</set>
             <set var="__cppflags">$(CPPFLAGS)</set>
@@ -454,10 +455,17 @@ makefiles (most notably GNU Make and Autoconf formats).
         <template template="__phony"/>
     </define-rule>
     
+    <tag-info name="install-if" position="before:install-to"/>
+
+    <define-tag name="install-if" rules="exe,dll,lib,module">
+        <set var="__install_if_cond">$(value)</set>
+    </define-tag>
+    
     <define-tag name="install-to" rules="exe,dll,lib,module">
         <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
             <add-target target="install_$(id)"
-                        type="inst-action" cond="target"/>
+                        type="inst-action"
+               cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
             <modify-target target="install_$(id)">
                 <command>$(INSTALL_DIR) $(value)</command>
                 <dependency-of>install</dependency-of>

@@ -119,6 +119,22 @@
                           <link linkend="targets">target's condition</link>
                           is used (or <literal>1</literal> if there's no
                           condition set on the target).
+                          The condition can also be "<literal>target
+                            and</literal><emphasis>condexpr</emphasis>" in
+                          which case target's condition (if any) is combined
+                          with <emphasis>condexpr</emphasis>.
+                      </para>
+                      <para>
+                        The string with condition may itself be a
+                        constant expression, so you can write this:
+                        <programlisting><![CDATA[
+<set var="IsRelease">=='release'</set>
+<set var="CondDebug">BUILD=='debug'</set>
+<set var="FILES">
+  <if cond="BUILD$(IsRelease)">foo_dbg.c</if>
+  <if cond="$(CondDebug)">foo.c</if>
+</set>
+]]></programlisting>
                       </para>
                   </listitem>
               </varlistentry>
