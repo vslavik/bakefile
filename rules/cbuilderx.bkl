@@ -84,6 +84,9 @@
             <set var="__debug">release</set>
             <set var="__threading">single</set>
             <set var="__runtime_libs">static</set>
+            <set var="__cxx_rtti">on</set>
+            <set var="__cxx_exceptions">on</set>
+            <set var="__warnings">default</set>
             <set var="__builddir" eval="0">
                 <if cond="BUILDDIR=='.'"></if>
                 <if cond="BUILDDIR!='.'">$(nativePaths(BUILDDIR))</if>
@@ -172,6 +175,18 @@
         </define-tag>
         
         <define-tag name="debug-runtime-libs"/>
+        
+        <define-tag name="cxx-rtti">
+            <set var="__cxx_rtti">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="cxx-exceptions">
+            <set var="__cxx_exceptions">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="warnings">
+            <set var="__warnings">$(value)</set>
+        </define-tag>
 
         <define-tag name="install-to"/>
         <define-tag name="install-if"/>
