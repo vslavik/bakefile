@@ -164,7 +164,29 @@
         <template>
             <set var="__copy_cmd" eval="0">
                 <if cond="TOOLSET=='unix'">
-                    @if test \( ! -s $(__dest) \) -o \( $(__file) -nt $(__dest) \) ; then \
+                    cp -pf $(__file) $(__dest)
+                </if>
+                <if cond="TOOLSET=='win32'">
+                    copy $(__file) $(__dest)
+                </if>
+            </set>
+            <command>$(__copy_cmd)</command>
+        </template>
+        <define-tag name="dst">
+            <set var="__dest">$(nativePaths(value))</set>
+            <set var="__targetname">$(__dest)</set>
+        </define-tag>
+        <define-tag name="src">
+            <set var="__file">$(nativePaths(value))</set>
+            <depends-on-file>$(value)</depends-on-file>
+        </define-tag>
+    </define-rule>
+    
+    <define-rule name="copy-file-to-file-if-not-exist" extends="action">
+        <template>
+            <set var="__copy_cmd" eval="0">
+                <if cond="TOOLSET=='unix'">
+                    @if test ! -s $(__dest) ; then \
                         cp -pf $(__file) $(__dest)
                     fi; \
                 </if>
