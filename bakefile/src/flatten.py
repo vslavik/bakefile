@@ -67,6 +67,10 @@ def flattenConfig(cfg):
     mk.make_vars = {}
     orig_cond_vars = mk.cond_vars
     mk.cond_vars = {}
+
+    if 'configs' in mk.vars: del mk.vars['configs']
+    for t in mk.targets.values():
+        if 'configs' in t.vars: del t.vars['configs']
     
     # add option values in this configuration:
     for opt in cfg:
@@ -122,8 +126,13 @@ def flattenConfig(cfg):
 
 def flatten():        
     cfgs = [x.values for x in makeConfigs()]
+    if len(cfgs) == 0:
+        cfgs = [{}]
+
     if config.verbose:
         print '%i configurations' % len(cfgs)
+        if config.debug:
+            for c in cfgs: print '[dbg] %s' % c
 
     # remove options and conditional variables:
     mk.__vars_opt = {}
