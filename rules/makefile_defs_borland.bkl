@@ -13,7 +13,8 @@
     <set var="__DEFAULT_CC">bcc32</set>
     <set var="__DEFAULT_CXX">bcc32</set>
     <set var="__DEFAULT_CFLAGS"></set>
-    <set var="__DEFAULT_CPPFLAGS">-I\$(BCCDIR)\include</set>
+    <!-- -a4: align to 32bit -->
+    <set var="__DEFAULT_CPPFLAGS">-a4 -I\$(BCCDIR)\include</set>
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
     
@@ -45,13 +46,13 @@
     
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -c -P- -o$@ $(__cflags) $**
+            $(CC) -q -c -P- -o$@ $(__cflags) $**
         </set>
     </template>
     
     <template id="__commands_templ_CXX">
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -c -P -o$@ $(__cxxflags) $**
+            $(CXX) -q -c -P -o$@ $(__cxxflags) $**
         </set>
     </template>
 
