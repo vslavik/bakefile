@@ -63,6 +63,9 @@ def run(args):
     parser.add_option('-v', '--verbose',
                       action="store_true", dest='verbose', default=0,
                       help='display detailed information')
+    parser.add_option('-q', '--quiet',
+                      action="store_true", dest='quiet', default=0,
+                      help='supress all output except of errors')
     parser.add_option('', '--output-deps',
                       action="store", dest='deps_file', metavar='DEPSFILE',
                       help="output dependencies information for bakefile_gen")
@@ -85,6 +88,13 @@ def run(args):
     if len(args) != 1:
         parser.error('incorrect number of arguments, exactly 1 .bkl required')
         sys.exit(1)
+
+    config.debug = options.debug
+    config.quiet = options.quiet
+    if config.quiet:
+        config.verbose = 0
+    else:
+        config.verbose = options.verbose
     
     if options.includes != None:
         for p in options.includes:
@@ -122,9 +132,6 @@ def run(args):
         else:
             config.output_file = \
                 os.path.join(os.path.dirname(args[0]), fmt.defaultFile)
-
-    config.verbose = options.verbose
-    config.debug = options.debug
     
     config.defines = {}
     if options.defines != None:
