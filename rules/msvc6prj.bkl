@@ -22,9 +22,7 @@
         <set var="_defines">/D "WIN32"</set>
         <set var="_ldflags">/machine:i386</set>
         <set var="_win32rc_flags">/l 0x405</set>
-        <!-- /GR /GX enables C++ exception handling and rtti
-             (FIXME: make it configurable) -->
-        <set var="_cppflags">/FD /GR /GX</set>
+        <set var="_cppflags">/FD</set> <!-- /FD: minimal rebuild -->
         
         <!-- choice of C runtime library: -->
         <set var="_rtl_dbg"/>
