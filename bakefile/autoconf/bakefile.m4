@@ -151,6 +151,7 @@ AC_DEFUN(AC_BAKEFILE_SUFFIXES,
     LIBEXT=".a"
     DLLPREFIX="lib"
     DLLPREFIX_MODULE=""
+    DLLIMP_SUFFIX=""
     
     case "${BAKEFILE_HOST}" in
         *-hp-hpux* )
@@ -169,6 +170,7 @@ AC_DEFUN(AC_BAKEFILE_SUFFIXES,
         *-*-cygwin* | *-*-mingw32* )
             SO_SUFFIX="dll"
             SO_SUFFIX_MODULE="dll"
+            DLLIMP_SUFFIX="dll.a"
             EXEEXT=".exe"
             DLLPREFIX=""
         ;;
@@ -179,6 +181,7 @@ AC_DEFUN(AC_BAKEFILE_SUFFIXES,
         *-pc-os2_emx | *-pc-os2-emx )
             SO_SUFFIX="dll"
             SO_SUFFIX_MODULE="dll"
+            DLLIMP_SUFFIX=$OS2_LIBEXT
             EXEEXT=".exe"
             DLLPREFIX=""
             LIBPREFIX=""
@@ -190,8 +193,13 @@ AC_DEFUN(AC_BAKEFILE_SUFFIXES,
         ;;
     esac
 
+    if test "x$DLLIMP_SUFFIX" = "x" ; then
+        DLLIMP_SUFFIX="$SO_SUFFIX"
+    fi
+
     AC_SUBST(SO_SUFFIX)
     AC_SUBST(SO_SUFFIX_MODULE)
+    AC_SUBST(DLLIMP_SUFFIX)
     AC_SUBST(EXEEXT)
     AC_SUBST(LIBPREFIX)
     AC_SUBST(LIBEXT)

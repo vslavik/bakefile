@@ -15,6 +15,7 @@
     <option name="LIBPREFIX"/>
     <option name="SO_SUFFIX"/>
     <option name="SO_SUFFIX_MODULE"/>
+    <option name="DLLIMP_SUFFIX"/>
     <option name="EXEEXT"/>
     <option name="LN_S"/>
     <option name="RESCOMP"/>
@@ -63,14 +64,9 @@
 
     <set var="DLLEXT">.$(SO_SUFFIX)</set>
     <set var="DLLEXT_MODULE">.$(SO_SUFFIX_MODULE)</set>
+    <set var="DLLIMPEXT">.$(DLLIMP_SUFFIX)</set>
     <option name="DLLPREFIX"/>
     <option name="DLLPREFIX_MODULE"/>
-
-    <set var="DLLIMPEXT">
-        <if cond="PLATFORM_WIN32=='1'">.a</if>
-        <if cond="PLATFORM_OS2=='1'">.a</if><!-- FIXME: should be .lib -->
-        <if cond="PLATFORM_WIN32=='0' and PLATFORM_OS2=='0'">$(DLLEXT)</if>
-    </set>
 
     <option name="LDFLAGS_GUI"/>   
     <set var="__FLAG_EXE_GUI">$(LDFLAGS_GUI)</set>
