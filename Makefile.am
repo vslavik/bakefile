@@ -65,7 +65,6 @@ rules_DATA =  rules/FORMATS.bkmanifest \
 rulesgettext_DATA = \
               rules/gettext/common.bkl \
 			  rules/gettext/autoconf.bkl
-
 presets_DATA = \
               presets/fake.bkl \
 			  presets/simple.bkl
@@ -109,7 +108,7 @@ EXTRA_DIST = \
     autogen.sh chversion.sh \
 	admin/swig.m4 \
     tests doc/images doc bakefile.spec bakefile.iss \
-    src/optik/README.txt autoconf output rules \
+    src/optik/README.txt autoconf output rules presets \
     src/empy/README src/empy/COPYING \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
