@@ -7,7 +7,7 @@
 # $Id$
 #
 
-import sys
+import sys, string
 from types import InstanceType, DictType
 import mk, errors, config, utils
 
@@ -234,8 +234,14 @@ def eliminateDuplicateCondVars():
         s1 = c1.name
         s2 = c2.name
         common = commonPrefix(s1, s2)
-        if common == '': common = commonSuffix(s1, s2)
-        if common == '': common = 'VAR'
+        if common == '' or common[0] in string.digits:
+            common = commonSuffix(s1, s2)
+        if common == '' or common[0] in string.digits:
+            common = commonPrefix(s1.strip('_'), s2.strip('_'))
+        if common == '' or common[0] in string.digits:
+            common = commonSuffix(s1.strip('_'), s2.strip('_'))
+        if common == '' or common[0] in string.digits:
+            common = 'VAR'
         if common == s1 or common == s2:
             newname = common
         else:
