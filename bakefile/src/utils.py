@@ -183,6 +183,7 @@ def formatIfNotEmpty(fmt, value):
            - $(cv) where cv is conditional variable
     """
 
+    if fmt == '': return ''
     value = value.strip()
     if value == '' or value.isspace():
         return ''
@@ -193,6 +194,12 @@ def formatIfNotEmpty(fmt, value):
     
     if value.startswith('$(') and value[-1] == ')':
         condname = value[2:-1]
+        if condname in mk.options:
+            if mk.options[condname].isNeverEmpty():
+                return fmt % value
+            else:
+                raise errors.Error("formatIfNotEmpty failed: option '%s' may be empty" % condname)
+
         if condname in mk.cond_vars:
             cond = mk.cond_vars[condname]
             var = mk.CondVar(makeUniqueCondVarName('%s_p' % cond.name))
