@@ -77,6 +77,17 @@ def substitute(str, callback, desc=None):
     
     return mk.__doEvalExpr(str, callbackVar, callbackTxt)
 
+
+def substituteFromDict(str, dict, desc=None):
+    """Like substitute(), but less generic: instead of calling callback, the
+       text is looked up in a dictionary. This imposes the restriction that
+       'str' may be only single word."""
+    try:
+        return substitute(str, lambda x: dict[x], desc)
+    except KeyError:
+        raise errors.Error('Invalid value')
+
+
 def nativePaths(filenames):
     """Translates filenames from Unix to native filenames."""
     if mk.vars['TOOLSET'] == 'unix':
@@ -164,9 +175,9 @@ def sources2objects(sources, target, ext, objSuffix=''):
     return substitute(sources2, callback, 'OBJECTS')
 
 
-def addPrefixIfNotEmpty(prefix, value):
-    """Adds prefix before 'value', unless value is empty string. Can handle
-       following forms of 'value':
+def formatIfNotEmpty(fmt, value):
+    """Return fmt % value (prefix: e.g. "%s"), unless value is empty string.
+       Can handle following forms of 'value':
            - empty string
            - anything beginning with literal
            - $(cv) where cv is conditional variable
@@ -176,9 +187,9 @@ def addPrefixIfNotEmpty(prefix, value):
     if value == '' or value.isspace():
         return ''
     if value[0] != '$':
-        return '%s%s' % (prefix,value)
+        return fmt % value
     if value[-1] != ')' and not value[-1].isspace():
-        return '%s%s' % (prefix,value)
+        return fmt % value
     
     if value.startswith('$(') and value[-1] == ')':
         condname = value[2:-1]
@@ -187,10 +198,14 @@ def addPrefixIfNotEmpty(prefix, value):
             var = mk.CondVar(makeUniqueCondVarName('%s_p' % cond.name))
             mk.addCondVar(var)
             for v in cond.values:
-                var.add(v.cond, addPrefixIfNotEmpty(prefix, v.value))
+                var.add(v.cond, formatIfNotEmpty(fmt, v.value))
             return '$(%s)' % var.name
-    raise errors.Error("addPrefixIfNotEmpty failed: '%s' too complicated" % value)
+    raise errors.Error("formatIfNotEmpty failed: '%s' too complicated" % value)
 
+def addPrefixIfNotEmpty(prefix, value):
+    """Prefixes value with prefix, unless value is empty. 
+       See formatIfNotEmpty for more details."""
+    return formatIfNotEmpty(prefix+'%s', value)
 
 
 def mkPathPrefix(p):
