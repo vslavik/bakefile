@@ -528,6 +528,8 @@
   <dependency-of>app</dependency-of>
 </exe>
 ]]></programlisting>
+                Note that only one of these tags should be used, it is not
+                necessary to specify both of them.
                 </entry>
                 <entry role="availability">all</entry>
               </row>
