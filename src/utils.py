@@ -22,7 +22,7 @@ def ifthenelse(cond, iftrue, iffalse):
 __refEval = 0
 def ref(var, target=None):
     if __refEval:
-        if target==None:
+        if target==None or var not in mk.targets[target].vars:
             return mk.vars[var]
         else:
             return mk.targets[target].vars[var]
