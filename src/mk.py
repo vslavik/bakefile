@@ -241,13 +241,14 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
     if makevar:
         addMakeVar(name, v)
     else:
-        if append and name in store:
-            store[name] = '%s %s' % (store[name], v)
+        if (append or prepend) and (name in store):
+            if append:
+                store[name] = '%s %s' % (store[name], v)
+            # note that if prepend=append=1, v is added twice:
+            if prepend:
+                store[name] = '%s %s' % (v, store[name])
         else:
             store[name] = v
-        # note that if prepend=append=1, v is added twice:
-        if prepend:
-            store[name] = '%s %s' % (v, store[name])
 
 def unsetVar(name):
     if name in vars:
