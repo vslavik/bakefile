@@ -1,11 +1,28 @@
-# 
-# Flattens prepared variables and targets after "finalize" step - i.e. removes
-# conditional variables and replaces them with representation with multiple
-# _configurations_ (assignments of values to options) and targets assigned to
-# them. This is only useful for - and used by - formats that don't support
-# variables, such as MSVC project files.
 #
-# $Id$
+#  This file is part of Bakefile (http://bakefile.sourceforge.net)
+#
+#  Copyright (C) 2003,2004 Vaclav Slavik
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License version 2 as
+#  published by the Free Software Foundation.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#  $Id$
+#
+#  Flattens prepared variables and targets after "finalize" step - i.e. removes
+#  conditional variables and replaces them with representation with multiple
+#  _configurations_ (assignments of values to options) and targets assigned to
+#  them. This is only useful for - and used by - formats that don't support
+#  variables, such as MSVC project files.
 #
 
 import config, copy
