@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+
+    <define-tag name="debug-info" rules="exe,dll,lib">
+        <define>
+            $(substituteFromDict(value, {'on':'_DEBUG', 'off':'NDEBUG'}))
+        </define>
+    </define-tag>
+    
+    <define-tag name="app-type" rules="exe">
+        <define>
+            $(substituteFromDict(value,
+            {'console':'_CONSOLE', 'gui':'_WINDOWS'}))
+        </define>
+    </define-tag>
+
+</makefile>

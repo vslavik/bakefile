@@ -13,7 +13,7 @@
     <set var="__DEFAULT_CC">cl</set>
     <set var="__DEFAULT_CXX">cl</set>
     <set var="__DEFAULT_CFLAGS"></set>
-    <set var="__DEFAULT_CPPFLAGS">/DWIN32 /D_WINDOWS</set>
+    <set var="__DEFAULT_CPPFLAGS"></set>
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
     
@@ -80,6 +80,7 @@
             <set var="__rtl_type">D</set>
             <set var="__rtl" eval="0">/M$(__rtl_type)$(__rtl_dbg)</set>
             <cppflags>$(__rtl)</cppflags>
+            <define>WIN32</define>
         </template>
 
         <define-tag name="runtime-libs">
