@@ -589,7 +589,7 @@ AC_DEFUN(AC_BAKEFILE_CHECK_BASIC_STUFF,
     LDFLAGS_GUI=
     case ${BAKEFILE_HOST} in
         *-*-cygwin* | *-*-mingw32* )
-        LDFLAGS_GUI="-Wl,--subsystem,windows -mwindows"
+        LDFLAGS_GUI="-mwindows"
     esac
     AC_SUBST(LDFLAGS_GUI)
 ])
