@@ -500,6 +500,22 @@
                 <entry role="availability">exe, dll, lib</entry>
               </row>
               
+              <row id="tag.debug-runtime-libs" xreflabel="debug-runtime-libs">
+                <entry role="tagname">debug-runtime-libs</entry>
+                <entry>
+                  Enable or disable linking against debug version of C runtime.
+                  Can be either <literal>on</literal> or <literal>off</literal>
+                  and <emphasis>must</emphasis> appear after
+                  <xref linkend="tag.debug-info"/>. If not specified, then
+                  debug runtime libraries are used if and only if
+                  <xref linkend="tag.debug-info"/> was set to
+                  <literal>on</literal>. Note that this tag has effect only
+                  with Visual C++; other compilers respect only
+                  <xref linkend="tag.debug-info"/>.
+                </entry>
+                <entry role="availability">exe, dll, lib</entry>
+              </row>
+              
               
               <row id="tag.arch" xreflabel="arch">
                 <entry role="tagname">arch</entry>

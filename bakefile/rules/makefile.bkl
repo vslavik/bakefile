@@ -233,6 +233,8 @@ makefiles (most notably GNU Make and Autoconf formats).
 
         <define-tag name="runtime-libs"/>
 
+        <define-tag name="debug-runtime-libs"/>
+
         <define-tag name="precomp-headers"/>
         <define-tag name="precomp-headers-file"/>
         <define-tag name="precomp-headers-header"/>

@@ -55,6 +55,7 @@
 
     <tag-info name="app-type" exclusive="1"/>
     <tag-info name="debug-info" exclusive="1"/>
+    <tag-info name="debug-runtime-libs" exclusive="1"/>
     <tag-info name="optimize" exclusive="1"/>
     <tag-info name="arch" exclusive="1"/>
     <tag-info name="threading" exclusive="1"/>
