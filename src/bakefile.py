@@ -38,15 +38,15 @@ def run(args):
     options, args = parser.parse_args(args)
 
     if len(args) != 1:
-        parser.error('incorrect number of arguments')
+        parser.error('incorrect number of arguments, exactly 1 .bkl required')
         sys.exit(1)
 
     if options.format == None:
-        parser.error('you must specify output format')
+        parser.error('you must specify output format (use -f option)')
         sys.exit(1)
     
     if options.outfile == None:
-        parser.error('you must specify output file')
+        parser.error('you must specify output file (use -o option)')
         sys.exit(1)
 
     config.verbose = options.verbose
