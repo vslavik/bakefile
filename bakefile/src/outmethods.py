@@ -12,7 +12,6 @@ def mergeBlocks(old, new):
         blocks = {}
         cur = []
         blocks[''] = cur
-        order = ['']
         for line in data:
             pos = line.find(BLOCK_MARK_LEFT)
             if pos != -1:
@@ -21,23 +20,23 @@ def mergeBlocks(old, new):
                     name = l[pos+len(BLOCK_MARK_LEFT):-len(BLOCK_MARK_RIGHT)]
                     cur = []
                     blocks[name] = cur
-                    order.append(name)
             cur.append(line)
-        return blocks, order
+        return blocks
+    b_old = findBlocks(old)
+    b_new = findBlocks(new)
 
-    b_old, order_old = findBlocks(old)
-    b_new, order_new = findBlocks(new)
-
+    keys = b_old.keys() + b_new.keys()
+    keys.sort()
+    
     out = []
-    for block in order_old:
+    used = {}
+    for block in keys:
+        if block in used: continue
         if block in b_new:
             out += b_new[block]
-            del b_new[block]
-            order_new.remove(block)
+            used[block] = 1
         else:
             out += b_old[block]
-
-    for block in order_new:
-        out += b_new[block]
+            used[block] = 1
    
     return out
