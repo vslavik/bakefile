@@ -2,12 +2,11 @@
 
 replace_ver()
 {
-    cp -f $1 $1.work
     echo "
 ,s@$2@$3@g
 w
 q
-" | ed -s $1.work 2>/dev/null
+" | ed -s $1 2>/dev/null
 }
 
 VER=$1
