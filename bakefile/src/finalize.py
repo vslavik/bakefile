@@ -334,3 +334,7 @@ def finalize():
 
     # replace \$ with $:
     replaceEscapeSequences()
+
+    if mk.vars['FORMAT_SUPPORTS_CONDITIONS'] != '1':
+        import flatten
+        flatten.flatten()
