@@ -112,7 +112,7 @@ _bottlenecks_la_CFLAGS = $(PYTHON_CPPFLAGS)
 EXTRA_DIST = \
     README THANKS \
     autogen.sh chversion.sh \
-	admin/swig.m4 \
+	admin/python-devel.m4 \
     tests doc/images doc bakefile.spec bakefile.iss \
     src/optik/README.txt autoconf output rules presets \
     src/empy/README src/empy/COPYING \
