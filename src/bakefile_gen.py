@@ -28,14 +28,15 @@ def _getBakefileExecutable():
     if _bakefileExecutable == None:
         if os.path.basename(sys.executable).lower() == 'bakefile_gen.exe':
             # we're on Windows and using the wrapper binary, use bakefile.exe:
-            _bakefileExecutable = os.path.join(os.path.dirname(sys.executable),
+            _bakefileExecutable = '"%s"' % \
+                                  os.path.join(os.path.dirname(sys.executable),
                                                'bakefile.exe')
         else:
             # find the location of bakefile.py:
             bakefile_py = os.path.normpath(os.path.join(
                             os.path.dirname(os.path.realpath(sys.argv[0])),
                             'bakefile.py'))
-            _bakefileExecutable = '%s %s' % (sys.executable, bakefile_py)
+            _bakefileExecutable = '%s "%s"' % (sys.executable, bakefile_py)
     return _bakefileExecutable
 
 
