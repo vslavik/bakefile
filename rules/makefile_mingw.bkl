@@ -26,7 +26,8 @@
         <set var="__win32rc_flags" append="1">--include-dir $(value)</set>
     </define-tag>
     <define-tag name="define" rules="exe,dll">
-        <set var="__win32rc_flags" append="1">--define $(value)</set>
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('--define ',value))</set>
     </define-tag>
 
     <!-- compilation rule for .rc files:  -->
