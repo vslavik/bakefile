@@ -79,6 +79,7 @@
 
     <set var="__so_symlinks_cmd"/> <!-- default value -->
     <set var="__so_symlinks_inst_cmd"/> <!-- default value -->
+    <set var="__mac_instname"/> <!-- default value -->
 
     <define-tag name="so_version" rules="dll">
         <set var="__soversion1">$(value.split('.')[0])</set>
@@ -121,19 +122,39 @@
             </if>
         </set>
         <__command>$(LF)$(__so_symlinks_cmd)</__command>
+    
+        <set var="__mac_instname">$(__linkname2)</set>
    
         <clean-files>
             $(ref('__targetdir',id))$(ref('__linkname1', id)) $(ref('__targetdir',id))$(ref('__linkname2', id))
         </clean-files>       
     </define-tag>
+    
+    <define-tag name="mac_version" rules="dll">
+        <set var="__macvercur">$(value)</set>
+        <set var="__macvercompat">$('.'.join(value.split('.')[0:2]))</set>
+        <set var="__macver">
+            <if cond="PLATFORM_MACOSX=='1'">
+-compatibility_version $(__macvercompat) -current_version $(__macvercur)
+            </if>
+        </set>
+        <ldflags>$(__macver)</ldflags>
+    </define-tag>
 
     <define-tag name="install-to" rules="dll">
+        <set var="__macinstname">
+            <if cond="PLATFORM_MACOSX=='1'">
+-install_name $(value)/$(ifthenelse(__mac_instname=='',ref('__targetname',id),ref('__mac_instname',id)))
+            </if>
+        </set>
+        <ldflags>$(__macinstname)</ldflags>
+
         <modify-target target="install_$(id)">
             <command>(cd $(value) ; $(ref('__so_symlinks_inst_cmd',id)))</command>
         </modify-target>
     </define-tag>
     
-    <define-tag name="libname" rules="dll">        
+    <define-tag name="libname" rules="dll">
         <set var="__importlib">
             <if cond="PLATFORM_WIN32=='1'">-Wl,--out-implib,$(__targetdir)$(__linkname)</if>
         </set>
