@@ -94,6 +94,10 @@
         <define-tag name="sources">
             <set var="__sources" append="1">$(value)</set>
         </define-tag>
+
+        <define-tag name="win32-res">
+            <sources>$(value)</sources>
+        </define-tag>
         
         <define-tag name="define">
             <set var="__defines" append="1">
@@ -264,6 +268,7 @@
     <define-tag name="version" rules="dll"/>
     <define-tag name="so_version" rules="dll"/>
     <define-tag name="mac_version" rules="dll"/>
+    <define-tag name="mac-res" rules="exe"/>
 
 
     <include file="msvc_common.bkl"/>
