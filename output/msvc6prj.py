@@ -57,6 +57,14 @@ def sortByBasename(files):
         elif f1 < f2: return -1
         else: return 1
     files.sort(__sort)
+            
+            
+def makeDependency(prj_id):
+    return """\
+Begin Project Dependency
+Project_Dep_Name %s
+End Project Dependency
+""" % prj_id
 
 
 # ------------------------------------------------------------------------
@@ -91,8 +99,14 @@ Package=<4>
             if d not in extern_deps:
                 extern_deps.append(d)
     for d in extern_deps:
-        dsw += project % (d.split(':')[0],
-                          os.path.splitext(d.split(':')[1])[0], '')
+        print d
+        deps = ''
+        d_components = d.split(':')
+        if len(d_components) == 3:
+            for d_dep in d_components[2].split(','):
+                deps += makeDependency(d_dep)
+        dsw += project % (d_components[0],
+                          os.path.splitext(d_components[1])[0], deps)
 
     single_target = (len(dsw_targets) == 1)
     for t in dsw_targets:
@@ -111,11 +125,7 @@ Package=<4>
                 d2 = deps_translation[d]
             else:
                 d2 = d
-            deps += """\
-Begin Project Dependency
-Project_Dep_Name %s
-End Project Dependency
-""" % d2
+            deps += makeDependency(d2)
 
         dsw += project % (t.id, dsp_name, deps)
         dspfile = (t, os.path.join(dirname, dsp_name+'.dsp'), dsp_name)
