@@ -251,3 +251,136 @@ def __doEvalExpr(e, varCallb, textCallb, moreArgs,
     return output
 
 */
+
+
+/* ------------------------------------------------------------------------ */
+/*                     Fast merged dictionaries support                     */
+/* ------------------------------------------------------------------------ */
+
+/* NB: see bottlenecks.i for high-level explanation. The way the hijacking
+       is implemented is by replacing PyDictObject::ma_lookup pointer with
+       out function. This pointer is used to do *all* lookups in PyDictObject
+       (i.e. not only PyDict_GetItem) so this can *badly* screw things up
+       if we're not extremely careful in what we're doing! */
+
+/* Max number of proxied dictionaries */
+#define MAX_PROXY_DICTS
+
+typedef struct _ProxySlave
+{
+    PyDictObject *dict;
+    struct _ProxySlave *next;
+} ProxySlave;
+
+typedef struct _ProxyDictData
+{
+    PyDictEntry *(*ma_lookup_orig)(PyDictObject *mp, PyObject *key, long hash);
+    PyObject *dict;
+    ProxySlave *slaves;
+    struct _ProxyDictData *next;
+} ProxyDictData;
+
+static ProxyDictData *gs_proxyDict = NULL;
+    
+static PyDictEntry *proxydict_ma_lookup(PyDictObject *mp,
+                                        PyObject *key,
+                                        long hash)
+{
+    ProxyDictData *data;
+    
+    //printf("proxy_ma_lookup=%p(%p,%p,%i)\n", proxydict_ma_lookup,mp,key,hash);
+    for (data = gs_proxyDict; data; data = data->next)
+    {
+        if ((PyDictObject*)data->dict == mp)
+        {
+            ProxySlave *slave;
+            PyDictEntry *ret;
+            for (slave = data->slaves; slave; slave = slave->next)
+            {
+                //printf("dict %p\n", slave->dict);
+                //printf("lookup fce=%p: %p\n",(void*) slave->dict->ma_lookup,slave->dict);
+                ret = slave->dict->ma_lookup(slave->dict, key, hash);
+                //printf("  ret %p (v %p)\n", ret, ret->me_value);
+                if (ret->me_value)
+                    return ret;
+            }
+            /* this will fail, but it will return NULL entry of the right
+               dictionary instance: */
+            return data->ma_lookup_orig(mp, key, hash);
+        }
+    }
+    assert(0);
+}
+
+void proxydict_release(void *d)
+{
+    ProxyDictData *data = (ProxyDictData*)d;
+    if (data->dict)
+    {
+        ProxySlave *s, *s2;
+        for (s = data->slaves; s; s = s2)
+        {
+            s2 = s->next;
+            Py_DECREF(s->dict);
+            free(s);
+        }
+        ((PyDictObject*)data->dict)->ma_lookup = data->ma_lookup_orig;
+        Py_DECREF(data->dict);
+    }
+
+    if (gs_proxyDict == data)
+    {
+        gs_proxyDict = data->next;
+    }
+    else
+    {
+        ProxyDictData *d;
+        for (d = gs_proxyDict; d; d = d->next)
+        {
+            if (d->next == data)
+            {
+                d->next = data->next;
+                break;
+            }
+        }
+    }
+    
+    free(data);
+    //printf("proxydict released\n");
+}
+
+PyObject *proxydict_create(void)
+{
+    //printf("creating proxydict\n");
+    ProxyDictData *data = malloc(sizeof(ProxyDictData));
+    data->ma_lookup_orig = NULL;
+    data->dict = NULL;
+    data->slaves = NULL;
+    data->next = gs_proxyDict;
+    gs_proxyDict = data;
+    return PyCObject_FromVoidPtr(data, proxydict_release);
+}
+
+void proxydict_hijack(PyObject *data, PyObject *dict)
+{
+    PyDictObject *asdict = (PyDictObject*)dict;
+    ProxyDictData *d = (ProxyDictData*)PyCObject_AsVoidPtr(data);
+    d->dict = dict;
+    d->ma_lookup_orig = asdict->ma_lookup;
+    asdict->ma_lookup = proxydict_ma_lookup;
+    Py_INCREF(dict);
+}
+
+void proxydict_add(PyObject *data, PyObject *dict)
+{
+    ProxySlave *slave;
+    PyDictObject *asdict = (PyDictObject*)dict;
+    ProxyDictData *d = (ProxyDictData*)PyCObject_AsVoidPtr(data);
+    
+    slave = malloc(sizeof(ProxySlave));
+    slave->dict = asdict;
+    slave->next = d->slaves;
+    d->slaves = slave;
+    Py_INCREF(dict);
+    //printf("added slave dict %p\n", asdict);
+}

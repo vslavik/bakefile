@@ -5,6 +5,7 @@
 #
 
 import utils, errors, config
+import bottlenecks
 from utils import *
 
 vars = {}
@@ -342,12 +343,12 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     if __trackUsage:
         __usageTracker.pyexprs += 1
    
-    v = vlist[0].copy()
-    for i in vlist[1:]: v.update(i)
-    
+    v = bottlenecks.ProxyDictionary()
+    for x in vlist: v.add(x)
+ 
     global __curNamespace, __pyExprPrecompiled
     oldNS = __curNamespace
-    __curNamespace = v
+    __curNamespace = v.dict
 
     # NB: Small percentage of py expressions evaluated during bakefile
     #     processing is evaluated more than once (up to several hundred times).
@@ -357,18 +358,17 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     #     bytecode for every expression into cache. This gains a little
     #     performance (~5-10 %).
     if expr in __pyExprPrecompiled:
-        val = eval(__pyExprPrecompiled[expr], globals(), v)
+        val = eval(__pyExprPrecompiled[expr], globals(), v.dict)
     else:
         c = compile(expr.replace('\\','\\\\'), '<e>', 'eval')
         __pyExprPrecompiled[expr] = c
-        val = eval(c, globals(), v)
+        val = eval(c, globals(), v.dict)
 
     if val == True: val = 1
     elif val == False: val = 0
     __curNamespace = oldNS
     return str(val)
 
-import bottlenecks
 __doEvalExpr = bottlenecks.doEvalExpr
 
 def evalExpr(e, use_options=1, target=None, add_dict=None):    
