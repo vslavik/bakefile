@@ -93,6 +93,8 @@ def findSources(filenames):
                       'SOURCEFILES')
 
 
+__src2obj = {}
+
 def sources2objects(sources, target, ext, objSuffix=''):
     """Adds rules to compile object files from source files listed in
        'sources', when compiling target 'target', with object files extension
@@ -112,8 +114,6 @@ def sources2objects(sources, target, ext, objSuffix=''):
     </makefile>
     """
 
-    srcs = []
-
     def callback(sources):
         prefix = suffix = ''
         if sources[0].isspace(): prefix=' '
@@ -123,9 +123,9 @@ def sources2objects(sources, target, ext, objSuffix=''):
             base, srcext = os.path.splitext(s)
             base = os.path.basename(base)
             objdir = mkPathPrefix(mk.vars['BUILDDIR'])
-            obj = '%s%s%s%s' % (objdir, base, objSuffix, ext)
-            if s not in srcs:
-                srcs.append(s)
+            index = (target,s,ext,objSuffix)
+            if index not in __src2obj:
+                obj = '%s%s%s%s' % (objdir, base, objSuffix, ext)
                 if obj in mk.targets:
                     obj = '%s%s-%s%s%s' % (objdir, mk.targets[target].id, base,
                                            objSuffix, ext)
@@ -137,12 +137,12 @@ def sources2objects(sources, target, ext, objSuffix=''):
                 rule = '__%s-to-%s' % (srcext[1:], ext[1:])
                 code2 = code % (rule, obj, target, s, rule)
                 reader.processString(code2)
-            retval.append(obj)
+                __src2obj[index] = obj
+            retval.append(__src2obj[index])
         return '%s%s%s' % (prefix, ' '.join(retval), suffix)
 
     sources2 = nativePaths(sources)
-    retval = substitute(sources2, callback, 'OBJECTS')
-    return retval
+    return substitute(sources2, callback, 'OBJECTS')
 
 
 def addPrefixIfNotEmpty(prefix, value):
