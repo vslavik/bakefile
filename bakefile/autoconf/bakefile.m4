@@ -424,6 +424,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_VERSIONS],
 
     case "${BAKEFILE_HOST}" in
       *-*-linux* )
+      *-*-freebsd* )
         SONAME_FLAG="-Wl,-soname,"
         USE_SOVERSION=1
         USE_SOVERLINUX=1
