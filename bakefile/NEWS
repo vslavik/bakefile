@@ -1,0 +1,17 @@
+
+Version 0.1.2
+-------------
+
+- fixed bakefile_gen if Bakefile was installed in directory containing
+  space in its name
+- fixed configure on Mac OS X
+- variables and targets are no longer alphabetically sorted in generated
+  makefiles, the order of their declaration in bakefiles is now preserved
+  (this fixes the bug when output generated using Python 2.2 was different
+  from output if using Python 2.3)
+
+
+Version 0.1.1
+-------------
+
+- first public release
