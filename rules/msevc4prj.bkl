@@ -90,8 +90,39 @@
             }))
         </set>
         
-        <set var="_MSVC_TYPECODE_DLL">0x0102</set>
-        <set var="_MSVC_TYPECODE_LIB">0x0104</set>
+        <set var="_MSVC_TYPECODE_DLL">
+            $(substituteFromDict(CPU,{
+                'ARMV4'     : '0xa302',
+                'ARMV4I'    : '0xa502',
+                'ARMV4T'    : '0xa402',
+                'MIPS16'    : '0x8902',
+                'MIPSII'    : '0xa102',
+                'MIPSII_FP' : '0xa202',
+                'MIPSIV'    : '0x9602',
+                'MIPSIV_FP' : '0x9202',
+                'SH3'       : '0x8102',
+                'SH4'       : '0x8602',
+                'x86'       : '0x0302',
+                'emulator'  : '0xa602',
+            }))
+        </set>
+        
+        <set var="_MSVC_TYPECODE_LIB">
+            $(substituteFromDict(CPU,{
+                'ARMV4'     : '0xa304',
+                'ARMV4I'    : '0xa504',
+                'ARMV4T'    : '0xa404',
+                'MIPS16'    : '0x8904',
+                'MIPSII'    : '0xa104',
+                'MIPSII_FP' : '0xa204',
+                'MIPSIV'    : '0x9604',
+                'MIPSIV_FP' : '0x9204',
+                'SH3'       : '0x8104',
+                'SH4'       : '0x8604',
+                'x86'       : '0x8304',
+                'emulator'  : '0xa604',
+            }))
+        </set>
         
         <!-- CPU-specific flags: -->
         <set var="_CPU_DEFINES">
