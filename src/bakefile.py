@@ -42,6 +42,9 @@ def run(args):
     parser.add_option('', '--output-deps',
                       action="store", dest='deps_file', metavar='DEPSFILE',
                       help="output dependencies information for bakefile_gen")
+    parser.add_option('', '--output-changes',
+                      action="store", dest='changes_file', metavar='MODSFILE',
+                      help="output list of modified files to a file")
     parser.add_option('', '--debug',
                       action="store_true", dest='debug', default=0,
                       help="show debugging information (you don't want this)")
@@ -70,6 +73,9 @@ def run(args):
     if options.deps_file != None:
         config.track_deps = 1
         config.deps_file = options.deps_file
+
+    if options.changes_file != None:
+        config.changes_file = options.changes_file
     
     if options.outfile != None:
         config.output_file = options.outfile

@@ -33,3 +33,6 @@ track_deps = 0
 
 # File to store dependencies into:
 deps_file = None
+
+# File to store list of modified output files:
+changes_file = None

@@ -170,26 +170,40 @@ def updateTargets():
                 needUpdate.append((f,fmt))
     if verbose:
         print '    ...%i out of %i will be updated' % (len(needUpdate),total)
+    
+    modifiedFiles = 0
+    def __countLines(fn):
+        try:
+            f = open(fn, 'rt')
+            cnt = len(f.readlines())
+            f.close()
+            return cnt
+        except IOError:
+            return 0
 
     total = len(needUpdate)
     i = 1
-    temp = tempfile.mktemp()
+    tempDeps = tempfile.mktemp()
+    tempChanges = tempfile.mktemp()
     try:
         for f,fmt in needUpdate:
             print '[%i/%i] generating %s from %s' % (i, total, fmt, f)        
             i += 1
-            cmd = 'bakefile -f%s %s %s --output-deps=%s' % \
-                    (fmt, files[f].flags[fmt], f, temp)
+            cmd = 'bakefile -f%s %s %s --output-deps=%s --output-changes=%s' % \
+                    (fmt, files[f].flags[fmt], f, tempDeps, tempChanges)
             if verbose >= 2: cmd += ' -v'
             if verbose:
                 print cmd
             if os.system(cmd) != 0:
                 raise errors.Error('bakefile exited with error')
-            dependencies.load(temp)
+            dependencies.load(tempDeps)
+            modifiedFiles += __countLines(tempChanges)
     finally:
-        if os.path.isfile(temp):
-            os.remove(temp)
+        if os.path.isfile(tempDeps): os.remove(tempDeps)
+        if os.path.isfile(tempChanges): os.remove(tempChanges)
         dependencies.save('.bakefile_gen.state')
+
+    print '%i files modified' % modifiedFiles
 
 
 def cleanTargets():
