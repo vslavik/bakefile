@@ -1,7 +1,7 @@
 /*
  *  This file is part of Bakefile (http://bakefile.sourceforge.net)
  *
- *  Copyright (C) 2003,2004 Vaclav Slavik
+ *  Copyright (C) 2003-2005 Vaclav Slavik
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -80,6 +80,10 @@ int main(int argc, char** argv)
     SetEnvironmentVariable("PYTHONHOME", dirname);
     sprintf(envvar, "PYTHONHOME=%s", dirname);
     _putenv(envvar);
+
+    /* ditto with PYTHONPATH, but make it empty: */
+    SetEnvironmentVariable("PYTHONPATH", "");
+    _putenv("PYTHONPATH=");
 
     Py_Initialize();
     argv[0] = (char*)filename;
