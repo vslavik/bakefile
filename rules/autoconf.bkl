@@ -275,6 +275,12 @@
                     AC_BAKEFILE_PRECOMP_HEADERS$(LF)
                 </set>
             </if>
+
+            <if cond="__pch_header==''">
+                <error>
+                Precompiled header must explicitly be provided using &lt;precomp-headers-header&gt; for Autoconf backend.
+                </error>
+            </if>
             
             <set var="__gcc_pch_dir">
                 .pch$(addPrefixIfNotEmpty('/', __pch_file))
