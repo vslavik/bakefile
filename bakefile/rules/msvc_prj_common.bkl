@@ -48,7 +48,7 @@
         
     </define-rule>
 
-    <define-rule name="_compiled" extends="_any">        
+    <define-rule name="_compiled" extends="_any,_compiled_base">        
         <template>
             <set var="_kind">project</set>
             <set var="_sources"/>
@@ -262,6 +262,7 @@
                 {'console':_MSVC_TYPECODE_CONSOLE,
                 'gui':     _MSVC_TYPECODE_GUI}))
             </set>
+            <set var="_type_nick">$(value)</set>
             <ldflags>
                 $(substituteFromDict(value,
                 {'console':'/subsystem:console',
@@ -274,8 +275,11 @@
         <template>
             <set var="_ldflags">/dll $(_ldflags)</set>
             <set var="_defines" append="1">/D "_USRDLL" /D "DLL_EXPORTS"</set>
-            <set var="_type">"Win32 (x86) Dynamic-Link Library"</set>
+            <set var="_type">
+                "Win32 ($(_MSVC_CPU_NAME)) Dynamic-Link Library"
+            </set>
             <set var="_type_code">$(_MSVC_TYPECODE_DLL)</set>
+            <set var="_type_nick">dll</set>
             <dllname>$(id)</dllname>
         </template>
         <define-tag name="dllname">
@@ -300,8 +304,9 @@
     <define-rule name="lib" extends="_compiled">
         <template>
             <set var="_defines" append="1">/D "_LIB"</set>
-            <set var="_type">"Win32 (x86) Static Library"</set>
+            <set var="_type">"Win32 ($(_MSVC_CPU_NAME)) Static Library"</set>
             <set var="_type_code">$(_MSVC_TYPECODE_LIB)</set>
+            <set var="_type_nick">lib</set>
             <libname>$(id)</libname>
         </template>
         <define-tag name="libname">
