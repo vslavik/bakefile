@@ -76,11 +76,11 @@
     <!-- =============================================================== -->
 
     <set var="CCC" eval="0">
-        <if cond="DEPS_TRACKING=='1'">$(top_builddir)bk-deps $(CC)</if>
+        <if cond="DEPS_TRACKING=='1'">$(top_builddir)./bk-deps $(CC)</if>
         <if cond="DEPS_TRACKING=='0'">$(CC)</if>
     </set>
     <set var="CXXC" eval="0">
-        <if cond="DEPS_TRACKING=='1'">$(top_builddir)bk-deps $(CXX)</if>
+        <if cond="DEPS_TRACKING=='1'">$(top_builddir)./bk-deps $(CXX)</if>
         <if cond="DEPS_TRACKING=='0'">$(CXX)</if>
     </set>
     
