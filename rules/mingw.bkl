@@ -9,7 +9,8 @@
     <include file="makefile.bkl"/>
     
     <define-tag name="libname" rules="dll">
-        <set var="__importlib">
+        <!-- FIXME: needs tag ordering to guarantee only one occurence -->
+        <set var="__importlib" eval="0">
             -Wl,--out-implib,$(__targetdir)$(__linkname)
         </set>
         <ldflags>$(__importlib)</ldflags>
