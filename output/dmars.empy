@@ -28,16 +28,11 @@ def orderByDeps(vars):
     return list
 }@
 @empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
-
-# -------------------------------------------------------------------------
-# These are configurable options:
-# -------------------------------------------------------------------------
-
-@[for o in options]@
-# @o.descStr.replace('\n','\n# ') @o.valuesStr
-@o.name = @o.defaultStr
-
-@[end for]@
+@[if OPTIONS_FILE != '']include @OPTIONS_FILE
+@[end if]@
+@[if OPTIONS_FILE == '']@
+@empy.include(os.path.join(RULESDIR, 'dmars-opts.empy'))
+@[end if]@
 
 # -------------------------------------------------------------------------
 # Do not modify the rest of this file!
