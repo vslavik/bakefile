@@ -1,4 +1,10 @@
 
+Version 0.1.4
+-------------
+
+- windows makefiles: fixed "clean" target to clean subprojects
+
+
 Version 0.1.3
 -------------
 

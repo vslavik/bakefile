@@ -457,10 +457,10 @@ makefiles (most notably GNU Make and Autoconf formats).
                 <modify-target target="install">
                     <command>$(ref('__INSTALL_SUBPROJECT_CMD',id))</command>
                 </modify-target>
-                <modify-target target="clean">
-                    <command>$(ref('__CLEAN_SUBPROJECT_CMD',id))</command>
-                </modify-target>
             </if>
+            <modify-target target="clean">
+                <command>$(ref('__CLEAN_SUBPROJECT_CMD',id))</command>
+            </modify-target>
         </template>
         <define-tag name="dir">
             <set var="__subdir">$(nativePaths(value))</set>
