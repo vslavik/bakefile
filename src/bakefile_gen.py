@@ -21,9 +21,9 @@
 #  $Id$
 #
 
-import sys, os, os.path, glob, fnmatch, tempfile
+import sys, os, os.path, glob, fnmatch
 from optik import OptionParser
-import xmlparser, dependencies, errors
+import xmlparser, dependencies, errors, portautils
 from errors import ReaderError
 
 verbose = 0
@@ -244,8 +244,8 @@ def updateTargets():
 
     total = len(needUpdate)
     i = 1
-    tempDeps = tempfile.mktemp()
-    tempChanges = tempfile.mktemp()
+    tempDeps = portautils.mktemp('bakefile')
+    tempChanges = portautils.mktemp('bakefile')
     # reduce (not eliminate!) the risk of race condition by immediately
     # creating the file:
     tmpf = open(tempDeps, 'wb'); tmpf.close()
