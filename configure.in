@@ -1,6 +1,6 @@
 AC_PREREQ(2.53)
 
-AC_INIT([bakefile], [0.1.0], [vaclav.slavik@matfyz.cz])
+AC_INIT([bakefile], [0.1.1], [vaclav.slavik@matfyz.cz])
 
 AC_CONFIG_SRCDIR([autogen.sh])
 AC_CONFIG_AUX_DIR([admin])
