@@ -16,7 +16,14 @@
         <template>
             <set var="__depname">$(id)</set>
             <set var="__deps"/>
+            <set var="__targetdir"/>
+            <set var="__targetname">$(id)</set>
         </template>
+        
+        <define-tag name="dirname">
+            <set var="__targetdir">$(nativePaths(value))$(DIRSEP)</set>
+        </define-tag>
+        
     </define-rule>
 
     <define-rule name="__compiled" extends="__any">        
@@ -30,7 +37,11 @@
             <set var="__builddir" eval="0">
                 $(substituteFromDict(__debug,{'0':'Release','1':'Debug'}))
             </set>
-            <set var="__targetdir"/>
+
+            <set var="__outflag" eval="0">
+                /out:$(__targetdir)$(__targetname)
+            </set>
+            <ldflags>$(__outflag)</ldflags>
         </template>
         
         <define-tag name="sources">
@@ -48,6 +59,14 @@
                 $(formatIfNotEmpty("%s.lib",value))
             </set>
         </define-tag>
+        
+        <define-tag name="ldflags">
+            <set var="__ldflags" append="1">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="ldlibs">
+            <set var="__ldlibs" append="1">$(value)</set>
+        </define-tag>
 
         <define-tag name="install-to"/>
     </define-rule>
@@ -55,6 +74,7 @@
     <define-rule name="exe" extends="__compiled">
         <template>
             <app-type>console</app-type>
+            <set var="__targetname">$(id).exe</set>
         </template>
         <define-tag name="app-type">
             <set var="__type">
