@@ -29,6 +29,7 @@ output_DATA = output/autoconf.empy \
               output/gnumake-opts.empy \
               output/watcom.empy \
               output/watcom-opts.empy \
+              output/_hdr_config.empy \
               output/_hdr_makefile.empy
 
 rules_DATA =  rules/FORMATS.bkmanifest \

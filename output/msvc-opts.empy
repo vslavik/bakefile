@@ -1,4 +1,4 @@
-@empy.include(os.path.join(RULESDIR, '_hdr_makefile.empy'))
+@empy.include(os.path.join(RULESDIR, '_hdr_config.empy'))
 
 # -------------------------------------------------------------------------
 # These are configurable options:
