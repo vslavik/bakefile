@@ -42,21 +42,23 @@ def makeCondEnd(c):
 # We need these variables in some bakefile-made rules:
 WATCOM_CWD = $+ $(%cdrive):$(%cwd) $-
 
-### Variables: ###
-
-@[ for v in make_vars :@
-@v = @make_vars[v]
-]@
-
 ### Conditionally set variables: ###
 
 @[ for c in cond_vars :@
+@c.name =
 @[ for v in c.values :@
 @makeCondBegin(v.cond)
 @c.name = @v.value.replace('\n', ' &\n')
 @makeCondEnd(v.cond)
 ]@
 ]@
+
+### Variables: ###
+
+@[ for v in make_vars :@
+@v = @make_vars[v]
+]@
+
 
 @[ if BUILDDIR != '.' :
 all : @BUILDDIR
