@@ -21,6 +21,9 @@ def run(args):
     parser.add_option('-D',
                       action="append", dest='defines', metavar='VAR=VALUE',
                       help='override variable or option definition')
+    parser.add_option('-I',
+                      action="append", dest='includes', metavar='PATH',
+                      help='search for bakefile rules in PATH')
     parser.add_option('-v', '--verbose',
                       action="store_true", dest='verbose', default=0,
                       help='display detailed information')
@@ -50,6 +53,7 @@ def run(args):
     config.debug = options.debug
     config.format = options.format # FIXME -- check for validity
     config.output_file = options.outfile
+    
     config.defines = {}
     if options.defines != None:
         for define in options.defines:
@@ -58,6 +62,11 @@ def run(args):
                 config.defines[d[0]] = ''
             else:
                 config.defines[d[0]] = '='.join(d[1:])
+    
+    if options.includes != None:
+        import os.path
+        for p in options.includes:
+            config.searchPath.append(os.path.normpath(p))
 
     if not reader.read(args[0]):
         sys.exit(1)
