@@ -132,8 +132,12 @@ def findSources(filenames):
 
 
 def getObjectName(source, target, ext, objSuffix=''):
-    base, srcext = os.path.splitext(source)
-    base = os.path.basename(base)
+    pos = source.rfind('.')
+    srcext = source[pos:]
+    base = source[:pos]
+    pos = max(base.rfind('/'), base.rfind(mk.vars['DIRSEP']))
+    base = base[pos+1:]
+    
     objdir = mkPathPrefix(mk.vars['BUILDDIR'])
     objname = '%s%s_%s%s%s' % (objdir, mk.targets[target].id, base,
                                objSuffix, ext)
@@ -147,7 +151,6 @@ def sources2objects(sources, target, ext, objSuffix=''):
        of object file (e.g. to compile foo.c to foo_rc.o instead of foo.o).
 
        Returns object files list."""
-    import os.path
     import reader, xmlparser
 
     # It's a bit faster (about 10% on wxWindows makefiles) to not parse XML
@@ -194,8 +197,8 @@ def sources2objects(sources, target, ext, objSuffix=''):
         return '%s%s%s' % (prefix, ' '.join(retval), suffix)
             
     def addRule(id, obj, src, cond):
-        base, srcext = os.path.splitext(src)
-        rule = '__%s-to-%s' % (srcext[1:], ext[1:])
+        srcext = src.split('.')[-1]
+        rule = '__%s-to-%s' % (srcext, ext[1:])
         cTarget.name = rule
         cTarget.props['id'] = id
         cSrc.value = src
