@@ -288,18 +288,19 @@ class ValueRecord:
         return self.evaluated
 
 
-def _extractTargetNodes(out_list, list, target, tags, valueRecord):
+def _extractTargetNodes(out_list, list, target, tags,
+                        valueRecord, parentTags):
     """Expand all rules in list of target nodes and returns a list of
        elementary commands to be executed on the target. The list contains
-       tuples (node, value_record)."""
+       tuples (node, value_record, parent_tags)."""
     
     for node in list:
         if node.name == 'if':
             if evalWeakCondition(node):
                 _extractTargetNodes(out_list, node.children, target,
-                                    tags, valueRecord)
+                                    tags, valueRecord, parentTags)
         elif node.name in COMMANDS:
-            out_list.append((node, valueRecord))
+            out_list.append((node, valueRecord, parentTags))
         else:
             if node.name not in tags:
                 raise ReaderError(node,
@@ -308,7 +309,7 @@ def _extractTargetNodes(out_list, list, target, tags, valueRecord):
                 continue
             value = ValueRecord(valueRecord, node.value)
             _extractTargetNodes(out_list, tags[node.name], target,
-                                tags, value)
+                                tags, value, parentTags + [node.name])
 
 
 def _processTargetNodes(list, target, tags, dict):
@@ -341,8 +342,8 @@ def _processTargetNodes(list, target, tags, dict):
         return 1
 
     cmd_list = []
-    _extractTargetNodes(cmd_list, list, target, tags, None)
-    for node, valueR in cmd_list:
+    _extractTargetNodes(cmd_list, list, target, tags, None, [])
+    for node, valueR, parentTags in cmd_list:
         if valueR == None:
             dict2 = dict
         else:
