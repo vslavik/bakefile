@@ -31,7 +31,7 @@ def finalEvaluation(outputVarsOnly=1):
     if outputVarsOnly:
         interestingVars = mk.vars['FORMAT_OUTPUT_VARIABLES'].strip()
         if interestingVars != '':
-            interestingVars = interestingVars.split(',')
+            interestingVars = interestingVars.split()
             optimizeVars = len(interestingVars) > 0
         else:
             optimizeVars = 0
@@ -102,7 +102,7 @@ def finalEvaluation(outputVarsOnly=1):
 def _getUneliminatableVars():
     """Returns list of variables that cannot be eliminated. This is union
        of VARS_DONT_ELIMINATE and FORMAT_OUTPUT_VARIABLES."""
-    return mk.vars['FORMAT_OUTPUT_VARIABLES'].strip().split(',') + \
+    return mk.vars['FORMAT_OUTPUT_VARIABLES'].strip().split() + \
            mk.vars['VARS_DONT_ELIMINATE'].strip().split()
 
 

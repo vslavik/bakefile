@@ -22,10 +22,10 @@ advantage of a particular feature.
 
     
     <!--
-    Comma separated list of variables (both global and target) used by output
-    writer. Output Empy template then can only use variables from this list.
-    This does not affect conditional or make variables or options - they are
-    always all available.  
+    Whitespace separated list of variables (both global and target) used by
+    output writer. Output Empy template then can only use variables from this
+    list.  This does not affect conditional or make variables or options - they
+    are always all available.  
 
     This list can be used to speed up finalization phase of Bakefile processing
     and it improves efficiency of unused variables purging as well.
