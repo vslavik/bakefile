@@ -247,6 +247,32 @@
         </set>
         <ldflags>$(__importlib)</ldflags>
     </define-tag>
+        
+        
+    <define-tag name="library" rules="exe,dll,module">
+        <!-- 
+         The standard version which adds full filename of the library to
+         linker's command line  doesn't work on BSD Unix where the linker
+         doesn't like being given shared library as e.g. lib/foo.so - it's then
+         recorded as lib/foo.so instead of foo.so in ELF binary.
+         
+         For details, see here:
+         http://sourceforge.net/tracker/?func=detail&aid=1009662&group_id=83016&atid=568029
+         -->
+        
+        <!-- It has to be inserted as the first -L, so the we won't
+             link against library version in some system directory: -->
+        <set var="__ldflags" prepend="1">
+            $(substitute(value,
+                         lambda x: '-L'+ref('__targetdir_dironly', x),
+                         'LIBR'))
+        </set>
+        <ldlibs>
+            $(substitute(value,
+                         lambda x: '-l'+ref('__libname', x),
+                         'LIBR'))
+        </ldlibs>
+    </define-tag>
     
     
     <!-- =============================================================== -->
