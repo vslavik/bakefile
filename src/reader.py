@@ -1,3 +1,8 @@
+# 
+# Reading and _interpreting_ the makefiles
+#
+# $Id$
+#
 
 import string, sys, copy, os, os.path
 import xmlparser
@@ -6,6 +11,7 @@ import utils
 import errors
 from errors import ReaderError
 import config
+import finalize
 
 def evalConstExpr(e, str, target=None):
     try:
@@ -544,94 +550,6 @@ def processString(data):
 def processXML(data):
     __doProcess(xmldata=data)
 
-from types import InstanceType, DictType
-
-def finalEvaluation():
-    """Evaluates all variables, so that unneccessary $(...) parts are
-       removed in cases when <set eval="0" ...> was used"""
-
-    # Replace $(foo) for options by config.variableSyntax format:
-    for v in mk.__vars_opt:
-        mk.__vars_opt[v] = config.variableSyntax % v
-
-    def iterateModifications():
-        class Modified: pass
-        modified = Modified()
-        modified.v = 1
-        def modify(old, new, m):
-            if old != new: m.v += 1
-            return new
-
-        while modified.v:
-            if config.verbose:
-                sys.stdout.write('.')
-                sys.stdout.flush()
-            modified.v = 0
-            for v in mk.vars:
-                if v in mk.make_vars: continue
-                if not (type(mk.vars[v]) is InstanceType or
-                        type(mk.vars[v]) is DictType):
-                    if '$' in mk.vars[v]:
-                        mk.vars[v] = modify(mk.vars[v], mk.evalExpr(mk.vars[v]),
-                                            modified)
-            for v in mk.make_vars:
-                if '$' in mk.make_vars[v]:
-                    mk.make_vars[v] = modify(mk.make_vars[v],
-                                             mk.evalExpr(mk.make_vars[v]),
-                                             modified)
-            for t in mk.targets.values():
-                for v in t.vars:
-                    if not (type(t.vars[v]) is InstanceType or 
-                            type(t.vars[v]) is DictType):
-                        try:
-                            if '$' in t.vars[v]:
-                                t.vars[v] = modify(t.vars[v],
-                                                   mk.evalExpr(t.vars[v],
-                                                               target=t),
-                                                   modified)
-                        except KeyError, err:
-                            raise ReaderError(None, "can't evaluate value '%s' of variable '%s' on target '%s'" % (t.vars[v], v, t.id))
-            for c in mk.cond_vars.values():
-                for v in c.values:
-                    if '$' in v.value:
-                        v.value = modify(v.value,
-                                         mk.evalExpr(v.value, target=c.target),
-                                         modified)
-    
-    if config.verbose:
-        sys.stdout.write('finalizing ')
-    iterateModifications()
-    utils.__refEval = 1
-    iterateModifications()
-    if config.verbose: sys.stdout.write('\n')
-
-    # Replace all occurences of \$ by $:
-    if config.verbose:
-        print 'removing escape sequences'
-    for v in mk.vars:
-        if not (type(mk.vars[v]) is InstanceType or
-                type(mk.vars[v]) is DictType):
-            mk.vars[v] = mk.vars[v].replace('\\$', '$')
-    for v in mk.make_vars:
-        mk.make_vars[v] = mk.make_vars[v].replace('\\$', '$')
-    for t in mk.targets.values():
-        for v in t.vars:
-            if not (type(t.vars[v]) is InstanceType or
-                    type(t.vars[v]) is DictType):
-                t.vars[v] = t.vars[v].replace('\\$', '$')
-    for o in mk.options.values():
-        if o.default == None: continue
-        o.default = o.default.replace('\\$', '$')
-    for c in mk.cond_vars.values():
-        for v in c.values:
-            v.value = v.value.replace('\\$', '$')
-    
-def finalize():
-    finalEvaluation()
-    # delete pseudo targets now:
-    pseudos = [ t for t in mk.targets if mk.targets[t].pseudo ]
-    for t in pseudos: del mk.targets[t]
-
 
 # -------------------------------------------------------------------------
 
@@ -654,7 +572,7 @@ def read(filename):
         loadModule('common')
         loadModule(config.format)
         processFile(filename)
-        finalize()
+        finalize.finalize()
         return 1
     except errors.ErrorBase, e:
         sys.stderr.write(str(e))
