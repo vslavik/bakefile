@@ -4,6 +4,7 @@
 "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 
 <!ENTITY intro SYSTEM      "intro.docbook">
+<!ENTITY tutorial SYSTEM   "tutorial.docbook">
 <!ENTITY concepts SYSTEM   "concepts.docbook">
 <!ENTITY targets SYSTEM    "targets.docbook">
 <!ENTITY variables SYSTEM  "variables.docbook">
@@ -24,6 +25,7 @@
   </bookinfo>
 
   &intro;
+  &tutorial;
   &concepts;
   &targets;
   &commands;
