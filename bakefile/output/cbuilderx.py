@@ -5,6 +5,15 @@
 #
 # $Id$
 
+#
+# FIXME - TODO:
+#  implement missing tags:
+#   <cxx-rtti>         (__cxx_rtti)
+#   <cxx-exceptions>   (__cxx_exceptions)
+#   <warnings>         (__warnings)
+#
+#
+
 import fnmatch, re
 import errors, utils
 
