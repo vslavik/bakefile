@@ -261,6 +261,8 @@ def updateTargets(jobs, pretend=0):
         else: threadId = '(%i)' % job
         tempDeps = portautils.mktemp('bakefile')
         tempChanges = portautils.mktemp('bakefile')
+        tempXmlCacheDir = portautils.mktempdir('bakefile')
+        tempXmlCacheFile = os.path.join(tempXmlCacheDir, 'xmlcache')
 
         try:
             while 1:
@@ -274,9 +276,10 @@ def updateTargets(jobs, pretend=0):
                     state.lock.release()
                 print '%s[%i/%i] generating %s from %s' % (
                             threadId, i, state.totalCount, fmt, f)
-                cmd = '%s -f%s %s %s --output-deps=%s --output-changes=%s' % \
+                cmd = '%s -f%s %s %s --output-deps=%s --output-changes=%s --xml-cache=%s' % \
                         (_getBakefileExecutable(),
-                         fmt, files[f].flags[fmt], f, tempDeps, tempChanges)
+                         fmt, files[f].flags[fmt], f,
+                         tempDeps, tempChanges, tempXmlCacheFile)
                 if verbose >= 2: cmd += ' -v'
                 if verbose:
                     print cmd
@@ -296,6 +299,8 @@ def updateTargets(jobs, pretend=0):
         finally:
             os.remove(tempDeps)
             os.remove(tempChanges)
+            os.remove(tempXmlCacheFile)
+            os.rmdir(tempXmlCacheDir)
             try:
                 state.lock.acquire()
                 state.activeThreads -= 1

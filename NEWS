@@ -12,6 +12,8 @@ Version 0.1.5
 - new format: gnu for GNU toolchain on Unix
 - misc portability fixes on Unix (Michael Champigny)
 - added BeOS support (thanks to information by Michael Champigny)
+- improved performance for when generating lots of makefiles using
+  bakefile_gen by caching parsed XML files
 
 
 Version 0.1.4

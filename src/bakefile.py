@@ -69,6 +69,9 @@ def run(args):
     parser.add_option('', '--output-changes',
                       action="store", dest='changes_file', metavar='MODSFILE',
                       help="output list of modified files to a file")
+    parser.add_option('', '--xml-cache',
+                      action="store", dest='xml_cache', metavar='CACHEFILE',
+                      help="cache file where bakefile_gen stores pre-parsed XML files")
     parser.add_option('', '--debug',
                       action="store_true", dest='debug', default=0,
                       help="show debugging information (you don't want this)")
@@ -86,6 +89,14 @@ def run(args):
     if options.includes != None:
         for p in options.includes:
             config.searchPath.append(os.path.normpath(p))
+    
+    if options.xml_cache != None:
+        try:
+            import xmlparser, pickle, shelve
+            xmlparser.cache = shelve.open(options.xml_cache,
+                                          protocol=pickle.HIGHEST_PROTOCOL)
+        except ImportError: pass
+        except KeyError: pass # python < 2.3 didn't have protocol argument
 
     formats.loadFormats()
     if options.format == None:
