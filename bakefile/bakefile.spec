@@ -24,7 +24,7 @@ many Unix and Windows compilers.
 
 %build
 ./configure --prefix=%{prefix}
-%make
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
