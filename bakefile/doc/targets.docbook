@@ -6,7 +6,8 @@
     (which makes "make dist" command possible). Target syntax is similar to
     <link linkend="ch.commands">commands syntax</link>:
     <programlisting><![CDATA[
-<RULE id="NAME" [template="TEMPLATE,..."] [template_append="TEMPLATE2,..."] [cond="CONDITION"]>
+<RULE id="NAME" [template="TEMPLATE,..."]
+[template_append="TEMPLATE2,..."] [cond="CONDITION"]>
   SPECIFICATION
 </RULE>
 ]]></programlisting>
@@ -248,6 +249,9 @@
       </para>
     </section>
     
+    <!-- =============================================================== -->
+    <!--                            module                               -->
+    <!-- =============================================================== -->
     
     <section id="rule.module" xreflabel="module">
       <title>module</title>
@@ -278,6 +282,11 @@
       </para>
     </section>
     
+    
+    <!-- =============================================================== -->
+    <!--                            phony                                -->
+    <!-- =============================================================== -->
+    
 
     <section id="rule.phony" xreflabel="phony">
       <title>phony</title>
@@ -288,6 +297,11 @@
         is an example of phony target.
       </para>
     </section>
+    
+    
+    <!-- =============================================================== -->
+    <!--                              action                             -->
+    <!-- =============================================================== -->
 
     <section id="rule.action" xreflabel="action">
       <title>action</title>
@@ -324,6 +338,79 @@
         </informaltable>
       </para>
     </section>
+
+
+
+    <!-- =============================================================== -->
+    <!--                           subproject                            -->
+    <!-- =============================================================== -->
+
+    <section id="rule.subproject" xreflabel="subproject">
+      <title>subproject</title>
+      <para>
+        Declares subproject. Subproject is typically another makefile in a
+        subdirectory and is indepent on its parent project. Therefore you
+        can't use any variables or refer to targets from parent project in
+        subproject.
+        <informaltable>
+          <tgroup cols='2'>
+            <thead>
+              <row>
+                <entry>Tag</entry>
+                <entry>Description</entry>
+                <entry>Required/Default value</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row id="tags.subproject.dir" xreflabel="dir">
+                <entry role="tagname">dir</entry>
+                <entry>
+                  <para>
+                    Directory with subproject -- parent makefile calls
+                    makefile in this directory.
+                  </para>
+                </entry>
+                <entry role="default">required</entry>
+              </row>
+              <row id="tags.subproject.target" xreflabel="target">
+                <entry role="tagname">target</entry>
+                <entry>
+                  <para>
+                    Optional argument which specifies what target to build
+                    in the subproject.
+                  </para>
+                </entry>
+                <entry role="default"><literal>all</literal></entry>
+              </row>
+              <row id="tags.subproject.installable" xreflabel="installable">
+                <entry role="tagname">installable</entry>
+                <entry>
+                  <para>
+                    Whether <command>make install</command> (if supported by
+                    the format) should descend into subproject's directory.
+                    The value can only be <literal>yes</literal> or
+                    <literal>no</literal> and must be constant expression.
+                  </para>
+                </entry>
+                <entry role="default"><literal>yes</literal></entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </para>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
     
     <section>
       <title>Common tags</title>
