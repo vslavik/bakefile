@@ -39,7 +39,8 @@
     <output file="$(OUTPUT_FILE)" writer="mingw.empy"/>
     
     <if cond="OPTIONS_FILE!='' and WRITE_OPTIONS_FILE=='1'">
-        <output file="$(OPTIONS_FILE)" writer="mingw-opts.empy"/>
+    <output file="$(os.path.join(os.path.dirname(OUTPUT_FILE), OPTIONS_FILE))"
+            writer="mingw-opts.empy"/>
     </if>
 
 </makefile>
