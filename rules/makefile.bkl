@@ -87,6 +87,9 @@ makefiles (most notably GNU Make and Autoconf formats).
                 $(substitute(value, lambda x: ref('__depname', x), 'DEP'))
             </set>
         </define-tag>
+        <define-tag name="depends-on-file">
+            <set var="__deps" append="1">$(nativePaths(value))</set>
+        </define-tag>
         <define-tag name="dependency-of">
             <modify-target target="$(value)">
                 <depends>$(id)</depends>
