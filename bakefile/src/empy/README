@@ -1,0 +1,1491 @@
+Summary
+
+    A templating system for Python.
+
+
+Overview
+
+    empy is a system for embedding Python expressions and statements
+    in template text; it takes an empy source file, processes it, and
+    produces output.  This is accomplished via expansions, which are
+    special signals to the empy system and are set off by a special
+    prefix (by default the at sign, '@').  empy can expand arbitrary
+    Python expressions and statements in this way, as well as a
+    variety of special forms.  Textual data not explicitly delimited
+    in this way is sent unaffected to the output, allowing Python to
+    be used in effect as a markup language.  Also supported are "hook"
+    callbacks, recording and playback via diversions, and dynamic,
+    chainable filters.  The system is highly configurable via command
+    line options and embedded commands.
+
+    Expressions are embedded in text with the '@(...)' notation;
+    variations include conditional expressions with '@(...?...:...)'
+    and the ability to handle thrown exceptions with '@(...$...)'.  As
+    a shortcut, simple variables and expressions can be abbreviated as
+    '@variable', '@object.attribute', '@function(arguments)',
+    '@sequence' [index], and combinations.  Full-fledged statements
+    are embedded with '@{...}'.  Forms of conditional, repeated, and
+    recallable expansion are available via '@[...]'.  A '@' followed
+    by a whitespace character (including a newline) expands to
+    nothing, allowing string concatenations and line continuations.
+    Comments are indicated with '@#' and consume the rest of the line,
+    up to and including the trailing newline.  '@%' indicate
+    "significators," which are special forms of variable assignment
+    intended to specify per-file identification information in a
+    format which is easy to parse externally.  Escape sequences
+    analogous to those in C can be specified with '@\...', and finally
+    a '@@' sequence expands to a single literal at sign.
+
+
+Getting the software
+
+    The current version of empy is 2.2.
+
+    The latest version of the software is available in a tarball here:
+    "http://www.alcyone.com/pyos/empy/empy-latest.tar.gz",
+    http://www.alcyone.com/pyos/empy/empy-latest.tar.gz.
+
+    The official URL for this Web site is
+    "http://www.alcyone.com/pyos/empy/",
+    http://www.alcyone.com/pyos/empy/.
+
+
+Requirements
+
+    empy should work with any version of Python from 1.5.x onward.
+    The test script is intended to run on UNIX-like systems with a
+    Bourne shell.
+
+
+License
+
+    This code is released under the "GPL",
+    http://www.gnu.org/copyleft/gpl.html.
+
+
+Basics
+
+    empy is intended for embedding Python code in otherwise
+    unprocessed text.  Source files are processed, and the results are
+    written to an output file.  Normal text is sent to the output
+    unchanged, but markups are processed, expanded to their results,
+    and then written to the output file as strings (that is, with the
+    'str' function, not 'repr').  The act of processing empy source
+    and handling markups is called "expansion."
+
+    Code that is processed is executed exactly as if it were entered
+    into the Python interpreter; that is, it is executed with the
+    equivalent of 'eval' (for expressions) and 'exec' (for
+    statements).  For instance, inside an expression, 'abc' represents
+    the *name* 'abc', not the string '"abc"'.
+
+    By default the embedding token prefix is the at sign ('@'), which
+    appears neither in valid Python code nor commonly in English text;
+    it can be overridden with the -p option (or with the
+    'empy.setPrefix' function).  The token prefix indicates to the
+    empy interpreter that a special sequence follows and should be
+    processed rather than sent to the output untouched (to indicate a
+    literal at sign, it can be doubled as in '@@').
+
+    When the interpreter starts processing its target file, no modules
+    are imported by default, save the 'empy' pseudomodule (see below),
+    which is placed in the globals.  The globals are not cleared or
+    reset in any way.  It is perfectly legal to set variables or
+    explicitly import modules and then use them in later markups,
+    *e.g.*, '@{import time} ... @time.time()'.  Scoping rules are as
+    in normal Python, although all defined variables and objects are
+    taken to be in the global namespace.
+
+    Activities you would like to be done before any processing of the
+    main empy file can be specified with the -I, -D, -E, -F, and -P
+    options.  -I imports modules, -D executes a Python variable
+    assignment, -E executes an arbitrary Python (not empy) statement,
+    -F executes a Python (not empy) file, and -P processes an empy
+    (not Python) file.  These operations are done in the order they
+    appear on the command line; any number of each (including, of
+    course, zero) can be used.
+
+
+Expansions
+
+    The following markups are supported.  For concreteness below, '@'
+    is taken for the sake of argument to be the prefix character,
+    although this can be changed.
+
+    **'@# COMMENT NEWLINE'** -- A comment.  Comments, including the
+      trailing newline, are stripped out completely.  Comments should
+      only be present outside of expansions.  The comment itself is
+      not processed in any way: It is completely discarded.  This
+      allows '@#' comments to be used to disable markups.  *Note:* As
+      special support for "bangpaths" in UNIX like operating systems,
+      if the first line of a file (or indeed any context) begins with
+      '#!', it is treated as a '@#' comment.  A '#!' sequence
+      appearing anywhere else will be handled literally and unaltered
+      in the expansion.  Example::
+
+          @# This line is a comment.
+          @# This will NOT be expanded: @x.
+
+    **'@ WHITESPACE'** -- A '@' followed by one whitespace character
+      (a space, horizontal tab, vertical tab, carriage return, or
+      newline) is expanded to nothing; it serves as a way to
+      explicitly separate two elements which might otherwise be
+      interpreted as being the same symbol (such as '@name@ s' to mean
+      '@(name)s'; see below).  Also, since a newline qualifies as
+      whitespace here, the lone '@' at the end of a line represents a
+      line continuation, similar to the backslash in other languages.
+      Coupled with statement expansion below, spurious newlines can be
+      eliminated in statement expansions by use of the '@{...}@'
+      construct.  Example::
+
+          This will appear as one word: salt@ water.
+          This is a line continuation; @
+          this text will appear on the same line.
+
+    **'@\ ESCAPE_CODE'** -- An escape code.  Escape codes in empy are
+      similar to C-style escape codes, although they all begin with
+      the prefix character.  Valid escape codes include:
+
+          '@\0' -- NUL, null
+
+          '@\a' -- BEL, bell
+
+          '@\b' -- BS, backspace
+
+          '@\d' -- three-digital decimal code DDD
+
+          '@\e' -- ESC, escape
+
+          '@\f' -- FF, form feed
+
+          '@\h' -- DEL, delete
+
+          '@\n' -- LF, linefeed character, newline
+          
+          '@\oOOO' -- three-digit octal code OOO
+
+          '@\qQQQQ' -- four-digit quaternary code QQQQ
+
+          '@\r' -- CR, carriage return
+
+          '@\s' -- SP, space
+
+          '@\t' -- HT, horizontal tab
+
+          '@\v' -- VT, vertical tab
+
+          '@\xHH' -- two-digit hexadecimal code HH
+
+          '@\z' -- EOT, end of transmission
+
+          '@^X' -- the control character ^X
+
+      Unlike in C-style escape codes, escape codes taking some number
+      of digits afterward always take the same number to prevent
+      ambiguities.  Furthermore, unknown escape codes are treated as
+      parse errors to discourage potential subtle mistakes.  Unlike in
+      C, to represent an octal value, one must use '@\o...'.
+      Example::
+
+          This embeds a newline.@\nThis is on the following line.
+          This beeps!@\a
+          There is a tab here:@\tSee?
+          This is the character with octal code 141: @\o141.
+
+    **'@@'** -- A literal at sign ('@').  To embed two adjacent at
+      signs, use '@@@@', and so on.  Any literal at sign that you wish
+      to appear in your text must be written this way, so that it will
+      not be processed by the system.  *Note:* If a prefix other than
+      '@' has been chosen via the command line option, one expresses
+      that literal prefix by doubling it, not by appending a '@'.
+      Example::
+
+          The prefix character is @@.
+          To get the expansion of x you would write @@x.
+
+    **'@)', '@]', '@}'** -- These expand to literal close parentheses,
+      close brackets, and close braces, respectively; these are
+      included for completeness and explicitness only.  Example::
+
+          This is a close parenthesis: @).
+
+    **'@( EXPRESSION )'** -- Evaluate an expression, and replace the
+      tokens with the string (via a call to 'str') representation
+      evaluation of that expression.  Whitespace immediately inside
+      the parentheses is ignored; '@( expression )' is equivalent to
+      '@(expression)'.  If the expression evaluates to 'None', nothing
+      is expanded in its place; this allows function calls that depend
+      on side effects (such as printing) to be called as expressions.
+      (If you really *do* want a 'None' to appear in the output, then
+      use the Python string '"None"'.)  Example::
+
+          2 + 2 is @(2 + 2).
+          4 squared is @(4**2).
+          The value of the variable x is @(x).
+          This will be blank: @(None).
+
+    **'@( TEST ? THEN (: ELSE)_opt ($ CATCH)_opt )'** -- A special
+      form of expression evaluation representing conditional and
+      protected evaluation.  Evaluate the "test" expression; if it
+      evaluates to true (in the Pythonic sense), then evaluate the
+      "then" section as an expression and expand with the 'str' of
+      that result.  If false, then the "else" section is evaluated and
+      similarly expanded.  The "else" section is optional and, if
+      omitted, is equivalent to 'None' (that is, no expansion will
+      take place).
+
+      If the "catch" section is present, then if any of the prior
+      expressions raises an exception when evaluated, the expansion
+      will be substituted with the evaluation of the catch expression.
+      (If the "catch" expression itself raises, then that exception
+      will be propagated normally.)  The catch section is optional
+      and, if omitted, is equivalent to 'None' (that is, no expansion
+      will take place).  An exception (cough) to this is if one of
+      these first expressions raises a SyntaxError; in that case the
+      protected evaluation lets the error through without evaluating
+      the "catch" expression.  The intent of this construct is to
+      catch runtime errors, and if there is actually a syntax error in
+      the "try" code, that is a problem that should probably be
+      diagnosed rather than hidden.  Example::
+
+          What is x? x is @(x ? "true" : "false").
+          Pluralization: How many words? @x word@(x != 1 ? 's').
+          The value of foo is @(foo $ "undefined").
+          The square root of -1 is @(math.sqrt(-1) $ "not real").
+
+    **'@ SIMPLE_EXPRESSION'** -- As a shortcut for the '@(...)'
+      notation, the parentheses can be omitted if it is followed by a
+      "simple expression."  A simple expression consists of a name
+      followed by a series of function applications, array
+      subscriptions, or attribute resolutions, with no intervening
+      whitespace.  For example:
+
+          - a name, possibly with qualifying attributes (*e.g.*,
+            '@value', '@os.environ').
+
+          - a straightforward function call (*e.g.*, '@min(2, 3)',
+            '@time.ctime()'), with no space between the function name
+            and the open parenthesis.
+
+          - an array subscription (*e.g.*, '@array[index]',
+            '@os.environ[name]', with no space between the name and
+            the open bracket.
+
+          - any combination of the above (*e.g.*,
+            '@function(args).attr[sub].other[i](foo)').
+
+      In essence, simple expressions are expressions that can be
+      written ambiguously from text, without intervening space.  Note
+      that trailing dots are not considered part of the expansion
+      (*e.g.*, '@x.' is equivalent to '@(x).', not '@(x.)', which
+      would be illegal anyway).  Also, whitespace is allowed within
+      parentheses or brackets since it is unambiguous , but not
+      between identifiers and parentheses, brackets, or dots.
+      Explicit '@(...)' notation can be used instead of the
+      abbreviation when concatenation is what one really wants
+      (*e.g.*, '@(word)s' for simple pluralization of the contents of
+      the variable 'word').  As above, if the expression evaluates to
+      the 'None' object, nothing is expanded.  Example::
+
+          The value of x is @x.
+          The ith value of a is @a[i].
+          The result of calling f with q is @f(q).
+          The attribute a of x is @x.a.
+          The current time is @time.ctime(time.time()).
+          The current year is @time.localtime(time.time())[0].
+          These are the same: @min(2,3) and @min(2, 3).
+          But these are not the same: @min(2, 3) vs. @min (2, 3).
+          The plural of @name is @(name)s, or @name@ s.
+
+    **'@` EXPRESSION `'** -- Evaluate a expression, and replace the
+      tokens with the 'repr' (instead of the 'str' which is the
+      default) of the evaluation of that expression.  This expansion
+      is primarily intended for debugging and is unlikely to be useful
+      in actual practice.  That is, a '@`...`' is identical to
+      '@(repr(...))'.  Example::
+
+          The repr of the value of x is @`x`.
+          This print the Python repr of a module: @`time`.
+          This actually does print None: @`None`.
+
+    **'@: EXPRESSION : DUMMY :'** -- Evaluate an expression and then
+      expand to a '@:', the original expression, a ':', the evaluation
+      of the expression, and then a ':'.  The current contents of the
+      dummy area are ignored in the new expansion.  In this sense it
+      is self-evaluating; the syntax is available for use in
+      situations where the same text will be sent through the empy
+      processor multiple times.  Example::
+
+          This construct allows self-evaluation:
+          @:2 + 2:this will get replaced with 4:
+
+    **'@[ if EXPRESSION : CODE ]'** -- Evaluate the Python test
+      expression; if it evaluates to true, then expand the following
+      code through the empy system (which can contain markups),
+      otherwise, expand to nothing.  Example::
+
+          @[if x > 0:@x is positive.]
+          @# If you want to embed unbalanced right brackets:
+          @[if showPrompt:@\x5dINIT HELLO]
+
+    **'@[ while EXPRESSION : CODE ]'** -- Evaluate the Python
+      expression; if it evaluates to true, then expand the code and
+      repeat; otherwise stop expanding.  Example::
+
+          @[while i < 10:@ i is @i.@\n]
+
+    **'@[ for NAME in EXPRESSION : CODE ]'** -- Evaluate the Python
+      expression and treat it as a sequence; iterate over the
+      sequence, assigning each element to the provided name in the
+      globals, and expanding the given code each time.  Example::
+
+          @[for i in range(5):@ The cube of @i is @(i**3).@\n]
+
+    **'@[ macro SIGNATURE : CODE ]'** -- Define a "macro," which is a
+      function-like object that causes an expansion whenever it is
+      called.  The signature defines the name of the function and its
+      parameter list, if any -- just like normal Python functions,
+      macro signatures can include optional arguments, keyword
+      arguments, etc.  When defined, calling the macro results in the
+      given code to be expanded, with the function arguments involved
+      as the locals dictionary in the expansion.  Additionally, the
+      doc string of the function object that is created corresponds to
+      the expansion.  Example::
+
+          @[macro f(n):@ @[for i in range(n):@ @i**2 is @(i**2)@\n]]
+
+    **'@{ STATEMENTS }'** -- Execute a (potentially compound)
+      statement; statements have no return value, so the expansion is
+      not replaced with anything.  Multiple statements can either be
+      separated on different lines, or with semicolons; indentation is
+      significant, just as in normal Python code.  Statements,
+      however, can have side effects, including printing; output to
+      'sys.stdout' (explicitly or via a 'print' statement) is
+      collected by the interpreter and sent to the output.  The usual
+      Python indentation rules must be followed, although if the
+      statement consists of only one statement, leading and trailing
+      whitespace is ignored (*e.g.*, '@{ print time.time() }' is
+      equivalent to '@{print time.time()}').  Example::
+
+          @{x = 123}
+          @{a = 1; b = 2}
+          @{print time.time()}
+          @# Note that extra newlines will appear above because of the
+          @# newlines trailing the close braces.  To suppress them
+          @# use a @ before the newline:
+          @{
+          for i in range(10):
+              print "i is %d" % i
+          }@
+          @{print "Welcome to empy."}@
+
+    **'@% KEY (WHITESPACE VALUE)_opt NEWLINE'** -- Declare a
+      significator.  Significators consume the whole line (including
+      the trailing newline), and consist of a key string containing no
+      whitespace, and than optional value prefixed by whitespace.  The
+      key may not start with or contain internal whitespace, but the
+      value may; preceding or following whitespace in the value is
+      stripped.  Significators are totally optional, and are intended
+      to be used for easy external (that is, outside of empy)
+      identification when used in large scale environments with many
+      empy files to be processed.  The purpose of significators is to
+      provide identification information about each file in a special,
+      easy-to-parse form so that external programs can process the
+      significators and build databases, independently of empy.
+      Inside of empy, when a significator is encountered, its key,
+      value pair is translated into a simple assignment of the form
+      '__KEY__ = VALUE' , where "__KEY__" is the key string with two
+      underscores on either side and "VALUE" is a Python expression.
+      Example::
+
+          @%title     "Nobody knows the trouble I've seen"
+          @%keywords  ['nobody', 'knows', 'trouble', 'seen']
+          @%copyright [2000, 2001, 2002]
+
+
+Substitutions
+
+    Supported are conditional and repeated substitutions, which
+    involve testing or iterating over Python expressions and then
+    possibly expanding empy code.  These different from normal Python
+    'if', 'for', and 'while' statements since the result is an empy
+    expansion, rather than the execution of a Python statement; the
+    empy expansion may, of course, contain further expansions.  This
+    is useful for in-place conditional or repeated expansion of
+    similar text; as with all expansions, markups contained within the
+    empy code are processed.  The simplest form would consist
+    something like::
+
+        @[if x != 0:x is @x]
+
+    This will expand 'x is @x' if x is greater than zero.  Note that
+    all characters, including whitespace and newlines, after the colon
+    and before the close bracket are considered part of the code to be
+    expanded; to put a space in there for readability, you can use the
+    prefix and a whitespace character::
+
+        @[if x != 0:@ x is @x]
+
+    Iteration via while is also possible::
+
+        @{i = 0}@[while i < 10:@ i is @i@\n@{i = i + 1}]
+
+    This is a rather contrived example which iterates i from 0 to 9
+    and then prints "i is (value)" for each iteration.
+
+    A more practical example can be demonstrated with the for
+    notation::
+
+        <table>@[for x in elements:@ <tr><td>@x</td></tr>]</table>
+
+    This empy fragment would format the contents of 'elements' into an
+    HTML table, with one element per row.
+
+    The macro substitution doesn't get replaced with anything, but
+    instead defines a "macro," or recallable expansion, which looks
+    and behaves like a function.  When called, it expands its
+    contents.  The arguments to the function -- which can be defined
+    with optional, remaining, and keyword arguments, just like any
+    Python function -- can be referenced in the expansion as local
+    variables.  For concreteness, the doc string of the macro function
+    is the original expansion.  An macro substitution of the form
+    '@[macro SIGNATURE:CODE]' is equivalent to the following Python
+    code::
+
+        def SIGNATURE:
+            repr(CODE) # so it is a doc string
+            empy.string(repr(CODE), '<macro>', locals())
+
+    This can be used to defer the expansion of something to a later
+    time::
+
+        @[macro header(title='None'):<head><title>@title</title></head>]
+
+    Note that all text up to the trailing bracket is considered part
+    of the empy code to be expanded.  If one wishes a stray trailing
+    brackets to appear in the code, one can use an escape code to
+    indicate it, such as '@\x5d'.  Matching open and close bracket
+    pairs do not need to be escaped, for either bracket pairs in an
+    expansion or even for further substitutions::
+
+        @[if something:@ This is an unbalanced close bracket: @\x5d]
+        @[if something:@ This is a balanced bracket pair: [word]]
+        @[if something:@ @[if somethingElse:@ This is nested.]]
+
+
+Significators
+
+    Significators are intended to represent special assignment in a
+    form that is easy to externally parse.  For instance, if one has a
+    system that contains many empy files, each of which has its own
+    title, one could use a 'title' significator in each file and use a
+    simple regular expression to find this significator in each file
+    and organize a database of the empy files to be built.  This is an
+    easier proposition than, for instance, attempting to grep for a
+    normal Python assignment (inside a '@{...}' expansion) of the
+    desired variable.
+
+    Significators look like the following::
+
+        @%KEY VALUE
+
+    including the trailing newline, where "key" is a name and "value"
+    is a Python expression, and are separated by any whitespace.  This
+    is equivalent to the following Python code::
+
+        __KEY__ = VALUE
+
+    That is to say, a significator key translates to a Python variable
+    consisting of that key surrounded by double underscores on either
+    side.  The value may contain spaces, but the key may not.  So::
+
+        @%title "All Roads Lead to Rome"
+
+    translates to the Python code::
+
+        __title__ = "All Roads Lead to Rome"
+
+    but obviously in a way that easier to detect externally than if
+    this Python code were to appear somewhere in an expansion.  Since
+    significator keys are surrounded by double underscores,
+    significator keys can be any sequence of alphanumeric and
+    underscore characters; choosing '123' is perfectly valid for a
+    significator (although straight), since it maps to the name
+    '__123__' which is a legal Python identifier.
+
+    Note the value can be any Python expression.  The value can be
+    omitted; if missing, it is treated as 'None'.
+
+    Significators are completely optional; it is totally legal for a
+    empy file or files to be processed without containing any
+    significators.
+
+    A regular expression string designed to match significators (with
+    the default prefix) is available as 'empy.SIGNIFICATOR_RE_STRING',
+    and also is a toplevel definition in the 'em' module itself.
+
+
+Diversions
+
+    empy supports an extended form of m4-style diversions, which are a
+    mechanism for deferring and recalling output on demand.  Multiple
+    "streams" of output can be diverted and undiverted in this manner.
+    A diversion is identified with a name, which is any immutable
+    object such an integer or string.  When recalled, diverted code is
+    *not* resent through the empy interpreter (although a filter
+    could be set up to do this).
+
+    By default, no diversions take place.  When no diversion is in
+    effect, processing output goes directly to the specified output
+    file.  This state can be explicitly requested at any time by
+    calling the 'empy.stopDiverting' function.  It is always legal to
+    call this function.
+
+    When diverted, however, output goes to a deferred location which
+    can then be recalled later.  Output is diverted with the
+    'empy.startDiversion' function, which takes an argument that is
+    the name of the diversion.  If there is no diversion by that name,
+    a new diversion is created and output will be sent to that
+    diversion; if the diversion already exists, output will be
+    appended to that preexisting diversion.
+
+    Output send to diversions can be recalled in two ways.  The first
+    is through the 'empy.playDiversion' function, which takes the
+    name of the diversion as an argument.  This recalls the named
+    diversion, sends it to the output, and then erases that
+    diversion.  A variant of this behavior is the
+    'empy.replayDiversion', which recalls the named diversion but does
+    not eliminate it afterwards; 'empy.replayDiversion' can be
+    repeatedly called with the same diversion name, and will replay
+    that diversion repeatedly.  'empy.createDiversion' create a
+    diversion without actually diverting to it, for cases where you
+    want to make sure a diversion exists but do not yet want to send
+    anything to it.
+
+    The diversion object itself can be retrieved with
+    'empy.retrieveDiversion'.  Diversions act as writable
+    file-objects, supporting the usual 'write', 'writelines', 'flush',
+    and 'close' methods.  The data that has been diverted to them can
+    be retrieved in one of two ways; either through the 'asString'
+    method, which returns the entire contents of the diversion as a
+    single strong, or through the 'asFile' method, which returns the
+    contents of the diversion as a readable (not writable) file-like
+    object.
+
+    Diversions can also be explicitly deleted without recalling them
+    with the 'empy.purgeDiversion' function, which takes the desired
+    diversion name as an argument.
+
+    Additionally there are three functions which will apply the above
+    operations to all existing diversions: 'empy.playAllDiversions',
+    'empy.replayAllDiversions', and 'empy.purgeAllDiversions'.  All
+    three will do the equivalent of a 'empy.stopDiverting' call before
+    they do their thing.
+
+    The name of the current diversion can be requested with the
+    'empy.getCurrentDiversion' function; also, the names of all
+    existing diversions (in sorted order) can be retrieved with
+    'empy.getAllDiversions'.
+
+    When all processing is finished, the equivalent of a call to
+    'empy.playAllDiversions' is done.
+
+
+Filters
+
+    empy also supports dynamic filters.  Filters are put in place
+    right "before" the final output file, and so are only invoked
+    after all other processing has taken place (including interpreting
+    and diverting).  Filters take input, remap it, and then send it to
+    the output.
+
+    The current filter can be retrieved with the 'empy.getFilter'
+    function.  The filter can be cleared (reset to no filter) with
+    'empy.resetFilter' and a special "null filter" which does not send
+    any output at all can be installed with 'empy.nullFilter'.  A
+    custom filter can be set with the 'empy.setFilter' function; for
+    convenience, specialized forms of filters preexist and can be
+    accessed with shortcuts for the 'empy.setFilter' argument:
+
+    - 'None' is a special filter meaning "no filter"; when installed,
+      no filtering whatsoever will take place.
+
+    - '0' (the integer constant zero) is another special filter that
+      represents the null filter; when installed, no output will ever
+      be sent to the filter's sink.
+
+    - A filter specified as a function (or lambda) is expected to take
+      one string argument and return one string argument; this filter
+      will execute the function on any input and use the return value
+      as output.
+
+    - A filter that is a string is a 256-character table is
+      substituted with the result of a call to 'string.translate'
+      using that table.
+
+    - A filter can be an instance of a subclass of 'empy.Filter'.
+      This is the most general form of filter.
+
+    - Finally, the argument to 'empy.setFilter' can be a Python list
+      consisting of one or more of the above objects.  In that case,
+      those filters are chained together in the order they appear in
+      the list.  An empty list is the equivalent of 'None'; all
+      filters will be uninstalled.
+
+    Filters are, at their core, simply file-like objects in Python
+    that, after performing whatever processing they need to do, send
+    their work to the next filter in line, or to the final output,
+    should there be no more filters.  That is to say, filters can be
+    "chained" together; the action of each filter takes place in
+    sequence, with the output of one filter being the input of the
+    next.
+
+    To create your own filter, you can derive from the 'empy.Filter'
+    class and override its 'write' method; it should write to the next
+    filter in the chain by accessing the file-like object attribute
+    'sink'.  You can also override its 'flush' and 'close' methods, if
+    need be; by default these simply flush and close the filter's
+    sink, respectively.  You can chain filters together by passing
+    them as elements in a list to the 'empy.setFilter' function, or
+    you can chain them together manually with the 'attach' method::
+
+        firstFilter.attach(secondFilter)
+        empy.setFilter(firstFilter)
+
+    or just let empy do the chaining for you::
+
+        empy.setFilter([firstFilter, secondFilter])
+
+    Subclasses of 'empy.Filter' are already provided with the above
+    null, function, and string functionality described above; they are
+    'NullFilter', 'FunctionFilter', and 'StringFilter', respectively.
+    In addition, a filter which supports buffering, 'BufferedFilter',
+    is provided.  Several variants are included: 'SizeBufferedFilter',
+    a filter which buffers into fixed-sized chunks,
+    'LineBufferedFilter', a filter which buffers by lines, and
+    'MaximallyBufferedFilter', a filter which completely buffers its
+    input.
+
+
+Hooks
+
+    The empy system also allows for the usage of "hooks," which are
+    callbacks that can be registered with an interpreter to get
+    information on the current state of activity and act upon it.
+
+    Hooks are associated with names, which are merely strings; these
+    strings represent a state of the interpreter.  Any number of hooks
+    can be associated with a given name, and are registered with the
+    'empy.addHook' function call.  Hooks are callable objects which
+    take two arguments: first, a reference to the interpreter that is
+    running; and second, a dictionary that contains contextual
+    information about the point at which the hook is invoked; the
+    contents of this dictionary are dependent on the hook name.
+
+    Hooks can perform any reasonable action, with one caveat:  When
+    hooks are invoked, 'sys.stdout' may not be properly wrapped and so
+    should be considered unusable.  If one wishes to really write to
+    the actually stdout stream (not the interpreter), use
+    'sys.__stdout__.write'.  If one wishes to send output to the
+    interpreter, then use 'interpreter.write'.  Neither references to
+    'sys.stdout' nor 'print' statements should ever appear in a hook.
+
+    The hooks associated with a given name can be retrieved with
+    'empy.getHooks'.  All hooks associated with a name can be cleared
+    with 'empy.clearHooks'.  A hook added with 'empy.addHook' can be
+    removed with 'empy.removeHook'.  Finally, hooks can be manually
+    invoked via 'empy.invokeHook'.
+
+    The following hooks are supported; also listed in curly braces are
+    the keys contained in the dictionary argument:
+
+    **'at_shutdown'** -- The interpreter is shutting down.
+
+    **'at_handle'** {meta} -- An exception is being handled; 'meta' is
+      the exception (an instance of 'MetaError').  Note that this hook
+      is invoked when the exception is *handled* by the empy system,
+      not when it is thrown.
+
+    **'before_include'** {name, file} -- An 'empy.include' call is
+      about to be processed; 'name' is the context name of the
+      inclusion and 'file' is the actual file object associated with
+      the include.
+
+    **'after_include'** -- An 'empy.include' was just completed.
+
+    **'before_expand'** {string, locals} -- An 'empy.expand' call is
+      about to be processed.  'string' is the actual data that is
+      about to be processed; 'locals' is the locals dictionary or
+      'None'.
+
+    **'after_expand'** -- An 'empy.expand' was just completed.
+
+    **'at_quote'** {string} -- An 'empy.quote' call is about to be
+      processed; 'string' is the string to be quoted.
+
+    **'at_escape'** {string} -- An 'empy.escape' call is about to be
+      processed; 'string' is the string to be escaped.
+
+    **'before_file'** {name, file} -- A file object is just about to
+      be processed.  'name' is the context name associated with the
+      object and 'file' is the file object itself.
+
+    **'after_file'** -- A file object has just finished processing.
+
+    **'before_string'** {name, string} -- A standalone string is just
+      about to be processed.  'name' is the context name associated
+      with it and 'string' is the string itself.
+
+    **'after_string'** -- A standalone string has just finished being
+      processed.
+
+    **'at_parse'** {scanner} -- A parsing pass is just about to be
+      performed.  'scanner' is the scanner associated with the parsing
+      pass.
+
+    **'before_evaluate'** {expression, locals} -- A Python expression
+      is just about to be evaluated.  'expression' is the (string)
+      expression, and 'locals' is the locals dictionary or 'None'.
+
+    **'after_evaluate'** -- A Python expression was just evaluated.
+
+    **'before_execute'** {statements, locals} -- A chunk of Python
+      statements is just about to be evaluated.  'statements' is the
+      (string) statement block, and 'locals' is the locals dictionary
+      or 'None'.
+
+    **'before_substitute'** {substitution} -- A '@[...]' substitution
+      is just about to be done.  'substitution' is the substitution
+      string itself.
+
+    **'after_substitute'** -- A substitution just took place.
+
+    **'before_significate'** {key, value} -- A significator is just
+      about to be processed; 'key' is the key and 'value' is the
+      value.
+
+    **'after_significate'** -- A significator was just processed.
+
+    As a practical example, this sample Python code would print a
+    pound sign followed by the name of every file that is included
+    with 'empy.include'::
+
+        def includeHook(interpreter, keywords):
+            interpreter.write("# %s\n" % keywords['name'])
+        empy.addHook('before_include', includeHook)
+
+    Note that this snippet properly uses a call to 'interpreter.write'
+    instead of executing a 'print' statement.
+
+
+Data flow
+
+    **input -> interpreter -> diversions -> filters -> output**
+
+    Here, in summary, is how data flows through a working empy system:
+
+    1. Input comes from a source, such an .em file on the command
+       line, or via an 'empy.include' statement.
+
+    2. The interpreter processes this material as it comes in,
+       expanding token sequences as it goes.
+
+    3. After interpretation, data is then sent through the diversion
+       layer, which may allow it directly through (if no diversion is
+       in progress) or defer it temporarily.  Diversions that are
+       recalled initiate from this point.
+
+    4. Any filters in place are then used to filter the data and
+       produce filtered data as output.
+
+    5. Finally, any material surviving this far is sent to the output
+       stream.  That stream is stdout by default, but can be changed
+       with the -o or -a options, or may be fully buffered with the -B
+       option (that is, the output file would not even be opened until
+       the entire system is finished).
+
+
+Pseudomodule contents
+
+    The 'empy' pseudomodule (available only in an operating empy
+    system) contains the following functions and objects (and their
+    signatures, with a suffixed 'opt' indicating an optional
+    argument):
+
+    First, basic identification:
+
+    **'VERSION'** -- A constant variable which contains a
+      string representation of the empy version.
+
+    **'SIGNIFICATOR_RE_STRING'** -- A constant variable
+      representing a regular expression string that can be used to
+      find significators in empy code.
+
+    **'interpreter'** -- The instance of the interpreter that is
+      currently being used to perform execution.
+
+    **'argv'** -- A list consisting of the name of the primary empy
+      script and its command line arguments, in analogue to the
+      'sys.argv' list.
+
+    **'args'** -- A list of the command line arguments following the
+      primary empy script; this is equivalent to 'empy.argv[1:]'.
+
+    **'identify() -> string, integer'** -- Retrieve identification
+      information about the current parsing context.  Returns a
+      2-tuple consisting of a filename and a line number; if the file
+      is something other than from a physical file (*e.g.*, an
+      explicit expansion with 'empy.expand', a file-like object within
+      Python, or via the -E or -F command line options), a string
+      representation is presented surrounded by angle brackets.  Note
+      that the context only applies to the *empy* context, not the
+      Python context.
+
+    **'setName(name)'** -- Manually set the name of the current
+      context.
+
+    **'setLine(line)'** -- Manually set the line number of the current
+      context; line must be a numeric value.  Note that afterward the
+      line number will increment by one for each newline that is
+      encountered, as before.
+
+    Filter classes:
+
+    **'Filter'** -- The base Filter class which can be derived from to
+      make custom filters.
+
+    **'NullFilter'** -- A null filter; all data sent to the filter is
+      discarded.
+
+    **'FunctionFilter'** -- A filter which uses a function taking a
+      string and returning another to perform the filtering.
+
+    **'StringFilter'** -- A filter which uses a 256-character string
+      table to map any incoming character.
+
+    **'BufferedFilter'** -- A filter which does not modify its input,
+      but instead holds it until it is told to flush (via the filter's
+      'flush' method).  This also serves as the base class for the
+      other buffered filters below.
+
+    **'SizeBufferedFilter'** -- A filter which buffers into fixed-size
+      chunks, with the possible exception of the last chunk.  The
+      buffer size is indicated as the sole argument to the
+      constructor.
+
+    **'LineBufferedFilter'** -- A filter which buffers into lines,
+      with the possible exception of the last line (which may not end
+      with a newline).
+
+    **'MaximallyBufferedFilter'** -- A filter which does not flush any
+      of its contents until it is closed.  Note that since this filter
+      ignores calls to its 'flush' method, this means that installing
+      this filter and then replacing it with another can result in
+      loss of data.
+
+    The following functions relate to source manipulation:
+
+    **'include(file_or_filename, locals_opt, bangpaths_opt)'** --
+      Include another empy file, by processing it in place.  The
+      argument can either be a filename (which is then opened with
+      'open' in text mode) or a file object, which is used as is.
+      Once the included file is processed, processing of the current
+      file continues.  Includes can be nested.  The call also takes an
+      optional locals dictionary which will be passed into the
+      evaluation function; in addition, the optional Boolean argument
+      indicates whether a bangpath ('#!') as the first characters of a
+      file will be treated as an empy comment (if true) or left intact
+      (if false).
+
+    **'expand(string, locals_opt)' -> string** -- Explicitly invoke
+      the empy parsing system to process the given string and return
+      its expansion.  This allows multiple levels of expansion,
+      *e.g.*, '@(empy.expand("@(2 + 2)"))'.  The call also takes an
+      optional locals dictionary which will be passed into the
+      evaluation function.  This is necessary when text is being
+      expanded inside a function definition and it is desired that the
+      function arguments (or just plain local variables) are available
+      to be referenced within the expansion.
+
+    **'quote(string) -> string'** -- The inverse process of
+      'empy.expand', this will take a string and return a new string
+      that, when expanded, would expand to the original string.  In
+      practice, this means that appearances of the prefix character
+      are doubled, except when they appear inside a string literal.
+
+    **'escape(string, more_opt) -> string'** -- Given a string, quote
+      the nonprintable characters contained within it with empy
+      escapes.  The optional 'more' argument specifies additional
+      characters that should be escaped.
+
+    **'string(string, name_opt, locals_opt)'** -- Explicitly process a
+      string-like object.  This differs from 'empy.expand' in that the
+      string is directly processed into the empy system, rather than
+      being evaluated in an isolated context and then returned as a
+      string.
+
+    **'flush()'** -- Do an explicit flush on the underlying stream.
+
+    **'atExit(callable)'** -- Register a callable object (or function)
+      taking no arguments which will be called at the end of a normal
+      shutdown.  Callable objects registered in this way are called in
+      the reverse order in which they are added, so the first callable
+      registered with 'empy.atExit' is the last one to be called.
+      Note that although the functionality is related to hooks,
+      'empy.atExit' does no work via the hook mechanism, and you are
+      guaranteed that the interpreter and stdout will be in a
+      consistent state when the callable is invoked.
+
+    Changing the behavior of the pseudomodule itself:
+
+    **'flatten(keys_opt)'** -- Perform the equivalent of 'from empy
+      import ...' in code (which is not directly possible because
+      'empy' is a pseudomodule).  If keys is omitted, it is taken as
+      being everything in the 'empy' pseudomodule.  Each of the
+      elements of this pseudomodule is flattened into the globals
+      namespace; after a call to 'empy.flatten', they can be referred
+      to simple as globals, *e.g.*, '@divert(3)' instead of
+      '@empy.divert(3)'.  If any preexisting variables are bound to
+      these names, they are silently overridden.  Doing this is
+      tantamount to declaring an 'from ... import ...' which is often
+      considered bad form in Python.
+
+    Prefix-related functions:
+
+    **'getPrefix() -> char'** -- Return the current prefix.
+
+    **'setPrefix(char)'** -- Set a new prefix.  Immediately after this
+      call finishes, the prefix will be changed.  Changing the prefix
+      affects only the current interpreter; any other created
+      interpreters are unaffected.
+
+    Diversions:
+
+    **'stopDiverting()'** -- Any diversions that are currently taking
+      place are stopped; thereafter, output will go directly to the
+      output file as normal.  It is never illegal to call this
+      function.
+
+    **'createDiversion(name)'** -- Create a diversion, but do not
+      begin diverting to it.  This is the equivalent of starting a
+      diversion and then immediately stopping diversion; it is used in
+      cases where you want to make sure that a diversion will exist
+      for future replaying but may be empty.
+
+    **'startDiversion(name)'** -- Start diverting to the specified
+      diversion name.  If such a diversion does not already exist, it
+      is created; if it does, then additional material will be
+      appended to the preexisting diversions.
+
+    **'playDiversion(name)'** -- Recall the specified diversion and
+      then purge it.  The provided diversion name must exist.
+
+    **'replayDiversion(name)'** -- Recall the specified diversion
+      without purging it.  The provided diversion name must exist.
+
+    **'purgeDiversion(name)'** -- Purge the specified diversion
+      without recalling it.  The provided diversion name must exist.
+
+    **'playAllDiversions()'** -- Play (and purge) all existing
+      diversions in the sorted order of their names.  This call does
+      an implicit 'empy.stopDiverting' before executing.
+
+    **'replayAllDiversions()'** -- Replay (without purging) all
+      existing diversions in the sorted order of their names.  This
+      call does an implicit 'empy.stopDiverting' before executing.
+
+    **'purgeAllDiversions()'** -- Purge all existing diversions
+      without recalling them.  This call does an implicit
+      'empy.stopDiverting' before executing.
+
+    **'getCurrentDiversion() -> diversion'** -- Return the name of the
+      current diversion.
+
+    **'getAllDiversions() -> sequence'** -- Return a sorted list of
+      all existing diversions.
+
+    Filters:
+
+    **'getFilter() -> filter'** -- Retrieve the current filter.
+      'None' indicates no filter is installed.
+
+    **'resetFilter()'** -- Reset the filter so that no filtering is
+      done.
+
+    **'nullFilter()'** -- Install a special null filter, one which
+      consumes all text and never sends any text to the output.
+
+    **'setFilter(filter)'** -- Install a new filter.  A filter is
+      'None' or an empty sequence representing no filter, or '0' for a
+      null filter, a function for a function filter, a string for a
+      string filter, or an instance of 'empy.Filter'.  If filter is a
+      list of the above things, they will be chained together
+      manually; if it is only one, it will be presumed to be solitary
+      or to have already been manually chained together.  See the
+      "Filters" section for more information.
+
+    Hooks:
+
+    **'getHooks(name)'** -- Get a list of the hooks associated with
+      this name.
+
+    **'clearHooks(name)'** -- Clear all hooks associated with this
+      name.
+
+    **'addHook(name, hook, prepend_opt)'** -- Add this hook to the
+      hooks associated with this name.  By default, the hook is
+      appended to the end of the existing hooks, if any; if the
+      optional insert argument is present and true, it will be
+      prepended to the list instead.
+
+    **'removeHook(name, hook)'** -- Remove this hook from the hooks
+      associated with this name.
+
+    **'invokeHook(name_, ...)'** -- Manually invoke all the hooks
+      associated with this name.  The remaining arguments are treated
+      as keyword arguments and the resulting dictionary is passed in
+      as the second argument to the hooks.
+
+
+Invocation
+
+    Basic invocation involves running the interpreter on an empy file
+    and some optional arguments.  If no file are specified, or the
+    file is named '-', empy takes its input from stdin.  One can
+    suppress option evaluation (to, say, specify a file that begins
+    with a dash) by using the canonical '--' option.
+
+    **'-a'/'--append' (filename)** -- Open the specified file for
+      append instead of using stdout.
+
+    **'-f'/'--flatten'** -- Before processing, move the contents of
+      the 'empy' pseudomodule into the globals, just as if
+      'empy.flatten()' were executed immediately after starting the
+      interpreter.  That is, *e.g.*, 'empy.include' can be referred to
+      simply as 'include' when this flag is specified on the command
+      line.  This can also be specified through the existence of the
+      'EMPY_FLATTEN' environment variable.
+
+    **'-h'/'--help'** -- Print usage and exit.
+
+    **'-i'/'--interactive'** -- After the main empy file has been
+      processed, the state of the interpreter is left intact and
+      further processing is done from stdin.  This is analogous to the
+      Python interpreter's -i option, which allows interactive
+      inspection of the state of the system after a main module is
+      executed.  This behaves as expected when the main file is stdin
+      itself.  This can also be specified through the existence of the
+      'EMPY_INTERACTIVE' environment variable.
+
+    **'-k'/'--suppress-errors'** -- Normally when an error is
+      encountered, information about its location is printed and the
+      empy interpreter exits.  With this option, when an error is
+      encountered (except for keyboard interrupts), processing stops
+      and the interpreter enters interactive mode, so the state of
+      affairs can be assessed.  This is also helpful, for instance,
+      when experimenting with empy in an interactive manner.  -k
+      implies -i.
+
+    **'-o'/'--output' (filename)** -- Open the specified file for
+      output instead of using stdout.  If a file with that name
+      already exists it is overwritten.
+
+    **'-p'/'--prefix' (prefix)** -- Change the prefix used to detect
+      expansions.  The argument is the one-character string that will
+      be used as the prefix.  Note that whatever it is changed to, the
+      way to represent the prefix literally is to double it, so if '$'
+      is the prefix, a literal dollar sign is represented with '$$'.
+      Note that if the prefix is changed to one of the secondary
+      characters (those that immediately follow the prefix to indicate
+      the type of action empy should take), it will not be possible to
+      represent literal prefix characters by doubling them (*e.g.*, if
+      the prefix were unadvisedly changed to '#' then '##' would
+      already have to represent a comment, so '##' could not represent
+      a literal '#').  This can also be specified through the
+      'EMPY_PREFIX' environment variable.
+
+    **'-r'/'--raw-errors'** -- Normally, empy catches Python
+      exceptions and prints them alongside an error notation
+      indicating the empy context in which it occurred.  This option
+      causes empy to display the full Python traceback; this is
+      sometimes helpful for debugging.  This can also be specified
+      through the existence of the 'EMPY_RAW_ERRORS' environment
+      variable.
+
+    **'-V'/'--version'** -- Print version and exit.
+
+    **'-B'/'--buffered-output'** -- Fully buffer processing output,
+      including the file open itself.  This is helpful when, should an
+      error occur, you wish that no output file be generated at all
+      (for instance, when using empy in conjunction with make).  When
+      specified, either the -o or -a options must be specified; fully
+      buffering does not work with stdout.  This can also be specified
+      through the existence of the 'EMPY_BUFFERED_OUTPUT' environment
+      variable.
+
+    **'-D'/'--define' (assignment)** -- Execute a Python assignment of
+      the form 'variable = expression'.  If only a variable name is
+      provided (*i.e.*, the statement does not contain an '=' sign),
+      then it is taken as being assigned to None.  The -D option is
+      simply a specialized -E option that special cases the lack of an
+      assignment operator.  Multiple -D options can be specified.
+
+    **'-E'/'--execute' (statement)** -- Execute the Python (not empy)
+      statement before processing any files.  Multiple -E options can
+      be specified.
+
+    **'-F'/'--execute-file' (filename)** -- Execute the Python (not
+      empy) file before processing any files.  This is equivalent to
+      '-E execfile("filename")' but provides a more readable context.
+      Multiple -F options can be specified.
+
+    **'-I'/'--import' (module)** -- Imports the specified module name
+      before processing any files.  Multiple modules can be specified
+      by separating them by commas, or by specifying multiple -I
+      options.
+
+    **'-P'/'--preprocess' (filename)** -- Process the empy file before
+      processing the primary empy file on the command line.
+
+
+Environment variables
+
+    empy also supports a few environment variables to predefine
+    certain behaviors.  The settings chosen by environment variables
+    can be overridden via command line arguments.  The following
+    environment variables have meaning to empy:
+
+    **'EMPY_PREFIX'** -- If present, the value of this environment
+      variable represents the prefix that will be used; this is
+      equivalent to the '-p' command line option.
+
+    **'EMPY_FLATTEN'** -- If defined, this is equivalent to including
+      '-f' on the command line.
+
+    **'EMPY_RAW_ERRORS'** -- If defined, this is equivalent to
+      including '-r' on the command line.
+
+    **'EMPY_INTERACTIVE'** -- If defined, this is equivalent to
+      including '-i' on the command line.
+
+    **'EMPY_BUFFERED_OUTPUT'** -- If defined, this is equivalent to
+      including '-B' on the command line.
+
+
+Examples
+
+    See the sample empy file 'sample.em' which is included with the
+    distribution.  Run empy on it by typing something like (presuming
+    a UNIX-like operating system)::
+
+         ./em.py sample.em
+
+    and compare the results and the sample source file side by side.
+    The sample content is intended to be self-documenting.
+
+    The file 'sample.bench' is the benchmark output of the sample.
+    Running the empy interpreter on the provided 'sample.em' file
+    should produce precisely the same results.  You can run diff to
+    verify that your interpreter is behaving as expected::
+
+        ./test.sh
+
+    By default this will test with the first Python interpreter
+    available in the path; if you want to test with another
+    interpreter, you can provide it as the first argument on the
+    command line::
+
+        ./test.sh /usr/bin/python1.5
+
+
+Known issues and caveats
+
+    - empy is intended for static processing of documents, rather than
+      dynamic use, and hence speed of processing was not a major
+      consideration in its design.
+
+    - empy is not threadsafe.
+
+    - Expressions ('@(...)') are intended primarily for their return
+      value; statements ('@{...}') are intended primarily for their
+      side effects, including of course printing.  If an expression is
+      expanded that as a side effect prints something, then the
+      printing side effects will appear in the output *before* the
+      expansion of the expression value.
+
+    - Due to Python's curious handling of the 'print' keyword --
+      particularly the form with a trailing comma to suppress the
+      final newline -- mixing statement expansions using prints inline
+      with unexpanded text will often result in surprising behavior,
+      such as extraneous (sometimes even deferred!) spaces.  This is a
+      Python "feature"; for finer control over output formatting -- as
+      is normal with python -- use 'sys.stdout.write' or
+      'empy.interpreter.write' (these will do the same thing)
+      directly.
+
+    - To function properly, empy must override 'sys.stdout' with a
+      proxy file object, so that it can capture output of side effects
+      and support diversions for each interpreter instance.  It is
+      important that code executed in an environment *not* rebind
+      'sys.stdout', although it is perfectly legal to invoke it
+      explicitly (*e.g.*, '@sys.stdout.write("Hello world\n")').  If
+      one really needs to access the "true" stdout, then use
+      'sys.__stdout__' instead (which should also not be rebound).
+      empy uses the standard Python error handlers when exceptions are
+      raised in empy code, which print to 'sys.stderr'.
+
+    - The 'empy' "module" exposed through the empy interface (*e.g.*,
+      '@empy') is an artificial module.  It cannot be imported with
+      the 'import' statement (and shouldn't -- it is an artifact of
+      the empy processing system and does not correspond to any
+      accessible '.py' file).
+
+    - For an empy statement expansion all alone on a line, *e.g.*,
+      '@{a = 1}', note that this will expand to a blank line due to
+      the newline following the closing curly brace.  To suppress this
+      blank line, use the symmetric convention '@{a = 1}@'.
+
+    - When using empy with make, note that partial output may be
+      created before an error occurs; this is a standard caveat when
+      using make.  To avoid this, write to a temporary file and move
+      when complete, delete the file in case of an error, use the -B
+      option to fully buffer output (including the open), or (with GNU
+      make) define a '.DELETE_ON_ERROR' target.
+
+    - 'empy.identify' tracks the context of executed *empy* code, not
+      Python code.  This means that blocks of code delimited with '@{'
+      and '}' will identify themselves as appearing on the line at
+      which the '}' appears, and that pure Python code executed via
+      the -D, -E and -F command line arguments will show up as all taking
+      place on line 1.  If you're tracking errors and want more
+      information about the location of the errors from the Python
+      code, use the -r command line option.
+
+
+Wish list
+
+    Here are some random ideas for future revisions of empy.  If any
+    of these are of particular interest to you, your input would be
+    appreciated.
+
+    - A "trivial" mode, where all the empy system does is scan for
+      @...@ tokens and replace them with evaluations/executions.  This
+      has the down side of being much less configurable and powerful
+      but the upside of being extremely efficient.
+
+    - The ability to funnel all code through a configurable 'RExec'
+      for user-controlled security control.
+
+    - Optimized handling of processing would be nice for the
+      possibility of an Apache module devoted to empy processing.
+
+    - An empy emacs mode.
+
+    - An "unbuffered" option which would lose contextual information
+      like line numbers, but could potentially be more efficient at
+      processing large files.
+
+    - An optimization of offloading diversions to files when they
+      become truly huge.
+
+    - Unicode support, particularly for filters.  (This may be
+      problematic given Python 1.5.2 support.)
+
+    - Support for mapping filters (specified by dictionaries).
+
+    - Support for some sort of batch processing, where several empy
+      files can be listed at once and all of them evaluated with the
+      same initial (presumably expensive) environment.
+
+    - A more elaborate interactive mode, perhaps with a prompt and
+      readline support.
+
+    - A toplevel 'run' function, which 'invoke' delegates to, that
+      accepts arguments similar to the command line as keyword
+      arguments.  Perhaps also a simplified wrapper just for doing
+      basic processing, *e.g.*, 'interpreter.simple'?
+
+    - A supplemental tool to collect significator information from a
+      hierarchy of .em files and put them in a database form available
+      for individual scripts would be extremely useful.
+
+    - A StructuredText and/or reStructuredText filter would be quite
+      useful.
+
+    - A caching system that stores off the compilations of repeated
+      evaluations and executions so that in a persistent environment
+      the same code does not have to be repeatedly evaluated/executed.
+      This would probably be a necessity in an Apache module-based
+      solution.
+
+    - An option to change the format of the standard empy messages in
+      a traceback.
+
+
+Author's notes
+
+    I originally conceived empy as a replacement for my "Web
+    templating system", http://www.alcyone.com/max/info/m4.html which
+    uses "m4", http://www.seindal.dk/rene/gnu/ (a general
+    macroprocessing system for UNIX).
+
+    Most of my Web sites include a variety of m4 files, some of which
+    are dynamically generated from databases, which are then scanned
+    by a cataloging tool to organize them hierarchically (so that,
+    say, a particular m4 file can understand where it is in the
+    hierarchy, or what the titles of files related to it are without
+    duplicating information); the results of the catalog are then
+    written in database form as an m4 file (which every other m4 file
+    implicitly includes), and then GNU make converts each m4 to an
+    HTML file by processing it.
+
+    As the Web sites got more complicated, the use of m4 (which I had
+    originally enjoyed for the challenge and abstractness) really
+    started to be come an impediment to serious work; while I am very
+    knowledgeable about m4 -- having used it for for so many years --
+    getting even simple things done with it is awkward and difficult.
+    Worse yet, as I started to use Python more and more over the
+    years, the cataloging programs which scanned the m4 and built m4
+    databases were migrated to Python and made almost trivial, but
+    writing out huge awkward tables of m4 definitions simply to make
+    them accessible in other m4 scripts started to become almost
+    farcical -- especially when coupled with the difficulty in getting
+    simple things done in m4.
+
+    It occurred to me what I really wanted was an all-Python solution.
+    But replacing what used to be the m4 files with standalone Python
+    programs would result in somewhat awkward programs normally
+    consisting mostly of unprocessed text punctuated by small portions
+    where variables and small amounts of code need to be substituted.
+    Thus the idea was a sort of inverse of a Python interpreter: a
+    program that normally would just pass text through unmolested, but
+    when it found a special signifier would execute Python code in a
+    persistent environment.  After considering between choices of
+    signifiers, I settled on '@' and empy was born.
+
+    As I developed the tool, I realized it could have general appeal,
+    even to those with widely varying problems to solve, provided the
+    core tool they needed was an interpreter that could embed Python
+    code inside templated text.  As I continue to use the tool, I have
+    been adding features, usually as unintrusively as possible, as I
+    see areas that can be improved.
+
+    A design goal of empy is that its feature set should work on
+    several levels; at each level, if the user does not wish or need
+    to use features from another level, they are under no obligation
+    to do so.  If you have no need of substitutions, for instance, you
+    are under no obligation to use them.  If significators will not
+    help you organize a set of empy scripts globally, then you need
+    not use them.  New features that are being added are whenever
+    possible transparently backward compatible; if you do not need
+    them, their introduction should not affect you in any way.
+
+
+Release history
+
+    - 2.2; 2002 Nov 21.  Switched to -V option for version
+      information; 'empy.createDiversion' for creating initially empty
+      diversion; direct access to diversion objects with
+      'empy.retrieveDiversion'; environment variable support; removed
+      --raw (used --raw-errors instead) long argument; added
+      quaternary escape code (well, why not).
+
+    - 2.1; 2002 Oct 18.  'empy.atExit' registry separate from hooks to
+      allow for normal interpreter support; include a benchmark sample
+      and test.sh verification script; expose 'empy.string' directly;
+      -D option for explicit defines on command line; remove
+      ill-conceived support for '@else:' separator in '@[if ...]'
+      substitution; handle nested substitutions properly; '@[macro
+      ...]' substitution for creating recallable expansions.
+
+    - 2.0.1; 2002 Oct 8.  Fix missing usage information; fix
+      after_evaluate hook not getting called; add 'empy.atExit' call
+      to register values.
+
+    - 2.0; 2002 Sep 30.  Parsing system completely revamped and
+      simplified, eliminating a whole class of context-related bugs;
+      builtin support for buffered filters; support for registering
+      hooks; support for command line arguments; interactive mode with
+      -i; significator value extended to be any valid Python
+      expression.
+
+    - 1.5.1; 2002 Sep 24.  Allow '@]' to represent unbalanced close
+      brackets in '@[...]' markups.
+
+    - 1.5; 2002 Sep 18.  Escape codes ('@\...'); conditional and
+      repeated expansion substitutions via '@[if E:...]', '@[for X in
+      E:...]', and '@[while E:...]' notations; fix a few bugs
+      involving files which do not end in newlines.
+
+    - 1.4; 2002 Sep 7.  Fix bug with triple quotes; collapse
+      conditional and protected expression syntaxes into the single
+      generalized '@(...)' notation; 'empy.setName' and 'empy.setLine'
+      functions; true support for multiple concurrent interpreters
+      with improved sys.stdout proxy; proper support for 'empy.expand'
+      to return a string evaluated in a subinterpreter as intended;
+      merged Context and Parser classes together, and separated out
+      Scanner functionality.
+
+    - 1.3; 2002 Aug 24.  Pseudomodule as true instance; move toward
+      more verbose (and clear) pseudomodule functions; fleshed out
+      diversion model; filters; conditional expressions; protected
+      expressions; preprocessing with -P (in preparation for
+      possible support for command line arguments).
+
+    - 1.2; 2002 Aug 16.  Treat bangpaths as comments; 'empy.quote' for
+      the opposite process of 'empy.expand'; significators ('@%...'
+      sequences); -I option; -f option; much improved documentation.
+
+    - 1.1.5; 2002 Aug 15.  Add a separate 'invoke' function that can be
+      called multiple times with arguments to simulate multiple runs.
+
+    - 1.1.4; 2002 Aug 12.  Handle strings thrown as exceptions
+      properly; use getopt to process command line arguments; cleanup
+      file buffering with AbstractFile; very slight documentation and
+      code cleanup.
+
+    - 1.1.3; 2002 Aug 9.  Support for changing the prefix from within
+      the 'empy' pseudomodule.
+
+    - 1.1.2; 2002 Aug 5.  Renamed buffering option to -B, added -F
+      option for interpreting Python files from the command line,
+      fixed improper handling of exceptions from command line options
+      (-E, -F).
+
+    - 1.1.1; 2002 Aug 4.  Typo bugfixes; documentation clarification.
+
+    - 1.1; 2002 Aug 4.  Added options for fully buffering output
+      (including file opens), executing commands through the command
+      line; some documentation errors fixed.
+
+    - 1.0; 2002 Jul 23.  Renamed project to empy.  Documentation and
+      sample tweaks; added 'empy.flatten'.  Added -a option.
+
+    - 0.3; 2002 Apr 14.  Extended "simple expression" syntax,
+      interpreter abstraction, proper context handling, better error
+      handling, explicit file inclusion, extended samples.
+
+    - 0.2; 2002 Apr 13.  Bugfixes, support non-expansion of Nones,
+      allow choice of alternate prefix.
+
+    - 0.1.1; 2002 Apr 12.  Bugfixes, support for Python 1.5.x, add -r
+      option.
+
+    - 0.1; 2002 Apr 12.  Initial early access release.
+
+
+Author
+
+    This module was written by "Erik Max Francis",
+    http://www.alcyone.com/max/.  If you use this software, have
+    suggestions for future releases, or bug reports, "I'd love to hear
+    about it", mailto:pyos@alcyone.com.
+
+    Even if you try out empy for a project and find it unsuitable, I'd
+    like to know what stumbling blocks you ran into so they can
+    potentially be addressed in a future version.
+
+
+Version
+
+    Version 2.2 $Date$ $Author$
