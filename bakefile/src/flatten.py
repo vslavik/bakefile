@@ -49,6 +49,8 @@ def makeConfigs():
     return cfgs
     
 
+configDefs = {}
+
 def __cfg2str(c):
     list = [mk.options[x].values_desc[c[x]] for x in c]
     if len(list) == 0:
@@ -124,6 +126,50 @@ def flattenConfig(cfg):
     return (myvars, mytgt)
 
 
+def findDistinctConfigs(t):
+    """Fills t.distinctConfigs which is subset of t.configs where any two
+       configs are different. E.g. if there are two configs "Debug ANSI"
+       and "Debug Unicode" that have identical variables, they are merged
+       into single distinct config "Debug"."""
+    configs = t.vars['configs']
+    options = configDefs[configs.keys()[0]].keys()
+
+    # try to remove every option and see if it has any effect:
+    notNeeded = []
+    for o in options:
+        if t.cond != None and o in [e.option.name for e in t.cond.exprs]:
+            # don't remove option that is part of target's condition - it is
+            # present with only one value anyway and we want it to show in
+            # config name
+            continue
+        
+        newConfigs = {}
+        ok = 1
+        for c in configs:
+            cdef = copy.copy(configDefs[c])
+            del cdef[o]
+            name = __cfg2str(cdef)
+            if name in newConfigs:
+                if newConfigs[name] != configs[c]:
+                    ok = 0
+                    break
+            else:
+                newConfigs[name] = configs[c]
+        if ok:
+            notNeeded.append(o)
+    
+    dc = {}
+    if len(notNeeded) > 0:
+        for c in configs:
+            cdef = copy.copy(configDefs[c])
+            for o in notNeeded:
+                del cdef[o]
+            dc[__cfg2str(cdef)] = c
+    else:
+        for c in configs: dc[c] = c
+    t.vars['distinctConfigs'] = dc
+    
+
 def flatten():        
     cfgs = [x.values for x in makeConfigs()]
     if len(cfgs) == 0:
@@ -147,5 +193,11 @@ def flatten():
     # expand or configurations:
     configs = {}
     for c in cfgs:
-        configs[__cfg2str(c)] = flattenConfig(c)
-    mk.vars['configs'] = configs
+        name = __cfg2str(c)
+        configDefs[name] = c
+        configs[name] = flattenConfig(c)
+    mk.vars['configs'] = configs    
+
+    # reduce number of configurations on targets:
+    for t in mk.targets.values():
+        findDistinctConfigs(t)
