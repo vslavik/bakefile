@@ -6,6 +6,8 @@ Version 0.1.4
 - added <exename> tag
 - changes to bakefile flags in Bakefiles.bkgen are now considered when
   determining whether a makefile is out of date
+- borland: fixed subdirs handling for directories that begin with ..
+  (idea by Hans Van Leemputten)
 
 
 Version 0.1.3
