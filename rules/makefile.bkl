@@ -15,7 +15,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     how to pass options to subproject's make - may be overriden by
     makefile_defs_*.bkl: -->
     <set var="__MAKEARGS" eval="0">
-        $(' '.join(['%s=$(DOLLAR)(%s)' % (x,x) for x in OPTIONS.split()]))
+        $(' '.join(['%s="$(DOLLAR)(%s)"' % (x,x) for x in OPTIONS.split()]))
     </set>
     <set var="MAKEARGS" make_var="1">$(__MAKEARGS)</set>
     
