@@ -221,7 +221,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
         <define-tag name="precomp-headers-file">
             <cppflags>
-                $(__FLAG_PCH_FILE % (mkPathPrefix(BUILDDIR)+value))
+                $(formatIfNotEmpty(__FLAG_PCH_FILE, mkPathPrefix(BUILDDIR)+value))
             </cppflags>
         </define-tag>
         
