@@ -41,9 +41,9 @@ Source: presets\*; DestDir: {app}\presets; Flags: recursesubdirs; Components: ba
 Source: output\*; DestDir: {app}\output; Flags: recursesubdirs; Components: base
 Source: tests\*; DestDir: {app}\tests; Flags: recursesubdirs; Components: tests
 Source: doc\*; DestDir: {app}\doc; Flags: recursesubdirs; Components: doc
-Source: ..\minipython\*; DestDir: {app}\src; Flags: recursesubdirs; Components: python
+Source: ..\minipython\*; DestDir: {app}\src; Flags: recursesubdirs; Components: python; Excludes: *.pyc
 Source: README; DestDir: {app}; Components: base
-Source: NEWS; DestDir: {app}; Components: base
+Source: NEWS; DestDir: {app}; Components: base; AfterInstall: InstallSetupPath
 Source: THANKS; DestDir: {app}; Components: base
 Source: COPYING; DestDir: {app}; Components: base
 Source: AUTHORS; DestDir: {app}; Components: base
@@ -401,11 +401,8 @@ begin
   ModifyPath(p, pmAddToEnd, scope);
 end;
 
-function NextButtonClick(CurPage: Integer): Boolean;
+procedure InstallSetupPath;
 begin
-  if CurPage = wpReady then begin
     if ShouldProcessEntry('', 'addpath') = srYes then
 		SetupPATH;
-  end;
-  Result := True;
 end;
