@@ -440,7 +440,9 @@ def handleTarget(e):
         condstr = e.props['cond']
         typ = mk.evalCondition(condstr)
         # Condition never met, ignore the target:
-        if typ == '0': return
+        if typ == '0':
+            utils.deadTargets.append(e.props['id'])
+            return
         # Condition always met:
         elif typ == '1':
             isCond = 0
