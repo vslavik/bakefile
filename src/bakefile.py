@@ -24,7 +24,11 @@
 BAKEFILE_VERSION = "0.1.4"
 
 import sys, os.path
-from optik import OptionParser
+try:
+    from optparse import OptionParser
+except ImportError:
+    from optik import OptionParser
+
 import formats
 
 class BakefileOptionParser(OptionParser):
