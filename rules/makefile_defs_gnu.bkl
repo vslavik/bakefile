@@ -29,6 +29,7 @@
     </if>
     
     <set var="AROPTIONS">rcu</set>
+    <set var="DLLPREFIX_MODULE"></set>
     
     <set var="__DEFINE_ARG">-D</set>
     <set var="__INCLUDE_ARG">-I</set>

@@ -5,6 +5,7 @@ Version 0.1.8
 - gnu: implemented dependencies tracking
 - msvc*: use /EHsc instead of /GX, which is deprecated in VC8 (Vadim Zeitlin)
 - added scripts for making Debian package (Vadim Zeitlin)
+- gnu: fixed <module> targets to not have "lib" prefix in name
 
 
 Version 0.1.7
