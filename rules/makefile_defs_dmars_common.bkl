@@ -133,16 +133,23 @@
                     $(BUILDDIR)$(DIRSEP)$(__pch_obj)
                 </set>
                 
-                <cppflags> 
+                <!-- FIXME: this is a hack in absense of PCH exclusion:
+                     it should be cppflags and there should be a way to
+                     exclude certain files from using PCH -->
+                <cxxflags> 
                     $(substituteFromDict(value,
                             {'on':'-H -HO- -HH$(__pch_sym_file)',
                              'off':''}))
-                </cppflags>
+                </cxxflags>
 
+                <!-- FIXME: the part that includes -cpp below is only correct
+                     when the PCH file will be used _only_ by C++; real solution
+                     would be (for all formats) to have different PCH files
+                     for different languages, one per language -->
                 <set var="__pch_cmd" eval="0">
                     $(ifthenelse(__uses_cxx,CXX,CC)+' '+ifthenelse(__uses_cxx,
                                  '$(%s_CXXFLAGS)' % id.upper(),
-                                 '$(%s_CFLAGS)' % id.upper())) -HF$(__pch_sym_file) -o$(BUILDDIR)$(DIRSEP)$(__pch_obj) $(__pch_header)
+                                 '$(%s_CFLAGS)' % id.upper())) -mn $(ifthenelse(__uses_cxx,'-cpp',''))  -HF$(__pch_sym_file) -o$(BUILDDIR)$(DIRSEP)$(__pch_obj) $(__pch_header)
                 </set>
 
                 <if cond="__pch_sym_tgt not in targets">
