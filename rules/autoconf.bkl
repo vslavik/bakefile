@@ -26,6 +26,7 @@
     <option name="USE_MACVERSION"><values>0,1</values></option>
     <option name="SONAME_FLAG"/>
     <option name="STRIP"/>
+    <option name="NM"/>
     <option name="INSTALL"/>
     <option name="INSTALL_PROGRAM"/>
     <option name="INSTALL_DATA"/>
@@ -114,6 +115,8 @@
     <include file="unixlike.bkl"/>
     <!-- autoconf can be used to compile win32 apps, too: -->
     <include file="makefile_mingw.bkl"/>    
+    <!-- and OS/2 as well: -->
+    <include file="makefile_os2.bkl"/>    
     
     <!-- =============================================================== -->
     <!--                   Compiler-specific tags:                       -->
