@@ -520,6 +520,16 @@ def handleTarget(e):
     errors.popCtx()
 
 
+def __addTagToRule(r, e):
+    name = e.props['name']
+    if name in r.tags:
+        r.tags[name] += e.children
+    else:
+        r.tags[name] = copy.copy(e.children)
+    r.cacheTagsDict = None
+
+__tagsWaitingForRules = {}
+
 def handleDefineRule(e):
     rule = Rule(evalConstExpr(e, e.props['name']))
     rules[rule.name] = rule
@@ -536,6 +546,11 @@ def handleDefineRule(e):
             if baserule not in rules:
                 raise ReaderError(e, "unknown rule '%s'" % baserule)
             rule.baserules.append(rules[baserule])
+
+    if rule.name in __tagsWaitingForRules:
+        for t in __tagsWaitingForRules[rule.name]:
+            __addTagToRule(rule, t)
+        del __tagsWaitingForRules[rule.name]
 
     for node in e.children:
         if node.name == 'define-tag':
@@ -561,14 +576,24 @@ def handleDefineTag(e, rule=None):
     
     for rn in rs:
         if not rn in rules:
-            raise ReaderError(e, "unknown rule '%s'" % rn)
-        r = rules[rn]
-        if name in r.tags:
-            r.tags[name] += e.children
+            # delayed tags addition, rule not defined yet
+            if rn in __tagsWaitingForRules:
+                __tagsWaitingForRules[rn].append(e)
+            else:
+                __tagsWaitingForRules[rn] = [e]
         else:
-            r.tags[name] = copy.copy(e.children)
-        r.cacheTagsDict = None
-
+            __addTagToRule(rules[rn], e)
+        
+def checkTagDefinitions():
+    if len(__tagsWaitingForRules) > 0:
+        errors = []
+        for r in __tagsWaitingForRules:
+            errors.append("  target '%s':" % r)
+            for t in __tagsWaitingForRules[r]:
+                errors.append('    at %s' % t.location())
+        errors = '\n'.join(errors)
+        raise ReaderError(None,
+                          "tag definitions for nonexistent rules:\n%s" % errors)
 
 def handleTagInfo(e):
     name = e.props['name']
@@ -788,6 +813,7 @@ def read(filename):
         loadModule('common')
         loadModule(config.format)
         processFile(filename)
+        checkTagDefinitions()
         finalize.finalize()
         return 1
     except errors.ErrorBase, e:
