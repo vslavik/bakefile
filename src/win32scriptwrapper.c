@@ -36,6 +36,7 @@ int main(int argc, char** argv)
     }
 
     Py_Initialize();
+    argv[0] = (char*)filename;
     PySys_SetArgv(argc, argv);
     ret = PyRun_SimpleFile(fp, filename);
     Py_Finalize();
