@@ -321,11 +321,22 @@ def sources2objects(sources, target, ext, objSuffix=''):
     return retval
 
 
+class __CounterHelper: pass
+def __containsLiteral(expr):
+    counter = __CounterHelper()
+    counter.c = 0
+    def textCb(counter, txt):
+        if len(txt) > 0: counter.c = 1
+        return ''
+    mk.__doEvalExpr(expr, lambda a,b,c,d,e: '', textCb, counter)
+    return counter.c > 0
+
 def formatIfNotEmpty(fmt, value):
     """Return fmt % value (prefix: e.g. "%s"), unless value is empty string.
        Can handle following forms of 'value':
            - empty string
            - anything beginning with literal
+           - anything with a literal in it
            - $(cv) where cv is conditional variable
     """
 
@@ -336,6 +347,8 @@ def formatIfNotEmpty(fmt, value):
     if value[0] != '$':
         return fmt % value
     if value[-1] != ')' and not value[-1].isspace():
+        return fmt % value
+    if __containsLiteral(value):
         return fmt % value
     
     if value.startswith('$(') and value[-1] == ')':
