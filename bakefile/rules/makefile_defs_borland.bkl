@@ -183,7 +183,7 @@
         <set var="__win32res"/>
         <set var="__LINK_EXE_CMD" eval="0">
             $(__linker) $(__ldflags) @&amp;&amp;|
-            $(__startup) $(__objects_var),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
+            $(__startup) $(__objects_var),$@,,$(__ldlibs) import32.lib $(__rtl),,$(__win32res)
             |
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
