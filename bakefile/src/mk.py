@@ -141,7 +141,7 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
     else:                store = vars
 
     if makevar and vars['FORMAT_HAS_VARIABLES'] != '1':
-        return
+        makevar = 0
     
     if (name in override_vars) and (store == vars):
         return # values of user-overriden variables can't be changed
