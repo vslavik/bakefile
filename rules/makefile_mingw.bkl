@@ -1,11 +1,6 @@
 <?xml version="1.0" ?>
 <!-- $Id$ -->
 
-<!-- 
-This file is common to all formats that share Unix way of writing 
-makefiles (most notably GNU Make and Autoconf formats).
--->
-
 <makefile>
     
     <!-- =============================================================== -->
@@ -17,7 +12,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     compiler to produce .o file from .rc, so we treat the resource as another
     source file. -->
 
-    <define-tag name="rc-file" rules="exe,dll">
+    <define-tag name="win32-res" rules="exe,dll">
         <set var="__win32rc">
             <if cond="PLATFORM_WIN32=='1'">
                 $(sources2objects(value, id, OBJEXT, '_rc'))
@@ -39,7 +34,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         <template>
             $(CXX) -c -o $@ $(__cppflags) $(__cxxflags) $&lt;
             <set var="__command" eval="0">
-                $(WINDRES) -i$&lt; -o$@ $(__win32rc_flags)
+                $(RESCOMP) -i$&lt; -o$@ $(__win32rc_flags)
             </set>
         </template>
         <define-tag name="parent-target">

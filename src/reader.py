@@ -165,7 +165,9 @@ def extractTemplates(e, post):
 
     if propname in e.props:
         derives = e.props[propname].split(',')
-        for d in derives:
+        for d2 in derives:
+            d = evalConstExpr(e, d2)
+            if d == '': continue
             try:
                 ch2 = mk.templates[d]
                 ch = ch + ch2
@@ -330,6 +332,7 @@ def handleDefineRule(e):
         baserules = [evalConstExpr(e,x) for x in e.props['extends'].split(',')]
         rule.baserules = []
         for baserule in baserules:
+            if baserule == '': continue
             if baserule not in rules:
                 raise ReaderError(e, "unknown rule '%s'" % baserule)
             rule.baserules.append(rules[baserule])

@@ -467,11 +467,24 @@
               </row>
               
               
-              <row id="tag.rc-file" xreflabel="rc-file">
-                <entry role="tagname">rc-file</entry>
+              <row id="tag.win32-res" xreflabel="win32-res">
+                <entry role="tagname">win32-res</entry>
                 <entry>
                   Sets win32 resource (.rc) file for executable or DLL.
                   The tag does nothing on platforms other than Windows.
+                  Compilation of the resource respects 
+                  <xref linkend="tag.define"/> and 
+                  <xref linkend="tag.include"/> tags on the target.
+                </entry>
+                <entry role="availability">exe,dll</entry>
+              </row>
+              
+              
+              <row id="tag.mac-res" xreflabel="mac-res">
+                <entry role="tagname">mac-res</entry>
+                <entry>
+                  Sets Mac resource (.r) file for executable or DLL.
+                  The tag does nothing on platforms other than Mac.
                   Compilation of the resource respects 
                   <xref linkend="tag.define"/> and 
                   <xref linkend="tag.include"/> tags on the target.
