@@ -41,7 +41,7 @@ def evalWeakCondition(e):
 
 def handleSet(e, target=None, add_dict=None):
     errors.pushCtx(e)
-    name = e.props['var']
+    name = evalConstExpr(e, e.props['var'], target)
     if (name in mk.override_vars) and target == None:
         errors.popCtx()
         return # can't change value of variable overriden with -D=xxx
@@ -51,6 +51,10 @@ def handleSet(e, target=None, add_dict=None):
     isCond = (len(e.children) > 0)
     isMakeVar = 'make_var' in e.props and e.props['make_var'] == '1'
     value = e.value
+    if 'hints' in e.props:
+        hints = e.props['hints']
+    else:
+        hints = ''
 
     # Handle conditions:
     if isCond:
@@ -100,7 +104,7 @@ def handleSet(e, target=None, add_dict=None):
                                     name)
                 mk.setVar(e.props['var'], '$(%s)' % name,
                              eval=0, target=target,
-                             add_dict=add_dict)
+                             add_dict=add_dict, hints=hints)
             if cond == None:
                 raise ReaderError(e, "malformed condition: '%s'" % condstr)
             if name in mk.cond_vars:
@@ -110,7 +114,7 @@ def handleSet(e, target=None, add_dict=None):
                 var = mk.cond_vars[name]
             else:
                 var = mk.CondVar(name, target)
-                mk.addCondVar(var)
+                mk.addCondVar(var, hints)
             if doEval:
                 value = mk.evalExpr(e_if.value,target=target,add_dict=add_dict)
             else:
@@ -151,7 +155,7 @@ def handleSet(e, target=None, add_dict=None):
     mk.setVar(name, value, eval=doEval, target=target,
               add_dict=add_dict, store_in=store_in,
               append=doAppend, overwrite=overwrite,
-              makevar=isMakeVar)
+              makevar=isMakeVar, hints=hints)
     errors.popCtx()
 
 

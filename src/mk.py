@@ -16,6 +16,7 @@ targets = {}
 templates = {}
 conditions = {}
 fragments = []
+vars_hints = {}
 
 vars['targets'] = {}
 
@@ -121,6 +122,10 @@ class Fragment:
 # purpose is to make Python code evaluation easier:
 __vars_opt = {}
 
+def getHints(var):
+    if var not in vars_hints: return ''
+    else: return ','.join(vars_hints[var])
+
 def addOption(opt):
     options[opt.name] = opt
     __vars_opt[opt.name] = '$(%s)' % opt.name
@@ -128,9 +133,11 @@ def addOption(opt):
 def addCondition(cond):
     conditions[cond.name] = cond
 
-def addCondVar(cv):
+def addCondVar(cv, hints=''):
     cond_vars[cv.name] = cv
     __vars_opt[cv.name] = '$(%s)' % cv.name
+    if hints != '':
+        mk.vars_hints[cv.name] = hints.split(',')
 
 def addMakeVar(var, value):
     make_vars[var] = value
@@ -144,7 +151,11 @@ def addFragment(fragment):
     fragments.append(fragment)
 
 def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
-           append=0, overwrite=1, makevar=0):
+           append=0, overwrite=1, makevar=0, hints=''):
+
+    if hints != '':
+        mk.vars_hints[name] = hints.split(',')
+        
     if store_in != None: store = store_in
     elif target != None: store = target.vars
     else:                store = vars
