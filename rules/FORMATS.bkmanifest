@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+
+<bakefile-manifest>
+
+    <format id="autoconf">
+        <description>GNU autoconf Makefile.in files</description>
+        <default-filename>Makefile.in</default-filename>
+    </format>
+    
+    <format id="watcom">
+        <description>OpenWatcom makefiles</description>
+        <default-filename>makefile.wat</default-filename>
+    </format>
+    
+    <format id="borland">
+        <description>Borland C/C++ makefiles</description>
+        <default-filename>makefile.bcc</default-filename>
+    </format>
+    
+    <format id="mingw">
+        <description>MinGW makefiles</description>
+        <default-filename>makefile.gcc</default-filename>
+    </format>
+    
+    <format id="msvc">
+        <description>Visual C++ nmake makefiles</description>
+        <default-filename>makefile.vc</default-filename>
+    </format>
+    
+    <format id="msvc6prj">
+        <description>Visual C++ 6.0 project files</description>
+        <default-filename>
+            $(os.path.basename(os.path.splitext(INPUT_FILE)[0])).dsw
+        </default-filename>
+    </format>
+    
+</bakefile-manifest>
