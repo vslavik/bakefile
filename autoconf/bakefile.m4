@@ -576,26 +576,33 @@ dnl ---------------------------------------------------------------------------
 
 AC_DEFUN(AC_BAKEFILE_PRECOMP_HEADERS,
 [
+
+    AC_ARG_ENABLE([precomp-headers],
+                  [  --disable-precomp-headers  don't use precompiled headers even if compiler can],
+                  [bk_use_pch="$enableval"])
+
     GCC_PCH=0
-    if test "x$GCC" = "xyes"; then
-        dnl test if we have gcc-3.4:
-        AC_MSG_CHECKING([if the compiler supports precompiled headers])
-        AC_TRY_COMPILE([],
-            [
-                #if !defined(__GNUC__) || !defined(__GNUC_MINOR__) || \
-                    (__GNUC__ < 3) || (__GNUC__ == 3 && __GNUC_MINOR__ < 4)
-                        #error "no pch support"
-                #endif
-            ],
-            [
-                AC_MSG_RESULT([yes])
-                GCC_PCH=1
-            ],
-            [
-                AC_MSG_RESULT([no])
-            ])
-        if test $GCC_PCH = 1 ; then
-            cat <<EOF >bk-make-pch
+
+    if test "x$bk_use_pch" = "x" -o "x$bk_use_pch" = "xyes" ; then
+        if test "x$GCC" = "xyes"; then
+            dnl test if we have gcc-3.4:
+            AC_MSG_CHECKING([if the compiler supports precompiled headers])
+            AC_TRY_COMPILE([],
+                [
+                    #if !defined(__GNUC__) || !defined(__GNUC_MINOR__) || \
+                        (__GNUC__ < 3) || (__GNUC__ == 3 && __GNUC_MINOR__ < 4)
+                            #error "no pch support"
+                    #endif
+                ],
+                [
+                    AC_MSG_RESULT([yes])
+                    GCC_PCH=1
+                ],
+                [
+                    AC_MSG_RESULT([no])
+                ])
+            if test $GCC_PCH = 1 ; then
+                cat <<EOF >bk-make-pch
 #!/bin/sh
 
 # This script is part of Bakefile (http://bakefile.sourceforge.net) autoconf
@@ -638,7 +645,8 @@ else
     exit \${?}
 fi
 EOF
-            chmod +x bk-make-pch
+                chmod +x bk-make-pch
+            fi
         fi
     fi
 
