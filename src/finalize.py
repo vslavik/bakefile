@@ -29,8 +29,12 @@ def finalEvaluation(outputVarsOnly=1):
     list = []
 
     if outputVarsOnly:
-        interestingVars = mk.vars['FORMAT_OUTPUT_VARIABLES'].strip().split(',')
-        optimizeVars = len(interestingVars) > 0
+        interestingVars = mk.vars['FORMAT_OUTPUT_VARIABLES'].strip()
+        if interestingVars != '':
+            interestingVars = interestingVars.split(',')
+            optimizeVars = len(interestingVars) > 0
+        else:
+            optimizeVars = 0
     else:
         optimizeVars = 0
 
