@@ -17,16 +17,22 @@
     
     <set var="__LINKER_CC" eval="0">$(CC)</set>
     <set var="__LINKER_CXX" eval="0">$(CXX)</set>
-    <set var="__DLL_LINKER_CC" eval="0">xxx</set>
-    <set var="__DLL_LINKER_CXX" eval="0">xxx</set>
+    <set var="__DLL_LINKER_CC" eval="0">$(CC) -tWD</set>
+    <set var="__DLL_LINKER_CXX" eval="0">$(CXX) -tWD</set>
 
-    <template id="__commands_templ">
+    <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
             $(CC) -c -o$@ $(__cppflags) $(__cflags) $**
         </set>
+    </template>
+    
+    <template id="__commands_templ_CXX">
         <set var="__COMPILE_CXX_CMD" eval="0">
             $(CXX) -c -P -o$@ $(__cppflags) $(__cxxflags) $**
         </set>
+    </template>
+    
+    <template id="__commands_templ">
         <set var="__LINK_EXE_CMD" eval="0">
             $(__linker) -e$@ $(__objects) $(__ldflags)
         </set>        
@@ -35,7 +41,8 @@
             tlib /a $(__targetname) $(__objects)
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) $@ $(__objects) $(__ldflags)
+            $(__dll_linker) -e$@ $(__objects) $(__ldflags)
+            implib $(__libname) $@
         </set>
     </template>
     

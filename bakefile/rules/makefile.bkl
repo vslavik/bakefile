@@ -66,6 +66,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__command"/>
             <set var="__post_command"/>
             <set var="__targetname">$(id)</set>
+            <set var="__libname"/>
             <set var="__depname">
                 <if cond="target">
                     $(ref('__targetdir',id))$(ref('__targetname',id))
@@ -84,7 +85,10 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
         <define-tag name="clean-files">
             <modify-target target="clean">
-                <command>$(RM) $(value)</command>
+                <command cond="TOOLSET!='win32'">$(RM) $(value)</command>
+                <command cond="TOOLSET=='win32'">
+                    -if exist $(value) del $(value)
+                </command>
             </modify-target>
         </define-tag>
         
@@ -207,7 +211,10 @@ makefiles (most notably GNU Make and Autoconf formats).
             <dllname>$(id)</dllname>
             <dependency-of>all</dependency-of>
             <clean-files>
-                $(ref('__targetdir',id))$(ref('__targetname',id)) $(ref('__targetdir',id))$(ref('__linkname',id))
+                $(ref('__targetdir',id))$(ref('__targetname',id))
+            </clean-files>
+            <clean-files>
+                $(ref('__targetdir',id))$(ref('__linkname',id))
             </clean-files>
         </template>
         <define-tag name="version"/>
@@ -355,16 +362,6 @@ makefiles (most notably GNU Make and Autoconf formats).
     
     <action id="uninstall"/>
 
-    <set var="__ALWAYS_CLEAN">
-        $(BUILDDIR)$(DIRSEP)*$(OBJEXT)
-    </set>
-    <action id="clean">
-        <set var="__clean_cmd" eval="0">$(RM) $(__ALWAYS_CLEAN)</set>
-        <command>$(__clean_cmd)</command>
-    </action>
-    
-    
-    
     <include file="makefile_$(MAKEFILE_SYNTAX).bkl" ignore_missing="1"/>
 
 </makefile>
