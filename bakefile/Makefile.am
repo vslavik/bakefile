@@ -68,6 +68,7 @@ codeoptik_PYTHON = \
 
 
 EXTRA_DIST = \
+    README THANKS \
     autogen.sh chversion.sh \
     tests doc/images doc bakefile.spec bakefile.iss \
     src/optik/README.txt autoconf output rules \
