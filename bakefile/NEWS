@@ -11,6 +11,7 @@ Version 0.1.4
 - autoconf: OS/2 fixes (Stefan Neis)
 - added <pic> for enabling position-independent code for static libraries
 - autoconf: added bakefilize tool to make packaging easier
+- added <error> command for sanity checking in .bkl files
 
 
 Version 0.1.3

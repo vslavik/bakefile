@@ -603,11 +603,41 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
           </informaltable>
           Example:
           <programlisting><![CDATA[
-<!-- refuse to run with Bakefile < 0.5.0, it's missing feature foo: -->
+<!-- refuse to run with Bakefile < 0.5.0,
+     it's missing feature foo: -->
 <requires version="0.5.0"/>
 ]]></programlisting>
         </para>
       </section>
+
+
+
+      
+      <!-- //////////////////        error          ////////////////// -->
+
+      
+      
+      
+      <section id="cmd.error" xreflabel="error">
+          <title>error</title>
+          <para>
+              Reports error to output and exits. This command is useful for
+              adding sanity checks to bakefiles (both user bakefiles and
+              format definitions).
+              <programlisting><![CDATA[
+<!-- This code prevents creation of rules
+     for console mode apps: -->
+<define-tag name="app-type" rules="exe">
+  <if cond="value == 'console'">
+    <error>
+      Windows CE doesn't support console applications.
+      </error>
+  </if>
+</define-tag>]]>
+</programlisting>
+          </para>
+      </section>
+
 
       
   

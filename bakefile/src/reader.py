@@ -338,7 +338,7 @@ def handleModifyTarget(e, dict=None):
     _processTargetNodes(e, target, tags, dict)
 
 
-COMMANDS = ['set', 'modify-target', 'add-target']
+COMMANDS = ['set', 'modify-target', 'add-target', 'error']
 
 class TgtCmdNode:
     # node types:
@@ -495,6 +495,8 @@ def _processTargetNodes(node, target, tags, dict):
                 else:
                     e2.props['cond'] = condstr
             handleTarget(e2)
+        elif e.name == 'error':
+            handleError(e)
         else:
             return 0
         return 1
@@ -807,6 +809,17 @@ def handleFragment(e):
             content = e.value
         mk.addFragment(mk.Fragment(content))
 
+
+def handleError(e):
+    sys.stderr.write("""
+-----------------------------------------------------------------------
+%s
+-----------------------------------------------------------------------
+
+""" % e.value)
+    raise ReaderError(e, "an error occured during processing")
+
+
 def handleRequires(e):
     if 'version' in e.props:
         vcur = mk.vars['BAKEFILE_VERSION'].split('.')
@@ -836,6 +849,7 @@ HANDLERS = {
     'output':        handleOutput,
     'fragment':      handleFragment,
     'modify-target': handleModifyTarget,
+    'error':         handleError,
     'requires':      handleRequires,
     }
 
