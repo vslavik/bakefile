@@ -19,6 +19,26 @@ files_all = files
 
 disabled_formats = []
 
+_bakefileExecutable = None
+def _getBakefileExecutable():
+    """Returns command that should be used to run Bakefile. Makes sure same
+       Python version as for bakefile_gen is used (if you run it e.g.
+       "python2.3 bakefile_gen.py")."""
+    global _bakefileExecutable
+    if _bakefileExecutable == None:
+        if os.path.basename(sys.executable).lower() == 'bakefile_gen.exe':
+            # we're on Windows and using the wrapper binary, use bakefile.exe:
+            _bakefileExecutable = os.path.join(os.path.dirname(sys.executable),
+                                               'bakefile.exe')
+        else:
+            # find the location of bakefile.py:
+            bakefile_py = os.path.normpath(os.path.join(
+                            os.path.dirname(os.path.realpath(sys.argv[0])),
+                            'bakefile.py'))
+            _bakefileExecutable = '%s %s' % (sys.executable, bakefile_py)
+    return _bakefileExecutable
+
+
 def _matchesWildcard(filename, wildcard, absolutize=0):
     """Returns whether the file matches wildcard (glob)."""
     if absolutize:
@@ -214,8 +234,9 @@ def updateTargets():
         for f,fmt in needUpdate:
             print '[%i/%i] generating %s from %s' % (i, total, fmt, f)        
             i += 1
-            cmd = 'bakefile -f%s %s %s --output-deps=%s --output-changes=%s' % \
-                    (fmt, files[f].flags[fmt], f, tempDeps, tempChanges)
+            cmd = '%s -f%s %s %s --output-deps=%s --output-changes=%s' % \
+                    (_getBakefileExecutable(),
+                     fmt, files[f].flags[fmt], f, tempDeps, tempChanges)
             if verbose >= 2: cmd += ' -v'
             if verbose:
                 print cmd
