@@ -34,6 +34,14 @@ advantage of a particular feature.
     -->
     <set var="FORMAT_OUTPUT_VARIABLES"></set>
 
+    <!--
+    Whether the output format can handle conditions (i.e. variable values
+    depending on conditions and conditionally built targets) at all. Most
+    make-tools do, but e.g. MSVC project files can't do it. If set to 0, then
+    the targets and variables are "flattened" = 
+    -->
+    <set var="FORMAT_SUPPORTS_CONDITIONS">1</set>
+
 
     <!--
     Whether the output format needs to have options that are used by
