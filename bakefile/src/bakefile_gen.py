@@ -372,10 +372,10 @@ def cleanTargets():
 def run(args):
     parser = OptionParser()
     parser.add_option('-f', '--formats',
-                      action="store", dest='formats',
+                      action="append", dest='formats',
                       help='only generate makefiles in these formats (comma-separated list)')
     parser.add_option('-b', '--bakefiles',
-                      action="store", dest='bakefiles',
+                      action="append", dest='bakefiles',
                       help='only generate makefiles from bakefiles that are matched by these wildcards (comma-separated list)')
     parser.add_option('-d', '--desc',
                       action="store", dest='descfile',
@@ -405,11 +405,13 @@ def run(args):
         verbose = 1
 
     if options.formats != None:
+        options.formats = ','.join(options.formats)
         options.formats = options.formats.split(',')
     if options.bakefiles != None:
+        options.bakefiles = ','.join(options.bakefiles)
         options.bakefiles = options.bakefiles.replace('/',os.sep).split(',')
     options.jobs = int(options.jobs)
-    
+ 
     try:
         loadTargets(os.path.abspath(options.descfile))
         filterFiles(options.bakefiles, options.formats)
