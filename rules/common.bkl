@@ -98,6 +98,7 @@
     <!-- Exclusive tags: -->
     <tag-info name="libname" exclusive="1"/>
     <tag-info name="dllname" exclusive="1"/>
+    <tag-info name="exename" exclusive="1"/>
     <tag-info name="version" exclusive="1"/>
     <tag-info name="so_version" exclusive="1"/>
     <tag-info name="mac_version" exclusive="1"/>

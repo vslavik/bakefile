@@ -340,8 +340,8 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <define-rule name="exe" extends="__compiled,$(__exe_baser)">
         <template template="$(__exe_baset)">
-            <set var="__targetname" eval="0">$(id)$(EXEEXT)</set>
             <set var="__name">$(id)</set>
+            <set var="__targetname" eval="0">$(__name)$(EXEEXT)</set>
             <set var="__command" eval="0">
                 $(__LINK_EXE_CMD)
                 $(__post_command)
@@ -355,6 +355,10 @@ makefiles (most notably GNU Make and Autoconf formats).
                       {'console':__FLAG_EXE_CONSOLE,
                        'gui':__FLAG_EXE_GUI}))
             </ldflags>
+        </define-tag>
+        
+        <define-tag name="exename">
+            <set var="__name">$(value)</set>
         </define-tag>
 
     </define-rule>
