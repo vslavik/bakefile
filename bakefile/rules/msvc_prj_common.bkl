@@ -11,13 +11,7 @@
     <set var="COMPILER">vc</set>
 
     <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
-    
-
-    <set var="_MSVC_TYPECODE_CONSOLE">0x0103</set>
-    <set var="_MSVC_TYPECODE_GUI">0x0101</set>
-    <set var="_MSVC_TYPECODE_DLL">0x0102</set>
-    <set var="_MSVC_TYPECODE_LIB">0x0104</set>
-    
+     
     <tag-info name="dirname"
               position="before:libname,before:dllname,before:exename"/>
     <tag-info name="debug-info"
@@ -260,8 +254,8 @@
         <define-tag name="app-type">
             <set var="_type">
                 $(substituteFromDict(value,
-                {'console':'"Win32 (x86) Console Application"',
-                 'gui':    '"Win32 (x86) Application"'}))
+                {'console':'"Win32 (%s) Console Application"' % _MSVC_CPU_NAME,
+                 'gui'    :'"Win32 (%s) Application"' % _MSVC_CPU_NAME}))
             </set>
             <set var="_type_code">
                 $(substituteFromDict(value,

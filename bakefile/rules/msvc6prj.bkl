@@ -3,6 +3,13 @@
 
 <makefile>
 
+    <set var="_MSVC_TYPECODE_CONSOLE">0x0103</set>
+    <set var="_MSVC_TYPECODE_GUI">0x0101</set>
+    <set var="_MSVC_TYPECODE_DLL">0x0102</set>
+    <set var="_MSVC_TYPECODE_LIB">0x0104</set>
+
+    <set var="_MSVC_CPU_NAME">x86</set>
+
     <include file="msvc_prj_common.bkl"/>
 
     <output file="$(OUTPUT_FILE)" writer="msvc6prj.py"/>
