@@ -66,5 +66,7 @@
     <tag-info name="precomp-headers-header" exclusive="1"/>
     <tag-info name="precomp-headers-gen" exclusive="1"/>
 
+    <tag-info name="win32-res" exclusive="1"/>
+
 </makefile>
 
