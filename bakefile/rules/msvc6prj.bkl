@@ -23,19 +23,33 @@
 
     <define-rule name="exe" extends="__compiled">
         <template>
-            <set var="__type">exe</set>
+            <app-type>console</app-type>
         </template>
+        <define-tag name="app-type">
+            <set var="__type">
+                $(substituteFromDict(value,
+                {'console':'"Win32 (x86) Console Application"',
+                 'gui':    '"Win32 (x86) Application"'}))
+             </set>
+             <set var="__type_code">
+                $(substituteFromDict(value,
+                {'console':'0x0103',
+                 'gui':    '0x0101'}))
+             </set>
+         </define-tag>
     </define-rule>
     
     <define-rule name="dll" extends="__compiled">
         <template>
-            <set var="__type">dll</set>
+            <set var="__type">"Win32 (x86) Dynamic-Link Library"</set>
+            <set var="__type_code">0x0102</set>
         </template>
     </define-rule>
     
     <define-rule name="lib" extends="__compiled">
         <template>
-            <set var="__type">lib</set>
+            <set var="__type">"Win32 (x86) Static Library"</set>
+            <set var="__type_code">0x0104</set>
         </template>
     </define-rule>
     
