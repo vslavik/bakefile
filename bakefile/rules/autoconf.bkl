@@ -190,7 +190,7 @@
 
         <set var="__so_symlinks_cmd">
             <if cond="USE_SOSYMLINKS=='1'">
-                (cd $(__targetdir);
+                (cd $(pathPrefixToPath(__targetdir));
                 $(RM) $(__linkname1) $(__linkname2);
                 $(LN_S) $(__targetname) $(__linkname2);
                 $(LN_S) $(__linkname2) $(__linkname1))
