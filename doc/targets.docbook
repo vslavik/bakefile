@@ -6,7 +6,7 @@
     (which makes "make dist" command possible). Target syntax is similar to
     <link linkend="ch.commands">commands syntax</link>:
     <programlisting><![CDATA[
-<RULE id="NAME" [template="TEMPLATE,..."] [cond="CONDITION"]>
+<RULE id="NAME" [template="TEMPLATE,..."] [template_append="TEMPLATE2,..."] [cond="CONDITION"]>
   SPECIFICATION
 </RULE>
 ]]></programlisting>
@@ -28,7 +28,10 @@
   <para>
     <varname>template</varname> is optional comma-separated list of
     IDs of <link linkend="cmd.template">templates</link> that the target is
-    derived from.
+    derived from. <varname>template_append</varname> is optional
+    comma-separated list of templates that are <emphasis>appended</emphasis>
+    to target specification (<varname>template</varname> inserts the template
+    before the specification).
   </para>
   <para>
     If <varname>cond</varname> attribute was given then the target is only

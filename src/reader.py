@@ -158,10 +158,13 @@ def handleOption(e):
     mk.addOption(mk.Option(name, default, desc, values))
 
 
-def extractTemplates(e):
+def extractTemplates(e, post):
     ch = []
-    if 'template' in e.props:
-        derives = e.props['template'].split(',')
+    if post: propname = 'template_append'
+    else: propname = 'template'
+
+    if propname in e.props:
+        derives = e.props[propname].split(',')
         for d in derives:
             try:
                 ch2 = mk.templates[d]
@@ -170,11 +173,11 @@ def extractTemplates(e):
                 raise ReaderError(e, "unknown template '%s'" % d)
     return ch
 
-def applyTemplates(e, templ):
-    if len(templ) == 0:
+def applyTemplates(e, templPre, templPost):
+    if len(templPre) == 0 and len(templPost) == 0:
         return e
     e = copy.copy(e)
-    e.children = templ + e.children
+    e.children = templPre + e.children + templPost
     return e
 
 
@@ -182,7 +185,9 @@ def handleTemplate(e):
     id = e.props['id']
     if id in mk.templates:
         raise ReaderError(e, "template ID '%s' already used" % id)
-    mk.templates[id] = applyTemplates(e, extractTemplates(e)).children
+    mk.templates[id] = applyTemplates(e,
+                                      extractTemplates(e, post=0),
+                                      extractTemplates(e, post=1)).children
 
 
 
@@ -290,7 +295,8 @@ def handleTarget(e):
         
     rule = rules[e.name]
     tags = rule.getTagsDict()
-    e = applyTemplates(e, rule.getTemplates() + extractTemplates(e))
+    e = applyTemplates(e, rule.getTemplates() + extractTemplates(e, post=0),
+                          extractTemplates(e, post=1))
     id = e.props['id']
     if id in mk.targets:
         raise ReaderError(e, "duplicate target name '%s'" % id)
@@ -321,7 +327,8 @@ def handleDefineRule(e):
             handleDefineTag(node, rule=rule)
         elif node.name == 'template':
             rule.template += applyTemplates(node,
-                                            extractTemplates(node)).children
+                                      extractTemplates(node, post=0),
+                                      extractTemplates(node, post=1)).children
         else:
             raise ReaderError(node,
                        "unknown element '%s' in <define-rule>" % node.name)
