@@ -108,8 +108,13 @@ dist-hook:
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	ln -sf $(codedir)/bakefile.py $(DESTDIR)$(bindir)/bakefile
-	chmod +x $(DESTDIR)$(codedir)/bakefile.py
 	ln -sf $(codedir)/bakefile_gen.py $(DESTDIR)$(bindir)/bakefile_gen
+	mv $(DESTDIR)$(codedir)/bakefile.py $(DESTDIR)$(codedir)/bakefile.py.x
+	mv $(DESTDIR)$(codedir)/bakefile_gen.py $(DESTDIR)$(codedir)/bakefile_gen.py.x
+	sed -e "s,#!/usr/bin/env python,#!$(PYTHON),g" $(DESTDIR)$(codedir)/bakefile.py.x >$(DESTDIR)$(codedir)/bakefile.py
+	sed -e "s,#!/usr/bin/env python,#!$(PYTHON),g" $(DESTDIR)$(codedir)/bakefile_gen.py.x >$(DESTDIR)$(codedir)/bakefile_gen.py
+	rm -f $(DESTDIR)$(codedir)/*.py.x
+	chmod +x $(DESTDIR)$(codedir)/bakefile.py
 	chmod +x $(DESTDIR)$(codedir)/bakefile_gen.py
 
 ACLOCAL_AMFLAGS = -I admin
