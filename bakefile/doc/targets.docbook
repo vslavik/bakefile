@@ -7,7 +7,7 @@
     <link linkend="ch.commands">commands syntax</link>:
     <programlisting><![CDATA[
 <RULE id="NAME" [template="TEMPLATE,..."]
-[template_append="TEMPLATE2,..."] [cond="CONDITION"]>
+[template_append="TEMPLATE2,..."] [cond="CONDITION"] [category="CATEGORY"]>
   SPECIFICATION
 </RULE>
 ]]></programlisting>
@@ -78,6 +78,18 @@
 ]]></programlisting>
     Unless the documentation says otherwise, you can use the same tag
     repeatedly with same target.
+  </para>
+  <para>
+    Optional <varname>category</varname> attribute can be given to clasify
+    the target. Possible clasifications are <literal>all</literal> (reserved
+    for the <literal>all</literal> target of makefiles and cannot be used
+    in user bakefiles), <literal>normal</literal> for targets declared in
+    bakefiles and <literal>automatic</literal> for targets that are created
+    as a side-effect of Bakefile's processing (e.g. object file targets).
+    The targets are sorted in generated makefile according to the category:
+    <literal>all</literal> target is first, followed by
+    <literal>normal</literal> targets and <literal>automatic</literal> targets
+    are last.
   </para>
 
   <note id="pseudotargets">
