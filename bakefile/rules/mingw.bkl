@@ -57,7 +57,7 @@
     
     <if cond="OPTIONS_FILE!='' and WRITE_OPTIONS_FILE=='1'">
     <output file="$(os.path.join(os.path.dirname(OUTPUT_FILE), OPTIONS_FILE))"
-            writer="mingw-opts.empy"/>
+            writer="gnumake-opts.empy"/>
     </if>
 
 </makefile>
