@@ -131,6 +131,15 @@ def findSources(filenames):
                       'SOURCEFILES')
 
 
+def getObjectName(source, target, ext, objSuffix=''):
+    base, srcext = os.path.splitext(source)
+    base = os.path.basename(base)
+    objdir = mkPathPrefix(mk.vars['BUILDDIR'])
+    objname = '%s%s_%s%s%s' % (objdir, mk.targets[target].id, base,
+                               objSuffix, ext)
+    return objname
+
+    
 def sources2objects(sources, target, ext, objSuffix=''):
     """Adds rules to compile object files from source files listed in
        'sources', when compiling target 'target', with object files extension
@@ -176,11 +185,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
         if sources[-1].isspace(): suffix=' '
         retval = []
         for s in sources.split():
-            base, srcext = os.path.splitext(s)
-            base = os.path.basename(base)
-            objdir = mkPathPrefix(mk.vars['BUILDDIR'])
-            objname = '%s%s_%s%s%s' % (objdir, mk.targets[target].id, base,
-                                       objSuffix, ext)
+            objname = getObjectName(s, target, ext, objSuffix)
             if objname in files:
                 files[objname].append((s,cond))
             else:
