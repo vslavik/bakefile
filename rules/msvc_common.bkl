@@ -5,12 +5,6 @@
 
     <!-- some nontrivial settings shared by all msvc formats: -->
 
-    <define-tag name="debug-info" rules="exe,dll,lib">
-        <define>
-            $(substituteFromDict(value, {'on':'_DEBUG', 'off':'NDEBUG'}))
-        </define>
-    </define-tag>
-    
     <tag-info name="threading"
               position="before:runtime-libs"/>      
     
@@ -25,12 +19,20 @@
             $(substituteFromDict(value, {'multi':'T', 'single':'L'}))
         </set>
     </define-tag>
+
     <define-tag name="debug-info" rules="exe,dll,lib">
+        <debug-runtime-libs>$(value)</debug-runtime-libs>
+        <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
+        <cppflags>/Fd$(__pdbfile)</cppflags>
+    </define-tag>
+
+    <define-tag name="debug-runtime-libs" rules="exe,dll,lib">
+        <define>
+            $(substituteFromDict(value, {'on':'_DEBUG', 'off':'NDEBUG'}))
+        </define>
         <set var="__rtl_dbg">
             $(substituteFromDict(value, {'on':'d', 'off':''}))
         </set>
-        <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
-        <cppflags>/Fd$(__pdbfile)</cppflags>
     </define-tag>
     
     <define-tag name="app-type" rules="exe">
