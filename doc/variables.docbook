@@ -309,7 +309,18 @@
               <row id="var.INPUT_FILE" xreflabel="INPUT_FILE">
                 <entry role="varname">INPUT_FILE</entry>
                 <entry>
-                  Name of input file. Read only.
+                  Name of input file. The name is always absolute path.
+                  Read only.
+                </entry>
+              </row>
+              
+              <row id="var.INPUT_FILE_ARG" xreflabel="INPUT_FILE_ARG">
+                <entry role="varname">INPUT_FILE_ARG</entry>
+                <entry>
+                  Same as <link linkend="var.INPUT_FILE">INPUT_FILE</link>, but
+                  the name is in exactly same form as it was passed on command
+                  line, it's not made absolute as in case of
+                  <varname>INPUT_FILE</varname>.
                 </entry>
               </row>
               

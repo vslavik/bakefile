@@ -952,6 +952,7 @@ def setStdVars(filename):
     mk.setVar('DOLLAR', '&dollar;')
     
     mk.setVar('INPUT_FILE', os.path.abspath(filename))
+    mk.setVar('INPUT_FILE_ARG', filename)
     mk.setVar('OUTPUT_FILE', config.output_file)
     mk.setVar('FORMAT', config.format)    
 
