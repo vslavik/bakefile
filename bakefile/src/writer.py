@@ -245,7 +245,12 @@ def write():
         except errors.Error, e:
             sys.stderr.write(str(e))
             return 0
-    
+   
+    if config.changes_file != None:
+        changes_f = open(config.changes_file, 'wt')
+    else:
+        changes_f = None
+   
     for file in __output_files:
         try:
             f = open(file, 'rt')
@@ -257,6 +262,8 @@ def write():
             f = open(file, 'wt')
             f.writelines(__output_files[file])
             f.close()
+            if changes_f != None:
+                changes_f.write('%s\n' % os.path.abspath(file))
             print 'writing %s' % file
         else:
             print 'no changes in %s' % file
@@ -264,4 +271,7 @@ def write():
             dependencies.addOutput(mk.vars['INPUT_FILE'], config.format,
                                    os.path.abspath(file),
                                    __output_methods[file])
+    if changes_f != None:
+        changes_f.close()
+
     return 1
