@@ -1,0 +1,148 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <include file="win32.bkl"/>
+    
+    <set var="__DEFINE_ARG">/D</set>
+    <set var="__INCLUDE_ARG">/I</set>
+    <set var="__LIB_ARG">%s.lib</set>
+    <set var="__LIBDIR_ARG">/LIBPATH:</set>
+
+    <set var="__DEFAULT_CC">cl</set>
+    <set var="__DEFAULT_CXX">cl</set>
+    <set var="__DEFAULT_CFLAGS"></set>
+    <set var="__DEFAULT_CPPFLAGS">/DWIN32 /D_WINDOWS</set>
+    <set var="__DEFAULT_CXXFLAGS"></set>
+    <set var="__DEFAULT_LDFLAGS"></set>
+    
+    <set var="__LINKER_CC" eval="0">link</set>
+    <set var="__LINKER_CXX" eval="0">link</set>
+    <set var="__DLL_LINKER_CC" eval="0">link /DLL</set>
+    <set var="__DLL_LINKER_CXX" eval="0">link /DLL</set>
+
+    <!-- basic compiler/linker flags: -->
+    <set var="__FLAG_EXE_CONSOLE" eval="0">/SUBSYSTEM:CONSOLE</set>
+    <set var="__FLAG_EXE_GUI" eval="0">/SUBSYSTEM:WINDOWS</set>
+    <set var="__FLAG_DEBUG_ON">/Zi</set>
+    <set var="__FLAG_DEBUG_ON_LINKER">/DEBUG</set>
+    <set var="__FLAG_DEBUG_OFF"></set>
+    <set var="__FLAG_DEBUG_OFF_LINKER"></set>
+    <set var="__FLAG_OPTIMIZE_OFF">/Od</set>
+    <set var="__FLAG_OPTIMIZE_SIZE">/O1</set>
+    <set var="__FLAG_OPTIMIZE_SPEED">/O2</set>
+    <set var="__FLAG_ARCH_I386">/G3</set>
+    <set var="__FLAG_ARCH_I486">/G4</set>
+    <set var="__FLAG_ARCH_I586">/G5</set>
+    <set var="__FLAG_ARCH_I686">/G6</set>
+    <set var="__FLAG_USE_PCH"/> <!-- NB: DON'T set this, see below! -->
+    <set var="__FLAG_PCH_FILE">/Fp%s.pch</set>
+    <set var="__FLAG_SINGLE_THREADING"></set>
+    <set var="__FLAG_MULTI_THREADING"></set>
+
+
+    <!-- rules building blocks: -->
+    
+    <template id="__commands_templ_C">
+        <set var="__COMPILE_C_CMD" eval="0">
+            $(CC) /c /nologo /TC /Fo$@ $(__cflags) $**
+        </set>
+    </template>
+    
+    <template id="__commands_templ_CXX">
+        <set var="__COMPILE_CXX_CMD" eval="0">
+            $(CXX) /c /nologo /TP /Fo$@ $(__cxxflags) $**
+        </set>
+    </template>
+
+    <set var="__exe_baser">__msvc_comp</set>
+    <set var="__dll_baser">__msvc_comp</set>
+    <set var="__lib_baser">__msvc_comp</set>
+
+    <!--
+    cl's runtime library flags:
+        /MD      multithreaded DLL            <- bakefile debug
+        /MDd     ditto debug
+        /ML      static singlethreaded
+        /MLd     ditto debug
+        /MT      static multithreaded
+        /MTd     ditto debug
+    -->
+
+    <define-rule name="__msvc_comp">
+        <template>
+            <set var="__pch_header"/>
+            <set var="__rtl_dbg"/>
+            <set var="__rtl_static" eval="0">L</set>
+            <set var="__rtl_type" eval="0">D</set>
+            <set var="__rtl" eval="0">/M$(__rtl_type)$(__rtl_dbg)</set>
+            <cppflags>$(__rtl)</cppflags>
+        </template>
+
+        <define-tag name="runtime-libs">
+            <set var="__rtl_type">
+                $(substituteFromDict(value, 
+                {'static':'$(__rtl_static)',
+                'dynamic':'D'}))
+            </set>
+        </define-tag>
+        <define-tag name="threading">
+            <set var="__rtl_static">
+                $(substituteFromDict(value, {'multi':'T', 'single':'L'}))
+            </set>
+        </define-tag>
+        <define-tag name="debug-info">
+            <set var="__rtl_dbg">
+                $(substituteFromDict(value, {'on':'d', 'off':''}))
+            </set>
+            <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
+            <cppflags>/Fd$(__pdbfile)</cppflags>
+        </define-tag>
+
+        <define-tag name="precomp-headers">
+            <cppflags>/YX$(__pch_header)</cppflags>
+        </define-tag>
+        <define-tag name="precomp-headers-header">
+            <set var="__pch_header">$(value)</set>
+        </define-tag>
+    </define-rule>
+    
+    <template id="__commands_templ">
+        <set var="__LINK_EXE_CMD" eval="0">
+            $(__linker) /NOLOGO /OUT:$@ $(__ldflags) @&lt;&lt;
+            $(__objects) $(__ldlibs)
+            &lt;&lt;NOKEEP
+        </set>        
+        <set var="__LINK_LIB_CMD" eval="0">
+            if exist $@ del $@
+            lib /NOLOGO /OUT:$@ @&lt;&lt;
+            $(__objects)
+            &lt;&lt;NOKEEP
+        </set>
+        <set var="__LINK_DLL_CMD" eval="0">
+            $(__dll_linker) /NOLOGO /OUT:$@ $(__ldflags) @&lt;&lt;
+            $(__objects) $(__ldlibs) /IMPLIB:$(__targetdir)$(__libname).lib
+            &lt;&lt;NOKEEP
+        </set>
+    </template>
+    
+    <template id="__subproject_templ">
+        <set var="__MAKE_SUBPROJECT_CMD" eval="0">
+            cd $(__subdir)
+            \$(MAKE) /\$(MAKEFLAGS) $(__subtarget)
+            cd \$(MAKEDIR)
+        </set>
+        <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
+            cd $(__subdir)
+            \$(MAKE) /\$(MAKEFLAGS) install
+            cd \$(MAKEDIR)
+        </set>
+        <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
+            cd $(__subdir)
+            \$(MAKE) /\$(MAKEFLAGS) clean
+            cd \$(MAKEDIR)
+        </set>
+    </template>
+
+</makefile>

@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <set var="COMPILER">vc</set>
+    <set var="MAKEFILE_SYNTAX">msvc</set>
+
+    <include file="makefile.bkl"/>
+
+    <!-- =============================================================== -->
+    <!--                         "make clean":                           -->
+    <!-- =============================================================== -->
+
+    <action id="clean">
+        <set var="__builddir" eval="0">$(BUILDDIR)</set>
+        <command>            
+            -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
+            -if exist $(__builddir)\*.res del $(__builddir)\*.res
+        </command>
+    </action>
+    
+    
+    <!-- =============================================================== -->
+    <!--                     win32 resources:                            -->
+    <!-- =============================================================== -->
+
+    <define-tag name="win32-res" rules="exe,dll">
+        <set var="__restmp">
+            $(sources2objects(value, id, '.res'))
+        </set>
+        <set var="__objects" append="1">$(__restmp)</set>
+        <set var="__deps" append="1">$(__restmp)</set>
+    </define-tag>
+
+    <!-- compilation rule for .rc files:  -->
+    <define-rule name="__rc-to-res" extends="__any,compilation_rule">
+        <template>
+            <set var="__command" eval="0">
+                rc /fo$@ $(__win32rc_flags) $**
+            </set>
+        </template>
+        <define-tag name="parent-target">
+            <set var="__win32rc_flags">$(targets[value].__win32rc_flags)</set>
+        </define-tag>
+    </define-rule>
+
+    <!-- includes and defines should propagate to rc compilation, too: -->
+    <define-tag name="include" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/i',value))</set>
+    </define-tag>
+    <define-tag name="define" rules="exe,dll">
+        <set var="__win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/d',value))</set>
+    </define-tag>
+
+    
+    <!-- =============================================================== -->
+    <!--                            output:                              -->
+    <!-- =============================================================== -->
+    
+    <!-- see format_features.bkl for explanation: -->
+    <set var="FORMAT_OUTPUT_VARIABLES">
+        __targetdir,__targetname,__deps,__command
+    </set>
+
+    <output file="$(OUTPUT_FILE)" writer="msvc.empy"/>
+
+</makefile>
