@@ -41,7 +41,7 @@
     <set var="__FLAG_ARCH_I586">-5</set>
     <set var="__FLAG_ARCH_I686">-6</set>
     <set var="__FLAG_SINGLE_THREADING"/>
-    <set var="__FLAG_MULTI_THREADING">-tWM</set>
+    <set var="__FLAG_MULTI_THREADING"/>
     <!-- FIXME: -tWR sets -tW as well, so it must be before -tC !! -->
 
 
@@ -97,7 +97,8 @@
             <set var="__rtl_mt"/>
             <set var="__startup" eval="0">c0$(__startup_obj_type)32.obj</set>
             <set var="__rtl" eval="0">cw32$(__rtl_mt)$(__rtl_i).lib</set>
-            <cppflags>$(__rtldll_flag)</cppflags>
+            <set var="__rtldll_cppflags" eval="0">$(__rtldll_flag)</set>
+            <cppflags>$(__rtldll_cppflags)</cppflags>
         </template>
         <define-tag name="runtime-libs">
             <set var="__rtldll_flag">
@@ -111,6 +112,9 @@
             <set var="__rtl_mt">
                 $(substituteFromDict(value, {'multi':'mt', 'single':''}))
             </set>
+            <cppflags>
+                $(substituteFromDict(value, {'multi':'-tWM', 'single':''}))
+            </cppflags>
         </define-tag>
         
         <define-tag name="precomp-headers">
