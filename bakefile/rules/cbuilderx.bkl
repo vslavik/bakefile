@@ -220,6 +220,7 @@
         <define-tag name="precomp-headers-header" rules="exe,dll,module,lib">
             <set var="__pch_header">$(value)</set>
         </define-tag>
+        <define-tag name="precomp-headers-location"/>
         <define-tag name="precomp-headers-file" rules="exe,dll,module,lib">
             <set var="__pch_file">$(value)</set>
         </define-tag>
