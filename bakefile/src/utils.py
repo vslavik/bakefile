@@ -203,6 +203,8 @@ def sources2objects(sources, target, ext, objSuffix=''):
                     all[e.option] = 0
                 else:
                     return None
+            else:
+                return None
         ret = []
         for e in all:
             if all[e] != 0:
@@ -214,7 +216,6 @@ def sources2objects(sources, target, ext, objSuffix=''):
  
     sources2 = nativePaths(sources)
     retval = substitute2(sources2, callback, 'OBJECTS')
-    
 
     if mk.vars['FORMAT_HAS_VARIABLES'] != '0':
         tg = mk.targets[target]
@@ -262,6 +263,8 @@ def sources2objects(sources, target, ext, objSuffix=''):
                 lng = len(conds)
                 for c1 in range(0,lng):
                     for c2 in range(c1+1,lng):
+                        if conds[c1] == None: continue
+                        #print conds[c1].name, conds[c2].name
                         r = reduceConditions(conds[c1], conds[c2])
                         if r != None:
                             conds[c1] = 0
