@@ -815,7 +815,8 @@ def processFile(filename):
         print 'loading %s...' % filename
     filename = os.path.abspath(filename)
     if config.track_deps:
-        dependencies.addDependency(mk.vars['INPUT_FILE'], filename)
+        dependencies.addDependency(mk.vars['INPUT_FILE'], config.format,
+                                   filename)
     newdir = os.path.dirname(filename)
     if newdir not in sys.path:
         sys.path.append(newdir)

@@ -53,6 +53,7 @@ rulesgettext_DATA = \
 
 code_PYTHON = src/config.py \
               src/bakefile.py \
+              src/bakefile_gen.py \
               src/errors.py \
               src/finalize.py \
               src/flatten.py \
@@ -84,6 +85,7 @@ EXTRA_DIST = \
     src/empy/README src/empy/COPYING \
 	src/win32scriptwrapper.c \
 	src/bakefile.exe
+	src/bakefile_gen.exe
 
 dist-hook:
 	(cd $(distdir)/doc ; ./process.sh)
@@ -93,5 +95,7 @@ install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	ln -sf ../share/bakefile/src/bakefile.py $(DESTDIR)$(bindir)/bakefile
 	chmod +x $(DESTDIR)/$(codedir)/bakefile.py
+	ln -sf ../share/bakefile/src/bakefile_gen.py $(DESTDIR)$(bindir)/bakefile_gen
+	chmod +x $(DESTDIR)/$(codedir)/bakefile_gen.py
 
 ACLOCAL_AMFLAGS = -I admin
