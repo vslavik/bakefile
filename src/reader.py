@@ -277,7 +277,7 @@ class Rule:
 
     
 
-def handleModifyTarget(e, dict):
+def handleModifyTarget(e, dict=None):
     tg = mk.evalExpr(e.props['target'], use_options=0, add_dict=dict)
     if tg not in mk.targets:
         raise ReaderError(e, "unknown target '%s'" % tg)
@@ -746,6 +746,7 @@ HANDLERS = {
     'tag-info':      handleTagInfo,
     'output':        handleOutput,
     'fragment':      handleFragment,
+    'modify-target': handleModifyTarget,
     }
 
 
