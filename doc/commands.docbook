@@ -535,8 +535,9 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
           Inserts text into generated native makefile verbosely, so that it is
           possible to include things not yet supported by Bakefile in the
           makefiles. The text can be either read from a file or is taken from
-          command node's content.
-
+          command node's content. Variables are <emphasis>not</emphasis>
+          substituted in fragment's content, it is copied to the makefile 
+          as-is, with no changes.
           <informaltable>
             <tgroup cols='3'>
               <thead>

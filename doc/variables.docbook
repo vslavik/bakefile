@@ -58,6 +58,35 @@
           </tgroup>
         </informaltable>
 
+        Variables for fine-tuning Bakefile's output (rarely needed):
+        <informaltable>
+          <tgroup cols='3'>
+            <thead>
+              <row>
+                <entry>Variable name</entry>
+                <entry>Description</entry>
+                <entry>Default</entry>
+              </row>
+            </thead>
+            <tbody>
+
+              <row id="var.VARS_DONT_ELIMINATE">
+                <entry role="varname">VARS_DONT_ELIMINATE</entry>
+                <entry>
+                  Bakefile normally eliminates all unused variables from
+                  the output. In some rare situations, it may not detect
+                  that a variable is used, in which case you can tell it to
+                  keep the variable by adding its name to this variable.
+                  So far this is only useful if the variables is used in
+                  makefile code included using <xref linkend="cmd.fragment"/>.
+                </entry>
+                <entry role="default">(empty)</entry>
+              </row>
+
+            </tbody>
+          </tgroup>
+        </informaltable>
+
       </para>
     </section>
     

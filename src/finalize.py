@@ -108,26 +108,30 @@ def purgeUnusedOptsVars():
         sys.stdout.flush()
     toKill = []
 
+    vars_to_keep = mk.vars['VARS_DONT_ELIMINATE'].split()
+
     if mk.vars['FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS'] != '0':
         usedOpts = []
         for c in mk.conditions.values():
             usedOpts += [x.option.name for x in c.exprs]
         for o in mk.options:
-            if (o not in mk.__usageTracker.map) and (o not in usedOpts):
+            if (o not in mk.__usageTracker.map) and (o not in usedOpts) and \
+                     (o not in vars_to_keep):
                 toKill.append((mk.options, mk.__vars_opt, o))
     else:
         for o in mk.options:
-            if o not in mk.__usageTracker.map:
+            if o not in mk.__usageTracker.map and o not in vars_to_keep:
                 toKill.append((mk.options, mk.__vars_opt, o))
     for v in mk.cond_vars:
-        if v not in mk.__usageTracker.map:
+        if v not in mk.__usageTracker.map and v not in vars_to_keep:
             toKill.append((mk.cond_vars, mk.__vars_opt, v))
     for v in mk.make_vars:
-        if v not in mk.__usageTracker.map:
+        if v not in mk.__usageTracker.map and v not in vars_to_keep:
             toKill.append((mk.make_vars, mk.vars, v))
     if config.verbose:
         sys.stdout.write(': %i of %i\n' % (len(toKill),
                          len(mk.options)+len(mk.cond_vars)+len(mk.make_vars)))
+
     for dict1, dict2, key in toKill:
         del dict1[key]
         del dict2[key]

@@ -39,7 +39,14 @@
          (but don't do it by default): -->
     <set var="OPTIONS_FILE"/>
     <set var="WRITE_OPTIONS_FILE">1</set>
-    
+
+    <!--
+    This variable can be set to list make variables and options that can't
+    be eliminated in finalize.py even though they appear to be unused. The
+    only reason for its existence is that somebody may use <fragment>
+    that refers to a variable that is otherwise not used.
+    -->
+    <set var="VARS_DONT_ELIMINATE"/> 
     
     
     <!-- =============================================================== -->
