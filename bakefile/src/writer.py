@@ -34,9 +34,6 @@ def __stringify(x):
     if x == None: return ''
     return str(x)
 
-def __valueToPy(v):
-    return v.replace('\\', '\\\\').replace('"','\\"')
-
 __preparedMkVars = None
 
 def __copyMkToVars():
@@ -69,16 +66,17 @@ def __copyMkToVars():
             if v == 'configs':
                 t.configs = {}
                 for x in tar.vars[v]:
-                    t.configs[x] = Struct()
+                    st = Struct()
+                    t.configs[x] = st
                     for y in tar.vars[v][x]:
-                        exec('t.configs["%s"].%s = """%s"""' % (x, y, __valueToPy(tar.vars[v][x][y].strip())))
+                        setattr(st, y, tar.vars[v][x][y].strip())
             elif v == 'distinctConfigs':
                 t.distinctConfigs = tar.vars['distinctConfigs']
             else:
                 if type(tar.vars[v]) is StringType:
-                    exec('t.%s = """%s"""' % (v, __valueToPy(tar.vars[v].strip())))
+                    setattr(t, v, tar.vars[v].strip())
                 else:
-                    exec('t.%s = tar.vars[v]' % v)
+                    setattr(t, v, tar.vars[v])
         t.cond = tar.cond
         targets.append(t.id, t)
     dict['targets'] = targets
