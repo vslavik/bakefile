@@ -238,6 +238,10 @@
                 <entry role="varname">PLATFORM_MACOSX</entry>
                 <entry>Mac OS X</entry>
               </row>
+              <row>
+                <entry role="varname">PLATFORM_OS2</entry>
+                <entry>OS/2</entry>
+              </row>
               
             </tbody>
           </tgroup>
