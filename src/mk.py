@@ -214,6 +214,24 @@ def mergeConditions(cond1, cond2):
     
     return makeCondition(' and '.join(parts1))
 
+
+# this is hack to get some information from __doEvalExpr for use in
+# finalize.py where we want to know that some variable only depends on
+# options and condvars and is thus not worth further evaluation:
+class UsageTracker: pass
+__trackUsage = 0
+__usageTracker = UsageTracker()
+def __resetUsageTracker(reset_coverage):
+    global __usageTracker
+    __usageTracker.vars = 0               # ordinary variables (inc.target ones)
+    __usageTracker.optionsAndCondVars = 0 # options & conditional vars
+    __usageTracker.makevars = 0           # make variables
+    __usageTracker.pyexprs = 0            # other python expressions
+    __usageTracker.refs = 0               # utils.ref() calls
+    if reset_coverage:
+        __usageTracker.usage = {}         # 1 for every option, makevar or
+                                          # condvar used
+
 __curNamespace = {}
 
 def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
@@ -227,8 +245,21 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
         vlist.append(add_dict)
 
     for v in range(len(vlist)-1,-1,-1):
-        if expr in vlist[v]:
-            return vlist[v][expr]
+        d = vlist[v]
+        if expr in d:
+            if __trackUsage:
+                if d is __vars_opt:
+                    __usageTracker.optionsAndCondVars += 1
+                    __usageTracker.usage[expr] = 1
+                elif d is vars and expr in make_vars:
+                    __usageTracker.makevars += 1
+                    __usageTracker.usage[expr] = 1
+                else:
+                    __usageTracker.vars += 1
+            return d[expr]
+    
+    if __trackUsage:
+        __usageTracker.pyexprs += 1
    
     v = vlist[0].copy()
     for i in vlist[1:]: v.update(i)
@@ -238,6 +269,7 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     val = eval(expr.replace('\\','\\\\'), globals(), v)
     __curNamespace = oldNS
     return str(val)
+
 
 def __doEvalExpr(e, varCallb, textCallb, moreArgs,
                  use_options=1, target=None, add_dict=None):

@@ -27,6 +27,7 @@ def ref(var, target=None):
         else:
             return mk.targets[target].vars[var]
     else:
+        if mk.__trackUsage: mk.__usageTracker.refs += 1
         if target==None:
             return "$(ref('%s'))" % var
         else:

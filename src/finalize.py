@@ -16,60 +16,72 @@ def finalEvaluation():
     """Evaluates all variables, so that unneccessary $(...) parts are
        removed in cases when <set eval="0" ...> was used"""
 
-    # Replace $(foo) for options by config.variableSyntax format:
-    for v in mk.__vars_opt:
-        mk.__vars_opt[v] = config.variableSyntax % v
+    mk.__trackUsage = 1
+    mk.__resetUsageTracker(reset_coverage=1)
 
-    def iterateModifications():
-        class Modified: pass
-        modified = Modified()
-        modified.v = 1
-        def modify(old, new, m):
-            if old != new: m.v += 1
-            return new
-
-        while modified.v:
+    refs = []
+    list = []
+    
+    for v in mk.vars:
+        if not (type(mk.vars[v]) is InstanceType or
+                type(mk.vars[v]) is DictType):
+            if '$' in mk.vars[v]:
+                list.append((mk.vars,v,None))
+    
+    for v in mk.make_vars:
+        if '$' in mk.make_vars[v]:
+            list.append((mk.make_vars,v,None))
+    
+    for t in mk.targets.values():
+        for v in t.vars:
+            if not (type(t.vars[v]) is InstanceType or 
+                    type(t.vars[v]) is DictType):
+                if '$' in t.vars[v]:
+                    list.append((t.vars,v,t))
+            
+    for c in mk.cond_vars.values():
+        for v in c.values:
+            if '$' in v.value:
+                list.append((None,v,c.target))
+    
+    def iterateModifications(list):
+        while len(list) > 0:
+            newList = []
             if config.verbose:
-                sys.stdout.write('.')
+                sys.stdout.write('[%i]' % len(list))
                 sys.stdout.flush()
-            modified.v = 0
-            for v in mk.vars:
-                if v in mk.make_vars: continue
-                if not (type(mk.vars[v]) is InstanceType or
-                        type(mk.vars[v]) is DictType):
-                    if '$' in mk.vars[v]:
-                        mk.vars[v] = modify(mk.vars[v], mk.evalExpr(mk.vars[v]),
-                                            modified)
-            for v in mk.make_vars:
-                if '$' in mk.make_vars[v]:
-                    mk.make_vars[v] = modify(mk.make_vars[v],
-                                             mk.evalExpr(mk.make_vars[v]),
-                                             modified)
-            for t in mk.targets.values():
-                for v in t.vars:
-                    if not (type(t.vars[v]) is InstanceType or 
-                            type(t.vars[v]) is DictType):
-                        try:
-                            if '$' in t.vars[v]:
-                                t.vars[v] = modify(t.vars[v],
-                                                   mk.evalExpr(t.vars[v],
-                                                               target=t),
-                                                   modified)
-                        except KeyError, err:
-                            raise ReaderError(None, "can't evaluate value '%s' of variable '%s' on target '%s'" % (t.vars[v], v, t.id))
-            for c in mk.cond_vars.values():
-                for v in c.values:
-                    if '$' in v.value:
-                        v.value = modify(v.value,
-                                         mk.evalExpr(v.value, target=c.target),
-                                         modified)
+            for dict, obj, target in list:
+                if dict == None:
+                    expr = obj.value
+                else:
+                    expr = dict[obj]
+                mk.__resetUsageTracker(reset_coverage=0)
+                new = mk.evalExpr(expr, target=target)
+                if expr != new:
+                    if dict == None: obj.value = new
+                    else: dict[obj] = new
+                if (mk.__usageTracker.vars + 
+                    mk.__usageTracker.pyexprs -  mk.__usageTracker.refs > 0) \
+                           and ('$' in new):
+                    newList.append((dict,obj,target))
+                if mk.__usageTracker.refs > 0:
+                    refs.append((dict,obj,target))
+            list = newList
     
     if config.verbose:
-        sys.stdout.write('finalizing ')
-    iterateModifications()
-    utils.__refEval = 1
-    iterateModifications()
+        sys.stdout.write('substituting variables ')
+        sys.stdout.flush()
+    iterateModifications(list)
     if config.verbose: sys.stdout.write('\n')
+        
+    if len(refs) > 0:
+        if config.verbose:
+            sys.stdout.write('eliminating references ')
+            sys.stdout.flush()
+        utils.__refEval = 1
+        iterateModifications(refs)
+        if config.verbose: sys.stdout.write('\n')
+        
 
 
 def purgeConstantCondVars():
@@ -171,6 +183,10 @@ def replaceEscapeSequences():
 
 
 def finalize():
+    # Replace $(foo) for options by config.variableSyntax format:
+    for v in mk.__vars_opt:
+        mk.__vars_opt[v] = config.variableSyntax % v
+
     # evaluate variables:
     finalEvaluation()
 
