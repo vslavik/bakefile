@@ -370,6 +370,7 @@ AC_DEFUN(AC_BAKEFILE_SHARED_VERSIONS,
       *-*-darwin* )
         USE_MACVERSION=1
         USE_SOVERSION=1
+        USE_SOSYMLINKS=1
       ;;      
     esac
 
