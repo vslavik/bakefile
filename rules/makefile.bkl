@@ -586,7 +586,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!--                 Standard makefile targets:                      -->
     <!-- =============================================================== -->
 
-    <phony id="all"/>
+    <phony id="all" category="all"/>
     
     <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
         <action id="install" template="__phony">
