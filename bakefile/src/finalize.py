@@ -271,8 +271,9 @@ def eliminateDuplicateCondVars():
             mk.vars[c1.name] = '$(%s)' % newname
         if c2.name != newname:
             mk.vars[c2.name] = '$(%s)' % newname
+        hints = mk.getHints(c1.name)
         c1.name = c2.name = newname
-        mk.addCondVar(c1)
+        mk.addCondVar(c1, hints=hints)
     
     if config.verbose:
         sys.stdout.write(': %i -> %i\n' % (before, len(mk.cond_vars)))
