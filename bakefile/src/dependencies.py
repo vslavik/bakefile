@@ -88,6 +88,10 @@ def needsUpdate(bakefile, format):
 
     if oldest_output == None:
         return 1
+
+    if oldest_output < bakefile_time:
+        return 1
+
     for f in info.deps:
         if not os.path.isfile(f):
             # one of dependencies is missing, we must regen:
