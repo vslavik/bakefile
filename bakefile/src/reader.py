@@ -231,6 +231,7 @@ class Rule:
         self.baserules = []
         self.tags = {}
         self.template = []
+        self.cacheTagsDict = None
 
     def getTemplates(self):
         t = []
@@ -240,16 +241,20 @@ class Rule:
         return t
 
     def getTagsDict(self):
-        d = {}
-        for b in self.baserules:
-            d2 = b.getTagsDict()
-            for key in d2:
-                if key in d: d[key] += d2[key]
-                else: d[key] = copy.copy(d2[key])
-        for key in self.tags:
-            if key in d: d[key] += self.tags[key]
-            else: d[key] = copy.copy(self.tags[key])
-        return d
+        if self.cacheTagsDict == None:
+            d = {}
+            for b in self.baserules:
+                d2 = b.getTagsDict()
+                for key in d2:
+                    if key in d: d[key] += d2[key]
+                    else: d[key] = copy.copy(d2[key])
+            for key in self.tags:
+                if key in d: d[key] += self.tags[key]
+                else: d[key] = copy.copy(self.tags[key])
+            self.cacheTagsDict = d
+            return d
+        else:
+            return self.cacheTagsDict
 
     
 
@@ -262,8 +267,53 @@ def handleModifyTarget(e, dict):
     _processTargetNodes(e.children, target, tags, dict)
 
 
+COMMANDS = ['set', 'modify-target', 'add-target']
+
+class ValueRecord:
+    def __init__(self, parent, value):
+        self.value = value
+        self.evaluated = None
+        self.parent = parent
+    def evalValue(self, target, dict):
+        if self.evaluated == None:
+            if self.parent == None:
+                d = dict
+            else:
+                d = {}
+                if dict != None:
+                    d.update(dict)
+                d['value'] = self.parent.evalValue(target, d)                
+            self.evaluated = mk.evalExpr(self.value,
+                                         target=target, add_dict=d)
+        return self.evaluated
+
+
+def _extractTargetNodes(out_list, list, target, tags, valueRecord):
+    """Expand all rules in list of target nodes and returns a list of
+       elementary commands to be executed on the target. The list contains
+       tuples (node, value_record)."""
+    
+    for node in list:
+        if node.name == 'if':
+            if evalWeakCondition(node):
+                _extractTargetNodes(out_list, node.children, target,
+                                    tags, valueRecord)
+        elif node.name in COMMANDS:
+            out_list.append((node, valueRecord))
+        else:
+            if node.name not in tags:
+                raise ReaderError(node,
+                                      "unknown target tag '%s'" % node.name)
+            if evalWeakCondition(node) == 0:
+                continue
+            value = ValueRecord(valueRecord, node.value)
+            _extractTargetNodes(out_list, tags[node.name], target,
+                                tags, value)
+
+
 def _processTargetNodes(list, target, tags, dict):
-    def processCmd(e, target, dict):        
+
+    def processCmd(e, target, dict):
         if e.name == 'set':
             handleSet(e, target=target, add_dict=dict)
         elif e.name == 'modify-target':
@@ -289,21 +339,16 @@ def _processTargetNodes(list, target, tags, dict):
         else:
             return 0
         return 1
-    
-    for node in list:
-        if node.name == 'if':
-            if evalWeakCondition(node):
-                _processTargetNodes(node.children, target, tags, dict)
-        elif not processCmd(node, target, dict):
-            if node.name not in tags:
-                raise ReaderError(node,
-                                      "unknown target tag '%s'" % node.name)
-            if evalWeakCondition(node) == 0:
-                continue
-            dict2 = {}
-            dict2['value'] = mk.evalExpr(node.value,
-                                         target=target, add_dict=dict)
-            _processTargetNodes(tags[node.name], target, tags, dict2)
+
+    cmd_list = []
+    _extractTargetNodes(cmd_list, list, target, tags, None)
+    for node, valueR in cmd_list:
+        if valueR == None:
+            dict2 = dict
+        else:
+            val = valueR.evalValue(target, dict)
+            dict2 = {'value':val}
+        processCmd(node, target, dict2)
 
 
 _pseudoTargetLastID = 0
@@ -400,6 +445,7 @@ def handleDefineTag(e, rule=None):
             r.tags[name] += e.children
         else:
             r.tags[name] = copy.copy(e.children)
+        r.cacheTagsDict = None
 
 loadedModules = []
 availableFiles = []
