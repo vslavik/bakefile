@@ -10,6 +10,7 @@ from utils import *
 vars = {}
 override_vars = {}
 options = {}
+options_order = []
 cond_vars = {}
 make_vars = {}
 targets = {}
@@ -128,6 +129,7 @@ def getHints(var):
 
 def addOption(opt):
     options[opt.name] = opt
+    options_order.append(opt.name)
     __vars_opt[opt.name] = '$(%s)' % opt.name
     vars['OPTIONS'] = ' '.join(mk.options.keys())
 
