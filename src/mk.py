@@ -57,7 +57,7 @@ class Option:
 
     def isNeverEmpty(self):
         if self.neverEmpty: return 1
-        if len(self.values) > 0:
+        if self.values != None and len(self.values) > 0:
             for v in self.values:
                 if len(v.strip()) == 0: return 0
             return 1
