@@ -210,7 +210,7 @@
           Adds an <link linkend="concept.option">option</link>
           to the makefile.
           <programlisting><![CDATA[
-<option name="NAME">
+<option name="NAME" [never_empty="NEVER_EMPTY"]>
   [<default-value>DEFVALUE</default-value>]
   [<description>DESC</description>]
   [<values>VALUES</values>]
@@ -227,6 +227,12 @@
           option, if appliable. It can be used by format backends that don't
           support options and it is used as default in those that do. Use it
           whenever possible.
+        </para>
+        <para>
+          <varname>NEVER_EMPTY</varname> may be set to <literal>1</literal> to
+          tell Bakefile that it can treat the option as non-empty variable.
+          This is useful only rarely in situations when Bakefile requires some
+          non-empty value as tag's argument.
         </para>
         <para>
           <varname>DESC</varname> is human-readable description of the option,
