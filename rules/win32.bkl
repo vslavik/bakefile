@@ -20,7 +20,7 @@
     <set var="DLLIMPEXT">$(LIBEXT)</set>
     <set var="DLLPREFIX"></set>
     <set var="DLLPREFIX_MODULE"></set>
-    <set var="DLL_CFLAGS"></set>
+    <set var="PIC_CFLAGS"></set>
 
     <set var="INSTALL_PROGRAM">copy /Y</set>
     <set var="INSTALL_DATA">$(INSTALL_PROGRAM)</set>

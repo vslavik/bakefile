@@ -266,7 +266,17 @@ makefiles (most notably GNU Make and Autoconf formats).
                        }))
             </cppflags>
         </define-tag>
-        
+            
+        <define-tag name="pic">
+            <set var="__picflag">
+                $(substituteFromDict(value,
+                      {'on':PIC_CFLAGS,
+                       'off':''}))
+            </set>
+            <cflags>$(__picflag)</cflags>
+            <cxxflags>$(__picflag)</cxxflags>
+        </define-tag>
+ 
         <define-tag name="debug-info">
             <cppflags>
                 $(substituteFromDict(value,
@@ -383,8 +393,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-rule name="_dll" extends="__compiled,$(__dll_baser)">
         <template template="$(__dll_baset)">
             <set var="__name" eval="0">$(__dllname)</set>
-            <cflags>$(DLL_CFLAGS)</cflags>
-            <cxxflags>$(DLL_CFLAGS)</cxxflags>
+            <pic>on</pic>
             <set var="__targetname" eval="0">
                 $(DLLPREFIX)$(__dllname)$(DLLEXT)
             </set>

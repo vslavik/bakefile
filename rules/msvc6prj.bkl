@@ -180,6 +180,8 @@
             </cppflags>
         </define-tag>
         
+        <define-tag name="pic"/> <!-- win32 code is always PIC -->
+        
         <define-tag name="debug-info">
             <cppflags>
                 $(substituteFromDict(value, {'on':'/Zi /Gm /GZ', 'off':''}))
