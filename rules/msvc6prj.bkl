@@ -169,6 +169,7 @@
         </define-tag>       
 
         <define-tag name="install-to"/>
+        <define-tag name="install-if"/>
         
         <define-tag name="msvc-project-files">
             <set var="__more_files" append="1">$(value)</set>
