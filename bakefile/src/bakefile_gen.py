@@ -76,7 +76,7 @@ def _matchesWildcard(filename, wildcard, absolutize=0):
             return 0
     return 1
 
-def loadTargets(filename):
+def loadTargets(filename, defaultFlags=''):
 
     def _loadFile(filename):
         if verbose:
@@ -165,7 +165,7 @@ def loadTargets(filename):
                 for f in formats:
                     if f not in file.formats:
                         file.formats.append(f)
-                        file.flags[f] = ''
+                        file.flags[f] = defaultFlags
         elif cmd.name == 'del-formats':
             formats = [x for x in cmd.value.split(',') 
                                if x not in disabled_formats]
@@ -380,16 +380,19 @@ def cleanTargets(pretend=0):
 
 def run(args):
     parser = OptionParser()
+    parser.add_option('-d', '--desc',
+                      action="store", dest='descfile',
+                      default='Bakefiles.bkgen',
+                      help='load description from DESCFILE instead of from Bakefiles.bkgen')
     parser.add_option('-f', '--formats',
                       action="append", dest='formats',
                       help='only generate makefiles in these formats (comma-separated list)')
     parser.add_option('-b', '--bakefiles',
                       action="append", dest='bakefiles',
                       help='only generate makefiles from bakefiles that are matched by these wildcards (comma-separated list)')
-    parser.add_option('-d', '--desc',
-                      action="store", dest='descfile',
-                      default='Bakefiles.bkgen',
-                      help='load description from DESCFILE instead of from Bakefiles.bkgen')
+    parser.add_option('-D',
+                      action="append", dest='defines', metavar='VAR=VALUE',
+                      help="add variable or option definition in addition to -D options defined in Bakefiles.bkgen's <add-flags>")
     parser.add_option('-c', '--clean',
                       action="store_true", dest='clean',
                       default=0,
@@ -424,9 +427,13 @@ def run(args):
         options.bakefiles = ','.join(options.bakefiles)
         options.bakefiles = options.bakefiles.replace('/',os.sep).split(',')
     options.jobs = int(options.jobs)
+
+    moreDefines=''
+    if options.defines != None:
+        moreDefines = ' '.join(['-D%s' % x for  x in options.defines])
  
     try:
-        loadTargets(os.path.abspath(options.descfile))
+        loadTargets(os.path.abspath(options.descfile), moreDefines)
         filterFiles(options.bakefiles, options.formats)
         if options.clean:
             cleanTargets(pretend=options.pretend)
