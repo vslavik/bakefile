@@ -124,11 +124,21 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__install_if_cond"/>
             <set var="__targetdir">$(mkPathPrefix(BUILDDIR))</set>
             <set var="__uses_cxx">0</set>
+            <set var="__ldflags">$(LDFLAGS)</set>
+            <set var="__ldlibs"/>
             <set var="__cppflags">$(CPPFLAGS)</set>
             <set var="__cflags">$(CFLAGS)</set>
             <set var="__cxxflags">$(CXXFLAGS)</set>
-            <set var="__ldflags">$(LDFLAGS)</set>
-            <set var="__ldlibs"/>
+
+            <!-- cflags, cxxflags make variables: -->
+            <set var="__cflags_mv" eval="0">$(__cppflags) $(__cflags)</set>
+            <set var="__cxxflags_mv" eval="0">$(__cppflags) $(__cxxflags)</set>
+            <set var="__cflags_var">
+                $(createMakeVar(id, '__cflags_mv', 'CFLAGS'))
+            </set>
+            <set var="__cxxflags_var">
+                $(createMakeVar(id, '__cxxflags_mv', 'CXXFLAGS'))
+            </set>
 
             <set var="__objects"/>
             <!-- access __objects as global make variable: -->
@@ -450,7 +460,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__command">$(__COMPILE_C_CMD)</set>
         </template>
         <define-tag name="parent-target">
-            <set var="__cflags">$('$(%s_CFLAGS)' % __parent.upper())</set>
+            <set var="__cflags">$(targets[__parent].__cflags_var)</set>
         </define-tag>
     </define-rule>
     
@@ -460,7 +470,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         </template>
         <define-tag name="parent-target">
             <set var="__uses_cxx" scope="$(__parent)">1</set>
-            <set var="__cxxflags">$('$(%s_CXXFLAGS)' % __parent.upper())</set>
+            <set var="__cxxflags">$(targets[__parent].__cxxflags_var)</set>
         </define-tag>
     </define-rule>
     <!-- more C++ extensions: -->

@@ -273,15 +273,6 @@ def sources2objects(sources, target, ext, objSuffix=''):
     sources2 = nativePaths(sources)
     retval = substitute2(sources2, callback, 'OBJECTS', hints='files')
 
-    if mk.vars['FORMAT_HAS_VARIABLES'] != '0':
-        tg = mk.targets[target]
-        mk.setVar('%s_CFLAGS' % target.upper(),
-                  "$(ref('__cppflags','%s')) $(ref('__cflags','%s'))" % \
-                  (target, target), target=tg, makevar=1)
-        mk.setVar('%s_CXXFLAGS' % target.upper(),
-                  "$(ref('__cppflags','%s')) $(ref('__cxxflags','%s'))" % \
-                  (target, target), target=tg, makevar=1)
-    
     easyFiles = []
     hardFiles = []
     for f in files:
