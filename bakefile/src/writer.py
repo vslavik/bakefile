@@ -265,10 +265,11 @@ def write():
         # if old and new content should be combined, do it:
         if __output_methods[file] != 'replace':
             __output_files[file] = \
-                eval('%s(txt, __output_files[file])' % method)
+                eval('%s(txt, __output_files[file])' % __output_methods[file])
         # write the file out only if changed:
         if __output_files[file] != txt:
             f.seek(0)
+            f.truncate()
             f.writelines(__output_files[file])
             if changes_f != None:
                 changes_f.write('%s\n' % os.path.abspath(file))
