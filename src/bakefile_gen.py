@@ -21,7 +21,7 @@
 #  $Id$
 #
 
-import sys, os, os.path, glob, fnmatch
+import sys, os, os.path, glob, fnmatch, threading
 from optik import OptionParser
 import xmlparser, dependencies, errors, portautils
 from errors import ReaderError
@@ -215,8 +215,8 @@ def filterFiles(bakefiles, formats):
 
 
 
-def updateTargets():
-    """Updates all targets."""
+def updateTargets(jobs):
+    """Updates all targets. Run jobs instances of bakefile simultaneously"""
     if verbose:
         print 'determining which makefiles are out of date...'
 
@@ -234,7 +234,6 @@ def updateTargets():
     if verbose:
         print '    ...%i out of %i will be updated' % (len(needUpdate),total)
     
-    modifiedFiles = 0
     def __countLines(fn):
         try:
             f = open(fn, 'rt')
@@ -244,35 +243,95 @@ def updateTargets():
         except IOError:
             return 0
 
-    total = len(needUpdate)
-    i = 1
-    tempDeps = portautils.mktemp('bakefile')
-    tempChanges = portautils.mktemp('bakefile')
-    # reduce (not eliminate!) the risk of race condition by immediately
-    # creating the file:
-    tmpf = open(tempDeps, 'wb'); tmpf.close()
-    tmpf = open(tempChanges, 'wb'); tmpf.close()
+    class UpdateState:
+        def __init__(self):
+            self.modifiedFiles = 0
+            self.needUpdate = []
+            self.totalCount = 0
+            self.done = 0
+
+    def _doUpdate(state, job):
+        if job == None: threadId = ''
+        else: threadId = '(%i)' % job
+        tempDeps = portautils.mktemp('bakefile')
+        tempChanges = portautils.mktemp('bakefile')
+
+        try:
+            while 1:
+                try:
+                    state.lock.acquire()
+                    if len(state.needUpdate) == 0: break
+                    f, fmt = state.needUpdate.pop()
+                    state.done += 1
+                    i = state.done
+                finally:
+                    state.lock.release()
+                print '%s[%i/%i] generating %s from %s' % (
+                            threadId, i, state.totalCount, fmt, f)
+                cmd = '%s -f%s %s %s --output-deps=%s --output-changes=%s' % \
+                        (_getBakefileExecutable(),
+                         fmt, files[f].flags[fmt], f, tempDeps, tempChanges)
+                if verbose >= 2: cmd += ' -v'
+                if verbose:
+                    print cmd
+                if os.system(cmd) != 0:
+                    raise errors.Error('bakefile exited with error')
+                modLinesCnt = __countLines(tempChanges)
+                try:
+                    state.lock.acquire()
+                    dependencies.load(tempDeps)
+                    state.modifiedFiles += modLinesCnt
+                finally:
+                    state.lock.release()
+        finally:
+            os.remove(tempDeps)
+            os.remove(tempChanges)
+            try:
+                state.lock.acquire()
+                state.activeThreads -= 1
+                if state.activeThreads == 0:
+                    state.lockAllDone.release()
+            finally:
+                state.lock.release()
+
+    class UpdateThread(threading.Thread):
+        def __init__(self, state, job):
+            threading.Thread.__init__(self)
+            self.state = state
+            self.job = job
+        def run(self):
+            _doUpdate(self.state, self.job)
+
+    state = UpdateState()
+    state.needUpdate = needUpdate
+    state.totalCount = len(needUpdate)
+    state.lock = threading.Lock()
+    state.lockAllDone = threading.Lock()
+    state.activeThreads = jobs
 
     try:
-        for f,fmt in needUpdate:
-            print '[%i/%i] generating %s from %s' % (i, total, fmt, f)        
-            i += 1
-            cmd = '%s -f%s %s %s --output-deps=%s --output-changes=%s' % \
-                    (_getBakefileExecutable(),
-                     fmt, files[f].flags[fmt], f, tempDeps, tempChanges)
-            if verbose >= 2: cmd += ' -v'
-            if verbose:
-                print cmd
-            if os.system(cmd) != 0:
-                raise errors.Error('bakefile exited with error')
-            dependencies.load(tempDeps)
-            modifiedFiles += __countLines(tempChanges)
+        state.lockAllDone.acquire()
+        if jobs == 1:
+            _doUpdate(state, None)
+        else:
+            for i in range(0, jobs-1):
+                t = UpdateThread(state, i)
+                t.setDaemon(1)
+                t.start()
+            
+            _doUpdate(state, jobs-1)                
+            # wait until everybody finishes (the thread that sets
+            # activeThreads to 0 will release the lock):
+            state.lockAllDone.acquire()
+            state.lockAllDone.release()
     finally:
-        os.remove(tempDeps)
-        os.remove(tempChanges)
-        dependencies.save('.bakefile_gen.state')
+        try:
+            state.lock.acquire()
+            dependencies.save('.bakefile_gen.state')
+        finally:
+            state.lock.release()
 
-    print '%i files modified' % modifiedFiles
+    print '%i files modified' % state.modifiedFiles
 
 
 def cleanTargets():
@@ -322,6 +381,10 @@ def run(args):
                       action="store_true", dest='clean',
                       default=0,
                       help='clean generated files, don\'t create them')
+    parser.add_option('-j', '--jobs',
+                      action="store", dest='jobs',
+                      default='1',
+                      help='number of jobs to run simultaneously')
     parser.add_option('-v', '--verbose',
                       action="store_true", dest='verbose', default=0,
                       help='display detailed information')
@@ -341,6 +404,7 @@ def run(args):
         options.formats = options.formats.split(',')
     if options.bakefiles != None:
         options.bakefiles = options.bakefiles.replace('/',os.sep).split(',')
+    options.jobs = int(options.jobs)
     
     try:
         loadTargets(os.path.abspath(options.descfile))
@@ -348,7 +412,7 @@ def run(args):
         if options.clean:
             cleanTargets()
         else:
-            updateTargets()
+            updateTargets(jobs=options.jobs)
     except errors.ErrorBase, e:
         sys.stderr.write('[bakefile_gen] %s' % str(e))
         sys.exit(1)
