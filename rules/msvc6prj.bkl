@@ -3,6 +3,8 @@
 
 <makefile>
 
+    <set var="COMPILER">vc</set>
+
     <set var="_MSVC_TYPECODE_CONSOLE">0x0103</set>
     <set var="_MSVC_TYPECODE_GUI">0x0101</set>
     <set var="_MSVC_TYPECODE_DLL">0x0102</set>
@@ -11,7 +13,28 @@
     <set var="_MSVC_CPU_NAME">x86</set>
     
     
-    <define-rule name="_compiled_base"/>
+    <template id="_compiled_baset">
+        <set var="_default_builddir" eval="0">
+            $(substituteFromDict(_debug,{'0':'Release','1':'Debug'}))
+        </set>
+        
+        <set var="_ldlibs"/>
+        <set var="_defines">/D "WIN32"</set>
+        <set var="_ldflags">/machine:i386</set>
+        <set var="_win32rc_flags">/l 0x405</set>
+        <!-- /GR /GX enables C++ exception handling and rtti
+             (FIXME: make it configurable) -->
+        <set var="_cppflags">/FD /GR /GX</set>
+        
+        <!-- choice of C runtime library: -->
+        <set var="_rtl_dbg"/>
+        <set var="_rtl_static">L</set>
+        <set var="_rtl_type">D</set>
+        <set var="_rtl" eval="0">/M$(_rtl_type)$(_rtl_dbg)</set>
+        <cppflags>$(_rtl)</cppflags>
+    </template>
+    
+    <define-rule name="_compiled_specific"/>
 
     <include file="msvc_prj_common.bkl"/>
 

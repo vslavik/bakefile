@@ -249,7 +249,7 @@ CPP=cl.exe
                             'MTL /nologo %s /mktyplib203 /win32' % cfg._defines)
 
     def makeSettingsRSC(self, cfg):
-        return self.mkFlags('ADD', 'RSC /l 0x405 %s' % cfg._win32rc_flags)
+        return self.mkFlags('ADD', 'RSC %s' % cfg._win32rc_flags)
 
     def makeSettingsCPP_MTL_RSC(self, cfg):
         txt = self.makeSettingsCPP(cfg)
