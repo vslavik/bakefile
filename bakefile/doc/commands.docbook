@@ -268,7 +268,7 @@
           Adds an <link linkend="concept.option">option</link>
           to the makefile.
           <programlisting><![CDATA[
-<option name="NAME" [never_empty="NEVER_EMPTY"]>
+<option name="NAME" [never_empty="NEVER_EMPTY"] [category="CATEGORY"]>
   [<default-value>DEFVALUE</default-value>]
   [<description>DESC</description>]
   [<values>VALUES</values>]
@@ -292,6 +292,20 @@
           tell Bakefile that it can treat the option as non-empty variable.
           This is useful only rarely in situations when Bakefile requires some
           non-empty value as tag's argument.
+        </para>
+        <para>
+          <varname>CATEGORY</varname> may be set to provide Bakefile
+          additional information about the option. Certain operations
+          (typically substitutions) may fail when applied to options unless
+          all of its possible values are known. Because many tags use
+          substitutions internally, this can be very limiting; the category
+          hint can be used to work around most common problems.
+
+          Possible values are <literal>unspecified</literal> (the default)
+          and <literal>path</literal>, which indicates that the option will
+          contain valid <emphasis>native</emphasis>, non-empty path name. An
+          option with category set to <literal>path</literal> can be used as
+          argument to tags like <xref linkend="tag.include"/>.
         </para>
         <para>
           <varname>DESC</varname> is human-readable description of the option,

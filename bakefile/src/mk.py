@@ -39,11 +39,16 @@ vars_hints = {}
 vars['targets'] = {}
 
 class Option:
+
+    CATEGORY_UNSPECIFICED = 'unspecified'
+    CATEGORY_PATH = 'path'
+
     def __init__(self, name, default, desc, values, values_desc):
         self.name = name
         self.default = default
         self.desc = desc
         self.values = values
+        self.category = Option.CATEGORY_UNSPECIFICED
         if self.values != None:
             self.values_desc = {}
             if values_desc != None:
