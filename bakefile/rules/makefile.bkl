@@ -93,7 +93,6 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__cflags">$(CFLAGS)</set>
             <set var="__cxxflags">$(CXXFLAGS)</set>
             <set var="__ldflags"/>
-            <set var="__ldflags_end"/>
             <set var="__objects"/>
             <set var="__deps" append="1">$(ref('__objects',id))</set>
             <set var="__linker" eval="0">
@@ -131,9 +130,6 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
         <define-tag name="ldflags">
             <set var="__ldflags" append="1">$(value)</set>
-        </define-tag>
-        <define-tag name="ldflags-end">
-            <set var="__ldflags_end" append="1">$(value)</set>
         </define-tag>
 
         <define-tag name="sources">

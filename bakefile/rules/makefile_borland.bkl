@@ -28,14 +28,14 @@
             $(CXX) -c -P -o$@ $(__cppflags) $(__cxxflags) $**
         </set>
         <set var="__LINK_EXE_CMD" eval="0">
-            $(__linker) -e$@ $(__objects) $(__ldflags) $(__ldflags_end)
+            $(__linker) -e$@ $(__objects) $(__ldflags)
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
             $(RM) $(__targetname)
             tlib /a $(__targetname) $(__objects)
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) $@ $(__objects) $(__ldflags) $(__ldflags_end)
+            $(__dll_linker) $@ $(__objects) $(__ldflags)
         </set>
     </template>
     
