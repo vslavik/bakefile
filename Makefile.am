@@ -13,8 +13,11 @@ man_MANS = doc/man/bakefile.1
 
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
+              output/cbuilderx.py \
               output/borland.empy \
               output/borland-opts.empy \
+              output/dmars.empy \
+              output/dmars-opts.empy \
               output/dmars.empy \
               output/msvc.empy \
               output/msvc-opts.empy \
@@ -27,6 +30,7 @@ output_DATA = output/autoconf.empy \
 
 rules_DATA =  rules/FORMATS.bkmanifest \
               rules/autoconf.bkl \
+			  rules/cbuilderx.bkl \
               rules/borland.bkl \
               rules/dmars.bkl \
               rules/common.bkl \

@@ -39,5 +39,12 @@
             $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).dsw
         </default-filename>
     </format>
+
+    <format id="cbuilderx">
+        <description>C++ Builder X project files</description>
+        <default-filename>
+            $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).bpgr
+        </default-filename>
+    </format>
     
 </bakefile-manifest>
