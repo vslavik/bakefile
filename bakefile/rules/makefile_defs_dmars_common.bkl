@@ -168,6 +168,9 @@
                     <modify-target target="$(__pch_sym_tgt)">
                         <set var="__targetname">$(__pch_sym_file)</set>
                         <command>$(ref("__pch_cmd",id))</command>
+                        <depends-on-file>
+                            $(__pch_location)$(nativePaths(__pch_header))
+                        </depends-on-file>
                     </modify-target>
                 </if> 
 
