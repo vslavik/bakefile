@@ -14,17 +14,6 @@
     <set var="PLATFORM_MSDOS">0</set>
     <set var="PLATFORM_MAC">0</set>
     <set var="PLATFORM_MACOSX">0</set>
-    
-
-    
-    <option name="BUILD">
-        <values>debug release</values>
-        <values-description>Debug Release</values-description>
-        <default-value>release</default-value>
-        <description>
-            Type of compiled binaries
-        </description>
-    </option>
 
     <define-rule name="compilation_rule">
         <define-tag name="src">
