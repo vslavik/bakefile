@@ -4,14 +4,26 @@
 BAKEFILE_VERSION = "0.1.1"
 
 import sys
+from optik import OptionParser
+import formats
+
+class BakefileOptionParser(OptionParser):
+    def __init__(self):
+        OptionParser.__init__(self,
+                              version='Bakefile %s' % BAKEFILE_VERSION,
+                              usage='usage: %prog [options] inputfile.bkl')
+    def print_help(self, file=None):
+        if file is None:
+            file = sys.stdout
+        OptionParser.print_help(self, file)
+        file.write('\n%s' % formats.showFormats())
+
 
 def run(args):
     import reader, writer
     import config
-    from optik import OptionParser
 
-    parser = OptionParser(version='Bakefile %s' % BAKEFILE_VERSION,
-                          usage='usage: %prog [options] inputfile.bkl')
+    parser = BakefileOptionParser()
     parser.add_option('-f', '--format',
                       action="store", dest='format',
                       help='format of generated makefile')
@@ -40,19 +52,30 @@ def run(args):
     if len(args) != 1:
         parser.error('incorrect number of arguments, exactly 1 .bkl required')
         sys.exit(1)
+    
+    if options.includes != None:
+        import os.path
+        for p in options.includes:
+            config.searchPath.append(os.path.normpath(p))
 
+    formats.loadFormats()
     if options.format == None:
         parser.error('you must specify output format (use -f option)')
-        sys.exit(1)
+    config.format = options.format
+    if not formats.isValidFormat(config.format):
+        parser.error('invalid format\n\n' + formats.showFormats())
     
-    if options.outfile == None:
-        parser.error('you must specify output file (use -o option)')
-        sys.exit(1)
+    if options.outfile != None:
+        config.output_file = options.outfile
+    else:
+        fmt = formats.formats[config.format]
+        if fmt.defaultFile == None or fmt.defaultFile == '':
+            parser.error('you must specify output file (use -o option)')
+        else:
+            config.output_file = fmt.defaultFile
 
     config.verbose = options.verbose
     config.debug = options.debug
-    config.format = options.format # FIXME -- check for validity
-    config.output_file = options.outfile
     
     config.defines = {}
     if options.defines != None:
@@ -63,11 +86,6 @@ def run(args):
             else:
                 config.defines[d[0]] = '='.join(d[1:])
     
-    if options.includes != None:
-        import os.path
-        for p in options.includes:
-            config.searchPath.append(os.path.normpath(p))
-
     if not reader.read(args[0]):
         sys.exit(1)
 

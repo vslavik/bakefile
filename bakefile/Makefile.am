@@ -24,7 +24,8 @@ output_DATA = output/autoconf.empy \
               output/watcom-opts.empy \
               output/_hdr_makefile.empy
 
-rules_DATA =  rules/autoconf.bkl \
+rules_DATA =  rules/FORMATS.bkmanifest \
+              rules/autoconf.bkl \
               rules/borland.bkl \
               rules/common.bkl \
               rules/format_features.bkl \
@@ -54,6 +55,7 @@ code_PYTHON = src/config.py \
               src/errors.py \
               src/finalize.py \
               src/flatten.py \
+			  src/formats.py \
               src/mk.py \
               src/mk_dump.py \
               src/reader.py \
