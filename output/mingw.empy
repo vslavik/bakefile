@@ -25,7 +25,6 @@ def makeCondEnd(c):
 ### Variables: ###
 
 @[ for v in make_vars :@
-@v.name = @v.value
 @utils.wrapLongLine('%s = ' % v.name, v.value, ' \\', variable=v.name)
 ]@
 
