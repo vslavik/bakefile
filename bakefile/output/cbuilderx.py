@@ -17,9 +17,6 @@
 import fnmatch, re
 import errors, utils
 
-basename = os.path.splitext(os.path.basename(FILE))[0]
-dirname = os.path.dirname(FILE)
-
 
 # ------------------------------------------------------------------------
 #   helpers
@@ -654,4 +651,8 @@ def outputBuildOrder(t):
 
 
 
-genProjectGroup()
+def run():
+    global basename, dirname
+    basename = os.path.splitext(os.path.basename(FILE))[0]
+    dirname = os.path.dirname(FILE)
+    genProjectGroup()
