@@ -189,5 +189,27 @@
     </para>
   </section>
   
+  <section id="rule.datafiles.mkdir" xreflabel="mkdir">
+    <title>mkdir</title>
+    <para>
+      Creates directory.
+      <informaltable>
+        <tgroup cols='2'>
+          <thead>
+            <row>
+              <entry>Tag</entry>
+              <entry>Description</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry role="tagname">dir</entry>
+              <entry>Name of the directory.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </section>
 
 </section>
