@@ -26,7 +26,7 @@
     <set var="__FLAG_EXE_CONSOLE">system nt</set>
     <set var="__FLAG_EXE_GUI">system nt_win</set>
     <set var="__FLAG_DEBUG_ON">-d2</set>
-    <set var="__FLAG_DEBUG_ON_LINKER">debug dwarf all</set>
+    <set var="__FLAG_DEBUG_ON_LINKER">debug all</set>
     <set var="__FLAG_DEBUG_OFF">-d0</set>
     <set var="__FLAG_DEBUG_OFF_LINKER"></set>
     <set var="__FLAG_OPTIMIZE_OFF">-od</set>
