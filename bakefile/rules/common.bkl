@@ -45,7 +45,10 @@
     <!-- =============================================================== -->
 
     <!-- Allow the user to redirect options to their own file
-         (but don't do it by default): -->
+         (but don't do it by default): 
+         NB: these two are understood by bakefile Python code, don't
+             remove them - if you do, make sure you update src/*.py as well
+    -->
     <set var="OPTIONS_FILE"/>
     <set var="WRITE_OPTIONS_FILE">1</set>
 
