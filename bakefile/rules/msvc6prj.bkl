@@ -137,6 +137,9 @@
             <ldflags>
                 $(substituteFromDict(value, {'on':'/DEBUG','off':''}))
             </ldflags>
+            <set var="__debug">
+                $(substituteFromDict(value, {'on':'1','off':'0'}))
+            </set>
         </define-tag>       
 
         <define-tag name="install-to"/>
