@@ -56,7 +56,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/msvc_common.bkl \
               rules/msvc_prj_common.bkl \
               rules/msvc6prj.bkl \
-              rules/msevc6prj.bkl \
+              rules/msevc4prj.bkl \
               rules/mingw.bkl \
               rules/watcom.bkl \
               rules/unixlike.bkl \
