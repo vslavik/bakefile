@@ -1,7 +1,7 @@
 ; This script was first created by ISTool
 ; http://www.lerstad.com/istool/
 
-#define VERSION          "0.1.2"
+#define VERSION          "0.1.3"
 
 [Setup]
 OutputBaseFilename=bakefile-{#VERSION}-setup
@@ -42,6 +42,7 @@ Source: tests\*; DestDir: {app}\tests; Flags: recursesubdirs; Components: tests
 Source: doc\*; DestDir: {app}\doc; Flags: recursesubdirs; Components: doc
 Source: ..\minipython\*; DestDir: {app}\src; Flags: recursesubdirs; Components: python
 Source: README; DestDir: {app}; Components: base
+Source: NEWS; DestDir: {app}; Components: base
 Source: THANKS; DestDir: {app}; Components: base
 Source: COPYING; DestDir: {app}; Components: base
 Source: AUTHORS; DestDir: {app}; Components: base
@@ -73,7 +74,7 @@ BeveledLabel=Bakefile
 [UninstallDelete]
 Name: {app}\src; Type: filesandordirs
 [Tasks]
-Name: addpath; Description: Add Bakefile to PATH environment variable
+Name: addpath; Description: Add Bakefile to PATH environment variable (may not work); Flags: unchecked
 [Code]
 // -----------------------------------------------------------------
 //                    code for changing PATH
@@ -407,4 +408,3 @@ begin
   end;
   Result := True;
 end;
-
