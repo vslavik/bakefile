@@ -17,10 +17,12 @@
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
     
-    <set var="__LINKER_CC" eval="0">wlink</set>
-    <set var="__LINKER_CXX" eval="0">wlink</set>
-    <set var="__DLL_LINKER_CC" eval="0">wlink</set>
-    <set var="__DLL_LINKER_CXX" eval="0">wlink</set>
+    <set var="__LINKER_CC">wlink</set>
+    <set var="__LINKER_CXX">wlink</set>
+    <set var="__DLL_LINKER_CC">wlink</set>
+    <set var="__DLL_LINKER_CXX">wlink</set>
+    <set var="__MODULE_LINKER_CC">$(__DLL_LINKER_CC)</set>
+    <set var="__MODULE_LINKER_CXX">$(__DLL_LINKER_CXX)</set>
 
     <!-- basic compiler/linker flags: -->
     <set var="__FLAG_DEBUG_ON">-d2</set>
@@ -134,6 +136,11 @@
             @%append $(__lbc_file) system nt_dll
             $(__linker) @$(__lbc_file)
             wlib -q -n -b $(__targetdir)$(__libname).lib +$^@
+        </set>
+        <set var="__LINK_MODULE_CMD" eval="0">
+            $(__LINK_CMD_BASE)
+            @%append $(__lbc_file) system nt_dll
+            $(__linker) @$(__lbc_file)
         </set>
     </template>
     

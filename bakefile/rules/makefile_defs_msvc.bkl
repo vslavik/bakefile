@@ -17,10 +17,12 @@
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
     
-    <set var="__LINKER_CC" eval="0">link</set>
-    <set var="__LINKER_CXX" eval="0">link</set>
-    <set var="__DLL_LINKER_CC" eval="0">link /DLL</set>
-    <set var="__DLL_LINKER_CXX" eval="0">link /DLL</set>
+    <set var="__LINKER_CC">link</set>
+    <set var="__LINKER_CXX">link</set>
+    <set var="__DLL_LINKER_CC">link /DLL</set>
+    <set var="__DLL_LINKER_CXX">link /DLL</set>
+    <set var="__MODULE_LINKER_CC">$(__DLL_LINKER_CC)</set>
+    <set var="__MODULE_LINKER_CXX">$(__DLL_LINKER_CXX)</set>
 
     <!-- basic compiler/linker flags: -->
     <set var="__FLAG_EXE_CONSOLE" eval="0">/SUBSYSTEM:CONSOLE</set>
@@ -111,6 +113,11 @@
         <set var="__LINK_DLL_CMD" eval="0">
             $(__dll_linker) /NOLOGO /OUT:$@ $(__ldflags) @&lt;&lt;
             $(__objects_var) $(__ldlibs) /IMPLIB:$(__targetdir)$(__libname).lib
+            &lt;&lt;NOKEEP
+        </set>
+        <set var="__LINK_MODULE_CMD" eval="0">
+            $(__dll_linker) /NOLOGO /OUT:$@ $(__ldflags) @&lt;&lt;
+            $(__objects_var) $(__ldlibs)
             &lt;&lt;NOKEEP
         </set>
     </template>

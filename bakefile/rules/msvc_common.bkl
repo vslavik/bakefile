@@ -8,25 +8,25 @@
     <tag-info name="threading"
               position="before:runtime-libs"/>      
     
-    <define-tag name="runtime-libs" rules="exe,dll,lib">
+    <define-tag name="runtime-libs" rules="exe,dll,module,lib">
         <set var="__rtl_type">
             $(substituteFromDict(value,
               {'static':__rtl_static, 'dynamic':'D'}))
         </set>
     </define-tag>
-    <define-tag name="threading" rules="exe,dll,lib">
+    <define-tag name="threading" rules="exe,dll,module,lib">
         <set var="__rtl_static">
             $(substituteFromDict(value, {'multi':'T', 'single':'L'}))
         </set>
     </define-tag>
 
-    <define-tag name="debug-info" rules="exe,dll,lib">
+    <define-tag name="debug-info" rules="exe,dll,module,lib">
         <debug-runtime-libs>$(value)</debug-runtime-libs>
         <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
         <cppflags>/Fd$(__pdbfile)</cppflags>
     </define-tag>
 
-    <define-tag name="debug-runtime-libs" rules="exe,dll,lib">
+    <define-tag name="debug-runtime-libs" rules="exe,dll,module,lib">
         <define>
             $(substituteFromDict(value, {'on':'_DEBUG', 'off':'NDEBUG'}))
         </define>
@@ -46,11 +46,11 @@
     
     <!-- includes and defines should propagate to rc compilation, too: -->
     
-    <define-tag name="include" rules="exe,dll">
+    <define-tag name="include" rules="exe,dll,module">
         <set var="__win32rc_flags" append="1">
             $(addPrefixIfNotEmpty('/i ',nativePaths(value)))</set>
     </define-tag>
-    <define-tag name="define" rules="exe,dll">
+    <define-tag name="define" rules="exe,dll,module">
         <set var="__win32rc_flags" append="1">
             $(addPrefixIfNotEmpty('/d ',value))</set>
     </define-tag>
@@ -66,22 +66,22 @@
     <tag-info name="precomp-headers"
               position="after:precomp-headers-file,after:precomp-headers-header,after:precomp-headers-gen"/>
 
-    <define-tag name="precomp-headers-header" rules="exe,dll,lib">
+    <define-tag name="precomp-headers-header" rules="exe,dll,module,lib">
         <set var="__pch_header">$(value)</set>
         <set var="__pch_flags">/YX"$(__pch_header)"</set>
     </define-tag>
 
-    <define-tag name="precomp-headers-gen" rules="exe,dll,lib">
+    <define-tag name="precomp-headers-gen" rules="exe,dll,module,lib">
         <set var="__pch_flags">/Yu"$(__pch_header)"</set>
     </define-tag>
     
-    <define-tag name="precomp-headers-file" rules="exe,dll,lib">
+    <define-tag name="precomp-headers-file" rules="exe,dll,module,lib">
         <set var="__pch_flags" append="1">
             $(formatIfNotEmpty('/Fp"%s.pch"', mkPathPrefix(BUILDDIR)+value))
         </set>
     </define-tag>
     
-    <define-tag name="precomp-headers" rules="exe,dll,lib">
+    <define-tag name="precomp-headers" rules="exe,dll,module,lib">
             <!-- FIXME: should be cppflags, this is temporary hack to
             make wxWindows work -->
         <cxxflags> 

@@ -27,6 +27,8 @@
     <set var="__LINKER_CXX" eval="0">ilink32 -Tpe -q</set>
     <set var="__DLL_LINKER_CC" eval="0">ilink32 -Tpd -q</set>
     <set var="__DLL_LINKER_CXX" eval="0">ilink32 -Tpd -q</set>
+    <set var="__MODULE_LINKER_CC">$(__DLL_LINKER_CC)</set>
+    <set var="__MODULE_LINKER_CXX">$(__DLL_LINKER_CXX)</set>
 
     <!-- basic compiler/linker flags: -->
     <set var="__FLAG_EXE_CONSOLE" eval="0">-ap</set> <!-- -tC -->
@@ -191,6 +193,11 @@
             $(__startup) $(__objects_var),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
             |
             implib -f $(__targetdir)$(__libname) $@
+        </set>
+        <set var="__LINK_MODULE_CMD" eval="0">
+            $(__module_linker) $(__ldflags) @&amp;&amp;|
+            $(__startup) $(__objects_var),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
+            |
         </set>
     </template>
     

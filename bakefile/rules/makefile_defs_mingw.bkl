@@ -39,6 +39,8 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="__LINKER_CXX" eval="0">$(CXX)</set>
     <set var="__DLL_LINKER_CC" eval="0">$(CC) -shared -o</set>
     <set var="__DLL_LINKER_CXX" eval="0">$(CXX) -shared -o</set>
+    <set var="__MODULE_LINKER_CC">$(__DLL_LINKER_CC)</set>
+    <set var="__MODULE_LINKER_CXX">$(__DLL_LINKER_CXX)</set>
     
     <!-- 
     basic compiler/linker flags (they are left almost empty because
@@ -83,6 +85,9 @@ makefiles (most notably GNU Make and Autoconf formats).
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(__dll_linker) $@ $(__objects_var) $(__ldflags) $(__ldlibs)
+        </set>
+        <set var="__LINK_MODULE_CMD" eval="0">
+            $(__module_linker) $@ $(__objects_var) $(__ldflags) $(__ldlibs)
         </set>
     </template>
     

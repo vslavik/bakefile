@@ -10,9 +10,10 @@
   SPECIFICATION
 </RULE>
 ]]></programlisting>
-    There are five elementary rules (types of targets):
+    There are six elementary rules (types of targets):
     <xref linkend="rule.exe"/>,
     <xref linkend="rule.dll"/>,
+    <xref linkend="rule.module"/>,
     <xref linkend="rule.lib"/>,
     <xref linkend="rule.phony"/> and
     <xref linkend="rule.action"/>. 
@@ -246,6 +247,37 @@
 
       </para>
     </section>
+    
+    
+    <section id="rule.module" xreflabel="module">
+      <title>module</title>
+      <para>
+        Builds loadable module (aka plugin). Unlike <xref linkend="rule.dll"/>,
+        this one does not create import library on Windows.
+        <informaltable>
+          <tgroup cols='2'>
+            <thead>
+              <row>
+                <entry>Tag</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+
+              <row id="tags.module.dllname" xreflabel="dllname">
+                <entry role="tagname">dllname</entry>           
+                <entry>
+                  See <xref linkend="tags.dll.dllname"/>.
+                </entry>
+              </row>
+              
+            </tbody>
+          </tgroup>
+        </informaltable>
+
+      </para>
+    </section>
+    
 
     <section id="rule.phony" xreflabel="phony">
       <title>phony</title>
@@ -347,7 +379,7 @@
                   Set name of directory where the target will be created.
                   <varname>BUILDDIR</varname> is used by default.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
               
               
@@ -386,7 +418,7 @@
 </exe>
 ]]></programlisting>
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
 
       
@@ -396,7 +428,7 @@
                 <entry>
                   Add directory where the compiler should look for headers.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
       
       
@@ -406,7 +438,7 @@
                   Define C preprocessor macro.
                   The value may be empty, in which case no flag is added.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
       
       
@@ -430,7 +462,7 @@
                   Library name may be empty.
                   See also <xref linkend="tag.lib-path"/>.
                 </entry>
-                <entry role="availability">exe, dll</entry>
+                <entry role="availability">exe, dll, module</entry>
               </row>
 
               
@@ -441,7 +473,7 @@
                   Add directory where to look for
                   <link linkend="tag.sys-lib">system libraries</link>.
                 </entry>
-                <entry role="availability">exe, dll</entry>
+                <entry role="availability">exe, dll, module</entry>
               </row>
       
               
@@ -465,7 +497,7 @@
 </exe>
 ]]></programlisting>
                 </entry>
-                <entry role="availability">exe, dll</entry>
+                <entry role="availability">exe, dll, module</entry>
               </row>
       
               
@@ -488,7 +520,7 @@
 </exe>
 ]]></programlisting>
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
               
               <row id="tag.debug-info" xreflabel="debug-info">
@@ -497,7 +529,7 @@
                   Enable or disable debugging information. Can be either
                   <literal>on</literal> or <literal>off</literal>.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
               
               <row id="tag.debug-runtime-libs" xreflabel="debug-runtime-libs">
@@ -513,7 +545,7 @@
                   with Visual C++; other compilers respect only
                   <xref linkend="tag.debug-info"/>.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
               
               
@@ -524,7 +556,7 @@
                   and should be avoided if possible. Accepted values are
                   <literal>i[3456]86</literal>.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
 
 
@@ -536,7 +568,7 @@
                   application. This affects what libraries are linked into
                   executable on some platforms.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
 
 
@@ -547,7 +579,7 @@
                   enables or disables use of precompiled headers with
                   compilers that support them.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
               
               
@@ -561,7 +593,7 @@
                   by Bakefile, e.g. by apending <literal>.pch</literal>
                   extension to it.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
               
               <row>
@@ -574,7 +606,7 @@
                   Add <emphasis>compiler dependent</emphasis> compilation
                   flags to compiler flags.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
               
               
@@ -586,7 +618,7 @@
                   Add <emphasis>linker dependent</emphasis>
                   flags for the linker.
                 </entry>
-                <entry role="availability">exe, dll, lib</entry>
+                <entry role="availability">exe, dll, module, lib</entry>
               </row>
               
               
@@ -600,7 +632,7 @@
                   <function>ldflags</function>. This is useful when resolving
                   command line order problems that gcc is prone to.
                 </entry>
-                <entry role="availability">exe, dll</entry>
+                <entry role="availability">exe, dll, module</entry>
               </row>
               
               
@@ -613,7 +645,7 @@
                   <xref linkend="tag.define"/> and 
                   <xref linkend="tag.include"/> tags on the target.
                 </entry>
-                <entry role="availability">exe,dll</entry>
+                <entry role="availability">exe, dll, module</entry>
               </row>
               
               
@@ -626,7 +658,7 @@
                   <xref linkend="tag.define"/> and 
                   <xref linkend="tag.include"/> tags on the target.
                 </entry>
-                <entry role="availability">exe,dll</entry>
+                <entry role="availability">exe, dll, module</entry>
               </row>
               
               
