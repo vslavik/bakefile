@@ -100,7 +100,7 @@ def flattenConfig(cfg):
             use = mk.evalCondition(tar.cond.tostr())
         assert use != None
         if use == '0':
-            toDep.append(t)
+            toDel.append(t)
         else:
             orig_targets[t].vars['configs'][__cfg2str(cfg)] = tar.vars
 
