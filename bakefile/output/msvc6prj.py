@@ -123,11 +123,9 @@ Package=<4>
             deps = ''
             if single_target:
                 dsp_name = self.basename
-                deplist = t._deps.split()
             else:
                 dsp_name = '%s_%s' % (self.basename, t.id)
-                deplist = ['%s_%s' % (self.basename, x)
-                           for x in t._deps.split()]
+            deplist = t._deps.split()
             
             # add external dsp dependencies:
             for d in t._dsp_deps.split():
@@ -140,7 +138,7 @@ Package=<4>
                     d2 = d
                 deps += self.makeDependency(d2)
 
-            dsw += project % (dsp_name, dsp_name, deps)
+            dsw += project % (t.id, dsp_name, deps)
             dspfile = (t, 
                        os.path.join(self.dirname,
                                     dsp_name + '.' + self.getDspExtension()),
