@@ -42,7 +42,9 @@
             <set var="__rez_flags" append="1">-i $(value)</set>
         </define-tag>
         <define-tag name="define">
-            <set var="__rez_flags" append="1">-d $(value)</set>
+            <set var="__rez_flags" append="1">
+                $(addPrefixIfNotEmpty('-d ',value))
+            </set>
         </define-tag>
         
     </define-rule>
