@@ -132,4 +132,4 @@ try:
 except(ImportError):
     parseFile = __parseFileMinidom
     import sys
-    sys.stderr.write("Warning: libxml2 missing, running in non-validating mode\n")
+    sys.stderr.write("Warning: libxml2 missing, will not show line numbers on errors\n")
