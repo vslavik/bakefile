@@ -1,6 +1,10 @@
-
-/* This is only a simple script-launcher utility that calls Python interpreter
-   on win32 systems, so that running the tools is simpler.
+/*
+ *  
+ * This is only a simple script-launcher utility that calls Python interpreter
+ * on win32 systems, so that running the tools is simpler.
+ * 
+ * $Id$
+ *  
  */
 
 #include <string.h>
