@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+
+<!ENTITY intro SYSTEM      "intro.docbook">
+<!ENTITY concepts SYSTEM   "concepts.docbook">
+<!ENTITY targets SYSTEM    "targets.docbook">
+<!ENTITY variables SYSTEM  "variables.docbook">
+<!ENTITY modules SYSTEM    "modules.docbook">
+<!ENTITY commands SYSTEM   "commands.docbook">
+<!ENTITY manpage SYSTEM    "manpage.docbook">
+
+]>
+
+<book lang="en">
+  <bookinfo>
+    <title>Bakefile</title>
+    <author>
+      <firstname>Václav</firstname>
+      <surname>Slavík</surname>
+    </author>
+  </bookinfo>
+
+  &intro;
+  &concepts;
+  &targets;
+  &commands;
+  &variables;
+  &modules;
+  &manpage;
+
+</book>
