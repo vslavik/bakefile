@@ -303,9 +303,6 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__targetname" eval="0">$(LIBPREFIX)$(__libname)$(LIBEXT)</set>
             <set var="__linkname" eval="0">$(LIBPREFIX)$(__libname)$(LIBEXT)</set>
             <dependency-of>all</dependency-of>
-            <clean-files>
-                $(ref('__targetdir',id))$(ref('__targetname',id))
-            </clean-files>
         </template>
         <define-tag name="libname">
             <set var="__libname">$(value)</set>
@@ -322,9 +319,6 @@ makefiles (most notably GNU Make and Autoconf formats).
             </set>
             <dllname>$(id)</dllname>
             <dependency-of>all</dependency-of>
-            <clean-files>
-                $(ref('__targetdir',id))$(ref('__targetname',id))
-            </clean-files>
         </template>
         <define-tag name="dllname">
             <set var="__dllname">$(value)</set>

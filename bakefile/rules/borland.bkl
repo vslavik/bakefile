@@ -35,7 +35,7 @@
             -if exist $(__builddir)\*.res del $(__builddir)\*.res
         </command>
     </action>
-    
+
     <define-tag name="__clean-target-files" rules="exe,dll,module">
         <clean-files>
             $(ref('__targetdir',id))$(ref('__name',id)).tds
