@@ -164,12 +164,15 @@
     </define-tag>
 
     <define-tag name="install-to" rules="dll">
-        <set var="__macinstname">
+        <set var="__macinstname" eval="0">
+            $(ifthenelse(__mac_instname=='',ref('__targetname',id),ref('__mac_instname',id)))
+        </set>
+        <set var="__macinstnamecmd">
             <if cond="PLATFORM_MACOSX=='1'">
--install_name $(value)/$(ifthenelse(__mac_instname=='',ref('__targetname',id),ref('__mac_instname',id)))
+                -install_name $(value)/$(__macinstname)
             </if>
         </set>
-        <ldflags>$(__macinstname)</ldflags>
+        <ldflags>$(__macinstnamecmd)</ldflags>
 
         <modify-target target="install_$(id)">
             <command>(cd $(value) ; $(ref('__so_symlinks_inst_cmd',id)))</command>
