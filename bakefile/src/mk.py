@@ -136,7 +136,7 @@ def evalCondition(cond):
         # it may be a "() and () and ()" statement with some part = 0:
         for c in __splitConjunction(cond):
             try:
-                if not evalExpr('$(%s)' % c, use_options=0):
+                if evalExpr('$(%s)' % c, use_options=0) == '0':
                     return '0'
             except NameError: pass        
         return None
