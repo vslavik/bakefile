@@ -44,8 +44,9 @@
     <set var="__FLAG_ARCH_I686">-6</set>
     <set var="__FLAG_SINGLE_THREADING"/>
     <set var="__FLAG_MULTI_THREADING"/>
-    <!-- FIXME: -tWR sets -tW as well, so it must be before -tC !! -->
-
+    
+    <!-- -tWR sets -tW as well, so it must be before -tC !! -->
+    <tag-info name="runtime-libs" position="before:app-type"/>
 
     <!-- rules building blocks: -->
     
