@@ -772,6 +772,19 @@ def handleFragment(e):
             content = e.value
         mk.addFragment(mk.Fragment(content))
 
+def handleRequires(e):
+    if 'version' in e.props:
+        vcur = mk.vars['BAKEFILE_VERSION'].split('.')
+        vreq = e.props['version'].split('.')
+        if vcur < vreq:
+            sys.stderr.write("""
+This file cannot be processed with Bakefile version older than %s.
+You are using Bakefile version %s. Please install the newest version
+from http://bakefile.sourceforge.net.
+
+""" % (e.props['version'], mk.vars['BAKEFILE_VERSION']))
+            raise ReaderError(e, "Bakefile not new enough")
+
 
 HANDLERS = {
     'set':           handleSet,
@@ -786,6 +799,7 @@ HANDLERS = {
     'output':        handleOutput,
     'fragment':      handleFragment,
     'modify-target': handleModifyTarget,
+    'requires':      handleRequires,
     }
 
 
