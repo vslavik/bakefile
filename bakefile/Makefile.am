@@ -14,6 +14,7 @@ man_MANS = doc/man/bakefile.1
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
               output/borland.empy \
+              output/msvc.empy \
               output/_hdr_makefile.empy
 
 rules_DATA =  rules/autoconf.bkl \
@@ -24,9 +25,11 @@ rules_DATA =  rules/autoconf.bkl \
               rules/dirs.bkl \
               rules/makefile.bkl \
               rules/makefile_defs_borland.bkl \
+              rules/makefile_defs_msvc.bkl \
               rules/makefile_defs_unix.bkl \
               rules/makefile_macres.bkl \
               rules/makefile_mingw.bkl \
+              rules/msvc.bkl \
               rules/unixlike.bkl \
               rules/vc5.bkl \
               rules/vc6.bkl \
