@@ -141,7 +141,9 @@ makefiles (most notably GNU Make and Autoconf formats).
             </set>
         </define-tag>
         <define-tag name="lib-path">
-            <set var="__ldflags" append="1">$(__LIBDIR_ARG)$(value)</set>
+            <set var="__ldflags" append="1">
+                $(__LIBDIR_ARG)$(nativePaths(value))
+            </set>
         </define-tag>
         
         <define-tag name="cflags">
@@ -170,9 +172,9 @@ makefiles (most notably GNU Make and Autoconf formats).
 
         <define-tag name="library">
             <depends>$(value)</depends>
-            <ldflags>                
+            <ldlibs>
                 $(substitute(value, lambda x: ref('__targetdir',x)+ref('__linkname', x), 'LIBR'))
-            </ldflags>
+            </ldlibs>
         </define-tag>
 
         <define-tag name="dirname">
@@ -218,7 +220,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                       {'multi':__FLAG_MULTI_THREADING,
                        'single':__FLAG_SINGLE_THREADING}))
             </ldflags>
-        </define-tag>       
+        </define-tag>
 
         <define-tag name="precomp-headers">
             <cppflags>
@@ -230,6 +232,8 @@ makefiles (most notably GNU Make and Autoconf formats).
                 $(formatIfNotEmpty(__FLAG_PCH_FILE, mkPathPrefix(BUILDDIR)+value))
             </cppflags>
         </define-tag>
+        
+        <define-tag name="runtime-libs"/>
         
     </define-rule>
 

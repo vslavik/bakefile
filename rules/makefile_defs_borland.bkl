@@ -17,14 +17,14 @@
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
     
-    <set var="__LINKER_CC" eval="0">$(CC)</set>
-    <set var="__LINKER_CXX" eval="0">$(CXX)</set>
-    <set var="__DLL_LINKER_CC" eval="0">$(CC) -tWD</set>
-    <set var="__DLL_LINKER_CXX" eval="0">$(CXX) -tWD</set>
+    <set var="__LINKER_CC" eval="0">ilink32 -Tpe</set>
+    <set var="__LINKER_CXX" eval="0">ilink32 -Tpe</set>
+    <set var="__DLL_LINKER_CC" eval="0">ilink32 -Tpd</set>
+    <set var="__DLL_LINKER_CXX" eval="0">ilink32 -Tpd</set>
 
     <!-- basic compiler/linker flags: -->
-    <set var="__FLAG_EXE_CONSOLE">-tWC</set>
-    <set var="__FLAG_EXE_GUI">-tW</set>
+    <set var="__FLAG_EXE_CONSOLE" eval="0">-ap</set> <!-- -tC -->
+    <set var="__FLAG_EXE_GUI" eval="0">-aa</set> <!-- -tW -->
     <set var="__FLAG_DEBUG_ON">-v</set>
     <set var="__FLAG_DEBUG_ON_LINKER">-v</set>
     <set var="__FLAG_DEBUG_OFF">-v-</set>
@@ -45,16 +45,81 @@
     <!-- rules building blocks: -->
     
     <template id="__commands_templ_C">
+        <set var="__rtldll_flag"/>
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -c -P- -o$@ $(__cflags) $**
+            $(CC) -c -P- -o$@ $(__rtldll_flag) $(__cflags) $**
         </set>
     </template>
     
     <template id="__commands_templ_CXX">
+        <set var="__rtldll_flag"/>
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -c -P -o$@ $(__cxxflags) $**
+            $(CXX) -c -P -o$@ $(__rtldll_flag) $(__cxxflags) $**
         </set>
     </template>
+
+    <!--
+    NB: We deal with the ilink32 mess here. We can't use simple linking
+        because it doesn't allow us to embed resources. ilink32 requires
+        that both startup object file and C RTL are specified explicitly,
+        and we must come with correct names.
+
+        Borland's startup objects are:
+          c0d32.obj         windowed app DLL
+          c0d32w.obj        DLL, wide char support
+          c0d32x.obj        console DLL
+          c0w32.obj         GUI app
+          c0w32w.obj        GUI app, wide char support
+          c0x32.obj         console app
+          c0x32w.obj        console app, wide char support
+
+        C runtime libs are:
+          cw32.lib          static
+          cw32i.lib         dynamic (import lib for DLL RTL)
+          cw32mt.lib        static multi-threaded
+          cw32mti.lib       dynamic multi-threaded
+
+        FIXME - No idea what's the different between console and win DLL is,
+                so we currently ignore it. Wide char support stuff is not
+                used either, it doesn't seem to make a difference.
+    -->
+
+    <define-rule name="__borland_comp">
+        <template>
+            <set var="__startup_obj_type">x</set> <!-- console app -->
+            <set var="__rtl_i"/>
+            <set var="__rtl_mt"/>
+            <set var="__startup" eval="0">c0$(__startup_obj_type)32.obj</set>
+            <set var="__rtl" eval="0">cw32$(__rtl_mt)$(__rtl_i).lib</set>
+        </template>
+        <define-tag name="runtime-libs">
+            <set var="__rtldll_flag">
+                $(substituteFromDict(value, {'static':'', 'dynamic':'-tWR'}))
+            </set>
+            <set var="__rtl_i">
+                $(substituteFromDict(value, {'static':'', 'dynamic':'i'}))
+            </set>
+        </define-tag>
+        <define-tag name="threading">
+            <set var="__rtl_mt">
+                $(substituteFromDict(value, {'multi':'mt', 'single':''}))
+            </set>
+        </define-tag>
+    </define-rule>
+    
+    <define-rule name="__borland_dll" extends="__borland_comp">
+        <template>
+            <set var="__startup_obj_type">d</set> <!-- for DLL -->
+        </template>
+    </define-rule>
+    <define-rule name="__borland_exe" extends="__borland_comp">
+        <define-tag name="app-type">
+            <set var="__startup_obj_type">
+                $(substituteFromDict(value, {'console':'x','gui':'w'}))
+            </set>
+        </define-tag>
+    </define-rule>
+    
     
     <template id="__commands_templ">
         <!-- 
@@ -69,10 +134,11 @@
             
             (We have to use response file because of windows command
             line length limitation.)
-        -->
+            -->
+        <set var="__win32res"/>
         <set var="__LINK_EXE_CMD" eval="0">
-            $(__linker) -e$@ $(__ldflags) $(__ldlibs) @&amp;&amp;|
-            $(__objects)
+            $(__linker) $(__ldflags) @&amp;&amp;|
+            $(__startup) $(__objects),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
             |
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
@@ -82,8 +148,8 @@
             |
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) -e$@ $(__ldflags) $(__ldlibs) @&amp;&amp;|
-            $(__objects)
+            $(__dll_linker) $(__ldflags) @&amp;&amp;|
+            $(__startup) $(__objects),$@,,$(__ldlibs) $(__rtl),,$(__win32res)
             |
             implib $(__targetdir)$(__libname) $@
         </set>
