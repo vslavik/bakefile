@@ -356,7 +356,7 @@
     <action id="distclean" template="__phony">
         <depends>clean</depends>
         <command>
-            $(RM) configure config.cache config.log config.status bk-deps bk-make-pch shared-ld-sh Makefile
+            $(RM) config.cache config.log config.status bk-deps bk-make-pch shared-ld-sh Makefile
         </command>
     </action>
 
