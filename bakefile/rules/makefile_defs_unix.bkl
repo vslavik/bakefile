@@ -55,7 +55,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     </template>
     <template id="__commands_templ">
         <set var="__LINK_EXE_CMD" eval="0">
-            $(__linker) -o $@ $(__objects) $(__ldflags)
+            $(__linker) -o $@ $(__objects) $(__ldflags) $(__ldflags_end)
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
             $(RM) $@
@@ -63,7 +63,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             $(RANLIB) $@
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) $@ $(__objects) $(__ldflags)
+            $(__dll_linker) $@ $(__objects) $(__ldflags) $(__ldflags_end)
         </set>
     </template>
     
