@@ -35,7 +35,7 @@ def ref(var, target=None):
 
 def makeUniqueCondVarName(name):
     """Creates name for cond. var."""
-    n = nb = '__%s' % (name)
+    n = nb = '__%s' % (name.replace('-','_'))
     i = 1
     while n in mk.cond_vars:
         n = '%s_%i' % (nb, i)
