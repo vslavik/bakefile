@@ -20,14 +20,13 @@ def evalConstExpr(e, str, target=None):
         raise ReaderError(e, "can't use options or conditional variables in this context (%s)" % err)
 
 
-def evalWeakCondition(e):
-    """Evaluates e's 'cond' property, if present, and returns 0 or 1 if it
-       can be evaluated to a constant. If it can't (i.e. it is a strong
-       condition) do it, raises exception."""
+def evalWeakConditionDontRaise(e, target=None, add_dict=None):
+    """Same as evalWeakCondition() but returns None instead of raising
+       an exception."""
     if 'cond' not in e.props:
         return 1
     condstr = e.props['cond']
-    typ = mk.evalCondition(condstr)
+    typ = mk.evalCondition(condstr, target=target, add_dict=add_dict)
     # Condition never met when generating this target:
     if typ == '0':
         return 0
@@ -35,8 +34,19 @@ def evalWeakCondition(e):
     elif typ == '1':
         return 1
     else:
+        return None
+
+def evalWeakCondition(e, target=None, add_dict=None):
+    """Evaluates e's 'cond' property, if present, and returns 0 or 1 if it
+       can be evaluated to a constant. If it can't (i.e. it is a strong
+       condition) do it, raises exception."""
+    x = evalWeakConditionDontRaise(e, target=target, add_dict=add_dict)
+    if x == None:
         raise ReaderError(e,
-                "'%s': only weak condition allowed in this context" % condstr)
+                "'%s': only weak condition allowed in this context" % \
+                        e.props['cond'])
+    else:
+        return x
 
 
 def handleSet(e, target=None, add_dict=None):
@@ -283,6 +293,7 @@ class TgtCmdNode:
     TARGET  = 0
     TAG     = 1
     COMMAND = 2
+    IF      = 3
     
     def __init__(self, parent, type, node):
         self.parent = parent
@@ -339,8 +350,12 @@ def _extractTargetNodes(parent, list, target, tags, index):
     
     for node in list:
         if node.name == 'if':
-            if evalWeakCondition(node):
+            condType = evalWeakConditionDontRaise(node, target=target)
+            if condType == 1:
                 _extractTargetNodes(parent, node.children, target, tags, index)
+            elif condType == None:
+                n = TgtCmdNode(parent, TgtCmdNode.IF, node)
+                _extractTargetNodes(n, node.children, target, tags, index)
         elif node.name in COMMANDS:
             n = TgtCmdNode(parent, TgtCmdNode.COMMAND, node)
             _removeDuplicates(n)
@@ -459,6 +474,10 @@ def _processTargetNodes(node, target, tags, dict):
     def _processEntry(entry, target, dict):
         if entry.type == TgtCmdNode.COMMAND:
             processCmd(entry.node, target, dict)
+        elif entry.type == TgtCmdNode.IF:
+            if evalWeakCondition(entry.node, target=target, add_dict=dict):
+                for c in entry.children:
+                    _processEntry(c, target, dict)
         else:
             if entry.type == TgtCmdNode.TAG and entry.node.value != None:
                 dict2 = {'value':mk.evalExpr(entry.node.value,
