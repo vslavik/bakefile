@@ -673,6 +673,12 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
                       e.g. to merge configuration settings from several
                       makefiles.
                     </para>
+                    <para>
+                      <literal>insertBetweenMarkers</literal> takes first and
+                      last line of generated output, finds them in the output
+                      file (which must exist and must contain them) and
+                      inserts generated content between them.
+                    </para>
                   </entry>
                   <entry role="default">
                     <literal>replace</literal>
