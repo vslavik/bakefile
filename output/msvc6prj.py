@@ -123,9 +123,12 @@ Package=<4>
             deps = ''
             if single_target:
                 dsp_name = self.basename
+                deplist = t._deps.split()
             else:
                 dsp_name = '%s_%s' % (self.basename, t.id)
-            deplist = t._deps.split()
+                deplist = ['%s_%s' % (self.basename, x)
+                           for x in t._deps.split()]
+            
             # add external dsp dependencies:
             for d in t._dsp_deps.split():
                 deplist.append(d.split(':')[0])

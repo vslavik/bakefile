@@ -17,7 +17,8 @@ Version 0.1.5
 - autoconf: fixed precompiled headers dependencies in case of multiple targets
 - precompiled headers support for dmars and dmars_smake formats
   (based on work by Wlodzimierz ABX Skiba)
-- BSD make fixes
+- BSD make fixes in the autoconf format
+- fixed dependencies in msvc6prj format project files 
 
 
 Version 0.1.4
