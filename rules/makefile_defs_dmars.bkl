@@ -19,7 +19,7 @@
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
     
-    <set var="__LINKER">link /NOLOGO /SILENT /DELEXECUTABLE</set>
+    <set var="__LINKER">link /NOLOGO /SILENT /NOI /DELEXECUTABLE</set>
     <set var="__LINKER_CC">$(__LINKER) /EXETYPE:NT</set>
     <set var="__LINKER_CXX">$(__LINKER) /EXETYPE:NT</set>
     <set var="__DLL_LINKER_CC">$(__LINKER)</set>
