@@ -157,6 +157,9 @@ def addPrefixIfNotEmpty(prefix, value):
         return ''
     if value[0] != '$':
         return '%s%s' % (prefix,value)
+    if value[-1] != ')' and not value[-1].isspace():
+        return '%s%s' % (prefix,value)
+    
     if value.startswith('$(') and value[-1] == ')':
         condname = value[2:-1]
         if condname in mk.cond_vars:
