@@ -3,12 +3,12 @@
 def makeCondBegin(c):
     s = ''
     for e in c.exprs:
-        s += 'ifeq %s %s\n' % (e.option.name, e.value)
+        s += '!ifeq %s %s\n' % (e.option.name, e.value)
     return s.strip()
 def makeCondEnd(c):
     s = ''
     for e in range(0,len(c.exprs)):
-        s += 'endif\n'
+        s += '!endif\n'
     return s.strip()
 }@
 
