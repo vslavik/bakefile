@@ -17,10 +17,14 @@ class FileInfo:
 files = {}
 files_all = files
 
-def _matchesWildcard(filename, wildcard):
+def _matchesWildcard(filename, wildcard, absolutize=0):
     """Returns whether the file matches wildcard (glob)."""
-    name = os.path.abspath(filename).split(os.sep)
-    wild = os.path.abspath(wildcard).split(os.sep)
+    if absolutize:
+        name = os.path.abspath(filename).split(os.sep)
+        wild = os.path.abspath(wildcard).split(os.sep)
+    else:
+        name = filename.split(os.sep)
+        wild = wildcard.split(os.sep)
     if len(name) != len(wild):
         return 0
     for i in range(0,len(name)):
@@ -141,7 +145,7 @@ def filterFiles(bakefiles, formats):
         files1 = {}
         for f in files:
             for wildcard in bakefiles:
-                if _matchesWildcard(f, wildcard):
+                if _matchesWildcard(f, wildcard, absolutize=1):
                     files1[f] = files[f]
                     break
     files = files1
