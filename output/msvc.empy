@@ -6,22 +6,12 @@
 
 @[ for o in options :@
 # @o.descStr.replace('\n','\n#') @o.valuesStr
-!ifndef @o.name
 @o.name = @o.defaultStr
-!endif
 ]@
 
 # -------------------------------------------------------------------------
 # Do not modify the rest of this file!
 # -------------------------------------------------------------------------
-
-!ifndef BCCDIR
-BCCDIR=$(MAKEDIR)\..
-!endif
-
-!if "$(BCCDIR)" == "\.."
-!error Your Borland compiler does not define MAKEDIR. Please define the BCCDIR variable, e.g. BCCDIR=d:\bc4
-!endif
 
 ### Variables: ###
 
@@ -52,7 +42,7 @@ all: @BUILDDIR
 ]@
 @t.__targetdir@t.__targetname: @t.__deps
 @[ for cmd in t.__command.splitlines():@
-@(cmd.strip()=='|' ? '|' : '\t'+cmd.strip())
+@(cmd.strip()[:2]=='<<' ? '<<' : '\t'+cmd.strip())
 ]@
 @[ if t.cond != None :@
 !endif
