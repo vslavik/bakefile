@@ -225,6 +225,38 @@ Package=<4>
 # ** DO NOT EDIT **
 
 """ % id
+        
+    def makeBeginProject(self, t):
+        txt = """\
+# PROP AllowPerConfigDependencies 0
+# PROP Scc_ProjName ""
+# PROP Scc_LocalPath ""
+CPP=cl.exe
+"""
+        if t._type_nick in ['gui','dll']:
+            txt += 'MTL=midl.exe\n'
+        txt += 'RSC=rc.exe\n'
+        return txt
+       
+    def makeCpuPlatformID(self, cfg):
+        return ''
+    
+    def makeSettingsCPP(self, cfg):
+        return self.mkFlags('ADD',
+                            'CPP /nologo %s %s /c' % (cfg._cppflags, cfg._defines))
+    def makeSettingsMTL(self, cfg):
+        return self.mkFlags('ADD',
+                            'MTL /nologo %s /mktyplib203 /win32' % cfg._defines)
+
+    def makeSettingsRSC(self, cfg):
+        return self.mkFlags('ADD', 'RSC /l 0x405 %s' % cfg._win32rc_flags)
+
+    def makeSettingsCPP_MTL_RSC(self, cfg):
+        txt = self.makeSettingsCPP(cfg)
+        if cfg._type_nick in ['gui','dll']:
+            txt += self.makeSettingsMTL(cfg)
+        txt += self.makeSettingsRSC(cfg)
+        return txt
 
     def genDSP(self, t, filename, prjname):
         # Create header and list of configurations:
@@ -262,15 +294,9 @@ Package=<4>
 !MESSAGE 
 
 # Begin Project
-# PROP AllowPerConfigDependencies 0
-# PROP Scc_ProjName ""
-# PROP Scc_LocalPath ""
-CPP=cl.exe
 """
-        if t._type_code in [_MSVC_TYPECODE_GUI,_MSVC_TYPECODE_DLL]:
-            dsp += 'MTL=midl.exe\n'
-
-        dsp += 'RSC=rc.exe\n\n'
+        dsp += self.makeBeginProject(t)
+        dsp += '\n'
 
         # Output settings for all configurations:
         flags = []
@@ -282,18 +308,16 @@ Use_MFC 0
 Use_Debug_Libraries """ + cfg._debug + """
 Output_Dir "%s"
 Intermediate_Dir "%s\\%s"
-Target_Dir ""
-""" % (cfg._targetdir[:-1], cfg._builddir, t.id)) + \
-                  self.mkFlags('ADD','CPP /nologo %s %s /c' % (cfg._cppflags, cfg._defines))
-            if cfg._type_code in [_MSVC_TYPECODE_GUI,_MSVC_TYPECODE_DLL]:
-                fl += self.mkFlags('ADD','MTL /nologo %s /mktyplib203 /win32' % cfg._defines)
-            fl += self.mkFlags('ADD', 'RSC /l 0x405 %s' % cfg._win32rc_flags)
+%sTarget_Dir ""
+""" % (cfg._targetdir[:-1], cfg._builddir, t.id,
+       self.makeCpuPlatformID(cfg)))
+            fl += self.makeSettingsCPP_MTL_RSC(cfg)
             fl += """\
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 """
-            if cfg._type_code != _MSVC_TYPECODE_LIB:
+            if cfg._type_nick != 'lib':
                 fl += 'LINK32=link.exe\n'
                 fl += self.mkFlags('ADD','LINK32 %s /nologo %s' % (cfg._ldlibs, cfg._ldflags))
             else:

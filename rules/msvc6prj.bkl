@@ -9,6 +9,9 @@
     <set var="_MSVC_TYPECODE_LIB">0x0104</set>
 
     <set var="_MSVC_CPU_NAME">x86</set>
+    
+    
+    <define-rule name="_compiled_base"/>
 
     <include file="msvc_prj_common.bkl"/>
 
