@@ -35,7 +35,7 @@ def evalWeakCondition(e):
 
 def handleSet(e, target=None, add_dict=None):
     errors.pushCtx(e)
-    name = e.props['var']
+    name = evalConstExpr(e, e.props['var'], target)
     if (name in mk.override_vars) and target == None:
         return # can't change value of variable overriden with -D=xxx
     
