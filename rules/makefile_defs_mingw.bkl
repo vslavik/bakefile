@@ -90,16 +90,20 @@ makefiles (most notably GNU Make and Autoconf formats).
             $(__module_linker) $@ $(__objects_var) $(__ldflags) $(__ldlibs)
         </set>
     </template>
+
+    <set var="__MAKE_OPTIONS" eval="0">
+        $(' '.join(['%s=$(DOLLAR)(%s)' % (x,x) for x in OPTIONS.split()]))
+    </set>
     
     <template id="__subproject_templ">
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
-            (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) $(__subtarget))
+            $(DOLLAR)(MAKE) -C $(__subdir) -f $(os.path.basename(OUTPUT_FILE)) $(DOLLAR)(MAKEARGS) $(__subtarget)
         </set>
         <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
-            (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) install)
+            $(DOLLAR)(MAKE) -C $(__subdir) -f $(os.path.basename(OUTPUT_FILE)) $(DOLLAR)(MAKEARGS) install
         </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
-            (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) clean)
+            $(DOLLAR)(MAKE) -C $(__subdir) -f $(os.path.basename(OUTPUT_FILE)) $(DOLLAR)(MAKEARGS) clean
         </set>
     </template>
 
