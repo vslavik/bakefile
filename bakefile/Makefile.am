@@ -9,13 +9,13 @@ codeempydir = $(codedir)/empy
 codeoptikdir = $(codedir)/optik
 
 aclocal_DATA = autoconf/bakefile.m4
-#man_MANS = doc/man/bakefile.1
+man_MANS = doc/man/bakefile.1
 
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
               output/borland.empy \
               output/msvc.empy \
-			  output/msvc6prj.py \
+              output/msvc6prj.py \
               output/mingw.empy \
               output/watcom.empy \
               output/_hdr_makefile.empy
@@ -35,7 +35,7 @@ rules_DATA =  rules/autoconf.bkl \
               rules/makefile_macres.bkl \
               rules/makefile_mingw.bkl \
               rules/msvc.bkl \
-			  rules/msvc6prj.bkl \
+              rules/msvc6prj.bkl \
               rules/mingw.bkl \
               rules/watcom.bkl \
               rules/unixlike.bkl \
@@ -67,7 +67,8 @@ codeoptik_PYTHON = \
 
 
 EXTRA_DIST = \
-    autogen.sh tests doc/images doc bakefile.spec bakefile.iss \
+    autogen.sh chversion.sh \
+    tests doc/images doc bakefile.spec bakefile.iss \
     src/optik/README.txt autoconf output rules \
     src/empy/README src/empy/COPYING
 
