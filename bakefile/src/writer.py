@@ -6,7 +6,6 @@
 
 import copy, sys, tempfile, os, os.path, string
 import mk, config, errors
-import empy.em
 import outmethods
 
 mergeBlocks = outmethods.mergeBlocks
@@ -40,6 +39,7 @@ def __copyMkToVars():
     # Copy variables:
     for v in mk.vars:
         if v == 'targets': continue
+        if v == 'configurations': continue
         dict[v] = __valueToPy(mk.vars[v].strip())
 
     # Copy targets information:
@@ -137,17 +137,21 @@ def __readFile(filename):
         txt = []
     return txt
 
-def invoke(method):
+def __findWriter(writer):
     found = 0
     for p in config.searchPath:
-        template = os.path.join(p, method)
+        template = os.path.join(p, writer)
         if os.path.isfile(template):
             found = 1
             rulesdir = p
             break
     if not found:        
-        raise errors.Error("can't find output writer '%s'" % method)
-   
+        raise errors.Error("can't find output writer '%s'" % writer)
+    return (rulesdir, template)
+
+def invoke_em(writer, file, method):
+    import empy.em
+    rulesdir, template = __findWriter(writer)
     filename = tempfile.mktemp('bakefile')   
     empy.em.invoke(['-I','mk',
                     '-I','writer',
@@ -160,44 +164,70 @@ def invoke(method):
                     template])
     txt = __readFile(filename)
     os.remove(filename)
-    return txt
-        
+    writeFile(file, txt, method)
 
-def __saveResult(files, filename, method, data):
-    if (filename not in files) and (method != 'replace'):
-            files[filename] = __readFile(filename)
-    if method == 'replace':
-        files[filename] = data
-        return files
+
+def invoke_py(writer, file, method):
+    rulesdir, program = __findWriter(writer)
+    writer_code = ''.join(__readFile(program))
+    code = """
+import mk, writer, utils, os, os.path
+globals().update(writer.__preparedMkVars)
+RULESDIR="%s"
+FILE="%s"
+
+%s
+""" % (rulesdir.replace('\\','\\\\'), file.replace('\\','\\\\'), writer_code)
+    global __files
+    __files = []
+    vars = {}
+    exec code in vars
+
+def invoke(writer, file, method):
+    if writer.endswith('.empy'):
+        return invoke_em(writer, file, method)
+    elif writer.endswith('.py'):
+        return invoke_py(writer, file, method)
     else:
-        files[filename] = eval('%s(files[filename],data)' % method)
-        return files
+        raise errors.Error("unknown type of writer: '%s'" % writer)
+
+
+__output_files = {}
+def writeFile(filename, data, method = 'replace'):
+    if (filename not in __output_files) and (method != 'replace'):
+            __output_files[filename] = __readFile(filename)
+    if method == 'replace':
+        __output_files[filename] = data
+        return
+    else:
+        __output_files[filename] = eval('%s(__output_files[filename],data)' % method)
+        return
 
 def write():
     if config.verbose: print 'preparing generator...'
-    global __preparedMkVars
+
+    global __preparedMkVars, __output_files
     __preparedMkVars = __copyMkToVars()
-    outs = {}
+    __output_files = {}
     
     for file, writer, method in config.to_output:
         try:
             if config.verbose: print 'generating %s...' % file
-            ret = invoke(writer)
+            invoke(writer, file, method)
         except errors.Error, e:
             sys.stderr.write(str(e))
             return 0
-        outs = __saveResult(outs, file, method, ret)
     
-    for file in outs:
+    for file in __output_files:
         try:
             f = open(file, 'rt')
             txt = f.readlines()
             f.close()
         except IOError:
             txt = None
-        if outs[file] != txt:
+        if __output_files[file] != txt:
             f = open(file, 'wt')
-            f.writelines(outs[file])
+            f.writelines(__output_files[file])
             f.close()
             print 'writing %s' % file
         else:
