@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <makefile>
 
-    <include file="version.bakefile"/>
-    <include file="dirs.bakefile"/>
+    <include file="version.bkl"/>
+    <include file="dirs.bkl"/>
 
 
     <!-- Variables redefined in other (more specific) ruleset files: -->

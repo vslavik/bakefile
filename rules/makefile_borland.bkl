@@ -2,7 +2,7 @@
 
 <makefile>
     
-    <include file="win32.bakefile"/>
+    <include file="win32.bkl"/>
     
     <set var="__DEFINE_ARG">-D</set>
     <set var="__INCLUDE_ARG">-I</set>

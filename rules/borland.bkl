@@ -5,7 +5,7 @@
     <set var="COMPILER">bcc</set>
     <set var="MAKEFILE_SYNTAX">borland</set>
 
-    <include file="makefile.bakefile"/>
+    <include file="makefile.bkl"/>
     
     <output file="$(OUTPUT_FILE)" writer="borland.empy"/>
 

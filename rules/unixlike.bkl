@@ -10,6 +10,6 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="TOOLSET">unix</set>
 
     <set var="MAKEFILE_SYNTAX">unix</set>
-    <include file="makefile.bakefile"/>
+    <include file="makefile.bkl"/>
 
 </makefile>
