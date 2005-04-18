@@ -54,6 +54,7 @@
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
         <command>            
             -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
+            -if exist $(__builddir)\*.d del $(__builddir)\*.d
         </command>
     </action>
     

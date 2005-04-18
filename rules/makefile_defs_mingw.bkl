@@ -30,16 +30,18 @@ makefiles (most notably GNU Make and Autoconf formats).
 
     <set var="__FLAG_EXE_CONSOLE"></set>
     <set var="__FLAG_EXE_GUI">-Wl,--subsystem,windows -mwindows</set>
-
+    
+    <!-- dependency tracking: -->
+    <set var="CPPDEPS" make_var="1">-MT$(DOLLAR)@ -MF$(DOLLAR)@.d -MD</set>
 
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -c -o $@ $(__cflags) $&lt;
+            $(CC) -c -o $@ $(__cflags) $(CPPDEPS) $&lt;
         </set>
     </template>
     <template id="__commands_templ_CXX">
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -c -o $@ $(__cxxflags) $&lt;
+            $(CXX) -c -o $@ $(__cxxflags) $(CPPDEPS) $&lt;
         </set>
     </template>
     <template id="__commands_templ">
