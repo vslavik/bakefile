@@ -3,6 +3,7 @@ Version 0.1.9
 
 - dmars: fixed precompiled headers to not recompile everything
 - mingw: added dependency tracking
+- dmars: fixed subprojects
 
 
 Version 0.1.8
