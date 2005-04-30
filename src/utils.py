@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003,2004 Vaclav Slavik
+#  Copyright (C) 2003-2005 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -269,6 +269,12 @@ def sources2objects(sources, target, ext, objSuffix=''):
     def addRule(id, obj, src, cond):
         srcext = src.split('.')[-1]
         rule = '__%s-to-%s' % (srcext, ext[1:])
+
+        # provide understandable message in case of unknown extension:
+        if not rule in reader.HANDLERS:
+            raise errors.Error(
+            'unable to generate rule for compilation of *.%s files' % srcext)
+        
         cTarget.name = rule
         cTarget.props['id'] = id
         cSrc.value = src
