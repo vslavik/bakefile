@@ -1,6 +1,6 @@
 AC_PREREQ(2.53)
 
-AC_INIT([bakefile], [0.1.8], [vslavik@fastmail.fm])
+AC_INIT([bakefile], [0.1.9], [vslavik@fastmail.fm])
 
 AC_CONFIG_SRCDIR([autogen.sh])
 AC_CONFIG_AUX_DIR([admin])
