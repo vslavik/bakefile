@@ -397,7 +397,7 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     if expr in __pyExprPrecompiled:
         val = eval(__pyExprPrecompiled[expr], globals(), v.dict)
     else:
-        c = compile(expr.replace('\\','\\\\'), '<e>', 'eval')
+        c = compile(expr, '<e>', 'eval')
         __pyExprPrecompiled[expr] = c
         val = eval(c, globals(), v.dict)
 

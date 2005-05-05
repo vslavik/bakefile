@@ -185,7 +185,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             </if>
             <if cond="FORMAT!='watcom'">
                 <set var="__cppflags" append="1">
-                    $(addPrefixIfNotEmpty(__DEFINE_ARG,value.replace('"', '\"')))
+                    $(addPrefixIfNotEmpty(__DEFINE_ARG,value.replace('"', '\\"')))
                 </set>
             </if>
             <res-define>$(value)</res-define>

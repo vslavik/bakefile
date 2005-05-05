@@ -108,7 +108,7 @@
         
         <define-tag name="define">
             <set var="_defines" append="1">
-                $(addPrefixIfNotEmpty('/D ',value.replace('"', '\"')))
+                $(addPrefixIfNotEmpty('/D ',value.replace('"', '\\"')))
             </set>
             <res-define>$(value)</res-define>
         </define-tag>
