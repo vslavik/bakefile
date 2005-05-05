@@ -27,7 +27,7 @@
                 \ in filenames. We can't modify DIRSEP because rules not
                 used for C/C++ compilation need correct one:
                 -->
-                <set var="src">$(src.replace('\','/'))</set>
+                <set var="src">$(src.replace('\\','/'))</set>
             </if>
             <set var="__deps" append="1">$(src)</set>
         </define-tag>
