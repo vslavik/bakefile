@@ -5,6 +5,7 @@ Version 0.1.9
 - mingw: added dependency tracking
 - dmars: fixed subprojects
 - don't escape \ in Python expressions
+- fixed copy-files on Solaris (Michael Wetherell)
 
 
 Version 0.1.8
