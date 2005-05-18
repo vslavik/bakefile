@@ -146,7 +146,7 @@
                 <if cond="TOOLSET=='unix'">
                     @mkdir -p $(__dstdir)
                     @for f in $(__files); do \
-                        if test ! -e $(__dstdir)/$(DOLLAR)$(DOLLAR)f ; \
+                        if test ! -f $(__dstdir)/$(DOLLAR)$(DOLLAR)f -a ! -d $(__dstdir)/$(DOLLAR)$(DOLLAR)f ; \
 			then x=yep ; \
 			else x=`find $(__srcdir)$(DOLLAR)$(DOLLAR)f -newer $(__dstdir)/$(DOLLAR)$(DOLLAR)f -print` ; \
 			fi; \
