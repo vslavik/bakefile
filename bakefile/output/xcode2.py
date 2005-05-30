@@ -65,18 +65,19 @@ def serializeList(list, level):
     return ret
 
 def serializeDictionary(dict, level):
-    ret = "{\n"
+    stringList = []
+    stringList.append("{\n")
     for key in dict:
         for x in range(0,level+1):
-            ret += "\t"
-        ret += serializeAnything(key,level+1)
-        ret += " = "
-        ret += serializeAnything(dict[key],level+1)
-        ret += ";\n"
+            stringList.append("\t")
+        stringList.append(serializeAnything(key,level+1))
+        stringList.append(" = ")
+        stringList.append(serializeAnything(dict[key],level+1))
+        stringList.append(";\n")
     for x in range(0,level):
-        ret += "\t"
-    ret += "}"
-    return ret
+        stringList.append("\t")
+    stringList.append("}")
+    return "".join(stringList)
     
 #refType
 #   0   Absolute
