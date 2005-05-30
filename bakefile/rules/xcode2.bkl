@@ -1,0 +1,176 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    <option name="INSTALL">
+        <default-value>install</default-value>
+        <description>'install' program location</description>
+    </option>
+    <set var="COMPILER">gcc</set>
+    <set var="TOOLSET">unix</set>
+    <include file="makefile_defs_unix.bkl"/>
+    <set var="PLATFORM_MAC">1</set>
+    <set var="PLATFORM_MACOSX">1</set>
+    <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+
+    <!-- =============================================================== -->
+    <!--                       Compiler options:                         -->
+    <!-- =============================================================== -->
+
+    <option name="CC">
+        <default-value>$(__DEFAULT_CC)</default-value>
+        <description>
+            C compiler
+        </description>
+    </option>
+    <option name="CXX">
+        <default-value>$(__DEFAULT_CXX)</default-value>
+        <description>
+            C++ compiler
+        </description>
+    </option>
+    <option name="CFLAGS">
+        <default-value>$(__DEFAULT_CFLAGS)</default-value>
+        <description>
+            Standard flags for CC
+        </description>
+    </option>
+    <option name="CXXFLAGS">
+        <default-value>$(__DEFAULT_CXXFLAGS)</default-value>
+        <description>
+            Standard flags for C++
+        </description>
+    </option>
+    <option name="CPPFLAGS">
+        <default-value>$(__DEFAULT_CPPFLAGS)</default-value>
+        <description>
+            Standard preprocessor flags (common for CC and CXX)
+        </description>
+    </option>
+    <option name="LDFLAGS">
+        <default-value>$(__DEFAULT_LDFLAGS)</default-value>
+        <description>
+            Standard linker flags
+        </description>
+    </option>
+
+    <!-- =============================================================== -->
+    <!--                     Rules & tags definitions:                   -->
+    <!-- =============================================================== -->
+
+    <define-rule name="__any">
+        <template>
+            <set var="_targetname">$(id)</set>
+            <set var="_sources"></set>
+        </template>
+        <define-tag name="dependency-of">
+            <modify-target target="$(value)">
+                <depends>$(id)</depends>
+            </modify-target>
+        </define-tag>
+        <define-tag name="depends">
+        </define-tag>
+    </define-rule>
+    <define-rule name="phony" extends="__any">
+        <template>
+            <set var="_kind">phony</set>
+        </template>
+    </define-rule>
+    <define-rule name="action" extends="__any">
+        <template>
+            <set var="_kind">action</set>
+        </template>
+        <define-tag name="command" />
+        <define-tag name="is-phony" />
+    </define-rule>
+    <define-rule name="subproject" extends="action">
+        <template>
+            <set var="_kind">aggregate_dependency</set>
+        </template>
+        <define-tag name="dir" />
+        <define-tag name="installable" />
+    </define-rule>
+
+    <define-rule name="__compiled" extends="__any">
+        <template>
+            <set var="_kind">binary_product</set>
+        </template>
+        <define-tag name="debug-info">
+        </define-tag>
+        <define-tag name="debug-runtime-libs"/>
+        <define-tag name="optimize"/>
+        <define-tag name="threading" />
+        <define-tag name="runtime-libs" />
+        <define-tag name="cxx-rtti" />
+        <define-tag name="cxx-exceptions" />
+        <define-tag name="cppflags" />
+        <define-tag name="define" />
+        <define-tag name="dirname" />
+        <define-tag name="libname">
+            <set var="_libname">$(value)</set>
+        </define-tag>
+        <define-tag name="install-to" />
+        <define-tag name="install-if" />
+        <define-tag name="pic" />
+        <define-tag name="include" />
+        <define-tag name="sources">
+            <set var="_sources" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="lib-path" />
+        <define-tag name="warnings" />
+        <define-tag name="sys-lib" />
+        <define-tag name="ldlibs" />
+        <define-tag name="library" />
+
+
+        <define-tag name="precomp-headers"/>
+        <define-tag name="precomp-headers-file"/>
+        <define-tag name="precomp-headers-header"/>
+        <define-tag name="precomp-headers-location"/>
+        <define-tag name="precomp-headers-gen"/>
+        <define-tag name="precomp-headers-exclude"/>
+
+        <define-tag name="res-define"/>
+        <define-tag name="res-include"/>
+        
+    </define-rule>
+
+    <define-rule name="_dll" extends="__compiled">
+        <template>
+            <set var="_productType">com.apple.product-type.library.dynamic</set>
+            <set var="_explicitFileType">compiled.mach-o.dylib</set>
+            <set var="_productname" eval="0">lib$(_libname).dylib</set>
+        </template>
+        <define-tag name="dllname" />
+    </define-rule>
+    <define-rule name="dll" extends="_dll">
+        <define-tag name="version"/>
+        <define-tag name="so_version"/>
+        <define-tag name="mac_version"/>
+    </define-rule>
+    <define-rule name="module" extends="_dll"/>
+    <define-rule name="lib" extends="__compiled">
+        <template>
+            <set var="_productType">com.apple.product-type.library.static</set>
+            <set var="_explicitFileType">archive.ar</set>
+            <set var="_productname" eval="0">lib$(_libname).a</set>
+        </template>
+    </define-rule>
+    <define-rule name="exe" extends="__compiled">
+    </define-rule>
+
+    <phony id="all" category="all" />
+
+    <!-- =============================================================== -->
+    <!--                      resources:                                 -->
+    <!-- =============================================================== -->
+
+    <define-tag name="win32-res" rules="exe,dll,module">
+        <!-- do nothing by default -->
+    </define-tag>
+    <define-tag name="mac-res" rules="exe,dll,module">
+        <!-- do nothing by default -->
+    </define-tag>
+    
+    <output file="$(OUTPUT_FILE)" writer="xcode2.py" />
+</makefile>

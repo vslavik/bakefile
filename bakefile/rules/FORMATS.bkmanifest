@@ -64,4 +64,9 @@
         <default-filename>GNUmakefile</default-filename>
     </format>
     
+    <format id="xcode2">
+        <description>Xcode 2.0 project.pbxproj files</description>
+        <default-filename>$(os.path.splitext(os.path.basename(INPUT_FILE))[0]).xcode</default-filename>
+    </format>
+
 </bakefile-manifest>

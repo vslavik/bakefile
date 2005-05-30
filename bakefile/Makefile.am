@@ -32,6 +32,7 @@ output_DATA = output/autoconf.empy \
               output/gnumake-opts.empy \
               output/watcom.empy \
               output/watcom-opts.empy \
+              output/xcode2.py \
               output/_hdr_config.empy \
               output/_hdr_makefile.empy
 
@@ -67,6 +68,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/mingw.bkl \
               rules/gnu.bkl \
               rules/watcom.bkl \
+              rules/xcode2.bkl \
               rules/unixlike.bkl \
               rules/version.bkl \
               rules/win32.bkl
