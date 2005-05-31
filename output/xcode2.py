@@ -92,9 +92,14 @@ def serializeDictionary(dict, level):
 #   3   Relative to build product
 #   4   Relative to Enclosing group
 class ProjectGeneratorXcode2:
-    def __init__(self):
-        self.pbxprojFilename = os.path.join(FILE, "project.pbxproj")
-        self.basename = os.path.splitext(os.path.basename(FILE))[0]
+    def __init__(self, _targets, targetGroupName=""):
+        self.targets = _targets
+        self.basename, self.extension = os.path.splitext(os.path.basename(FILE))
+        if targetGroupName != "":
+            self.basename += "_" + targetGroupName
+        self.dirname = os.path.dirname(FILE)
+        self.xcodeProjectDirname = os.path.join(self.dirname,self.basename + self.extension)
+        self.pbxprojFilename = os.path.join(self.xcodeProjectDirname, "project.pbxproj")
         self.objectIdGenerator = ObjectIdGenerator()
 
     def genProject(self):
@@ -169,7 +174,7 @@ class ProjectGeneratorXcode2:
 
         ###################################################################
         # Now go through the targets and configs of targets
-        for t in targets:
+        for t in self.targets:
             for cKey in t.configs:
                 config = t.configs[cKey]
                 if config._kind == "binary_product":
@@ -193,7 +198,9 @@ class ProjectGeneratorXcode2:
 #        pbxprojData += "}"
 
         #TODO: Check if FILE (foo.xcode) is a directory and make it if necessary
-        writer.writeFile(os.path.join(FILE, "project.pbxproj"), pbxprojData)
+        if not os.path.isdir(self.xcodeProjectDirname):
+            os.mkdir(self.xcodeProjectDirname)
+        writer.writeFile(self.pbxprojFilename, pbxprojData)
 
 
     def idForDirectoryGroup(self, path):
@@ -312,7 +319,7 @@ class ProjectGeneratorXcode2:
 #            print c
 #        for c in configs:
 #            print c
-        for t in targets:
+        for t in self.targets:
             print "id=",t._targetname
 #            print "sources=",t._sources.split()
 #            print "COMPILER=", COMPILER
@@ -327,8 +334,44 @@ class ProjectGeneratorXcode2:
                 print
             print
 
+class Struct:
+    pass
+
 def run():
     print FILE
-    generator = ProjectGeneratorXcode2()
-    generator.genProject()
+    targetGroups = {}
+    targetGroups[""] = Struct()
+    targetGroups[""].targets = writer.Container()
+    for t in targets:
+        # All non-binary targets immediately go to basename.xcode
+        if t._kind != "binary_product":
+            targetGroups[""].targets.append(t.id,t)
+        else:
+            for cKey in t.configs:
+                config = t.configs[cKey]
+                groupname = config._xcode_target_group
+                # If we haven't created the target group yet, do so
+                if not targetGroups.has_key(groupname):
+                    targetGroups[groupname] = Struct()
+                    targetGroups[groupname].targets = writer.Container()
+                # If the target group doesn't have this target in it, add it
+                if not targetGroups[groupname].targets.dict.has_key(t.id):
+                    groupedTarget = Struct()
+                    # copy all variables except for configs
+                    for varname in vars(t):
+                        if varname != "configs":
+                            setattr(groupedTarget, varname, getattr(t, varname))
+                    # Create an empty configs dictoinary
+                    groupedTarget.configs = {}
+                    targetGroups[groupname].targets.append(groupedTarget.id, groupedTarget)
 
+                # Add this config to the grouped target
+                targetGroups[groupname].targets[t.id].configs[cKey] = config
+
+    targetGroupKeys = targetGroups.keys()
+    targetGroupKeys.sort()
+    for targetGroupKey in targetGroupKeys:
+        targetGroup = targetGroups[targetGroupKey]
+        print "--- GENERATING %s PROJECT ---" % targetGroupKey
+        generator = ProjectGeneratorXcode2(targetGroup.targets, targetGroupKey)
+        generator.genProject()
