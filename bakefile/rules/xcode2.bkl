@@ -94,6 +94,7 @@
     <define-rule name="__compiled" extends="__any">
         <template>
             <set var="_kind">binary_product</set>
+            <set var="_xcode_project_grouping"></set>
         </template>
         <define-tag name="debug-info">
         </define-tag>
