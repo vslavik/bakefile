@@ -11,6 +11,10 @@ class XcodeObjectId:
         self.integer = integer
     def __str__(self):
         return "%024x" % self.integer
+    def __cmp__(self, other):
+        return self.integer - other.integer
+    def __hash__(self):
+        return self.integer
 
 class ObjectIdGenerator:
     def __init__(self):
@@ -67,7 +71,9 @@ def serializeList(list, level):
 def serializeDictionary(dict, level):
     stringList = []
     stringList.append("{\n")
-    for key in dict:
+    dictKeys = dict.keys()
+    dictKeys.sort()
+    for key in dictKeys:
         for x in range(0,level+1):
             stringList.append("\t")
         stringList.append(serializeAnything(key,level+1))
