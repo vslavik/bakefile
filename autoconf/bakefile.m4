@@ -484,6 +484,11 @@ AC_DEFUN([AC_BAKEFILE_DEPS],
         DEPS_TRACKING=1
         DEPSFLAG_MWCC="-MM"
         AC_MSG_RESULT([mwcc])
+    elif test "x$SUNCC" = "xyes"; then
+        DEPSMODE=suncc
+        DEPS_TRACKING=1
+        DEPSFLAG_SUNCC="-xM1"
+        AC_MSG_RESULT([suncc])
     else
         AC_MSG_RESULT([none])
     fi
@@ -1178,6 +1183,7 @@ DEPSMODE=${DEPSMODE}
 DEPSDIR=.deps
 DEPSFLAG_GCC="${DEPSFLAG_GCC}"
 DEPSFLAG_MWCC="${DEPSFLAG_MWCC}"
+DEPSFLAG_SUNCC="${DEPSFLAG_SUNCC}"
 
 mkdir -p ${D}DEPSDIR
 
@@ -1239,6 +1245,28 @@ elif test ${D}DEPSMODE = mwcc ; then
         prevarg="${D}arg"
     done
     ${D}* ${D}DEPSFLAG_MWCC >${D}{DEPSDIR}/${D}{objfile}.d
+    exit 0
+elif test ${D}DEPSMODE = suncc; then
+    ${D}* || exit
+    # Run compiler again with deps flag and redirect into the dep file.
+    # It doesn't work if the '-o FILE' option is used, but without it the
+    # dependency file will contain the wrong name for the object. So it is
+    # removed from the command line, and the dep file is fixed with sed.
+    cmd=""
+    while test ${D}# -gt 0; do
+        case "${D}1" in
+            -o )
+                shift
+                objfile=${D}1
+            ;;
+            * )
+                eval arg${D}#=\\${D}1
+                cmd="${D}cmd \\${D}arg${D}#"
+            ;;
+        esac
+        shift
+    done
+    eval "${D}cmd ${D}DEPSFLAG_SUNCC" | sed "s|.*:|${D}objfile:|" >${D}{DEPSDIR}/${D}{objfile}.d
     exit 0
 else
     ${D}*

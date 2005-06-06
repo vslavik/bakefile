@@ -69,6 +69,46 @@ XLCXX=`test $wx_cv_cxx_compiler_xlc = yes && echo yes`
 AC_LANG_POP(C++)
 ])
 
+dnl Based on autoconf _AC_LANG_COMPILER_GNU
+dnl _AC_BAKEFILE_LANG_COMPILER(NAME, LANG, SYMBOL, IF-YES, IF-NO)
+AC_DEFUN([_AC_BAKEFILE_LANG_COMPILER],
+[
+    AC_LANG_PUSH($2)
+    AC_CACHE_CHECK(
+        [whether we are using the $1 $2 compiler],
+        [bakefile_cv_[]_AC_LANG_ABBREV[]_compiler_[]$3],
+        [AC_TRY_COMPILE(
+            [],
+            [
+             #ifndef $3
+                choke me
+             #endif
+            ],
+            [bakefile_cv_[]_AC_LANG_ABBREV[]_compiler_[]$3=yes],
+            [bakefile_cv_[]_AC_LANG_ABBREV[]_compiler_[]$3=no]
+         )
+        ]
+    )
+    AC_LANG_POP($2)
+    if test "x$bakefile_cv_[]_AC_LANG_ABBREV[]_compiler_[]$3" = "xyes"; then
+        :; $4
+    else
+        :; $5
+    fi
+])
+
+dnl Loosely based on autoconf AC_PROG_CC
+AC_DEFUN([AC_BAKEFILE_PROG_SUNCC],
+[
+    _AC_BAKEFILE_LANG_COMPILER(Sun, C, __SUNPRO_C, SUNCC=yes)
+])
+
+dnl Loosely based on autoconf AC_PROG_CC
+AC_DEFUN([AC_BAKEFILE_PROG_SUNCXX],
+[
+    _AC_BAKEFILE_LANG_COMPILER(Sun, C++, __SUNPRO_CC, SUNCXX=yes)
+])
+
 
 dnl ===========================================================================
 dnl macros to detect specialty compiler options
@@ -124,6 +164,7 @@ AC_DEFUN([AC_BAKEFILE_PROG_CC],
     fi
     AC_BAKEFILE_PROG_MWCC
     AC_BAKEFILE_PROG_XLCC
+    AC_BAKEFILE_PROG_SUNCC
 ])
 
 AC_DEFUN([AC_BAKEFILE_PROG_CXX],
@@ -137,5 +178,6 @@ AC_DEFUN([AC_BAKEFILE_PROG_CXX],
     fi
     AC_BAKEFILE_PROG_MWCXX
     AC_BAKEFILE_PROG_XLCXX
+    AC_BAKEFILE_PROG_SUNCXX
 ])
 

@@ -9,6 +9,7 @@ DEPSMODE=@DEPSMODE@
 DEPSDIR=.deps
 DEPSFLAG_GCC="@DEPSFLAG_GCC@"
 DEPSFLAG_MWCC="@DEPSFLAG_MWCC@"
+DEPSFLAG_SUNCC="@DEPSFLAG_SUNCC@"
 
 mkdir -p $DEPSDIR
 
@@ -70,6 +71,28 @@ elif test $DEPSMODE = mwcc ; then
         prevarg="$arg"
     done
     $* $DEPSFLAG_MWCC >${DEPSDIR}/${objfile}.d
+    exit 0
+elif test $DEPSMODE = suncc; then
+    $* || exit
+    # Run compiler again with deps flag and redirect into the dep file.
+    # It doesn't work if the '-o FILE' option is used, but without it the
+    # dependency file will contain the wrong name for the object. So it is
+    # removed from the command line, and the dep file is fixed with sed.
+    cmd=""
+    while test $# -gt 0; do
+        case "$1" in
+            -o )
+                shift
+                objfile=$1
+            ;;
+            * )
+                eval arg$#=\$1
+                cmd="$cmd \$arg$#"
+            ;;
+        esac
+        shift
+    done
+    eval "$cmd $DEPSFLAG_SUNCC" | sed "s|.*:|$objfile:|" >${DEPSDIR}/${objfile}.d
     exit 0
 else
     $*
