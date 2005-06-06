@@ -10,6 +10,11 @@
     <set var="__LIB_ARG">%s.lib</set>
     <set var="__LIBDIR_ARG">/LIBPATH:</set>
 
+    <set var="__LIB_TOOL">
+        <if cond="FORMAT=='msvc'">link /LIB</if>
+        <if cond="FORMAT!='msvc'">lib</if>
+    </set>
+
     <set var="__DEFAULT_CC">cl</set>
     <set var="__DEFAULT_CXX">cl</set>
     <set var="__DEFAULT_CFLAGS"></set>
@@ -119,7 +124,7 @@
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
             if exist $@ del $@
-            lib /NOLOGO /OUT:$@ @&lt;&lt;
+            $(__LIB_TOOL) /NOLOGO /OUT:$@ @&lt;&lt;
             $(__objects_var)
             &lt;&lt;NOKEEP
         </set>
