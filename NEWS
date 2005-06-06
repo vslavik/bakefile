@@ -7,6 +7,7 @@ Version 0.1.9
 - don't escape \ in Python expressions
 - fixed copy-files on Solaris (Michael Wetherell)
 - added dependencies tracking for Sun CC (Michael Wetherell)
+- msvc: fixed to work with free MS tools (Włodzimierz Skiba)
 
 
 Version 0.1.8
@@ -41,7 +42,7 @@ Version 0.1.6
 Version 0.1.5
 -------------
 
-- new format: dmars_smake for DigitalMars's smake (Wlodzimierz ABX Skiba)
+- new format: dmars_smake for DigitalMars's smake (Włodzimierz Skiba)
 - msvc6prj, msevc4prj: change project names to be same as file names
 - portability fix for datafiles module (Greg Noel)
 - watcom: support <cxx-rtti> (Hans Van Leemputten)
@@ -55,7 +56,7 @@ Version 0.1.5
   bakefile_gen by caching parsed XML files
 - autoconf: fixed precompiled headers dependencies in case of multiple targets
 - precompiled headers support for dmars and dmars_smake formats
-  (based on work by Wlodzimierz ABX Skiba)
+  (based on work by Włodzimierz Skiba)
 - autoconf: BSD make fixes in the format
 - msvc6prj: fixed dependencies in project files 
 - msvc6prj: <optimize>speed optimized for size and vice versa, fixed
