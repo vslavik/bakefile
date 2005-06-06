@@ -6,6 +6,7 @@ Version 0.1.9
 - dmars: fixed subprojects
 - don't escape \ in Python expressions
 - fixed copy-files on Solaris (Michael Wetherell)
+- added dependencies tracking for Sun CC (Michael Wetherell)
 
 
 Version 0.1.8
