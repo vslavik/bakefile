@@ -133,7 +133,7 @@ def handleSet(e, target=None, add_dict=None):
             condstr = evalConstExpr(e_if, e_if.props['cond'],
                                     target=target, add_dict=add_dict)
             condstr = translateSpecialCondition(e_if, condstr, target)
-                
+             
             typ = mk.evalCondition(condstr)
             # Condition never met when generating this target:
             if typ == '0':
@@ -232,7 +232,7 @@ def handleUnset(e):
 
 
 def handleOption(e):
-    name = e.props['name']
+    name = evalConstExpr(e, e.props['name'])
     if name in mk.options:
         raise ReaderError(e, "option '%s' already defined" % name)
 
@@ -260,7 +260,7 @@ def handleOption(e):
         o.neverEmpty = 1
 
     if 'category' in e.props:
-        category = e.props['category']
+        category = evalConstExpr(e, e.props['category'])
         if category == mk.Option.CATEGORY_PATH:
             o.category = category
             o.neverEmpty = 1
