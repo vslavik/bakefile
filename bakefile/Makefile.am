@@ -33,6 +33,7 @@ output_DATA = output/autoconf.empy \
               output/watcom.empy \
               output/watcom-opts.empy \
               output/xcode2.py \
+              output/symbian.py \
               output/_hdr_config.empy \
               output/_hdr_makefile.empy
 
@@ -49,6 +50,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/dirs.bkl \
               rules/makefile.bkl \
               rules/makefile_defs_borland.bkl \
+              rules/makefile_defs_cw.bkl \
               rules/makefile_defs_dmars.bkl \
               rules/makefile_defs_dmars_common.bkl \
               rules/makefile_defs_dmars_smake.bkl \
@@ -69,6 +71,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/gnu.bkl \
               rules/watcom.bkl \
               rules/xcode2.bkl \
+              rules/symbian.bkl \
               rules/unixlike.bkl \
               rules/version.bkl \
               rules/win32.bkl
