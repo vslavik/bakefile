@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<makefile>
+    
+    <requires version="0.1.8"/>
+
+    <exe id="paths">
+        <sources>
+            hello1.c
+            hello2.c
+            src/hello2.c
+            src/hello2.c
+            hello3.c
+        </sources>
+        <include>src</include>
+        <app-type>console</app-type>
+    </exe>
+
+</makefile>

@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<makefile>
+    
+    <requires version="0.1.1"/>
+
+    <set var="BUILDDIR">
+        <if cond="TOOLSET=='win32'">build-$(COMPILER)</if>
+        <if cond="TOOLSET!='win32'">.</if>
+    </set>
+    
+    <template id="hello">
+        <sources>hello.c</sources>
+        <app-type>console</app-type>
+        <dirname>$(id)</dirname>
+    </template>
+
+    <exe id="default_hello" template="hello">
+        <!-- default debug-info settings -->
+    </exe>
+
+    <exe id="debug_hello" template="hello">
+        <debug-info>on</debug-info>
+    </exe>
+
+    <exe id="release_hello" template="hello">
+        <debug-info>off</debug-info>
+    </exe>
+
+</makefile>
