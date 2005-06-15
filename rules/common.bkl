@@ -9,7 +9,7 @@
 
 
     <!-- Variables redefined in other (more specific) ruleset files: -->
-    
+
     <set var="PLATFORM_UNIX">0</set>
     <set var="PLATFORM_WIN32">0</set>
     <set var="PLATFORM_MSDOS">0</set>
@@ -17,6 +17,7 @@
     <set var="PLATFORM_MACOSX">0</set>
     <set var="PLATFORM_OS2">0</set>
     <set var="PLATFORM_BEOS">0</set>
+    <set var="PLATFORM_SYMBIAN">0</set>
 
     <define-rule name="compilation_rule">
         <define-tag name="src">
@@ -46,7 +47,7 @@
     <!-- =============================================================== -->
 
     <!-- Allow the user to redirect options to their own file
-         (but don't do it by default): 
+         (but don't do it by default):
          NB: these two are understood by bakefile Python code, don't
              remove them - if you do, make sure you update src/*.py as well
     -->
@@ -59,9 +60,9 @@
     only reason for its existence is that somebody may use <fragment>
     that refers to a variable that is otherwise not used.
     -->
-    <set var="VARS_DONT_ELIMINATE"/> 
-    
-    
+    <set var="VARS_DONT_ELIMINATE"/>
+
+
     <!-- =============================================================== -->
     <!--              Empty definitions of tags that need it:            -->
     <!-- =============================================================== -->
@@ -74,7 +75,7 @@
     <define-tag name="cppflags-msvc" rules="exe,lib,dll,module"/>
     <define-tag name="cppflags-watcom" rules="exe,lib,dll,module"/>
     <define-tag name="cppflags-dmars" rules="exe,lib,dll,module"/>
-    
+
     <define-tag name="cflags-borland" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-unix" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-mingw" rules="exe,lib,dll,module"/>
@@ -82,7 +83,7 @@
     <define-tag name="cflags-msvc" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-watcom" rules="exe,lib,dll,module"/>
     <define-tag name="cflags-dmars" rules="exe,lib,dll,module"/>
-    
+
     <define-tag name="cxxflags-borland" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-unix" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-mingw" rules="exe,lib,dll,module"/>
@@ -90,7 +91,7 @@
     <define-tag name="cxxflags-msvc" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-watcom" rules="exe,lib,dll,module"/>
     <define-tag name="cxxflags-dmars" rules="exe,lib,dll,module"/>
-    
+
     <define-tag name="ldflags-borland" rules="exe,dll,module"/>
     <define-tag name="ldflags-unix" rules="exe,dll,module"/>
     <define-tag name="ldflags-mingw" rules="exe,dll,module"/>
@@ -129,7 +130,7 @@
     <tag-info name="precomp-headers-header" exclusive="1"/>
     <tag-info name="precomp-headers-location" exclusive="1"/>
     <tag-info name="precomp-headers-gen" exclusive="1"/>
-    
+
     <tag-info name="cxx-rtti" exclusive="1"/>
     <tag-info name="cxx-exceptions" exclusive="1"/>
 

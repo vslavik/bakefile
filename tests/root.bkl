@@ -5,14 +5,16 @@
         <dir>$(id)</dir>
         <dependency-of>all</dependency-of>
     </template>
-    
+
     <subproject id="cond" template="sub"/>
     <subproject id="cond_install" template="sub"/>
+    <subproject id="debug" template="sub"/>
     <subproject id="dll" template="sub"/>
     <subproject id="gettext" template="sub"/>
     <subproject id="hello" template="sub"/>
     <subproject id="library" template="sub"/>
     <subproject id="module" template="sub"/>
+    <subproject id="paths" template="sub"/>
     <subproject id="pch" template="sub"/>
     <subproject id="regressions" template="sub"/>
     <subproject id="datafiles" template="sub"/>

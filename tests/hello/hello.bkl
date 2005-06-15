@@ -1,24 +1,31 @@
 <?xml version="1.0" ?>
 <makefile>
-    
+
     <requires version="0.1.1"/>
 
     <set var="BUILDDIR">
         <if cond="TOOLSET=='win32'">build-$(COMPILER)</if>
         <if cond="TOOLSET!='win32'">.</if>
     </set>
-    
+
     <if cond="FORMAT!='msevc4prj'">
         <exe id="hello">
+            <define>SOMEMACRO</define>
             <sources>hello.c</sources>
         </exe>
         <exe id="hello_cxx">
+            <define>SOMEMACRO</define>
             <sources>hello.cpp</sources>
         </exe>
     </if>
 
     <exe id="hello_gui">
         <app-type>gui</app-type>
+        <uid type="symbian2">0x100039CE</uid>
+        <uid type="symbian3">0x10005B91</uid>
+        <define>SOMEMACRO</define>
         <sources>hello.cpp</sources>
+        <win32-res>hello.rc</win32-res>
+        <symbian-res>hello.rss</symbian-res>
     </exe>
 </makefile>

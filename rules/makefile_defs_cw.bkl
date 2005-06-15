@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+
+    <set var="__FLAG_CW_OPTIMIZE_OFF"></set>
+    <set var="__FLAG_CW_OPTIMIZE_SIZE"></set>
+    <set var="__FLAG_CW_OPTIMIZE_SPEED"></set>
+    <set var="__FLAG_CW_WARNINGS_NO"></set>
+    <set var="__FLAG_CW_WARNINGS_DEFAULT"></set>
+    <set var="__FLAG_CW_WARNINGS_MAX"></set>
+
+    <if cond="FORMAT!='symbian'">
+
+        <set var="__FLAG_OPTIMIZE_OFF">$(__FLAG_CW_OPTIMIZE_OFF)</set>
+        <set var="__FLAG_OPTIMIZE_SIZE">$(__FLAG_CW_OPTIMIZE_SIZE)</set>
+        <set var="__FLAG_OPTIMIZE_SPEED">$(__FLAG_CW_OPTIMIZE_SPEED)</set>
+        <set var="__FLAG_WARNINGS_NO">$(__FLAG_CW_WARNINGS_NO)</set>
+        <set var="__FLAG_WARNINGS_DEFAULT">$(__FLAG_CW_WARNINGS_DEFAULT)</set>
+        <set var="__FLAG_WARNINGS_MAX">$(__FLAG_CW_WARNINGS_MAX)</set>
+
+    </if>
+
+</makefile>
