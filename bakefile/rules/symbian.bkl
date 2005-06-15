@@ -1,0 +1,275 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+
+    <!-- None specific compiler is forced. Possible are VC, BCC, GCC -->
+    <!-- and CW so use "anything" related to Symbian developmen.     -->
+    <set var="COMPILER">MMP</set>
+
+    <include file="makefile_defs_gnu.bkl"/>
+    <include file="makefile_defs_msvc.bkl"/>
+    <include file="makefile_defs_cw.bkl"/>
+
+    <set var="PLATFORM_SYMBIAN">1</set>
+    <set var="TOOLSET">symbian</set>
+    <set var="DIRSEP">\</set>
+    <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+    <set var="INSTALL_DATA"></set>
+
+    <define-rule name="_any">
+        <template>
+            <set var="_depname">$(id)</set>
+            <set var="_targetdir"/>
+            <set var="_targetname">$(id)</set>
+            <set var="_deps"/>
+        </template>
+        <define-tag name="depends">
+            <set var="_deps" append="1">
+                $(substitute(value, lambda x: ifthenelse(isDeadTarget(x),'',ref('_depname', x)), 'DEP'))
+            </set>
+        </define-tag>
+        <define-tag name="dependency-of">
+            <modify-target target="$(value)">
+                <depends>$(id)</depends>
+            </modify-target>
+        </define-tag>
+        <define-tag name="dirname">
+            <set var="_targetdir">$(nativePaths(value))$(DIRSEP)</set>
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="_compiled" extends="_any">
+        <template>
+            <set var="_kind">project</set>
+            <set var="_sources"/>
+            <set var="_defines"/>
+            <set var="_libraries"/>
+            <set var="_include_paths"/>
+            <set var="_installto"/>
+            <set var="_uid2"/>
+            <set var="_uid3"/>
+            <set var="_CW_options"/>
+            <set var="_GCC_options"/>
+            <set var="_MSVC_options"/>
+            <set var="_debug_or_release">default</set>
+            <targettype>app</targettype>
+        </template>
+
+        <define-tag name="targettype">
+            <set var="_targettype">$(value)</set>
+            <set var="_targetextension">
+                $(substituteFromDict(value,
+                      {'ani'      :'dll',
+                       'app'      :'app',
+                       'ctl'      :'???',
+                       'dll'      :'dll',
+                       'ecomiic'  :'dll',
+                       'epocexe'  :'exe',
+                       'exe'      :'exe',
+                       'exedll'   :'dll',
+                       'fsy'      :'???',
+                       'kdll'     :'???',
+                       'kext'     :'???',
+                       'klib'     :'???',
+                       'ldd'      :'???',
+                       'lib'      :'lib',
+                       'mda'      :'???',
+                       'mdl'      :'???',
+                       'notifier' :'???',
+                       'opx'      :'???',
+                       'pdd'      :'???',
+                       'pdl'      :'???',
+                       'rdl'      :'???',
+                       'var'      :'???',
+                       'wlog'     :'???'}))
+            </set>
+        </define-tag>
+
+        <!-- source settings -->
+        <define-tag name="cppflags"/>
+        <define-tag name="include">
+            <set var="_include_paths" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="define">
+            <set var="_defines" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="sources">
+            <set var="_sources" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="optimize">
+            <set var="_CW_options" append="1">
+                $(substituteFromDict(value,
+                      {'off':__FLAG_CW_OPTIMIZE_OFF,
+                       'speed':__FLAG_CW_OPTIMIZE_SPEED,
+                       'size':__FLAG_CW_OPTIMIZE_SIZE}))
+            </set>
+            <set var="_GCC_options" append="1">
+                $(substituteFromDict(value,
+                      {'off':__FLAG_GNU_OPTIMIZE_OFF,
+                       'speed':__FLAG_GNU_OPTIMIZE_SPEED,
+                       'size':__FLAG_GNU_OPTIMIZE_SIZE}))
+            </set>
+            <set var="_MSVC_options" append="1">
+                $(substituteFromDict(value,
+                      {'off':__FLAG_MSVC_OPTIMIZE_OFF,
+                       'speed':__FLAG_MSVC_OPTIMIZE_SPEED,
+                       'size':__FLAG_MSVC_OPTIMIZE_SIZE}))
+            </set>
+        </define-tag>
+
+        <define-tag name="warnings">
+            <set var="_CW_options" append="1">
+                $(substituteFromDict(value,
+                      {'no':__FLAG_CW_WARNINGS_NO,
+                       'default':__FLAG_CW_WARNINGS_DEFAULT,
+                       'max':__FLAG_CW_WARNINGS_MAX}))
+            </set>
+            <set var="_GCC_options" append="1">
+                $(substituteFromDict(value,
+                      {'no':__FLAG_GNU_WARNINGS_NO,
+                       'default':__FLAG_GNU_WARNINGS_DEFAULT,
+                       'max':__FLAG_GNU_WARNINGS_MAX}))
+            </set>
+            <set var="_MSVC_options" append="1">
+                $(substituteFromDict(value,
+                      {'no':__FLAG_MSVC_WARNINGS_NO,
+                       'default':__FLAG_MSVC_WARNINGS_DEFAULT,
+                       'max':__FLAG_MSVC_WARNINGS_MAX}))
+            </set>
+        </define-tag>
+        <define-tag name="threading"/>
+        <define-tag name="cxx-rtti"/>
+        <define-tag name="cxx-exceptions"/>
+        <define-tag name="precomp-headers"/>
+        <define-tag name="precomp-headers-exclude"/>
+        <define-tag name="precomp-headers-file"/>
+        <define-tag name="precomp-headers-gen"/>
+        <define-tag name="precomp-headers-header"/>
+        <define-tag name="precomp-headers-location"/>
+
+        <!-- lib and link settings -->
+        <define-tag name="lib-path"/>
+        <define-tag name="library">
+            <set var="_libraries" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="sys-lib">
+            <library>$(value)</library>
+        </define-tag>
+        <define-tag name="ldlibs"/>
+        <define-tag name="ldflags"/>
+
+        <!-- resource settings -->
+        <define-tag name="win32-res"/>
+        <define-tag name="mac-res"/>
+        <define-tag name="res-define"/>
+        <define-tag name="res-include"/>
+        <define-tag name="symbian-res" rules="exe,dll,module">
+            <set var="_sources" append="1">$(value)</set>
+        </define-tag>
+
+        <define-tag name="debug-info">
+            <set var="_debug_or_release">
+                $(substituteFromDict(value, {'on':'UDEB','off':'UREL'}))
+            </set>
+        </define-tag>
+        <define-tag name="debug-runtime-libs"/>
+        <define-tag name="runtime-libs"/>
+
+        <define-tag name="install-to">
+            <set var="_installto">$(value)</set>
+        </define-tag>
+        <define-tag name="install-if"/>
+
+        <define-tag name="pic"/>
+    </define-rule>
+
+    <define-rule name="phony" extends="_any">
+        <template>
+            <set var="_kind">phony</set>
+        </template>
+    </define-rule>
+
+    <define-rule name="action" extends="_any">
+        <template>
+            <set var="_kind">action</set>
+        </template>
+        <define-tag name="is-phony"/>
+        <define-tag name="command"/>
+    </define-rule>
+
+    <define-rule name="subproject" extends="_any">
+        <template>
+            <set var="_kind">phony</set>
+        </template>
+        <define-tag name="installable"/>
+        <define-tag name="dir"/>
+    </define-rule>
+
+    <define-rule name="exe" extends="_compiled">
+        <define-tag name="app-type">
+            <targettype>
+                $(substituteFromDict(value,
+                      {'console':'exe',
+                       'gui':'app'}))
+            </targettype>
+        </define-tag>
+        <define-tag name="exename">
+            <set var="_targetname">$(value)</set>
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="_dll" extends="_compiled">
+        <template>
+            <targettype>dll</targettype>
+        </template>
+        <define-tag name="dllname">
+            <set var="_name">$(value)</set>
+            <set var="_targetname">$(value)</set>
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="dll" extends="_dll">
+        <template>
+            <libname>$(id)</libname>
+        </template>
+        <define-tag name="libname">
+            <set var="_targetname">$(value)</set>
+        </define-tag>
+        <define-tag name="version"/>
+        <define-tag name="so_version"/>
+        <define-tag name="mac_version"/>
+    </define-rule>
+
+    <define-rule name="module" extends="_dll">
+    </define-rule>
+
+    <define-rule name="lib" extends="_compiled">
+        <template>
+            <targettype>lib</targettype>
+            <libname>$(id)</libname>
+        </template>
+        <define-tag name="libname">
+            <set var="_targetname">$(value)</set>
+        </define-tag>
+    </define-rule>
+
+    <!-- some fake, never used: -->
+    <phony id="all" category="all"/>
+
+    <define-tag name="uid" rules="exe,dll">
+        <if cond="attributes['type']=='symbian2'">
+            <set var="_uid2">$(value)</set>
+        </if>
+        <if cond="attributes['type']=='symbian3'">
+            <set var="_uid3">$(value)</set>
+        </if>
+    </define-tag>
+
+    <!-- =============================================================== -->
+    <!--                            output:                              -->
+    <!-- =============================================================== -->
+
+    <output file="$(OUTPUT_FILE)" writer="symbian.py"/>
+
+</makefile>

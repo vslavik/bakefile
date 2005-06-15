@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <!-- $Id$ -->
 
-<!-- 
-This file is common to all formats that share Unix way of writing 
+<!--
+This file is common to all formats that share Unix way of writing
 makefiles (most notably GNU Make and Autoconf formats).
 -->
 
@@ -18,8 +18,8 @@ makefiles (most notably GNU Make and Autoconf formats).
         $(' '.join(['%s="$(DOLLAR)(%s)"' % (x,x) for x in OPTIONS.split()]))
     </set>
     <set var="MAKEARGS" make_var="1">$(__MAKEARGS)</set>
-    
-    
+
+
     <include file="makefile_defs_$(MAKEFILE_SYNTAX).bkl"/>
 
     <!-- =============================================================== -->
@@ -112,14 +112,14 @@ makefiles (most notably GNU Make and Autoconf formats).
                 </command>
             </modify-target>
         </define-tag>
-        
+
         <define-tag name="__command">
             <set var="__command" append="1">$(value)$(LF)</set>
         </define-tag>
     </define-rule>
 
     <define-rule name="__compiled" extends="__any">
-    
+
         <template template="__commands_templ">
             <set var="__post_command"/>
             <set var="__install_if_cond"/>
@@ -154,13 +154,13 @@ makefiles (most notably GNU Make and Autoconf formats).
                 $(createMakeVar(id, '__objects', 'OBJECTS', hints='files'))
             </set>
             <set var="__deps" append="1">$(__objects_var)</set>
-            
+
             <!-- it makes sense to make <objects-depend> use make var, too: -->
             <set var="__objects_deps"/>
             <set var="__objects_deps_var">
                 $(createMakeVar(id, '__objects_deps', 'ODEP'))
             </set>
-            
+
             <set var="__linker" eval="0">
                 $(ifthenelse(__uses_cxx, __LINKER_CXX, __LINKER_CC))
             </set>
@@ -176,7 +176,7 @@ makefiles (most notably GNU Make and Autoconf formats).
 
         <define-tag name="res-define"/>
         <define-tag name="res-include"/>
-        
+
         <define-tag name="define">
             <if cond="FORMAT=='watcom'">
                 <set var="__cppflags" append="1">
@@ -208,7 +208,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                 </set>
             </if>
         </define-tag>
-        
+
         <define-tag name="cflags">
             <set var="__cflags" append="1">$(value)</set>
         </define-tag>
@@ -224,7 +224,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="ldlibs">
             <set var="__ldlibs" append="1">$(value)</set>
         </define-tag>
-        
+
         <define-tag name="objects-depend">
             <set var="__objects_deps" append="1">
                 $(substitute(value, lambda x: ref('__depname', x), 'DEP'))
@@ -235,12 +235,12 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__objtmp">
                 $(sources2objects(value, id, OBJEXT))
             </set>
-            <set var="__objects" append="1">$(__objtmp)</set>            
+            <set var="__objects" append="1">$(__objtmp)</set>
         </define-tag>
 
         <define-tag name="library">
             <depends>$(value)</depends>
-            <!-- 
+            <!--
              This doesn't work on BSD Unix where the linker doesn't like
              being given shared library as e.g. lib/foo.so - it's then recorded
              as lib/foo.so instead of foo.so in ELF binary. We implement a
@@ -259,7 +259,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__targetdir_dironly">$(nativePaths(value))</set>
             <set var="__targetdir">$(__targetdir_dironly)$(DIRSEP)</set>
         </define-tag>
-        
+
         <define-tag name="optimize">
             <cppflags>
                 $(substituteFromDict(value,
@@ -268,7 +268,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                        'size':__FLAG_OPTIMIZE_SIZE}))
             </cppflags>
         </define-tag>
-        
+
         <define-tag name="arch">
             <cppflags>
                 $(substituteFromDict(value,
@@ -279,7 +279,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                        }))
             </cppflags>
         </define-tag>
-            
+
         <define-tag name="pic">
             <set var="__picflag">
                 $(substituteFromDict(value,
@@ -289,7 +289,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <cflags>$(__picflag)</cflags>
             <cxxflags>$(__picflag)</cxxflags>
         </define-tag>
- 
+
         <define-tag name="debug-info">
             <cppflags>
                 $(substituteFromDict(value,
@@ -302,7 +302,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                        'off':__FLAG_DEBUG_OFF_LINKER}))
             </ldflags>
         </define-tag>
-        
+
         <define-tag name="threading">
             <ldflags>
                 $(substituteFromDict(value,
@@ -315,7 +315,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                        'single':__FLAG_SINGLE_THREADING_CPP}))
             </cppflags>
         </define-tag>
-        
+
         <define-tag name="warnings">
             <cppflags>
                 $(substituteFromDict(value,
@@ -324,7 +324,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                        'max':__FLAG_WARNINGS_MAX}))
             </cppflags>
         </define-tag>
-        
+
         <define-tag name="cxx-rtti">
             <cxxflags>
                 $(substituteFromDict(value,
@@ -332,7 +332,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                          'off':__FLAG_RTTI_OFF}))
             </cxxflags>
         </define-tag>
-        
+
         <define-tag name="cxx-exceptions">
             <cxxflags>
                 $(substituteFromDict(value,
@@ -354,17 +354,17 @@ makefiles (most notably GNU Make and Autoconf formats).
 
         <define-tag name="msvc-project-files"/>
         <define-tag name="msvc-file-group"/>
-        
+
         <define-tag name="__clean-target-files">
             <clean-files>
                 $(ref('__targetdir',id))$(ref('__targetname',id))
             </clean-files>
         </define-tag>
-        
+
         <define-tag name="postlink-command">
             <set var="__post_command" append="1">$(value)$(LF)</set>
         </define-tag>
-        
+
     </define-rule>
 
     <define-rule name="exe" extends="__compiled,$(__exe_baser)">
@@ -385,13 +385,13 @@ makefiles (most notably GNU Make and Autoconf formats).
                        'gui':__FLAG_EXE_GUI}))
             </ldflags>
         </define-tag>
-        
+
         <define-tag name="exename">
             <set var="__name">$(value)</set>
         </define-tag>
 
     </define-rule>
-    
+
     <define-rule name="lib" extends="__compiled,$(__lib_baser)">
         <template template="$(__lib_baset)">
             <set var="__name" eval="0">$(__libname)</set>
@@ -457,7 +457,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         </template>
     </define-rule>
 
-    
+
     <define-rule name="action" extends="__any">
         <template>
             <set var="__command"/>
@@ -474,7 +474,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     <template id="__phony">
         <set var="__is_phony">1</set>
     </template>
-    
+
     <define-rule name="phony" extends="__any">
         <template template="__phony"/>
     </define-rule>
@@ -506,12 +506,12 @@ makefiles (most notably GNU Make and Autoconf formats).
             </if>
         </define-tag>
     </define-rule>
-    
-    
+
+
     <!-- =============================================================== -->
     <!--                  Sources compilation rules:                     -->
     <!-- =============================================================== -->
-            
+
     <define-tag name="src" rules="compilation_rule">
         <set var="__deps" append="1">
             $(targets[__parent].__objects_deps_var)
@@ -526,7 +526,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__cflags">$(targets[__parent].__cflags_var)</set>
         </define-tag>
     </define-rule>
-    
+
     <define-rule name="__cpp-to-$(OBJEXT[1:])" extends="__any,compilation_rule">
         <template template="__commands_templ_CXX">
             <set var="__command">$(__COMPILE_CXX_CMD)</set>
@@ -543,8 +543,8 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!-- this is Objective-C++, not C++, but c++ can handle it: -->
     <define-rule name="__mm-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
     <define-rule name="__M-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
-    
-    
+
+
     <!-- =============================================================== -->
     <!--                      resources:                                 -->
     <!-- =============================================================== -->
@@ -555,8 +555,11 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-tag name="mac-res" rules="exe,dll,module">
         <!-- do nothing by default -->
     </define-tag>
-    
-    
+    <define-tag name="symbian-res" rules="exe,dll,module">
+        <!-- do nothing by default -->
+    </define-tag>
+
+
     <!-- =============================================================== -->
     <!--                     "make install":                             -->
     <!-- =============================================================== -->
@@ -564,13 +567,13 @@ makefiles (most notably GNU Make and Autoconf formats).
     <define-rule name="inst-action" extends="action">
         <template template="__phony"/>
     </define-rule>
-    
+
     <tag-info name="install-if" position="before:install-to"/>
 
     <define-tag name="install-if" rules="exe,dll,lib,module">
         <set var="__install_if_cond">$(value)</set>
     </define-tag>
-    
+
     <define-tag name="install-to" rules="exe,dll,lib,module">
         <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
             <add-target target="install_$(id)"
@@ -600,7 +603,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                 </command>
             </modify-target>
         </define-tag>
-        
+
         <define-tag name="install-to" rules="module">
             <modify-target target="install_$(id)">
                 <command>
@@ -617,19 +620,19 @@ makefiles (most notably GNU Make and Autoconf formats).
             </modify-target>
         </define-tag>
     </if>
-    
-    
+
+
     <!-- =============================================================== -->
     <!--                 Standard makefile targets:                      -->
     <!-- =============================================================== -->
 
     <phony id="all" category="all"/>
-    
+
     <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
         <action id="install" template="__phony">
             <depends>all</depends>
         </action>
-    
+
         <action id="uninstall" template="__phony"/>
     </if>
 

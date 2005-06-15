@@ -8,6 +8,8 @@ Version 0.1.9
 - fixed copy-files on Solaris (Michael Wetherell)
 - added dependencies tracking for Sun CC (Michael Wetherell)
 - msvc: fixed to work with free MS tools (Włodzimierz Skiba)
+- new format: xcode2 for XCode project files (David Elliott)
+- new format: symbian for Symbian tools (Włodzimierz Skiba)
 
 
 Version 0.1.8

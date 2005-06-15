@@ -7,18 +7,20 @@
         root.bkl
         cond/hello.bkl
         cond_install/cond_install.bkl
+        debug/debug.bkl
         dll/dll.bkl
         gettext/gettext.bkl
         hello/hello.bkl
         library/library.bkl
         module/module.bkl
+        paths/paths.bkl
         pch/pch.bkl
         regressions/regressions.bkl
         datafiles/datafiles.bkl
     </input>
     
     <add-formats>
-        autoconf,borland,cbuilderx,dmars,dmars_smake,mingw,msevc4prj,msvc,msvc6prj,msevc4prj,watcom
+        autoconf,borland,cbuilderx,dmars,dmars_smake,mingw,msevc4prj,msvc,msvc6prj,msevc4prj,symbian,watcom
     </add-formats>
     
     <!-- WinCE can't handle console-only apps: -->

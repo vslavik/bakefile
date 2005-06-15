@@ -7,41 +7,41 @@
         <description>GNU autoconf Makefile.in files</description>
         <default-filename>Makefile.in</default-filename>
     </format>
-    
+
     <format id="watcom">
         <description>OpenWatcom makefiles</description>
         <default-filename>makefile.wat</default-filename>
     </format>
-    
+
     <format id="borland">
         <description>Borland C/C++ makefiles</description>
         <default-filename>makefile.bcc</default-filename>
     </format>
-    
+
     <format id="mingw">
         <description>MinGW makefiles (mingw32-make)</description>
         <default-filename>makefile.gcc</default-filename>
     </format>
-    
+
     <format id="msvc">
         <description>MS Visual C++ nmake makefiles</description>
         <default-filename>makefile.vc</default-filename>
     </format>
-    
+
     <format id="msvc6prj">
         <description>MS Visual C++ 6.0 project files</description>
         <default-filename>
             $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).dsw
         </default-filename>
     </format>
-    
+
     <format id="msevc4prj">
         <description>MS eMbedded Visual C++ 4 project files</description>
         <default-filename>
             $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).vcw
         </default-filename>
     </format>
-    
+
     <format id="dmars">
         <description>Digital Mars makefiles</description>
         <default-filename>makefile.dmc</default-filename>
@@ -67,6 +67,11 @@
     <format id="xcode2">
         <description>Xcode 2.0 project.pbxproj files</description>
         <default-filename>$(os.path.splitext(os.path.basename(INPUT_FILE))[0]).xcode</default-filename>
+    </format>
+
+    <format id="symbian">
+        <description>Symbian development files</description>
+        <default-filename>bld.inf</default-filename>
     </format>
 
 </bakefile-manifest>
