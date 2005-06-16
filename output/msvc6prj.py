@@ -184,6 +184,11 @@ Package=<4>
             tgR = split1[0]
             tg1 = split2[0]
             tg2 = split2[1]
+
+            # the targets may be disabled by some (weak) condition:
+            if tg1 not in targets and tg2 not in targets:
+                continue
+            
             t = targets[tg1]
             for c in targets[tg2].configs:
                 t.configs[c] = targets[tg2].configs[c]
