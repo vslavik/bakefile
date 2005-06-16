@@ -25,4 +25,4 @@
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 
-DEFAULT /cvsroot/sitedocs/CVSROOT/cvstools/syncmail -u [bake-cvs]%{sVv} vaclavslavik@users.sourceforge.net
+DEFAULT /cvsroot/sitedocs/CVSROOT/cvstools/syncmail -u %{sVv} bakefile-cvs@lists.sourceforge.net
