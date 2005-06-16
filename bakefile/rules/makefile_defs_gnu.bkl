@@ -3,6 +3,15 @@
 
 <makefile>
 
+    <!--
+
+      GNU compilers can be used in GNU/MinGW-only development and
+      Symbian development (which holds more compilers) therefore some shared
+      flags are exposed with __FLAG_GNU_* prefix to not conflict with flags
+      imported from makefile_defs_cw.bkl and makefile_defs_msvc.bkl
+
+      -->
+
     <set var="__FLAG_GNU_OPTIMIZE_OFF">-O0</set>
     <set var="__FLAG_GNU_OPTIMIZE_SIZE">-Os</set>
     <set var="__FLAG_GNU_OPTIMIZE_SPEED">-O2</set>
