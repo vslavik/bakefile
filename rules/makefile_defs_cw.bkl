@@ -3,12 +3,23 @@
 
 <makefile>
 
+    <!--
+
+      CodeWarrior compiler can be used in CodeWarrior-only development and
+      Symbian development (which holds more compilers) therefore some shared
+      flags are exposed with __FLAG_CW_* prefix to not conflict with flags
+      imported from makefile_defs_gnu.bkl and makefile_defs_msvc.bkl
+
+      Non symbian block is currently unused due to lack of CodeWarrior format.
+
+      -->
+
     <set var="__FLAG_CW_OPTIMIZE_OFF"></set>
-    <set var="__FLAG_CW_OPTIMIZE_SIZE"></set>
-    <set var="__FLAG_CW_OPTIMIZE_SPEED"></set>
-    <set var="__FLAG_CW_WARNINGS_NO"></set>
+    <set var="__FLAG_CW_OPTIMIZE_SIZE">-opt space</set>
+    <set var="__FLAG_CW_OPTIMIZE_SPEED">-opt speed</set>
+    <set var="__FLAG_CW_WARNINGS_NO">-w off</set>
     <set var="__FLAG_CW_WARNINGS_DEFAULT"></set>
-    <set var="__FLAG_CW_WARNINGS_MAX"></set>
+    <set var="__FLAG_CW_WARNINGS_MAX">-w all</set>
 
     <if cond="FORMAT!='symbian'">
 

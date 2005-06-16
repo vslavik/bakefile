@@ -3,6 +3,15 @@
 
 <makefile>
 
+    <!--
+
+      MSVC compilers can be used in VC/eVC/VCIDE developments and
+      Symbian development (which holds more compilers) therefore some shared
+      flags are exposed with __FLAG_MSVC_* prefix to not conflict with flags
+      imported from makefile_defs_cw.bkl and makefile_defs_gnu.bkl
+
+      -->
+
     <set var="__FLAG_MSVC_OPTIMIZE_OFF">/Od</set>
     <set var="__FLAG_MSVC_OPTIMIZE_SIZE">/O1</set>
     <set var="__FLAG_MSVC_OPTIMIZE_SPEED">/O2</set>
