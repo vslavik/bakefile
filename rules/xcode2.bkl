@@ -151,16 +151,24 @@
         <define-tag name="dllname" />
     </define-rule>
     <define-rule name="dll" extends="_dll">
+        <template>
+            <libname>$(id)</libname>
+        </template>
         <define-tag name="version"/>
         <define-tag name="so_version"/>
         <define-tag name="mac_version"/>
     </define-rule>
-    <define-rule name="module" extends="_dll"/>
+    <define-rule name="module" extends="_dll">
+        <template>
+            <libname>$(id)</libname>
+        </template>
+    </define-rule>
     <define-rule name="lib" extends="__compiled">
         <template>
             <set var="_productType">com.apple.product-type.library.static</set>
             <set var="_explicitFileType">archive.ar</set>
             <set var="_productname" eval="0">lib$(_libname).a</set>
+            <libname>$(id)</libname>
         </template>
     </define-rule>
     <define-rule name="exe" extends="__compiled">
