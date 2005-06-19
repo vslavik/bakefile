@@ -11,6 +11,7 @@ Version 0.1.9
 - new format: xcode2 for XCode project files (David Elliott)
 - new format: symbian for Symbian tools (Włodzimierz Skiba)
 - msevc4prj: support C++ exceptions
+- autoconf: treat Cygwin as Unix (Michael Wetherell)
 
 
 Version 0.1.8
