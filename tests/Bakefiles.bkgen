@@ -23,11 +23,13 @@
         autoconf,borland,cbuilderx,dmars,dmars_smake,mingw,msevc4prj,msvc,msvc6prj,msevc4prj,symbian,watcom
     </add-formats>
     
-    <!-- WinCE can't handle console-only apps: -->
+    <!-- WinCE can't handle console-only apps (FIXME: build tests anyway!): -->
     <del-formats files="cond/*.bkl">msevc4prj</del-formats>
     <del-formats files="cond_install/*.bkl">msevc4prj</del-formats>
     <del-formats files="regressions/*.bkl">msevc4prj</del-formats>
     <del-formats files="pch/*.bkl">msevc4prj</del-formats>
+    <del-formats files="debug/*.bkl">msevc4prj</del-formats>
+    <del-formats files="paths/*.bkl">msevc4prj</del-formats>
 
     <!-- DigitalMars' make can't handle conditions: -->
     <del-formats files="cond*/*.bkl">dmars</del-formats>
