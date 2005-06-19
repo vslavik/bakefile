@@ -171,6 +171,7 @@ AC_DEFUN([AC_BAKEFILE_SUFFIXES],
     DLLPREFIX="lib"
     DLLPREFIX_MODULE=""
     DLLIMP_SUFFIX=""
+    dlldir="$libdir"
     
     case "${BAKEFILE_HOST}" in
         *-hp-hpux* )
@@ -192,6 +193,7 @@ AC_DEFUN([AC_BAKEFILE_SUFFIXES],
             DLLIMP_SUFFIX="dll.a"
             EXEEXT=".exe"
             DLLPREFIX="cyg"
+            dlldir="$bindir"
         ;;
         *-*-mingw32* )
             SO_SUFFIX="dll"
@@ -199,10 +201,12 @@ AC_DEFUN([AC_BAKEFILE_SUFFIXES],
             DLLIMP_SUFFIX="dll.a"
             EXEEXT=".exe"
             DLLPREFIX=""
+            dlldir="$bindir"
         ;;
         *-pc-msdosdjgpp )
             EXEEXT=".exe"
             DLLPREFIX=""
+            dlldir="$bindir"
         ;;
         *-pc-os2_emx | *-pc-os2-emx )
             SO_SUFFIX="dll"
@@ -212,6 +216,7 @@ AC_DEFUN([AC_BAKEFILE_SUFFIXES],
             DLLPREFIX=""
             LIBPREFIX=""
             LIBEXT=".$OS2_LIBEXT"
+            dlldir="$bindir"
         ;;
         powerpc-*-darwin* )
             SO_SUFFIX="dylib"
@@ -231,6 +236,7 @@ AC_DEFUN([AC_BAKEFILE_SUFFIXES],
     AC_SUBST(LIBEXT)
     AC_SUBST(DLLPREFIX)
     AC_SUBST(DLLPREFIX_MODULE)
+    AC_SUBST(dlldir)
 ])
 
 
