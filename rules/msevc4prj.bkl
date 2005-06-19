@@ -282,6 +282,20 @@
                                      {'on':_CPU_CRT_DBG,'off':_CPU_CRT_REL}))
             </cppflags>
         </define-tag>
+
+        <!-- eVC's RTTI requires additional library and exceptions require
+             RTTI. See here for more information:
+             http://sourceforge.net/tracker/index.php?func=detail&aid=1086311&group_id=83016&atid=568029
+             http://support.microsoft.com/default.aspx?scid=kb;en-us;830482
+          -->
+        <define-tag name="cxx-rtti">
+            <sys-lib>
+                $(substituteFromDict(value, {'on':'ccrtrtti.lib','off':''}))
+            </sys-lib>
+        </define-tag>
+        <define-tag name="cxx-exceptions">
+            <cxx-rtti>on</cxx-rtti>
+        </define-tag>
         
         <define-tag name="runtime-libs"/>
         <define-tag name="threading"/>
