@@ -320,6 +320,7 @@
     <define-tag name="so_version" rules="dll"/>
     <define-tag name="mac_version" rules="dll"/>
     <define-tag name="mac-res" rules="exe"/>
+    <define-tag name="symbian-res" rules="exe"/>
 
 
     <!-- =============================================================== -->

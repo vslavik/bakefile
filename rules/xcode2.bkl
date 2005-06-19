@@ -166,12 +166,10 @@
     <!--                      resources:                                 -->
     <!-- =============================================================== -->
 
-    <define-tag name="win32-res" rules="exe,dll,module">
-        <!-- do nothing by default -->
-    </define-tag>
-    <define-tag name="mac-res" rules="exe,dll,module">
-        <!-- do nothing by default -->
-    </define-tag>
+    <!-- do nothing by default: -->
+    <define-tag name="win32-res" rules="exe,dll,module"/>
+    <define-tag name="mac-res" rules="exe,dll,module"/>
+    <define-tag name="symbian-res" rules="exe,dll,module"/>
     
     <output file="$(OUTPUT_FILE)" writer="xcode2.py" />
 </makefile>
