@@ -53,7 +53,7 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
 
     if test "x$BAKEFILE_FORCE_PLATFORM" = "x"; then 
         case "${BAKEFILE_HOST}" in
-            *-*-cygwin* | *-*-mingw32* )
+            *-*-mingw32* )
                 PLATFORM_WIN32=1
             ;;
             *-pc-msdosdjgpp )
@@ -186,7 +186,14 @@ AC_DEFUN([AC_BAKEFILE_SUFFIXES],
             SO_SUFFIX="a"
             SO_SUFFIX_MODULE="a"
         ;;
-        *-*-cygwin* | *-*-mingw32* )
+        *-*-cygwin* )
+            SO_SUFFIX="dll"
+            SO_SUFFIX_MODULE="dll"
+            DLLIMP_SUFFIX="dll.a"
+            EXEEXT=".exe"
+            DLLPREFIX="cyg"
+        ;;
+        *-*-mingw32* )
             SO_SUFFIX="dll"
             SO_SUFFIX_MODULE="dll"
             DLLIMP_SUFFIX="dll.a"
@@ -246,6 +253,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
     dnl Defaults for GCC and ELF .so shared libs:
     SHARED_LD_CC="\$(CC) -shared ${PIC_FLAG} -o"
     SHARED_LD_CXX="\$(CXX) -shared ${PIC_FLAG} -o"
+    WINDOWS_IMPLIB=0
 
     case "${BAKEFILE_HOST}" in
       *-hp-hpux* )
@@ -365,6 +373,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
         PIC_FLAG=""
         SHARED_LD_CC="\$(CC) -shared -o"
         SHARED_LD_CXX="\$(CXX) -shared -o"
+        WINDOWS_IMPLIB=1
       ;;
 
       *-pc-os2_emx | *-pc-os2-emx )
@@ -405,6 +414,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
     AC_SUBST(SHARED_LD_MODULE_CC)
     AC_SUBST(SHARED_LD_MODULE_CXX)
     AC_SUBST(PIC_FLAG)
+    AC_SUBST(WINDOWS_IMPLIB)
 ])
 
 
@@ -419,6 +429,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_VERSIONS],
     USE_SOVERSION=0
     USE_SOVERLINUX=0
     USE_SOVERSOLARIS=0
+    USE_SOVERCYGWIN=0
     USE_SOSYMLINKS=0
     USE_MACVERSION=0
     SONAME_FLAG=
@@ -442,12 +453,18 @@ AC_DEFUN([AC_BAKEFILE_SHARED_VERSIONS],
         USE_MACVERSION=1
         USE_SOVERSION=1
         USE_SOSYMLINKS=1
-      ;;      
+      ;;
+
+      *-*-cygwin* )
+        USE_SOVERSION=1
+        USE_SOVERCYGWIN=1
+      ;;
     esac
 
     AC_SUBST(USE_SOVERSION)
     AC_SUBST(USE_SOVERLINUX)
     AC_SUBST(USE_SOVERSOLARIS)
+    AC_SUBST(USE_SOVERCYGWIN)
     AC_SUBST(USE_MACVERSION)
     AC_SUBST(USE_SOSYMLINKS)
     AC_SUBST(SONAME_FLAG)

@@ -21,9 +21,11 @@
     <option name="RESCOMP"/>
     <option name="SETFILE"/>
     <option name="PIC_FLAG"/>
+    <option name="WINDOWS_IMPLIB"><values>0,1</values></option>
     <option name="USE_SOVERSION"><values>0,1</values></option>
     <option name="USE_SOVERLINUX"><values>0,1</values></option>
     <option name="USE_SOVERSOLARIS"><values>0,1</values></option>
+    <option name="USE_SOVERCYGWIN"><values>0,1</values></option>
     <option name="USE_SOSYMLINKS"><values>0,1</values></option>
     <option name="USE_MACVERSION"><values>0,1</values></option>
     <option name="SONAME_FLAG"/>
@@ -167,11 +169,14 @@
         </set>
         
         <set var="__targetsuf3">
-            <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='0'">
+            <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='0' and USE_SOVERCYGWIN=='0'">
                 $(DLLEXT).$(__soversion1).$(__soversion2).$(__soversion3)
             </if>
             <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='1'">
                 .$(__soversion1).$(__soversion2).$(__soversion3)$(DLLEXT)
+            </if>
+            <if cond="USE_SOVERSION=='1' and USE_SOVERCYGWIN=='1'">
+                -$(__soversion1)$(DLLEXT)
             </if>
             <if cond="USE_SOVERSION=='0'">$(DLLEXT)</if>
         </set>
@@ -242,7 +247,7 @@
     
     <define-tag name="libname" rules="dll">
         <set var="__importlib">
-            <if cond="PLATFORM_WIN32=='1'">-Wl,--out-implib,$(__targetdir)$(__linkname)</if>
+            <if cond="WINDOWS_IMPLIB=='1'">-Wl,--out-implib,$(__targetdir)$(__linkname)</if>
             <if cond="PLATFORM_OS2=='1'">-import $(__targetdir)$(__linkname)</if>
         </set>
         <ldflags>$(__importlib)</ldflags>
