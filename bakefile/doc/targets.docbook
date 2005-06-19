@@ -854,6 +854,21 @@
                 <entry role="availability">exe, dll, module</entry>
               </row>
               
+              <row id="tag.symbian-res" xreflabel="symbian-res">
+                <entry role="tagname">symbian-res</entry>
+                <entry>
+                  Sets Symbian resource file for executable or DLL.
+                  The tag does nothing on platforms other than Symbian.
+                  Compilation of the resource respects 
+                  <xref linkend="tag.define"/> and 
+                  <xref linkend="tag.include"/> tags on the target,
+                  as well as their resource specific counterparts
+                  <xref linkend="tag.res-define"/> and
+                  <xref linkend="tag.res-include"/>.
+                </entry>
+                <entry role="availability">exe, dll, module</entry>
+              </row>
+              
               
               <row id="tag.res-include" xreflabel="res-include">
                 <entry role="tagname">res-include</entry>
