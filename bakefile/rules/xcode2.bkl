@@ -164,6 +164,14 @@
         </template>
     </define-rule>
     <define-rule name="exe" extends="__compiled">
+        <template>
+            <set var="_productType">com.apple.product-type.application</set>
+            <set var="_explicitFileType">wrapper.application</set>
+            <set var="_productname" eval="0">__TODO__</set>
+        </template>
+        <define-tag name="app-type">
+            <!-- TODO: Set _productType and _explitFileType -->
+         </define-tag>
     </define-rule>
 
     <phony id="all" category="all" />
