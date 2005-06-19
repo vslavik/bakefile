@@ -283,10 +283,6 @@
             </cppflags>
         </define-tag>
         
-        <!-- Not supported by eVC++ (?) -->
-        <define-tag name="cxx-rtti"/>
-        <define-tag name="cxx-exceptions"/>
-        
         <define-tag name="runtime-libs"/>
         <define-tag name="threading"/>
 

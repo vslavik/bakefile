@@ -203,6 +203,17 @@
         </define-tag>
         <define-tag name="precomp-headers-location"/>
         
+        <define-tag name="cxx-rtti">
+            <cxxflags>
+                $(substituteFromDict(value, {'on':'/GR','off':''}))
+            </cxxflags>
+        </define-tag>
+        <define-tag name="cxx-exceptions">
+            <cxxflags>
+                $(substituteFromDict(value, {'on':'/EHsc','off':''}))
+            </cxxflags>
+        </define-tag>
+        
         <!-- Support for files grouping: -->
         <define-tag name="msvc-file-group">
             <set var="_file_groups">
