@@ -183,6 +183,15 @@
                 </row>
                 
                 <row>
+                  <entry role="varname">DLLDIR</entry>
+                  <entry>Directory where DLLs are installed.</entry>
+                  <entry role="default">
+                    $(PREFIX)/lib on Unix, $(PREFIX)/bin when targetting
+                    win32
+                  </entry>
+                </row>
+                
+                <row>
                   <entry role="varname">INCLUDEDIR</entry>
                   <entry>Directory where C and C++ headers are installed.</entry>
                   <entry role="default">$(PREFIX)/include on Unix</entry>

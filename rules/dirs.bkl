@@ -13,6 +13,7 @@
     <set var="PREFIX">/usr/local</set>
     <set var="BINDIR" eval="0">$(PREFIX)/bin</set>
     <set var="LIBDIR" eval="0">$(PREFIX)/lib</set>
+    <set var="DLLDIR" eval="0">$(LIBDIR)</set>
     <set var="INCLUDEDIR" eval="0">$(PREFIX)/include</set>
     <set var="DATADIR" eval="0">$(PREFIX)/share</set>
 

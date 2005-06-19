@@ -55,11 +55,13 @@
     <option name="exec_prefix"/>
     <option name="bindir"/>
     <option name="libdir"/>
+    <option name="dlldir"/>
     <option name="datadir"/>
     <option name="includedir"/>
     <set var="PREFIX">$(prefix)</set>
     <set var="BINDIR">$(bindir)</set>
     <set var="LIBDIR">$(libdir)</set>
+    <set var="DLLDIR">$(dlldir)</set>
     <set var="DATADIR">$(datadir)</set>
     <set var="INCLUDEDIR">$(includedir)</set>
 
