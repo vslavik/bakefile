@@ -12,6 +12,7 @@ Version 0.1.9
 - new format: symbian for Symbian tools (Włodzimierz Skiba)
 - msevc4prj: support C++ exceptions
 - autoconf: treat Cygwin as Unix (Michael Wetherell)
+- added --keep-going option to bakefile_gen
 
 
 Version 0.1.8

@@ -219,7 +219,7 @@ def filterFiles(bakefiles, formats):
 
 
 
-def updateTargets(jobs, pretend=0):
+def updateTargets(jobs, pretend=0, keepGoing=0):
     """Updates all targets. Run jobs instances of bakefile simultaneously"""
     if verbose:
         print 'determining which makefiles are out of date...'
@@ -286,7 +286,12 @@ def updateTargets(jobs, pretend=0):
                 if pretend: continue
 
                 if os.system(cmd) != 0:
-                    raise errors.Error('bakefile exited with error')
+                    if keepGoing:
+                        sys.stderr.write(
+                          '[bakefile_gen] bakefile exited with error, ignoring')
+                        continue
+                    else:
+                        raise errors.Error('bakefile exited with error')
                 modLinesCnt = __countLines(tempChanges)
                 try:
                     state.lock.acquire()
@@ -413,6 +418,10 @@ def run(args):
                       action="store_true", dest='pretend',
                       default=0,
                       help="don't do anything, only display actions that would be performed")
+    parser.add_option('-k', '--keep-going',
+                      action="store_true", dest='keepGoing',
+                      default=0,
+                      help="keep going when some targets can't be made")
     parser.add_option('-v', '--verbose',
                       action="store_true", dest='verbose', default=0,
                       help='display detailed information')
@@ -446,7 +455,9 @@ def run(args):
         if options.clean:
             cleanTargets(pretend=options.pretend)
         else:
-            updateTargets(jobs=options.jobs, pretend=options.pretend)
+            updateTargets(jobs=options.jobs,
+                          pretend=options.pretend,
+                          keepGoing=options.keepGoing)
     except errors.ErrorBase, e:
         sys.stderr.write('[bakefile_gen] %s' % str(e))
         sys.exit(1)
