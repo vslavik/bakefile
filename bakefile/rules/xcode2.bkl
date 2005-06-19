@@ -173,13 +173,25 @@
     </define-rule>
     <define-rule name="exe" extends="__compiled">
         <template>
-            <set var="_productType">com.apple.product-type.application</set>
-            <set var="_explicitFileType">wrapper.application</set>
-            <set var="_productname" eval="0">__TODO__</set>
+            <set var="_productname" eval="0">$(_exename)</set>
+            <exename>$(id)</exename>
+            <app-type>console</app-type>
         </template>
         <define-tag name="app-type">
-            <!-- TODO: Set _productType and _explitFileType -->
-         </define-tag>
+            <set var="_productType">
+                $(substituteFromDict(value,
+                {'console':'com.apple.product-type.tool',
+                 'gui':'com.apple.product-type.application'}))
+            </set>
+            <set var="_explicitFileType">
+                $(substituteFromDict(value,
+                {'console':'compiled.mach-o.executable',
+                 'gui':'wrapper.application'}))
+            </set>
+        </define-tag>
+        <define-tag name="exename">
+            <set var="_exename">$(value)</set>
+        </define-tag>
     </define-rule>
 
     <phony id="all" category="all" />
