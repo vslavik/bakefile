@@ -138,12 +138,7 @@
                 <set var="__pch_sym_file">
                     $(BUILDDIR)$(DIRSEP)$(__pch_sym_tgt)
                 </set>
-                <set var="__pch_obj">pch_$(__pch_file).obj</set>
  
-                <set var="__objects" append="1">
-                    $(BUILDDIR)$(DIRSEP)$(__pch_obj)
-                </set>
-                
                 <!-- FIXME: this is a hack in absense of PCH exclusion:
                      it should be cppflags and there should be a way to
                      exclude certain files from using PCH -->
@@ -160,14 +155,17 @@
                 <set var="__pch_cmd" eval="0">
                     $(ifthenelse(__uses_cxx,CXX,CC)+' '+ifthenelse(__uses_cxx,
                                  '$(%s_CXXFLAGS)' % id.upper(),
-                                 '$(%s_CFLAGS)' % id.upper())) -mn $(ifthenelse(__uses_cxx,'-cpp',''))  -HF$(__pch_sym_file) -o$(BUILDDIR)$(DIRSEP)$(__pch_obj) $(__pch_location)$(nativePaths(__pch_header))
+                                 '$(%s_CFLAGS)' % id.upper())) -mn $(ifthenelse(__uses_cxx,'-cpp',''))  -HF$(__pch_sym_file) $(__pch_location)$(nativePaths(__pch_header))
                 </set>
 
                 <if cond="__pch_sym_tgt not in targets">
                     <add-target target="$(__pch_sym_tgt)" type="action"/>
                     <modify-target target="$(__pch_sym_tgt)">
                         <set var="__targetname">$(__pch_sym_file)</set>
-                        <command>$(ref("__pch_cmd",id))</command>
+                        <command>
+                            if not exist $(BUILDDIR) mkdir $(BUILDDIR)
+                            $(ref("__pch_cmd",id))
+                        </command>
                         <depends-on-file>
                             $(__pch_location)$(nativePaths(__pch_header))
                         </depends-on-file>
