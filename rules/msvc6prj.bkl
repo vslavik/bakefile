@@ -42,17 +42,6 @@
             </cppflags>
             <!-- NB: rest of handling is done in msvc_prj_common.bkl -->
         </define-tag>
-        
-        <define-tag name="cxx-rtti">
-            <cxxflags>
-                $(substituteFromDict(value, {'on':'/GR','off':''}))
-            </cxxflags>
-        </define-tag>
-        <define-tag name="cxx-exceptions">
-            <cxxflags>
-                $(substituteFromDict(value, {'on':'/EHsc','off':''}))
-            </cxxflags>
-        </define-tag>
     </define-rule>
 
     <include file="msvc_prj_common.bkl"/>
