@@ -94,7 +94,9 @@
     <define-rule name="__compiled" extends="__any">
         <template>
             <set var="_kind">binary_product</set>
-            <set var="_xcode_project_grouping"></set>
+            <set var="_xcode_target_group"></set>
+            <set var="_defines"></set>
+            <set var="_includes"></set>
         </template>
         <define-tag name="debug-info">
         </define-tag>
@@ -105,7 +107,9 @@
         <define-tag name="cxx-rtti" />
         <define-tag name="cxx-exceptions" />
         <define-tag name="cppflags" />
-        <define-tag name="define" />
+        <define-tag name="define">
+            <set var="_defines" append="1">$(value)</set>
+        </define-tag>
         <define-tag name="dirname" />
         <define-tag name="libname">
             <set var="_libname">$(value)</set>
@@ -113,7 +117,9 @@
         <define-tag name="install-to" />
         <define-tag name="install-if" />
         <define-tag name="pic" />
-        <define-tag name="include" />
+        <define-tag name="include">
+            <set var="_includes" append="1">$(value)</set>
+        </define-tag>
         <define-tag name="sources">
             <set var="_sources" append="1">$(value)</set>
         </define-tag>
