@@ -20,7 +20,7 @@
     </input>
     
     <add-formats>
-        autoconf,borland,cbuilderx,dmars,dmars_smake,mingw,msevc4prj,msvc,msvc6prj,msevc4prj,symbian,watcom
+        autoconf,borland,cbuilderx,dmars,dmars_smake,gnu,mingw,msevc4prj,msvc,msvc6prj,symbian,watcom,xcode2
     </add-formats>
     
     <!-- WinCE can't handle console-only apps (FIXME: build tests anyway!): -->
