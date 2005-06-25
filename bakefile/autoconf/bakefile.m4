@@ -694,6 +694,10 @@ AC_DEFUN([AC_BAKEFILE],
     dnl includes autoconf_inc.m4:
     $1
     
+    if test "$BAKEFILE_AUTOCONF_INC_M4_VERSION" = "" ; then
+        AC_MSG_ERROR([No version found in autoconf_inc.m4 - bakefile macro was changed to take additional argument, perhaps configure.in wasn't updated (see the documentation)?])
+    fi
+    
     if test "$BAKEFILE_BAKEFILE_M4_VERSION" != "$BAKEFILE_AUTOCONF_INC_M4_VERSION" ; then
         AC_MSG_ERROR([Versions of Bakefile used to generate makefiles ($BAKEFILE_AUTOCONF_INC_M4_VERSION) and configure ($BAKEFILE_BAKEFILE_M4_VERSION) do not match.])
     fi
