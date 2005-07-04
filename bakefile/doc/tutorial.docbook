@@ -14,7 +14,7 @@
       our bakefile would look like:
       <programlisting><![CDATA[
 <?xml version="1.0"?>
-<bakefile>
+<makefile>
 
   <include file="presets/simple.bkl"/>
   
@@ -22,7 +22,7 @@
     <sources>hello.c</sources>
   </exe>
 
-</bakefile>
+</makefile>
 ]]></programlisting>
     </para>
     <para>
