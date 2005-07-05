@@ -53,7 +53,7 @@
                 </entry>
                 <entry role="default">1</entry>
               </row>
-              
+
             </tbody>
           </tgroup>
         </informaltable>
@@ -82,7 +82,7 @@
                 </entry>
                 <entry role="default">(empty)</entry>
               </row>
-              
+
               <row id="var.LIB_PAGESIZE">
                 <entry role="varname">LIB_PAGESIZE</entry>
                 <entry>
@@ -99,12 +99,12 @@
 
       </para>
     </section>
-    
-  
+
+
     <!-- =============================================================== -->
     <!--                        Directories                              -->
     <!-- =============================================================== -->
-    
+
     <section>
       <title>Directories</title>
 
@@ -137,13 +137,13 @@
                 </entry>
                 <entry role="default">(depends on format)</entry>
               </row>
-              
+
             </tbody>
           </tgroup>
         </informaltable>
 
       </para>
-      
+
       <section>
         <title>Installation Directories</title>
 
@@ -163,25 +163,25 @@
                 </row>
               </thead>
               <tbody>
-                
+
                 <row>
                   <entry role="varname">PREFIX</entry>
                   <entry>Base directory for installed files.</entry>
                   <entry role="default">/usr/local on Unix</entry>
                 </row>
-                
+
                 <row>
                   <entry role="varname">BINDIR</entry>
                   <entry>Directory where programs are installed.</entry>
                   <entry role="default">$(PREFIX)/bin on Unix</entry>
                 </row>
-                
+
                 <row>
                   <entry role="varname">LIBDIR</entry>
                   <entry>Directory where libraries are installed.</entry>
                   <entry role="default">$(PREFIX)/lib on Unix</entry>
                 </row>
-                
+
                 <row>
                   <entry role="varname">DLLDIR</entry>
                   <entry>Directory where DLLs are installed.</entry>
@@ -190,30 +190,30 @@
                     win32
                   </entry>
                 </row>
-                
+
                 <row>
                   <entry role="varname">INCLUDEDIR</entry>
                   <entry>Directory where C and C++ headers are installed.</entry>
                   <entry role="default">$(PREFIX)/include on Unix</entry>
                 </row>
-                
+
                 <row>
                   <entry role="varname">DATADIR</entry>
                   <entry>Directory where data files are installed.</entry>
                   <entry role="default">$(PREFIX)/share on Unix</entry>
                 </row>
-                
-                
+
+
               </tbody>
             </tgroup>
           </informaltable>
         </para>
       </section>
-      
+
 
     </section>
-    
-    
+
+
     <!-- =============================================================== -->
     <!--                          Platform                               -->
     <!-- =============================================================== -->
@@ -226,7 +226,7 @@
         exception of <literal>autoconf</literal> format backend where they are
         options.
       </para>
-      <para>        
+      <para>
         <informaltable>
           <tgroup cols='2'>
             <thead>
@@ -265,7 +265,11 @@
                 <entry role="varname">PLATFORM_BEOS</entry>
                 <entry>BeOS</entry>
               </row>
-              
+              <row>
+                <entry role="varname">PLATFORM_SYMBIAN</entry>
+                <entry>Symbian OS</entry>
+              </row>
+
             </tbody>
           </tgroup>
         </informaltable>
@@ -275,9 +279,9 @@
 
 
 
-    
-    
-    
+
+
+
     <!-- =============================================================== -->
     <!--                        Miscellaneous                            -->
     <!-- =============================================================== -->
@@ -303,11 +307,11 @@
                   three numbers delimined by period. Read only.
                 </entry>
               </row>
-              
+
               <row id="var.OPTIONS">
                 <entry role="varname">OPTIONS</entry>
                 <entry>
-                  Space-separation list of 
+                  Space-separation list of
                   <link linkend="concept.option">options</link> defined in
                   the makefiles. Note that the value of this variable
                   changes during processing as new options are defined!
@@ -322,7 +326,7 @@
                   Read only.
                 </entry>
               </row>
-              
+
               <row id="var.INPUT_FILE_ARG" xreflabel="INPUT_FILE_ARG">
                 <entry role="varname">INPUT_FILE_ARG</entry>
                 <entry>
@@ -332,7 +336,7 @@
                   <varname>INPUT_FILE</varname>.
                 </entry>
               </row>
-              
+
               <row id="var.OUTPUT_FILE" xreflabel="OUTPUT_FILE">
                 <entry role="varname">OUTPUT_FILE</entry>
                 <entry>
@@ -340,7 +344,7 @@
                   written. Read only.
                 </entry>
               </row>
-              
+
               <row>
                 <entry role="varname">FORMAT</entry>
                 <entry>
@@ -348,7 +352,7 @@
                   <literal>autoconf</literal>. Always constant expression.
                 </entry>
               </row>
-              
+
               <row>
                 <entry role="varname">COMPILER</entry>
                 <entry>
@@ -357,7 +361,7 @@
                   guaranteed to evaluate to constant expression.
                 </entry>
               </row>
-              
+
               <row>
                 <entry role="varname">TOOLSET</entry>
                 <entry>
@@ -368,28 +372,28 @@
                   <literal>unix</literal>. Always a constanst expression.
                 </entry>
               </row>
-              
+
               <row>
                 <entry role="varname">LF</entry>
                 <entry>
                   Line feed character (\n in C).
                 </entry>
               </row>
-              
+
               <row>
                 <entry role="varname">TAB</entry>
                 <entry>
                   Tabelator character (\t in C).
                 </entry>
               </row>
-              
+
               <row>
                 <entry role="varname">DOLLAR</entry>
                 <entry>
                   Dollar sign ($).
                 </entry>
               </row>
-              
+
               <row>
                 <entry role="varname">SPACE</entry>
                 <entry>
@@ -398,7 +402,7 @@
                   constant expression is expected.
                 </entry>
               </row>
-              
+
               <row>
                 <entry role="varname">DIRSEP</entry>
                 <entry>
@@ -406,7 +410,7 @@
                   target platform (/ on Unix, \ on Windows).
                 </entry>
               </row>
-              
+
             </tbody>
           </tgroup>
         </informaltable>
@@ -418,11 +422,11 @@
 
 
   </section>
-  
-  
-  
-  
-  <section>    
+
+
+
+
+  <section>
     <title>Format specific variables</title>
 
 
@@ -448,7 +452,7 @@
                   calls) are written. This file <emphasis>must</emphasis> be
                   included by your <filename>configure.in</filename> script.
                   Set it to empty string to disable creation of this file
-                  (e.g. for subprojects of main project, see also 
+                  (e.g. for subprojects of main project, see also
                   <link  linkend="var.OPTIONS_FILE">
                     <varname>OPTIONS_FILE</varname>
                   </link>).
@@ -460,7 +464,7 @@
         </informaltable>
       </para>
     </section>
-    
+
   </section>
 
 </chapter>
