@@ -201,14 +201,16 @@ def findSources(filenames):
 
 
 def getObjectName(source, target, ext, objSuffix=''):
+    def safeValue(s):
+        return str(s).replace('-','_')
     pos = source.rfind('.')
     srcext = source[pos:]
     base = source[:pos]
     pos = max(base.rfind('/'), base.rfind(mk.vars['DIRSEP']))
-    base = base[pos+1:]
+    base = safeValue(base[pos+1:])
     
     objdir = mkPathPrefix(mk.vars['BUILDDIR'])
-    objname = '%s%s_%s%s%s' % (objdir, mk.targets[target].id, base,
+    objname = '%s%s_%s%s%s' % (objdir, safeValue(mk.targets[target].id), base,
                                objSuffix, ext)
     return objname
 
@@ -500,13 +502,15 @@ def condition2string(cond, format):
                 
 
 def createMakeVar(target, var, makevar, hints=''):
+    def safeValue(s):
+        return str(s).replace('-','_')
     """Creates make variable called 'makevar' with same value as 'var' and
        returns reference to it in the form of $(makevar)."""
     tg = mk.targets[target]
-    mk.setVar('%s_%s' % (target.upper(), makevar),
+    mk.setVar('%s_%s' % (safeValue(target.upper()), makevar),
               "$(ref('%s','%s'))" % (var, target),
               target=tg, makevar=1, hints=hints)
-    return '$(%s_%s)' % (target.upper(), makevar)
+    return '$(%s_%s)' % (safeValue(target.upper()), makevar)
 
 
 def wrapLongLine(prefix, line,
