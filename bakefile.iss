@@ -74,6 +74,7 @@ BeveledLabel=Bakefile
 
 [UninstallDelete]
 Name: {app}\src; Type: filesandordirs
+Name: {app}\output; Type: filesandordirs
 [Tasks]
 Name: addpath; Description: Add Bakefile to PATH environment variable (may not work); Flags: unchecked
 [Code]
