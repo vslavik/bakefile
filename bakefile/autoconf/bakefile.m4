@@ -1323,6 +1323,7 @@ verbose=0
 args=""
 objects=""
 linking_flag="-dynamiclib"
+ldargs="-r -keep_private_externs -nostdlib"
 
 while test ${D}# -gt 0; do
     case ${D}1 in
@@ -1336,8 +1337,12 @@ while test ${D}# -gt 0; do
         args="${D}{args} ${D}1 ${D}2"
         shift
         ;;
+       
+       -s|-Wl,*)
+        # collect these load args
+        ldargs="${D}{ldargs} ${D}1"
 
-       -l*|-L*|-Wl,*|-flat_namespace|-headerpad_max_install_names)
+       -l*|-L*|-flat_namespace|-headerpad_max_install_names)
         # collect these options
         args="${D}{args} ${D}1"
         ;;
@@ -1365,28 +1370,27 @@ while test ${D}# -gt 0; do
     shift
 done
 
+status=0
+
 #
 # Link one module containing all the others
 #
 if test ${D}{verbose} = 1; then
-    echo "c++ -r -keep_private_externs -nostdlib ${D}{objects} -o master.${D}${D}.o"
+    echo "c++ ${D}{ldargs} ${D}{objects} -o master.${D}${D}.o"
 fi
-c++ -r -keep_private_externs -nostdlib ${D}{objects} -o master.${D}${D}.o
+c++ ${D}{ldargs} ${D}{objects} -o master.${D}${D}.o
 status=${D}?
-if test ${D}{status} != 0; then
-    exit ${D}{status}
-fi
 
 #
-# Link the shared library from the single module created
+# Link the shared library from the single module created, but only if the
+# previous command didn't fail:
 #
-if test ${D}{verbose} = 1; then
-    echo "cc ${D}{linking_flag} master.${D}${D}.o ${D}{args}"
-fi
-c++ ${D}{linking_flag} master.${D}${D}.o ${D}{args}
-status=${D}?
-if test ${D}{status} != 0; then
-    exit ${D}{status}
+if test ${D}{status} = 0; then
+    if test ${D}{verbose} = 1; then
+        echo "c++ ${D}{linking_flag} master.${D}${D}.o ${D}{args}"
+    fi
+    c++ ${D}{linking_flag} master.${D}${D}.o ${D}{args}
+    status=${D}?
 fi
 
 #
@@ -1394,7 +1398,7 @@ fi
 #
 rm -f master.${D}${D}.o
 
-exit 0
+exit ${D}status
 EOF
 dnl ===================== shared-ld-sh ends here =====================
 ])

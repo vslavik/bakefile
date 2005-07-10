@@ -11,6 +11,7 @@ verbose=0
 args=""
 objects=""
 linking_flag="-dynamiclib"
+ldargs="-r -keep_private_externs -nostdlib"
 
 while test $# -gt 0; do
     case $1 in
@@ -24,8 +25,12 @@ while test $# -gt 0; do
         args="${args} $1 $2"
         shift
         ;;
+       
+       -s|-Wl,*)
+        # collect these load args
+        ldargs="${ldargs} $1"
 
-       -l*|-L*|-Wl,*|-flat_namespace|-headerpad_max_install_names)
+       -l*|-L*|-flat_namespace|-headerpad_max_install_names)
         # collect these options
         args="${args} $1"
         ;;
@@ -59,9 +64,9 @@ status=0
 # Link one module containing all the others
 #
 if test ${verbose} = 1; then
-    echo "c++ -r -keep_private_externs -nostdlib ${objects} -o master.$$.o"
+    echo "c++ ${ldargs} ${objects} -o master.$$.o"
 fi
-c++ -r -keep_private_externs -nostdlib ${objects} -o master.$$.o
+c++ ${ldargs} ${objects} -o master.$$.o
 status=$?
 
 #
