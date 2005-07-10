@@ -65,7 +65,7 @@
     </format>
     
     <format id="xcode2">
-        <description>Xcode 2.0 project.pbxproj files</description>
+        <description>Xcode 2.0 project.pbxproj files (UNFINISHED!)</description>
         <default-filename>
             $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).xcode
         </default-filename>
