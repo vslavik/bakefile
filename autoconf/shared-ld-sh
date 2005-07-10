@@ -53,6 +53,8 @@ while test $# -gt 0; do
     shift
 done
 
+status=0
+
 #
 # Link one module containing all the others
 #
@@ -61,20 +63,17 @@ if test ${verbose} = 1; then
 fi
 c++ -r -keep_private_externs -nostdlib ${objects} -o master.$$.o
 status=$?
-if test ${status} != 0; then
-    exit ${status}
-fi
 
 #
-# Link the shared library from the single module created
+# Link the shared library from the single module created, but only if the
+# previous command didn't fail:
 #
-if test ${verbose} = 1; then
-    echo "c++ ${linking_flag} master.$$.o ${args}"
-fi
-c++ ${linking_flag} master.$$.o ${args}
-status=$?
-if test ${status} != 0; then
-    exit ${status}
+if test ${status} = 0; then
+    if test ${verbose} = 1; then
+        echo "c++ ${linking_flag} master.$$.o ${args}"
+    fi
+    c++ ${linking_flag} master.$$.o ${args}
+    status=$?
 fi
 
 #
@@ -82,4 +81,4 @@ fi
 #
 rm -f master.$$.o
 
-exit 0
+exit $status
