@@ -69,7 +69,7 @@ fi
 # Link the shared library from the single module created
 #
 if test ${verbose} = 1; then
-    echo "cc ${linking_flag} master.$$.o ${args}"
+    echo "c++ ${linking_flag} master.$$.o ${args}"
 fi
 c++ ${linking_flag} master.$$.o ${args}
 status=$?
