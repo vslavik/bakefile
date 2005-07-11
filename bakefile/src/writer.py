@@ -45,6 +45,8 @@ class Container:
         return self.dict[key]
     def __delitem__(self, key):
         del self.dict[key]
+    def __contains__(self, key):
+        return key in self.dict
     def __len__(self):
         return len(self.list)
 
