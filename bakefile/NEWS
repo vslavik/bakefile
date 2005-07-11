@@ -1,3 +1,9 @@
+Version 0.1.9.1
+---------------
+
+- msvc6prj: fixed handling of MSVC6PRJ_MERGED_TARGETS hack
+
+
 Version 0.1.9
 -------------
 
