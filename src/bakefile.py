@@ -21,7 +21,7 @@
 #  $Id$
 #
 
-BAKEFILE_VERSION = "0.1.9"
+BAKEFILE_VERSION = "0.1.9.1"
 
 import sys, os.path
 try:
