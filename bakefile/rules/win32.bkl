@@ -11,7 +11,7 @@
     <set var="TOOLSET">win32</set>
     <set var="DIRSEP">\</set>
     
-    <set var="OBJEXT">.obj</set>
+    <set var="OBJEXT" overwrite="0">.obj</set>
     <set var="LIBEXT">.lib</set>
     <set var="LIBPREFIX"></set>
     <set var="EXEEXT">.exe</set>

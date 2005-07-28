@@ -156,7 +156,7 @@
                     done
                 </if>
 
-                <if cond="TOOLSET=='win32' and FORMAT!='mingw' and FORMAT!='dmars_smake'">
+                <if cond="TOOLSET in ['win32','os2'] and FORMAT!='mingw' and FORMAT!='dmars_smake'">
                     if not exist $(__dstdir) mkdir $(__dstdir)
                     for %f in ($(__files)) do if not exist $(__dstdir)\%f copy $(__srcdir)%f $(__dstdir)
                 </if>
@@ -191,7 +191,7 @@
                 <if cond="TOOLSET=='unix'">
                     cp -pf $(__file) $(__dest)
                 </if>
-                <if cond="TOOLSET=='win32'">
+                <if cond="TOOLSET in ['win32','os2']">
                     copy $(__file) $(__dest)
                 </if>
             </set>
@@ -215,7 +215,7 @@
                         cp -pf $(__file) $(__dest)
                     fi; \
                 </if>
-                <if cond="TOOLSET=='win32'">
+                <if cond="TOOLSET in ['win32','os2']">
                     if not exist $(__dest) copy $(__file) $(__dest)
                 </if>
             </set>
@@ -237,7 +237,7 @@
             <command cond="TOOLSET=='unix'">
                 @mkdir -p $(__targetname)
             </command>
-            <command cond="TOOLSET=='win32'">
+            <command cond="TOOLSET in ['win32','os2']">
                 if not exist $(__targetname) mkdir $(__targetname)
             </command>
         </define-tag>
