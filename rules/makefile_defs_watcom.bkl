@@ -2,9 +2,43 @@
 <!-- $Id$ -->
 
 <makefile>
-    
-    <include file="win32.bkl"/>
-    
+
+    <set var="OBJEXT">.obj</set>
+
+    <if cond="PLATFORM_OS2=='0'">
+        <include file="win32.bkl"/>
+    </if>
+    <if cond="PLATFORM_OS2=='1'">
+        <set var="TOOLSET">os2</set>
+        <set var="DIRSEP">\</set>
+
+        <set var="LIBEXT">.lib</set>
+        <set var="LIBPREFIX"></set>
+        <set var="EXEEXT">.exe</set>
+        <set var="DLLEXT">.dll</set>
+        <set var="DLLEXT_MODULE">.dll</set>
+        <set var="DLLIMPEXT">$(LIBEXT)</set>
+        <set var="DLLPREFIX"></set>
+        <set var="DLLPREFIX_MODULE"></set>
+        <set var="PIC_CFLAGS"></set>
+
+        <set var="INSTALL_PROGRAM">copy /Y</set>
+        <set var="INSTALL_DATA">$(INSTALL_PROGRAM)</set>
+
+        <set var="RM">-del</set>
+
+        <!-- for static libraries: -->
+        <set var="LIB_PAGESIZE" overwrite="0">4096</set>
+    </if>
+
+    <!-- target settings: -->
+    <set var="__TARGET_FLAG">
+        <if cond="PLATFORM_WIN32=='1'">-bt=nt</if>
+        <if cond="PLATFORM_MSDOS=='1'">-bt=dos</if>
+        <if cond="PLATFORM_OS2=='1'">-bt=os2</if>
+        <if cond="PLATFORM_UNIX=='1'">-bt=linux</if>
+    </set>
+
     <set var="__DEFINE_ARG">-d</set>
     <set var="__INCLUDE_ARG">-i=</set>
     <set var="__LIB_ARG">%s.lib</set>
@@ -16,7 +50,7 @@
     <set var="__DEFAULT_CPPFLAGS"></set>
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
-    
+
     <set var="__LINKER_CC">wlink</set>
     <set var="__LINKER_CXX">wlink</set>
     <set var="__DLL_LINKER_CC">wlink</set>
@@ -46,28 +80,40 @@
     <!-- NB: we explicitly reference startup function in case it was
              in a library (e.g. wxWindows) in which case wlink would
              optimize it out: -->
-    <set var="__FLAG_EXE_CONSOLE">system nt ref 'main_'</set>
-    <set var="__FLAG_EXE_GUI">system nt_win ref '_WinMain@16'</set>
-    
+    <set var="__FLAG_EXE">
+        <if cond="PLATFORM_MSDOS=='1'">system dos</if>
+        <if cond="PLATFORM_UNIX=='1'">system linux</if>
+    </set>
+    <set var="__FLAG_EXE_CONSOLE">
+        <if cond="PLATFORM_WIN32=='1'">system nt ref 'main_'</if>
+        <if cond="PLATFORM_OS2=='1'">system os2v2</if>
+        <if cond="PLATFORM_WIN32!='1'">$(__FLAG_EXE)</if>
+    </set>
+    <set var="__FLAG_EXE_GUI">
+        <if cond="PLATFORM_WIN32=='1'">system nt_win ref '_WinMain@16'</if>
+        <if cond="PLATFORM_OS2=='1'">system os2v2_pm</if>
+        <if cond="PLATFORM_WIN32!='1'">$(__FLAG_EXE)</if>
+    </set>
+
     <set var="__FLAG_RTTI_ON">-xr</set>
     <set var="__FLAG_RTTI_OFF"></set>
-    <set var="__FLAG_EXCEPTIONS_ON">-xs</set>    
+    <set var="__FLAG_EXCEPTIONS_ON">-xs</set>
     <set var="__FLAG_EXCEPTIONS_OFF"></set>
 
-    
+
     <!-- rules building blocks: -->
-    
+
     <template id="__commands_templ_C">
         <set var="__deps" append="1">.AUTODEPEND</set>
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -zq -fo=$^@ $(__cflags) $&lt;
+            $(CC) $(__TARGET_FLAG) -zq -fo=$^@ $(__cflags) $&lt;
         </set>
     </template>
-    
+
     <template id="__commands_templ_CXX">
         <set var="__deps" append="1">.AUTODEPEND</set>
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -zq -fo=$^@ $(__cxxflags) $&lt;
+            $(CXX) $(__TARGET_FLAG) -zq -fo=$^@ $(__cxxflags) $&lt;
         </set>
     </template>
 
@@ -90,23 +136,23 @@
                    working!! -->
             <cxxflags>$(__pch_cppflags)</cxxflags>
         </template>
-        
+
         <define-tag name="threading">
             <cppflags>
                 $(substituteFromDict(value,{'multi':'-bm','single':''}))
             </cppflags>
         </define-tag>
-        
+
         <define-tag name="lib-path">
             <set var="__libpath" append="1">;$(value)</set>
         </define-tag>
-        
+
         <define-tag name="runtime-libs">
             <cppflags>
                 $(substituteFromDict(value, {'static':'', 'dynamic':'-br'}))
             </cppflags>
         </define-tag>
-        
+
         <define-tag name="precomp-headers">
             <set var="__pch_flag">/fh</set>
         </define-tag>
@@ -116,12 +162,16 @@
             </set>
         </define-tag>
     </define-rule>
-    
+
 
     <template id="__commands_templ">
         <set var="__win32res_flag"/>
 
         <set var="__lbc_file">$(mkPathPrefix(BUILDDIR))$(id).lbc</set>
+        <set var="__dll_option">
+            <if cond="PLATFORM_WIN32=='1'">nr_dll</if>
+            <if cond="PLATFORM_OS2=='1'">os2v2 dll</if>
+        </set>
         <set var="__LINK_CMD_BASE" eval="0">
             @%create $(__lbc_file)
             @%append $(__lbc_file) option quiet
@@ -131,11 +181,11 @@
             @for %i in ($(__objects_var)) do @%append $(__lbc_file) file %i
             @for %i in ($(__ldlibs)) do @%append $(__lbc_file) library %i
             @%append $(__lbc_file) $(__win32res_flag)
-        </set>        
+        </set>
         <set var="__LINK_EXE_CMD" eval="0">
             $(__LINK_CMD_BASE)
             $(__linker) @$(__lbc_file)
-        </set>        
+        </set>
         <set var="__LINK_LIB_CMD" eval="0">
             @%create $(__lbc_file)
             @for %i in ($(__objects_var)) do @%append $(__lbc_file) +%i
@@ -143,7 +193,7 @@
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(__LINK_CMD_BASE)
-            @%append $(__lbc_file) system nt_dll
+            @%append $(__lbc_file) system $(__dll_option)
             $(__linker) @$(__lbc_file)
             wlib -q -n -b $(__targetdir)$(__libname).lib +$^@
         </set>
@@ -153,7 +203,7 @@
             $(__linker) @$(__lbc_file)
         </set>
     </template>
-    
+
     <template id="__subproject_templ">
         <set var="__MAKE_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)

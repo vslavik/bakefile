@@ -10,14 +10,14 @@
 
     <!-- Variables redefined in other (more specific) ruleset files: -->
 
-    <set var="PLATFORM_UNIX">0</set>
-    <set var="PLATFORM_WIN32">0</set>
-    <set var="PLATFORM_MSDOS">0</set>
-    <set var="PLATFORM_MAC">0</set>
-    <set var="PLATFORM_MACOSX">0</set>
-    <set var="PLATFORM_OS2">0</set>
-    <set var="PLATFORM_BEOS">0</set>
-    <set var="PLATFORM_SYMBIAN">0</set>
+    <set var="PLATFORM_UNIX" overwrite="0">0</set>
+    <set var="PLATFORM_WIN32" overwrite="0">0</set>
+    <set var="PLATFORM_MSDOS" overwrite="0">0</set>
+    <set var="PLATFORM_MAC" overwrite="0">0</set>
+    <set var="PLATFORM_MACOSX" overwrite="0">0</set>
+    <set var="PLATFORM_OS2" overwrite="0">0</set>
+    <set var="PLATFORM_BEOS" overwrite="0">0</set>
+    <set var="PLATFORM_SYMBIAN" overwrite="0">0</set>
 
     <define-rule name="compilation_rule">
         <define-tag name="src">
