@@ -5,7 +5,7 @@ Maintainer: Vadim Zeitlin <vadim@wxwindows.org>
 Build-Depends: debhelper (>= 4.0.0), autoconf, automake1.7|automake1.8|automake1.9,
  python2.2|python2.3|python2.4, python2.2-dev|python2.3-dev|python2.4-dev,
  libxml2-utils, xsltproc, swig
-Build-Conflicts: autoconf2.13, automake1.4
+Build-Conflicts: automake1.4
 Standards-Version: 3.6.1
 
 Package: bakefile
