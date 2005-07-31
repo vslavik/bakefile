@@ -1,3 +1,21 @@
+bakefile (0.1.9.1) unstable; urgency=low
+
+  * msvc6prj: fixed handling of MSVC6PRJ_MERGED_TARGETS hack
+  * dmars: fixed precompiled headers to not recompile everything
+  * mingw: added dependency tracking
+  * dmars: fixed subprojects
+  * don't escape backslashes in Python expressions
+  * fixed copy-files on Solaris
+  * added dependencies tracking for Sun CC
+  * msvc: fixed to work with free MS tools
+  * new format (unfinished!): xcode2 for XCode project files
+  * new format: symbian for Symbian tools
+  * msevc4prj: support C++ exceptions and RTTI
+  * autoconf: treat Cygwin as Unix
+  * added --keep-going option to bakefile_gen
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Mon, 14 Feb 2005 18:42:03 +0100
+
 bakefile (0.1.8) unstable; urgency=low
 
   * gnu format improvements: define PLATFORM_UNIX,
