@@ -2,6 +2,7 @@ Version 0.1.10
 --------------
 
 - watcom: new targets (OS/2) support
+- darwin (Mac OS X): support IBM xlC compiler
 
 
 Version 0.1.9.1
