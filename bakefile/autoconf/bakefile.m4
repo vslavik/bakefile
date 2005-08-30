@@ -360,8 +360,15 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
       ;;
 
       *-*-aix* )
-        dnl default settings are ok for gcc
-        if test "x$GCC" != "xyes"; then
+        dnl at least gcc 2.95 warns that -fPIC is ignored when compiling
+	dnl each and every file under AIX which is annoying, so don't use
+	dnl it there (it's useless as AIX runs on position-independent
+	dnl architectures only anyhow)
+        if test "x$GCC" = "xyes"; then
+	    PIC_FLAG=""
+	    SHARED_LD_CC="\$(CC) -shared ${PIC_FLAG} -o"
+	    SHARED_LD_CXX="\$(CXX) -shared ${PIC_FLAG} -o"
+	else
             dnl the abs path below used to be hardcoded here so I guess it must
             dnl be some sort of standard location under AIX?
             AC_CHECK_PROG(AIX_CXX_LD, makeC++SharedLib,
