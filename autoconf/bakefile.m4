@@ -409,7 +409,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
       ;;
       
       powerpc-apple-macos* | \
-      *-*-freebsd* | *-*-openbsd* | *-*-netbsd* | \
+      *-*-freebsd* | *-*-openbsd* | *-*-netbsd* | *-*-k*bsd*-gnu | \
       *-*-sunos4* | \
       *-*-osf* | \
       *-*-dgux5* | \
@@ -459,7 +459,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_VERSIONS],
     SONAME_FLAG=
 
     case "${BAKEFILE_HOST}" in
-      *-*-linux* | *-*-freebsd* )
+      *-*-linux* | *-*-freebsd* | *-*-k*bsd*-gnu )
         SONAME_FLAG="-Wl,-soname,"
         USE_SOVERSION=1
         USE_SOVERLINUX=1
