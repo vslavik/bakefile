@@ -293,9 +293,6 @@
                 $(substituteFromDict(value, {'on':'ccrtrtti','off':''}))
             </sys-lib>
         </define-tag>
-        <define-tag name="cxx-exceptions">
-            <cxx-rtti>on</cxx-rtti>
-        </define-tag>
         
         <define-tag name="runtime-libs"/>
         <define-tag name="threading"/>
