@@ -48,11 +48,7 @@ if test $DEPSMODE = gcc ; then
     fi
     exit 0
 elif test $DEPSMODE = mwcc ; then
-    $*
-    status=$?
-    if test ${status} != 0 ; then
-        exit ${status}
-    fi
+    $* || exit $?
     # Run mwcc again with -MM and redirect into the dep file we want
     # NOTE: We can't use shift here because we need $* to be valid
     prevarg=
@@ -73,7 +69,7 @@ elif test $DEPSMODE = mwcc ; then
     $* $DEPSFLAG_MWCC >${DEPSDIR}/${objfile}.d
     exit 0
 elif test $DEPSMODE = suncc; then
-    $* || exit
+    $* || exit $?
     # Run compiler again with deps flag and redirect into the dep file.
     # It doesn't work if the '-o FILE' option is used, but without it the
     # dependency file will contain the wrong name for the object. So it is
