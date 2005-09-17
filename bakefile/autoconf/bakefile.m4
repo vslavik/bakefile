@@ -504,33 +504,35 @@ dnl ---------------------------------------------------------------------------
 AC_DEFUN([AC_BAKEFILE_DEPS],
 [
     AC_MSG_CHECKING([for dependency tracking method])
-    DEPS_TRACKING=0
+    DEPS_TRACKING=1
 
     if test "x$GCC" = "xyes"; then
         DEPSMODE=gcc
-        DEPS_TRACKING=1
         case "${BAKEFILE_HOST}" in
             *-*-darwin* )
                 dnl -cpp-precomp (the default) conflicts with -MMD option
                 dnl used by bk-deps (see also http://developer.apple.com/documentation/Darwin/Conceptual/PortingUnix/compiling/chapter_4_section_3.html)
-                DEPSFLAG_GCC="-no-cpp-precomp -MMD"
+                DEPSFLAG="-no-cpp-precomp -MMD"
             ;;
             * )
-                DEPSFLAG_GCC="-MMD"
+                DEPSFLAG="-MMD"
             ;;
         esac
         AC_MSG_RESULT([gcc])
     elif test "x$MWCC" = "xyes"; then
         DEPSMODE=mwcc
-        DEPS_TRACKING=1
-        DEPSFLAG_MWCC="-MM"
+        DEPSFLAG="-MM"
         AC_MSG_RESULT([mwcc])
     elif test "x$SUNCC" = "xyes"; then
-        DEPSMODE=suncc
-        DEPS_TRACKING=1
-        DEPSFLAG_SUNCC="-xM1"
-        AC_MSG_RESULT([suncc])
+        DEPSMODE=unixcc
+        DEPSFLAG="-xM1"
+        AC_MSG_RESULT([Sun cc])
+    elif test "x$SGICC" = "xyes"; then
+        DEPSMODE=unixcc
+        DEPSFLAG="-M"
+        AC_MSG_RESULT([SGI cc])
     else
+	DEPS_TRACKING=0
         AC_MSG_RESULT([none])
     fi
 
@@ -1226,14 +1228,12 @@ cat <<EOF >bk-deps
 
 DEPSMODE=${DEPSMODE}
 DEPSDIR=.deps
-DEPSFLAG_GCC="${DEPSFLAG_GCC}"
-DEPSFLAG_MWCC="${DEPSFLAG_MWCC}"
-DEPSFLAG_SUNCC="${DEPSFLAG_SUNCC}"
+DEPSFLAG="${DEPSFLAG}"
 
 mkdir -p ${D}DEPSDIR
 
 if test ${D}DEPSMODE = gcc ; then
-    ${D}* ${D}{DEPSFLAG_GCC}
+    ${D}* ${D}{DEPSFLAG}
     status=${D}?
     if test ${D}{status} != 0 ; then
         exit ${D}{status}
@@ -1285,9 +1285,9 @@ elif test ${D}DEPSMODE = mwcc ; then
         fi
         prevarg="${D}arg"
     done
-    ${D}* ${D}DEPSFLAG_MWCC >${D}{DEPSDIR}/${D}{objfile}.d
+    ${D}* ${D}DEPSFLAG >${D}{DEPSDIR}/${D}{objfile}.d
     exit 0
-elif test ${D}DEPSMODE = suncc; then
+elif test ${D}DEPSMODE = unixcc; then
     ${D}* || exit ${D}?
     # Run compiler again with deps flag and redirect into the dep file.
     # It doesn't work if the '-o FILE' option is used, but without it the
@@ -1307,7 +1307,7 @@ elif test ${D}DEPSMODE = suncc; then
         esac
         shift
     done
-    eval "${D}cmd ${D}DEPSFLAG_SUNCC" | sed "s|.*:|${D}objfile:|" >${D}{DEPSDIR}/${D}{objfile}.d
+    eval "${D}cmd ${D}DEPSFLAG" | sed "s|.*:|${D}objfile:|" >${D}{DEPSDIR}/${D}{objfile}.d
     exit 0
 else
     ${D}*

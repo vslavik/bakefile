@@ -7,14 +7,12 @@
 
 DEPSMODE=@DEPSMODE@
 DEPSDIR=.deps
-DEPSFLAG_GCC="@DEPSFLAG_GCC@"
-DEPSFLAG_MWCC="@DEPSFLAG_MWCC@"
-DEPSFLAG_SUNCC="@DEPSFLAG_SUNCC@"
+DEPSFLAG="@DEPSFLAG@"
 
 mkdir -p $DEPSDIR
 
 if test $DEPSMODE = gcc ; then
-    $* ${DEPSFLAG_GCC}
+    $* ${DEPSFLAG}
     status=$?
     if test ${status} != 0 ; then
         exit ${status}
@@ -66,9 +64,9 @@ elif test $DEPSMODE = mwcc ; then
         fi
         prevarg="$arg"
     done
-    $* $DEPSFLAG_MWCC >${DEPSDIR}/${objfile}.d
+    $* $DEPSFLAG >${DEPSDIR}/${objfile}.d
     exit 0
-elif test $DEPSMODE = suncc; then
+elif test $DEPSMODE = unixcc; then
     $* || exit $?
     # Run compiler again with deps flag and redirect into the dep file.
     # It doesn't work if the '-o FILE' option is used, but without it the
@@ -88,7 +86,7 @@ elif test $DEPSMODE = suncc; then
         esac
         shift
     done
-    eval "$cmd $DEPSFLAG_SUNCC" | sed "s|.*:|$objfile:|" >${DEPSDIR}/${objfile}.d
+    eval "$cmd $DEPSFLAG" | sed "s|.*:|$objfile:|" >${DEPSDIR}/${objfile}.d
     exit 0
 else
     $*
