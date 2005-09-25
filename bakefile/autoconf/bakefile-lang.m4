@@ -166,30 +166,35 @@ dnl ===========================================================================
 AC_DEFUN([AC_BAKEFILE_PROG_CC],
 [
     AC_PROG_CC
-    AC_BAKEFILE_METROWERKS_EXTO
-    dnl By the time we find out that we need -ext o some tests have failed.
-    if test "x$wx_cv_c_exto" '!=' "x"; then
-        unset ac_cv_prog_cc_g
-        _AC_PROG_CC_G
+    dnl if we're using gcc, we can't be using any of incompatible compilers
+    if test "x$GCC" != "xyes"; then
+        AC_BAKEFILE_METROWERKS_EXTO
+        dnl By the time we find out that we need -ext o some tests have failed.
+        if test "x$wx_cv_c_exto" '!=' "x"; then
+            unset ac_cv_prog_cc_g
+            _AC_PROG_CC_G
+        fi
+        AC_BAKEFILE_PROG_MWCC
+        AC_BAKEFILE_PROG_XLCC
+        AC_BAKEFILE_PROG_SGICC
+        AC_BAKEFILE_PROG_SUNCC
     fi
-    AC_BAKEFILE_PROG_MWCC
-    AC_BAKEFILE_PROG_XLCC
-    AC_BAKEFILE_PROG_SGICC
-    AC_BAKEFILE_PROG_SUNCC
 ])
 
 AC_DEFUN([AC_BAKEFILE_PROG_CXX],
 [
     AC_PROG_CXX
-    AC_BAKEFILE_METROWERKS_EXTO
-    dnl By the time we find out that we need -ext o some tests have failed.
-    if test "x$wx_cv_cxx_exto" '!=' "x"; then
-        unset ac_cv_prog_cxx_g
-        _AC_PROG_CXX_G
+    if test "x$GXX" != "xyes"; then
+        AC_BAKEFILE_METROWERKS_EXTO
+        dnl By the time we find out that we need -ext o some tests have failed.
+        if test "x$wx_cv_cxx_exto" '!=' "x"; then
+            unset ac_cv_prog_cxx_g
+            _AC_PROG_CXX_G
+        fi
+        AC_BAKEFILE_PROG_MWCXX
+        AC_BAKEFILE_PROG_XLCXX
+        AC_BAKEFILE_PROG_SGICXX
+        AC_BAKEFILE_PROG_SUNCXX
     fi
-    AC_BAKEFILE_PROG_MWCXX
-    AC_BAKEFILE_PROG_XLCXX
-    AC_BAKEFILE_PROG_SGICXX
-    AC_BAKEFILE_PROG_SUNCXX
 ])
 
