@@ -318,7 +318,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
         dnl If using newer dev tools then there is a -single_module flag that
         dnl we can use to do this, otherwise we'll need to use a helper
         dnl script.  Check the version of gcc to see which way we can go:
-        AC_CACHE_CHECK([for gcc 3.1 or later], wx_cv_gcc31, [
+        AC_CACHE_CHECK([for gcc 3.1 or later], bakefile_cv_gcc31, [
            AC_TRY_COMPILE([],
                [
                    #if (__GNUC__ < 3) || \
@@ -327,14 +327,14 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
                    #endif
                ],
                [
-                   wx_cv_gcc31=yes
+                   bakefile_cv_gcc31=yes
                ],
                [
-                   wx_cv_gcc31=no
+                   bakefile_cv_gcc31=no
                ]
            )
         ])
-        if test "$wx_cv_gcc31" = "no"; then
+        if test "$bakefile_cv_gcc31" = "no"; then
             AC_BAKEFILE_CREATE_FILE_SHARED_LD_SH
             chmod +x shared-ld-sh
 
