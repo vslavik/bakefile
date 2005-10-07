@@ -3,6 +3,7 @@ Version 0.1.10
 
 - watcom: new targets (OS/2) support
 - autoconf: support IBM xlC compiler on Mac OS X
+- autoconf: dependencies support for HP aCC compiler (Vadim Zeitlin)
 - autoconf: dependencies support for SGI mipsPro compiler (Vadim Zeitlin)
 - autoconf: fixed shared libraries with gcc under AIX 5 (Vadim Zeitlin)
 - autoconf: added support for Intel C/C++ compiler (Vadim Zeitlin)
