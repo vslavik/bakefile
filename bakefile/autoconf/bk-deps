@@ -38,7 +38,12 @@ if test $DEPSMODE = gcc ; then
         sed -e "s,$depobjname:,$objfile:,g" $depfile >${DEPSDIR}/${objfile}.d
         rm -f $depfile
     else
+        # "g++ -MMD -o fooobj.o foosrc.cpp" produces fooobj.d
         depfile=`basename $objfile | sed -e 's/\..*$/.d/g'`
+        if test ! -f $depfile ; then
+            # "cxx -MD -o fooobj.o foosrc.cpp" creates fooobj.o.d (Compaq C++)
+            depfile="$objfile.d"
+        fi
         if test -f $depfile ; then
             sed -e "/^$objfile/!s,$depobjname:,$objfile:,g" $depfile >${DEPSDIR}/${objfile}.d
             rm -f $depfile
