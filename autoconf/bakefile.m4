@@ -547,6 +547,10 @@ AC_DEFUN([AC_BAKEFILE_DEPS],
         DEPSMODE=unixcc
         DEPSFLAG="+make"
         AC_MSG_RESULT([HP cc])
+    elif test "x$COMPAQCC" = "xyes"; then
+        DEPSMODE=gcc
+        DEPSFLAG="-MD"
+        AC_MSG_RESULT([Compaq cc])
     else
         DEPS_TRACKING=0
         AC_MSG_RESULT([none])
@@ -1275,7 +1279,12 @@ if test ${D}DEPSMODE = gcc ; then
         sed -e "s,${D}depobjname:,${D}objfile:,g" ${D}depfile >${D}{DEPSDIR}/${D}{objfile}.d
         rm -f ${D}depfile
     else
+        # "g++ -MMD -o fooobj.o foosrc.cpp" produces fooobj.d
         depfile=\`basename ${D}objfile | sed -e 's/\\..*${D}/.d/g'\`
+        if test ! -f ${D}depfile ; then
+            # "cxx -MD -o fooobj.o foosrc.cpp" creates fooobj.o.d (Compaq C++)
+            depfile="${D}objfile.d"
+        fi
         if test -f ${D}depfile ; then
             sed -e "/^${D}objfile/!s,${D}depobjname:,${D}objfile:,g" ${D}depfile >${D}{DEPSDIR}/${D}{objfile}.d
             rm -f ${D}depfile

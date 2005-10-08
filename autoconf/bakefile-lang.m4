@@ -144,6 +144,17 @@ AC_DEFUN([AC_BAKEFILE_PROG_HPCXX],
     _AC_BAKEFILE_LANG_COMPILER(HP, C++, __HP_aCC, HPCXX=yes)
 ])
 
+dnl Tru64 cc and cxx
+AC_DEFUN([AC_BAKEFILE_PROG_COMPAQCC],
+[
+    _AC_BAKEFILE_LANG_COMPILER(Compaq, C, __DECC, COMPAQCC=yes)
+])
+
+AC_DEFUN([AC_BAKEFILE_PROG_COMPAQCXX],
+[
+    _AC_BAKEFILE_LANG_COMPILER(Compaq, C++, __DECCXX, COMPAQCXX=yes)
+])
+
 dnl ===========================================================================
 dnl macros to detect specialty compiler options
 dnl ===========================================================================
@@ -220,12 +231,16 @@ AC_DEFUN([_AC_BAKEFILE_PROG_COMPILER],
                 AC_BAKEFILE_PROG_SGI$1
                 ;;
 
-            SunOS)
-                AC_BAKEFILE_PROG_SUN$1
-                ;;
-
             HP-UX*)
                 AC_BAKEFILE_PROG_HP$1
+                ;;
+
+            OSF1)
+                AC_BAKEFILE_PROG_COMPAQ$1
+                ;;
+
+            SunOS)
+                AC_BAKEFILE_PROG_SUN$1
                 ;;
         esac
     fi
