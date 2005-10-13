@@ -1,8 +1,9 @@
 
- Main developer:
------------------
+ Developers:
+-------------
 
 Vaclav Slavik <vslavik@fastmail.fm>
+Włodzimierz Skiba <abx@abx.art.pl>
 
 
  Patches:
@@ -10,13 +11,13 @@ Vaclav Slavik <vslavik@fastmail.fm>
 
 Artur Frysiak <wiget@users.sourceforge.net>
 Stefan Neis <Stefan.Neis@t-online.de>
-Włodzimierz Skiba <abx@abx.art.pl>
 Greg Noel <GregNoel@users.sourceforge.net>
 Hans Van Leemputten <hansvl@users.sourceforge.net>
 David Elliott <elliott@stcnet.com>
 Francesco Montorsi <fr_m@hotmail.com>
 Vadim Zeitlin <vadim@wxwindows.org>
 Michael Wetherell <mike.wetherell@ntlworld.com>
+Warren Young <warren@etr-usa.com> (many manual changes)
 
 
  Reused code:
