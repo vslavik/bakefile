@@ -1,43 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- $Id$ -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-
-<!ENTITY intro SYSTEM      "intro.docbook">
-<!ENTITY tutorial SYSTEM   "tutorial.docbook">
-<!ENTITY concepts SYSTEM   "concepts.docbook">
-<!ENTITY targets SYSTEM    "targets.docbook">
-<!ENTITY variables SYSTEM  "variables.docbook">
-<!ENTITY commands SYSTEM   "commands.docbook">
-<!ENTITY faq SYSTEM        "faq.docbook">
-<!ENTITY manpage SYSTEM    "manpage.docbook">
-
-<!ENTITY datafiles SYSTEM  "datafiles.docbook">
-
-]>
+    "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 
 <book lang="en">
   <bookinfo>
-    <title>Bakefile</title>
-    <author>
-      <firstname>Václav</firstname>
-      <surname>Slavík</surname>
-    </author>
+    <title>Bakefile Manual</title>
   </bookinfo>
 
-  &intro;
-  &tutorial;
-  &concepts;
-  &targets;
-  &commands;
-  &faq;
-  &variables;
+  <xi:include href="intro.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="tutorial.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="concepts.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="targets.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="commands.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="faq.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="variables.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
   <chapter id="ch.modules">
     <title>Modules</title>
-    &datafiles;
+    <xi:include href="datafiles.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   </chapter>
-  
-  &manpage;
 
+  <xi:include href="manpage.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 </book>
