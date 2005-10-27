@@ -5,9 +5,9 @@
 
     <!-- the value in win32.bkl is too high for DMC: -->
     <set var="LIB_PAGESIZE" overwrite="0">512</set>
-    
+
     <include file="win32.bkl"/>
-    
+
     <set var="__DEFINE_ARG">-D</set>
     <set var="__INCLUDE_ARG">-I</set>
     <set var="__LIB_ARG">%s.lib</set>
@@ -18,7 +18,7 @@
     <set var="__DEFAULT_CPPFLAGS"></set>
     <set var="__DEFAULT_CXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
-    
+
     <set var="__LINKER">link /NOLOGO /SILENT /NOI /DELEXECUTABLE</set>
     <set var="__LINKER_CC">$(__LINKER) /EXETYPE:NT</set>
     <set var="__LINKER_CXX">$(__LINKER) /EXETYPE:NT</set>
@@ -48,14 +48,14 @@
     <set var="__FLAG_WARNINGS_NO">-w</set>
     <set var="__FLAG_WARNINGS_DEFAULT"/>
     <set var="__FLAG_WARNINGS_MAX">-w-</set>
-    
+
     <set var="__FLAG_RTTI_ON">-Ar</set>
     <set var="__FLAG_RTTI_OFF"></set>
-    <set var="__FLAG_EXCEPTIONS_ON">-Ae</set>    
+    <set var="__FLAG_EXCEPTIONS_ON">-Ae</set>
     <set var="__FLAG_EXCEPTIONS_OFF"></set>
 
     <!-- rules building blocks: -->
-    
+
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
             $(CC) -mn -c -o$@ $(__cflags) $(src)
@@ -63,7 +63,7 @@
         <!-- FIXME: temporary hack, $(src) should be used only if there are
                     object-dependencies, otherwise $** should be used -->
     </template>
-    
+
     <template id="__commands_templ_CXX">
         <set var="__COMPILE_CXX_CMD" eval="0">
             $(CXX) -mn -c -cpp -o$@ $(__cxxflags) $(src)
@@ -77,13 +77,13 @@
             $(substituteFromDict(value, {'static':'', 'dynamic':'-ND'}))
         </cppflags>
     </define-tag>
-    
+
     <define-tag name="app-type" rules="exe">
         <cppflags>
             $(substituteFromDict(value, {'console':'', 'gui':'-WA'}))
         </cppflags>
     </define-tag>
-    
+
     <define-tag name="lib-path" rules="exe,dll,module">
         <set var="__ldlibs" append="1">$(nativePaths(value))\</set>
     </define-tag>
@@ -91,7 +91,7 @@
     <set var="__exe_baser">__dmars_comp</set>
     <set var="__dll_baser">__dmars_dll</set>
     <set var="__lib_baser">__dmars_comp</set>
-    
+
 
     <!-- Precompiled headers support: -->
     <tag-info name="precomp-headers-header"
@@ -109,11 +109,11 @@
             <set var="__pch_location">$(SRCDIR)$(DIRSEP)</set>
             <set var="__pch_file">hdr</set>
         </template>
- 
+
         <define-tag name="precomp-headers-file" rules="__compiled">
             <set var="__pch_file">$(value)</set>
         </define-tag>
-        
+
         <define-tag name="precomp-headers-location" rules="__compiled">
             <set var="__pch_location">$(SRCDIR)$(DIRSEP)$(nativePaths(value))$(DIRSEP)</set>
         </define-tag>
@@ -129,7 +129,7 @@
                     Precompiled header must explicitly be provided using &lt;precomp-headers-header&gt; for DMC.
                     </error>
                 </if>
-                
+
                 <!--
                  DMC generates both .sym file with pch data and .obj file
                  with code for the header; this object file must be linked in:
@@ -138,13 +138,13 @@
                 <set var="__pch_sym_file">
                     $(BUILDDIR)$(DIRSEP)$(__pch_sym_tgt)
                 </set>
- 
+
                 <!-- FIXME: this is a hack in absense of PCH exclusion:
                      it should be cppflags and there should be a way to
                      exclude certain files from using PCH -->
-                <cxxflags> 
+                <cxxflags>
                     $(substituteFromDict(value,
-                            {'on':'-H -HO- -HH$(__pch_sym_file)',
+                            {'on':'-H -HP99 -HO- -HH$(__pch_sym_file)',
                              'off':''}))
                 </cxxflags>
 
@@ -155,7 +155,7 @@
                 <set var="__pch_cmd" eval="0">
                     $(ifthenelse(__uses_cxx,CXX,CC)+' '+ifthenelse(__uses_cxx,
                                  '$(%s_CXXFLAGS)' % id.upper(),
-                                 '$(%s_CFLAGS)' % id.upper())) -mn $(ifthenelse(__uses_cxx,'-cpp',''))  -HF$(__pch_sym_file) $(__pch_location)$(nativePaths(__pch_header))
+                                 '$(%s_CFLAGS)' % id.upper())) -mn $(ifthenelse(__uses_cxx,'-cpp','')) -HP99 -HF$(__pch_sym_file) $(__pch_location)$(nativePaths(__pch_header))
                 </set>
 
                 <if cond="__pch_sym_tgt not in targets">
@@ -170,12 +170,12 @@
                             $(__pch_location)$(nativePaths(__pch_header))
                         </depends-on-file>
                     </modify-target>
-                </if> 
+                </if>
 
                 <objects-depend>$(__pch_sym_tgt)</objects-depend>
             </if> <!-- value=on -->
         </define-tag>
-        
+
     </define-rule>
 
     <define-rule name="__dmars_dll" extends="__dmars_comp">
@@ -184,7 +184,7 @@
             <sys-lib>kernel32</sys-lib>
         </template>
     </define-rule>
-    
+
     <template id="__commands_templ">
         <set var="__win32res"/>
         <set var="__mapfile" eval="0">$(__targetdir)$(__name).map</set>
@@ -201,5 +201,5 @@
             $(__module_linker) $(__ldflags) $(__objects_var),$@,$(__mapfile),$(__ldlibs),,$(__win32res)
         </set>
     </template>
-    
+
 </makefile>
