@@ -9,14 +9,14 @@
 2) Copies file(s) specified with <src> tag to either file specified with
    <destfile> or to directory set with <destdir> (will be created if
    it doesn't exist).
-   
+
 -->
 
 <makefile>
 
     <!-- Copy files to flat destination directory, i.e. do *not* preserve
          directory tree: -->
-    
+
     <define-rule name="__data-files-base">
         <template>
             <set var="__iprg">$(INSTALL_DATA)</set>
@@ -58,13 +58,13 @@
             </if>
         </template>
     </define-rule>
-    
+
     <define-rule name="script-files" extends="data-files" pseudo="1">
         <template>
             <set var="__iprg">$(INSTALL_PROGRAM)</set>
         </template>
     </define-rule>
-    
+
     <define-rule name="script-files-tg" extends="data-files-tg">
         <template>
             <set var="__iprg">$(INSTALL_PROGRAM)</set>
@@ -108,21 +108,21 @@
 
 
     <!-- Convenience rule for C/C++ header files to be installed: -->
-    
+
     <define-rule name="headers" extends="data-files-tree" pseudo="1">
         <template>
             <srcdir>$(SRCDIR)</srcdir>
             <install-to>$(INCLUDEDIR)</install-to>
         </template>
     </define-rule>
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     <!-- Copying files around as part of the build process: -->
-    
+
     <define-rule name="copy-files" extends="action">
         <template>
             <is-phony/>
@@ -142,21 +142,21 @@
             </if>
 
             <set var="__copy_cmd" eval="0">
-                
+
                 <if cond="TOOLSET=='unix'">
                     @mkdir -p $(__dstdir)
                     @for f in $(__files); do \
                         if test ! -f $(__dstdir)/$(DOLLAR)$(DOLLAR)f -a ! -d $(__dstdir)/$(DOLLAR)$(DOLLAR)f ; \
-			then x=yep ; \
-			else x=`find $(__srcdir)$(DOLLAR)$(DOLLAR)f -newer $(__dstdir)/$(DOLLAR)$(DOLLAR)f -print` ; \
-			fi; \
-			case "$(DOLLAR)$(DOLLAR)x" in ?*) \
+                        then x=yep ; \
+                        else x=`find $(__srcdir)$(DOLLAR)$(DOLLAR)f -newer $(__dstdir)/$(DOLLAR)$(DOLLAR)f -print` ; \
+                        fi; \
+                        case "$(DOLLAR)$(DOLLAR)x" in ?*) \
                             cp -pRf $(__srcdir)$(DOLLAR)$(DOLLAR)f $(__dstdir) ;; \
                         esac; \
                     done
                 </if>
 
-                <if cond="TOOLSET in ['win32','os2'] and FORMAT!='mingw' and FORMAT!='dmars_smake'">
+                <if cond="TOOLSET in ['win32','os2','dos'] and FORMAT!='mingw' and FORMAT!='dmars_smake'">
                     if not exist $(__dstdir) mkdir $(__dstdir)
                     for %f in ($(__files)) do if not exist $(__dstdir)\%f copy $(__srcdir)%f $(__dstdir)
                 </if>
@@ -170,7 +170,7 @@
                     if not exist $(__dstdir) mkdir $(__dstdir)
                     for %%f in ($(__files)) do if not exist $(__dstdir)\%%f copy $(__srcdir)%%f $(__dstdir)
                 </if>
-                
+
             </set>
             <command>$(__copy_cmd)</command>
         </template>
@@ -184,14 +184,14 @@
             <set var="__files">$(' '.join(value.split()))</set>
         </define-tag>
     </define-rule>
-        
+
     <define-rule name="copy-file-to-file" extends="action">
         <template>
             <set var="__copy_cmd" eval="0">
                 <if cond="TOOLSET=='unix'">
                     cp -pf $(__file) $(__dest)
                 </if>
-                <if cond="TOOLSET in ['win32','os2']">
+                <if cond="TOOLSET in ['win32','os2','dos']">
                     copy $(__file) $(__dest)
                 </if>
             </set>
@@ -206,7 +206,7 @@
             <depends-on-file>$(value)</depends-on-file>
         </define-tag>
     </define-rule>
-    
+
     <define-rule name="copy-file-to-file-if-not-exist" extends="action">
         <template>
             <set var="__copy_cmd" eval="0">
@@ -215,7 +215,7 @@
                         cp -pf $(__file) $(__dest)
                     fi; \
                 </if>
-                <if cond="TOOLSET in ['win32','os2']">
+                <if cond="TOOLSET in ['win32','os2','dos']">
                     if not exist $(__dest) copy $(__file) $(__dest)
                 </if>
             </set>
@@ -237,7 +237,7 @@
             <command cond="TOOLSET=='unix'">
                 @mkdir -p $(__targetname)
             </command>
-            <command cond="TOOLSET in ['win32','os2']">
+            <command cond="TOOLSET in ['win32','os2','dos']">
                 if not exist $(__targetname) mkdir $(__targetname)
             </command>
         </define-tag>
