@@ -5,11 +5,14 @@
 
     <set var="OBJEXT">.obj</set>
 
-    <if cond="PLATFORM_OS2=='0'">
+    <if cond="PLATFORM_OS2=='0' and PLATFORM_MSDOS=='0'">
         <include file="win32.bkl"/>
     </if>
-    <if cond="PLATFORM_OS2=='1'">
-        <set var="TOOLSET">os2</set>
+    <if cond="PLATFORM_OS2=='1' or PLATFORM_MSDOS=='1'">
+        <set var="TOOLSET">
+            <if cond="PLATFORM_MSDOS=='1'">dos</if>
+            <if cond="PLATFORM_OS2=='1'">os2</if>
+        </set>
         <set var="DIRSEP">\</set>
 
         <set var="LIBEXT">.lib</set>
