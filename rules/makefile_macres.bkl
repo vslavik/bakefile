@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 
 <makefile>
-    
+
     <!-- =============================================================== -->
     <!--                        Mac OS resources:                        -->
     <!-- =============================================================== -->
@@ -10,7 +10,7 @@
     <define-rule name="__macexe">
         <template template="$(__macexe_baset)">
             <set var="__mac_setfile" eval="0">
-                $(SETFILE) -t APPL $(__targetname)
+                $(SETFILE) -t APPL $(__targetdir)$(__targetname)
             </set>
             <set var="__mac_setfilecmd" eval="0">
                 <if cond="PLATFORM_MAC=='1'">$(__mac_setfile)</if>
@@ -26,7 +26,7 @@
                 $(__mac_setfilecmd)$(LF)
             </set>
         </template>
-        
+
         <define-tag name="mac-res">
             <set var="__macrfiles" append="1">$(value)</set>
             <!-- FIXME: this is incorrect assumption that every .r file contains
@@ -34,7 +34,7 @@
             <set var="__mac_setfile" eval="0">$(SETFILE) -a C $(__targetname)</set>
             <set var="__mac_rez" eval="0">
                 $(addPrefixIfNotEmpty('%s %s -o %s ' % (RESCOMP,__rez_flags,__targetname), __macrfiles))
-            </set>            
+            </set>
         </define-tag>
 
         <!-- includes and defines should propagate to rc compilation, too: -->
@@ -48,7 +48,7 @@
                 $(addPrefixIfNotEmpty('-d ',value))
             </set>
         </define-tag>
-        
+
     </define-rule>
 
 
