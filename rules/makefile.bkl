@@ -108,7 +108,11 @@ makefiles (most notably GNU Make and Autoconf formats).
             <modify-target target="clean">
                 <command cond="TOOLSET!='win32'">$(RM) $(value)</command>
                 <command cond="TOOLSET=='win32'">
-                    -if exist $(value) del $(value)
+                    <!-- in case $(value) is a list of files, we split all the tokens of the
+                         list and create single clean commands; all lines are separed by newlines
+                         but we also have to remove the newline after the last clean command to
+                         avoid that following <clean-files> tags will be spaced by an empty line -->
+                    $((''.join([('-if exist %s del %s\n') % (x, x) for x in value.split()]))[0:-1])
                 </command>
             </modify-target>
         </define-tag>

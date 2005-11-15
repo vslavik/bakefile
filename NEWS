@@ -8,6 +8,7 @@ Version 0.1.10
 - autoconf: dependencies support for SGI MIPSpro compiler (Vadim Zeitlin)
 - autoconf: fixed shared libraries with gcc under AIX 5 (Vadim Zeitlin)
 - autoconf: added support for Intel C/C++ compiler (Vadim Zeitlin)
+- win32 makefiles: fixed cleaning list of files (Francesco Montorsi)
 
 
 Version 0.1.9.1
@@ -81,7 +82,7 @@ Version 0.1.5
 - precompiled headers support for dmars and dmars_smake formats
   (based on work by Włodzimierz Skiba)
 - autoconf: BSD make fixes in the format
-- msvc6prj: fixed dependencies in project files 
+- msvc6prj: fixed dependencies in project files
 - msvc6prj: <optimize>speed optimized for size and vice versa, fixed
 - fixed win32 formats' "make clean" to delete precompiled headers files
 - autoconf: fixed to not accumulate outdated content in autoconf_inc.m4
