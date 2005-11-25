@@ -18,7 +18,8 @@
     <option name="DLLIMP_SUFFIX"/>
     <option name="EXEEXT"/>
     <option name="LN_S"/>
-    <option name="RESCOMP"/>
+    <option name="WINDRES"/>
+    <option name="REZ"/>
     <option name="SETFILE"/>
     <option name="PIC_FLAG"/>
     <option name="WINDOWS_IMPLIB"><values>0,1</values></option>
