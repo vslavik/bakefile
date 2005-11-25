@@ -33,7 +33,7 @@
                         an icon! -->
             <set var="__mac_setfile" eval="0">$(SETFILE) -a C $(__targetname)</set>
             <set var="__mac_rez" eval="0">
-                $(addPrefixIfNotEmpty('%s %s -o %s ' % (RESCOMP,__rez_flags,__targetname), __macrfiles))
+                $(addPrefixIfNotEmpty('%s %s -o %s ' % (REZ,__rez_flags,__targetname), __macrfiles))
             </set>
         </define-tag>
 

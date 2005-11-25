@@ -37,7 +37,7 @@
         <template>
             $(CXX) -c -o $@ $(__cppflags) $(__cxxflags) $&lt;
             <set var="__command" eval="0">
-                $(RESCOMP) -i$&lt; -o$@ $(__win32rc_flags)
+                $(WINDRES) -i$&lt; -o$@ $(__win32rc_flags)
             </set>
         </template>
         <define-tag name="parent-target">

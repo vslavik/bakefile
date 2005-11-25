@@ -13,7 +13,7 @@ makefiles (most notably GNU Make and Autoconf formats).
     
     <set var="AR">ar</set>
     <set var="RANLIB">ranlib</set>
-    <set var="RESCOMP">windres --use-temp-file</set>
+    <set var="WINDRES">windres --use-temp-file</set>
 
     <set var="OBJEXT">.o</set>
     <set var="LIBEXT">.a</set>
