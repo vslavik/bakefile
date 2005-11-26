@@ -9,12 +9,12 @@ codedir = $(pkglibdir)
 codeempydir = $(codedir)/empy
 codeoptikdir = $(codedir)/optik
 
+SUBDIRS = @OPTIONAL_DOCS@
+
 bin_SCRIPTS = autoconf/bakefilize
 
 aclocal_DATA = autoconf/bakefile.m4 \
                autoconf/bakefile-lang.m4
-
-man_MANS = doc/man/bakefile.1
 
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
@@ -126,8 +126,6 @@ EXTRA_DIST = \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
     makefile.vc
-
-SUBDIRS = @OPTIONAL_DOCS@
 
 dist-hook: doc
 
