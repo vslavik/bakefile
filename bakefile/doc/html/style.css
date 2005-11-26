@@ -77,8 +77,7 @@ div.note
 div.note h3
 {
     color: red;
-    font-size: 50%;
-    text-decoration: underline;
+    font-size: 75%;
 }
 
 div.navfooter *
@@ -171,8 +170,12 @@ div.informaltable th
   font-style: italic;
 }
 
+td
+{
+  vertical-align: top;
+}
+
 td.varname, td.tagname, td.paramname
 {
   font-weight: bold;
-  vertical-align: top;
 }
