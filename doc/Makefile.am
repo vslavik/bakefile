@@ -28,7 +28,8 @@ PDFFILE=$(BASENAME).pdf
 FO_SS=$(srcdir)/fo.xsl
 HTML_SS=$(srcdir)/html.xsl
 MAN_SS=$(srcdir)/manpage.xsl
-MANPAGE=man/bakefile.1
+MANPAGE_MAIN=man/bakefile.1
+MANPAGES=man/bakefile.1 man/bakefilize.1
 
 
 ## -------------------------
@@ -40,10 +41,13 @@ MANPAGE=man/bakefile.1
 # test-debug-rebuild cycle short, we generate only the HTML manual by
 # default.  You can explicitly say "make pdf" when you're sure the
 # DocBook file's contents are correct.
-noinst_DATA=html/index.html $(MANPAGE)
+noinst_DATA=html/index.html
+
+man_MANS = $(MANPAGES)
 
 EXTRA_DIST=$(srcdir)/html/*.css $(srcdir)/*.docbook $(srcdir)/*.xsl \
-		   $(srcdir)/html/images/*.png html/*.html man
+		   $(srcdir)/html/images/*.png html/*.html \
+		   $(MANPAGES)
 
 clean-local:
 	rm -rf tags *.fo html man *.log *.out *.pdf

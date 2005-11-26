@@ -51,7 +51,9 @@
     <refsect1>
       <title>Description</title>
       <para>
-        FIXME FIXME
+        <command>bakefile</command> creates various types of
+        Makefiles and project files from a single project
+        description called a "Bakefile".
       </para>
     </refsect1>
 
@@ -91,9 +93,94 @@
             </term>
             <listitem>
               <para>
-                Specify format of generated makefile (what compiler it is
-                for), e.g. <literal>autoconf</literal> or 
-                <literal>borland</literal>.
+                Specify output format. Bakefile supports these formats:
+              </para>
+
+              <para>
+                <informaltable>
+                  <tgroup cols='2'>
+                    <thead>
+                      <row>
+                        <entry>Format</entry>
+                        <entry>File(s) Generated</entry>
+                      </row>
+                    </thead>
+
+                    <tbody>
+                      <row>
+                        <entry>autoconf</entry>
+                        <entry>Makefile.in for GNU Autoconf</entry>
+                      </row>
+
+                      <row>
+                        <entry>borland</entry>
+                        <entry>Makefile for Borland C++ and Borland
+                        make</entry>
+                      </row>
+
+                      <row>
+                        <entry>cbuilderx</entry>
+                        <entry>Borland C++Builder X project files</entry>
+                      </row>
+
+                      <row>
+                        <entry>dmars</entry>
+                        <entry>Generic Makefile for Digital Mars C/C++</entry>
+                      </row>
+
+                      <row>
+                        <entry>dmars_smake</entry>
+                        <entry>Makefile for Digital Mars C/C++ with
+                        SMAKE</entry>
+                      </row>
+
+                      <row>
+                        <entry>gnu</entry>
+                        <entry>Makefile for GNU toolchain: GNU Make, GCC,
+                        etc.</entry>
+                      </row>
+
+                      <row>
+                        <entry>mingw</entry>
+                        <entry>Makefile for MinGW toolchain:
+                        mingw32-make, MinGW port of GCC, etc.</entry>
+                      </row>
+
+                      <row>
+                        <entry>msvc</entry>
+                        <entry>Makefile for Visual C++ with Microsoft
+                        nmake</entry>
+                      </row>
+
+                      <row>
+                        <entry>msvc6prj</entry>
+                        <entry>Microsoft Visual C++ 6.0 project files</entry>
+                      </row>
+
+                      <row>
+                        <entry>msevc4prj</entry>
+                        <entry>Microsoft Embedded Visual C++ 4 project
+                        files</entry>
+                      </row>
+
+                      <row>
+                        <entry>symbian</entry>
+                        <entry>Symbian development files</entry>
+                      </row>
+
+                      <row>
+                        <entry>watcom</entry>
+                        <entry>Makefile for OpenWatcom C/C++</entry>
+                      </row>
+
+                      <row>
+                        <entry>xcode2</entry>
+                        <entry>Apple Xcode 2.<emphasis>x</emphasis>
+                        project files</entry>
+                      </row>
+                    </tbody>
+                  </tgroup>
+                </informaltable>
               </para>
             </listitem>
           </varlistentry>
@@ -107,13 +194,12 @@
             </term>
             <listitem>
               <para>
-                File to write generated makefile to. Note that some backends
-                generate more than one file, this option specifies name of the
-                main makefile.
+                File to write generated makefile to. For those backends
+                that generate more than one file, this option specifies
+                the name of the main makefile.
               </para>
             </listitem>
           </varlistentry>
-          
           
           <varlistentry>
             <term>
@@ -153,6 +239,15 @@
 
           <varlistentry>
             <term>
+              <option>--debug</option>
+            </term>
+            <listitem>
+              <para>show internal debugging information</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
               <option>-q</option>
             </term>
             <listitem>
@@ -175,6 +270,44 @@
           </varlistentry>
           
 
+          <varlistentry>
+            <term>
+              <option>--output-deps</option>=<replaceable
+              class="parameter">FILE</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Output dependency information needed by
+                <command>bakefile_gen</command> utility
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry>
+            <term>
+              <option>--output-changes</option>=<replaceable
+              class="parameter">FILE</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Store list of changed files to the given file
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry>
+            <term>
+              <option>--xml-cache</option>=<replaceable
+              class="parameter">FILE</replaceable>
+            </term>
+            <listitem>
+              <para>
+                specify cache file where <command>bakefile_gen</command>
+                stores pre-parsed XML files
+              </para>
+            </listitem>
+          </varlistentry>
+          
         </variablelist>
       </para>
     </refsect1>
@@ -201,4 +334,132 @@
 
   </refentry>
 
+
+
+
+  <refentry id="man.bakefilize">
+    <refmeta>
+      <refentrytitle>bakefilize</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </refmeta>
+    <refnamediv>
+      <refname>bakefilize</refname>
+      <refpurpose>prepare Bakefile project for use with Autoconf</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>bakefile</command>
+        <arg choice="opt">
+          <option>--copy</option>
+        </arg>
+        <arg choice="opt">
+          <option>--dry-run</option>
+        </arg>
+        <arg choice="opt">
+          <option>--force</option>
+        </arg>
+        <arg choice="opt">
+          <option>--verbose</option>
+        </arg>
+        <arg choice="opt">
+          <option>--help</option>
+        </arg>
+    </cmdsynopsis>
+    </refsynopsisdiv>
+
+    <refsect1>
+      <title>Description</title>
+      <para>
+      For the "autoconf" format, Bakefile creates Makefile.in
+      files that depend on the availability of common pieces
+      of a GNU build system. (<filename>config.guess</filename>, 
+    <filename>install-sh</filename>, etc.) These tools
+    are part of Automake, which can copy these files
+    into a project's directory during processing.
+    <command>bakefilize</command> effectively replaces
+    the <command>automake --add-missing</command> feature.
+    </para>
+
+    <para>
+      It is standard practice in Autoconf-based projects to
+      provide a "bootstrap" script (commonly called
+    either <command>bootstrap</command> or
+    <command>autogen.sh</command>) to run commands
+    like <command>autoconf</command> with the proper
+    flags and in the proper order. You should run
+    <command>bakefilize</command> in that script, at
+    some point before the <command>configure</command>
+    script runs.
+    </para>
+    </refsect1>
+
+    <refsect1>
+      <title>Command Line Options</title>
+      <para>
+        <variablelist>
+
+          <varlistentry>
+            <term>
+              <option>-c</option>, <option>--copy</option>
+            </term>
+            <listitem>
+              <para>
+                Copy the files from the Automake directory, rather than
+        the default behavior of making symbolic links.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-n</option>, <option>--dry-run</option>
+            </term>
+            <listitem>
+              <para>
+                Only show the commands that would be executed.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-f</option>, <option>--force</option>
+            </term>
+            <listitem>
+              <para>
+                Replace all existing files, instead of only adding
+        missing files.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-v</option>, <option>--verbose</option>
+            </term>
+            <listitem>
+              <para>
+                Show debugging messages.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--help</option>
+            </term>
+            <listitem>
+              <para>
+                Display usage information for
+        <command>bakefilize</command>
+              </para>
+            </listitem>
+          </varlistentry>
+          
+        </variablelist>
+      </para>
+    </refsect1>
+    
+  </refentry>
 </reference>
