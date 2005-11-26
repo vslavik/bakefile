@@ -716,6 +716,10 @@ AC_DEFUN([AC_BAKEFILE],
     AC_PREREQ(2.58)
 
     if test "x$BAKEFILE_HOST" = "x"; then
+               if test "x${host}" = "x" ; then
+                       AC_MSG_ERROR([You must call the autoconf "CANONICAL_HOST" macro in your configure.ac (or .in) file.])
+               fi
+
         BAKEFILE_HOST="${host}"
     fi
 
