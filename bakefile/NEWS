@@ -1,4 +1,4 @@
-Version 0.1.10
+Version 0.2.0
 --------------
 
 - watcom: new targets (OS/2) support
@@ -9,6 +9,7 @@ Version 0.1.10
 - autoconf: fixed shared libraries with gcc under AIX 5 (Vadim Zeitlin)
 - autoconf: added support for Intel C/C++ compiler (Vadim Zeitlin)
 - win32 makefiles: fixed cleaning list of files (Francesco Montorsi)
+- many improvements to the documentation (Warren Young)
 
 
 Version 0.1.9.1

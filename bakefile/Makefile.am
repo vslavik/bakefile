@@ -118,18 +118,18 @@ _bottlenecks_la_CFLAGS = $(PYTHON_CPPFLAGS)
 
 EXTRA_DIST = \
     README THANKS \
-    autogen.sh chversion.sh \
-	admin/python-devel.m4 \
-    tests doc/images doc bakefile.spec bakefile.iss \
-    src/optik/README.txt autoconf output rules presets \
+    bootstrap chversion.sh \
+	$(srcdir)/admin/*.m4 \
+	bakefile.spec bakefile.iss bakefile.vim \
+    src/optik/README.txt autoconf output rules presets tests \
     src/empy/README src/empy/COPYING \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
     makefile.vc
 
-dist-hook:
-	(cd $(distdir)/doc ; ./process.sh)
-	rm -rf `find $(distdir) -name 'CVS'`
+SUBDIRS = @OPTIONAL_DOCS@
+
+dist-hook: doc
 
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
@@ -144,3 +144,7 @@ install-data-hook:
 	chmod +x $(DESTDIR)$(codedir)/bakefile_gen.py
 
 ACLOCAL_AMFLAGS = -I admin
+
+.PHONY: doc
+doc:
+	( cd doc ; $(MAKE) )
