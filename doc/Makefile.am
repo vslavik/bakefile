@@ -3,7 +3,7 @@
 ## ------------------------
 
 # FIXME: autodetect this
-FOPDIR=/usr/local/fop
+FOP=fop
 
 
 ## ------------------------
@@ -72,6 +72,6 @@ $(MANPAGE): $(DBFILES) $(MAN_SS)
 
 $(PDFFILE): $(DBFILES) $(FO_SS)
 	xsltproc --xinclude $(FO_SS) $(MAINDBFILE) > $(FOFILE)
-	$(FOPDIR)/fop.sh -q -fo $(FOFILE) $(PDFFILE)
+	$(FOP) -q -fo $(FOFILE) $(PDFFILE)
 
 .PHONY: pdf 
