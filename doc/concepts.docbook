@@ -237,5 +237,19 @@
       <emphasis>configure</emphasis> checks.
     </para>
   </section>
+  
+  <section id="concept.preset">
+    <title>Presets</title>
+    <para>
+      Presets are pieces of Bakefile code that can be included in user
+      bakefiles. Their purpose is to provide support for e.g. libraries or
+      tools or to provide commonly used code snippets in convenient form.
+    </para>
+    <para>
+      For example, Bakefile contains the <literal>simple</literal> preset
+      that can be used to quickly create makefiles with support for both
+      debug and release builds.
+    </para>
+  </section>
 
 </chapter>
