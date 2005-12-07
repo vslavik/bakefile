@@ -1,17 +1,17 @@
 <!-- $Id$ -->
-<chapter>
+<chapter id="ch.tutorial">
   <title>Tutorial</title>
 
   <section>
     <title>Hello, world</title>
 
     <para>
-      By far the simplest way to generate makefiles using Bakefile is to use
-      so-called <emphasis>presets</emphasis> which are prepared skeletons of
-      bakefiles that get you started quickly. Let's see how it works on an
-      example of the famous <emphasis>Hello, world</emphasis> program written
-      in C and implemented in <filename>hello.c</filename> file. Here is how
-      our bakefile would look like:
+      By far the simplest way to generate makefiles using Bakefile is
+      to use so-called <link linkend="concept.preset">presets</link>
+      which are prepared skeletons of bakefiles that get you
+      started quickly. Let's see how it works on an example of
+      the famous <emphasis>Hello, world</emphasis> program written
+      in C and implemented in the <filename>hello.c</filename> file:
       <programlisting><![CDATA[
 <?xml version="1.0"?>
 <makefile>
@@ -26,17 +26,18 @@
 ]]></programlisting>
     </para>
     <para>
-      Presets are included by means of using the
-      <xref linkend="cmd.include"/> command to include file named
-      <filename>presets/NAME-OF-PRESET.bkl</filename>. In general, you can
-      combine several presents, but in practice you must be careful when doing
-      so and it's always good idea to check what the preset does in its code.
-      The "simple" preset we include here defines a <varname>DEBUG</varname>
-      <link linkend="concept.option">option</link> and
-      a <link linkend="concept.template">template</link>
-      <literal>simple</literal>. Generated makefiles will allow the user to
-      build all targets that are based on this template as either debug or
-      release build.
+      Presets are included using the <xref linkend="cmd.include"/>
+      directive. The structure of the file name is always the same:
+      <filename>presets/NAME-OF-PRESET.bkl</filename>. In general,
+      you can combine several presets, but in practice you must
+      be careful when doing so. It's always a good idea to read
+      the code for the preset before using it.  The "simple"
+      preset we include here defines a <varname>DEBUG</varname>
+      <link linkend="concept.option">option</link> and a
+      <link linkend="concept.template">template</link> called
+      <literal>simple</literal>. Generated makefiles will allow the
+      user to build all targets that are based on this template as
+      either debug or release build.
     </para>
     <para>
       Let's generate some makefiles now. The <command>bakefile</command>
@@ -57,23 +58,25 @@
       <userinput>bakefile -f msvc -o makefile hello.bkl</userinput>
     </para>
     <para>
-      It's more complicated when using the Autoconf format. Autoconf uses
-      <filename>Makefile.in</filename> files that are templates for makefiles
-      and <filename>configure.in</filename> script that checks if the system
-      has all required libraries and software installed. Bakefile is makefiles
-      generator, it takes care of creating <filename>Makefile.in</filename>s,
-      but <filename>configure.in</filename> remains your responsibility
-      (except for a few things that Bakefile generates). 
+      Bakefile will also generate the <filename>Makefile.in</filename> files
+	  used by <ulink url="http://www.gnu.org/software/autoconf/">Autoconf</ulink>.
+	  These are templates for makefiles. Autoconf also requires
+      a <filename>configure.ac</filename> script (previously,
+	  <filename>configure.in</filename>), but Bakefile will not
+	  generate this for you. This script checks for platform
+      features necessary to build the program; see the autoconf
+	  manual for details.
     </para>
     <para>
-      Autoconf format generates more than one file -- in addition to
-      <filename>Makefile.in</filename> there's also file called
-      <filename>autoconf_inc.m4</filename> which must be included
-      in <filename>configure.in</filename> to
-      ensure proper function of Bakefile-generated makefiles. This is done by
-      the <literal>AC_BAKEFILE</literal> macro. A minimal
-      <filename>configure.in</filename> script for our example program would
-      look like this:
+      When producing autoconf format output, Bakefile will also generate a file called
+      <filename>autoconf_inc.m4</filename> which defines macros needed
+      by the generated Makefile.in files. To use this, call the
+      <literal>AC_BAKEFILE</literal> macro within your
+	  <filename>configure.ac</filename> script.
+	</para>
+	<para>
+	  A minimal <filename>configure.ac</filename> script for our
+	  example program would look like this:
       <programlisting><![CDATA[
 AC_PREREQ(2.53)
 AC_INIT(aclocal.m4)
@@ -84,11 +87,16 @@ AC_OUTPUT([Makefile])
 ]]></programlisting>
     </para>
     <para>
-      Note the part that sets <varname>DEBUG</varname> variable. If you use
-      options in your bakefile (as you do when you use the simple preset), you
-      must set their values before calling <literal>AC_BAKEFILE</literal>.
-      Debug build is always disabled in the example above, proper handling
-      would be a little more complicated:
+      Note the part that sets the <varname>DEBUG</varname> variable. Any
+	  options declared in your bakefile must be set to some default
+	  value before calling <literal>AC_BAKEFILE</literal>. The
+	  simple.bkl preset defines the <varname>DEBUG</varname> option,
+	  so we have to give it a default value here.
+	</para>
+
+	<para>
+      While the above code will work, there's a better way to handle the
+	  debug option:
       <programlisting><![CDATA[
 AC_PREREQ(2.53)
 AC_INIT(aclocal.m4)
@@ -101,7 +109,9 @@ AC_ARG_ENABLE(debug,
 if test $USE_DEBUG = yes ; then 
   DEBUG=1
   dnl Bakefile doesn't touch {C,CPP,CXX,LD}FLAGS in autoconf format, we
-  dnl have to do it ourselves. (Incorrectly) assuming GCC here:
+  dnl have to do it ourselves. This will work with many compilers
+  dnl (but not all, proper configure script would check if the compiler
+  dnl supports it):
   CFLAGS="$CFLAGS -g"
 else
   DEBUG=0
