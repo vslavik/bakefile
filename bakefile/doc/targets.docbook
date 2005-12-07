@@ -1,69 +1,73 @@
 <chapter id="ch.targets">
   <title>Targets</title>
   <para id="targets">
-    Bakefile targets correspond to native makefiles targets, they are compiled
-    programs, libraries or more complex actions such as "install" or "dist"
-    (which makes "make dist" command possible). Target syntax is similar to
-    <link linkend="ch.commands">commands syntax</link>:
+    Bakefile targets correspond to native makefile targets: they are compiled
+    programs, libraries, or more complex actions such as "install" or "dist".
+    Target syntax is similar to <link linkend="ch.commands">command</link>
+    syntax:
     <programlisting><![CDATA[
-<RULE id="NAME" [template="TEMPLATE,..."]
-[template_append="TEMPLATE2,..."] [cond="CONDITION"] [category="CATEGORY"]>
+<TYPE id="NAME" [template="TEMPLATE,..."] [template_append="TEMPLATE,..."]
+      [cond="CONDITION"] [category="CATEGORY"]>
   SPECIFICATION
-</RULE>
+</TYPE>
 ]]></programlisting>
-    There are six elementary rules (types of targets):
-    <xref linkend="rule.exe"/>,
-    <xref linkend="rule.dll"/>,
-    <xref linkend="rule.module"/>,
-    <xref linkend="rule.lib"/>,
-    <xref linkend="rule.phony"/> and
-    <xref linkend="rule.action"/>. 
-    More target types can be defined in ruleset (or even in the makefile) using
-    <xref linkend="cmd.define-rule"/> command. Such new rules only extend
-    one of elementary rules, though.
+  </para>
+
+  <para>
+    There are six standard target types: <xref linkend="rule.exe"/>,
+    <xref linkend="rule.dll"/>, <xref linkend="rule.module"/>,
+    <xref linkend="rule.lib"/>, <xref linkend="rule.phony"/> and
+    <xref linkend="rule.action"/>. You can define a new "rule"
+    (that is, a target type) based on one of the standard rules
+    using the <xref linkend="cmd.define-rule"/> command.
   </para>
   <para>
-    Target has unique <varname>id</varname>. This ID is usually present in
-    generated makefile (so you can type <userinput>make myprogram</userinput>
-    if you have target with ID <literal>myprogram</literal>). Name of the
-    generated file is based on the ID, too. </para>
+    Each target requires a unique <varname>id</varname>. This ID is usually
+    present in the generated makefile, so you can type <userinput>make
+    myprogram</userinput> to create the target with the ID
+    <literal>myprogram</literal>. The target's ID also controls
+    the name of the output file.
+  </para>
   <para>
-    <varname>template</varname> is optional comma-separated list of
+    <varname>template</varname> is an optional comma-separated list of
     IDs of <link linkend="cmd.template">templates</link> that the target is
-    derived from. <varname>template_append</varname> is optional
+    derived from. <varname>template_append</varname> is an optional
     comma-separated list of templates that are <emphasis>appended</emphasis>
-    to target specification (<varname>template</varname> inserts the template
-    before the specification).
+    to the target specification. (<varname>template</varname> inserts the
+    template before the specification).
   </para>
   <para>
-    If <varname>cond</varname> attribute was given then the target is only
-    compiled if given
-    <link linkend="concept.conditions">condition was met</link> (the decision
-    may be done either by Bakefile if the condition is weak or by generated
-    makefile).
+    If the <varname>cond</varname> attribute is given, the target is only
+    compiled if the named <link linkend="concept.conditions">condition</link>
+    was met. (Follow that link to see the rules governing whether Bakefile
+    evaluates the condition, or the native build system (e.g.
+    <filename>make</filename>) evaluates it).
   </para>
   <para>
     In addition to the ID, every target can have
     <link linkend="concept.variables">variables</link> attached to it.
-    These variables are only effective for the target (unlike global variables
-    that affect all targets). They can be used to override global default
-    (for example <varname>DLLEXT</varname> variable is <literal>.dll</literal>
-    for Windows makefiles but you can override the variable locally for
-    <literal>sharpen_plugin</literal> target to be <literal>.plugin</literal>).
+    These variables are only effective for the target; contrast global
+    variables, which affect all targets. They can be used to override a
+    global variable: for example, the <varname>DLLEXT</varname> variable
+    is <literal>.dll</literal> for Windows makefiles, but you can override
+    the variable locally for the <literal>sharpen_plugin</literal> target to
+    be <literal>.plugin</literal>.
   </para>
   <para>
     Target is described using <varname>SPECIFICATION</varname>, which is a
     list of <xref linkend="cmd.set"/>
-    command and so-called <emphasis>tags</emphasis>. Tags are rule-specific
-    constructs that provide simple way to e.g. list source files for an
-    executable, set include directories or define compiler flags. Unlike
-    <function>set</function> they don't set any specific variable, but rather
-    set various variables in <emphasis>generator-specific way</emphasis>.
-    Tag syntax is almost identical to <function>set</function> function, but
-    without variable name:
-  <programlisting><![CDATA[<TAGNAME>VALUE</TAGNAME></RULE>]]></programlisting>
+    commands and <emphasis>tags</emphasis>. Tags are rule-specific
+    constructs, so they come in several forms: they can list source files for
+    an executable, set include directories, or define compiler flags. Unlike
+    <function>set</function>, they don't set any specific variable, but rather
+    set various variables in a <emphasis>generator-specific way</emphasis>.
+    Tag syntax is almost identical to the <function>set</function> function,
+    but without a variable name:
+    <programlisting><![CDATA[<TAGNAME>VALUE</TAGNAME>]]></programlisting>
+  </para>
+  <para>
     Common tags are described in
-    <link linkend="rules">the section bellow</link>, tags specific to
+    <link linkend="rules">the section below</link>. Tags specific to
     particular modules are described in <xref linkend="ch.modules"/>.
     A small example of using tags:
     <programlisting><![CDATA[
@@ -77,19 +81,19 @@
 </exe>
 ]]></programlisting>
     Unless the documentation says otherwise, you can use the same tag
-    repeatedly with same target.
+    repeatedly with the same target.
   </para>
   <para>
-    Optional <varname>category</varname> attribute can be given to clasify
-    the target. Possible clasifications are <literal>all</literal> (reserved
+    The optional <varname>category</varname> attribute can be given to classify
+    the target. Possible classifications are <literal>all</literal> (reserved
     for the <literal>all</literal> target of makefiles and cannot be used
-    in user bakefiles), <literal>normal</literal> for targets declared in
-    bakefiles and <literal>automatic</literal> for targets that are created
+    in user Bakefiles), <literal>normal</literal> for targets declared in
+    Bakefiles, and <literal>automatic</literal> for targets that are created
     as a side-effect of Bakefile's processing (e.g. object file targets).
-    The targets are sorted in generated makefile according to the category:
-    <literal>all</literal> target is first, followed by
-    <literal>normal</literal> targets and <literal>automatic</literal> targets
-    are last.
+    The targets are sorted in the generated makefile according to the category:
+    the <literal>all</literal> target is first, followed by
+    <literal>normal</literal> targets, and then <literal>automatic</literal>
+    targets.
   </para>
 
   <note id="pseudotargets">
@@ -98,10 +102,9 @@
       Some rules don't declare real targets but so-called
       <emphasis>pseudo targets</emphasis>. Pseudo targets are processed as
       standard targets, but they don't appear in the generated makefile, have
-      no action associated with them and can't depend on any other target or
-      be dependency of another target. They are used as user-friendly means of
-      modifying behaviour of other targets. 
-      An example of pseudo target is
+      no action associated with them, can't depend on any other target, and
+      can't be a dependency of another target. They can only modify the
+      behavior of other targets. An example of a pseudo target is
       <xref linkend="rule.datafiles.data-files"/>.
     </para>
     <para>
@@ -113,7 +116,7 @@
 
 
   <section id="rules">
-    <title>Rules</title>
+    <title>Standard Target Types ("Rules")</title>
     <para>
       Description of builtin rules and their tags follows. Additional rules
       and tags are defined by modules, see <xref linkend="ch.modules"/>.
@@ -373,10 +376,10 @@
     <section id="rule.subproject" xreflabel="subproject">
       <title>subproject</title>
       <para>
-        Declares subproject. Subproject is typically another makefile in a
-        subdirectory and is indepent on its parent project. Therefore you
-        can't use any variables or refer to targets from parent project in
-        subproject.
+        Declares a subproject. This is typically another makefile in a
+        subdirectory and is independent of its parent project. Therefore you
+        can't use any variables or refer to targets from the parent project
+        in a subproject.
         <informaltable>
           <tgroup cols='2'>
             <thead>
@@ -391,7 +394,7 @@
                 <entry role="tagname">dir</entry>
                 <entry>
                   <para>
-                    Directory with subproject -- parent makefile calls
+                    Directory containing subproject. Parent makefile calls
                     makefile in this directory.
                   </para>
                 </entry>
@@ -414,7 +417,7 @@
                     Whether <command>make install</command> (if supported by
                     the format) should descend into subproject's directory.
                     The value can only be <literal>yes</literal> or
-                    <literal>no</literal> and must be constant expression.
+                    <literal>no</literal> and must be a constant expression.
                   </para>
                 </entry>
                 <entry role="default"><literal>yes</literal></entry>
@@ -423,210 +426,208 @@
           </tgroup>
         </informaltable>
       </para>
+
+      <para>
+        Here is an example of how to use the subproject target:
+        <programlisting><![CDATA[
+<subproject id="examples">
+  <dir>examples</dir>
+  <installable>no</installable>
+</subproject>
+]]></programlisting>
+      </para>
     </section>
-
-
-
-
-
-
-
-
+  </section>
 
 
 
 
     
-    <section>
-      <title>Common tags</title>
-      <para>
-        These tags are always available, it is not neccessary to load any
-        <link linkend="ch.modules">module</link> to use them.
+	<section>
+		<title>Common tags</title>
+		<para>
+			These are tags you can use with any of the above target types.
+			These tags are always available: it is not neccessary to load any
+			<link linkend="ch.modules">module</link> to use them.
 
-        <informaltable>
-          <tgroup cols='3'>
-            <thead>
-              <row>
-                <entry>Tag</entry>
-                <entry>Description</entry>
-                <entry>Availability</entry>
-              </row>
-            </thead>
-            <tbody>
-        
-              <row id="tag.depends" xreflabel="depends">
-                <entry role="tagname">depends</entry>
-                <entry>
-                  <para>
-                    This tag is used to express target's dependency on other
-                    targets. All targets in <function>depends</function> tag
-                    must be built prior to building this target. The value is
-                    whitespace-separated list of target IDs. It is an error to
-                    specify nonexistent target here.
-                  </para>
-                  <para>
-                    Note that <xref linkend="tag.library"/> tag implies
-                    <function>depends</function>.
-                  </para>
-                  <programlisting><![CDATA[
-<copy-file id="setup">
-  <source>setup0.h</source>
-  <dest>setup.h</dest>
-</copy-file>
-
+			<informaltable>
+				<tgroup cols='3'>
+					<thead>
+						<row>
+							<entry>Tag</entry>
+							<entry>Description</entry>
+							<entry>Availability</entry>
+						</row>
+					</thead>
+					<tbody>
+			
+						<row id="tag.depends" xreflabel="depends">
+							<entry role="tagname">depends</entry>
+							<entry>
+								<para>
+									This tag is used to express target's dependency on other
+									targets. All targets in the <function>depends</function>
+									tag must be built prior to building this target. The value
+									is whitespace-separated list of target IDs. It is an error
+									to specify a nonexistent target here.
+								</para>
+								<para>
+									Note that the <xref linkend="tag.library"/> tag implies
+									<function>depends</function>.
+								</para>
+								<programlisting><![CDATA[
 <exe id="app">
-  <depends>setup</depends>
-  <sources>app.c</sources>
-  <define>USE_SETUP_H</define>
+<sources>app.c</sources>
+<depends>setup</depends>
 </exe>
 ]]></programlisting>
-                </entry>
-                <entry role="availability">all rules</entry>
-              </row>
-              
-              <row id="tag.objects-depend" xreflabel="objects-depend">
-                <entry role="tagname">objects-depend</entry>
-                <entry>
-                  <para>
-                    Same as <xref linkend="tag.depends"/>, except the dependency
-                    is added to all <emphasis>object files</emphasis> used
-                    to build the target instead of to the target itself.
-                    This is useful e.g. in combination with precompiled
-                    headers (which must be generated before any source file
-                    is compiled) or when a commonly used header file is
-                    generated by the makefile.
-                  </para>
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              <row id="tags.lib.dirname">
-                <entry role="tagname">dirname</entry>
-                <entry>
-                  Set name of directory where the target will be created.
-                  <varname>BUILDDIR</varname> is used by default.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              <row id="tag.dependency-of" xreflabel="dependency-of">
-                <entry role="tagname">dependency-of</entry>
-                <entry>
-                  Mark the target as dependency of target specified in tag's
-                  value. The value must be ID of existing target. This tag
-                  is opposite of <xref linkend="tag.depends"/>. Following two
-                  examples have identical effect:
-                  <programlisting><![CDATA[
+							</entry>
+							<entry role="availability">all rules</entry>
+						</row>
+						
+						<row id="tag.objects-depend" xreflabel="objects-depend">
+							<entry role="tagname">objects-depend</entry>
+							<entry>
+								<para>
+									Same as <xref linkend="tag.depends"/>, except the dependency
+									is added to all <emphasis>object files</emphasis> used
+									to build the target instead of to the target itself.
+									This is useful e.g. in combination with precompiled
+									headers (which must be generated before any source file
+									is compiled) or when a commonly used header file is
+									generated by the makefile.
+								</para>
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						<row id="tags.lib.dirname">
+							<entry role="tagname">dirname</entry>
+							<entry>
+								Set name of directory where the target will be created.
+								<varname>BUILDDIR</varname> is used by default.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row id="tag.dependency-of" xreflabel="dependency-of">
+							<entry role="tagname">dependency-of</entry>
+							<entry>
+								Mark the target as dependency of target specified in tag's
+								value. The value must be ID of existing target. This tag
+								is opposite of <xref linkend="tag.depends"/>. Following two
+								examples have identical effect:
+								<programlisting><![CDATA[
 <exe id="setup"></exe>
 <exe id="app">
-  <depends>setup</depends>
+<depends>setup</depends>
 </exe>
 ]]></programlisting><programlisting><![CDATA[
 <exe id="app"></exe>
 <exe id="setup">
-  <dependency-of>app</dependency-of>
+<dependency-of>app</dependency-of>
 </exe>
 ]]></programlisting>
-                Note that only one of these tags should be used, it is not
-                necessary to specify both of them.
-                </entry>
-                <entry role="availability">all</entry>
-              </row>
+							Note that only one of these tags should be used, it is not
+							necessary to specify both of them.
+							</entry>
+							<entry role="availability">all</entry>
+						</row>
 
 
-              
-              <row id="tag.sources" xreflabel="sources">
-                <entry role="tagname">sources</entry>
-                <entry>
-                  Specify source files used to build the target.
-                  <programlisting><![CDATA[
+						
+						<row id="tag.sources" xreflabel="sources">
+							<entry role="tagname">sources</entry>
+							<entry>
+								Specify source files used to build the target.
+								<programlisting><![CDATA[
 <exe id="app">
   <sources>app.c</sources>
   <sources>utils.c utils2.c</sources>
 </exe>
 ]]></programlisting>
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
 
-      
-      
-              <row id="tag.include" xreflabel="include">
-                <entry role="tagname">include</entry>
-                <entry>
-                  Add directory where the compiler should look for headers.
-                  Calls <xref linkend="tag.res-include"/> with same value.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-      
-      
-              <row id="tag.define" xreflabel="define">
-                <entry role="tagname">define</entry>
-                <entry>
-                  Define C preprocessor macro.
-                  The value may be empty, in which case no flag is added.
-                  Calls <xref linkend="tag.res-define"/> with same value.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-      
-      
-              <row id="tag.sys-lib" xreflabel="sys-lib">
-                <entry role="tagname">sys-lib</entry>
-                <entry>
-                  Link against specified library installed in the system. Note
-                  that this is <emphasis>not</emphasis> meant for linking in
-                  libraries that were built by the same makefile, use
-                  <xref linkend="tag.library"/> for that. This command links
-                  against a library installed in the system or provided by the
-                  compiler and corresponds to the <literal>-l</literal> switch
-                  of Unix compilers.
-              <programlisting><![CDATA[
+		
+		
+						<row id="tag.include" xreflabel="include">
+							<entry role="tagname">include</entry>
+							<entry>
+								Add directory where the compiler should look for headers.
+								Calls <xref linkend="tag.res-include"/> with same value.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+		
+		
+						<row id="tag.define" xreflabel="define">
+							<entry role="tagname">define</entry>
+							<entry>
+								Define C preprocessor macro.
+								The value may be empty, in which case no flag is added.
+								Calls <xref linkend="tag.res-define"/> with same value.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+		
+		
+						<row id="tag.sys-lib" xreflabel="sys-lib">
+							<entry role="tagname">sys-lib</entry>
+							<entry>
+								Link against specified library installed in the system. Note
+								that this is <emphasis>not</emphasis> meant for linking in
+								libraries that were built by the same makefile, use
+								<xref linkend="tag.library"/> for that. This command links
+								against a library installed in the system or provided by the
+								compiler and corresponds to the <literal>-l</literal> switch
+								of Unix compilers.
+						<programlisting><![CDATA[
 <exe id="png2bmp">
   <sources>png2bmp.c</sources>
   <sys-lib>png</sys-lib>
   <sys-lib>z</sys-lib>
 </exe>
 ]]></programlisting>
-                  Library name may be empty. Only one library may be specified
-                  as argument, following usage is incorrect:
-              <programlisting><![CDATA[
+								Library name may be empty. Only one library may be specified
+								as argument, following usage is incorrect:
+						<programlisting><![CDATA[
 <exe id="png2bmp">
   <sources>png2bmp.c</sources>
   <sys-lib>png z</sys-lib> <!-- INCORRECT -->
 </exe>
 ]]></programlisting>
-                  Note that the name of library in this tag is
-                  <emphasis>not</emphasis> filename and must not include
-                  paths; use <xref linkend="tag.lib-path"/> to specify
-                  library search path.
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
+								Note that the name of library in this tag is
+								<emphasis>not</emphasis> filename and must not include
+								paths; use <xref linkend="tag.lib-path"/> to specify
+								library search path.
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
 
-              
-              
-              <row id="tag.lib-path" xreflabel="lib-path">
-                <entry role="tagname">lib-path</entry>
-                <entry>
-                  Add directory where to look for
-                  <link linkend="tag.sys-lib">system libraries</link>.
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
-      
-              
-              
-              
-              <row id="tag.library" xreflabel="library">
-                <entry role="tagname">library</entry>
-                <entry>
-                  Link against library compiled by this makefile. The value
-                  passed to this tag must be name of existing target. Compare
-                  <xref linkend="tag.sys-lib"/>.
-                  <programlisting><![CDATA[
+						
+						
+						<row id="tag.lib-path" xreflabel="lib-path">
+							<entry role="tagname">lib-path</entry>
+							<entry>
+								Add directory where to look for
+								<link linkend="tag.sys-lib">system libraries</link>.
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
+		
+						
+						
+						
+						<row id="tag.library" xreflabel="library">
+							<entry role="tagname">library</entry>
+							<entry>
+								Link against library compiled by this makefile. The value
+								passed to this tag must be name of existing target. Compare
+								<xref linkend="tag.sys-lib"/>.
+								<programlisting><![CDATA[
 <lib id="mylib">
   <sources>lib1.c lib2.c</sources>
 </lib>
@@ -637,19 +638,19 @@
   <sys-lib>GL</sys-lib>
 </exe>
 ]]></programlisting>
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
-      
-              
-              <row id="tag.optimize" xreflabel="optimize">
-                <entry role="tagname">optimize</entry>
-                <entry>
-                  Set compiler's optimization level. May be one of
-                  <literal>off</literal> (no optimization),
-                  <literal>speed</literal> (generate fastest code) or
-                  <literal>size</literal> (smallest code).
-                  <programlisting><![CDATA[
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
+		
+						
+						<row id="tag.optimize" xreflabel="optimize">
+							<entry role="tagname">optimize</entry>
+							<entry>
+								Set compiler's optimization level. May be one of
+								<literal>off</literal> (no optimization),
+								<literal>speed</literal> (generate fastest code) or
+								<literal>size</literal> (smallest code).
+								<programlisting><![CDATA[
 <set var="OPTIMIZE_FLAG">
   <if cond="BUILD=='release'">speed</if>
   <if cond="BUILD=='debug'">off</if>
@@ -660,267 +661,267 @@
   <sys-lib>GL</sys-lib>
 </exe>
 ]]></programlisting>
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              <row id="tag.debug-info" xreflabel="debug-info">
-                <entry role="tagname">debug-info</entry>
-                <entry>
-                  Enable or disable debugging information. Can be either
-                  <literal>on</literal> or <literal>off</literal>.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              <row id="tag.debug-runtime-libs" xreflabel="debug-runtime-libs">
-                <entry role="tagname">debug-runtime-libs</entry>
-                <entry>
-                  Enable or disable linking against debug version of C runtime.
-                  Can be either <literal>on</literal> or <literal>off</literal>
-                  and <emphasis>must</emphasis> appear after
-                  <xref linkend="tag.debug-info"/>. If not specified, then
-                  debug runtime libraries are used if and only if
-                  <xref linkend="tag.debug-info"/> was set to
-                  <literal>on</literal>. Note that this tag has effect only
-                  with Visual C++; other compilers respect only
-                  <xref linkend="tag.debug-info"/>.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              <row id="tag.arch" xreflabel="arch">
-                <entry role="tagname">arch</entry>
-                <entry>
-                  Set target CPU architecture. Note that this is not portable
-                  and should be avoided if possible. Accepted values are
-                  <literal>i[3456]86</literal>.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						<row id="tag.debug-info" xreflabel="debug-info">
+							<entry role="tagname">debug-info</entry>
+							<entry>
+								Enable or disable debugging information. Can be either
+								<literal>on</literal> or <literal>off</literal>.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						<row id="tag.debug-runtime-libs" xreflabel="debug-runtime-libs">
+							<entry role="tagname">debug-runtime-libs</entry>
+							<entry>
+								Enable or disable linking against debug version of C runtime.
+								Can be either <literal>on</literal> or <literal>off</literal>
+								and <emphasis>must</emphasis> appear after
+								<xref linkend="tag.debug-info"/>. If not specified, then
+								debug runtime libraries are used if and only if
+								<xref linkend="tag.debug-info"/> was set to
+								<literal>on</literal>. Note that this tag has effect only
+								with Visual C++; other compilers respect only
+								<xref linkend="tag.debug-info"/>.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row id="tag.arch" xreflabel="arch">
+							<entry role="tagname">arch</entry>
+							<entry>
+								Set target CPU architecture. Note that this is not portable
+								and should be avoided if possible. Accepted values are
+								<literal>i[3456]86</literal>.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
 
 
-              <row id="tag.pic" xreflabel="pic">
-                <entry role="tagname">pic</entry>
-                <entry>
-                  Tells the compiler whether to generate position-independent
-                  code or not. The default is to use PIC for DLLs and
-                  <emphasis>not</emphasis> use it for executables and static
-                  libraries, but you may want to change it if your static
-                  library may be linked into a DLL.
-                  Accepted values are
-                  <literal>on</literal> and <literal>off</literal>.
-                </entry>
-                <entry role="availability">exe, lib</entry>
-              </row>
+						<row id="tag.pic" xreflabel="pic">
+							<entry role="tagname">pic</entry>
+							<entry>
+								Tells the compiler whether to generate position-independent
+								code or not. The default is to use PIC for DLLs and
+								<emphasis>not</emphasis> use it for executables and static
+								libraries, but you may want to change it if your static
+								library may be linked into a DLL.
+								Accepted values are
+								<literal>on</literal> and <literal>off</literal>.
+							</entry>
+							<entry role="availability">exe, lib</entry>
+						</row>
 
 
-              <row id="tag.threading" xreflabel="threading">
-                <entry role="tagname">threading</entry>
-                <entry>
-                  Use <literal>multi</literal> to enable and
-                  <literal>single</literal> to disable multithreading in the
-                  application. This affects what libraries are linked into
-                  executable on some platforms.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              <row id="tag.warnings" xreflabel="warnings">
-                <entry role="tagname">warnings</entry>
-                <entry>
-                  Sets warnings level for C/C++ compiler. Possible values
-                  are <literal>no</literal>, <literal>default</literal>
-                  and <literal>max</literal>.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
+						<row id="tag.threading" xreflabel="threading">
+							<entry role="tagname">threading</entry>
+							<entry>
+								Use <literal>multi</literal> to enable and
+								<literal>single</literal> to disable multithreading in the
+								application. This affects what libraries are linked into
+								executable on some platforms.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row id="tag.warnings" xreflabel="warnings">
+							<entry role="tagname">warnings</entry>
+							<entry>
+								Sets warnings level for C/C++ compiler. Possible values
+								are <literal>no</literal>, <literal>default</literal>
+								and <literal>max</literal>.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
 
 
-              <row id="tag.precomp-headers" xreflabel="precomp-headers">
-                <entry role="tagname">precomp-headers</entry>
-                <entry>
-                  Can be <literal>on</literal> or <literal>off</literal>,
-                  enables or disables use of precompiled headers with
-                  compilers that support them.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              <row id="tag.cxx-rtti" xreflabel="cxx-rtti">
-                <entry role="tagname">cxx-rtti</entry>
-                <entry>
-                  Enable or disable RTTI when compiling C++ sources. Can be either
-                  <literal>on</literal> or <literal>off</literal>.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              <row id="tag.cxx-exceptions" xreflabel="cxx-exceptions">
-                <entry role="tagname">cxx-exceptions</entry>
-                <entry>
-                  Enable or disable C++ exceptions handling. Can be either
-                  <literal>on</literal> or <literal>off</literal>.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              <row id="tag.precomp-headers-file"
-                xreflabel="precomp-headers-file">
-                <entry role="tagname">precomp-headers-file</entry>
-                <entry>
-                  Use this tag to fine-tune where precompiled headers are
-                  stored. The compiler must support this and the value passed
-                  to <function>precomp-headers-file</function> can be modified
-                  by Bakefile, e.g. by apending <literal>.pch</literal>
-                  extension to it.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              <row>
-                <entry role="tagname">
-                  <para id="tag.cflags">cflags</para>
-                  <para id="tag.cxxflags">cxxflags</para>
-                  <para id="tag.cppflags">cppflags</para>
-                </entry>
-                <entry>
-                  Add <emphasis>compiler dependent</emphasis> compilation
-                  flags to compiler flags.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              <row>
-                <entry role="tagname">
-                  <para id="tag.ldflags" xreflabel="ldflags">ldflags</para>
-                </entry>
-                <entry>
-                  Add <emphasis>linker dependent</emphasis>
-                  flags for the linker.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              <row>
-                <entry role="tagname">
-                  <para id="tag.ldlibs">ldlibs</para>
-                </entry>
-                <entry>
-                  Same as <xref linkend="tag.ldflags"/>, but adds the flags
-                  <emphasis>after</emphasis> all flags specified using
-                  <function>ldflags</function>. This is useful when resolving
-                  command line order problems that gcc is prone to.
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
-              
-              
-              <row id="tag.win32-res" xreflabel="win32-res">
-                <entry role="tagname">win32-res</entry>
-                <entry>
-                  Sets win32 resource (.rc) file for executable or DLL.
-                  The tag does nothing on platforms other than Windows.
-                  Compilation of the resource respects 
-                  <xref linkend="tag.define"/> and 
-                  <xref linkend="tag.include"/> tags on the target,
-                  as well as their resource specific counterparts
-                  <xref linkend="tag.res-define"/> and
-                  <xref linkend="tag.res-include"/>.
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
-              
-              
-              <row id="tag.mac-res" xreflabel="mac-res">
-                <entry role="tagname">mac-res</entry>
-                <entry>
-                  Sets Mac resource (.r) file for executable or DLL.
-                  The tag does nothing on platforms other than Mac.
-                  Compilation of the resource respects 
-                  <xref linkend="tag.define"/> and 
-                  <xref linkend="tag.include"/> tags on the target,
-                  as well as their resource specific counterparts
-                  <xref linkend="tag.res-define"/> and
-                  <xref linkend="tag.res-include"/>.
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
-              
-              <row id="tag.symbian-res" xreflabel="symbian-res">
-                <entry role="tagname">symbian-res</entry>
-                <entry>
-                  Sets Symbian resource file for executable or DLL.
-                  The tag does nothing on platforms other than Symbian.
-                  Compilation of the resource respects 
-                  <xref linkend="tag.define"/> and 
-                  <xref linkend="tag.include"/> tags on the target,
-                  as well as their resource specific counterparts
-                  <xref linkend="tag.res-define"/> and
-                  <xref linkend="tag.res-include"/>.
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
-              
-              
-              <row id="tag.res-include" xreflabel="res-include">
-                <entry role="tagname">res-include</entry>
-                <entry>
-                  Similar to <xref linkend="tag.include"/>, but applies only
-                  to resources (<xref linkend="tag.mac-res"/>,
-                  <xref linkend="tag.win32-res"/>) and not to C/C++ sources.
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
-      
-      
-              <row id="tag.res-define" xreflabel="res-define">
-                <entry role="tagname">res-define</entry>
-                <entry>
-                  Similar to <xref linkend="tag.define"/>, but applies only
-                  to resources (<xref linkend="tag.mac-res"/>,
-                  <xref linkend="tag.win32-res"/>) and not to C/C++ sources.
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
-              
-              
-              <row id="tag.clean-files" xreflabel="clean-files">
-                <entry role="tagname">clean-files</entry>
-                <entry>
-                  Adds files to list of files that are cleaned when
-                  <command>make clean</command> is run -- i.e. files created
-                  while building the target.
-                </entry>
-                <entry role="availability">all</entry>
-              </row>
-              
-              
-              
-              <row id="tag.install-to" xreflabel="install-to">
-                <entry role="tagname">install-to</entry>
-                <entry>
-                  If used, then the target is installed into directory
-                  specified as tag's value by <command>make install</command>.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              <row id="tag.install-if" xreflabel="install-if">
-                <entry role="tagname">install-if</entry>
-                <entry>
-                  Install (see <xref linkend="tag.install-to"/>
-                  the target conditionally. The value must be well-formed
-                  condition.
-                  <programlisting><![CDATA[
+						<row id="tag.precomp-headers" xreflabel="precomp-headers">
+							<entry role="tagname">precomp-headers</entry>
+							<entry>
+								Can be <literal>on</literal> or <literal>off</literal>,
+								enables or disables use of precompiled headers with
+								compilers that support them.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row id="tag.cxx-rtti" xreflabel="cxx-rtti">
+							<entry role="tagname">cxx-rtti</entry>
+							<entry>
+								Enable or disable RTTI when compiling C++ sources. Can be either
+								<literal>on</literal> or <literal>off</literal>.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row id="tag.cxx-exceptions" xreflabel="cxx-exceptions">
+							<entry role="tagname">cxx-exceptions</entry>
+							<entry>
+								Enable or disable C++ exceptions handling. Can be either
+								<literal>on</literal> or <literal>off</literal>.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row id="tag.precomp-headers-file"
+							xreflabel="precomp-headers-file">
+							<entry role="tagname">precomp-headers-file</entry>
+							<entry>
+								Use this tag to fine-tune where precompiled headers are
+								stored. The compiler must support this and the value passed
+								to <function>precomp-headers-file</function> can be modified
+								by Bakefile, e.g. by apending <literal>.pch</literal>
+								extension to it.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						<row>
+							<entry role="tagname">
+								<para id="tag.cflags">cflags</para>
+								<para id="tag.cxxflags">cxxflags</para>
+								<para id="tag.cppflags">cppflags</para>
+							</entry>
+							<entry>
+								Add <emphasis>compiler dependent</emphasis> compilation
+								flags to compiler flags.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row>
+							<entry role="tagname">
+								<para id="tag.ldflags" xreflabel="ldflags">ldflags</para>
+							</entry>
+							<entry>
+								Add <emphasis>linker dependent</emphasis>
+								flags for the linker.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row>
+							<entry role="tagname">
+								<para id="tag.ldlibs">ldlibs</para>
+							</entry>
+							<entry>
+								Same as <xref linkend="tag.ldflags"/>, but adds the flags
+								<emphasis>after</emphasis> all flags specified using
+								<function>ldflags</function>. This is useful when resolving
+								command line order problems that gcc is prone to.
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
+						
+						
+						<row id="tag.win32-res" xreflabel="win32-res">
+							<entry role="tagname">win32-res</entry>
+							<entry>
+								Sets win32 resource (.rc) file for executable or DLL.
+								The tag does nothing on platforms other than Windows.
+								Compilation of the resource respects 
+								<xref linkend="tag.define"/> and 
+								<xref linkend="tag.include"/> tags on the target,
+								as well as their resource specific counterparts
+								<xref linkend="tag.res-define"/> and
+								<xref linkend="tag.res-include"/>.
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
+						
+						
+						<row id="tag.mac-res" xreflabel="mac-res">
+							<entry role="tagname">mac-res</entry>
+							<entry>
+								Sets Mac resource (.r) file for executable or DLL.
+								The tag does nothing on platforms other than Mac.
+								Compilation of the resource respects 
+								<xref linkend="tag.define"/> and 
+								<xref linkend="tag.include"/> tags on the target,
+								as well as their resource specific counterparts
+								<xref linkend="tag.res-define"/> and
+								<xref linkend="tag.res-include"/>.
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
+						
+						<row id="tag.symbian-res" xreflabel="symbian-res">
+							<entry role="tagname">symbian-res</entry>
+							<entry>
+								Sets Symbian resource file for executable or DLL.
+								The tag does nothing on platforms other than Symbian.
+								Compilation of the resource respects 
+								<xref linkend="tag.define"/> and 
+								<xref linkend="tag.include"/> tags on the target,
+								as well as their resource specific counterparts
+								<xref linkend="tag.res-define"/> and
+								<xref linkend="tag.res-include"/>.
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
+						
+						
+						<row id="tag.res-include" xreflabel="res-include">
+							<entry role="tagname">res-include</entry>
+							<entry>
+								Similar to <xref linkend="tag.include"/>, but applies only
+								to resources (<xref linkend="tag.mac-res"/>,
+								<xref linkend="tag.win32-res"/>) and not to C/C++ sources.
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
+		
+		
+						<row id="tag.res-define" xreflabel="res-define">
+							<entry role="tagname">res-define</entry>
+							<entry>
+								Similar to <xref linkend="tag.define"/>, but applies only
+								to resources (<xref linkend="tag.mac-res"/>,
+								<xref linkend="tag.win32-res"/>) and not to C/C++ sources.
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
+						
+						
+						<row id="tag.clean-files" xreflabel="clean-files">
+							<entry role="tagname">clean-files</entry>
+							<entry>
+								Adds files to list of files that are cleaned when
+								<command>make clean</command> is run -- i.e. files created
+								while building the target.
+							</entry>
+							<entry role="availability">all</entry>
+						</row>
+						
+						
+						
+						<row id="tag.install-to" xreflabel="install-to">
+							<entry role="tagname">install-to</entry>
+							<entry>
+								If used, then the target is installed into directory
+								specified as tag's value by <command>make install</command>.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row id="tag.install-if" xreflabel="install-if">
+							<entry role="tagname">install-if</entry>
+							<entry>
+								Install (see <xref linkend="tag.install-to"/>
+								the target conditionally. The value must be well-formed
+								condition.
+								<programlisting><![CDATA[
 <option name="INSTALL_HELLO">
   <values>0,1</values>
   <default-value>1</default-value>
@@ -931,55 +932,54 @@
   <install-if>INSTALL_HELLO=='1'</install-if>
 </exe>
 ]]></programlisting>
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-              
-              
-              
-              <row id="tag.postlink-command" xreflabel="postlink-command">
-                <entry role="tagname">postlink-command</entry>
-                <entry>
-                  Use this tag to specify command(s) that must be executed
-                  after the target is linked. This can be used to e.g. add
-                  resources or strip debugging information.
-                </entry>
-                <entry role="availability">exe, dll, module, lib</entry>
-              </row>
-        
-      
-              <row id="tag.uid" xreflabel="uid">
-                <entry role="tagname">uid</entry>
-                <entry>
-                  Defines target's unique ID number for formats that need it.
-                  <emphasis>FIXME: currently not implemented in any format;
-                  document use of type=symbian1 etc. once it is used by
-                  something</emphasis>
-                </entry>
-                <entry role="availability">exe, dll, module</entry>
-              </row>
-      
-            </tbody>
-          </tgroup>
-        </informaltable>
-              
-              
-        
-        
-        <note>
-          <title>Autoconf Note</title>
-          <para>
-            Many configuration options listed above are not supported by the
-            Autoconf format (e.g. <xref linkend="tag.optimize"/>,
-            <xref linkend="tag.debug-info"/> or <xref linkend="tag.arch"/>.
-            This is because <filename>configure</filename> is used to find
-            appropriate compiler flags.
-          </para>
-        </note>
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						
+						<row id="tag.postlink-command" xreflabel="postlink-command">
+							<entry role="tagname">postlink-command</entry>
+							<entry>
+								Use this tag to specify command(s) that must be executed
+								after the target is linked. This can be used to e.g. add
+								resources or strip debugging information.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+			
+		
+						<row id="tag.uid" xreflabel="uid">
+							<entry role="tagname">uid</entry>
+							<entry>
+								Defines target's unique ID number for formats that need it.
+								<emphasis>FIXME: currently not implemented in any format;
+								document use of type=symbian1 etc. once it is used by
+								something</emphasis>
+							</entry>
+							<entry role="availability">exe, dll, module</entry>
+						</row>
+		
+					</tbody>
+				</tgroup>
+			</informaltable>
+						
+						
+			
+			
+			<note>
+				<title>Autoconf Note</title>
+				<para>
+					Many configuration options listed above are not supported by the
+					Autoconf format (e.g. <xref linkend="tag.optimize"/>,
+					<xref linkend="tag.debug-info"/> or <xref linkend="tag.arch"/>.
+					This is because <filename>configure</filename> is used to find
+					appropriate compiler flags.
+				</para>
+			</note>
 
-      </para>
+		</para>
 
-    </section>  
-  </section>
+	</section>
   
 </chapter>
