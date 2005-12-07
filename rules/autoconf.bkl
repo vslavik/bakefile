@@ -370,11 +370,17 @@
         <set var="__installable">$(value)</set>
     </define-tag>
     <define-tag name="dir" rules="subproject">
-        <modify-target target="install-strip">
             <if cond="__installable!='no'">
+           <!-- create the (conditional) install-strip_$(id) target and add it, as a dependency,
+                to the global INSTALL-STRIP target of the makefile -->
+           <add-target target="install-strip_$(id)"
+                            type="inst-action"
+                            cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
+           <modify-target target="install-strip_$(id)">
                 <command>(cd $(value) &amp;&amp; $(DOLLAR)(MAKE) install-strip)</command>
-            </if>
+               <dependency-of>install-strip</dependency-of>
         </modify-target>
+        </if>
     </define-tag>
     
     

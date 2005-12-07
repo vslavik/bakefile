@@ -488,15 +488,15 @@ makefiles (most notably GNU Make and Autoconf formats).
         <template template="__subproject_templ">
             <set var="__is_phony">1</set>
             <set var="__subtarget">all</set>
+            <set var="__install_if_cond"></set>
             <command>$(__MAKE_SUBPROJECT_CMD)</command>
-            <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
-                <modify-target target="install">
-                    <command>$(ref('__INSTALL_SUBPROJECT_CMD',id))</command>
-                </modify-target>
-            </if>
             <modify-target target="clean">
                 <command>$(ref('__CLEAN_SUBPROJECT_CMD',id))</command>
             </modify-target>
+
+            <!-- by default, subprojects are not installable, user can safely
+                 override this setting in his bakefiles -->
+            <installable>no</installable>
         </template>
         <define-tag name="dir">
             <set var="__subdir">$(nativePaths(value))</set>
@@ -504,9 +504,19 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="target">
             <set var="__subtarget">$(value)</set>
         </define-tag>
+
         <define-tag name="installable">
-            <if cond="value=='no'">
-                <set var="__INSTALL_SUBPROJECT_CMD"/>
+            <if cond="value=='yes' and FORMAT_HAS_MAKE_INSTALL=='1'">
+
+                <!-- create the (conditional) install_$(id) target and add it, as a dependency,
+                     to the global INSTALL target of the makefile -->
+                <add-target target="install_$(id)"
+                            type="inst-action"
+                        cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
+                <modify-target target="install_$(id)">
+                    <command>$(ref('__INSTALL_SUBPROJECT_CMD',id))</command>
+                    <dependency-of>install</dependency-of>
+                </modify-target>
             </if>
         </define-tag>
     </define-rule>
