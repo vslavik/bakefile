@@ -21,7 +21,8 @@
 #  Misc utility functions for use in Bakefiles
 #
 
-import mk, errors, config, sys, os
+import sys, os, string
+import mk, errors, config
 import containers
 
 def checkBakefileVersion(version):
@@ -551,3 +552,34 @@ def wrapLongLine(prefix, line,
             lng += wlen
     return s
 
+
+def safeSplit(str):
+    """
+       Splits the given string like the built-in split() python function but, unlike
+       the python split() function, recognizes that an expression like:
+                            "$(myPythonFuncCall(arg1, arg2)) item2"
+       must be split as:
+                        [ "$(myPythonFuncCall(arg1, arg2))", "item2" ]
+       and not as the built-in split() function would do:
+                      [ "$(myPythonFuncCall(arg1,", "arg2))", "item2" ]
+    """
+    str = str.strip() + " " # to make simpler our algorithm below we add a whitespace at the end
+    lst = []
+
+    # scan  char by char the string
+    bracketNestLevel = 0
+    alreadyParsed = 0
+    for i in range(len(str)):
+        c = str[i]
+        if c in string.whitespace and bracketNestLevel == 0:
+            # discard empty tokens:
+            token = str[alreadyParsed:i].strip()
+            if token != '':
+                # this whitespace is not enclosed by brackets; we can break here:
+                lst.append(token)
+                alreadyParsed = i + 1 # +1 is to remove the whitespace from next token
+        elif c == '(':
+            bracketNestLevel += 1
+        elif c == ')':
+            bracketNestLevel -= 1
+    return lst
