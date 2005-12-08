@@ -10,6 +10,8 @@ Version 0.2.0
 - autoconf: added support for Intel C/C++ compiler (Vadim Zeitlin)
 - win32 makefiles: fixed cleaning list of files (Francesco Montorsi)
 - many improvements to the documentation (Warren Young)
+- support for conditional installation of <subproject> targets
+  (Francesco Montorsi)
 
 
 Version 0.1.9.1
