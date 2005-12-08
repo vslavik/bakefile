@@ -112,7 +112,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                          list and create single clean commands; all lines are separed by newlines
                          but we also have to remove the newline after the last clean command to
                          avoid that following <clean-files> tags will be spaced by an empty line -->
-                    $('\n'.join([('-if exist %s del %s' % (x, x)) for x in value.split()]))
+                    $('\n'.join([('-if exist %s del %s' % (x, x)) for x in safeSplit(value)]))
                 </command>
             </modify-target>
         </define-tag>
