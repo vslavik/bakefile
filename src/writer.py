@@ -101,6 +101,7 @@ def __copyMkToVars():
         o.desc = opt.desc
         o.descStr = __stringify(o.desc)
         o.values = opt.values
+        o.values_desc = opt.values_desc
         if o.values != None: o.valuesStr = '[%s]' % ','.join(o.values)
         else: o.valuesStr = ''
         options.append(o.name, o)
