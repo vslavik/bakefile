@@ -49,11 +49,14 @@ class Option:
         self.desc = desc
         self.values = values
         self.category = Option.CATEGORY_UNSPECIFICED
+        self.values_desc = {}
         if self.values != None:
-            self.values_desc = {}
             if values_desc != None:
                 for i in range(0,len(self.values)):
-                    self.values_desc[self.values[i]] = values_desc[i]
+                    desc = values_desc[i]
+                    if desc.find('\n')==0:
+                        desc = desc[1:]
+                    self.values_desc[self.values[i]] = desc.strip()
             else:
                 for i in range(0,len(self.values)):
                     self.values_desc[self.values[i]] = \

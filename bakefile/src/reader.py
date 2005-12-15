@@ -250,7 +250,9 @@ def handleOption(e):
         elif c.name == 'description':
             desc = c.value
         elif c.name == 'values':
-            values = evalConstExpr(e, c.value).split(',')
+            values = evalConstExpr(e, c.value.replace('\n','')).split(',')
+            for i in range(len(values)):
+                values[i] = values[i].strip()
         elif c.name == 'values-description':
             values_desc = evalConstExpr(e, c.value).split(',')
     o = mk.Option(name, default, desc, values, values_desc)
