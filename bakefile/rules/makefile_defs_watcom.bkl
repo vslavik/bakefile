@@ -8,6 +8,46 @@
     <if cond="PLATFORM_OS2=='0' and PLATFORM_MSDOS=='0'">
         <include file="win32.bkl"/>
     </if>
+    <if cond="PLATFORM_MSDOS=='1'">
+        <option name="DOS32">
+            <values>
+                X32VM,
+                X32,
+                PMODEW,
+                CAUSEWAY,
+                DOS32A,
+                DOS4GW
+            </values>
+            <values-description>
+                FlashTek X-32VM DOS extender,
+                FlashTek X-32 DOS extender,
+                PMODE/W,
+                CauseWay DOS extender,
+                DOS32/A,
+                Tenberry/Watcom 32-bit DOS extender
+            </values-description>
+            <default-value>DOS4GW</default-value>
+            <description>
+                DOS32 mode/extender
+            </description>
+        </option>
+        <set var="__DOS_LDFLAG">
+            <if cond="DOS32=='X32VM'">X32RV</if>
+            <if cond="DOS32=='X32'">X32R</if>
+            <if cond="DOS32=='PMODEW'">PMODEW</if>
+            <if cond="DOS32=='CAUSEWAY'">CAUSEWAY</if>
+            <if cond="DOS32=='DOS32A'">DOS32A</if>
+            <if cond="DOS32=='DOS4GW'">DOS4G</if>
+        </set>
+        <set var="__DOS_CFLAG">
+            <if cond="DOS32=='X32VM'">X32VM</if>
+            <if cond="DOS32=='X32'">X32VM</if>
+            <if cond="DOS32=='PMODEW'">DOS4GW</if>
+            <if cond="DOS32=='CAUSEWAY'">DOS4GW</if>
+            <if cond="DOS32=='DOS32A'">DOS4GW</if>
+            <if cond="DOS32=='DOS4GW'">DOS4GW</if>
+        </set>
+    </if>
     <if cond="PLATFORM_OS2=='1' or PLATFORM_MSDOS=='1'">
         <set var="TOOLSET">
             <if cond="PLATFORM_MSDOS=='1'">dos</if>
@@ -84,7 +124,7 @@
              in a library (e.g. wxWindows) in which case wlink would
              optimize it out: -->
     <set var="__FLAG_EXE">
-        <if cond="PLATFORM_MSDOS=='1'">system dos</if>
+        <if cond="PLATFORM_MSDOS=='1'">system $(__DOS_LDFLAG)</if>
         <if cond="PLATFORM_UNIX=='1'">system linux</if>
     </set>
     <set var="__FLAG_EXE_CONSOLE">
@@ -138,6 +178,7 @@
             <!-- FIXME: should be cppflags, temporary fix to make wxWin
                    working!! -->
             <cxxflags>$(__pch_cppflags)</cxxflags>
+            <define>$(__DOS_CFLAG)</define>
         </template>
 
         <define-tag name="threading">
