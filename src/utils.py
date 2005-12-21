@@ -21,7 +21,7 @@
 #  Misc utility functions for use in Bakefiles
 #
 
-import sys, os, string
+import sys, os, os.path, string, glob
 import mk, errors, config
 import containers
 
@@ -586,3 +586,31 @@ def safeSplit(str):
         elif c == ')':
             bracketNestLevel -= 1
     return lst
+
+
+def fileList(path):
+    """
+       Returns a string containing a space-separed list of all files
+       found in the given path. 'path' typically is a relative path
+       with a mask used to match only wanted files.
+       E.g.
+            <sources>$(fileList('../src/*.cpp'))</sources>
+    """
+    # we need OS' native separator for glob():
+    p = path.replace('/', os.sep)
+
+    # make the path relative to SRCDIR (unless already absolute):
+    srcdir = mk.vars['SRCDIR'].replace('/', os.sep)
+    p = os.path.join(srcdir, p)
+    srcdir += os.sep
+    if p.startswith(srcdir):
+        srcdirPrefix = len(srcdir)
+    else:
+        srcdirPrefix = 0
+
+    files = glob.glob(p)
+
+    # remove srcdir prefix and use / for separator:
+    files = [f[srcdirPrefix:].replace(os.sep, '/') for f in files]
+
+    return ' '.join(files)

@@ -17,6 +17,7 @@
         pch/pch.bkl
         regressions/regressions.bkl
         datafiles/datafiles.bkl
+        filelist/filelist.bkl
     </input>
     
     <add-formats>
