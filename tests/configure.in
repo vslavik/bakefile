@@ -3,6 +3,24 @@ AC_INIT(aclocal.m4)
 
 AC_CANONICAL_SYSTEM
 
+
+
+# this is used to test if <subproject>s (and their 'install' and 'install-strip' targets)
+# are correctly handled when using conditional targets
+AC_ARG_ENABLE([datafiles], AC_HELP_STRING([--enable-datafiles],
+         [Enables the datafiles subproject (default is no)]), [], [enable_datafiles=no])
+
+AC_MSG_CHECKING([for the --enable-datafiles option])
+if test "$enable_datafiles" = "yes"; then
+    DATAFILES=1
+    AC_MSG_RESULT([yes])
+else
+    DATAFILES=0
+    AC_MSG_RESULT([no])
+fi
+
+
+
 AC_BAKEFILE([m4_include(autoconf_inc.m4)])
 
 AC_OUTPUT([
