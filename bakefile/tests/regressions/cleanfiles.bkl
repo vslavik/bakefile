@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<makefile>
+    <action id="testclean">
+
+        <if cond="FORMAT not in [ 'xcode2', 'symbian', 'msvc6prj', 'cbuilderx' ]">
+            <clean-files>file1.txt file2.txt</clean-files>
+            <clean-files>file3.txt file4.txt</clean-files>
+            <clean-files>file5.txt</clean-files>
+        </if>
+    </action>
+</makefile>
