@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <!-- test expansion relative to SRCDIR: -->
+    <set var="SRCDIR">../filelist</set>
+    
+    <exe id="filelist">
+        <app-type>gui</app-type>
+        <sources>$(fileList('*.c'))</sources>
+    </exe>
+
+</makefile>

@@ -35,4 +35,5 @@ AC_OUTPUT([
            pch/Makefile
            regressions/Makefile
            datafiles/Makefile
+           filelist/Makefile
          ])

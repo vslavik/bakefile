@@ -12,6 +12,7 @@ Version 0.2.0
 - many improvements to the documentation (Warren Young)
 - support for conditional installation of <subproject> targets
   (Francesco Montorsi)
+- added fileList() function (loosely based on Francesco Montorsi's patch)
 
 
 Version 0.1.9.1
