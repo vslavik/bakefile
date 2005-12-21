@@ -563,7 +563,8 @@ def safeSplit(str):
        and not as the built-in split() function would do:
                       [ "$(myPythonFuncCall(arg1,", "arg2))", "item2" ]
     """
-    str = str.strip() + " " # to make simpler our algorithm below we add a whitespace at the end
+    # to make simpler our algorithm below we add a whitespace at the end:
+    str = str.strip() + " "
     lst = []
 
     # scan  char by char the string
@@ -575,9 +576,11 @@ def safeSplit(str):
             # discard empty tokens:
             token = str[alreadyParsed:i].strip()
             if token != '':
-                # this whitespace is not enclosed by brackets; we can break here:
+                # this whitespace is not enclosed by brackets; we can break
+                # here:
                 lst.append(token)
-                alreadyParsed = i + 1 # +1 is to remove the whitespace from next token
+                # +1 is to remove the whitespace from next token:
+                alreadyParsed = i + 1
         elif c == '(':
             bracketNestLevel += 1
         elif c == ')':
