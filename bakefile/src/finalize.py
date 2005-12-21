@@ -100,7 +100,10 @@ def finalEvaluation(outputVarsOnly=1):
                 else:
                     expr = dict[obj]
                 mk.__resetUsageTracker(reset_coverage=0)
-                new = mk.evalExpr(expr, target=target)
+                try:
+                    new = mk.evalExpr(expr, target=target)
+                except:
+                    raise errors.Error("Failed to set variable '%s' to value '%s'" % (obj, expr))
                 if expr != new:
                     if dict == None: obj.value = new
                     else: dict[obj] = new
