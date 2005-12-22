@@ -178,7 +178,7 @@
             <!-- FIXME: should be cppflags, temporary fix to make wxWin
                    working!! -->
             <cxxflags>$(__pch_cppflags)</cxxflags>
-            <define>$(__DOS_CFLAG)</define>
+            <define cond="PLATFORM_MSDOS=='1'">$(__DOS_CFLAG)</define>
         </template>
 
         <define-tag name="threading">
