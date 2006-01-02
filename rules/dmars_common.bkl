@@ -2,13 +2,13 @@
 <!-- $Id$ -->
 
 <makefile>
-    
+
     <include file="makefile.bkl"/>
-    
+
     <!-- =============================================================== -->
     <!--                   Compiler-specific tags:                       -->
     <!-- =============================================================== -->
-    
+
     <define-tag name="cppflags-dmars" rules="exe,lib,dll,module">
         <cppflags>$(value)</cppflags>
     </define-tag>
@@ -28,7 +28,7 @@
 
     <action id="clean" template="__phony">
         <set var="__builddir" eval="0">$(BUILDDIR)</set>
-        <command>            
+        <command>
             -if exist $(__builddir)\*$(OBJEXT) del $(__builddir)\*$(OBJEXT)
             -if exist $(__builddir)\*.res del $(__builddir)\*.res
             -if exist $(__builddir)\*.sym del $(__builddir)\*.sym
@@ -40,7 +40,7 @@
             $(ref('__targetdir',id))$(ref('__name',id)).map
         </clean-files>
     </define-tag>
-    
+
     <!-- =============================================================== -->
     <!--                     win32 resources:                            -->
     <!-- =============================================================== -->
@@ -56,7 +56,7 @@
     <define-rule name="__rc-to-res" extends="__any,compilation_rule">
         <template>
             <set var="__command" eval="0">
-                rcc $** -o$@ $(__win32rc_flags) -32 -v-
+                rcc $(src) -o$@ $(__win32rc_flags) -32 -v-
             </set>
         </template>
         <define-tag name="parent-target">

@@ -13,6 +13,7 @@ Version 0.2.0
 - support for conditional installation of <subproject> targets
   (Francesco Montorsi)
 - added fileList() function (loosely based on Francesco Montorsi's patch)
+- fixed bug #1246534: pch file passed to resource compiler in dmars formats
 
 
 Version 0.1.9.1
