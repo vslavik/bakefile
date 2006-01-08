@@ -588,29 +588,63 @@ def safeSplit(str):
     return lst
 
 
-def fileList(path):
+def fileList(pathlist):
     """
        Returns a string containing a space-separed list of all files
        found in the given path. 'path' typically is a relative path
+       (absolute paths should be avoided in well-designed bakefiles)
        with a mask used to match only wanted files.
+       When the given path is relative, it must be relative to SRCDIR
+       global variable; remember that SRCDIR is in turn relative to
+       the location of the generated makefile.
+
+       Additionally this function can accept python lists of strings, too.
+       The returned value is the list of all files found in all the paths
+       of the list.
+
        E.g.
             <sources>$(fileList('../src/*.cpp'))</sources>
+            <sources>$(fileList(['../src/*.cpp', '../src/*.c']))</sources>
     """
-    # we need OS' native separator for glob():
-    p = path.replace('/', os.sep)
+    def __fileList(path):
+        # get the absolute path for the generated makefile
+        finalmakefile = os.path.abspath(
+                    os.path.split(config.output_file.replace('/', os.sep))[0])
 
-    # make the path relative to SRCDIR (unless already absolute):
-    srcdir = mk.vars['SRCDIR'].replace('/', os.sep)
-    p = os.path.join(srcdir, p)
-    srcdir += os.sep
-    if p.startswith(srcdir):
-        srcdirPrefix = len(srcdir)
+        # make the user path relative to SRCDIR and then absolute using using
+        # the generated makefile path (unless already absolute):
+        srcdir = mk.vars['SRCDIR'].replace('/', os.sep)
+
+        # we need OS' native separator for glob():
+        p = path.replace('/', os.sep)
+        p = os.path.join(finalmakefile, srcdir, p)
+
+        # NB: do not normalize the path since this could interfere with the
+        #     prefix detection & removal later...
+        prefix = os.path.join(finalmakefile, srcdir) + os.sep
+        if p.startswith(prefix):
+            srcdirPrefix = len(prefix)
+        else:
+            srcdirPrefix = 0
+
+        files = glob.glob(p)
+
+        # remove prefix, normalize the filepath and use / for separator:
+        files = [os.path.normpath(f[srcdirPrefix:]).replace(os.sep, '/')
+                 for f in files]
+
+        if config.debug:
+            print "fileList('%s'): matches for '%s' pattern found: '%s'" % \
+                  (path, os.path.normpath(p), ' '.join(files))
+
+        return ' '.join(files)
+
+    if isinstance(pathlist, str):
+        return __fileList(pathlist)
+    elif isinstance(pathlist, list):
+        ret = ' '.join([__fileList(path) for path in pathlist])
+        if config.debug:
+            print "fileList(%s): returned '%s'" % (pathlist, ret.strip())
+        return ret
     else:
-        srcdirPrefix = 0
-
-    files = glob.glob(p)
-
-    # remove srcdir prefix and use / for separator:
-    files = [f[srcdirPrefix:].replace(os.sep, '/') for f in files]
-
-    return ' '.join(files)
+        raise errors.Error('fileList() function only accepts a string or a python list of strings as argument')
