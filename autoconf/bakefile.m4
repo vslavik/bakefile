@@ -1484,7 +1484,7 @@ while test ${D}{#} -gt 0; do
 done
 
 if test "x${D}{headerfile}" = "x" ; then
-    echo "error: can't find header ${D}{header} in include paths" >2
+    echo "error: can't find header ${D}{header} in include paths" >&2
 else
     if test -f ${D}{outfile} ; then
         rm -f ${D}{outfile}
