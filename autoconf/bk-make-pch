@@ -10,9 +10,11 @@ header="${2}"
 shift
 shift
 
-compiler=
-headerfile=
+compiler=""
+headerfile=""
+
 while test ${#} -gt 0; do
+    add_to_cmdline=1
     case "${1}" in
         -I* )
             incdir=`echo ${1} | sed -e 's/-I\(.*\)/\1/g'`
@@ -20,8 +22,14 @@ while test ${#} -gt 0; do
                 headerfile="${incdir}/${header}"
             fi
         ;;
+        -use-pch )
+            shift
+            add_to_cmdline=0
+        ;;
     esac
-    compiler="${compiler} ${1}"
+    if test $add_to_cmdline = 1 ; then
+        compiler="${compiler} ${1}"
+    fi
     shift
 done
 
@@ -35,7 +43,20 @@ else
     fi
     depsfile=".deps/`echo ${outfile} | tr '/.' '__'`.d"
     mkdir -p .deps
-    # can do this because gcc is >= 3.4:
-    ${compiler} -o ${outfile} -MMD -MF "${depsfile}" "${headerfile}"
+    if test "x@GCC_PCH@" = "x1" ; then
+        # can do this because gcc is >= 3.4:
+        ${compiler} -o ${outfile} -MMD -MF "${depsfile}" "${headerfile}"
+    elif test "x@ICC_PCH@" = "x1" ; then
+        filename=pch_gen-$$
+        file=${filename}.c
+        dfile=${filename}.d
+        cat > $file <<EOT
+#include "$header"
+EOT
+        # using -MF icc complains about differing command lines in creation/use
+        $compiler -c -create-pch $outfile -MMD $file && \
+          sed -e "s,^.*:,$outfile:," -e "s, $file,," < $dfile > $depsfile && \
+          rm -f $file $dfile ${filename}.o
+    fi
     exit ${?}
 fi

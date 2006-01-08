@@ -287,7 +287,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
                 AC_TRY_COMPILE([],
                     [
                         #ifndef __INTEL_COMPILER
-                        #error Not icc
+                        #error Not ICC
                         #endif
                     ],
                     bakefile_cv_prog_icc=yes,
@@ -643,6 +643,8 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
                   [bk_use_pch="$enableval"])
 
     GCC_PCH=0
+    ICC_PCH=0
+    USE_PCH=0
 
     case ${BAKEFILE_HOST} in 
         *-*-cygwin* )
@@ -667,7 +669,8 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
                     #endif
                     #if (__GNUC__ == 3) && \
                        ((!defined(__APPLE_CC__) && (__GNUC_MINOR__ < 4)) || \
-                       ( defined(__APPLE_CC__) && (__GNUC_MINOR__ < 3)))
+                       ( defined(__APPLE_CC__) && (__GNUC_MINOR__ < 3))) || \
+                       ( defined(__INTEL_COMPILER) )
                         #error "no pch support"
                     #endif
                 ],
@@ -676,9 +679,23 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
                     GCC_PCH=1
                 ],
                 [
-                    AC_MSG_RESULT([no])
+                    AC_TRY_COMPILE([],
+                        [
+                            #if !defined(__INTEL_COMPILER) || \
+                                (__INTEL_COMPILER < 900)
+                                #error "no pch support"
+                            #endif
+                        ],
+                        [
+                            AC_MSG_RESULT([yes])
+                            ICC_PCH=1
+                        ],
+                        [
+                            AC_MSG_RESULT([no])
+                        ])
                 ])
-            if test $GCC_PCH = 1 ; then
+            if test $GCC_PCH = 1 -o $ICC_PCH = 1 ; then
+                USE_PCH=1
                 AC_BAKEFILE_CREATE_FILE_BK_MAKE_PCH
                 chmod +x bk-make-pch
             fi
@@ -686,6 +703,7 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
     fi
 
     AC_SUBST(GCC_PCH)
+    AC_SUBST(ICC_PCH)
 ])
 
 
@@ -1468,9 +1486,11 @@ header="${D}{2}"
 shift
 shift
 
-compiler=
-headerfile=
+compiler=""
+headerfile=""
+
 while test ${D}{#} -gt 0; do
+    add_to_cmdline=1
     case "${D}{1}" in
         -I* )
             incdir=\`echo ${D}{1} | sed -e 's/-I\\(.*\\)/\\1/g'\`
@@ -1478,8 +1498,14 @@ while test ${D}{#} -gt 0; do
                 headerfile="${D}{incdir}/${D}{header}"
             fi
         ;;
+        -use-pch )
+            shift
+            add_to_cmdline=0
+        ;;
     esac
-    compiler="${D}{compiler} ${D}{1}"
+    if test ${D}add_to_cmdline = 1 ; then
+        compiler="${D}{compiler} ${D}{1}"
+    fi
     shift
 done
 
@@ -1493,8 +1519,21 @@ else
     fi
     depsfile=".deps/\`echo ${D}{outfile} | tr '/.' '__'\`.d"
     mkdir -p .deps
-    # can do this because gcc is >= 3.4:
-    ${D}{compiler} -o ${D}{outfile} -MMD -MF "${D}{depsfile}" "${D}{headerfile}"
+    if test "x${GCC_PCH}" = "x1" ; then
+        # can do this because gcc is >= 3.4:
+        ${D}{compiler} -o ${D}{outfile} -MMD -MF "${D}{depsfile}" "${D}{headerfile}"
+    elif test "x${ICC_PCH}" = "x1" ; then
+        filename=pch_gen-${D}${D}
+        file=${D}{filename}.c
+        dfile=${D}{filename}.d
+        cat > ${D}file <<EOT
+#include "${D}header"
+EOT
+        # using -MF icc complains about differing command lines in creation/use
+        ${D}compiler -c -create-pch ${D}outfile -MMD ${D}file && \\
+          sed -e "s,^.*:,${D}outfile:," -e "s, ${D}file,," < ${D}dfile > ${D}depsfile && \\
+          rm -f ${D}file ${D}dfile ${D}{filename}.o
+    fi
     exit ${D}{?}
 fi
 EOF

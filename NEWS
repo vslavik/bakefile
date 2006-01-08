@@ -8,12 +8,13 @@ Version 0.2.0
 - autoconf: dependencies support for SGI MIPSpro compiler (Vadim Zeitlin)
 - autoconf: fixed shared libraries with gcc under AIX 5 (Vadim Zeitlin)
 - autoconf: added support for Intel C/C++ compiler (Vadim Zeitlin)
+  and its precompiled headers (based on Mattia Barbon's patch)
 - win32 makefiles: fixed cleaning list of files (Francesco Montorsi)
 - many improvements to the documentation (Warren Young)
 - support for conditional installation of <subproject> targets
   (Francesco Montorsi)
 - added fileList() function (loosely based on Francesco Montorsi's patch)
-- fixed bug #1246534: pch file passed to resource compiler in dmars formats
+- dmars: don't pass pch file to resource compiler
 
 
 Version 0.1.9.1
