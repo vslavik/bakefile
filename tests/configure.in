@@ -3,6 +3,10 @@ AC_INIT(aclocal.m4)
 
 AC_CANONICAL_SYSTEM
 
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CXXCPP
+
 
 
 # this is used to test if <subproject>s (and their 'install' and 'install-strip' targets)
