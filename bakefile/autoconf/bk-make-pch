@@ -26,7 +26,7 @@ while test ${#} -gt 0; do
 done
 
 if test "x${headerfile}" = "x" ; then
-    echo "error: can't find header ${header} in include paths" >2
+    echo "error: can't find header ${header} in include paths" >&2
 else
     if test -f ${outfile} ; then
         rm -f ${outfile}
