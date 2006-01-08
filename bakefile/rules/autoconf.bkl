@@ -38,6 +38,8 @@
     <option name="INSTALL_DIR"/>
     <option name="DEPS_TRACKING"><values>0,1</values></option>
     <option name="GCC_PCH"><values>0,1</values></option>
+    <option name="ICC_PCH"><values>0,1</values></option>
+    <option name="USE_PCH"><values>0,1</values></option>
 
     <!-- Platforms: -->
     <option name="PLATFORM_UNIX"/>
@@ -325,6 +327,7 @@
             <!-- must look into this directory first: -->
             <set var="PCH_INC">
                 <if cond="GCC_PCH=='1'">-I$(__gcc_pch_dir)</if>
+                <if cond="ICC_PCH=='1'">-use-pch $(__gcc_pch_file)</if>
             </set> 
             <set var="__cppflags">$(PCH_INC) $(__cppflags)</set>
 
@@ -336,7 +339,7 @@
 
             <if cond="__gcc_pch_file not in targets">
                 <add-target target="$(__gcc_pch_file)"
-                            type="action" cond="GCC_PCH=='1'"/>
+                            type="action" cond="USE_PCH=='1'"/>
                 <modify-target target="$(__gcc_pch_file)">
                     <command>
                         $(top_builddir)./bk-make-pch $(__gcc_pch_file) $(__pch_header) $(ref("__gcc_pch_cmd",id))
