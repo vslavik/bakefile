@@ -20,7 +20,8 @@ SUBDBFILES=$(srcdir)/commands.docbook \
 		   $(srcdir)/manpage.docbook \
 		   $(srcdir)/targets.docbook \
 		   $(srcdir)/tutorial.docbook \
-    	   $(srcdir)/variables.docbook
+    	   $(srcdir)/variables.docbook \
+    	   $(srcdir)/functions.docbook
 DBFILES=$(MAINDBFILE) $(SUBDBFILES)
 
 FOFILE=$(BASENAME).fo
