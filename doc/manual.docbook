@@ -15,6 +15,7 @@
   <xi:include href="commands.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   <xi:include href="faq.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   <xi:include href="variables.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="functions.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
   <chapter id="ch.modules">
     <title>Modules</title>

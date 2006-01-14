@@ -121,7 +121,7 @@
             <tbody>
 
               <row>
-                <entry role="varname">SRCDIR</entry>
+                <entry id="var.SRCDIR" xreflabel="SRCDIR" role="varname">SRCDIR</entry>
                 <entry>
                   Directory to which names of source files are relative to.
                   This value is relative to <xref linkend="var.OUTPUT_FILE"/>.
@@ -308,7 +308,7 @@
                 </entry>
               </row>
 
-              <row id="var.OPTIONS">
+              <row id="var.OPTIONS" xreflabel="OPTIONS">
                 <entry role="varname">OPTIONS</entry>
                 <entry>
                   Space-separation list of
@@ -403,7 +403,7 @@
                 </entry>
               </row>
 
-              <row>
+              <row id="var.DIRSEP" xreflabel="DIRSEP">
                 <entry role="varname">DIRSEP</entry>
                 <entry>
                   Character used to separate directory components in paths on
