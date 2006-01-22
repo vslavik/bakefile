@@ -682,7 +682,7 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
                     AC_TRY_COMPILE([],
                         [
                             #if !defined(__INTEL_COMPILER) || \
-                                (__INTEL_COMPILER < 900)
+                                (__INTEL_COMPILER < 800)
                                 #error "no pch support"
                             #endif
                         ],
@@ -1498,7 +1498,7 @@ while test ${D}{#} -gt 0; do
                 headerfile="${D}{incdir}/${D}{header}"
             fi
         ;;
-        -use-pch )
+        -use-pch|-use_pch )
             shift
             add_to_cmdline=0
         ;;
@@ -1530,7 +1530,7 @@ else
 #include "${D}header"
 EOT
         # using -MF icc complains about differing command lines in creation/use
-        ${D}compiler -c -create-pch ${D}outfile -MMD ${D}file && \\
+        ${D}compiler -c -create_pch ${D}outfile -MMD ${D}file && \\
           sed -e "s,^.*:,${D}outfile:," -e "s, ${D}file,," < ${D}dfile > ${D}depsfile && \\
           rm -f ${D}file ${D}dfile ${D}{filename}.o
     fi
