@@ -327,7 +327,7 @@
             <!-- must look into this directory first: -->
             <set var="PCH_INC">
                 <if cond="GCC_PCH=='1'">-I$(__gcc_pch_dir)</if>
-                <if cond="ICC_PCH=='1'">-use-pch $(__gcc_pch_file)</if>
+                <if cond="ICC_PCH=='1'">-use_pch $(__gcc_pch_file)</if>
             </set> 
             <set var="__cppflags">$(PCH_INC) $(__cppflags)</set>
 
