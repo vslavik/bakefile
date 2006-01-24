@@ -142,4 +142,6 @@
     <tag-info name="install-if" exclusive="1"/>
     <tag-info name="installable" exclusive="1"/>
 
+    <define-tag name="stack" rules="exe"/>
+
 </makefile>

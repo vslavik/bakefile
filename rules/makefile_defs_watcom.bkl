@@ -173,6 +173,9 @@
         <template>
             <set var="__libpath"/>
             <set var="__pch_flag"/>
+            <set var="__stack_var">
+                <if cond="PLATFORM_MSDOS=='1'">256k</if>
+            </set>
             <!-- FIXME: get rid of this once tag ordering works!: -->
             <set var="__pch_cppflags" eval="0">$(__pch_flag)</set>
             <!-- FIXME: should be cppflags, temporary fix to make wxWin
@@ -228,6 +231,7 @@
         </set>
         <set var="__LINK_EXE_CMD" eval="0">
             $(__LINK_CMD_BASE)
+            @for %i in ($(__stack_var)) do @%append $(__lbc_file) option stack=%i
             $(__linker) @$(__lbc_file)
         </set>
         <set var="__LINK_LIB_CMD" eval="0">

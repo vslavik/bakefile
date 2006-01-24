@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<!-- $Id$ -->
 
 <makefile>
 
@@ -23,6 +24,16 @@
     <define-tag name="ldflags-watcom" rules="exe,dll,module">
         <ldflags>$(value)</ldflags>
     </define-tag>
+
+    <!-- =============================================================== -->
+    <!--                   Platform-specific tags:                       -->
+    <!-- =============================================================== -->
+
+    <if cond="PLATFORM_MSDOS=='1'">
+        <define-tag name="stack" rules="exe">
+            <set var="__stack_var">$(value)</set>
+        </define-tag>
+    </if>
 
     <!-- =============================================================== -->
     <!--                         "make clean":                           -->
