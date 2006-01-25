@@ -216,7 +216,7 @@
 
         <set var="__lbc_file">$(mkPathPrefix(BUILDDIR))$(id).lbc</set>
         <set var="__dll_option">
-            <if cond="PLATFORM_WIN32=='1'">nr_dll</if>
+            <if cond="PLATFORM_WIN32=='1'">nt_dll</if>
             <if cond="PLATFORM_OS2=='1'">os2v2 dll</if>
         </set>
         <set var="__LINK_CMD_BASE" eval="0">
