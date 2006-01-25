@@ -514,50 +514,61 @@ dnl ---------------------------------------------------------------------------
 
 AC_DEFUN([AC_BAKEFILE_DEPS],
 [
+    AC_ARG_ENABLE([dependency-tracking],
+                  AS_HELP_STRING([--disable-dependency-tracking],
+                                 [don't use dependency tracking even if the compiler can]),
+                  [bk_use_trackdeps="$enableval"])
+    
     AC_MSG_CHECKING([for dependency tracking method])
-    DEPS_TRACKING=1
 
-    if test "x$GCC" = "xyes"; then
-        DEPSMODE=gcc
-        case "${BAKEFILE_HOST}" in
-            *-*-darwin* )
-                dnl -cpp-precomp (the default) conflicts with -MMD option
-                dnl used by bk-deps (see also http://developer.apple.com/documentation/Darwin/Conceptual/PortingUnix/compiling/chapter_4_section_3.html)
-                DEPSFLAG="-no-cpp-precomp -MMD"
-            ;;
-            * )
-                DEPSFLAG="-MMD"
-            ;;
-        esac
-        AC_MSG_RESULT([gcc])
-    elif test "x$MWCC" = "xyes"; then
-        DEPSMODE=mwcc
-        DEPSFLAG="-MM"
-        AC_MSG_RESULT([mwcc])
-    elif test "x$SUNCC" = "xyes"; then
-        DEPSMODE=unixcc
-        DEPSFLAG="-xM1"
-        AC_MSG_RESULT([Sun cc])
-    elif test "x$SGICC" = "xyes"; then
-        DEPSMODE=unixcc
-        DEPSFLAG="-M"
-        AC_MSG_RESULT([SGI cc])
-    elif test "x$HPCC" = "xyes"; then
-        DEPSMODE=unixcc
-        DEPSFLAG="+make"
-        AC_MSG_RESULT([HP cc])
-    elif test "x$COMPAQCC" = "xyes"; then
-        DEPSMODE=gcc
-        DEPSFLAG="-MD"
-        AC_MSG_RESULT([Compaq cc])
-    else
+    if test "x$bk_use_trackdeps" = "xno" ; then
         DEPS_TRACKING=0
-        AC_MSG_RESULT([none])
-    fi
+        AC_MSG_RESULT([disabled])
+    else
+        DEPS_TRACKING=1
 
-    if test $DEPS_TRACKING = 1 ; then
-        AC_BAKEFILE_CREATE_FILE_BK_DEPS
-        chmod +x bk-deps
+        if test "x$GCC" = "xyes"; then
+            DEPSMODE=gcc
+            case "${BAKEFILE_HOST}" in
+                *-*-darwin* )
+                    dnl -cpp-precomp (the default) conflicts with -MMD option
+                    dnl used by bk-deps (see also http://developer.apple.com/documentation/Darwin/Conceptual/PortingUnix/compiling/chapter_4_section_3.html)
+                    DEPSFLAG="-no-cpp-precomp -MMD"
+                ;;
+                * )
+                    DEPSFLAG="-MMD"
+                ;;
+            esac
+            AC_MSG_RESULT([gcc])
+        elif test "x$MWCC" = "xyes"; then
+            DEPSMODE=mwcc
+            DEPSFLAG="-MM"
+            AC_MSG_RESULT([mwcc])
+        elif test "x$SUNCC" = "xyes"; then
+            DEPSMODE=unixcc
+            DEPSFLAG="-xM1"
+            AC_MSG_RESULT([Sun cc])
+        elif test "x$SGICC" = "xyes"; then
+            DEPSMODE=unixcc
+            DEPSFLAG="-M"
+            AC_MSG_RESULT([SGI cc])
+        elif test "x$HPCC" = "xyes"; then
+            DEPSMODE=unixcc
+            DEPSFLAG="+make"
+            AC_MSG_RESULT([HP cc])
+        elif test "x$COMPAQCC" = "xyes"; then
+            DEPSMODE=gcc
+            DEPSFLAG="-MD"
+            AC_MSG_RESULT([Compaq cc])
+        else
+            DEPS_TRACKING=0
+            AC_MSG_RESULT([none])
+        fi
+
+        if test $DEPS_TRACKING = 1 ; then
+            AC_BAKEFILE_CREATE_FILE_BK_DEPS
+            chmod +x bk-deps
+        fi
     fi
 
     AC_SUBST(DEPS_TRACKING)
