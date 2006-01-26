@@ -1,8 +1,11 @@
 <?xml version="1.0" ?>
 <makefile>
 
-    <!-- test expansion relative to SRCDIR: -->
-    <set var="SRCDIR">../filelist</set>
+    <!-- test expansion relative to SRCDIR, but also test proper
+         handling of SRCDIR set to "$(srcdir)" in the autoconf format: -->
+    <if cond="FORMAT!='autoconf'">
+        <set var="SRCDIR">../filelist</set>
+    </if>
     
     <exe id="filelist">
         <app-type>gui</app-type>
