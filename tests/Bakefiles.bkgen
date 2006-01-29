@@ -18,6 +18,7 @@
         regressions/regressions.bkl
         datafiles/datafiles.bkl
         filelist/filelist.bkl
+        echo/echo.bkl
     </input>
     
     <add-formats>

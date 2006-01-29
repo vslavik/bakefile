@@ -1,0 +1,10 @@
+<makefile>
+
+    <!-- use some utilities to set a dummy var -->
+    <set var="VAR">$(addPrefixToList('mypath/', fileList('../d*')))</set>
+
+    <echo level="normal">this is a simple echo test</echo>
+    <echo level="verbose">VAR value is '$(VAR)'</echo>
+    <echo level="warning">warning...</echo>
+
+</makefile>
