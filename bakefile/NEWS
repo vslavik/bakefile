@@ -16,6 +16,7 @@ Version 0.2.0
 - added fileList() function (loosely based on Francesco Montorsi's patch)
 - dmars: don't pass pch file to resource compiler
 - autoconf: added --disable-dependency-tracking
+- added <echo> command (Francesco Montorsi)
 
 
 Version 0.1.9.1

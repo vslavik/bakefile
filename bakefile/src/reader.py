@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003,2004 Vaclav Slavik
+#  Copyright (C) 2003-2006 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -852,6 +852,25 @@ def handleError(e):
     raise ReaderError(e, "an error occured during processing")
 
 
+def handleEcho(e):
+    text = evalConstExpr(e, e.value)
+
+    # extract echo level
+    if 'level' in e.props:
+        level = e.props['level']
+        if level not in ['verbose', 'warning', 'normal']:
+            raise ReaderError(e, "unknown echo level '%s'" % level)
+    else:
+        level = 'normal'
+
+    if level == 'normal':
+        print text
+    elif level == 'verbose' and config.verbose:
+        print text
+    elif level == 'warning':
+        sys.stderr.write('WARNING: %s\n' % text)
+
+
 def handleRequires(e):
     if 'version' in e.props:
         if not utils.checkBakefileVersion(e.props['version']):
@@ -880,6 +899,7 @@ HANDLERS = {
     'fragment':      handleFragment,
     'modify-target': handleModifyTarget,
     'error':         handleError,
+    'echo' :         handleEcho,
     'requires':      handleRequires,
     }
 
