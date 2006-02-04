@@ -26,7 +26,7 @@
         <arg choice="plain">
           <option>-o</option><replaceable class="parameter">OUTFILE</replaceable>
         </arg>        
-        <arg choice="opt" rep="repeat">
+        <arg choice="opt" rep="repeat" id="bakefile.command.variable">
           <option>-D</option><replaceable
             class="parameter">VAR</replaceable>=<replaceable class="parameter">VALUE</replaceable>
         </arg>

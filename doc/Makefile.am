@@ -21,6 +21,7 @@ SUBDBFILES=$(srcdir)/commands.docbook \
 		   $(srcdir)/targets.docbook \
 		   $(srcdir)/tutorial.docbook \
     	   $(srcdir)/variables.docbook \
+    	   $(srcdir)/formats.docbook \
     	   $(srcdir)/functions.docbook
 DBFILES=$(MAINDBFILE) $(SUBDBFILES)
 
