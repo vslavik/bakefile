@@ -1,0 +1,45 @@
+<chapter id="ch.formats">
+  <title>Format specific documentation</title>
+  <para>
+    Depending on the format there are some additional steps required to
+    get extra functionality specific to this format.
+  </para>
+
+  <section id="watcom">
+
+    <title>Watcom format extended functionality</title>
+    <para>
+      Open Watcom compiler has possibility of crossplatform building for
+      many platforms. MS Windows binaries are the most common used output
+      of this compiler but it has also possibility of building for DOS,
+      OS/2 and other operating systems. Because of that by default watcom
+      makefiles are outputed with settings for building windows binaries.
+      This default setting can be changed by
+      <link linkend="bakefile.command.variable">defining</link> additional
+      <link linkend="platform">platform</link> variable.
+      <programlisting><![CDATA[
+# generate makefile.wat dedicated to windows development
+bakefile file.bkl -f watcom
+
+# generate makefile.wat dedicated to DOS development in extended 32-bit mode
+bakefile file.bkl -f watcom -DPLATFORM_MSDOS=1
+
+# generate makefile.wat dedicated to OS/2 development
+bakefile file.bkl -f watcom -DPLATFORM_OS2=1
+]]></programlisting>
+      <note>
+        <title>PLATFORM_MSDOS note</title>
+        <para>
+          Only 32-bit DOS mode with dedicated extender is supported. Generated
+          makefile contains additional <varname>DOS32</varname> variable which
+          points to desired extender. Expected values: <varname>X32VM</varname>,
+          <varname>X32</varname>, <varname>PMODEW</varname>,
+          <varname>CAUSEWAY</varname>, <varname>DOS32A</varname> and default
+          <varname>DOS4GW</varname> .
+        </para>
+      </note>
+    </para>
+
+  </section>
+  
+</chapter>
