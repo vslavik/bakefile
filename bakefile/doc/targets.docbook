@@ -164,7 +164,18 @@
                   extension (e.g. <literal>.exe</literal> on Windows).
                 </entry>
               </row>
-              
+
+              <row id="tags.exe.stack">
+                <entry role="tagname">stack</entry>
+                <entry>
+                  Set the size of the stack on platforms where it is possible.
+                  The default stack size varies for different platforms and
+                  compilers. With too small stack you may get an error
+                  indicating stack has overflowed. (Currently used by
+                  <link linkend="watcom">Watcom format</link> only.)
+                </entry>
+              </row>
+
             </tbody>
           </tgroup>
         </informaltable>
