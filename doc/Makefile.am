@@ -72,7 +72,7 @@ html/index.html: $(DBFILES) $(HTML_SS)
 	xmllint --xinclude --postvalid --noent --noout $(MAINDBFILE)
 	xsltproc --xinclude -o html/ $(HTML_SS) $(MAINDBFILE)
 
-$(MANPAGE): $(DBFILES) $(MAN_SS)
+$(MANPAGE_MAIN): $(DBFILES) $(MAN_SS)
 	@mkdir -p man
 	xsltproc --xinclude -o man/ $(MAN_SS) $(MAINDBFILE)
 
