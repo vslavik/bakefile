@@ -9,7 +9,7 @@ codedir = $(pkglibdir)
 codeempydir = $(codedir)/empy
 codeoptikdir = $(codedir)/optik
 
-SUBDIRS = @OPTIONAL_DOCS@
+SUBDIRS = doc
 
 bin_SCRIPTS = autoconf/bakefilize
 
@@ -126,8 +126,6 @@ EXTRA_DIST = \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
     makefile.vc
-
-dist-hook: doc
 
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
