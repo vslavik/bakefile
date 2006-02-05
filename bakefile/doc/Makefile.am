@@ -38,6 +38,13 @@ MANPAGES=man/bakefile.1 man/bakefilize.1
 ## Standard Automake targets
 ## -------------------------
 
+EXTRA_DIST=$(srcdir)/html/*.css $(srcdir)/*.docbook $(srcdir)/*.xsl \
+		   $(srcdir)/html/images/*.png html/*.html \
+		   $(MANPAGES) \
+		   $(DBFILES) $(FO_SS) $(HTML_SS) $(MAN_SS)
+
+man_MANS = $(MANPAGES)
+
 if BUILD_DOCS
 
 # Notice that we do not build the PDF version by default.  PDF
@@ -46,12 +53,6 @@ if BUILD_DOCS
 # default.  You can explicitly say "make pdf" when you're sure the
 # DocBook file's contents are correct.
 noinst_DATA=html/index.html
-
-man_MANS = $(MANPAGES)
-
-EXTRA_DIST=$(srcdir)/html/*.css $(srcdir)/*.docbook $(srcdir)/*.xsl \
-		   $(srcdir)/html/images/*.png html/*.html \
-		   $(MANPAGES)
 
 clean-local:
 	rm -rf tags *.fo html man *.log *.out *.pdf
