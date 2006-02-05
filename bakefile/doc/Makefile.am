@@ -38,6 +38,8 @@ MANPAGES=man/bakefile.1 man/bakefilize.1
 ## Standard Automake targets
 ## -------------------------
 
+if BUILD_DOCS
+
 # Notice that we do not build the PDF version by default.  PDF
 # generation takes longer than HTML generation, so to keep the code-
 # test-debug-rebuild cycle short, we generate only the HTML manual by
@@ -80,4 +82,6 @@ $(PDFFILE): $(DBFILES) $(FO_SS)
 	xsltproc --xinclude $(FO_SS) $(MAINDBFILE) > $(FOFILE)
 	$(FOP) -q -fo $(FOFILE) $(PDFFILE)
 
-.PHONY: pdf 
+.PHONY: pdf
+
+endif

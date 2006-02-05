@@ -23,12 +23,12 @@ BKL_PYTHON_DEVEL
 
 dnl Enable building of docs in maintainer mode:
 if test "x$USE_MAINTAINER_MODE" = "xyes"; then
-    OPTIONAL_DOCS="doc"
+    build_docs=yes
 else
-    OPTIONAL_DOCS=""
+    build_docs=no
 fi
 
-AC_SUBST([OPTIONAL_DOCS])
+AM_CONDITIONAL(BUILD_DOCS, test $build_docs = yes)
 
 
 AC_OUTPUT([
