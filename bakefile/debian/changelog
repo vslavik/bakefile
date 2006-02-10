@@ -1,3 +1,22 @@
+bakefile (0.2.0) unstable; urgency=low
+
+  * watcom: more platforms (OS/2, DOS) support
+  * autoconf: support IBM xlC compiler on Mac OS X
+  * autoconf: dependencies support for DEC/Compaq/HP cxx compiler
+  * autoconf: dependencies support for HP aCC compiler
+  * autoconf: dependencies support for SGI MIPSpro compile
+  * autoconf: fixed shared libraries with gcc under AIX 5
+  * autoconf: added support for Intel C/C++ compiler and PCH for it
+  * win32 makefiles: fixed cleaning list of files
+  * many improvements to the documentation
+  * support for conditional installation of <subproject> targets
+  * added fileList() function
+  * dmars: don't pass pch file to resource compiler
+  * autoconf: added --disable-dependency-tracking
+  * added <echo> command
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Thu, 10 Feb 2006 03:01:23 +0100
+
 bakefile (0.1.9.1) unstable; urgency=low
 
   * msvc6prj: fixed handling of MSVC6PRJ_MERGED_TARGETS hack
