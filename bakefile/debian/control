@@ -10,7 +10,7 @@ Standards-Version: 3.6.1
 
 Package: bakefile
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, python2.2|python2.3|python2.4
 Recommends: python2.2-libxml2|python2.3-libxml2|python2.4-libxml2
 Description: cross-platform, cross-compiler native makefiles generator
  Bakefile is a cross-platform, cross-compiler native makefiles generator. It
