@@ -30,7 +30,6 @@ PDFFILE=$(BASENAME).pdf
 FO_SS=$(srcdir)/fo.xsl
 HTML_SS=$(srcdir)/html.xsl
 MAN_SS=$(srcdir)/manpage.xsl
-MANPAGE_MAIN=man/bakefile.1
 MANPAGES=man/bakefile.1 man/bakefilize.1
 
 
@@ -75,7 +74,7 @@ html/index.html: $(DBFILES) $(HTML_SS)
 	xmllint --xinclude --postvalid --noent --noout $(MAINDBFILE)
 	xsltproc --xinclude -o html/ $(HTML_SS) $(MAINDBFILE)
 
-$(MANPAGE_MAIN): $(DBFILES) $(MAN_SS)
+$(MANPAGES): $(DBFILES) $(MAN_SS)
 	@mkdir -p man
 	xsltproc --xinclude -o man/ $(MAN_SS) $(MAINDBFILE)
 
