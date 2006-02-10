@@ -27,8 +27,8 @@ Python installed in the same directory where they are!
 
 (Note: this does _not_ apply to downloaded tarballs, only to code fetched
 from SourceForge CVS.)
-Run autogen.sh script and then proceed as when building from tarball. In order
-to run autogen.sh successfully, you need the following packages: SWIG 1.3.x
+Run bootstrap script and then proceed as when building from tarball. In order
+to run bootstrap successfully, you need the following packages: SWIG 1.3.x
 (http://www.swig.org), Automake >= 1.6, Autoconf >= 2.53, libtool, libxslt
 (including xsltproc program) and DocBook XSL stylesheets (last two are needed
 only to build HTML documentation).
