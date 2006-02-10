@@ -25,7 +25,10 @@ else
 endif
 
 configure: configure.in
-	./autogen.sh
+	aclocal -I admin
+	libtoolize --automake -c -f
+	automake --foreign -a -c -f
+	autoconf
 
 config.status: configure
 	dh_testdir
