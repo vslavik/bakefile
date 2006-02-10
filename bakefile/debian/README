@@ -1,0 +1,5 @@
+To build a new Debian package of bakefile:
+
+1. update debian/changelog (copy from NEWS basically)
+2. rename the parent directory to bakefile-x.y.z
+3. do "debuild" or "dpkg-buildpackage -rfakeroot"
