@@ -255,6 +255,13 @@ def handleOption(e):
                 values[i] = values[i].strip()
         elif c.name == 'values-description':
             values_desc = evalConstExpr(e, c.value).split(',')
+
+    # if this is an option with listed values, then the default value
+    # which has been specified must be in the list of allowed values:
+    if default != None and values != None and default not in values:
+        raise ReaderError(e, "default value '%s' for option '%s' is not among allowed values (%s)" %
+                          (default, name, values))
+
     o = mk.Option(name, default, desc, values, values_desc)
     mk.addOption(o)
     

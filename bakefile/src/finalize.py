@@ -102,8 +102,10 @@ def finalEvaluation(outputVarsOnly=1):
                 mk.__resetUsageTracker(reset_coverage=0)
                 try:
                     new = mk.evalExpr(expr, target=target)
+                except errors.Error, err:
+                    raise errors.Error("failed to set variable '%s' to value '%s': %s" % (obj, expr, err))
                 except:
-                    raise errors.Error("Failed to set variable '%s' to value '%s'" % (obj, expr))
+                    raise errors.Error("failed to set variable '%s' to value '%s'" % (obj, expr))
                 if expr != new:
                     if dict == None: obj.value = new
                     else: dict[obj] = new

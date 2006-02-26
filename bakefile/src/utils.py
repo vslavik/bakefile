@@ -52,6 +52,8 @@ def ifthenelse(cond, iftrue, iffalse):
 __refEval = 0
 def ref(var, target=None):
     if __refEval:
+        if target not in mk.targets:
+            raise errors.Error("target '%s' cannot be used in ref() since it doesn't exist" % target)
         if target==None or var not in mk.targets[target].vars:
             return mk.vars[var]
         else:
