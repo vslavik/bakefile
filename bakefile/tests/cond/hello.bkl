@@ -2,7 +2,7 @@
 <makefile>
 
     <option name="TOOLKIT">
-       <values>GTK MGL MAC OS2 MOTIF MSW</values>
+        <values>GTK,MGL,MAC,OS2,MOTIF,MSW</values>
     </option>
     
     <set var="FOO_1">
