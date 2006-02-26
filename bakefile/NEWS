@@ -1,4 +1,6 @@
+
 - better error messages in some cases (Francesco Montorsi)
+- show detailed backtraces on errors
 
 
 Version 0.2.0

@@ -559,6 +559,8 @@ def _processTargetNodes(node, target, tags, dict):
         dumpTgtNode(root, -1)
 
     def _processEntry(entry, target, dict):
+        errors.pushCtx("when in <%s> at %s" %
+                       (entry.node.name, entry.node.location()))
         if entry.type == TgtCmdNode.COMMAND:
             processCmd(entry.node, target, dict)
         elif entry.type == TgtCmdNode.IF:
@@ -581,6 +583,7 @@ def _processTargetNodes(node, target, tags, dict):
                 dict2 = dict
             for c in entry.children:
                 _processEntry(c, target, dict2)
+        errors.popCtx()
 
     _processEntry(root, target, dict)
 
@@ -643,7 +646,8 @@ def handleTarget(e):
     target = mk.Target(e.name, id, cond, rule.pseudo, category)
     mk.addTarget(target)
 
-    errors.pushCtx("when processing target at %s" % e.location())
+    errors.pushCtx("when processing target '%s' at %s" %
+                   (target.id, e.location()))
     _processTargetNodes(e, target, tags, None)
     errors.popCtx()
 
