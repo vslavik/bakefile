@@ -3,7 +3,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003-2005 Vaclav Slavik
+#  Copyright (C) 2003-2006 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -219,24 +219,41 @@ def filterFiles(bakefiles, formats):
 
 
 
-def updateTargets(jobs, pretend=0, keepGoing=0):
+def updateTargets(jobs, pretend=0, keepGoing=0, alwaysMakeAll=0):
     """Updates all targets. Run jobs instances of bakefile simultaneously"""
     if verbose:
-        print 'determining which makefiles are out of date...'
+        if alwaysMakeAll:
+            print 'pretending all makefiles are out of date...'
+        else:
+            print 'determining which makefiles are out of date...'
 
+    needUpdate = []
+    total = 0
+    
+    # load the state file with dependencies even when using --always-make
+    # so that running bakefile_gen --always-make doesn't invalidate all
+    # dependencies if it doesn't finish:
     try:
         dependencies.load('.bakefile_gen.state')
     except IOError: pass
 
-    needUpdate = []
-    total = 0
-    for f in files:
-        for fmt in files[f].formats:
-            total += 1
-            if dependencies.needsUpdate(os.path.abspath(f),
-                                        fmt,
-                                        cmdline=files[f].flags[fmt]):
+    if alwaysMakeAll:
+        # uncoditionally add all bakefiles to the list of bakefiles which
+        # need to be regenerated:
+        for f in files:
+            for fmt in files[f].formats:
+                total += 1
                 needUpdate.append((f,fmt))
+    else:
+        # load bakefile_gen state file and choose only bakefiles out of date:
+        for f in files:
+            for fmt in files[f].formats:
+                total += 1
+                if dependencies.needsUpdate(os.path.abspath(f),
+                                            fmt,
+                                            cmdline=files[f].flags[fmt]):
+                    needUpdate.append((f,fmt))
+    
     if verbose:
         print '    ...%i out of %i will be updated' % (len(needUpdate),total)
     
@@ -422,6 +439,10 @@ def run(args):
                       action="store_true", dest='keepGoing',
                       default=0,
                       help="keep going when some targets can't be made")
+    parser.add_option('-B', '--always-make',
+                      action="store_true", dest='alwaysMakeAll',
+                      default=0,
+                      help="unconditionally generate all makefiles even if they are up to date")
     parser.add_option('-v', '--verbose',
                       action="store_true", dest='verbose', default=0,
                       help='display detailed information')
@@ -457,7 +478,8 @@ def run(args):
         else:
             updateTargets(jobs=options.jobs,
                           pretend=options.pretend,
-                          keepGoing=options.keepGoing)
+                          keepGoing=options.keepGoing,
+                          alwaysMakeAll=options.alwaysMakeAll)
     except errors.ErrorBase, e:
         sys.stderr.write('[bakefile_gen] %s' % str(e))
         sys.exit(1)
