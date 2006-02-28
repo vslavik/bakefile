@@ -30,7 +30,7 @@ PDFFILE=$(BASENAME).pdf
 FO_SS=$(srcdir)/fo.xsl
 HTML_SS=$(srcdir)/html.xsl
 MAN_SS=$(srcdir)/manpage.xsl
-MANPAGES=man/bakefile.1 man/bakefilize.1
+MANPAGES=man/bakefile.1 man/bakefilize.1 man/bakefile_gen.1
 
 
 ## -------------------------

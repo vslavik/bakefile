@@ -2,6 +2,7 @@
 - better error messages in some cases (Francesco Montorsi)
 - show detailed backtraces on errors
 - added --always-make option to bakefile_gen (Francesco Montorsi)
+- added bakefile_gen manpage (Francesco Montorsi)
 
 
 Version 0.2.0
