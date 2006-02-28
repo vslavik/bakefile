@@ -671,6 +671,67 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
           </para>
       </section>
 
+      <!-- //////////////////        echo          ////////////////// -->
+
+
+
+
+      <section id="cmd.echo" xreflabel="echo">
+          <title>echo</title>
+          <para>
+            Prints the text in tag's value to output and,
+            unlike <xref linkend="cmd.error"/>,
+            continues processing. This command is useful for debugging
+            bakefiles (e.g. by printing variable values or adding progress
+            messages).
+          </para>
+          <para>
+            Note that if a variable is used in the text, it must evaluate to
+            a constant (i.e. <link linkend="concept.condvar">conditional
+            variables</link> or <link linkend="concept.option">options</link>
+            cannot be used).
+            <informaltable>
+              <tgroup cols='3'>
+                  <thead>
+                  <row>
+                      <entry>Parameter</entry>
+                      <entry>Description</entry>
+                      <entry>Default value</entry>
+                  </row>
+                  </thead>
+                  <tbody>
+                  <row>
+                      <entry role="paramname">level</entry>
+                      <entry>
+                        Can be <literal>warning</literal>
+                        (in which case the message is printed to
+                        stderr and prefixed with <literal>WARNING:</literal>),
+                        <literal>verbose</literal> (in which case the
+                        message is printed only when <xref
+                        linkend='man.bakefile'/> is run with
+                        <literal>--verbose</literal> argument) or
+                        <literal>normal</literal> (message is printed
+                        in any case to stdout).
+                      </entry>
+                      <entry role="default"><literal>normal</literal></entry>
+                  </row>
+                  </tbody>
+              </tgroup>
+            </informaltable>
+
+            Example:
+
+              <programlisting><![CDATA[
+<!-- Show the content of the variable X -->
+<set var="X">$(someComplexFunction())</set>
+<echo>The content of the X variable is: $(X)</echo>]]>
+</programlisting>
+          </para>
+      </section>
+
+
+
+
 
       
   
