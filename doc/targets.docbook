@@ -372,6 +372,18 @@
                   </para>
                 </entry>
               </row>
+              
+              <row id="tags.action.is-phony" xreflabel="is-phony">
+                <entry role="tagname">is-phony</entry>
+                <entry>
+                  <para>
+                    Marks the target as <emphasis>phony</emphasis>, i.e. not
+                    producing any file. This is useful e.g. for writing
+                    targets that upload files somewhere or that generate
+                    ctags.
+                  </para>
+                </entry>
+              </row>
             </tbody>
           </tgroup>
         </informaltable>
