@@ -24,6 +24,7 @@
         <uid type="symbian2">0x100039CE</uid>
         <uid type="symbian3">0x10005B91</uid>
         <define>SOMEMACRO</define>
+        <define>BUILD_AS_GUI</define>
         <sources>hello.cpp</sources>
         <win32-res>hello.rc</win32-res>
         <symbian-res>hello.rss</symbian-res>
