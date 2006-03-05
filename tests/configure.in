@@ -31,14 +31,18 @@ AC_OUTPUT([
            Makefile
            cond/Makefile
            cond_install/Makefile
+           datafiles/Makefile
+           debug/Makefile
            dll/Makefile
+           echo/Makefile
+           error/Makefile
+           filelist/Makefile
            gettext/Makefile
            hello/Makefile
            library/Makefile
            module/Makefile
+           paths/Makefile
            pch/Makefile
            regressions/Makefile
-           datafiles/Makefile
-           filelist/Makefile
            subproject/Makefile
          ])
