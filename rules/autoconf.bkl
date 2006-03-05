@@ -409,8 +409,19 @@
             $(RM) config.cache config.log config.status bk-deps bk-make-pch shared-ld-sh Makefile
         </command>
     </action>
-
     
+    <!-- the <dir> tag needs to be specified for any <subproject> so we
+         use it to add to "distclean" target the additional rm command -->
+    <define-tag name="dir" rules="subproject">
+        <set var="__subdir">$(nativePaths(value))</set>
+        <modify-target target="distclean">
+            <command>
+                (cd $(value) &amp;&amp; $(DOLLAR)(MAKE) distclean)
+            </command>
+        </modify-target>
+    </define-tag>
+
+
     <!-- =============================================================== -->
     <!--                       Generate output:                          -->
     <!-- =============================================================== -->

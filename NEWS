@@ -3,6 +3,7 @@
 - show detailed backtraces on errors
 - added --always-make option to bakefile_gen (Francesco Montorsi)
 - added bakefile_gen manpage (Francesco Montorsi)
+- autoconf: fixed make distclean for <subproject> targets
 
 
 Version 0.2.0
