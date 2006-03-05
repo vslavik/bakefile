@@ -19,6 +19,7 @@
         datafiles/datafiles.bkl
         filelist/filelist.bkl
         echo/echo.bkl
+        subproject/subproject.bkl
     </input>
     
     <add-formats>

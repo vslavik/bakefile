@@ -40,4 +40,5 @@ AC_OUTPUT([
            regressions/Makefile
            datafiles/Makefile
            filelist/Makefile
+           subproject/Makefile
          ])
