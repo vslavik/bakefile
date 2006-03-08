@@ -615,7 +615,16 @@
 							<entry role="tagname">include</entry>
 							<entry>
 								Add directory where the compiler should look for headers.
-								Calls <xref linkend="tag.res-include"/> with same value.
+                This corresponds to the <literal>-I</literal> switch used by
+                many compilers.
+                Calls <xref linkend="tag.res-include"/> with the same value.
+                Example:
+                <programlisting><![CDATA[
+<exe id="hello">
+  <sources>hello.c</sources>
+  <include>../include/foo</include>
+</exe>
+]]></programlisting>
 							</entry>
 							<entry role="availability">exe, dll, module, lib</entry>
 						</row>
