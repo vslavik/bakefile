@@ -377,10 +377,23 @@
                 <entry role="tagname">is-phony</entry>
                 <entry>
                   <para>
-                    Marks the target as <emphasis>phony</emphasis>, i.e. not
-                    producing any file. This is useful e.g. for writing
-                    targets that upload files somewhere or that generate
-                    ctags.
+                    Marks the target as <emphasis>phony</emphasis>.
+                    A phony target is target that doesn't produce a file,
+                    it's just a symbolic name for some commands to be
+                    executed. In other words, this target should not be
+                    considered by <literal>make</literal> when creating
+                    the file dependency graph. For an example of why this
+                    is useful, consider a
+                    <literal>tags</literal> target that runs the Unix
+                    <filename>ctags</filename> program. That
+                    program creates a file called <filename>tags</filename>,
+                    so after saying <computeroutput>make
+                    tags</computeroutput> once, <filename>make</filename>
+                    will always say that the tags target is up to date.
+                    By marking the target as phony, you disable the file
+                    dependency checking for it, so <computeroutput>make
+                    tags</computeroutput> always runs the
+                    <filename>ctags</filename> program.
                   </para>
                 </entry>
               </row>
