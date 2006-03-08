@@ -646,7 +646,7 @@
 							<entry>
 								Link against specified library installed in the system. Note
 								that this is <emphasis>not</emphasis> meant for linking in
-								libraries that were built by the same makefile, use
+								libraries that were built by the same makefile; use
 								<xref linkend="tag.library"/> for that. This command links
 								against a library installed in the system or provided by the
 								compiler and corresponds to the <literal>-l</literal> switch
@@ -658,18 +658,19 @@
   <sys-lib>z</sys-lib>
 </exe>
 ]]></programlisting>
-								Library name may be empty. Only one library may be specified
-								as argument, following usage is incorrect:
+								The library name may be empty. Only one library may be
+								given as the tag's argument; the following usage is
+								incorrect:
 						<programlisting><![CDATA[
 <exe id="png2bmp">
   <sources>png2bmp.c</sources>
   <sys-lib>png z</sys-lib> <!-- INCORRECT -->
 </exe>
 ]]></programlisting>
-								Note that the name of library in this tag is
-								<emphasis>not</emphasis> filename and must not include
-								paths; use <xref linkend="tag.lib-path"/> to specify
-								library search path.
+								Note that the name of the library in this tag is
+								<emphasis>not</emphasis> a file name and must not
+								include paths. Use <xref linkend="tag.lib-path"/> to
+								add a directory to the library search path.
 							</entry>
 							<entry role="availability">exe, dll, module</entry>
 						</row>
@@ -679,8 +680,27 @@
 						<row id="tag.lib-path" xreflabel="lib-path">
 							<entry role="tagname">lib-path</entry>
 							<entry>
-								Add directory where to look for
-								<link linkend="tag.sys-lib">system libraries</link>.
+								Add a directory to the search path used by the compiler
+								to find <link linkend="tag.sys-lib">system
+								libraries</link>. This corresponds to the
+								<literal>-L</literal> switch of Unix compilers.
+								Example:
+						<programlisting><![CDATA[
+<exe id="hello">
+  <sources>hello.c</sources>
+  <!-- note that hardcoding library paths like this is a bad
+       idea, it's done here only for the sake of simplicity;
+       in real bakefile, an <option> would be used -->
+  <lib-path>/usr/lib/mysql</lib-path>
+  <sys-lib>mysqlclient</sys-lib>
+</exe>
+]]></programlisting>
+								On a typical Unix system, this asks the linker to link
+								the <filename>hello</filename> program against
+								<filename>libmysqlclient.so</filename> and to search for
+								it in the directory <filename>/usr/lib/mysql</filename>
+								in addition to any other directories the linker is
+								configured to use.
 							</entry>
 							<entry role="availability">exe, dll, module</entry>
 						</row>
