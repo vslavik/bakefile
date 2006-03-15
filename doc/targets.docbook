@@ -378,7 +378,9 @@
                 <entry>
                   <para>
                     Marks the target as <emphasis>phony</emphasis>.
-                    A phony target is target that doesn't produce a file,
+                    A phony target is target whose name is not really
+                    the name of file produced by it, as is the case with
+                    "standard" targets. Instead,
                     it's just a symbolic name for some commands to be
                     executed. In other words, this target should not be
                     considered by <literal>make</literal> when creating
