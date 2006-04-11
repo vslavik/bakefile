@@ -5,6 +5,7 @@
 - added bakefile_gen manpage (Francesco Montorsi)
 - autoconf: fixed make distclean for <subproject> targets
 - more improvements to the documentation (Warren Young)
+- autoconf: respect the LIBS variable (Francesco Montorsi)
 
 
 Version 0.2.0

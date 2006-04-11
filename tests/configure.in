@@ -8,6 +8,10 @@ AC_PROG_CXX
 AC_PROG_CXXCPP
 
 
+# to test if the LIBS option is correctly substituted in Makefile.in files, we
+# do a fake check here using AC_CHECK_LIB([m], [sin]) which prepends '-lm' to
+# LIBS in its default action-if-found.
+AC_CHECK_LIB([m], [sin])
 
 # this is used to test if <subproject>s (and their 'install' and 'install-strip' targets)
 # are correctly handled when using conditional targets

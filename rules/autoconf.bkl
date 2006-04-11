@@ -76,6 +76,7 @@
     <option name="DLLPREFIX"/>
     <option name="DLLPREFIX_MODULE"/>
 
+    <option name="LIBS"/>
     <option name="LDFLAGS_GUI"/>   
     <set var="__FLAG_EXE_GUI">$(LDFLAGS_GUI)</set>
 
@@ -110,6 +111,8 @@
     <template id="__autoconf_baset">
         <set var="__pch_header"/>
         <set var="__pch_file"/>
+
+        <set var="__ldlibs" append="1">$(LIBS)</set>
     </template>
     <set var="__macexe_baset">__autoconf_baset</set>
     <set var="__dll_baset">__autoconf_baset</set>
