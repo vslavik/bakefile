@@ -39,7 +39,6 @@ AC_OUTPUT([
            debug/Makefile
            dll/Makefile
            echo/Makefile
-           error/Makefile
            filelist/Makefile
            gettext/Makefile
            hello/Makefile
