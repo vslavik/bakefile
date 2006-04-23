@@ -17,6 +17,7 @@
     <subproject id="dll" template="sub"/>
     <subproject id="gettext" template="sub"/>
     <subproject id="hello" template="sub"/>
+    <subproject id="includeonce" template="sub"/>
     <subproject id="library" template="sub"/>
     <subproject id="module" template="sub"/>
     <subproject id="paths" template="sub"/>

@@ -814,10 +814,11 @@ def handleUsing(e):
 def handleInclude(e):
     file = evalConstExpr(e, e.props['file'])
     canIgnore = 'ignore_missing' in e.props and e.props['ignore_missing'] == '1'
+    justOnce = 'once' in e.props and e.props['once'] == '1'
     lookup = [os.path.dirname(e.filename)] + config.searchPath
     errors.pushCtx("included from %s" % e.location())
     for dir in lookup:
-        if processFileIfExists(os.path.join(dir, file)):
+        if processFileIfExists(os.path.join(dir, file), justOnce):
             errors.popCtx()
             return
     if not canIgnore:
@@ -948,12 +949,21 @@ def __doProcess(file=None, strdata=None, xmldata=None):
     #except Exception, ex:
     #    raise ReaderError(e, ex)
 
-def processFile(filename):
+
+# the list of files (with absolute paths) already processed
+includedFiles = []
+
+def processFile(filename, onlyOnce=False):
     if not os.path.isfile(filename):
         raise ReaderError(None, "file '%s' doesn't exist" % filename)
+    filename = os.path.abspath(filename)
+    if onlyOnce and filename in includedFiles:
+        if config.verbose:
+            print "file %s already included, skipping..." % filename
+        return
+    includedFiles.append(filename)
     if config.verbose:
         print 'loading %s...' % filename
-    filename = os.path.abspath(filename)
     if config.track_deps:
         dependencies.addDependency(mk.vars['INPUT_FILE'], config.format,
                                    filename)
@@ -962,9 +972,9 @@ def processFile(filename):
         sys.path.append(newdir)
     __doProcess(file=filename)
 
-def processFileIfExists(filename):
+def processFileIfExists(filename, onlyOnce=False):
     if os.path.isfile(filename):
-        processFile(filename)
+        processFile(filename, onlyOnce)
         return 1
     else:
         return 0

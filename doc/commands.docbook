@@ -502,7 +502,7 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
         file in place of the
         <function>include</function> command.
         <programlisting><![CDATA[
-<include file="FILENAME" [ignore_missing="0|1"]/>
+<include file="FILENAME" [ignore_missing="0|1"] [once="0|1"]/>
 ]]></programlisting>
       </para>
       <variablelist>
@@ -525,6 +525,18 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
               <para>
                 If set to 1, it is not an error if the file can't be found. If
                 0, Bakefile will abort with an error if it can't find the file.
+              </para>
+              <para role="default">
+                Default value: 0
+              </para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>once</term>
+            <listitem>
+              <para>
+                If set to 1, then the file won't be included if it was already
+                included previously.
               </para>
               <para role="default">
                 Default value: 0

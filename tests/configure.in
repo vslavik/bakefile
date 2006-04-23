@@ -42,6 +42,7 @@ AC_OUTPUT([
            filelist/Makefile
            gettext/Makefile
            hello/Makefile
+           includeonce/Makefile
            library/Makefile
            module/Makefile
            paths/Makefile

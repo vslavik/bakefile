@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <!-- Removing the 'once' attribute below an error should be shown -->
+    <include file="included.bkl"/>
+    <include file="included.bkl" once="1"/>
+
+    <!-- see if include tag recognizes that the following is the same file
+         included above even if it is referenced using a different path -->
+    <include file="../includeonce/included.bkl" once="1"/>
+
+    <!-- now let's see if the following <include> really includes twice the
+         file (note that now once=0) -->
+    <unset var="__included"/>       <!-- clear included.bkl's flag -->
+    <include file="../includeonce/included.bkl" once="0"/>
+    <if cond="not isdefined('__included')">
+        <error>the 'once' attribute of include tags doesn't work!</error>
+    </if>
+</makefile>

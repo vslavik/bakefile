@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<makefile>
+    <if cond="isdefined('__included')">
+        <error>the 'once' attribute of include tags doesn't work!</error>
+    </if>
+    <set var="__included">yes</set>
+</makefile>
+
