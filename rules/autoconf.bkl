@@ -36,6 +36,7 @@
     <option name="INSTALL_PROGRAM"/>
     <option name="INSTALL_DATA"/>
     <option name="INSTALL_DIR"/>
+
     <option name="DEPS_TRACKING"><values>0,1</values></option>
     <option name="GCC_PCH"><values>0,1</values></option>
     <option name="ICC_PCH"><values>0,1</values></option>
@@ -217,6 +218,11 @@
                 $(LN_S) $(__linkname2) $(__linkname1)
             </if>
         </set>
+        <set var="__so_symlinks_uninst_cmd">
+            <if cond="USE_SOSYMLINKS=='1'">
+                $(RM) $(__linkname2) $(__linkname1)
+            </if>
+        </set>
         <__command>$(LF)$(__so_symlinks_cmd)</__command>
     
         <set var="__mac_instname">$(__linkname2)</set>
@@ -250,6 +256,9 @@
 
         <modify-target target="install_$(id)">
             <command>(cd $(DESTDIR)$(value) ; $(ref('__so_symlinks_inst_cmd',id)))</command>
+        </modify-target>
+        <modify-target target="uninstall_$(id)">
+            <command>(cd $(DESTDIR)$(value) ; $(ref('__so_symlinks_uninst_cmd',id)))</command>
         </modify-target>
     </define-tag>
     

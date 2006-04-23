@@ -998,7 +998,9 @@
 							<entry role="tagname">install-to</entry>
 							<entry>
 								If used, then the target is installed into directory
-								specified as tag's value by <command>make install</command>.
+								specified as tag's value by <command>make install</command>
+                (and uninstalled from there by the
+                <command>make uninstall</command> target).
 							</entry>
 							<entry role="availability">exe, dll, module, lib</entry>
 						</row>

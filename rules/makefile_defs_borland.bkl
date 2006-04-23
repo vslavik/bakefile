@@ -234,6 +234,9 @@
         <set var="__INSTALL_SUBPROJECT_CMD">
             $(__MAKE_SUBPROJECT_TEMPLATE.replace('@@@','install'))
         </set>
+        <set var="__UNINSTALL_SUBPROJECT_CMD">
+            $(__MAKE_SUBPROJECT_TEMPLATE.replace('@@@','uninstall'))
+        </set>
         <set var="__CLEAN_SUBPROJECT_CMD">
             $(__MAKE_SUBPROJECT_TEMPLATE.replace('@@@','clean'))
         </set>

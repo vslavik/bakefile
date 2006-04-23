@@ -20,12 +20,18 @@
     <define-rule name="__data-files-base">
         <template>
             <set var="__iprg">$(INSTALL_DATA)</set>
+            <set var="__uprg">$(UNINSTALL_DATA)</set>
             <set var="__srcdir">$(SRCDIR)</set>
             <set var="__files"/>
             <set var="__copy_cmd" eval="0">
                 <if cond="TOOLSET=='unix'">
                     $(INSTALL_DIR) $(__dstdir)
                     (cd $(__srcdir) ; $(__iprg) $(__files) $(__dstdir))
+                </if>
+            </set>
+            <set var="__remove_cmd" eval="0">
+                <if cond="TOOLSET=='unix'">
+                    $('(cd %s ; %s %s)' % (__dstdir, __uprg,  ' '.join(os.path.basename(x) for x in safeSplit(__files))))
                 </if>
             </set>
         </template>
@@ -45,6 +51,9 @@
             <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
                 <modify-target target="install">
                     <command>$(ref('__copy_cmd',id))</command>
+                </modify-target>
+                <modify-target target="uninstall">
+                    <command>$(ref('__remove_cmd',id))</command>
                 </modify-target>
             </if>
         </template>
@@ -77,6 +86,7 @@
     <define-rule name="data-files-tree" pseudo="1">
         <template>
             <set var="__iprg">$(INSTALL_DATA)</set>
+            <set var="__uprg">$(UNINSTALL_DATA)</set>
             <set var="__srcdir"/>
             <set var="__copy_cmd" eval="0">
                 <if cond="TOOLSET=='unix'">
@@ -89,9 +99,19 @@
                     done
                 </if>
             </set>
+            <set var="__remove_cmd" eval="0">
+                <if cond="TOOLSET=='unix'">
+                    for f in $(__files); do \
+                        $(__uprg) $(__dstdir)/$(DOLLAR)$(DOLLAR)f; \
+                    done
+                </if>
+            </set>
             <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
                 <modify-target target="install">
                     <command>$(ref('__copy_cmd',id))</command>
+                </modify-target>
+                <modify-target target="uninstall">
+                    <command>$(ref('__remove_cmd',id))</command>
                 </modify-target>
             </if>
         </template>

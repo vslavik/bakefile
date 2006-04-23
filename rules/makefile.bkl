@@ -517,6 +517,15 @@ makefiles (most notably GNU Make and Autoconf formats).
                     <command>$(ref('__INSTALL_SUBPROJECT_CMD',id))</command>
                     <dependency-of>install</dependency-of>
                 </modify-target>
+
+                <!-- do the same for uninstall_$(id) target -->
+                <add-target target="uninstall_$(id)"
+                            type="inst-action"
+                        cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
+                <modify-target target="uninstall_$(id)">
+                    <command>$(ref('__UNINSTALL_SUBPROJECT_CMD',id))</command>
+                    <dependency-of>uninstall</dependency-of>
+                </modify-target>
             </if>
         </define-tag>
     </define-rule>
@@ -574,8 +583,9 @@ makefiles (most notably GNU Make and Autoconf formats).
     </define-tag>
 
 
+
     <!-- =============================================================== -->
-    <!--                     "make install":                             -->
+    <!--               "make install" and "make uninstall":              -->
     <!-- =============================================================== -->
 
     <define-rule name="inst-action" extends="action">
@@ -593,9 +603,20 @@ makefiles (most notably GNU Make and Autoconf formats).
             <add-target target="install_$(id)"
                         type="inst-action"
                cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
+            <add-target target="uninstall_$(id)"
+                        type="inst-action"
+               cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
+
             <modify-target target="install_$(id)">
                 <command>$(INSTALL_DIR) $(DESTDIR)$(value)</command>
                 <dependency-of>install</dependency-of>
+            </modify-target>
+            <modify-target target="uninstall_$(id)">
+                <!-- we won't uninstall the $(DESTDIR)$(value) folder that we
+                     installed in the 'install_$(id)' target since it could
+                     really be dangerous: that folder could contain also other
+                     user-installed programs (think to /usr/local/bin !) -->
+                <dependency-of>uninstall</dependency-of>
             </modify-target>
         </if>
     </define-tag>
@@ -607,6 +628,11 @@ makefiles (most notably GNU Make and Autoconf formats).
                     $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
                 </command>
             </modify-target>
+            <modify-target target="uninstall_$(id)">
+                <command>
+                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(value)$(DIRSEP)$(ref('__targetname',id))
+                </command>
+            </modify-target>
         </define-tag>
 
         <define-tag name="install-to" rules="dll">
@@ -614,6 +640,12 @@ makefiles (most notably GNU Make and Autoconf formats).
                 <command>
                     $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(DESTDIR)$(value)
                     $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
+                </command>
+            </modify-target>
+            <modify-target target="uninstall_$(id)">
+                <command>
+                    $(UNINSTALL_DATA) $(DESTDIR)$(value)$(DIRSEP)$(ref('__linkname',id))
+                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(value)$(DIRSEP)$(ref('__targetname',id))
                 </command>
             </modify-target>
         </define-tag>
@@ -624,6 +656,11 @@ makefiles (most notably GNU Make and Autoconf formats).
                     $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
                 </command>
             </modify-target>
+            <modify-target target="uninstall_$(id)">
+                <command>
+                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(value)$(DIRSEP)$(ref('__targetname',id))
+                </command>
+            </modify-target>
         </define-tag>
 
         <define-tag name="install-to" rules="lib">
@@ -632,8 +669,14 @@ makefiles (most notably GNU Make and Autoconf formats).
                     $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
                 </command>
             </modify-target>
+            <modify-target target="uninstall_$(id)">
+                <command>
+                    $(UNINSTALL_DATA) $(DESTDIR)$(value)$(DIRSEP)$(ref('__targetname',id))
+                </command>
+            </modify-target>
         </define-tag>
     </if>
+
 
 
     <!-- =============================================================== -->

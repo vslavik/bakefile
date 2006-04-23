@@ -3,6 +3,8 @@
 
     <define-tag name="install-to" rules="gettext-catalogs">
         <set var="dstdir">$(DESTDIR)$(value)</set>
+
+        <!-- "make install" target -->
         <add-target target="$(id)_install" type="action" cond="target"/>
         <modify-target target="$(id)_install">
             <dependency-of>install</dependency-of>
@@ -16,6 +18,20 @@
                         $(INSTALL_DATA) $(__srcdir)/$(iter).mo $(dstdir)/$(iter)/LC_MESSAGES/$(catalog).mo ; \
                     fi ; \
                 done 
+            </command>
+        </modify-target>
+
+        <!-- "make uninstall" target -->
+        <add-target target="$(id)_uninstall" type="action" cond="target"/>
+        <modify-target target="$(id)_uninstall">
+            <dependency-of>uninstall</dependency-of>
+            <set var="iter">$(DOLLAR)$(DOLLAR)l</set> <!-- helper -->
+            <command>
+                for l in $(linguas) ; do \
+                    if test -f $(dstdir)/$(iter)/LC_MESSAGES/$(catalog).mo ; then \
+                        $(UNINSTALL_DATA) $(dstdir)/$(iter)/LC_MESSAGES/$(catalog).mo ; \
+                    fi ; \
+                done
             </command>
         </modify-target>
     </define-tag>

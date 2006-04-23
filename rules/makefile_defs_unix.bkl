@@ -26,12 +26,17 @@ makefiles (most notably GNU Make and Autoconf formats).
     <set var="DLLPREFIX_MODULE" overwrite="0">$(DLLPREFIX)</set>
     <set var="PIC_CFLAGS" overwrite="0">-fPIC -DPIC</set>
 
+   <set var="RM">rm -f</set>
+
     <set var="INSTALL_PROGRAM" overwrite="0">install -c</set>
     <set var="INSTALL_DATA" overwrite="0">$(INSTALL) -m 644</set>
     <set var="INSTALL_DIR" overwrite="0">$(INSTALL) -d</set>
 
+    <set var="UNINSTALL_PROGRAM" overwrite="0">$(RM)</set>
+    <set var="UNINSTALL_DATA" overwrite="0">$(RM)</set>
+    <set var="UNINSTALL_DIR" overwrite="0">$(RM) -r</set>
+
     <set var="AROPTIONS">rcu</set>
-    <set var="RM">rm -f</set>
 
     <set var="__DEFINE_ARG">-D</set>
     <set var="__INCLUDE_ARG">-I</set>
@@ -127,6 +132,9 @@ makefiles (most notably GNU Make and Autoconf formats).
         </set>
         <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
             (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) install)
+        </set>
+        <set var="__UNINSTALL_SUBPROJECT_CMD" eval="0">
+            (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) uninstall)
         </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
             (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) clean)

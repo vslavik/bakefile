@@ -23,6 +23,11 @@
             $(DOLLAR)(MAKE) /NOLOGO /F $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) install
             cd $(DOLLAR)(MAKEDIR)
         </set>
+        <set var="__UNINSTALL_SUBPROJECT_CMD" eval="0">
+            cd $(__subdir)
+            $(DOLLAR)(MAKE) /NOLOGO /F $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) uninstall
+            cd $(DOLLAR)(MAKEDIR)
+        </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
             cd $(__subdir)
             $(DOLLAR)(MAKE) /NOLOGO /F $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) clean

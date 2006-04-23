@@ -68,6 +68,9 @@ makefiles (most notably GNU Make and Autoconf formats).
         <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
             $(DOLLAR)(MAKE) -C $(__subdir) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) install
         </set>
+        <set var="__UNINSTALL_SUBPROJECT_CMD" eval="0">
+            $(DOLLAR)(MAKE) -C $(__subdir) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) uninstall
+        </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
             $(DOLLAR)(MAKE) -C $(__subdir) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) clean
         </set>

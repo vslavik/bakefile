@@ -22,11 +22,15 @@
     <set var="DLLPREFIX_MODULE"></set>
     <set var="PIC_CFLAGS"></set>
 
+    <set var="RM">-del</set>
+
     <set var="INSTALL_PROGRAM">copy /Y</set>
     <set var="INSTALL_DATA">$(INSTALL_PROGRAM)</set>
     <set var="INSTALL_DIR">mkdir</set>
 
-    <set var="RM">-del</set>
+    <set var="UNINSTALL_PROGRAM">$(RM)</set>
+    <set var="UNINSTALL_DATA">$(UNINSTALL_PROGRAM)</set>
+    <set var="UNINSTALL_DIR">deltree</set>      <!-- never really used directly by Bakefile -->
 
     <!-- for static libraries: -->
     <set var="LIB_PAGESIZE" overwrite="0">4096</set>
