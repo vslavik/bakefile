@@ -50,20 +50,28 @@ def ifthenelse(cond, iftrue, iffalse):
 
 
 __refEval = 0
-def ref(var, target=None):
+__refContexts = {}
+
+def ref(var, target=None, context=None):
     if __refEval:
         if target != None and target not in mk.targets:
-            raise errors.Error("target '%s' cannot be used in ref() since it doesn't exist" % target)
+            if context != None:
+                context = __refContexts[context]
+            raise errors.Error("target '%s' cannot be used in ref() since it doesn't exist" % target,
+                               context=context)
         if target==None or var not in mk.targets[target].vars:
             return mk.vars[var]
         else:
             return mk.targets[target].vars[var]
     else:
         if mk.__trackUsage: mk.__usageTracker.refs += 1
-        if target==None:
-            return "$(ref('%s'))" % var
+        if context == None:
+            context = len(__refContexts)
+            __refContexts[context] = errors.getCtx()
+        if target == None:
+            return "$(ref('%s',None,%i))" % (var, context)
         else:
-            return "$(ref('%s', '%s'))" % (var,target)
+            return "$(ref('%s','%s',%i))" % (var, target, context)
 
 deadTargets = []
 def isDeadTarget(target):

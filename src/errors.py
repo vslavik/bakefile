@@ -21,6 +21,7 @@
 #  Exceptions classes and errors handling code
 #
 
+import copy
 import xmlparser
 
 _readerContext = []
@@ -34,24 +35,29 @@ def pushCtx(desc):
 def popCtx():
     _readerContext.pop()
 
+def getCtx():
+    return copy.deepcopy(_readerContext)
+
 class ErrorBase(Exception):
-    def __init__(self, desc):
+    def __init__(self, desc, context=None):
+        if context == None: context = _readerContext
         self.desc = desc
+        self.context = copy.deepcopy(context)
     def __str__(self):
         s = ''
-        for ctx in range(len(_readerContext)-1,-1,-1):
-            s += "    %s\n" % _readerContext[ctx]
+        for ctx in range(len(self.context)-1,-1,-1):
+            s += "    %s\n" % self.context[ctx]
         return s
 
 class Error(ErrorBase):
-    def __init__(self, desc):
-        ErrorBase.__init__(self, desc)
+    def __init__(self, desc, context=None):
+        ErrorBase.__init__(self, desc, context)
     def __str__(self):
         return 'error: %s\n%s' % (self.desc, ErrorBase.__str__(self))
 
 class ReaderError(ErrorBase):
-    def __init__(self, el, desc):
-        ErrorBase.__init__(self, desc)
+    def __init__(self, el, desc, context=None):
+        ErrorBase.__init__(self, desc, context)
         self.element = el
     def __str__(self):
         s = ''
