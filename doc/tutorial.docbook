@@ -13,6 +13,19 @@
       the famous <emphasis>Hello, world</emphasis> program written
       in C and implemented in the <filename>hello.c</filename> file:
       <programlisting><![CDATA[
+#include <stdio.h>
+
+int main()
+{
+  printf("Hello, world!\n");
+  return 0;
+}
+]]></programlisting>
+    </para>
+    <para>
+      The bakefile needed to compile it,<filename>hello.bkl</filename>,
+      looks like this:
+      <programlisting><![CDATA[
 <?xml version="1.0"?>
 <makefile>
 
@@ -59,24 +72,31 @@
     </para>
     <para>
       Bakefile will also generate the <filename>Makefile.in</filename> files
-	  used by <ulink url="http://www.gnu.org/software/autoconf/">Autoconf</ulink>.
-	  These are templates for makefiles. Autoconf also requires
-      a <filename>configure.ac</filename> script (previously,
-	  <filename>configure.in</filename>), but Bakefile will not
-	  generate this for you. This script checks for platform
-      features necessary to build the program; see the autoconf
-	  manual for details.
+      used by 
+      <ulink url="http://www.gnu.org/software/autoconf/">Autoconf</ulink>:
     </para>
     <para>
-      When producing autoconf format output, Bakefile will also generate a file called
-      <filename>autoconf_inc.m4</filename> which defines macros needed
+      <prompt>$ </prompt>
+      <userinput>bakefile -f autoconf hello.bkl</userinput>
+    </para>
+    <para>
+  	  These are templates for makefiles. Autoconf also requires
+      a <filename>configure.ac</filename> script (previously,
+  	  <filename>configure.in</filename>), but Bakefile will not
+  	  generate this for you. This script checks for platform
+      features necessary to build the program; see the autoconf
+  	  manual for details.
+    </para>
+    <para>
+      When producing autoconf format output, Bakefile will also generate a file
+      called <filename>autoconf_inc.m4</filename> which defines macros needed
       by the generated Makefile.in files. To use this, call the
       <literal>AC_BAKEFILE</literal> macro within your
-	  <filename>configure.ac</filename> script.
-	</para>
-	<para>
-	  A minimal <filename>configure.ac</filename> script for our
-	  example program would look like this:
+	    <filename>configure.ac</filename> script.
+  	</para>
+  	<para>
+  	  A minimal <filename>configure.ac</filename> script for our
+  	  example program would look like this:
       <programlisting><![CDATA[
 AC_PREREQ(2.53)
 AC_INIT(aclocal.m4)
@@ -88,15 +108,15 @@ AC_OUTPUT([Makefile])
     </para>
     <para>
       Note the part that sets the <varname>DEBUG</varname> variable. Any
-	  options declared in your bakefile must be set to some default
-	  value before calling <literal>AC_BAKEFILE</literal>. The
-	  simple.bkl preset defines the <varname>DEBUG</varname> option,
-	  so we have to give it a default value here.
-	</para>
+	    options declared in your bakefile must be set to some default
+  	  value before calling <literal>AC_BAKEFILE</literal>. The
+  	  simple.bkl preset defines the <varname>DEBUG</varname> option,
+  	  so we have to give it a default value here.
+	  </para>
 
-	<para>
+  	<para>
       While the above code will work, there's a better way to handle the
-	  debug option:
+  	  debug option:
       <programlisting><![CDATA[
 AC_PREREQ(2.53)
 AC_INIT(aclocal.m4)
@@ -121,6 +141,18 @@ AC_BAKEFILE([m4_include(autoconf_inc.m4)])
 AC_OUTPUT([Makefile])
 ]]></programlisting>
     </para>
+
+    <para>
+      You are ready to generate Autoconf's <filename>configure</filename>
+      script now:
+    </para>
+    <para>
+      <prompt>$ </prompt>
+      <userinput>
+        bakefilize --copy &amp;&amp; aclocal &amp;&amp; autoconf
+      </userinput>
+    </para>
+
   </section>
 
 </chapter>
