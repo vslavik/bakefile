@@ -31,6 +31,11 @@ except ImportError:
 
 import formats
 
+def addIncludePaths(includes):
+    import config
+    for p in includes:
+        config.searchPath.append(os.path.normpath(p))
+
 class BakefileOptionParser(OptionParser):
     def __init__(self):
         OptionParser.__init__(self,
@@ -40,6 +45,10 @@ class BakefileOptionParser(OptionParser):
         if file is None:
             file = sys.stdout
         OptionParser.print_help(self, file)
+   
+        # show all available formats:
+        if self.values.includes != None:
+            addIncludePaths(self.values.includes)
         file.write('\n%s' % formats.showFormats())
 
 
@@ -97,8 +106,7 @@ def run(args):
         config.verbose = options.verbose
     
     if options.includes != None:
-        for p in options.includes:
-            config.searchPath.append(os.path.normpath(p))
+        addIncludePaths(options.includes)
     
     if options.xml_cache != None:
         try:
