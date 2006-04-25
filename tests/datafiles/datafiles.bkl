@@ -10,4 +10,11 @@
         <files>datafiles.bkl</files>
     </copy-files>
 
+    <!-- Test install/uninstall rules for files with a directory component -->
+    <data-files id="test">
+        <srcdir>$(SRCDIR)/..</srcdir>
+        <install-to>$(DATADIR)</install-to>
+        <files>datafiles/datafiles.bkl</files>
+    </data-files>
+
 </makefile>
