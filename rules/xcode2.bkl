@@ -12,6 +12,7 @@
     <set var="PLATFORM_MAC">1</set>
     <set var="PLATFORM_MACOSX">1</set>
     <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+    <set var="FORMAT_HAS_MAKE_INSTALL">0</set>
 
     <!-- =============================================================== -->
     <!--                       Compiler options:                         -->
