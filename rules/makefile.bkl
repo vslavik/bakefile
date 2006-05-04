@@ -159,6 +159,12 @@ makefiles (most notably GNU Make and Autoconf formats).
             </set>
             <set var="__deps" append="1">$(__objects_var)</set>
 
+            <set var="__headers"/>
+            <!-- access __headers as global make variable: -->
+            <set var="__headers_var">
+                $(createMakeVar(id, '__headers', 'HEADERS', hints='files'))
+            </set>
+
             <!-- it makes sense to make <objects-depend> use make var, too: -->
             <set var="__objects_deps"/>
             <set var="__objects_deps_var">
@@ -240,6 +246,10 @@ makefiles (most notably GNU Make and Autoconf formats).
                 $(sources2objects(value, id, OBJEXT))
             </set>
             <set var="__objects" append="1">$(__objtmp)</set>
+        </define-tag>
+
+        <define-tag name="headers">
+            <set var="__headers" append="1">$(value)</set>
         </define-tag>
 
         <define-tag name="library">
@@ -588,18 +598,19 @@ makefiles (most notably GNU Make and Autoconf formats).
     <!--               "make install" and "make uninstall":              -->
     <!-- =============================================================== -->
 
-    <define-rule name="inst-action" extends="action">
-        <template template="__phony"/>
-    </define-rule>
+    <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
 
-    <tag-info name="install-if" position="before:install-to"/>
+        <define-rule name="inst-action" extends="action">
+            <template template="__phony"/>
+        </define-rule>
 
-    <define-tag name="install-if" rules="exe,dll,lib,module">
-        <set var="__install_if_cond">$(value)</set>
-    </define-tag>
+        <tag-info name="install-if" position="before:install-to"/>
 
-    <define-tag name="install-to" rules="exe,dll,lib,module">
-        <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+        <define-tag name="install-if" rules="exe,dll,lib,module">
+            <set var="__install_if_cond">$(value)</set>
+        </define-tag>
+
+        <define-tag name="install-to" rules="exe,dll,lib,module">
             <add-target target="install_$(id)"
                         type="inst-action"
                cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
@@ -618,10 +629,9 @@ makefiles (most notably GNU Make and Autoconf formats).
                      user-installed programs (think to /usr/local/bin !) -->
                 <dependency-of>uninstall</dependency-of>
             </modify-target>
-        </if>
-    </define-tag>
+        </define-tag>
 
-    <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+
         <define-tag name="install-to" rules="exe">
             <modify-target target="install_$(id)">
                 <command>
@@ -675,6 +685,44 @@ makefiles (most notably GNU Make and Autoconf formats).
                 </command>
             </modify-target>
         </define-tag>
+
+        <define-tag name="install-headers-to" rules="dll,lib">
+            <!-- proceed only if the <headers/> tag was used somewhere in this target -->
+            <if cond="__headers!=''">
+                <add-target target="install_$(id)_headers"
+                            type="inst-action"
+                   cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
+                <add-target target="uninstall_$(id)_headers"
+                            type="inst-action"
+                   cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
+
+                <modify-target target="install_$(id)_headers">
+                    <if cond="TOOLSET=='unix'">
+                       <command>
+                           $(INSTALL_DIR) $(DESTDIR)$(value)
+                           for f in $(__headers_var); do \
+                               if test ! -d $(DESTDIR)$(value)/`dirname $(DOLLAR)$(DOLLAR)f` ; then \
+                                   $(INSTALL_DIR) $(DESTDIR)$(value)/`dirname $(DOLLAR)$(DOLLAR)f`; \
+                               fi; \
+                               $(INSTALL_DATA) $(SRCDIR)/$(DOLLAR)$(DOLLAR)f $(DESTDIR)$(value)/$(DOLLAR)$(DOLLAR)f; \
+                           done
+                       </command>
+                    </if>
+                    <dependency-of>install</dependency-of>
+                </modify-target>
+                <modify-target target="uninstall_$(id)_headers">
+                    <if cond="TOOLSET=='unix'">
+                       <command>
+                           for f in $(__headers_var); do \
+                               $(UNINSTALL_DATA) $(DESTDIR)$(value)/$(DOLLAR)$(DOLLAR)f; \
+                           done
+                        </command>
+                    </if>
+                    <dependency-of>uninstall</dependency-of>
+                </modify-target>
+            </if>
+        </define-tag>
+
     </if>
 
 

@@ -127,16 +127,6 @@
     </define-rule>
 
 
-    <!-- Convenience rule for C/C++ header files to be installed: -->
-
-    <define-rule name="headers" extends="data-files-tree" pseudo="1">
-        <template>
-            <srcdir>$(SRCDIR)</srcdir>
-            <install-to>$(INCLUDEDIR)</install-to>
-        </template>
-    </define-rule>
-
-
 
 
 

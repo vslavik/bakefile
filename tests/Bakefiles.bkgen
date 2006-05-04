@@ -10,6 +10,7 @@
         debug/debug.bkl
         dll/dll.bkl
         gettext/gettext.bkl
+        headers/headers.bkl
         hello/hello.bkl
         includeonce/includeonce.bkl
         library/library.bkl
@@ -34,6 +35,7 @@
     <del-formats files="pch/*.bkl">msevc4prj</del-formats>
     <del-formats files="debug/*.bkl">msevc4prj</del-formats>
     <del-formats files="paths/*.bkl">msevc4prj</del-formats>
+    <del-formats files="headers/*.bkl">msevc4prj</del-formats>
 
     <!-- DigitalMars' make can't handle conditions: -->
     <del-formats files="cond*/*.bkl">dmars</del-formats>

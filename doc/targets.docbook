@@ -547,6 +547,21 @@
 							<entry role="availability">all</entry>
 						</row>
 
+						<row id="tag.headers" xreflabel="headers">
+							<entry role="tagname">headers</entry>
+							<entry>
+                Specify (C/C++) header files used by the target.
+								<programlisting><![CDATA[
+<exe id="app">
+  <headers>app.h</headers>
+  <headers>utils.h additionalheader.h</headers>
+  <sources>app.c</sources>
+</exe>
+]]></programlisting>
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+
 
 						<row id="tag.depends-on-file" xreflabel="depends-on-file">
 							<entry role="tagname">depends-on-file</entry>
@@ -1001,10 +1016,24 @@
 								specified as tag's value by <command>make install</command>
                 (and uninstalled from there by the
                 <command>make uninstall</command> target).
+                Note that this tag automatically enable header installation
+                to the <xref linkend="var.INCLUDEDIR"/> directory. See
+                <xref linkend="tag.install-headers-to"/> tag.
 							</entry>
 							<entry role="availability">exe, dll, module, lib</entry>
 						</row>
-						
+
+            <row id="tag.install-headers-to" xreflabel="install-headers-to">
+                <entry role="tagname">install-headers-to</entry>
+                <entry>
+                    If used, then the headers (see <xref linkend="tag.headers"/> tag)
+                    of the target are installed into the directory
+                    specified as tag's value by <command>make install</command>
+                    (and uninstalled from there by the
+                    <command>make uninstall</command> target).
+                </entry>
+                <entry role="availability">exe, dll, module, lib</entry>
+            </row>
 						
 						<row id="tag.install-if" xreflabel="install-if">
 							<entry role="tagname">install-if</entry>

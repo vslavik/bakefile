@@ -28,6 +28,11 @@ else
 fi
 
 
+# in order to be able to correctly test the 'cond_install' and 'headers' test programs,
+# we need to define the following:
+BUILD_BOTH=1
+DO_INSTALL=1
+
 
 AC_BAKEFILE([m4_include(autoconf_inc.m4)])
 
@@ -41,6 +46,7 @@ AC_OUTPUT([
            echo/Makefile
            filelist/Makefile
            gettext/Makefile
+           headers/Makefile
            hello/Makefile
            includeonce/Makefile
            library/Makefile

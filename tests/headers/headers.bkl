@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <if cond="FORMAT!='dmars'">
+        <option name="DO_INSTALL">
+            <values>0,1</values>
+        </option>
+
+        <option name="BUILD_BOTH">
+            <values>0,1</values>
+        </option>
+    </if>
+    <if cond="FORMAT=='dmars'">
+        <set var="DO_INSTALL">1</set>
+        <set var="BUILD_BOTH">1</set>
+    </if>
+
+    <!-- simple test without any header -->
+    <lib id="testlib">
+
+        <sources>hello.c</sources>
+        <install-to>$(LIBDIR)</install-to>
+
+        <!-- this will be ignored since no headers have been defined for
+             this target -->
+        <install-headers-to>somefolder</install-headers-to>
+    </lib>
+
+    <lib id="testlib2" cond="BUILD_BOTH=='1'">
+        <headers>hello.h test/hello.h</headers>
+        <sources>hello.c</sources>
+
+        <!-- no header install rule specified... -->
+        <install-to>$(BINDIR)</install-to>
+        <install-if>DO_INSTALL=='1'</install-if>
+    </lib>
+
+    <dll id="testdll">
+        <libname>myLibrary</libname>
+        <dllname>myDLL</dllname>
+        <so_version>1.0.3</so_version>
+
+        <headers>hello.h test/hello.h</headers>
+        <sources>hello.c</sources>
+        <install-to>$(BINDIR)</install-to>
+
+        <!-- change default installation folder for headers... -->
+        <install-headers-to>$(INCLUDEDIR)/myfolder</install-headers-to>
+    </dll>
+
+    <exe id="testexe">
+        <headers>hello.h test/hello.h</headers>
+        <sources>hello.c</sources>
+
+        <!-- headers are not installed for EXE targets... -->
+        <install-to>$(BINDIR)</install-to>
+    </exe>
+
+</makefile>

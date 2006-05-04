@@ -8,6 +8,9 @@
 - autoconf: respect the LIBS variable (Francesco Montorsi)
 - added "once" property to <include> command (Francesco Montorsi)
 - implemented uninstall target (Francesco Montorsi)
+- added <headers> tag to targets; <headers> rule was removed from
+  the 'datafiles' module and any code using it needs to be upgraded to
+  use per-target <headers> tag (Francesco Montorsi)
 
 
 Version 0.2.0

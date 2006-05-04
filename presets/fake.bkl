@@ -25,6 +25,7 @@ some unexpected way.
     
         <define-tag name="app-type"/>
         <define-tag name="sources"/>
+        <define-tag name="headers"/>
         <define-tag name="libname"/>
         <define-tag name="dllname"/>
         <define-tag name="dirname"/>
@@ -45,6 +46,7 @@ some unexpected way.
         <define-tag name="ldlibs"/>
         <define-tag name="define"/>
         <define-tag name="include"/>
+        <define-tag name="install-headers-to"/>
         <define-tag name="install-to"/>
         <define-tag name="install-if"/>
         <define-tag name="installable"/>

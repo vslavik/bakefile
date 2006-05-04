@@ -192,7 +192,7 @@
                 </row>
 
                 <row>
-                  <entry role="varname">INCLUDEDIR</entry>
+                  <entry id="var.INCLUDEDIR" xreflabel="INCLUDEDIR" role="varname">INCLUDEDIR</entry>
                   <entry>Directory where C and C++ headers are installed.</entry>
                   <entry role="default">$(PREFIX)/include on Unix</entry>
                 </row>
