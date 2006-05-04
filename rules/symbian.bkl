@@ -16,6 +16,7 @@
     <set var="DIRSEP">\</set>
     <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
     <set var="INSTALL_DATA"></set>
+    <set var="UNINSTALL_DATA"></set>
 
     <define-rule name="_any">
         <template>
