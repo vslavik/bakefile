@@ -45,7 +45,8 @@
         </para>
 
         <section id="pyfunc.isoption" xreflabel="isoption">
-            <title>isoption(name)</title>
+            <title>isoption</title>
+            <synopsis>isoption(<parameter>name</parameter>)</synopsis>
             <para>
             Returns <emphasis>true</emphasis> if the given string is the name
             of an option previously declared in the bakefile.
@@ -53,7 +54,8 @@
         </section>
 
         <section id="pyfunc.isdefined" xreflabel="isdefined">
-            <title>isdefined(name)</title>
+            <title>isdefined</title>
+            <synopsis>isdefined(<parameter>name</parameter>)</synopsis>
             <para>
             Returns <emphasis>true</emphasis> if the given string is the name
             of an option or a variable previously declared in the bakefile.
@@ -61,7 +63,8 @@
         </section>
 
         <section id="pyfunc.ifthenelse" xreflabel="ifthenelse">
-            <title>ifthenelse(cond, iftrue, iffalse)</title>
+            <title>ifthenelse</title>
+            <synopsis>ifthenelse(<parameter>cond</parameter>, <parameter>iftrue</parameter>, <parameter>iffalse</parameter>)</synopsis>
             <para>
             Allows to write if-then-else constructs inside bakefiles. The
             arguments are respectively the <emphasis>if condition</emphasis>
@@ -72,16 +75,18 @@
         </section>
 
         <section id="pyfunc.ref" xreflabel="ref">
-            <title>ref(var, target=None)</title>
+            <title>ref</title>
+            <synopsis>ref(<parameter>var</parameter>, <parameter>target=None</parameter>)</synopsis>
             <para>
-            Creates a reference to the given <emphasis>var</emphasis> variable
+            Creates a reference to the given <parameter>var</parameter> variable
             which will be evaluated only in the final stage of bakefile
             processing.
             </para>
         </section>
 
         <section id="pyfunc.isDeadTarget" xreflabel="isDeadTarget">
-            <title>isDeadTarget(target)</title>
+            <title>isDeadTarget</title>
+            <synopsis>isDeadTarget(<parameter>target</parameter>)</synopsis>
             <para>
             Returns <emphasis>true</emphasis> if the given string is the name
             of a conditional target whose condition is never met.
@@ -89,11 +94,12 @@
         </section>
 
         <section id="pyfunc.substituteFromDict" xreflabel="substituteFromDict">
-            <title>substituteFromDict(var, dict, desc=None)</title>
+            <title>substituteFromDict</title>
+            <synopsis>substituteFromDict(<parameter>var</parameter>, <parameter>dict</parameter>, <parameter>desc=None</parameter>)</synopsis>
             <para>
             Returns the <emphasis>value</emphasis> of the dictionary entry
             whose <emphasis>key</emphasis> matches the value of the variable
-            or option named <emphasis>var</emphasis>.
+            or option named <parameter>var</parameter>.
             E.g.
             <programlisting><![CDATA[
 <set var="A">
@@ -110,7 +116,8 @@
         </section>
 
         <section id="pyfunc.nativePaths" xreflabel="nativePaths">
-            <title>nativePaths(filenames)</title>
+            <title>nativePaths</title>
+            <synopsis>nativePaths(<parameter>filenames</parameter>)</synopsis>
             <para>
             Returns the given string with the <literal>/</literal> characters
             substituted by the content of the <xref linkend="var.DIRSEP"/>
@@ -119,19 +126,21 @@
         </section>
 
         <section id="pyfunc.addPrefixIfNotEmpty" xreflabel="addPrefixIfNotEmpty">
-            <title>addPrefixIfNotEmpty(prefix, value)</title>
+            <title>addPrefixIfNotEmpty</title>
+            <synopsis>addPrefixIfNotEmpty(<parameter>prefix</parameter>, <parameter>value</parameter>)</synopsis>
             <para>
-            Returns the <emphasis>value</emphasis> string prefixed with
-            <emphasis>prefix</emphasis>, unless <emphasis>value</emphasis> is
+            Returns the <parameter>value</parameter> string prefixed with
+            <parameter>prefix</parameter>, unless <parameter>value</parameter> is
             empty.
             </para>
         </section>
 
         <section id="pyfunc.addPrefixToList" xreflabel="addPrefixToList">
-            <title>addPrefixToList(prefix, value)</title>
+            <title>addPrefixToList</title>
+            <synopsis>addPrefixToList(<parameter>prefix</parameter>, <parameter>value</parameter>)</synopsis>
             <para>
-            Adds <emphasis>prefix</emphasis> to every item in
-            <emphasis>value</emphasis> interpreted as whitespace-separated
+            Adds <parameter>prefix</parameter> to every item in
+            <parameter>value</parameter> interpreted as whitespace-separated
             list.
             E.g.
             <programlisting><![CDATA[
@@ -144,7 +153,8 @@
         </section>
 
         <section id="pyfunc.safeSplit" xreflabel="safeSplit">
-            <title>safeSplit(str)</title>
+            <title>safeSplit</title>
+            <synopsis>safeSplit(<parameter>str</parameter>)</synopsis>
             <para>
             Splits the given string like the built-in split() Python function
             but, unlike the Python <literal>split()</literal> function,
@@ -164,11 +174,12 @@
         </section>
 
         <section id="pyfunc.fileList" xreflabel="fileList">
-            <title>fileList(path)</title>
+            <title>fileList</title>
+            <synopsis>fileList(<parameter>path</parameter>)</synopsis>
             <para>
                 Returns a string containing a space-separed list of all files
-                found in the given <emphasis>path</emphasis>.
-                <emphasis>path</emphasis> typically is a relative path
+                found in the given <parameter>path</parameter>.
+                <parameter>path</parameter> typically is a relative path
                 (absolute paths should be avoided in well-designed bakefiles)
                 with a mask used to match only wanted files.
             </para>

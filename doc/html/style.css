@@ -179,3 +179,23 @@ td.varname, td.tagname, td.paramname
 {
   font-weight: bold;
 }
+
+
+/***************************************************************************
+                                Python functions:
+ ***************************************************************************/
+
+.synopsis
+{
+    font-weight: bold;
+    background: #eeeeee;
+    margin-left: 1%;
+    padding-left: 1ex;
+}
+
+.parameter
+{
+    font-weight: normal;
+    font-style: italic;
+    color: #005aa0;
+}
