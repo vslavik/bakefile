@@ -44,5 +44,5 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/bakefile/*
 %dir %{_libdir}/bakefile
 %{_libdir}/bakefile/*
-%{_datadir}/aclocal/bakefile.m4
+%{_datadir}/aclocal/*.m4
 %{_mandir}/*/*
