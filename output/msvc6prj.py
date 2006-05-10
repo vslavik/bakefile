@@ -385,7 +385,7 @@ Intermediate_Dir "%s\\%s"
             for f in cbf.split():
                 filesWithCustomBuild[f] = {}
         for f in filesWithCustomBuild:
-            fname = f.replace('.','_').replace('\\','_')
+            fname = f.replace('.','_').replace('\\','_').replace('-','_')
             for c in sortedKeys(t.configs):
                 filesWithCustomBuild[f][c] = \
                        eval ('t.configs[c]._custom_build_%s' % fname)

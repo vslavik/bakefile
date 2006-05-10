@@ -11,6 +11,8 @@
 - added <headers> tag to targets; <headers> rule was removed from
   the 'datafiles' module and any code using it needs to be upgraded to
   use per-target <headers> tag (Francesco Montorsi)
+- msvc6prj: fixed _custom_build_files to work with filenames
+  containing '-' (Dmitry Kononov)
 
 
 Version 0.2.0

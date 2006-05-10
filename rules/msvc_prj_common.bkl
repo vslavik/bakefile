@@ -77,7 +77,7 @@
             _custom_build_files variable lists all source files that have
             associated custom build with them. For every such file, there is
             _custom_build_FILENAME variable with build commands (FILENAME
-            is file name with ./\ replaced with _):
+            is file name with ./\- replaced with _):
             -->
             <set var="_custom_build_files"/>
 
