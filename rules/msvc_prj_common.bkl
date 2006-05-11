@@ -230,7 +230,7 @@
         </template>
         <define-tag name="exename">
             <set var="_name">$(value)</set>
-            <set var="_targetname">$(value).exe</set>
+            <set var="_targetname">$(value)$(EXEEXT)</set>
         </define-tag>
         <define-tag name="app-type">
             <set var="_type">
@@ -265,7 +265,7 @@
         </template>
         <define-tag name="dllname">
             <set var="_name">$(value)</set>
-            <set var="_targetname">$(value).dll</set>
+            <set var="_targetname">$(value)$(DLLEXT)</set>
         </define-tag>
     </define-rule>
     

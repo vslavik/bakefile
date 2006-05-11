@@ -13,6 +13,7 @@
   use per-target <headers> tag (Francesco Montorsi)
 - msvc6prj: fixed _custom_build_files to work with filenames
   containing '-' (Dmitry Kononov)
+- msvc*: respect DLLEXT and EXEEXT variables (Dmitry Kononov)
 
 
 Version 0.2.0
