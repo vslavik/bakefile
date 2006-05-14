@@ -122,7 +122,8 @@ def run(args):
         parser.error('you must specify output format (use -f option)')
     config.format = options.format
     if not formats.isValidFormat(config.format):
-        parser.error('invalid format\n\n' + formats.showFormats())
+        parser.error("unknown format '%s'\n\n" % config.format +
+                     formats.showFormats())
 
     if options.deps_file != None:
         config.track_deps = 1
