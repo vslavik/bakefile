@@ -120,7 +120,7 @@ EXTRA_DIST = \
     README THANKS \
     bootstrap chversion.sh \
 	$(srcdir)/admin/*.m4 \
-	bakefile.spec bakefile.iss bakefile.vim \
+	bakefile.spec bakefile.iss bakefile.vim bash_completion \
     src/optik/README.txt autoconf output rules presets tests \
     src/empy/README src/empy/COPYING \
 	src/bottlenecks.i \

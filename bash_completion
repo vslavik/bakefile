@@ -1,0 +1,85 @@
+# Bakefile completion
+# 
+# $Id$
+#
+
+_bakefile_list_formats() {
+    local all_formats
+    all_formats=`bakefile --help | awk '/available formats are/,EOF {split($0,a);print a[1]}' | tail -n +2`
+    COMPREPLY=( $(compgen -W "$all_formats" -- $1 ) )
+}
+
+_bakefile() {
+    local cur prev all_cmds
+    cur=${COMP_WORDS[COMP_CWORD]}
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    COMPREPLY=()
+
+    case "$prev" in
+        -f|--format)
+            _bakefile_list_formats $cur
+            ;;
+        -D)
+            # allow anything here
+            ;;
+        *)
+            case "$cur" in
+                -*) 
+                    all_cmds="--version -h --help -f --format -o --output -D \
+                              -I -v --verbose -q --quiet --output-deps \
+                              --output-changes --xml-cache --debug --dump"
+                    COMPREPLY=( $(compgen -W "$all_cmds" -- $cur ) )
+                    ;;
+                *)
+                    _filedir 'bkl'
+                    ;;
+                    
+            esac
+            ;;
+    esac
+
+    return 0
+}
+
+complete -F _bakefile -o filenames bakefile
+
+
+_bakefile_gen() {
+    local cur prev all_cmds
+    cur=${COMP_WORDS[COMP_CWORD]}
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    COMPREPLY=()
+
+    case "$prev" in
+        -f|--formats)
+            _bakefile_list_formats $cur
+            ;;
+        -b|--bakefiles)
+            _filedir 'bkl'
+            ;;
+        -j|--jobs|-D)
+            # allow anything here
+            ;;
+        *)
+            case "$cur" in
+                -*) 
+                    all_cmds="-h --help -f --formats -b --bakefiles \
+                              -D -c --clean -j --jobs -p --pretend \
+                              -k --keep-going -B --always-make \
+                              -v --verbose -V --very-verbose"
+                    COMPREPLY=( $(compgen -W "$all_cmds" -- $cur ) )
+                    ;;
+                *)
+                    # nothing here - bakefile_gen doesn't take filenames
+                    ;;
+                    
+            esac
+            ;;
+    esac
+
+    return 0
+}
+
+complete -F _bakefile_gen bakefile_gen
