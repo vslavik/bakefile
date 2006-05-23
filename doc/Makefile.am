@@ -54,7 +54,7 @@ if BUILD_DOCS
 noinst_DATA=html/index.html
 
 clean-local:
-	rm -rf tags *.fo html man *.log *.out *.pdf
+	rm -rf tags *.fo html/*.html man *.log *.out *.pdf
 
 
 ## ---------------------------
