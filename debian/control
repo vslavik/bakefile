@@ -2,7 +2,7 @@ Source: bakefile
 Section: devel
 Priority: optional
 Maintainer: Vadim Zeitlin <vadim@wxwindows.org>
-Build-Depends: debhelper (>= 4.0.0), autoconf, automake1.7|automake1.8|automake1.9,
+Build-Depends: debhelper (>= 4.1.67), autoconf, automake1.7|automake1.8|automake1.9,
  python2.2|python2.3|python2.4, python2.2-dev|python2.3-dev|python2.4-dev,
  libxml2-utils, xsltproc, swig
 Build-Conflicts: automake1.4
@@ -10,8 +10,8 @@ Standards-Version: 3.6.1
 
 Package: bakefile
 Architecture: any
-Depends: ${shlibs:Depends}, python2.2|python2.3|python2.4
-Recommends: python2.2-libxml2|python2.3-libxml2|python2.4-libxml2
+Depends: ${shlibs:Depends}, ${python:Depends}
+Recommends: ${python:Depends}-libxml2
 Description: cross-platform, cross-compiler native makefiles generator
  Bakefile is a cross-platform, cross-compiler native makefiles generator. It
  takes compiler-independent description of build tasks as input and generates
