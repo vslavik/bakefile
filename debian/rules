@@ -69,6 +69,8 @@ install: build
 	mkdir -p $(CURDIR)/debian/bakefile/usr/share/doc/bakefile/html/images
 	cp doc/html/*.{html,css} $(CURDIR)/debian/bakefile/usr/share/doc/bakefile/html
 	cp doc/html/images/*.png $(CURDIR)/debian/bakefile/usr/share/doc/bakefile/html/images
+	mkdir -p $(CURDIR)/debian/bakefile/etc/bash_completion.d
+	cp bash_completion $(CURDIR)/debian/bakefile/etc/bash_completion.d/bakefile
 
 
 # Build architecture-independent files here.
