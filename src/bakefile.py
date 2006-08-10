@@ -113,9 +113,14 @@ def run(args):
             import xmlparser, pickle, shelve
             xmlparser.cache = shelve.open(options.xml_cache,
                                           protocol=pickle.HIGHEST_PROTOCOL)
-        except ImportError: pass
-        except AttributeError: pass # python < 2.3 didn't have HIGHEST_PROTOCOL
-        except KeyError: pass # python < 2.3 didn't have protocol argument
+        except ImportError:
+            sys.stderr.write("Warning: disabling XML cache because it's not supported by this version of Python\n")
+        except AttributeError: # python < 2.3 didn't have HIGHEST_PROTOCOL
+            sys.stderr.write("Warning: disabling XML cache because it's not supported by Python 2.2\n")
+        except KeyError: # python < 2.3 didn't have protocol argument
+            sys.stderr.write("Warning: disabling XML cache because it's not supported by Python 2.2\n")
+        except Exception, e:
+            sys.stderr.write("Warning: disabling XML cache because an error occured while loading %s:\n         %s\n" % (options.xml_cache, e))
 
     formats.loadFormats()
     if options.format == None:
