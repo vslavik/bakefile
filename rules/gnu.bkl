@@ -23,6 +23,12 @@
     </option>
 
     <set var="PREFIX">$(prefix)</set>
+
+    <option name="DESTDIR">
+        <description>
+            Destination root (/ is used if empty)
+        </description>
+    </option>
     
     <include file="makefile.bkl"/>
     

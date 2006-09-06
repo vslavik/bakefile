@@ -15,6 +15,7 @@
   containing '-' (Dmitry Kononov)
 - msvc*: respect DLLEXT and EXEEXT variables (Dmitry Kononov)
 - added bash completion script
+- gnu: support DESTDIR variable
 
 
 Version 0.2.0
