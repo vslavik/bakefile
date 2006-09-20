@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *  $Id$
- *  
+ *
  *  Assorted routines that were too slow when implemented in Python are
  *  implemented in C here for better performance.
  *
@@ -176,7 +176,7 @@ const char *doEvalExpr(const char *expr,
                 i++;
                 expr++;
             }
-            
+
             text_begin = expr + 1;
         }
         i++;
@@ -222,7 +222,7 @@ const char *doEvalExpr(const char *expr,
 /*
 
 Original Python code for reference:
-   
+
 def __doEvalExpr(e, varCallb, textCallb, moreArgs,
                  use_options=1, target=None, add_dict=None):
     if textCallb == None:
@@ -276,7 +276,7 @@ def __doEvalExpr(e, varCallb, textCallb, moreArgs,
 
 /* NB: see bottlenecks.i for high-level explanation. The way the hijacking
        is implemented is by replacing PyDictObject::ma_lookup pointer with
-       out function. This pointer is used to do *all* lookups in PyDictObject
+       our function. This pointer is used to do *all* lookups in PyDictObject
        (i.e. not only PyDict_GetItem) so this can *badly* screw things up
        if we're not extremely careful in what we're doing! */
 
@@ -298,13 +298,13 @@ typedef struct _ProxyDictData
 } ProxyDictData;
 
 static ProxyDictData *gs_proxyDict = NULL;
-    
+
 static PyDictEntry *proxydict_ma_lookup(PyDictObject *mp,
                                         PyObject *key,
                                         long hash)
 {
     ProxyDictData *data;
-    
+
     for (data = gs_proxyDict; data; data = data->next)
     {
         if ((PyDictObject*)data->dict == mp)
@@ -357,7 +357,7 @@ void proxydict_release(void *d)
             }
         }
     }
-    
+
     free(data);
 }
 
@@ -387,7 +387,7 @@ void proxydict_add(PyObject *data, PyObject *dict)
     ProxySlave *slave;
     PyDictObject *asdict = (PyDictObject*)dict;
     ProxyDictData *d = (ProxyDictData*)PyCObject_AsVoidPtr(data);
-    
+
     slave = malloc(sizeof(ProxySlave));
     slave->dict = asdict;
     slave->next = d->slaves;
