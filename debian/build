@@ -1,0 +1,61 @@
+#!/bin/sh
+
+#
+#  This file is part of Bakefile (http://bakefile.sourceforge.net) and can be
+#  used to create the Debian package. Please update debian/changelog before
+#  running it and ensure that the working copy is not modified.
+#
+#  Copyright (C) 2006 Vadim Zeitlin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License version 2 as
+#  published by the Free Software Foundation.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#  $Id: bakefile.py 906 2006-08-10 08:11:52Z vaclavslavik $
+#
+
+case `pwd` in
+    */bakefile)
+        ;;
+
+    *)
+        echo "Please run this script from bakefile root directory."
+        exit 1
+        ;;
+esac
+
+eval `grep '^BAKEFILE_VERSION =' src/bakefile.py | tr -d ' '`
+if [ -z "$BAKEFILE_VERSION" ]; then
+    echo "Couldn't get BAKEFILE_VERSION."
+    exit 1
+fi
+
+REVISION=`svnversion`
+echo $REVISION | grep -q '[^0-9]'
+if [ $? == 0 ]; then
+    echo "Current source tree is modified or not up to date."
+    exit 2
+fi
+
+FULL_VERSION="$BAKEFILE_VERSION.$REVISION"
+
+cd ..
+mv bakefile bakefile-$FULL_VERSION
+cd bakefile-$FULL_VERSION
+
+dpkg-buildpackage -rfakeroot
+
+cd ..
+mv bakefile-$FULL_VERSION bakefile
+cd bakefile
+
+exit 0
