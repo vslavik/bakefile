@@ -367,7 +367,7 @@ def handleModifyTarget(e, dict=None):
     _processTargetNodes(e, target, tags, dict)
 
 
-COMMANDS = ['set', 'modify-target', 'add-target', 'error']
+COMMANDS = ['set', 'modify-target', 'add-target', 'error', 'echo']
 
 class TgtCmdNode:
     # node types:
@@ -527,6 +527,8 @@ def _processTargetNodes(node, target, tags, dict):
             handleTarget(e2)
         elif e.name == 'error':
             handleError(e)
+        elif e.name == 'echo':
+            handleEcho(e)
         else:
             return 0
         return 1
