@@ -253,4 +253,19 @@
         </define-tag>
     </define-rule>
 
+
+    <!-- FIXME: DEPRECATED
+         deprecated stuff (will be removed in future versions): -->
+
+    <!-- Convenience rule for C/C++ header files to be installed: -->
+    <define-rule name="headers" extends="data-files-tree" pseudo="1"> 	 
+        <template> 	 
+            <echo level="warning">
+                &lt;headers&gt; rule is deprecated and will be removed, use per-target &lt;headers&gt; tag instead.
+            </echo>
+            <srcdir>$(SRCDIR)</srcdir> 	 
+            <install-to>$(INCLUDEDIR)</install-to> 	 
+        </template> 	 
+    </define-rule>
+
 </makefile>
