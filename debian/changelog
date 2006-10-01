@@ -1,3 +1,8 @@
+bakefile (0.2.0.911) unstable; urgency=low
+  * gnu: support DESTDIR variable
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Mon,  1 Oct 2006 21:59:03 +0200
+
 bakefile (0.2.0.1) unstable; urgency=low
 
   * better error messages in some cases
