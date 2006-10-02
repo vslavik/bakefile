@@ -600,7 +600,10 @@ AC_DEFUN([AC_BAKEFILE_CHECK_BASIC_STUFF],
             dnl use it there
             INSTALL_DIR="mkdir -p"
             ;;
-        *)  INSTALL_DIR="$INSTALL -d"
+        * )
+            dnl we must refer to makefile's $(INSTALL) variable and not
+            dnl current value of shell variable, hence the single quoting:
+            INSTALL_DIR='$(INSTALL) -d'
             ;;
     esac
     AC_SUBST(INSTALL_DIR)
