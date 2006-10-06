@@ -939,9 +939,9 @@ def __doProcess(file=None, strdata=None, xmldata=None):
             else:
                 try:
                     h=HANDLERS[e.name]
+                    h(e)
                 except(KeyError):
                     raise ReaderError(e, "unknown tag '%s'" % e.name)
-                h(e)
     
     try:
         processNodes(m.children)
