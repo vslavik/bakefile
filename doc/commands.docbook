@@ -764,7 +764,108 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
       
       <section id="cmd.define-rule" xreflabel="define-rule">
         <title>define-rule</title>
-        <para></para>
+          <para>
+            Creates a new rule which can then be used as any other
+            <link linkend="rules">rule</link>. A rule consists of the template
+            (which is processed before target-specific code for all targets
+            created by this rule) and unlimited number of
+            <xref linkend="cmd.define-tag"/> statements that define tags
+            specific to this rule (and derived rules).
+          </para>
+          <para>
+            The usage of &lt;define-rule&gt; is as follows:
+              <programlisting><![CDATA[
+<define-rule name="NAME">
+  <template>
+    <!-- here goes the template for this rule -->
+  </template>
+
+  <define-tag name="TAG1">
+    ..
+  </define-tag>
+  <define-tag name="TAG2">
+    ..
+  </define-tag>
+  ...
+</define-rule>]]>
+</programlisting>
+          </para>
+          <para>
+            <informaltable>
+              <tgroup cols='3'>
+                  <thead>
+                  <row>
+                      <entry>Parameter</entry>
+                      <entry>Description</entry>
+                      <entry>Required/Default value</entry>
+                  </row>
+                  </thead>
+                  <tbody>
+                  <row>
+                      <entry role="paramname">name</entry>
+                      <entry>
+                        The name of the rule to create.
+                      </entry>
+                      <entry role="default">required</entry>
+                  </row>
+
+                  <row>
+                      <entry role="paramname">pseudo</entry>
+                      <entry>
+                        Allowed values are <literal>0</literal> and
+                        <literal>1</literal>; the value of  means that the
+                        rule is a 
+                        <link linkend="pseudotargets">pseudotarget</link>.
+                      </entry>
+                      <entry role="default">
+                        <literal>0</literal>
+                      </entry>
+                  </row>
+
+                  <row>
+                      <entry role="paramname">extends</entry>
+                      <entry>
+                        A comma-separed list of the rules which are
+                        <emphasis>extended</emphasis> by this rule. If
+                        rule B extends rule A, it means that all tags defined
+                        for A are also valid for B and the
+                        template of rule B automatically derives from the
+                        the template of rule A.
+                      </entry>
+                      <entry role="default"></entry>
+                  </row>
+
+                  </tbody>
+              </tgroup>
+            </informaltable>
+
+            Example:
+
+              <programlisting><![CDATA[
+<!-- Creates a new "copymo" rule with its own specialized
+     tags; example usage of this rule:
+
+        <copymo id="i18n">
+            <lang>en</lang>
+            <mo>myfile.mo</mo>
+        </copymo>
+-->
+<using module="datafiles"/>
+<define-rule name="copymo" extends="copy-files">
+    <template>
+        <srcdir>$(SRCDIR)/locale</srcdir>
+        <files>$(__mofiles)</files>
+        <dependency-of>all</dependency-of>
+    </template>
+    <define-tag name="lang">
+        <dstdir>$(DATADIR)/locale/$(value)/LC_MESSAGES</dstdir>
+    </define-tag>
+    <define-tag name="mo">
+        <set var="__mofiles">$(value)</set>
+    </define-tag>
+</define-rule>]]>
+</programlisting>
+          </para>
       </section>
           
 
@@ -775,7 +876,124 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
       
       <section id="cmd.define-tag" xreflabel="define-tag">
         <title>define-tag</title>
-        <para></para>
+        <para>
+          Creates a new tag which can be used inside target definition or
+          rules templates.
+        </para>
+        <para>
+          This command can be used in two ways: either it's used inside of
+          <xref linkend="cmd.define-rule"/>, in which case it defines a new
+          tag for the current rule, or it's used in the global scope, in
+          which case it must have the <literal>rules</literal> attribute that
+          specifies which rules the tag applies to.
+        </para>
+        <para>
+          <informaltable>
+            <tgroup cols='3'>
+                <thead>
+                <row>
+                    <entry>Parameter</entry>
+                    <entry>Description</entry>
+                    <entry>Required/Default value</entry>
+                </row>
+                </thead>
+                <tbody>
+                <row>
+                    <entry role="paramname">name</entry>
+                    <entry>
+                      Name of the tag to define.
+                    </entry>
+                    <entry role="default">required</entry>
+                </row>
+
+                <row>
+                    <entry role="paramname">rules</entry>
+                    <entry>
+                      Comma-separed list of rules to which the tag
+                      applies.
+                    </entry>
+                    <entry role="default">
+                      required in global scope, implicit inside
+                      <xref linkend="cmd.define-rule"/>
+                    </entry>
+                </row>
+                </tbody>
+            </tgroup>
+          </informaltable>
+
+          Example:
+            <programlisting><![CDATA[
+<!--
+Create a new tag which adds include and lib paths for a "standard"
+library and can be used inside <exe> or <dll> tags; e.g.
+
+  <exe id="test">
+    <stdlib>lib1</stdlib>
+    <stdlib>lib2</stdlib>
+  </exe>
+-->
+<define-tag name="stdlib" rules="exe,dll">
+  <include>$(value)/include</include>
+  <lib-path>$(value)/lib</lib-path>
+</define-tag>
+]]></programlisting>
+        </para>
+      </section>
+
+
+      
+      <!-- //////////////////   define-global-tag      ////////////////// -->
+
+      
+      <section id="cmd.define-global-tag" xreflabel="define-global-tag">
+        <title>define-global-tag</title>
+        <para>
+          Like <xref linkend="cmd.define-tag"/>, but creates a tag that can
+          only be used in the global scope (i.e. alongside targets definitions
+          as opposed to inside them).
+        </para>
+        <para>
+          <informaltable>
+            <tgroup cols='3'>
+                <thead>
+                <row>
+                    <entry>Parameter</entry>
+                    <entry>Description</entry>
+                    <entry>Required/Default value</entry>
+                </row>
+                </thead>
+                <tbody>
+                <row>
+                    <entry role="paramname">name</entry>
+                    <entry>
+                      Name of the tag to define.
+                    </entry>
+                    <entry role="default">required</entry>
+                </row>
+                </tbody>
+            </tgroup>
+          </informaltable>
+
+          Example:
+
+            <programlisting><![CDATA[
+<!--
+Create a global tag which defines 3 variables with the same given
+prefix and with the same content; e.g.
+
+  <dummyset prefix="test">abc</dummyset>
+  <echo>$(test_first) $(test_second) $(test_third)</echo>
+
+will display "abc abc abc"
+-->
+<define-global-tag name="dummyset">
+  <set var="$(attributes['prefix'])_first">$(value)</set>
+  <set var="$(attributes['prefix'])_second">$(value)</set>
+  <set var="$(attributes['prefix'])_third">$(value)</set>
+</define-global-tag>
+]]></programlisting>
+<!-- FIXME: better (realistic) example! -->
+        </para>
       </section>
 
     
@@ -784,7 +1002,74 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
       
       <section id="cmd.add-target" xreflabel="add-target">
         <title>add-target</title>
-        <para></para>
+        <para>
+          Creates a target programatically.
+        </para>
+        <para>
+          Using this command is equivalent to defining a target by using
+          the standard rules syntax, but it makes it possible to add a target
+          using dynamically determined rule. As such, it's only useful when
+          implementing other, higher-level rules.
+          This tag is hardly useful for normal uses of bakefile and is used
+          mostly as an internal utility.
+        </para>
+        <para>
+          This command can only be used inside rule definition, not in the
+          global scope.
+        </para>
+        <para>
+          <informaltable>
+            <tgroup cols='3'>
+                <thead>
+                <row>
+                    <entry>Parameter</entry>
+                    <entry>Description</entry>
+                    <entry>Required/Default value</entry>
+                </row>
+                </thead>
+                <tbody>
+                <row>
+                    <entry role="paramname">target</entry>
+                    <entry>
+                      ID of the target to create.
+                    </entry>
+                    <entry role="default">required</entry>
+                </row>
+
+                <row>
+                    <entry role="paramname">type</entry>
+                    <entry>
+                      The rule for the target.
+                    </entry>
+                    <entry role="default">required</entry>
+                </row>
+
+                <row>
+                    <entry role="paramname">cond</entry>
+                    <entry>
+                      The condition under which the target is built.
+                    </entry>
+                    <entry role="default"><literal>1</literal></entry>
+                </row>
+
+                </tbody>
+            </tgroup>
+          </informaltable>
+
+          Example:
+
+            <programlisting><![CDATA[
+<!--
+Creates a new EXE target 'myexe'; this is equivalent to
+  <exe id="myexe">
+    <sources>source1.c</sources>
+  </exe>
+-->
+<add-target target="myexe" type="exe">
+  <sources>source1.c</sources>
+</add-target>
+]]></programlisting>
+        </para>
       </section>
       
       
@@ -794,7 +1079,41 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
       
       <section id="cmd.modify-target" xreflabel="modify-target">
         <title>modify-target</title>
-        <para></para>
+        <para>
+          Modifies an existing target by appending tags under this node to
+          its definition.
+        </para>
+        <para>
+          <informaltable>
+            <tgroup cols='3'>
+                <thead>
+                <row>
+                    <entry>Parameter</entry>
+                    <entry>Description</entry>
+                    <entry>Required/Default value</entry>
+                </row>
+                </thead>
+                <tbody>
+                <row>
+                    <entry role="paramname">target</entry>
+                    <entry>
+                      ID of the target to modify.
+                    </entry>
+                    <entry role="default">required</entry>
+                </row>
+                </tbody>
+            </tgroup>
+          </informaltable>
+
+          Example:
+
+            <programlisting><![CDATA[
+<!-- Modifies the global 'install' target to run an additional command -->
+<modify-target target="install">
+  <command>$(CP) myfile dest</command>
+</modify-target>
+]]></programlisting>
+        </para>
       </section>
 
       
