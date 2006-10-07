@@ -497,6 +497,23 @@ def _reorderTargetNodes(node, index):
         pass
 
 
+def _extractDictForTag(e, target, dict):
+    if e.value == None:
+        return dict
+
+    # $(value) expands to the thing passed as tag's text value:
+    dict2 = {'value' : mk.evalExpr(e.value, target=target, add_dict=dict)}
+
+    # tag's attributes are available as $(attributes['foo']):
+    if len(e.props) > 0:
+        attr = {}
+        for a in e.props:
+            attr[a] = mk.evalExpr(e.props[a], target=target, add_dict=dict)
+        dict2['attributes'] = attr
+
+    return dict2
+
+
 def _processTargetNodes(node, target, tags, dict):
     
     def processCmd(e, target, dict):
@@ -570,17 +587,8 @@ def _processTargetNodes(node, target, tags, dict):
                 for c in entry.children:
                     _processEntry(c, target, dict)
         else:
-            if entry.type == TgtCmdNode.TAG and entry.node.value != None:
-                # $(value) expands to the thing passed as tag's text value:
-                dict2 = {'value':mk.evalExpr(entry.node.value,
-                                             target=target, add_dict=dict)}
-                # tag's attributes are available as $(attributes['foo']):
-                if len(entry.node.props) > 0:
-                    attr = {}
-                    for a in entry.node.props:
-                        attr[a] = mk.evalExpr(entry.node.props[a],
-                                              target=target, add_dict=dict)
-                    dict2['attributes'] = attr
+            if entry.type == TgtCmdNode.TAG:
+                dict2 = _extractDictForTag(entry.node, target, dict)
             else:
                 dict2 = dict
             for c in entry.children:
@@ -666,6 +674,11 @@ __tagsWaitingForRules = {}
 
 def handleDefineRule(e):
     rule = Rule(evalConstExpr(e, e.props['name']))
+    
+    # check that the rule name is valid
+    if rule.name in HANDLERS:
+         raise ReaderError(e, "global tag or rule '%s' already defined" % rule.name)
+
     rules[rule.name] = rule
     HANDLERS[rule.name] = handleTarget
 
@@ -698,6 +711,37 @@ def handleDefineRule(e):
                        "unknown element '%s' in <define-rule>" % node.name)
 
 
+globalTags = {}
+
+def handleGlobalTag(e):
+    errors.pushCtx("when processing global tag '%s' at %s" %
+                   (e.name, e.location()))
+        
+    dict = _extractDictForTag(e, target=None, dict=None)
+
+    # FIXME: This is hack, it would be better to pass the dict to
+    #        __doProcess(). But we don't have an easy way of doing it,
+    #        so we modify the main variables dictionary mk.vars instead
+    #        and then restore its original content.
+    old_vars = {}
+    for key in dict:
+        if key in mk.vars:
+            old_vars[key] = mk.vars[key]
+        mk.vars[key] = dict[key]
+    
+    # execute the tag's commands now:
+    __doProcess(xmldata=globalTags[e.name])
+
+    # restore the original content of mk.vars:
+    for key in dict:
+        if key in old_vars:
+            mk.vars[key] = old_vars[key]
+        else:
+            del mk.vars[key]
+
+    errors.popCtx()
+
+
 def handleDefineTag(e, rule=None):
     name = e.props['name']
     if rule == None:
@@ -717,7 +761,18 @@ def handleDefineTag(e, rule=None):
                 __tagsWaitingForRules[rn] = [e]
         else:
             __addTagToRule(rules[rn], e)
-        
+
+
+def handleDefineGlobalTag(e):
+    name = e.props['name']
+    
+    if name in HANDLERS:
+        raise ReaderError(e, "global tag '%s' is already defined" % name)
+    
+    globalTags[name] = e
+    HANDLERS[name] = handleGlobalTag
+
+
 def checkTagDefinitions():
     if len(__tagsWaitingForRules) > 0:
         errors = []
@@ -900,21 +955,22 @@ from http://bakefile.sourceforge.net.
 
 
 HANDLERS = {
-    'set':           handleSet,
-    'unset':         handleUnset,
-    'option':        handleOption,
-    'using':         handleUsing,
-    'template':      handleTemplate,
-    'include':       handleInclude,
-    'define-rule':   handleDefineRule,
-    'define-tag':    handleDefineTag,
-    'tag-info':      handleTagInfo,
-    'output':        handleOutput,
-    'fragment':      handleFragment,
-    'modify-target': handleModifyTarget,
-    'error':         handleError,
-    'echo' :         handleEcho,
-    'requires':      handleRequires,
+    'set':               handleSet,
+    'unset':             handleUnset,
+    'option':            handleOption,
+    'using':             handleUsing,
+    'template':          handleTemplate,
+    'include':           handleInclude,
+    'define-rule':       handleDefineRule,
+    'define-tag':        handleDefineTag,
+    'define-global-tag': handleDefineGlobalTag,
+    'tag-info':          handleTagInfo,
+    'output':            handleOutput,
+    'fragment':          handleFragment,
+    'modify-target':     handleModifyTarget,
+    'error':             handleError,
+    'echo' :             handleEcho,
+    'requires':          handleRequires,
     }
 
 

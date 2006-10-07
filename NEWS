@@ -16,6 +16,9 @@
 - msvc*: respect DLLEXT and EXEEXT variables (Dmitry Kononov)
 - added bash completion script
 - gnu: support DESTDIR variable
+- added <define-global-tag> which can be used to define tags with global
+  scope; this makes it easy to define new toplevel commands (based on patch
+  by Francesco Montorsi)
 
 
 Version 0.2.0

@@ -22,6 +22,7 @@
         filelist/filelist.bkl
         echo/echo.bkl
         subproject/subproject.bkl
+        definetag/definetag.bkl
     </input>
     
     <add-formats>
@@ -36,6 +37,7 @@
     <del-formats files="debug/*.bkl">msevc4prj</del-formats>
     <del-formats files="paths/*.bkl">msevc4prj</del-formats>
     <del-formats files="headers/*.bkl">msevc4prj</del-formats>
+    <del-formats files="definetag/*.bkl">msevc4prj</del-formats>
 
     <!-- DigitalMars' make can't handle conditions: -->
     <del-formats files="cond*/*.bkl">dmars</del-formats>

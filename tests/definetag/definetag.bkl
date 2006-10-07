@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+
+<makefile>
+
+    <!-- test <define-tag> when used inside rules -->
+
+    <define-tag name="ruletag" rules="exe">
+        <sources>$(attributes['a']) $(value)</sources>
+    </define-tag>
+
+    <exe id="test1">
+        <ruletag a="source1.c">source2.c</ruletag>
+    </exe>
+
+
+
+    <!-- test <define-tag> when used to create global tags -->
+
+    <define-global-tag name="test">
+        <echo>this is a global tag used as test</echo>
+    </define-global-tag>
+
+    <define-global-tag name="myrule">
+        <!-- inside global tags you can place any tag which is allowed
+             to be a child of <makefile>
+        -->
+        <exe id="test2">
+            <sources>$(value).c</sources>
+            <sources>$(attributes['a']).c</sources>
+        </exe>
+    </define-global-tag>
+
+    <define-global-tag name="set-multiple-vars">
+        <set var="var1_$(value)">$(attributes['content'])</set>
+        <set var="var2_$(value)">$(attributes['content'])</set>
+    </define-global-tag>
+
+    <test/>
+    <myrule a="source1">
+        source2
+    </myrule>
+    
+    <set-multiple-vars content="abcde">test</set-multiple-vars>
+    <echo>variable contents: $(var1_test)  -  $(var2_test)</echo>
+
+</makefile>

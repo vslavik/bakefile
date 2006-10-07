@@ -42,6 +42,7 @@ AC_OUTPUT([
            cond_install/Makefile
            datafiles/Makefile
            debug/Makefile
+           definetag/Makefile
            dll/Makefile
            echo/Makefile
            filelist/Makefile
