@@ -44,12 +44,12 @@
             The following Python functions are defined:
         </para>
 
-        <section id="pyfunc.isoption" xreflabel="isoption">
-            <title>isoption</title>
-            <synopsis>isoption(<parameter>name</parameter>)</synopsis>
+        <section id="pyfunc.isconst" xreflabel="isconst">
+            <title>isconst</title>
+            <synopsis>isconst(<parameter>expr</parameter>)</synopsis>
             <para>
-            Returns <emphasis>true</emphasis> if the given string is the name
-            of an option previously declared in the bakefile.
+              Returns <literal>true</literal> if the expression given as
+              argument is constant expression.
             </para>
         </section>
 
@@ -57,10 +57,20 @@
             <title>isdefined</title>
             <synopsis>isdefined(<parameter>name</parameter>)</synopsis>
             <para>
-            Returns <emphasis>true</emphasis> if the given string is the name
-            of an option or a variable previously declared in the bakefile.
+            Returns <literal>true</literal> if the given string is the name
+            of an option or a variable previously defined in the bakefile.
             </para>
         </section>
+
+        <section id="pyfunc.isoption" xreflabel="isoption">
+            <title>isoption</title>
+            <synopsis>isoption(<parameter>name</parameter>)</synopsis>
+            <para>
+            Returns <literal>true</literal> if the given string is the name
+            of an option previously defined in the bakefile.
+            </para>
+        </section>
+
 
         <section id="pyfunc.ifthenelse" xreflabel="ifthenelse">
             <title>ifthenelse</title>

@@ -43,6 +43,12 @@ def isdefined(name):
         return isoption(name)
     return 1
 
+def isconst(expr):
+    try:
+        mk.evalExpr(expr, use_options=0)
+        return True
+    except NameError:
+        return False
 
 def ifthenelse(cond, iftrue, iffalse):
     if eval(str(cond)): return iftrue
