@@ -68,7 +68,9 @@
     <set var="DLLDIR">$(dlldir)</set>
     <set var="DATADIR">$(datadir)</set>
     <set var="INCLUDEDIR">$(includedir)</set>
-
+   
+    <!-- the initial value of SRCDIR set in dirs.bkl is incorrect for autoconf
+         format, so correct it here: -->
     <set var="SRCDIR">$(srcdir)</set>
 
     <set var="DLLEXT">.$(SO_SUFFIX)</set>

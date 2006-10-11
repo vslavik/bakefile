@@ -627,9 +627,9 @@ def fileList(pathlist):
         finalmakefile = os.path.abspath(
                     os.path.split(config.output_file.replace('/', os.sep))[0])
 
-        # make the user path relative to SRCDIR and then absolute using using
+        # make the user path relative to SRCDIR_RAW and then absolute using
         # the generated makefile path (unless already absolute):
-        srcdir = mk.vars['SRCDIR'].replace('/', os.sep)
+        srcdir = mk.vars['SRCDIR_RAW'].replace('/', os.sep)
 
         # we need OS' native separator for glob():
         p = path.replace('/', os.sep)

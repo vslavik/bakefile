@@ -123,8 +123,29 @@
               <row>
                 <entry id="var.SRCDIR" xreflabel="SRCDIR" role="varname">SRCDIR</entry>
                 <entry>
-                  Directory to which names of source files are relative to.
-                  This value is relative to <xref linkend="var.OUTPUT_FILE"/>.
+                  <para>
+                    Directory to which names of source files are relative to.
+                    This value is relative to <xref linkend="var.OUTPUT_FILE"/>
+                    (the only exception is the <literal>autoconf</literal>
+                    format, which prefixes the value with
+                    <literal>$(srcdir)</literal> in order to allow out-of-tree
+                    compilation).
+                  </para>
+                  <para>
+                    Note that the value of <varname>SRCDIR</varname>
+                    <emphasis>cannot</emphasis> be set manually; if you want
+                    to change it, you must use the
+                    <command>set-srcdir</command> command as early in your
+                    bakefile as possible. For example:
+                    <programlisting><![CDATA[
+<makefile>
+  <set-srcdir>../..</set-srcdir>
+  ..
+</makefile>
+]]></programlisting>
+                    The argument to <command>set-srcdir</command> must be
+                    a constant expression.
+                  </para>
                 </entry>
                 <entry role="default">.</entry>
               </row>

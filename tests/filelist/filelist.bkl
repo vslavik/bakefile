@@ -3,9 +3,8 @@
 
     <!-- test expansion relative to SRCDIR, but also test proper
          handling of SRCDIR set to "$(srcdir)" in the autoconf format: -->
-    <if cond="FORMAT!='autoconf'">
-        <set var="SRCDIR">../filelist</set>
-    </if>
+    <set-srcdir>../filelist</set-srcdir>
+    <echo>SRCDIR is $(SRCDIR)</echo>
     
     <exe id="filelist">
         <app-type>gui</app-type>

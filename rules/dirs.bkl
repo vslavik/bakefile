@@ -1,12 +1,43 @@
 <?xml version="1.0" ?>
+<!-- $Id$ -->
 
 <makefile>
 
-    <!-- Source dirs: -->
-    
-    <set var="SRCDIR">.</set>
-    <set var="BUILDDIR">.</set> <!-- to be overwritten by backend: -->
+    <!-- Source dir: -->
 
+    <!-- this tag must be used for changing SRCDIR value -->
+    <define-global-tag name="set-srcdir">
+        <if cond="not isconst(value)">
+            <error>set-srcdir argument must be constant expression</error>
+        </if>
+
+        <set var="SRCDIR_RAW">$(value)</set>
+        <set var="SRCDIR">$(nativePaths(SRCDIR_RAW))</set>
+        
+        <if cond="FORMAT=='autoconf'">
+            <!-- autoconf is an exception, it has to use $(srcdir) to support
+                 out-of-tree compilation: -->
+            <set var="SRCDIR">
+                <if cond="SRCDIR_RAW=='.'">$(srcdir)</if>
+                <if cond="SRCDIR_RAW!='.'">$(os.path.join(srcdir, SRCDIR_RAW))</if>
+            </set>
+        </if>
+    </define-global-tag>
+
+    <!-- set the default value of SRCDIR; note that we don't use <set-srcdir>
+         here even though it would be nicer, because its implementation
+         requires TOOLSET to be set and this file is processed too early
+         for that:
+      -->
+    <!-- equivalent of <set-srcdir>.</set-srcdir> : -->
+    <set var="SRCDIR_RAW">.</set>
+    <set var="SRCDIR">.</set> <!-- autoconf format overwrites this in autoconf.bkl -->
+
+
+
+    <!-- Build dir: -->
+    
+    <set var="BUILDDIR">.</set> <!-- to be overwritten by the backend -->
 
 
     <!-- Install dirs: -->

@@ -19,6 +19,8 @@
 - added <define-global-tag> which can be used to define tags with global
   scope; this makes it easy to define new toplevel commands (based on patch
   by Francesco Montorsi)
+- added <set-srcdir> for setting SRCDIR variable; it cannot be done manually
+  anymore (Francesco Montorsi)
 
 
 Version 0.2.0
