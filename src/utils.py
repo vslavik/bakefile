@@ -34,7 +34,7 @@ def checkBakefileVersion(version):
     return vcur >= vreq
 
 def isoption(name):
-    return name in mk.__vars_opt
+    return name in mk.options
 
 def isdefined(name):
     try:
