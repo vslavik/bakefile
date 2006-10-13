@@ -7,8 +7,7 @@
         <sources>
             hello1.c
             hello2.c
-            src/hello2.c
-            src/hello2.c
+            src/hello4.c
             hello3.c
         </sources>
         <include>src</include>
