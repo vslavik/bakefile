@@ -24,6 +24,7 @@
 import sys, os, os.path, string, glob
 import mk, errors, config
 import containers
+import dependencies
 
 def checkBakefileVersion(version):
     """Returns true iff current bakefile version is at least 'version'.
@@ -644,6 +645,9 @@ def fileList(pathlist):
             srcdirPrefix = 0
 
         files = glob.glob(p)
+        dependencies.addDependencyWildcard(mk.vars['INPUT_FILE'],
+                                           config.format,
+                                           p)
 
         # remove prefix, normalize the filepath and use / for separator:
         files = [os.path.normpath(f[srcdirPrefix:]).replace(os.sep, '/')

@@ -21,6 +21,7 @@
   by Francesco Montorsi)
 - added <set-srcdir> for setting SRCDIR variable; it cannot be done manually
   anymore (Francesco Montorsi)
+- fixed dependencies handling in bakefile_gen if fileList() is used
 
 
 Version 0.2.0
