@@ -41,6 +41,8 @@
     <option name="GCC_PCH"><values>0,1</values></option>
     <option name="ICC_PCH"><values>0,1</values></option>
     <option name="USE_PCH"><values>0,1</values></option>
+    <option name="BK_DEPS"/>
+    <option name="BK_MAKE_PCH"/>
 
     <!-- Platforms: -->
     <option name="PLATFORM_UNIX"/>
@@ -98,11 +100,11 @@
     <!-- =============================================================== -->
 
     <set var="CCC" eval="0">
-        <if cond="DEPS_TRACKING=='1'">$(top_builddir)./bk-deps $(CC)</if>
+        <if cond="DEPS_TRACKING=='1'">$(BK_DEPS) $(CC)</if>
         <if cond="DEPS_TRACKING=='0'">$(CC)</if>
     </set>
     <set var="CXXC" eval="0">
-        <if cond="DEPS_TRACKING=='1'">$(top_builddir)./bk-deps $(CXX)</if>
+        <if cond="DEPS_TRACKING=='1'">$(BK_DEPS) $(CXX)</if>
         <if cond="DEPS_TRACKING=='0'">$(CXX)</if>
     </set>
     
@@ -357,7 +359,7 @@
                             type="action" cond="USE_PCH=='1'"/>
                 <modify-target target="$(__gcc_pch_file)">
                     <command>
-                        $(top_builddir)./bk-make-pch $(__gcc_pch_file) $(__pch_header) $(ref("__gcc_pch_cmd",id))
+                        $(BK_MAKE_PCH) $(__gcc_pch_file) $(__pch_header) $(ref("__gcc_pch_cmd",id))
                     </command>
                 </modify-target>
             </if> 

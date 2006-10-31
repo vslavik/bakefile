@@ -521,6 +521,7 @@ AC_DEFUN([AC_BAKEFILE_DEPS],
     
     AC_MSG_CHECKING([for dependency tracking method])
 
+    BK_DEPS=""
     if test "x$bk_use_trackdeps" = "xno" ; then
         DEPS_TRACKING=0
         AC_MSG_RESULT([disabled])
@@ -568,10 +569,14 @@ AC_DEFUN([AC_BAKEFILE_DEPS],
         if test $DEPS_TRACKING = 1 ; then
             AC_BAKEFILE_CREATE_FILE_BK_DEPS
             chmod +x bk-deps
+            dnl FIXME: make this $(top_builddir)/bk-deps once autoconf-2.60
+            dnl        is required (and so top_builddir is never empty):
+            BK_DEPS="`pwd`/bk-deps"
         fi
     fi
 
     AC_SUBST(DEPS_TRACKING)
+    AC_SUBST(BK_DEPS)
 ])
 
 dnl ---------------------------------------------------------------------------
@@ -659,6 +664,7 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
     GCC_PCH=0
     ICC_PCH=0
     USE_PCH=0
+    BK_MAKE_PCH=""
 
     case ${BAKEFILE_HOST} in 
         *-*-cygwin* )
@@ -712,12 +718,17 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
                 USE_PCH=1
                 AC_BAKEFILE_CREATE_FILE_BK_MAKE_PCH
                 chmod +x bk-make-pch
+                dnl FIXME: make this $(top_builddir)/bk-make-pch once
+                dnl        autoconf-2.60 is required (and so top_builddir is
+                dnl        never empty):
+                BK_MAKE_PCH="`pwd`/bk-make-pch"
             fi
         fi
     fi
 
     AC_SUBST(GCC_PCH)
     AC_SUBST(ICC_PCH)
+    AC_SUBST(BK_MAKE_PCH)
 ])
 
 
@@ -745,7 +756,7 @@ dnl ---------------------------------------------------------------------------
 
 AC_DEFUN([AC_BAKEFILE],
 [
-    AC_PREREQ(2.58)
+    AC_PREREQ([2.58])
 
     if test "x$BAKEFILE_HOST" = "x"; then
                if test "x${host}" = "x" ; then
