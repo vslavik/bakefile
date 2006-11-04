@@ -595,7 +595,19 @@ AC_DEFUN([AC_BAKEFILE_CHECK_BASIC_STUFF],
     AC_PROG_MAKE_SET
     AC_SUBST(MAKE_SET)
     
-    AC_CHECK_TOOL(AR, ar, ar)
+    if test "x$SUNCXX" = "xyes"; then
+        dnl Sun C++ compiler requires special way of creating static libs;
+        dnl see here for more details:
+        dnl https://sourceforge.net/tracker/?func=detail&atid=109863&aid=1229751&group_id=9863
+        AR=$CXX
+        AC_SUBST(AR)
+        AROPTIONS="-xar -o"
+    else
+        AC_CHECK_TOOL(AR, ar, ar)
+        AROPTIONS=rcu
+    fi
+    AC_SUBST(AROPTIONS)
+
     AC_CHECK_TOOL(STRIP, strip, :)
     AC_CHECK_TOOL(NM, nm, :)
 
