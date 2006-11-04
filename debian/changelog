@@ -1,3 +1,12 @@
+bakefile (0.2.0.928) unstable; urgency=low
+  * added <define-global-tag> define tags with global * scope; this makes it
+  * added <set-srcdir> for setting SRCDIR variable
+  * fixed dependencies handling in bakefile_gen if fileList() is used
+  * autoconf: fixes for autoconf-2.60
+  * autoconf: fixed static libraries creation with SunCC compiler
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Nov,  4 Sat 2006 20:47:23 +0100
+
 bakefile (0.2.0.914) unstable; urgency=low
   * gnu: support DESTDIR variable
 
