@@ -1,4 +1,7 @@
 
+Version 0.2.1
+--------------
+
 - better error messages in some cases (Francesco Montorsi)
 - show detailed backtraces on errors
 - added --always-make option to bakefile_gen (Francesco Montorsi)
