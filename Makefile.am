@@ -125,6 +125,7 @@ EXTRA_DIST = \
     src/empy/README src/empy/COPYING \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
+	macosx/buildpkg.py macosx/makepkg.sh \
     makefile.vc
 
 install-data-hook:

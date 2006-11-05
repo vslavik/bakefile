@@ -28,6 +28,7 @@ Version 0.2.1
 - autoconf: compatible with autoconf-2.60
 - autoconf: fixed creation of static libraries when using the SunCC
   compiler (Michael Wetherell)
+- added Mac OS X package (Kevin Ollivier)
 
 
 Version 0.2.0

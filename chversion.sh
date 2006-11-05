@@ -23,3 +23,5 @@ replace_ver rules/version.bkl \
             '\(>\).*\(<\)' "\1$VER\2"
 replace_ver autoconf/bakefile.m4 \
             '\(BAKEFILE_BAKEFILE_M4_VERSION="*\).*\("\)' "\1$VER\2"
+replace_ver macosx/makepkg.sh \
+            '\(VERSION="\).*\("\)' "\1$VER\2"

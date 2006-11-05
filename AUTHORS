@@ -19,6 +19,7 @@ Vadim Zeitlin <vadim@wxwindows.org>
 Michael Wetherell <mike.wetherell@ntlworld.com>
 Warren Young <warren@etr-usa.com> (many manual changes)
 Dmitry Kononov <kdmix@fromru.com>
+Kevin Ollivier <kevino@theolliviers.com>
 
 
  Reused code:
@@ -28,3 +29,4 @@ Empy:  by Erik Max Francis <software@alcyone.com>
        http://www.alcyone.com/pyos/empy
 Optik: by Greg Ward <gward@python.net> et al
        http://optik.sourceforge.net
+macosx/buildpkg.py: by Dinu C. Gherman
