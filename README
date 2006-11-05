@@ -22,14 +22,14 @@ bakefile.exe and bakefile_gen.exe binaries that work only if you have
 Python installed in the same directory where they are!
 
 
- Building from CVS
--------------------
+ Building from Subversion repository
+-------------------------------------
 
 (Note: this does _not_ apply to downloaded tarballs, only to code fetched
-from SourceForge CVS.)
+from SourceForge Subversion repository.)
 Run bootstrap script and then proceed as when building from tarball. In order
 to run bootstrap successfully, you need the following packages: SWIG 1.3.x
 (http://www.swig.org), Automake >= 1.6, Autoconf >= 2.53, libtool, libxslt
 (including xsltproc program) and DocBook XSL stylesheets (last two are needed
 only to build HTML documentation).
-On Windows, you need SWIG to build Bakefile from CVS.
+On Windows, you need SWIG to build Bakefile from Subversion sources.
