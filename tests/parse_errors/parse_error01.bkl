@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<makefile>
+    <set var="HELLO_C">hello.c</set>
+    <set var="SOURCES">$(HELLO_C</set>
+    <echo>SOURCES="$(SOURCES)"</echo>
+
+    <exe id="test">
+        <sources>$(SOURCES)</sources>
+    </exe>
+</makefile>

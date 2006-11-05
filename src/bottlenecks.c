@@ -1,7 +1,7 @@
 /*
  *  This file is part of Bakefile (http://bakefile.sourceforge.net)
  *
- *  Copyright (C) 2003,2004 Vaclav Slavik
+ *  Copyright (C) 2003-2006 Vaclav Slavik
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -82,7 +82,7 @@ const char *doEvalExpr(const char *expr,
     int i;
     char *output, *txtbuf;
     const char *text_begin, *code_begin;
-    unsigned braces;
+    unsigned brackets = 0;
     const char *origexpr = expr;
 
     ACQUIRE_BUFFER();
@@ -126,14 +126,14 @@ const char *doEvalExpr(const char *expr,
 
             expr += 2;
             i += 2;
-            braces = 1;
+            brackets = 1;
             code_begin = expr;
 
             while (i < len)
             {
                 if (*expr == ')')
                 {
-                    if (--braces == 0)
+                    if (--brackets == 0)
                     {
                         int size;
                         PyObject *r =
@@ -160,7 +160,7 @@ const char *doEvalExpr(const char *expr,
                 }
                 else if (*expr == '(')
                 {
-                    braces++;
+                    brackets++;
                 }
                 else if (*expr == '\'' || *expr == '"')
                 {
@@ -181,6 +181,13 @@ const char *doEvalExpr(const char *expr,
         }
         i++;
         expr++;
+    }
+
+    if (brackets > 0)
+    {
+        PyErr_Format(PyExc_RuntimeError,
+                     "unmatched brackets in '%s'", origexpr);
+        return NULL;
     }
 
     if (expr - text_begin >= 0)
@@ -229,6 +236,7 @@ def __doEvalExpr(e, varCallb, textCallb, moreArgs,
         textCallb = lambda y,x: x
     lng = len(e)
     i = 0
+    brackets = 0
     txt = ''
     output = ''
     while i < lng-1:
@@ -238,18 +246,18 @@ def __doEvalExpr(e, varCallb, textCallb, moreArgs,
             txt = ''
             code = ''
             i += 2
-            braces = 1
+            brackets = 1
             while i < lng:
                 if e[i] == ')':
-                    braces -= 1
-                    if braces == 0:
+                    brackets -= 1
+                    if brackets == 0:
                         output += varCallb(moreArgs,
                                            code, use_options, target, add_dict)
                         break
                     else:
                         code += e[i]
                 elif e[i] == '(':
-                    braces += 1
+                    brackets += 1
                     code += e[i]
                 elif e[i] == "'" or e[i] == '"':
                     what = e[i]
@@ -264,6 +272,10 @@ def __doEvalExpr(e, varCallb, textCallb, moreArgs,
         else:
             txt += e[i]
         i += 1
+
+    if brackets > 0:
+        raise RuntimeError("unmatched brackets in '%s'" % expr)
+
     output += textCallb(moreArgs, txt + e[i:])
     return output
 
