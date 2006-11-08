@@ -31,7 +31,7 @@
             </set>
             <set var="__remove_cmd" eval="0">
                 <if cond="TOOLSET=='unix'">
-                    $('(cd %s ; %s %s)' % (__dstdir, __uprg,  ' '.join(os.path.basename(x) for x in safeSplit(__files))))
+                    $('(cd %s ; %s %s)' % (__dstdir, __uprg,  ' '.join([os.path.basename(x) for x in safeSplit(__files)])))
                 </if>
             </set>
         </template>
