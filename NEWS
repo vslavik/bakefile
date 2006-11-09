@@ -29,6 +29,7 @@ Version 0.2.1
 - autoconf: fixed creation of static libraries when using the SunCC
   compiler (Michael Wetherell)
 - added Mac OS X package (Kevin Ollivier)
+- added --dry-run option to bakefile
 
 
 Version 0.2.0

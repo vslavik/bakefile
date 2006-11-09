@@ -82,14 +82,15 @@ def addDependencyWildcard(bakefile, format, dependency_wildcard):
        the bakefile being processed."""
     __doAddDependency(bakefile, format, WildcardDep(dependency_wildcard))
 
-def addOutput(bakefile, format, output_file, output_method):
+def addOutput(bakefile, format, output_file, output_method, save_modtime):
     """Adds file 'output_file' as output created by the bakefile being
        processed."""
     key = (bakefile,format)
     if key not in deps_db:
         deps_db[key] = DepsRecord()
     deps_db[key].outputs.append((output_file, output_method))
-    modtimes_db[output_file] = int(time.time())
+    if save_modtime:
+        modtimes_db[output_file] = int(time.time())
 
 def addCmdLine(bakefile, format, cmdline):
     """Records that command line arguments `cmdline' were used when

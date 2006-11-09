@@ -268,29 +268,42 @@ def write():
         changes_f = None
    
     for file in __output_files:
-        # open (or create) file for R/W and lock it:
-        f = __openFile(file)
-        txt = f.readlines()
+        if config.dry_run and not os.path.isfile(file):
+            # in dry mode, don't create new files as __openFile() would do:
+            f = None
+            txt = []
+        else:
+            # open (or create) file for R/W and lock it:
+            f = __openFile(file)
+            txt = f.readlines()
+
         # if old and new content should be combined, do it:
         if __output_methods[file] != 'replace':
             __output_files[file] = \
                 eval('%s(txt, __output_files[file])' % __output_methods[file])
         # write the file out only if changed:
         if __output_files[file] != txt:
-            f.seek(0)
-            f.truncate()
-            f.writelines(__output_files[file])
-            if changes_f != None:
-                changes_f.write('%s\n' % os.path.abspath(file))
-            if not config.quiet: print 'writing %s' % file
+            if not config.dry_run:
+                f.seek(0)
+                f.truncate()
+                f.writelines(__output_files[file])
+                if changes_f != None:
+                    changes_f.write('%s\n' % os.path.abspath(file))
+            if not config.quiet:
+                print 'writing %s' % file
         else:
-            if not config.quiet: print 'no changes in %s' % file
-        __closeFile(f)
+            if not config.quiet:
+                print 'no changes in %s' % file
+
+        if f != None:
+            __closeFile(f)
         
         if config.track_deps:
-            dependencies.addOutput(mk.vars['INPUT_FILE'], config.format,
+            dependencies.addOutput(mk.vars['INPUT_FILE'],
+                                   config.format,
                                    os.path.abspath(file),
-                                   __output_methods[file])
+                                   __output_methods[file],
+                                   save_modtime=not config.dry_run)
     if changes_f != None:
         changes_f.close()
 

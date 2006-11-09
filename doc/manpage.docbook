@@ -40,6 +40,9 @@
           <option>-q</option>
         </arg>        
         <arg choice="opt">
+          <option>--dry-run</option>
+        </arg>        
+        <arg choice="opt">
           <option>--dump</option>
         </arg>        
         <arg choice="plain">
@@ -224,6 +227,19 @@
               <para>
                 Add path to the list of directories where Bakefile looks for
                 rules and output templates.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--dry-run</option>
+            </term>
+            <listitem>
+              <para>
+                Process the bakefile normally, but instead of creating or
+                modifying files, just print which files would be changed
+                without actually modifying them.
               </para>
             </listitem>
           </varlistentry>

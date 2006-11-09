@@ -75,6 +75,9 @@ def run(args):
     parser.add_option('-q', '--quiet',
                       action="store_true", dest='quiet', default=0,
                       help='supress all output except of errors')
+    parser.add_option('', '--dry-run',
+                      action="store_true", dest='dry_run', default=0,
+                      help="don't write any files, just pretend doing it")
     parser.add_option('', '--output-deps',
                       action="store", dest='deps_file', metavar='DEPSFILE',
                       help="output dependencies information for bakefile_gen")
@@ -98,6 +101,7 @@ def run(args):
         parser.error('incorrect number of arguments, exactly 1 .bkl required')
         sys.exit(1)
 
+    config.dry_run = options.dry_run
     config.debug = options.debug
     config.quiet = options.quiet
     if config.quiet:

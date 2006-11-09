@@ -27,8 +27,9 @@ _bakefile() {
             case "$cur" in
                 -*) 
                     all_cmds="--version -h --help -f --format -o --output -D \
-                              -I -v --verbose -q --quiet --output-deps \
-                              --output-changes --xml-cache --debug --dump"
+                              -I -v --verbose -q --quiet --dry-run \
+                              --output-deps --output-changes --xml-cache \
+                              --debug --dump"
                     COMPREPLY=( $(compgen -W "$all_cmds" -- $cur ) )
                     ;;
                 *)

@@ -64,3 +64,6 @@ deps_file = None
 
 # File to store list of modified output files:
 changes_file = None
+
+# If set to True, no output is written, bakefile just pretends to do it
+dry_run = False
