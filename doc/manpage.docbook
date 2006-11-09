@@ -511,6 +511,9 @@
           <option>-c</option>
         </arg>
         <arg choice="opt">
+          <option>--list-files</option>
+        </arg>
+        <arg choice="opt">
           <option>-j</option>
         </arg>
         <arg choice="opt">
@@ -612,6 +615,22 @@
             <listitem>
               <para>
                 Removes all output files instead of generating them.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--list-files</option>
+            </term>
+            <listitem>
+              <para>
+                Prints the list of output files that would be generated
+                instead of creating them. This command respects the
+                constraints specified using the <option>--format</option>
+                and <option>--bakefile</option> options. It can be used
+                for example to create the list of all makefiles for given
+                format.
               </para>
             </listitem>
           </varlistentry>

@@ -221,7 +221,7 @@ def filterFiles(bakefiles, formats):
 
 
 
-def updateTargets(jobs, pretend=0, keepGoing=0, alwaysMakeAll=0):
+def updateTargets(jobs, pretend=0, keepGoing=0, alwaysMakeAll=0, dryRun=0):
     """Updates all targets. Run jobs instances of bakefile simultaneously"""
     if verbose:
         if alwaysMakeAll:
@@ -293,13 +293,16 @@ def updateTargets(jobs, pretend=0, keepGoing=0, alwaysMakeAll=0):
                     i = state.done
                 finally:
                     state.lock.release()
-                print '%s[%i/%i] generating %s from %s' % (
+                if not dryRun:
+                    print '%s[%i/%i] generating %s from %s' % (
                             threadId, i, state.totalCount, fmt, f)
                 cmd = '%s -f%s %s %s --output-deps=%s --output-changes=%s --xml-cache=%s' % \
                         (_getBakefileExecutable(),
                          fmt, files[f].flags[fmt], f,
                          tempDeps, tempChanges, tempXmlCacheFile)
-                if verbose >= 2: cmd += ' -v'
+                if dryRun:
+                    cmd += ' --quiet --dry-run'
+                elif verbose >= 2: cmd += ' -v'
                 if verbose:
                     print cmd
                 if pretend: continue
@@ -373,7 +376,8 @@ def updateTargets(jobs, pretend=0, keepGoing=0, alwaysMakeAll=0):
         finally:
             state.lock.release()
 
-    print '%i files modified' % state.modifiedFiles
+    if not dryRun:
+        print '%i files modified' % state.modifiedFiles
 
 
 def cleanTargets(pretend=0):
@@ -409,6 +413,17 @@ def cleanTargets(pretend=0):
                     else:
                         os.remove(o)
 
+def listOutputFiles(jobs, alwaysMakeAll=0):
+    # make sure all data are current:
+    updateTargets(jobs=jobs, alwaysMakeAll=alwaysMakeAll, dryRun=True)
+
+    # then extract and print the output files from .bakefile_gen.state:
+    for f in files:
+        absf = os.path.abspath(f)
+        for fmt in files[f].formats:
+            for outf, m in dependencies.deps_db[(absf,fmt)].outputs:
+                print outf
+
 
 def run(args):
     parser = OptionParser()
@@ -429,6 +444,10 @@ def run(args):
                       action="store_true", dest='clean',
                       default=0,
                       help='clean generated files, don\'t create them')
+    parser.add_option('', '--list-files',
+                      action="store_true", dest='list_files',
+                      default=0,
+                      help="print the list of output files that would be generated (given -f and -b arguments) instead of creating them")
     parser.add_option('-j', '--jobs',
                       action="store", dest='jobs',
                       default='1',
@@ -453,6 +472,9 @@ def run(args):
                       help='display even more detailed information')
 
     options, args = parser.parse_args(args)
+    
+    if options.clean and options.list_files:
+      parser.error('--clean and --list-files are mutually exclusive')
 
     global verbose
     if options.very_verbose:
@@ -477,6 +499,9 @@ def run(args):
         filterFiles(options.bakefiles, options.formats)
         if options.clean:
             cleanTargets(pretend=options.pretend)
+        elif options.list_files:
+            listOutputFiles(jobs=options.jobs,
+                            alwaysMakeAll=options.alwaysMakeAll)
         else:
             updateTargets(jobs=options.jobs,
                           pretend=options.pretend,

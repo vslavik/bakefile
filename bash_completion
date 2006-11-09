@@ -69,6 +69,7 @@ _bakefile_gen() {
                     all_cmds="-h --help -f --formats -b --bakefiles \
                               -D -c --clean -j --jobs -p --pretend \
                               -k --keep-going -B --always-make \
+                              --list-files \
                               -v --verbose -V --very-verbose"
                     COMPREPLY=( $(compgen -W "$all_cmds" -- $cur ) )
                     ;;
