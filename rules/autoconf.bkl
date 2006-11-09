@@ -269,7 +269,7 @@
     
     <define-tag name="libname" rules="dll">
         <set var="__importlib">
-            <if cond="WINDOWS_IMPLIB=='1'">-Wl,--out-implib,$(__targetdir)$(__linkname)</if>
+            <if cond="WINDOWS_IMPLIB=='1'">-Wl,--out-implib=$(__targetdir)$(__linkname)</if>
             <if cond="PLATFORM_OS2=='1'">-import $(__targetdir)$(__linkname)</if>
         </set>
         <ldflags>$(__importlib)</ldflags>

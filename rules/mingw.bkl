@@ -11,7 +11,7 @@
     <tag-info name="libname" position="after:dirname"/> 
     <define-tag name="libname" rules="dll">
         <set var="__importlib">
-            -Wl,--out-implib,$(__targetdir)$(__linkname)
+            -Wl,--out-implib=$(__targetdir)$(__linkname)
         </set>
         <ldflags>$(__importlib)</ldflags>
     </define-tag>
