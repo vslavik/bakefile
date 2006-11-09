@@ -43,7 +43,7 @@
           <option>--dump</option>
         </arg>        
         <arg choice="plain">
-          <replaceable class="parameter">file.bakefile</replaceable>
+          <replaceable class="parameter">file.bkl</replaceable>
         </arg>
       </cmdsynopsis>
     </refsynopsisdiv>
@@ -230,10 +230,19 @@
           
           <varlistentry>
             <term>
-              <option>-v</option>
+              <option>-v</option>, <option>--verbose</option>
             </term>
             <listitem>
               <para>Be verbose.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-q</option>, <option>--quiet</option>
+            </term>
+            <listitem>
+              <para>Supress all output except for errors.</para>
             </listitem>
           </varlistentry>
 
@@ -245,17 +254,7 @@
               <para>show internal debugging information</para>
             </listitem>
           </varlistentry>
-
-          <varlistentry>
-            <term>
-              <option>-q</option>
-            </term>
-            <listitem>
-              <para>Supress all output except for errors.</para>
-            </listitem>
-          </varlistentry>
-          
-          
+                    
           <varlistentry>
             <term>
               <option>--dump</option>
