@@ -543,9 +543,9 @@ def _processTargetNodes(node, target, tags, dict):
                     e2.props['cond'] = condstr
             handleTarget(e2)
         elif e.name == 'error':
-            handleError(e)
+            handleError(e, target=target, add_dict=dict)
         elif e.name == 'echo':
-            handleEcho(e)
+            handleEcho(e, target=target, add_dict=dict)
         else:
             return 0
         return 1
@@ -910,8 +910,8 @@ def handleFragment(e):
         mk.addFragment(mk.Fragment(content))
 
 
-def handleError(e):
-    text = evalConstExpr(e, e.value)
+def handleError(e, target=None, add_dict=None):
+    text = evalConstExpr(e, e.value, target=target, add_dict=add_dict)
     sys.stderr.write("""
 -----------------------------------------------------------------------
 %s
@@ -921,8 +921,8 @@ def handleError(e):
     raise ReaderError(e, "an error occured during processing")
 
 
-def handleEcho(e):
-    text = evalConstExpr(e, e.value)
+def handleEcho(e, target=None, add_dict=None):
+    text = evalConstExpr(e, e.value, target=target, add_dict=add_dict)
 
     # extract echo level
     if 'level' in e.props:

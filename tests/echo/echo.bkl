@@ -7,4 +7,12 @@
     <echo level="verbose">VAR value is '$(VAR)'</echo>
     <echo level="warning">warning...</echo>
 
+    <exe id="test">
+        <echo>VAR value is '$(VAR)' (inside target)</echo>
+        <set var="FOO">foo1</set>
+        <echo>FOO value is '$(FOO)' (should be foo1)</echo>
+
+        <sources>../hello/hello.c</sources>
+    </exe>
+
 </makefile>
