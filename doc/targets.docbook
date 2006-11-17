@@ -1016,9 +1016,6 @@
 								specified as tag's value by <command>make install</command>
                 (and uninstalled from there by the
                 <command>make uninstall</command> target).
-                Note that this tag automatically enable header installation
-                to the <xref linkend="var.INCLUDEDIR"/> directory. See
-                <xref linkend="tag.install-headers-to"/> tag.
 							</entry>
 							<entry role="availability">exe, dll, module, lib</entry>
 						</row>
