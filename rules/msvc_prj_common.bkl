@@ -99,6 +99,10 @@
             <set var="_sources" append="1">$(value)</set>
         </define-tag>
 
+        <define-tag name="headers">
+            <msvc-project-files>$(value)</msvc-project-files>
+        </define-tag>
+
         <define-tag name="win32-res">
             <sources>$(value)</sources>
         </define-tag>
