@@ -68,6 +68,16 @@
                   <listitem>
                       <para>
                           Name of the variable to assign the value.
+                          Any constant expression is allowed for this
+                          attribute, not only literals.
+                          <programlisting><![CDATA[
+<set var="postfix">world</set>
+<set var="prefix">hello</set>
+
+<!-- the following <set> tag will create a "hello_world" variable: -->
+<set var="$(prefix)_$(postfix)">Hello world</set>
+<echo>$(hello_world)</echo>
+]]></programlisting>
                      </para>
                       <para role="default">
                           Required parameter
