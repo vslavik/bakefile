@@ -157,7 +157,6 @@ def handleSet(e, target=None, add_dict=None):
             if 'scope' in e.props:
                 raise ReaderError(e, "conditional variable can't have nondefault scope ('%s')" % e.props['scope'])
 
-            name = e.props['var']
             if target != None:
                 if (not overwrite) and (name in target.vars):
                     errors.popCtx()
