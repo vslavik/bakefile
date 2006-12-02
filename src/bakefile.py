@@ -3,7 +3,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003,2004 Vaclav Slavik
+#  Copyright (C) 2003-2006 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -78,6 +78,9 @@ def run(args):
     parser.add_option('', '--dry-run',
                       action="store_true", dest='dry_run', default=0,
                       help="don't write any files, just pretend doing it")
+    parser.add_option('', '--touch',
+                      action="store_true", dest='always_touch_output', default=0,
+                      help="always touch output files, even if their content doesn't change")
     parser.add_option('', '--output-deps',
                       action="store", dest='deps_file', metavar='DEPSFILE',
                       help="output dependencies information for bakefile_gen")
@@ -102,6 +105,7 @@ def run(args):
         sys.exit(1)
 
     config.dry_run = options.dry_run
+    config.always_touch_output = options.always_touch_output
     config.debug = options.debug
     config.quiet = options.quiet
     if config.quiet:

@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003,2004 Vaclav Slavik
+#  Copyright (C) 2003-2006 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -67,3 +67,7 @@ changes_file = None
 
 # If set to True, no output is written, bakefile just pretends to do it
 dry_run = False
+
+# If set to True, output files are always touched (written), even if their
+# content didn't change
+always_touch_output = False

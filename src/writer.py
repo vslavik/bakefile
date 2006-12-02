@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003,2004 Vaclav Slavik
+#  Copyright (C) 2003-2006 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -282,7 +282,7 @@ def write():
             __output_files[file] = \
                 eval('%s(txt, __output_files[file])' % __output_methods[file])
         # write the file out only if changed:
-        if __output_files[file] != txt:
+        if config.always_touch_output or __output_files[file] != txt:
             if not config.dry_run:
                 f.seek(0)
                 f.truncate()

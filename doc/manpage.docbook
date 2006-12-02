@@ -43,6 +43,9 @@
           <option>--dry-run</option>
         </arg>        
         <arg choice="opt">
+          <option>--touch</option>
+        </arg>        
+        <arg choice="opt">
           <option>--dump</option>
         </arg>        
         <arg choice="plain">
@@ -259,6 +262,18 @@
             </term>
             <listitem>
               <para>Supress all output except for errors.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--touch</option>
+            </term>
+            <listitem>
+              <para>
+                Always touch output files, even if their content doesn't
+                change.
+              </para>
             </listitem>
           </varlistentry>
 
