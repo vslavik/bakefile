@@ -685,6 +685,8 @@ makefiles (most notably GNU Make and Autoconf formats).
                 </command>
             </modify-target>
         </define-tag>
+        
+        <tag-info name="install-headers-to" position="after:headers"/>
 
         <define-tag name="install-headers-to" rules="dll,lib">
             <!-- proceed only if the <headers/> tag was used somewhere in this target -->
