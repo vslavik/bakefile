@@ -150,4 +150,11 @@
 
     <define-tag name="stack" rules="exe"/>
 
+    <!-- Tag positions: -->
+    <tag-info name="res-include" 
+              position="before:win32-res,before:mac-res,before:symbian-res"/>
+    <tag-info name="res-define" 
+              position="before:win32-res,before:mac-res,before:symbian-res"/>
+
+
 </makefile>
