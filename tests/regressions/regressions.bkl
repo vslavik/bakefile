@@ -2,4 +2,5 @@
 <makefile>
     <include file="onefilemultipleconds.bkl"/>
     <include file="cleanfiles.bkl"/>
+    <include file="win32rcflags.bkl"/>
 </makefile>

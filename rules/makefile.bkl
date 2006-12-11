@@ -135,6 +135,7 @@ makefiles (most notably GNU Make and Autoconf formats).
             <set var="__cppflags"/>
             <set var="__cflags"/>
             <set var="__cxxflags"/>
+            <set var="__win32rc_flags"/>
 
             <!-- cflags, cxxflags make variables (CFLAGS etc. options must
                  be last, so that e.g. headers from -I passed by configure
