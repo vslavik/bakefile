@@ -58,7 +58,7 @@
             <synopsis>isdefined(<parameter>name</parameter>)</synopsis>
             <para>
             Returns <literal>true</literal> if the given string is the name
-            of an option or a variable previously defined in the bakefile.
+            of an option or a (conditional) variable previously defined in the bakefile.
             </para>
         </section>
 
@@ -71,6 +71,14 @@
             </para>
         </section>
 
+        <section id="pyfunc.iscondvar" xreflabel="iscondvar">
+            <title>iscondvar</title>
+            <synopsis>iscondvar(<parameter>name</parameter>)</synopsis>
+            <para>
+            Returns <literal>true</literal> if the given string is the name
+            of a conditional variable previously defined in the bakefile.
+            </para>
+        </section>
 
         <section id="pyfunc.ifthenelse" xreflabel="ifthenelse">
             <title>ifthenelse</title>

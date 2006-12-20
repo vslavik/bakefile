@@ -37,11 +37,14 @@ def checkBakefileVersion(version):
 def isoption(name):
     return name in mk.options
 
+def iscondvar(name):
+    return name in mk.cond_vars
+
 def isdefined(name):
     try:
         exec('__foo__ = %s' % name, mk.__curNamespace)
     except NameError:
-        return isoption(name)
+        return isoption(name) or iscondvar(name)
     return 1
 
 def isconst(expr):
