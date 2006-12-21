@@ -38,7 +38,6 @@ Version 0.2.1
 - added Mac OS X package (Kevin Ollivier)
 - added --dry-run option to bakefile and --list-files to bakefile_gen
 - correctly evaluate per-target variables in <echo> and <error>
-- Bakefile is now under the MIT license
 
 
 Version 0.2.0
