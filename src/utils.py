@@ -64,15 +64,23 @@ __refContexts = {}
 
 def ref(var, target=None, context=None):
     if __refEval:
+        if context != None:
+            context = __refContexts[context]
         if target != None and target not in mk.targets:
-            if context != None:
-                context = __refContexts[context]
             raise errors.Error("target '%s' cannot be used in ref() since it doesn't exist" % target,
                                context=context)
-        if target==None or var not in mk.targets[target].vars:
-            return mk.vars[var]
-        else:
-            return mk.targets[target].vars[var]
+        try:
+            if target == None or var not in mk.targets[target].vars:
+                return mk.vars[var]
+            else:
+                return mk.targets[target].vars[var]
+        except KeyError:
+            if target == None:
+                raise errors.Error("undefined variable '%s'" % var,
+                                   context=context)
+            else:
+                raise errors.Error("undefined variable '%s' on target '%s'" % (var, target),
+                                   context=context)
     else:
         if mk.__trackUsage: mk.__usageTracker.refs += 1
         if context == None:
