@@ -32,6 +32,7 @@
     <!-- WinCE can't handle console-only apps (FIXME: build tests anyway!): -->
     <del-formats files="cond/*.bkl">msevc4prj</del-formats>
     <del-formats files="cond_install/*.bkl">msevc4prj</del-formats>
+    <del-formats files="echo/*.bkl">msevc4prj</del-formats>
     <del-formats files="regressions/*.bkl">msevc4prj</del-formats>
     <del-formats files="pch/*.bkl">msevc4prj</del-formats>
     <del-formats files="debug/*.bkl">msevc4prj</del-formats>
