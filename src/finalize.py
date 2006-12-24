@@ -102,6 +102,8 @@ def finalEvaluation(outputVarsOnly=1):
                 mk.__resetUsageTracker(reset_coverage=0)
                 try:
                     new = mk.evalExpr(expr, target=target)
+                except KeyError, e:
+                    raise errors.Error("failed to set variable '%s' to value '%s': undefined variable %s" % (obj, expr, e))
                 except Exception, e:
                     raise errors.Error("failed to set variable '%s' to value '%s': %s" % (obj, expr, e))
                 if expr != new:

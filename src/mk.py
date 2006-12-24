@@ -237,8 +237,10 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
     if eval:
         try:
             v = evalExpr(value, target=target, add_dict=add_dict)
+        except KeyError, e:
+            raise errors.Error("failed to set variable '%s' to value '%s': undefined variable %s" % (name, value, e))
         except Exception,e:
-            raise errors.Error("failed to set variable '%s' with value '%s':  %s" % (name, value, e))
+            raise errors.Error("failed to set variable '%s' to value '%s': %s" % (name, value, e))
     else:
         v = value
     if makevar:
