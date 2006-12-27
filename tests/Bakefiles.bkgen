@@ -21,6 +21,7 @@
         datafiles/datafiles.bkl
         filelist/filelist.bkl
         echo/echo.bkl
+        isdefined/isdefined.bkl
         subproject/subproject.bkl
         definetag/definetag.bkl
     </input>
@@ -33,6 +34,7 @@
     <del-formats files="cond/*.bkl">msevc4prj</del-formats>
     <del-formats files="cond_install/*.bkl">msevc4prj</del-formats>
     <del-formats files="echo/*.bkl">msevc4prj</del-formats>
+    <del-formats files="isdefined/*.bkl">msevc4prj,dmars</del-formats>
     <del-formats files="regressions/*.bkl">msevc4prj</del-formats>
     <del-formats files="pch/*.bkl">msevc4prj</del-formats>
     <del-formats files="debug/*.bkl">msevc4prj</del-formats>

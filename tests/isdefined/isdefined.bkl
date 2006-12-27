@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<makefile>
+    <option name="MY_OPTION">
+        <values>val1,val2</values>
+    </option>
+    <set var="MY_CONDVAR">
+        <if cond="MY_OPTION=='val1'">one</if>
+        <if cond="MY_OPTION=='val2'">two</if>
+    </set>
+    <set var="MY_VAR">foo</set>
+
+    <echo>isdefined('MY_OPTION')=$(isdefined('MY_OPTION'))</echo>
+    <echo>isdefined('MY_CONDVAR')=$(isdefined('MY_CONDVAR'))</echo>
+    <echo>isdefined('MY_VAR')=$(isdefined('MY_VAR'))</echo>
+
+    <echo>isoption('MY_OPTION')=$(isoption('MY_OPTION'))</echo>
+    <echo>isoption('MY_CONDVAR')=$(isoption('MY_CONDVAR'))</echo>
+    <echo>isoption('MY_VAR')=$(isoption('MY_VAR'))</echo>
+
+    <echo>iscondvar('MY_OPTION')=$(iscondvar('MY_OPTION'))</echo>
+    <echo>iscondvar('MY_CONDVAR')=$(iscondvar('MY_CONDVAR'))</echo>
+    <echo>iscondvar('MY_VAR')=$(iscondvar('MY_VAR'))</echo>
+
+    <echo>isconst('MY_OPTION')=$(isconst('MY_OPTION'))</echo>
+    <echo>isconst('MY_CONDVAR')=$(isconst('MY_CONDVAR'))</echo>
+    <echo>isconst('MY_VAR')=$(isconst('MY_VAR'))</echo>
+
+</makefile>
