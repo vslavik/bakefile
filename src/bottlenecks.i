@@ -1,7 +1,7 @@
 /*
  *  This file is part of Bakefile (http://bakefile.sourceforge.net)
  *
- *  Copyright (C) 2003,2004 Vaclav Slavik
+ *  Copyright (C) 2003-2006 Vaclav Slavik
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -52,7 +52,7 @@ extern const char *doEvalExpr(const char *expr,
 
 
 /* ------------------------------------------------------------------------ */
-/*                     Fast merged dictionaries support                     */
+/*           Fast merged dictionaries support for Python < 2.4              */
 /* ------------------------------------------------------------------------ */
 
 /* These functions and ProxyDictionary class are used to optimize 
@@ -63,7 +63,7 @@ extern const char *doEvalExpr(const char *expr,
    variables, global variables and options), though. Original pure Python
    code merged the dicts into single dictionary that was then passed to
    eval():
-      
+
        v = vlist[0].copy()
        for i in vlist[1:]: v.update(i)
 
@@ -75,7 +75,10 @@ extern const char *doEvalExpr(const char *expr,
    a Really Ugly Hack to route all PyDict_GetItem queries to other dictionaries
    (in order they were specified). This can't be done using clean code because
    the Python interpreter has hard-wired assumption that the dictionary passed
-   to eval() wasn't subclassed in Python. */
+   to eval() wasn't subclassed in Python.
+
+   As of Python 2.4, this hack is no longer needed because it's possible to
+   use dict-like objects as eval's third argument. */
 
 /* create proxy dictionary helper object: */
 extern PyObject *proxydict_create(void);

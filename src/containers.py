@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003,2004 Vaclav Slavik
+#  Copyright (C) 2003-2006 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -22,6 +22,7 @@
 #
 
 from __future__ import generators
+import sys
 import copy
 
 class OrderedDict(dict):
@@ -116,4 +117,66 @@ class OrderedDictWithClasification(OrderedDict):
         c = OrderedDictWithClasification(len(self.order), self.getGroup)
         for k in self.iterkeys():
             c[k] = copy.deepcopy(self[k])
-        return c        
+        return c
+
+if sys.version_info >= (2,4):
+
+    class MergedDict:
+        """This class implements "merged dictionary" - fake dictionary that
+           serves as a proxy to ordered list of "slave" dictionaries. Lookups
+           are performed by trying the slaves in order. Insertions and removals
+           are done using temporary dict object that is initially empty."""
+        def __init__(self):
+            self.localdict = {}
+            self.dicts = []
+
+        def add(self, dict):
+            """Adds a dictionary to the front of the list (i.e. variables in
+               the latest added dictionary take precendence over variables
+               from the lists added earlier)."""
+            self.dicts.insert(0, dict)
+
+        def dictForEval(self):
+            """Returns dictionary that can be passed to eval()."""
+            return self
+
+        def __getitem__(self, key):
+            if key in self.localdict:
+                return self.localdict[key]
+            for d in self.dicts:
+                if key in d: return d[key]
+            raise KeyError(key)
+
+        def __contains__(self, key):
+            for d in self.dicts:
+                if key in d: return True
+            return key in self.localdict
+        
+        def __setitem__(self, key, value):
+            self.localdict.__setitem__(key, value)
+        
+        def __delitem__(self, key):
+            self.localdict.__delitem__(key)
+
+else:
+
+    # MergedDict implementation for Python <= 2.3, which depends on an ugly
+    # hack from bottlenecks.c:
+    import bottlenecks
+
+    class MergedDict:
+        def __init__(self):
+            self.proxy = bottlenecks.ProxyDictionary()
+            self.dicts = []
+
+        def add(self, dict):
+            self.proxy.add(dict)
+            self.dicts.insert(0, dict)
+        
+        def dictForEval(self):
+            return self.proxy.dict
+
+        def __contains__(self, key):
+            for d in self.dicts:
+                if key in d: return True
+            return False

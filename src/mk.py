@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003,2004 Vaclav Slavik
+#  Copyright (C) 2003-2006 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -359,17 +359,17 @@ False, True = 0, 1
 __pyExprPrecompiled = {}
 
 def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
-    if use_options:
-        vlist = [__vars_opt, vars]
-    else:
-        vlist = [vars]
-    if target != None:
-        vlist.append(target.vars)
-    if add_dict != None:
-        vlist.append(add_dict)
+    vdict = containers.MergedDict()
 
-    for v in range(len(vlist)-1,-1,-1):
-        d = vlist[v]
+    if use_options:
+        vdict.add(__vars_opt)
+    vdict.add(vars)
+    if target != None:
+        vdict.add(target.vars)
+    if add_dict != None:
+        vdict.add(add_dict)
+
+    for d in vdict.dicts:
         if expr in d:
             if __trackUsage:
                 if d is __vars_opt:
@@ -384,13 +384,10 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     
     if __trackUsage:
         __usageTracker.pyexprs += 1
-   
-    v = bottlenecks.ProxyDictionary()
-    for x in vlist: v.add(x)
  
     global __curNamespace, __pyExprPrecompiled
     oldNS = __curNamespace
-    __curNamespace = v.dict
+    __curNamespace = vdict
 
     # NB: Small percentage of py expressions evaluated during bakefile
     #     processing is evaluated more than once (up to several hundred times).
@@ -400,11 +397,11 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     #     bytecode for every expression into cache. This gains a little
     #     performance (~5-10 %).
     if expr in __pyExprPrecompiled:
-        val = eval(__pyExprPrecompiled[expr], globals(), v.dict)
+        val = eval(__pyExprPrecompiled[expr], globals(), vdict.dictForEval())
     else:
         c = compile(expr, '<e>', 'eval')
         __pyExprPrecompiled[expr] = c
-        val = eval(c, globals(), v.dict)
+        val = eval(c, globals(), vdict.dictForEval())
 
     if val == True: val = 1
     elif val == False: val = 0

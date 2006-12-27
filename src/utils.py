@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003-2005 Vaclav Slavik
+#  Copyright (C) 2003-2006 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -41,11 +41,12 @@ def iscondvar(name):
     return name in mk.cond_vars
 
 def isdefined(name):
-    try:
-        exec('__foo__ = %s' % name, mk.__curNamespace)
-    except NameError:
-        return isoption(name) or iscondvar(name)
-    return 1
+    return (name in mk.__curNamespace or
+            # names of options and condvars are not in the current namespace
+            # if we're evaluating a constant expression, but this function
+            # must work correctly even in that case, so we have to test for
+            # options and condvars explicitly:
+            isoption(name) or iscondvar(name))
 
 def isconst(expr):
     try:

@@ -286,6 +286,8 @@ def __doEvalExpr(e, varCallb, textCallb, moreArgs,
 /*                     Fast merged dictionaries support                     */
 /* ------------------------------------------------------------------------ */
 
+#if PY_VERSION_HEX < 0x02040000
+
 /* NB: see bottlenecks.i for high-level explanation. The way the hijacking
        is implemented is by replacing PyDictObject::ma_lookup pointer with
        our function. This pointer is used to do *all* lookups in PyDictObject
@@ -406,3 +408,14 @@ void proxydict_add(PyObject *data, PyObject *dict)
     d->slaves = slave;
     Py_INCREF(dict);
 }
+
+#else /* Python>=2.4 */
+
+/* not used with new Python versions, but SWIG won't let us compile this
+   in only conditionally, so use empty stubs: */
+void proxydict_release(void *d) {}
+PyObject *proxydict_create(void) { return NULL; }
+void proxydict_hijack(PyObject *data, PyObject *dict) {}
+void proxydict_add(PyObject *data, PyObject *dict) {}
+
+#endif /* Python<2.4 / Python>=2.4 */
