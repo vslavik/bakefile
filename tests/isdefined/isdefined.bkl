@@ -21,8 +21,4 @@
     <echo>iscondvar('MY_CONDVAR')=$(iscondvar('MY_CONDVAR'))</echo>
     <echo>iscondvar('MY_VAR')=$(iscondvar('MY_VAR'))</echo>
 
-    <echo>isconst('MY_OPTION')=$(isconst('MY_OPTION'))</echo>
-    <echo>isconst('MY_CONDVAR')=$(isconst('MY_CONDVAR'))</echo>
-    <echo>isconst('MY_VAR')=$(isconst('MY_VAR'))</echo>
-
 </makefile>

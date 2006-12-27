@@ -48,7 +48,9 @@
             <title>isconst</title>
             <synopsis>isconst(<parameter>expr</parameter>)</synopsis>
             <para>
-              Returns <literal>true</literal> if the expression given as
+              Returns <literal>true</literal> if the
+              <emphasis>expression</emphasis> (i.e. not variable name as in
+              the case of <xref linkend="pyfunc.isdefined"/> etc.) given as
               argument is constant expression.
             </para>
         </section>
