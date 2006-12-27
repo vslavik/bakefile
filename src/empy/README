@@ -34,14 +34,15 @@ Overview
     intended to specify per-file identification information in a
     format which is easy to parse externally.  Context name and line
     number changes can be done with '@?' and '@!' respectively.
-    Escape sequences analogous to those in C can be specified with
-    '@\...', and finally a '@@' sequence expands to a single literal
-    at sign.
+    '@<...>' markups are customizeable by the user and can be used for
+    any desired purpose.  Escape sequences analogous to those in C can
+    be specified with '@\...', and finally a '@@' sequence expands to
+    a single literal at sign.
 
 
 Getting the software
 
-    The current version of empy is 3.1.1.
+    The current version of empy is 3.3.
 
     The latest version of the software is available in a tarball here:
     "http://www.alcyone.com/software/empy/empy-latest.tar.gz",
@@ -63,8 +64,8 @@ Requirements
 
 License
 
-    This code is released under the "GPL",
-    http://www.gnu.org/copyleft/gpl.html.
+    This code is released under the "LGPL",
+    http://www.gnu.org/copyleft/lesser.html.
 
 
 Mailing lists
@@ -98,7 +99,10 @@ Basics
     Code that is processed is executed exactly as if it were entered
     into the Python interpreter; that is, it is executed with the
     equivalent of 'eval' (for expressions) and 'exec' (for
-    statements).
+    statements).  EmPy is intended to be a very thin (though powerful)
+    layer on top of a running Python system; Python and EmPy files can
+    be mixed together (via command line options) without
+    complications.
 
     By default the embedding prefix is the at sign ('@'), which
     appears neither in valid Python code nor commonly in arbitrary
@@ -111,15 +115,16 @@ Basics
     When the interpreter starts processing its target file, no modules
     are imported by default, save the 'empy' pseudomodule (see below),
     which is placed in the globals; the 'empy' pseudomodule is
-    associated with a particular interpreter; it is important that it
-    not be removed from that interpreter's globals, nor that it be
-    shared with other interpreters running concurrently (a name other
-    than 'empy' can be specified with the -m option).  The globals are
-    not cleared or reset in any way.  It is perfectly legal to set
-    variables or explicitly import modules and then use them in later
-    markups, *e.g.*, '@{import time} ... @time.time()'.  Scoping rules
-    are as in normal Python, although all defined variables and
-    objects are taken to be in the global namespace.
+    associated with a particular interpreter -- in fact, they are the
+    same object -- and it is important that it not be removed from
+    that interpreter's globals, nor that it be shared with other
+    interpreters running concurrently (a name other than 'empy' can be
+    specified with the -m option).  The globals are not cleared or
+    reset in any way.  It is perfectly legal to set variables or
+    explicitly import modules and then use them in later markups,
+    *e.g.*, '@{import time} ... @time.time()'.  Scoping rules are as
+    in normal Python, although all defined variables and objects are
+    taken to be in the global namespace.
 
     Indentation is significant in Python, and therefore is also
     significant in EmPy.  EmPy statement markups ('@{...}'), when
@@ -276,7 +281,10 @@ Expansions
       its place; this allows function calls that depend on side
       effects (such as printing) to be called as expressions.  (If you
       really *do* want a 'None' to appear in the output, then use the
-      Python string '"None"'.)  Example::
+      Python string '"None"'.)  *Note:* If an expression prints
+      something to 'sys.stdout' as a side effect, then that printing
+      will be spooled to the output *before* the expression's return
+      value is.  Example::
 
           2 + 2 is @(2 + 2).
           4 squared is @(4**2).
@@ -434,6 +442,14 @@ Expansions
           @%pages     1279
           @%keywords  'physics', 'gravity', 'Einstein', 'relativity'
           @%copyright 1970, 1971
+
+    **'@< CONTENTS >'** -- Invoke a custom markup.  The custom markup
+      is a special markup reserved for use by the user; it has no
+      prescribed meaning on its own.  If 'contents' is a string
+      representing what appears in between the angle brackets, then
+      expanding this markup is equivalent to
+      'empy.invokeCallback(contents)'.  See the "Custom markup"
+      section for more information.
 
 
 Control
@@ -847,157 +863,86 @@ Filters
 
 Hooks
 
-    The EmPy system also allows for the usage of hooks, introduced in
-    version 2.0, which are callbacks that can be registered with an
-    interpreter to get information on the current state of activity
-    and act upon it.
+    The EmPy system allows for the registry of hooks with a running
+    EmPy interpreter.  Originally introduced in version 2.0 and much
+    improved in 3.2, hooks are objects, registered with an
+    interpreter, whose methods represent specific callbacks.  Any
+    number of hook objects can be registered with an interpreter, and
+    when a callback is invoked, the associated method on each one of
+    those hook objects will be called by the interpreter in sequence.
 
-    Hooks are associated with names, which are merely strings; these
-    strings represent a state of the interpreter.  Any number of hooks
-    can be associated with a given name, and are registered with the
-    'empy.addHook' function call.  Hooks are callable objects which
-    take two arguments: first, a reference to the interpreter that is
-    running; and second, a dictionary that contains contextual
-    information about the point at which the hook is invoked; the
-    contents of this dictionary are dependent on the hook name.
+    Hooks are simply instances, nominally derived from the 'empy.Hook'
+    class.  The 'empy.Hook' class itself defines a series of methods,
+    with the expected arguments, which would be called by a running
+    EmPy interpreter.  This scenario, much improved from the prior
+    implementation in 2.0, allows hooks to keep state and have more
+    direct access to the interpreter they are running in (the
+    'empy.Hook' instance contains an 'interpreter' attribute).
 
-    Hooks can perform any reasonable action, with one caveat:  When
-    hooks are invoked, 'sys.stdout' may not be properly wrapped and so
-    should be considered unusable.  If one wishes to really write to
-    the actually stdout stream (not the interpreter), use
-    'sys.__stdout__.write'.  If one wishes to send output to the
-    interpreter, then use 'interpreter.write'.  Neither references to
-    'sys.stdout' nor 'print' statements should ever appear in a hook.
+    To use a hook, derive a class from 'empy.Hook' and override the
+    desired methods (with the same signatures as they appear in the
+    base class).  Create an instance of that subclass, and then
+    register it with a running interpreter with the 'empy.addHook'
+    function.  (This same hook instance can be removed with the
+    'empy.removeHook' function.)
 
-    The hooks associated with a given name can be retrieved with
-    'empy.getHooks'.  All hooks associated with a name can be cleared
-    with 'empy.clearHooks', and all hooks associated with all names
-    can be cleared with 'empy.clearAllHooks'.  A hook added with
-    'empy.addHook' can be removed with 'empy.removeHook'.  Finally,
-    hooks can be manually invoked via 'empy.invokeHook'.
+    More than one hook instance can be registered with an interpreter;
+    in such a case, the appropriate methods are invoked on each
+    instance in the order in which they were registered.  To adjust
+    this behavior, an optional 'prepend' argument to the
+    'empy.addHook' function can be used dictate that the new hook
+    should placed at the *beginning* of the sequence of hooks, rather
+    than at the end (which is the default).
 
-    The following hooks are supported; also listed in curly braces are
-    the keys contained in the dictionary argument:
+    All hooks can be enabled and disabled entirely for a given
+    interpreter; this is done with the 'empy.enableHooks' and
+    'empy.disableHooks' functions.  By default hooks are enabled, but
+    obviously if no hooks have been registered no hook callbacks will
+    be made.  Whether hooks are enabled or disabled can be determined
+    by calling 'empy.areHooksEnabled'.  To get a (copy of) the list of
+    registered hooks, call 'empy.getHooks'.  Finally, to invoke a hook
+    manually, use 'empy.invokeHook'.
 
-    **'at_shutdown'** -- The interpreter is shutting down.
-
-    **'at_handle'** {meta} -- An exception is being handled; 'meta' is
-      the exception (an instance of 'MetaError').  Note that this hook
-      is invoked when the exception is *handled* by the EmPy system,
-      not when it is thrown.
-
-    **'before_include'** {name, file} -- An 'empy.include' call is
-      about to be processed; 'name' is the context name of the
-      inclusion and 'file' is the actual file object associated with
-      the include.
-
-    **'after_include'** -- An 'empy.include' was just completed.
-
-    **'before_expand'** {string, locals} -- An 'empy.expand' call is
-      about to be processed.  'string' is the actual data that is
-      about to be processed; 'locals' is the locals dictionary or
-      'None'.
-
-    **'after_expand'** -- An 'empy.expand' was just completed.
-
-    **'at_quote'** {string} -- An 'empy.quote' call is about to be
-      processed; 'string' is the string to be quoted.
-
-    **'at_escape'** {string} -- An 'empy.escape' call is about to be
-      processed; 'string' is the string to be escaped.
-
-    **'before_file'** {name, file} -- A file object is just about to
-      be processed.  'name' is the context name associated with the
-      object and 'file' is the file object itself.
-
-    **'after_file'** -- A file object has just finished processing.
-
-    **'before_binary'** {name, file, chunkSize} -- A binary file
-      object is just about to be processed.  'name' is the context
-      name associated with the object, 'file' is the file object
-      itself, and 'chunkSize' is the integral value indicating the
-      (approximate) number of bytes to be read each time through.
-
-    **'after_binary'** -- A file object has just finished processing.
-
-    **'before_string'** {name, string} -- A standalone string is just
-      about to be processed.  'name' is the context name associated
-      with it and 'string' is the string itself.
-
-    **'after_string'** -- A standalone string has just finished being
-      processed.
-
-    **'at_parse'** {scanner} -- A parsing pass is just about to be
-      performed.  'scanner' is the scanner associated with the parsing
-      pass.
-
-    **'before_evaluate'** {expression, locals} -- A Python expression
-      is just about to be evaluated.  'expression' is the (string)
-      expression, and 'locals' is the locals dictionary or 'None'.
-
-    **'after_evaluate'** -- A Python expression was just evaluated.
-
-    **'before_execute'** {statements, locals} -- A chunk of Python
-      statements is just about to be evaluated.  'statements' is the
-      (string) statement block, and 'locals' is the locals dictionary
-      or 'None'.
-
-    **'before_single'** {source, locals} -- A single interactive
-      source code fragment (just as in the Python interpreter) is
-      about to be executed via 'Interpreter.single'.  'source' is the
-      code (expression or statement) to execute, and 'locals' is the
-      locals directory or 'None'.
-
-    **'after_single'** -- A single has just taken place.
-
-    **'before_control' {type, rest}** -- A control markup is about to
-      be processed.
-
-    **'after_control'** -- A control markup has just been processed.
-
-    **'before_significate'** {key, value} -- A significator is just
-      about to be processed; 'key' is the key and 'value' is the
-      value.
-
-    **'after_significate'** -- A significator was just processed.
+    For a list of supported hook callbacks, see the 'empy.Hook' class
+    definition.
 
     As a practical example, this sample Python code would print a
     pound sign followed by the name of every file that is included
     with 'empy.include'::
 
-        def includeHook(interpreter, keywords):
-            interpreter.write("# %s\n" % keywords['name'])
-        empy.addHook('before_include', includeHook)
+        class IncludeHook(empy.Hook):
+            def beforeInclude(self, name, file, locals):
+                print "# %s" % name
 
-    Note that this snippet properly uses a call to 'interpreter.write'
-    instead of executing a 'print' statement.
+        empy.addHook(IncludeHook())
 
 
-Data flow
+Custom markup
 
-    **input -> interpreter -> diversions -> filters -> output**
+    Since version 3.2.1, the markup '@<...>' is reserved for
+    user-defined use.  Unlike the other markups, this markup has no
+    specified meaning on its own, and can be provided a meaning by the
+    user.  This meaning is provided with the use of a "custom
+    callback," or just "callback," which can be set, queried, or reset
+    using the pseudomodule function.
 
-    Here, in summary, is how data flows through a working EmPy system:
+    The custom callback is a callable object which, when invoked, is
+    passed a single argument: a string representing the contents of
+    what was found inside the custom markup '@<...>'.
 
-    1. Input comes from a source, such an .em file on the command
-       line, or via an 'empy.include' statement.
+    To register a callback, call 'empy.registerCallback'.  To remove
+    one, call 'empy.deregisterCallback'.  To retrieve the callback (if
+    any) registered with the interpreter, use 'empy.getCallback'.
+    Finally, to invoke the callback just as if the custom markup were
+    encountered, call 'empy.invokeCallback'.  For instance, '@<This
+    text>' would be equivalent to the call '@empy.invokeCallback("This
+    text")'.
 
-    2. The interpreter processes this material as it comes in,
-       expanding EmPy expansions as it goes.
-
-    3. After interpretation, data is then sent through the diversion
-       layer, which may allow it directly through (if no diversion is
-       in progress) or defer it temporarily.  Diversions that are
-       recalled initiate from this point.
-
-    4. Any filters in place are then used to filter the data and
-       produce filtered data as output.
-
-    5. Finally, any material surviving this far is sent to the output
-       stream.  That stream is stdout by default, but can be changed
-       with the -o or -a options, or may be fully buffered with the -b
-       option (that is, the output file would not even be opened until
-       the entire system is finished).
+    By default, to invoke a callback (either explicitly with
+    'empy.invokeCallback' or by processing a '@<...>' custom markup)
+    when no callback has been registered is an error.  This behavior
+    can be changed with the 'CALLBACK_OPT' option, or the
+    --no-callback-error command line option.
 
 
 Pseudomodule
@@ -1006,7 +951,9 @@ Pseudomodule
     system.  (The name of the module, by default 'empy', can be
     changed with the -m option or the 'EMPY_PSEUDO' environment
     variable).  It is called a pseudomodule because it is not actually
-    a module, but rather exports a module-like interface.
+    a module, but rather exports a module-like interface.  In fact,
+    the pseudmodule is actually the same internal object as the
+    interpreter itself.
 
     The pseudomodule contains the following functions and objects (and
     their signatures, with a suffixed 'opt' indicating an optional
@@ -1027,7 +974,9 @@ Pseudomodule
       expression string with 'myPrefix + empy.SIGNIFICATOR_RE_SUFFIX'.
 
     **'interpreter'** -- The instance of the interpreter that is
-      currently being used to perform execution.
+      currently being used to perform execution.  *Note:* This is now
+      obsolete; the pseudomodule is itself the interpreter.  Instead
+      of using 'empy.interpreter', simply use 'empy'.
 
     **'argv'** -- A list consisting of the name of the primary EmPy
       script and its command line arguments, in analogue to the
@@ -1046,14 +995,14 @@ Pseudomodule
       that the context only applies to the *EmPy* context, not the
       Python context.
 
-    **'atExit(callable)'** -- Register a callable object (or function)
-      taking no arguments which will be called at the end of a normal
-      shutdown.  Callable objects registered in this way are called in
-      the reverse order in which they are added, so the first callable
-      registered with 'empy.atExit' is the last one to be called.
-      Note that although the functionality is related to hooks,
-      'empy.atExit' does no work via the hook mechanism, and you are
-      guaranteed that the interpreter and stdout will be in a
+    **'atExit(callable)'** -- Register a callable object (such as a
+      function) taking no arguments which will be called at the end of
+      a normal shutdown.  Callable objects registered in this way are
+      called in the reverse order in which they are added, so the
+      first callable registered with 'empy.atExit' is the last one to
+      be called.  Note that although the functionality is related to
+      hooks, 'empy.atExit' does no work via the hook mechanism, and
+      you are guaranteed that the interpreter and stdout will be in a
       consistent state when the callable is invoked.
 
     Context manipulation:
@@ -1105,40 +1054,6 @@ Pseudomodule
     Types:
 
     **'Interpreter'** -- The actual interpreter class.
-
-    **'Filter'** -- The base Filter class which can be derived from to
-      make custom filters.
-
-    **'NullFilter'** -- A null filter; all data sent to the filter is
-      discarded.
-
-    **'FunctionFilter'** -- A filter which uses a function taking a
-      string and returning another to perform the filtering.
-
-    **'StringFilter'** -- A filter which uses a 256-character string
-      table to map any incoming character.  (The table must be a
-      string and cannot be Unicode, for reasons which should be
-      obvious.)
-
-    **'BufferedFilter'** -- A filter which does not modify its input,
-      but instead holds it until it is told to flush (via the filter's
-      'flush' method).  This also serves as the base class for the
-      other buffered filters below.
-
-    **'SizeBufferedFilter'** -- A filter which buffers into fixed-size
-      chunks, with the possible exception of the last chunk.  The
-      buffer size is indicated as the sole argument to the
-      constructor.
-
-    **'LineBufferedFilter'** -- A filter which buffers into lines,
-      with the possible exception of the last line (which may not end
-      with a newline).
-
-    **'MaximallyBufferedFilter'** -- A filter which does not flush any
-      of its contents until it is closed.  Note that since this filter
-      ignores calls to its 'flush' method, this means that installing
-      this filter and then replacing it with another can result in
-      loss of data.
 
     The following functions allow direct execution; optional 'locals'
     arguments, if specified, are treated as the locals dictionary in
@@ -1322,6 +1237,9 @@ Pseudomodule
 
     Hooks:
 
+    **'areHooksEnabled()'** -- Return whether or not hooks are
+      presently enabled.
+
     **'enableHooks()'** -- Enable invocation of hooks.  By default
       hooks are enabled.
 
@@ -1330,31 +1248,45 @@ Pseudomodule
       will not occur (even explicit invocation with
       'empy.invokeHook').
 
-    **'areHooksEnabled()'** -- Return whether or not hooks are
-      presently enabled.
+    **'getHooks()'** -- Get a (copy of the) list of the hooks
+      currently registered.
 
-    **'getHooks(name)'** -- Get a list of the hooks associated with
-      this name.
+    **'clearHooks()'** -- Clear all the hooks registered with this
+      interpreter.
 
-    **'clearHooks(name)'** -- Clear all hooks associated with this
-      name.
-
-    **'clearAllHooks(name)'** -- Clear all hooks associated with this
-      name.
-
-    **'addHook(name, hook, prepend_opt)'** -- Add this hook to the
-      hooks associated with this name.  By default, the hook is
+    **'addHook(hook, prepend_opt)'** -- Add this hook to the hooks
+      associated with this interpreter.  By default, the hook is
       appended to the end of the existing hooks, if any; if the
       optional insert argument is present and true, it will be
       prepended to the list instead.
 
-    **'removeHook(name, hook)'** -- Remove this hook from the hooks
-      associated with this name.
+    **'removeHook(hook)'** -- Remove this hook from the hooks
+      associated with this interpreter.
 
-    **'invokeHook(name_, ...)'** -- Manually invoke all the hooks
-      associated with this name.  The remaining arguments are treated
-      as keyword arguments and the resulting dictionary is passed in
-      as the second argument to the hooks.
+    **'invokeHook(_name, ...)'** -- Manually invoke a hook method.
+      The remaining arguments are treated as keyword arguments and the
+      resulting dictionary is passed in as the second argument to the
+      hooks.
+
+    Custom markup callback:
+
+    **'getCallback() -> callback'** -- Retrieve the current callback
+      associated with this interpreter, or 'None' if it does not yet
+      have one.
+
+    **'registerCallback(callback)'** -- Register a callback to be
+      called whenever a custom markup ('@<...>') is encountered.  When
+      encountered, 'invokeCallback' is called.
+
+    **'deregisterCallback()'** -- Clear any callback previously
+      registered with the interpreter for being called when a custom
+      markup is encountered.
+
+    **'invokeCallback(contents)'** -- Invoke a custom callback.  This
+      function is called whenever a custom markup ('@<...>') is
+      encountered.  It in turn calls the registered callback, with a
+      single argument, 'contents', which is a string representing of
+      the contents of the custom markup.
 
 
 Invocation
@@ -1371,6 +1303,10 @@ Invocation
       Extended usage includes a rundown of all the legal expansions,
       escape sequences, pseudomodule contents, used hooks, and
       supported environment variables.
+
+    **'-v'/'--verbose'** -- The EmPy system will print all manner of
+      details about what it is doing and what it is processing to
+      stderr.
 
     **'-V'/'--version'** -- Print version and exit.
 
@@ -1431,7 +1367,7 @@ Invocation
       characters (those that immediately follow the prefix to indicate
       the type of action EmPy should take), it will not be possible to
       represent literal prefix characters by doubling them (*e.g.*, if
-      the prefix were unadvisedly changed to '#' then '##' would
+      the prefix were inadvisedly changed to '#' then '##' would
       already have to represent a comment, so '##' could not represent
       a literal '#').  This can also be specified through the
       'EMPY_PREFIX' environment variable.
@@ -1481,6 +1417,21 @@ Invocation
     **'--no-prefix'** -- Disable the prefixing system entirely; when
       specified, EmPy will not expand any markups.  This allows EmPy
       to merely act as a Unicode encoding translator..
+
+    **'--pause-at-end'** -- If present, then 'raw_input' will be
+      called at the end of processing.  Useful in systems where the
+      output window would otherwise be closed by the operating
+      system/window manager immediately after EmPy exited.
+
+    **'--relative-path'** -- When present, the path the EmPy script
+      being invoked is contained in will be prepended to 'sys.path'.
+      This is analogous to Python's internal handling of 'sys.path'
+      and scripts.  If input is from stdin ('-' for a filename or no
+      filename is specified), then nothing is added to the path.
+
+    **'--no-callback-error'** -- Do not consider it an error if the
+      custom markup is invoked '@<...>' and there is no callback
+      function registered for it.
 
     **'--chunk-size' (chunk)** -- Use the specific binary chunk size
       rather than the default; implies --binary.
@@ -1592,6 +1543,9 @@ Examples and testing EmPy
         ./test.sh /usr/bin/python1.5
         ./test.sh jython
 
+    A more comprehensive test suite and set of real-world examples is
+    planned for a future version.
+
 
 Embedding EmPy
 
@@ -1656,9 +1610,9 @@ Embedding EmPy
             interpreter.shutdown()
  
     The 'em.Interpreter' constructor takes the following arguments;
-    all are optional.  Since options may be added in the future, it's
-    recommended that you invoke them via keyword arguments, rather
-    than their explicit order.  They are:
+    all are optional.  Since options may be added in the future, it is
+    highly recommended that the constructor be invoked via keyword
+    arguments, rather than assuming their order.  The arguments are:
 
     *output* -- The output file which the interpreter will be sending
      all its processed data to.  This need only be a file-like object;
@@ -1686,6 +1640,12 @@ Embedding EmPy
      dictionary of globals (except, of course, for the 'empy'
      pseudomodule).  Specifying this argument will allow the globals
      to start with more.
+
+    *hooks* -- A sequence of hooks (or 'None' for none) to register
+     with the interpreter at startup.  Hooks can, of course, be added
+     after the fact, but this allows the hooks to intercept the
+     'atStartup' event (otherwise, the startup event would already
+     have occurred by the time new hooks could be registered)..
 
     Many things can be done with EmPy interpreters; for the full
     developer documentation, see the generated documentation for the
@@ -1732,225 +1692,36 @@ Interpreter options
       captured by the EmPy system, but EmPy will support
       multithreading.  Default: true.
 
-
-Known issues and caveats
-
-    - EmPy was primarily intended for static processing of documents,
-      rather than dynamic use, and hence speed of processing was not a
-      major consideration in its design.
-
-    - EmPy is not threadsafe by default.  This is because of the need
-      for EmPy to override the 'sys.stdout' file with a proxy object
-      which can capture effects of 'print' and other spooling to
-      stdout.  This proxy can be suppressed with the -n option, which
-      will result in EmPy being unable to do anything meaningful with
-      this output, but will allow EmPy to be threadsafe.
-
-    - Expressions ('@(...)') are intended primarily for their return
-      value; statements ('@{...}') are intended primarily for their
-      side effects, including of course printing.  If an expression is
-      expanded that as a side effect prints something, then the
-      printing side effects will appear in the output *before* the
-      expansion of the expression value.
-
-    - Due to Python's curious handling of the 'print' statement --
-      particularly the form with a trailing comma to suppress the
-      final newline -- mixing statement expansions using prints inline
-      with unexpanded text will often result in surprising behavior,
-      such as extraneous (sometimes even deferred!) spaces.  This is a
-      Python "feature," and occurs in non-EmPy applications as well;
-      for finer control over output formatting, use 'sys.stdout.write'
-      or 'empy.interpreter.write' directly.
-
-    - To function properly, EmPy must override 'sys.stdout' with a
-      proxy file object, so that it can capture output of side effects
-      and support diversions for each interpreter instance.  It is
-      important that code executed in an environment *not* rebind
-      'sys.stdout', although it is perfectly legal to invoke it
-      explicitly (*e.g.*, '@sys.stdout.write("Hello world\n")').  If
-      one really needs to access the "true" stdout, then use
-      'sys.__stdout__' instead (which should also not be rebound).
-      EmPy uses the standard Python error handlers when exceptions are
-      raised in EmPy code, which print to 'sys.stderr'.  (This
-      behavior can be overridden with the -n option.)
-
-    - The 'empy' "module" exposed through the EmPy interface (*e.g.*,
-      '@empy') is an artificial module.  It cannot be imported with
-      the 'import' statement (and shouldn't -- it is an artifact of
-      the EmPy processing system and does not correspond to any
-      accessible '.py' file).
-
-    - For an EmPy statement expansion all alone on a line, *e.g.*,
-      '@{a = 1}', note that this will expand to a blank line due to
-      the newline following the closing curly brace.  To suppress this
-      blank line, use the symmetric convention '@{a = 1}@'.
-
-    - When using EmPy with make, note that partial output may be
-      created before an error occurs; this is a standard caveat when
-      using make.  To avoid this, write to a temporary file and move
-      when complete, delete the file in case of an error, use the -b
-      option to fully buffer output (including the open), or (with GNU
-      make) define a '.DELETE_ON_ERROR' target.
-
-    - 'empy.identify' tracks the context of executed *EmPy* code, not
-      Python code.  This means that blocks of code delimited with '@{'
-      and '}' will identify themselves as appearing on the line at
-      which the '}' appears, and that pure Python code executed via
-      the -D, -E and -F command line arguments will show up as all taking
-      place on line 1.  If you're tracking errors and want more
-      information about the location of the errors from the Python
-      code, use the -r command line option, which will provide you
-      with the full Python traceback.
-
-    - The conditional form of expression expansion '@(...?...!...)'
-      allows the use of a colon instead of an exclamation point,
-      *e.g.*, '@(...?...:...)'.  This behavior is supported for
-      backward compatibility, but is deprecated (although the support
-      is unlikely to be removed anytime soon).  Due to an oversight,
-      the colon was a poor choice since colons can appear legally in
-      expressions (*e.g.*, dictionary literals or lambda expressions).
-
-    - The '@[try]' construct only works with Python exceptions derived
-      from 'Exception'.  It is not able to catch string exceptions.
-
-    - The '@[for]' variable specification supports tuples for tuple
-      unpacking, even recursive tuples.  However, it is limited in
-      that the names included may only be valid Python identifiers,
-      not arbitrary Python lvalues.  Since the internal Python
-      mechanism is very rarely used for this purpose (*e.g.*, 'for (x,
-      l[0], q.a) in sequence'), it is not thought to be a significant
-      limitation.
+    **'CALLBACK_OPT'** -- If a callback is invoked when none has yet
+      been registered, should an error be raised or should the
+      situation be ignored?  Default: true.
 
 
-Wish list
+Data flow
 
-    Here are some random ideas for future revisions of EmPy.  If any
-    of these are of particular interest to you, your input would be
-    appreciated.
+    **input -> interpreter -> diversions -> filters -> output**
 
-    - Some real-world examples should really be included for
-      demonstrating the power and expressiveness of EmPy first-hand.
+    Here, in summary, is how data flows through a working EmPy system:
 
-    - More extensive help (rather than a ridiculously long README),
-      probably inherently using the EmPy system itself for building to
-      HTML and other formats, thereby acting as a help facility and a
-      demonstration of the working system.
+    1. Input comes from a source, such an .em file on the command
+       line, or via an 'empy.include' statement.
 
-    - A "trivial" mode, where all the EmPy system does is scan for
-      simple symbols to replace them with evaluations/executions,
-      rather than having to do the contextual scanning it does now.
-      This has the down side of being much less configurable and
-      powerful but the upside of being extremely efficient.  Perhaps
-      this need not be a separate mode, but an additional prefix
-      something of the form '@<(...)>', '@<[...]>', and '@<{...}>'?
-      Setting the trivial mode might simply disallow other expansions.
-      Also, perhaps there might be a special mode where EmPy might
-      convert normal expansions to their '@<...>' form in an automated
-      fashion.
+    2. The interpreter processes this material as it comes in,
+       expanding EmPy expansions as it goes.
 
-    - A "debug" mode, where EmPy prints the contents of everything
-      it's about to evaluate (probably to stderr) before it does?
+    3. After interpretation, data is then sent through the diversion
+       layer, which may allow it directly through (if no diversion is
+       in progress) or defer it temporarily.  Diversions that are
+       recalled initiate from this point.
 
-    - The ability to funnel all code through a configurable 'RExec'
-      for user-controlled security control.  This would probably
-      involve abstracting the execution functionality outside of the
-      interpreter.  [This suggestion is on hold until the
-      rexec/Bastion exploits are worked out.]
+    4. Any filters in place are then used to filter the data and
+       produce filtered data as output.
 
-    - Optimized handling of processing would be nice for the
-      possibility of an Apache module devoted to EmPy processing.
-
-    - An EmPy emacs mode.
-
-    - An optimization of offloading diversions to files when they
-      become truly huge.  (This is made possible by the abstraction of
-      the 'Diversion' class.)
-
-    - Support for mapping filters (specified by dictionaries).
-
-    - Support for some sort of batch processing, where several EmPy
-      files can be listed at once and all of them evaluated with the
-      same initial (presumably expensive) environment.
-      'empy.saveGlobals' and 'empy.restoreGlobals' have been
-      introduced as a partial solution, but they need to be made more
-      robust.
-
-    - A more elaborate interactive mode, perhaps with a prompt and
-      readline support.
-
-    - A StructuredText and/or reStructuredText filter would be quite
-      useful, as would SGML/HTML/XML/XHTML, s-expression, Python,
-      etc. auto-indenter filters.
-
-    - An indexing filter, which can process text and pick out
-      predefined keywords and thereby setup links to them.
-
-    - The ability to rerun diverted material back through the
-      interpreter.  (This can be done, awkwardly, by manually creating
-      a filter which itself contains an interpreter, but it might be
-      helpful if this was an all-in-one operation.)
-
-    - A caching system that stores off the compilations of repeated
-      evaluations and executions so that in a persistent environment
-      the same code does not have to be repeatedly evaluated/executed.
-      This would probably be a necessity in an Apache module-based
-      solution.  Perhaps caching even to the point of generating pure
-      PyWM bytecode?
-
-    - An option to change the format of the standard EmPy errors in a
-      traceback.
-
-    - Support for some manner of implicitly processed /etc/empyrc
-      and/or ~/.empyrc file, and of course an option to inhibit its
-      processing.  This can already be accomplished (and with greater
-      control) via use of EMPY_OPTIONS, though.
-
-    - More uniform handling of the preprocessing directives (-I, -D,
-      -E, -F, and -P), probably mapping directly to methods in the
-      'Interpreter' class.
-
-    - Support for integration with mod_python.
-
-    - In simple expressions, a '{...}' suffix has no meaning in Python
-      (*e.g.*, in Python, '@x(...)' is a call, '@x[...]' is
-      subscription, but '@x{...}' is illegal).  This could be
-      exploited by having a '{...}' suffix in a simple expression
-      representing an encapsulation of an expanded string; *e.g.*,
-      '@bullet{There are @count people here}' would be equivalent to
-      '@bullet(empy.expand("There are @count people here",
-      locals()))}'.
-
-    - A tool to collect significator information from a hierarchy of
-      .em files and put them in a database form available for
-      individual scripts would be extremely useful -- this tool should
-      be extensible so that users can use it to, say, build ordered
-      hierarchies of their EmPy files by detecting contextual
-      information like application-specific links to other EmPy
-      documents.
-
-    - Extensions of the basic EmPy concepts to projects for other
-      interpreted languages, such as Java, Lua, Ruby, and/or Perl.
-
-    - Ignore 'SystemExit' when doing error handling, letting the
-      exception progagate up?  So far no one seems to worry about
-      this; deliberately exiting early in a template seems to be an
-      unlikely occurrence.  (Furthermore, there are the 'os.abort' and
-      'os._exit' facilities for terminating without exception
-      propagation.)
-
-    - Reengineer hooks functionality as calls on a proxy instance of a
-      class which can be overridden by users.
-
-    - Verbose mode for debugging information about all processed
-      routines?  (This would be easier with the above proposed hook
-      reengineering.)
-
-    - A trivial expansion for strings looking like '@"..."', which can
-      be used to specialize behavior based on a unique hook.
-
-    - An entirely unique and dedicated expansion for user-definable
-      behavior (which would raise an exception if used without that
-      behavior being defined).
+    5. Finally, any material surviving this far is sent to the output
+       stream.  That stream is stdout by default, but can be changed
+       with the -o or -a options, or may be fully buffered with the -b
+       option (that is, the output file would not even be opened until
+       the entire system is finished).
 
 
 Author's notes
@@ -2108,6 +1879,8 @@ Acknowledgements
 
     - Grzegorz Adam Hankiewicz
 
+    - Bohdan Kushnir
+
     - Robert Kroeger
 
     - Kouichi Takahashi
@@ -2115,19 +1888,250 @@ Acknowledgements
     - Ville Vainio
 
 
+Known issues and caveats
+
+    - EmPy was primarily intended for static processing of documents,
+      rather than dynamic use, and hence speed of processing was not
+      the primary consideration in its design.
+
+    - EmPy is not threadsafe by default.  This is because of the need
+      for EmPy to override the 'sys.stdout' file with a proxy object
+      which can capture effects of 'print' and other spooling to
+      stdout.  This proxy can be suppressed with the -n option, which
+      will result in EmPy being unable to do anything meaningful with
+      this output, but will allow EmPy to be threadsafe.
+
+    - To function properly, EmPy must override 'sys.stdout' with a
+      proxy file object, so that it can capture output of side effects
+      and support diversions for each interpreter instance.  It is
+      important that code executed in an environment *not* rebind
+      'sys.stdout', although it is perfectly legal to invoke it
+      explicitly (*e.g.*, '@sys.stdout.write("Hello world\n")').  If
+      one really needs to access the "true" stdout, then use
+      'sys.__stdout__' instead (which should also not be rebound).
+      EmPy uses the standard Python error handlers when exceptions are
+      raised in EmPy code, which print to 'sys.stderr'.
+
+    - Due to Python's curious handling of the 'print' statement --
+      particularly the form with a trailing comma to suppress the
+      final newline -- mixing statement expansions using prints inline
+      with unexpanded text will often result in surprising behavior,
+      such as extraneous (sometimes even deferred!) spaces.  This is a
+      Python "feature," and occurs in non-EmPy applications as well;
+      for finer control over output formatting, use 'sys.stdout.write'
+      or 'empy.interpreter.write' directly.
+
+    - The 'empy' "module" exposed through the EmPy interface (*e.g.*,
+      '@empy') is an artificial module.  It cannot be imported with
+      the 'import' statement (and shouldn't -- it is an artifact of
+      the EmPy processing system and does not correspond to any
+      accessible .py file).
+
+    - For an EmPy statement expansion all alone on a line, *e.g.*,
+      '@{a = 1}', note that this will expand to a blank line due to
+      the newline following the closing curly brace.  To suppress this
+      blank line, use the symmetric convention '@{a = 1}@'.
+
+    - When using EmPy with make, note that partial output may be
+      created before an error occurs; this is a standard caveat when
+      using make.  To avoid this, write to a temporary file and move
+      when complete, delete the file in case of an error, use the -b
+      option to fully buffer output (including the open), or (with GNU
+      make) define a '.DELETE_ON_ERROR' target.
+
+    - 'empy.identify' tracks the context of executed *EmPy* code, not
+      Python code.  This means that blocks of code delimited with '@{'
+      and '}' will identify themselves as appearing on the line at
+      which the '}' appears, and that pure Python code executed via
+      the -D, -E and -F command line arguments will show up as all taking
+      place on line 1.  If you're tracking errors and want more
+      information about the location of the errors from the Python
+      code, use the -r command line option, which will provide you
+      with the full Python traceback.
+
+    - The conditional form of expression expansion '@(...?...!...)'
+      allows the use of a colon instead of an exclamation point,
+      *e.g.*, '@(...?...:...)'.  This behavior is supported for
+      backward compatibility, but is deprecated.  Due to an oversight,
+      the colon was a poor choice since colons can appear legally in
+      expressions (*e.g.*, dictionary literals or lambda expressions).
+
+    - The '@[try]' construct only works with Python exceptions derived
+      from 'Exception'.  It is not able to catch string exceptions.
+
+    - The '@[for]' variable specification supports tuples for tuple
+      unpacking, even recursive tuples.  However, it is limited in
+      that the names included may only be valid Python identifiers,
+      not arbitrary Python lvalues.  Since the internal Python
+      mechanism is very rarely used for this purpose (*e.g.*, 'for (x,
+      l[0], q.a) in sequence'), it is not thought to be a significant
+      limitation.
+
+
+Wish list
+
+    Here are some random ideas for future revisions of EmPy.  If any
+    of these are of particular interest to you, your input would be
+    appreciated.
+
+    - Some real-world examples should really be included for
+      demonstrating the power and expressiveness of EmPy first-hand.
+
+    - More extensive help (rather than a ridiculously long README),
+      probably inherently using the EmPy system itself for building to
+      HTML and other formats, thereby acting as a help facility and a
+      demonstration of the working system.
+
+    - A "trivial" mode, where all the EmPy system does is scan for
+      simple symbols to replace them with evaluations/executions,
+      rather than having to do the contextual scanning it does now.
+      This has the down side of being much less configurable and
+      powerful but the upside of being extremely efficient.
+
+    - A "debug" mode, where EmPy prints the contents of everything
+      it's about to evaluate (probably to stderr) before it does?
+
+    - The ability to funnel all code through a configurable 'RExec'
+      for user-controlled security control.  This would probably
+      involve abstracting the execution functionality outside of the
+      interpreter.  [This suggestion is on hold until the
+      rexec/Bastion exploits are worked out.]
+
+    - Optimized handling of processing would be nice for the
+      possibility of an Apache module devoted to EmPy processing.
+
+    - An EmPy emacs mode.
+
+    - An optimization of offloading diversions to files when they
+      become truly huge.  (This is made possible by the abstraction of
+      the 'Diversion' class.)
+
+    - Support for mapping filters (specified by dictionaries).
+
+    - Support for some sort of batch processing, where several EmPy
+      files can be listed at once and all of them evaluated with the
+      same initial (presumably expensive) environment.
+      'empy.saveGlobals' and 'empy.restoreGlobals' have been
+      introduced as a partial solution, but they need to be made more
+      robust.
+
+    - A more elaborate interactive mode, perhaps with a prompt and
+      readline support.
+
+    - A StructuredText and/or reStructuredText filter would be quite
+      useful, as would SGML/HTML/XML/XHTML, s-expression, Python,
+      etc. auto-indenter filters.
+
+    - An indexing filter, which can process text and pick out
+      predefined keywords and thereby setup links to them.
+
+    - The ability to rerun diverted material back through the
+      interpreter.  (This can be done, awkwardly, by manually creating
+      a filter which itself contains an interpreter, but it might be
+      helpful if this was an all-in-one operation.)
+
+    - A caching system that stores off the compilations of repeated
+      evaluations and executions so that in a persistent environment
+      the same code does not have to be repeatedly evaluated/executed.
+      This would probably be a necessity in an Apache module-based
+      solution.  Perhaps caching even to the point of generating pure
+      PyWM bytecode?
+
+    - An option to change the format of the standard EmPy errors in a
+      traceback.
+
+    - Support for some manner of implicitly processed /etc/empyrc
+      and/or ~/.empyrc file, and of course an option to inhibit its
+      processing.  This can already be accomplished (and with greater
+      control) via use of EMPY_OPTIONS, though.
+
+    - More uniform handling of the preprocessing directives (-I, -D,
+      -E, -F, and -P), probably mapping directly to methods in the
+      'Interpreter' class.
+
+    - Support for integration with mod_python.
+
+    - In simple expressions, a '{...}' suffix has no meaning in Python
+      (*e.g.*, in Python, '@x(...)' is a call, '@x[...]' is
+      subscription, but '@x{...}' is illegal).  This could be
+      exploited by having a '{...}' suffix in a simple expression
+      representing an encapsulation of an expanded string; *e.g.*,
+      '@bullet{There are @count people here}' would be equivalent to
+      '@bullet(empy.expand("There are @count people here",
+      locals()))}'.
+
+    - A tool to collect significator information from a hierarchy of
+      .em files and put them in a database form available for
+      individual scripts would be extremely useful -- this tool should
+      be extensible so that users can use it to, say, build ordered
+      hierarchies of their EmPy files by detecting contextual
+      information like application-specific links to other EmPy
+      documents.
+
+    - Extensions of the basic EmPy concepts to projects for other
+      interpreted languages, such as Java, Lua, Ruby, and/or Perl.
+
+    - Ignore 'SystemExit' when doing error handling, letting the
+      exception progagate up?  So far no one seems to worry about
+      this; deliberately exiting early in a template seems to be an
+      unlikely occurrence.  (Furthermore, there are the 'os.abort' and
+      'os._exit' facilities for terminating without exception
+      propagation.)
+
+    - A new markup which is the equivalent of '$...:...$' in source
+      control systems, where the left-hand portion represents a
+      keyword and the right-hand portion represents its value which is
+      substituted in by the EmPy system.
+
+    - The ability to obtain the filename (if relevant) and mode of the
+      primary output file.
+
+    - The ability to redirect multiple streams of output; not
+      diversions, but rather the ability to write to one file and then
+      another.  Since output would be under the EmPy script's control,
+      this would imply a useful --no-output option, where by default
+      no output is written.  This would also suggest the usefulness of
+      all the output file delegates (diversions, filters, abstract
+      files, etc.) passing unrecognized method calls all the way down
+      to underlying file object.
+
+    - In addition to the em.py script, an additional support library
+      (non-executable) should be included which includes ancillary
+      functionality for more advanced features, but which is not
+      necessary to use EmPy in its basic form as a standalone
+      executable.  Such features would include things like
+      significator processing, metadata scanning, and advanced
+      prompting systems.
+
+
 Release history
 
-    - 3.1.1; 2003 Sep 20.  Added literal '@"..."' markup; added
-      --pause-at-end command line option; fixed improper globals
+    - 3.3; 2003 Oct 27.  Custom markup '@<...>'; remove separate
+      pseudomodule instance for greater transparency; deprecate
+      'interpreter' attribute of pseudomodule; deprecate auxiliary
+      class name attributes associated with pseudomodule in
+      preparation for separate support library in 4.0; add
+      --no-callback-error and --no-bangpath-processing command line
+      options; add 'atToken' hook.
+
+    - 3.2; 2003 Oct 7.  Reengineer hooks support to use hook
+      instances; add -v option; add --relative-path option; reversed
+      PEP 317 style; modify Unicode support to give less confusing
+      errors in the case of unknown encodings and error handlers;
+      relicensed under LGPL.
+
+    - 3.1.1; 2003 Sep 20.  Add literal '@"..."' markup; add
+      --pause-at-end command line option; fix improper globals
       collision error via the 'sys.stdout' proxy.
 
-    - 3.1; 2003 Aug 8.  Unicode support (Python 2.0 and above); added
+    - 3.1; 2003 Aug 8.  Unicode support (Python 2.0 and above); add
       Document and Processor helper classes for processing
-      significators; added --no-prefix option for suppressing all
+      significators; add --no-prefix option for suppressing all
       markups.
 
-    - 3.0.4; 2003 Aug 7.  Somewhat more robust lvalue parsing for
-      '@[for]' construct (thanks to Beni Cherniavsky for inspiration).
+    - 3.0.4; 2003 Aug 7.  Implement somewhat more robust lvalue
+      parsing for '@[for]' construct (thanks to Beni Cherniavsky for
+      inspiration).
 
     - 3.0.3; 2003 Jul 9.  Fix bug regarding recursive tuple unpacking
       using '@[for]'; add 'empy.saveGlobals', 'empy.restoreGlobals',
@@ -2141,7 +2145,7 @@ Release history
 
     - 3.0.1; 2003 Jun 9.  Fix simple bug preventing command line
       preprocessing directives (-I, -D, -E, -F, -P) from executing
-      properly; defensive PEP 317 compliance.
+      properly; defensive PEP 317 compliance [defunct].
 
     - 3.0; 2003 Jun 1.  Control markups with '@[...]'; remove
       substitutions (use control markups instead); support
@@ -2303,4 +2307,4 @@ Author
 
 Version
 
-    Version 3.1.1 $Date$ $Author$
+    Version 3.3 $Date: 2003/10/27 $ $Author: max $
