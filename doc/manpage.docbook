@@ -535,6 +535,9 @@
           <option>-p</option>
         </arg>
         <arg choice="opt">
+          <option>--dry-run</option>
+        </arg>        
+        <arg choice="opt">
           <option>-k</option>
         </arg>
         <arg choice="opt">
@@ -668,6 +671,19 @@
             <listitem>
               <para>
                 Don't do anything, only display actions that would be performed.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry>
+            <term>
+              <option>--dry-run</option>
+            </term>
+            <listitem>
+              <para>
+                Process the bakefile normally, but instead of creating or
+                modifying files, just print which files would be changed
+                without actually modifying them.
               </para>
             </listitem>
           </varlistentry>

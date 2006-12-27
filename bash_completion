@@ -67,7 +67,7 @@ _bakefile_gen() {
             case "$cur" in
                 -*) 
                     all_cmds="-h --help -f --formats -b --bakefiles \
-                              -D -c --clean -j --jobs -p --pretend \
+                              -D -c --clean -j --jobs -p --pretend --dry-run \
                               -k --keep-going -B --always-make \
                               --list-files \
                               -v --verbose -V --very-verbose"

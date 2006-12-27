@@ -221,7 +221,8 @@ def filterFiles(bakefiles, formats):
 
 
 
-def updateTargets(jobs, pretend=0, keepGoing=0, alwaysMakeAll=0, dryRun=0):
+def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
+                  dryRun=False, quiet=False):
     """Updates all targets. Run jobs instances of bakefile simultaneously"""
     if verbose:
         if alwaysMakeAll:
@@ -293,15 +294,17 @@ def updateTargets(jobs, pretend=0, keepGoing=0, alwaysMakeAll=0, dryRun=0):
                     i = state.done
                 finally:
                     state.lock.release()
-                if not dryRun:
+                if not quiet:
                     print '%s[%i/%i] generating %s from %s' % (
                             threadId, i, state.totalCount, fmt, f)
                 cmd = '%s -f%s %s %s --output-deps=%s --output-changes=%s --xml-cache=%s' % \
                         (_getBakefileExecutable(),
                          fmt, files[f].flags[fmt], f,
                          tempDeps, tempChanges, tempXmlCacheFile)
+                if quiet:
+                    cmd += ' --quiet'
                 if dryRun:
-                    cmd += ' --quiet --dry-run'
+                    cmd += ' --dry-run'
                 elif verbose >= 2: cmd += ' -v'
                 if verbose:
                     print cmd
@@ -376,7 +379,7 @@ def updateTargets(jobs, pretend=0, keepGoing=0, alwaysMakeAll=0, dryRun=0):
         finally:
             state.lock.release()
 
-    if not dryRun:
+    if not quiet:
         print '%i files modified' % state.modifiedFiles
 
 
@@ -415,7 +418,8 @@ def cleanTargets(pretend=0):
 
 def listOutputFiles(jobs, alwaysMakeAll=0):
     # make sure all data are current:
-    updateTargets(jobs=jobs, alwaysMakeAll=alwaysMakeAll, dryRun=True)
+    updateTargets(jobs=jobs, alwaysMakeAll=alwaysMakeAll,
+                  dryRun=True, quiet=True)
 
     # then extract and print the output files from .bakefile_gen.state:
     for f in files:
@@ -456,6 +460,9 @@ def run(args):
                       action="store_true", dest='pretend',
                       default=0,
                       help="don't do anything, only display actions that would be performed")
+    parser.add_option('', '--dry-run',
+                      action="store_true", dest='dryRun', default=0,
+                      help="don't write any files, just pretend doing it")
     parser.add_option('-k', '--keep-going',
                       action="store_true", dest='keepGoing',
                       default=0,
@@ -506,7 +513,8 @@ def run(args):
             updateTargets(jobs=options.jobs,
                           pretend=options.pretend,
                           keepGoing=options.keepGoing,
-                          alwaysMakeAll=options.alwaysMakeAll)
+                          alwaysMakeAll=options.alwaysMakeAll,
+                          dryRun=options.dryRun)
     except errors.ErrorBase, e:
         sys.stderr.write('[bakefile_gen] %s' % str(e))
         sys.exit(1)
