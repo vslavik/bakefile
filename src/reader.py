@@ -106,7 +106,7 @@ def checkConditionsSupport(e):
 
 def handleSet(e, target=None, add_dict=None):
     errors.pushCtx(e)
-    name = evalConstExpr(e, e.props['var'], target)
+    name = basename = evalConstExpr(e, e.props['var'], target)
     if (name in mk.override_vars) and target == None:
         errors.popCtx()
         return # can't change value of variable overriden with -D=xxx
@@ -162,7 +162,7 @@ def handleSet(e, target=None, add_dict=None):
                     errors.popCtx()
                     return
                 name = '__%s_%s' % (target.id.replace('-','_').replace('.','_').replace('/','_'),
-                                    name)
+                                    basename)
                 mk.setVar(e.props['var'], '$(%s)' % name,
                              eval=0, target=target,
                              add_dict=add_dict, hints=hints)
