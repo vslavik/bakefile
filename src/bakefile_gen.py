@@ -22,10 +22,7 @@
 #
 
 import sys, os, os.path, glob, fnmatch, threading, shutil
-try:
-    from optparse import OptionParser
-except ImportError:
-    from optik import OptionParser
+from optparse import OptionParser
 
 import xmlparser, dependencies, errors, portautils
 from errors import ReaderError

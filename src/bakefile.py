@@ -24,10 +24,7 @@
 BAKEFILE_VERSION = "0.2.1"
 
 import sys, os.path
-try:
-    from optparse import OptionParser
-except ImportError:
-    from optik import OptionParser
+from optparse import OptionParser
 
 import formats
 

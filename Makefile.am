@@ -7,7 +7,6 @@ rulesgettextdir = $(rulesdir)/gettext
 presetsdir = $(pkgdatadir)/presets
 codedir = $(pkglibdir)
 codeempydir = $(codedir)/empy
-codeoptikdir = $(codedir)/optik
 
 SUBDIRS = doc
 
@@ -103,12 +102,6 @@ code_PYTHON = src/config.py \
 codeempy_PYTHON = \
               src/empy/__init__.py \
               src/empy/em.py
-codeoptik_PYTHON = \
-              src/optik/__init__.py \
-              src/optik/errors.py \
-              src/optik/help.py \
-              src/optik/option.py \
-              src/optik/option_parser.py
 
 code_LTLIBRARIES = _bottlenecks.la
 
@@ -121,7 +114,7 @@ EXTRA_DIST = \
     bootstrap chversion.sh \
 	$(srcdir)/admin/*.m4 \
 	bakefile.spec bakefile.iss bakefile.vim bash_completion \
-    src/optik/README.txt autoconf output rules presets tests \
+    autoconf output rules presets tests \
     src/empy/README src/empy/COPYING \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
