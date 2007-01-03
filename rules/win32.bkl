@@ -11,6 +11,47 @@
     <set var="TOOLSET">win32</set>
     <set var="DIRSEP">\</set>
     
+    <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+    
+
+        <!-- Define install dirs in case the user sets the FORMAT_HAS_MAKE_INSTALL
+             variable to 1 in his Bakefiles.bkgen file to enable install/uninstall 
+             support also under win32
+    
+             NOTE: since on Windows (unlike e.g. Unix) there are no standard 
+                   paths for installing libraries, headers, etc, the bakefile 
+                   user which wants to enable installation also under Windows, 
+                   should provide valid replacements for PREFIX and EXEC_PREFIX
+                   options
+        -->
+        
+        <option name="PREFIX" category="path">
+            <description>
+                The common installation prefix for header, data and library files
+            </description>
+        </option>
+        <option name="EXEC_PREFIX" category="path">
+            <description>
+                The common installation prefix for binary and DLL files
+            </description>
+        </option>
+        
+        <!-- TEMPORARY FIX (FIXME):
+             without adding PREFIX and EXEC_PREFIX to VARS_DONT_ELIMINATE these
+             two options would be passed to subprojects as expected but their 
+             default values would be lost 
+        -->
+        <set var="VARS_DONT_ELIMINATE" append="1">PREFIX EXEC_PREFIX</set>    
+            
+        <set var="INCLUDEDIR" eval="0">$(PREFIX)/include</set>
+        <set var="DATADIR" eval="0">$(PREFIX)/share</set>
+        <set var="LIBDIR" eval="0">$(PREFIX)/lib</set>
+    
+        <set var="DLLDIR" eval="0">$(EXEC_PREFIX)</set>
+        <set var="BINDIR" eval="0">$(EXEC_PREFIX)</set>
+    </if>
+    
+	
     <set var="OBJEXT" overwrite="0">.obj</set>
     <set var="LIBEXT">.lib</set>
     <set var="LIBPREFIX"></set>
@@ -22,15 +63,22 @@
     <set var="DLLPREFIX_MODULE"></set>
     <set var="PIC_CFLAGS"></set>
 
+    <!-- del command always return success on Windows so the '-' is used here only
+         to skip error messages generated when trying to remove nonexistent files -->
     <set var="RM">-del</set>
 
     <set var="INSTALL_PROGRAM">copy /Y</set>
     <set var="INSTALL_DATA">$(INSTALL_PROGRAM)</set>
-    <set var="INSTALL_DIR">mkdir</set>
+    
+    <!-- trying to create an existing directory will fail... thus we must ignore
+         the return code of Windows' mkdir -->
+    <set var="INSTALL_DIR">-mkdir</set>
 
     <set var="UNINSTALL_PROGRAM">$(RM)</set>
     <set var="UNINSTALL_DATA">$(UNINSTALL_PROGRAM)</set>
-    <set var="UNINSTALL_DIR">deltree</set>      <!-- never really used directly by Bakefile -->
+    
+    <!-- UNINSTALL_DIR is never really used directly by Bakefile -->
+    <set var="UNINSTALL_DIR">deltree</set>   
 
     <!-- for static libraries: -->
     <set var="LIB_PAGESIZE" overwrite="0">4096</set>

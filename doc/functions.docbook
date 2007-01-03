@@ -224,5 +224,14 @@
             </para>
         </section>
 
+        <section id="pyfunc.removeDuplicates" xreflabel="removeDuplicates">
+            <title>removeDuplicates</title>
+            <synopsis>removeDuplicates(<parameter>list</parameter>)</synopsis>
+            <para>
+                Returns a copy of the given (space-separed) list with all 
+                duplicate tokens removed.
+            </para>
+        </section>
+        
     </section>
 </chapter>

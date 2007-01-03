@@ -55,4 +55,9 @@
         -DAUTOCONF_MACROS_FILE=./autoconf_inc.m4
     </add-flags>
 
+    <!-- This is for testing [un]install targets for win32 formats -->
+    <add-flags formats="msvc,mingw,borland,watcom">
+        -DFORMAT_HAS_MAKE_INSTALL=1
+    </add-flags>
+
 </bakefile-gen>

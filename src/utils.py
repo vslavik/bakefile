@@ -21,7 +21,7 @@
 #  Misc utility functions for use in Bakefiles
 #
 
-import sys, os, os.path, string, glob
+import sys, os, os.path, string, glob, sets
 import mk, errors, config
 import containers
 import dependencies
@@ -680,3 +680,45 @@ def fileList(pathlist):
         return ret
     else:
         raise errors.Error('fileList() function only accepts a string or a python list of strings as argument')
+        
+def removeDuplicates(list):
+    """
+        Returns a copy of the given (space-separed) list with all 
+        duplicate tokens removed.
+    """
+    retlist = sets.Set(list.split())
+    return ' '.join(retlist)
+
+def getDirsFromList(filedirlist):
+    """
+        Returns a (space-separed) list of all directories in the given list.
+        Note that this function does a check at bakefile-time to determine if the
+        tokens of the given list, prefixed with the path of the generated makefile
+        and with the SRCDIR variable contents, are directories or not.
+        This mostly makes sense only for internal use of Bakefile.
+    """
+    def __isDir(path):
+        dir = os.path.dirname(path)
+        if dir=='' or dir=='.':
+            return None;
+
+        # get the absolute path to the generated makefile
+        finalmakefile = os.path.abspath(
+                    os.path.split(config.output_file.replace('/', os.sep))[0])
+    
+        # get the SRCDIR in a format suitable for the currently running OS
+        srcdir = mk.vars['SRCDIR'].replace('/', os.sep)
+    
+        # we need OS' native separator for os.path.isdir:
+        tocheck = os.path.join(finalmakefile, srcdir, dir.replace('/', os.sep))
+        
+        if os.path.isdir(tocheck):
+            return dir
+        return None
+    
+    ret = [ ]
+    for path in filedirlist.split():
+        d = __isDir(path)
+        if d!=None:
+            ret.append(d)
+    return removeDuplicates(' '.join(ret))

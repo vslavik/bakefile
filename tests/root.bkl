@@ -9,6 +9,7 @@
     <template id="sub">
         <dir>$(id)</dir>
         <dependency-of>all</dependency-of>
+        <installable>yes</installable>
     </template>
 
     <subproject id="cond" template="sub"/>

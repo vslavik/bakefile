@@ -42,4 +42,36 @@ bakefile file.bkl -f watcom -DPLATFORM_OS2=1
 
   </section>
   
+  
+  
+  <section id="wininstall">
+    <title>Install and uninstall support on Windows</title>
+    <para>
+      By default the <xref linkend="tag.install-to"/> and 
+      <xref linkend="tag.install-headers-to"/> tags won't have any effect
+      on Windows since the install and uninstall MAKE targets are not very
+      common there (unlike in the Unix world).
+    </para>
+    <para>
+      However you may find it useful to have (un)installation targets
+      under Windows as well. In this case you can enable this feature
+      by <link linkend="bakefile.command.variable">defining</link> the
+      <varname>FORMAT_HAS_MAKE_INSTALL</varname> variable and setting it to <literal>1</literal>:
+      <programlisting><![CDATA[
+# enable install and uninstall support also under Windows: 
+bakefile file.bkl -f msvc -DFORMAT_HAS_MAKE_INSTALL=1
+]]></programlisting>
+    </para>
+    <para>
+      When enabling the install/uninstall support for Windows, you should also
+      set the desired <varname>PREFIX</varname> and <varname>EXEC_PREFIX</varname> 
+      in your bakefile:
+      <programlisting><![CDATA[
+<set var="PREFIX">%MYPROJECTROOT%</set>
+<set var="EXEC_PREFIX">%MYPROJECTROOT%</set>
+]]></programlisting>
+    </para>
+  </section>
+  
+  
 </chapter>

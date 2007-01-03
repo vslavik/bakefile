@@ -109,9 +109,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                 <command cond="TOOLSET!='win32'">$(RM) $(value)</command>
                 <command cond="TOOLSET=='win32'">
                     <!-- in case $(value) is a list of files, we split all the tokens of the
-                         list and create single clean commands; all lines are separed by newlines
-                         but we also have to remove the newline after the last clean command to
-                         avoid that following <clean-files> tags will be spaced by an empty line -->
+                         list and create single clean commands -->
                     $('\n'.join([('-if exist %s del %s' % (x, x)) for x in safeSplit(value)]))
                 </command>
             </modify-target>
@@ -250,7 +248,7 @@ makefiles (most notably GNU Make and Autoconf formats).
         </define-tag>
 
         <define-tag name="headers">
-            <set var="__headers" append="1">$(value)</set>
+            <set var="__headers" append="1">$(nativePaths(value))</set>
         </define-tag>
 
         <define-tag name="library">
@@ -595,14 +593,10 @@ makefiles (most notably GNU Make and Autoconf formats).
 
 
 
-    <!-- =============================================================== -->
-    <!--               "make install" and "make uninstall":              -->
-    <!-- =============================================================== -->
-
     <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
 
         <define-rule name="inst-action" extends="action">
-            <template template="__phony"/>
+            <template template="__phony,_installcmd"/>
         </define-rule>
 
         <tag-info name="install-if" position="before:install-to"/>
@@ -620,7 +614,7 @@ makefiles (most notably GNU Make and Autoconf formats).
                cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
 
             <modify-target target="install_$(id)">
-                <command>$(INSTALL_DIR) $(DESTDIR)$(value)</command>
+                <command>$(INSTALL_DIR) $(DESTDIR)$(nativePaths(value))</command>
                 <dependency-of>install</dependency-of>
             </modify-target>
             <modify-target target="uninstall_$(id)">
@@ -636,12 +630,12 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="install-to" rules="exe">
             <modify-target target="install_$(id)">
                 <command>
-                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(nativePaths(value))
                 </command>
             </modify-target>
             <modify-target target="uninstall_$(id)">
                 <command>
-                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(value)$(DIRSEP)$(ref('__targetname',id))
+                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(nativePaths(value))$(DIRSEP)$(ref('__targetname',id))
                 </command>
             </modify-target>
         </define-tag>
@@ -649,14 +643,14 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="install-to" rules="dll">
             <modify-target target="install_$(id)">
                 <command>
-                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(DESTDIR)$(value)
-                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
+                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(DESTDIR)$(nativePaths(value))
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(nativePaths(value))
                 </command>
             </modify-target>
             <modify-target target="uninstall_$(id)">
                 <command>
-                    $(UNINSTALL_DATA) $(DESTDIR)$(value)$(DIRSEP)$(ref('__linkname',id))
-                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(value)$(DIRSEP)$(ref('__targetname',id))
+                    $(UNINSTALL_DATA) $(DESTDIR)$(nativePaths(value))$(DIRSEP)$(ref('__linkname',id))
+                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(nativePaths(value))$(DIRSEP)$(ref('__targetname',id))
                 </command>
             </modify-target>
         </define-tag>
@@ -664,12 +658,12 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="install-to" rules="module">
             <modify-target target="install_$(id)">
                 <command>
-                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(nativePaths(value))
                 </command>
             </modify-target>
             <modify-target target="uninstall_$(id)">
                 <command>
-                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(value)$(DIRSEP)$(ref('__targetname',id))
+                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(nativePaths(value))$(DIRSEP)$(ref('__targetname',id))
                 </command>
             </modify-target>
         </define-tag>
@@ -677,12 +671,12 @@ makefiles (most notably GNU Make and Autoconf formats).
         <define-tag name="install-to" rules="lib">
             <modify-target target="install_$(id)">
                 <command>
-                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(value)
+                    $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(nativePaths(value))
                 </command>
             </modify-target>
             <modify-target target="uninstall_$(id)">
                 <command>
-                    $(UNINSTALL_DATA) $(DESTDIR)$(value)$(DIRSEP)$(ref('__targetname',id))
+                    $(UNINSTALL_DATA) $(DESTDIR)$(nativePaths(value))$(DIRSEP)$(ref('__targetname',id))
                 </command>
             </modify-target>
         </define-tag>
@@ -700,27 +694,27 @@ makefiles (most notably GNU Make and Autoconf formats).
                    cond="target$(addPrefixIfNotEmpty(' and ',__install_if_cond))"/>
 
                 <modify-target target="install_$(id)_headers">
-                    <if cond="TOOLSET=='unix'">
-                       <command>
-                           $(INSTALL_DIR) $(DESTDIR)$(value)
-                           for f in $(__headers_var); do \
-                               if test ! -d $(DESTDIR)$(value)/`dirname $(DOLLAR)$(DOLLAR)f` ; then \
-                                   $(INSTALL_DIR) $(DESTDIR)$(value)/`dirname $(DOLLAR)$(DOLLAR)f`; \
-                               fi; \
-                               $(INSTALL_DATA) $(SRCDIR)/$(DOLLAR)$(DOLLAR)f $(DESTDIR)$(value)/$(DOLLAR)$(DOLLAR)f; \
-                           done
-                       </command>
-                    </if>
+                    <set var="__iprg">$(INSTALL_DATA)</set>
+                    <set var="__dstdir">$(DESTDIR)$(nativePaths(value))</set>
+                    <set var="__files">
+                        <!-- FIXME: always use __headers_var -->
+                        <if cond="TOOLSET=='unix'">$(__headers_var)</if>
+                        <if cond="TOOLSET!='unix'">$(__headers)</if>
+                    </set>
+                    
+                    <command>$(__install_cmd_preservetree)</command>
                     <dependency-of>install</dependency-of>
                 </modify-target>
                 <modify-target target="uninstall_$(id)_headers">
-                    <if cond="TOOLSET=='unix'">
-                       <command>
-                           for f in $(__headers_var); do \
-                               $(UNINSTALL_DATA) $(DESTDIR)$(value)/$(DOLLAR)$(DOLLAR)f; \
-                           done
-                        </command>
-                    </if>
+                    <set var="__uprg">$(UNINSTALL_DATA)</set>
+                    <set var="__dstdir">$(DESTDIR)$(nativePaths(value))</set>
+                    <set var="__files">
+                        <!-- FIXME: always use __headers_var -->
+                        <if cond="TOOLSET=='unix'">$(__headers_var)</if>
+                        <if cond="TOOLSET!='unix'">$(__headers)</if>
+                    </set>
+
+                    <command>$(__uninstall_cmd_preservetree)</command>
                     <dependency-of>uninstall</dependency-of>
                 </modify-target>
             </if>

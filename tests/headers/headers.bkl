@@ -1,6 +1,15 @@
 <?xml version="1.0" ?>
 <makefile>
 
+    <if cond="FORMAT_HAS_MAKE_INSTALL=='1' and FORMAT in ['msvc','mingw','borland','watcom']">
+        <!-- to test win32 [un]installation support, we will make the prefix and 
+             exec_prefix fixed to a dummy value: variables override options thus 
+             PREFIX and EXEC_PREFIX options will be just dropped.
+        -->
+        <set var="PREFIX">C:</set>
+        <set var="EXEC_PREFIX">C:</set>
+    </if>
+
     <if cond="FORMAT!='dmars'">
         <option name="DO_INSTALL">
             <values>0,1</values>

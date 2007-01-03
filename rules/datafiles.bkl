@@ -18,28 +18,19 @@
          directory tree: -->
 
     <define-rule name="__data-files-base">
-        <template>
+        <template template="_installcmd">
             <set var="__iprg">$(INSTALL_DATA)</set>
             <set var="__uprg">$(UNINSTALL_DATA)</set>
             <set var="__srcdir">$(SRCDIR)</set>
             <set var="__files"/>
-            <set var="__copy_cmd" eval="0">
-                <if cond="TOOLSET=='unix'">
-                    $(INSTALL_DIR) $(__dstdir)
-                    (cd $(__srcdir) ; $(__iprg) $(__files) $(__dstdir))
-                </if>
-            </set>
-            <set var="__remove_cmd" eval="0">
-                <if cond="TOOLSET=='unix'">
-                    $('(cd %s ; %s %s)' % (__dstdir, __uprg,  ' '.join([os.path.basename(x) for x in safeSplit(__files)])))
-                </if>
-            </set>
+            <set var="__copy_cmd" eval="0">$(__install_cmd)</set>
+            <set var="__remove_cmd" eval="0">$(__uninstall_cmd)</set>
         </template>
         <define-tag name="install-to">
-            <set var="__dstdir">$(DESTDIR)$(value)</set>
+            <set var="__dstdir">$(DESTDIR)$(nativePaths(value))</set>
         </define-tag>
         <define-tag name="srcdir">
-            <set var="__srcdir">$(value)$(DIRSEP)</set>
+            <set var="__srcdir">$(nativePaths(value))$(DIRSEP)</set>
         </define-tag>
         <define-tag name="files">
             <set var="__files" append="1">$(' '.join(value.split()))</set>
@@ -84,28 +75,13 @@
     <!-- Copy files while preserving their directory structure: -->
 
     <define-rule name="data-files-tree" pseudo="1">
-        <template>
+        <template template="_installcmd">
             <set var="__iprg">$(INSTALL_DATA)</set>
             <set var="__uprg">$(UNINSTALL_DATA)</set>
             <set var="__srcdir"/>
-            <set var="__copy_cmd" eval="0">
-                <if cond="TOOLSET=='unix'">
-                    $(INSTALL_DIR) $(__dstdir)
-                    for f in $(__files); do \
-                        if test ! -d $(__dstdir)/`dirname $(DOLLAR)$(DOLLAR)f` ; then \
-                            $(INSTALL_DIR) $(__dstdir)/`dirname $(DOLLAR)$(DOLLAR)f`; \
-                        fi; \
-                        $(__iprg) $(__srcdir)/$(DOLLAR)$(DOLLAR)f $(__dstdir)/$(DOLLAR)$(DOLLAR)f; \
-                    done
-                </if>
-            </set>
-            <set var="__remove_cmd" eval="0">
-                <if cond="TOOLSET=='unix'">
-                    for f in $(__files); do \
-                        $(__uprg) $(__dstdir)/$(DOLLAR)$(DOLLAR)f; \
-                    done
-                </if>
-            </set>
+            <set var="__copy_cmd" eval="0">$(__install_cmd_preservetree)</set>
+            <set var="__remove_cmd" eval="0">$(__uninstall_cmd_preservetree)</set>
+
             <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
                 <modify-target target="install">
                     <command>$(ref('__copy_cmd',id))</command>
@@ -131,7 +107,8 @@
 
 
 
-    <!-- Copying files around as part of the build process: -->
+    <!-- Copying files around as part of the build process:
+         NOTE: this rules do not modify 'install' or 'uninstall' targets -->
 
     <define-rule name="copy-files" extends="action">
         <template>
