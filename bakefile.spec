@@ -12,7 +12,7 @@ URL:           http://bakefile.sourceforge.net
 Packager:      Vaclav Slavik <vslavik@fastmail.fm>
 BuildRoot:     /var/tmp/%{name}-%{version}-root
 
-Requires:      python >= 2.2.2
+Requires:      python >= 2.3.0
 BuildRequires: python-devel
 
 %description
