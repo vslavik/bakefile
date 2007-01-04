@@ -27,10 +27,14 @@
             <set var="__remove_cmd" eval="0">$(__uninstall_cmd)</set>
         </template>
         <define-tag name="install-to">
-            <set var="__dstdir">$(DESTDIR)$(nativePaths(value))</set>
+            <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+                <set var="__dstdir">$(DESTDIR)$(nativePaths(value))</set>
+            </if>
         </define-tag>
         <define-tag name="srcdir">
-            <set var="__srcdir">$(nativePaths(value))$(DIRSEP)</set>
+            <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+                <set var="__srcdir">$(nativePaths(value))$(DIRSEP)</set>
+            </if>
         </define-tag>
         <define-tag name="files">
             <set var="__files" append="1">$(' '.join(value.split()))</set>
