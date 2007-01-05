@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<makefile>
+    <set var="FOO">x $(BAR) y</set>
+</makefile>
