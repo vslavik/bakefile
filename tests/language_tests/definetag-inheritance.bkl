@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!-- 
+Tests whether externally defined tags apply not only to rules
+enumerated in the "rules" attribute, but to all rules inherited from
+it as well.
+
+Expected output:
+    My tag with value "foo"
+
+$Id$
+-->
+
+<makefile>
+
+    <define-rule name="baserule" extends="exe">
+    </define-rule>
+
+    <define-rule name="derived" extends="baserule">
+    </define-rule>
+    
+    <define-rule name="not_derived" extends="exe">
+    </define-rule>
+
+    <define-tag name="mytag" rules="baserule">
+        <echo>My tag with value "$(value)"</echo>
+    </define-tag>
+
+    <define-tag name="mytag" rules="not_derived">
+        <echo>My tag on not_derived - shouldn't happen!</echo>
+    </define-tag>
+    
+
+    <derived id="test">
+        <sources>foo.c</sources>
+        <mytag>foo</mytag>
+    </derived>
+
+</makefile>

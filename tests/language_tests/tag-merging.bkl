@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<!--
+Tests merging of multiple definitions of tags.
+
+Expected output:
+    mytag@baserule
+    mytag external def for baserule
+    mytag@derived
+    mytag external def for derived
+    
+$Id$
+-->
+
+<makefile>
+
+    <define-rule name="baserule" extends="exe">
+        <define-tag name="mytag">
+            <echo>mytag@baserule</echo>
+        </define-tag>
+    </define-rule>
+
+    <define-rule name="derived" extends="baserule">
+        <define-tag name="mytag">
+            <echo>mytag@derived</echo>
+        </define-tag>
+    </define-rule>
+    
+    <define-tag name="mytag" rules="baserule">
+        <echo>mytag external def for baserule</echo>
+    </define-tag>
+
+    <define-tag name="mytag" rules="derived">
+        <echo>mytag external def for derived</echo>
+    </define-tag>
+
+    <derived id="test">
+        <sources>foo.c</sources>
+        <mytag>foo</mytag>
+    </derived>
+
+</makefile>
