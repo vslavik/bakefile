@@ -209,7 +209,9 @@ def substituteFromDict(str, dict, desc=None):
     try:
         return substitute(str, lambda x: dict[x], desc)
     except KeyError:
-        raise errors.Error("Invalid value '%s'" % str)
+        raise errors.Error(
+                "value '%s' not allowed in this context: not one of %s" %
+                (str, dict.keys()))
 
 
 def nativePaths(filenames):
