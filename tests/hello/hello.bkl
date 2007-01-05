@@ -12,10 +12,12 @@
         <exe id="hello">
             <define>SOMEMACRO</define>
             <sources>hello.c</sources>
+            <headers>hello.h</headers>
         </exe>
         <exe id="hello_cxx">
             <define>SOMEMACRO</define>
             <sources>hello.cpp</sources>
+            <headers>hello.h</headers>
         </exe>
     </if>
 
@@ -26,6 +28,7 @@
         <define>SOMEMACRO</define>
         <define>BUILD_AS_GUI</define>
         <sources>hello.cpp</sources>
+        <headers>hello.h</headers>
         <win32-res>hello.rc</win32-res>
         <symbian-res>hello.rss</symbian-res>
     </exe>

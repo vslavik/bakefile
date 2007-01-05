@@ -1,7 +1,9 @@
+
 #include <stdio.h>
+#include "hello.h"
 
 int main()
 {
-    printf("Hello, world!\n");
+    printf("%s\n", HELLO_BANNER);
     return 0;
 }
