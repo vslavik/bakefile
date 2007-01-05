@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003-2006 Vaclav Slavik
+#  Copyright (C) 2003-2007 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -287,8 +287,8 @@ def write():
                 f.seek(0)
                 f.truncate()
                 f.writelines(__output_files[file])
-                if changes_f != None:
-                    changes_f.write('%s\n' % os.path.abspath(file))
+            if changes_f != None:
+                changes_f.write('%s\n' % os.path.abspath(file))
             if not config.quiet:
                 print 'writing %s' % file
         else:

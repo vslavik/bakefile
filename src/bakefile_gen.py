@@ -3,7 +3,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.sourceforge.net)
 #
-#  Copyright (C) 2003-2006 Vaclav Slavik
+#  Copyright (C) 2003-2007 Vaclav Slavik
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -377,7 +377,10 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
             state.lock.release()
 
     if not quiet:
-        print '%i files modified' % state.modifiedFiles
+        if dryRun:
+            print '%i files would be modified' % state.modifiedFiles
+        else:
+            print '%i files modified' % state.modifiedFiles
 
 
 def cleanTargets(pretend=0):
