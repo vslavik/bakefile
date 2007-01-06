@@ -206,12 +206,15 @@ def substituteFromDict(str, dict, desc=None):
     """Like substitute(), but less generic: instead of calling callback, the
        text is looked up in a dictionary. This imposes the restriction that
        'str' may be only single word."""
-    try:
-        return substitute(str, lambda x: dict[x], desc)
-    except KeyError:
-        raise errors.Error(
-                "value '%s' not allowed in this context: not one of %s" %
-                (str, dict.keys()))
+
+    def _getValue(x):
+        try:
+            return dict[x]
+        except KeyError:
+            raise errors.Error(
+                    "value '%s' not allowed in this context: not one of %s" %
+                    (x, dict.keys()))
+    return substitute(str, _getValue, desc)
 
 
 def nativePaths(filenames):
