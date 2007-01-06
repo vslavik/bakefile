@@ -9,6 +9,7 @@
         cond_install/cond_install.bkl
         debug/debug.bkl
         dll/dll.bkl
+        features/features.bkl
         gettext/gettext.bkl
         headers/headers.bkl
         hello/hello.bkl

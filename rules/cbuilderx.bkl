@@ -13,6 +13,8 @@
     <include file="win32.bkl"/>
     
     <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+    <set var="FORMAT_SUPPORTS_ACTIONS">0</set>
+    <set var="FORMAT_SUPPORTS_SUBPROJECTS">0</set>
 
     <option name="COMPILER">
         <values>bcc,gcc,vc</values>

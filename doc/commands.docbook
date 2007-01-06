@@ -207,7 +207,7 @@
                           is preserved in the makefile instead of being
                           substituted by Bakefile. This happens only if the
                           output format supports it
-                          (<varname>FORMAT_HAS_VARIABLES</varname> is set to
+                          (<xref linkend="var.FORMAT_HAS_VARIABLES"/> is set to
                           <literal>1</literal>) and if variable's value is not
                           empty string. This settings is useful
                           together with frequently used variables with long

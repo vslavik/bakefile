@@ -55,6 +55,20 @@ advantage of a particular feature.
 
 
     <!--
+    Whether the output format can handle <action>s at all.
+    Most make-tools do, but IDE project files typically don't.
+    -->
+    <set var="FORMAT_SUPPORTS_ACTIONS">1</set>
+
+
+    <!--
+    Whether the output format can handle <subproject>s at all.
+    Most make-tools do, but IDE project files typically don't.
+    -->
+    <set var="FORMAT_SUPPORTS_SUBPROJECTS">1</set>
+
+
+    <!--
     Whether the output format needs to have options that are used by
     conditions listed in the output file. This is true in majority of cases
     because the conditions take form such as "!if $(OPT) == value" and OPT must
@@ -72,6 +86,7 @@ advantage of a particular feature.
     format. Unix makefiles do, the rest usually doesn't.
     -->
     <set var="FORMAT_HAS_MAKE_INSTALL">0</set>
+
 
 </makefile>
 

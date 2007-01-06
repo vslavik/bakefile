@@ -302,6 +302,96 @@
 
 
 
+    <!-- =============================================================== -->
+    <!--                      Format feature tests                       -->
+    <!-- =============================================================== -->
+
+    <section>
+      <title>Format features</title>
+
+      <para>
+        <informaltable>
+          <tgroup cols='2'>
+            <thead>
+              <row>
+                <entry>Variable name</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+
+              <row id="var.FORMAT_HAS_VARIABLES" xreflabel="FORMAT_HAS_VARIABLES">
+                <entry role="varname">FORMAT_HAS_VARIABLES</entry>
+                <entry>
+                    This boolean flag indicates whether the output format supports variables.
+                    If it does, then some space and time optimization are possible and long
+                    Bakefile variables that would otherwise be expanded into literals are left
+                    as variables in generated makefile/project.
+                </entry>
+              </row>
+
+              <row id="var.FORMAT_SUPPORTS_CONDITIONS" xreflabel="FORMAT_SUPPORTS_CONDITIONS">
+                <entry role="varname">FORMAT_SUPPORTS_CONDITIONS</entry>
+                <entry>
+                    Whether the output format can handle conditions (i.e. variable values
+                    depending on conditions and conditionally built targets) at all. Most
+                    make-tools do, but e.g. MSVC project files can't do it. If set to 0, then
+                    the targets and variables are "flattened", i.e. expanded into multiple
+                    'configurations' as in many IDEs.
+                </entry>
+              </row>
+
+              <row id="var.FORMAT_SUPPORTS_CONFIGURATIONS" xreflabel="FORMAT_SUPPORTS_CONFIGURATIONS">
+                <entry role="varname">FORMAT_SUPPORTS_CONFIGURATIONS</entry>
+                <entry>
+                    Whether it is at least possible to have multiple configurations if
+                    conditions are not supported (such as in IDEs). Meaningless if
+                    FORMAT_SUPPORTS_CONDITIONS=1. If both FORMAT_SUPPORTS_CONDITIONS and
+                    FORMAT_SUPPORTS_CONFIGURATIONS are 0, then we're in deep trouble and
+                    we can only generate makefiles that are not configurable.
+                </entry>
+              </row>
+
+              <row id="var.FORMAT_SUPPORTS_ACTIONS" xreflabel="FORMAT_SUPPORTS_ACTIONS">
+                <entry role="varname">FORMAT_SUPPORTS_ACTIONS</entry>
+                <entry>
+                    Whether the output format can handle <xref linkend="rule.action"/>s at all.
+                    Most make-tools do, but IDE project files typically don't.
+                </entry>
+              </row>
+
+              <row id="var.FORMAT_SUPPORTS_SUBPROJECTS" xreflabel="FORMAT_SUPPORTS_SUBPROJECTS">
+                <entry role="varname">FORMAT_SUPPORTS_SUBPROJECTS</entry>
+                <entry>
+                    Whether the output format can handle <xref linkend="rule.subproject"/>s at all.
+                    Most make-tools do, but IDE project files typically don't.
+                </entry>
+              </row>
+
+              <row id="var.FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS" xreflabel="FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS">
+                <entry role="varname">FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS</entry>
+                <entry>
+                    Whether the output format needs to have options that are
+                    used by conditions listed in the output file. This is true
+                    in majority of cases because the conditions take form such
+                    as <literal>"!if $(OPT) == value"</literal> and OPT must
+                    be defined, but there's one exception: autoconf. It
+                    decides on whether the condition is true or false in
+                    autoconf_inc.m4 and Makefile.in does not need the
+                    variables, so we can safely purge them and save some
+                    space.
+                </entry>
+              </row>
+
+            </tbody>
+          </tgroup>
+        </informaltable>
+
+      </para>
+
+    </section>
+
+
 
     <!-- =============================================================== -->
     <!--                        Miscellaneous                            -->

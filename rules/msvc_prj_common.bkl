@@ -9,6 +9,8 @@
     <include file="win32.bkl"/>
 
     <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+    <set var="FORMAT_SUPPORTS_ACTIONS">0</set>
+    <set var="FORMAT_SUPPORTS_SUBPROJECTS">0</set>
      
     <tag-info name="dirname"
               position="before:libname,before:dllname,before:exename"/>

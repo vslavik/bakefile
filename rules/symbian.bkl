@@ -15,6 +15,9 @@
     <set var="TOOLSET">symbian</set>
     <set var="DIRSEP">\</set>
     <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
+    <set var="FORMAT_SUPPORTS_ACTIONS">0</set> <!-- FIXME: is this true? -->
+    <set var="FORMAT_SUPPORTS_SUBPROJECTS">0</set>  <!-- FIXME: is this true? -->
+
     <set var="INSTALL_DATA"></set>
     <set var="UNINSTALL_DATA"></set>
 

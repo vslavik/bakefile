@@ -8,6 +8,7 @@ Version 0.2.2
 - added --dry-run option to bakefile_gen too
 - added optional support for (un)installation targets in Windows
   formats (Francesco Montorsi)
+- added FORMAT_SUPPORTS_{ACTIONS,SUBPROJECTS} (Francesco Montorsi)
 
 
 Version 0.2.1
