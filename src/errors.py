@@ -43,6 +43,8 @@ class ErrorBase(Exception):
         if context == None: context = _readerContext
         self.desc = desc
         self.context = copy.deepcopy(context)
+    def getErrorMessage(self):
+        return self.desc
     def __str__(self):
         s = ''
         for ctx in range(len(self.context)-1,-1,-1):

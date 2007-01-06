@@ -417,6 +417,8 @@ def evalExpr(e, use_options=1, target=None, add_dict=None):
                             add_dict)
     except KeyError, err:
         raise RuntimeError("undefined variable %s" % err)
+    except errors.ErrorBase, err:
+        raise RuntimeError(err.getErrorMessage())
 
 
 def __recordDeps(mod):
