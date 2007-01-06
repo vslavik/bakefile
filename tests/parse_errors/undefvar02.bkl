@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<makefile>
+    <lib id="test">
+        <!-- pass undefined variable as tag's value argument: -->
+        <libname>foo-$(BAR)</libname>
+    </lib>
+</makefile>

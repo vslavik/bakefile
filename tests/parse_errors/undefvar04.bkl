@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <define-tag name="foo" rules="lib">
+        <set var="foovar">$(attributes['bar'])</set>
+    </define-tag>
+
+    <lib id="test">
+        <!-- don't set required attribute 'bar': -->
+        <foo value="1"/>
+    </lib>
+</makefile>
