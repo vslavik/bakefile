@@ -502,13 +502,20 @@ def _extractDictForTag(e, target, dict):
         return dict
 
     # $(value) expands to the thing passed as tag's text value:
-    dict2 = {'value' : mk.evalExpr(e.value, target=target, add_dict=dict)}
+    try:
+        dict2 = {'value' : mk.evalExpr(e.value, target=target, add_dict=dict)}
+    except Exception, err:
+        raise errors.Error("incorrect argument value '%s': %s" % (e.value, err))
+
 
     # tag's attributes are available as $(attributes['foo']):
     if len(e.props) > 0:
         attr = {}
         for a in e.props:
-            attr[a] = mk.evalExpr(e.props[a], target=target, add_dict=dict)
+            try:
+                attr[a] = mk.evalExpr(e.props[a], target=target, add_dict=dict)
+            except Exception, err:
+                raise errors.Error("incorrect value '%s' of attribute '%s': %s" % (e.props[a], a, err))
         dict2['attributes'] = attr
 
     return dict2

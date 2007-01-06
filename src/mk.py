@@ -237,8 +237,6 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
     if eval:
         try:
             v = evalExpr(value, target=target, add_dict=add_dict)
-        except KeyError, e:
-            raise errors.Error("failed to set variable '%s' to value '%s': undefined variable %s" % (name, value, e))
         except Exception,e:
             raise errors.Error("failed to set variable '%s' to value '%s': %s" % (name, value, e))
     else:
@@ -411,11 +409,14 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
 __doEvalExpr = bottlenecks.doEvalExpr
 
 def evalExpr(e, use_options=1, target=None, add_dict=None):    
-    return __doEvalExpr(e, __evalPyExpr, None,
-                        None, # moreArgs
-                        use_options,
-                        target, 
-                        add_dict)
+    try:
+        return __doEvalExpr(e, __evalPyExpr, None,
+                            None, # moreArgs
+                            use_options,
+                            target, 
+                            add_dict)
+    except KeyError, err:
+        raise RuntimeError("undefined variable %s" % err)
 
 
 def __recordDeps(mod):
