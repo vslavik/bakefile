@@ -42,6 +42,11 @@
         </default-filename>
     </format>
 
+    <format id="msvs2005prj">
+        <description>MS Visual Studio 2005 project files</description>
+        <default-filename>$(os.path.splitext(os.path.basename(INPUT_FILE))[0]).sln</default-filename>
+    </format>
+
     <format id="dmars">
         <description>Digital Mars makefiles</description>
         <default-filename>makefile.dmc</default-filename>
@@ -75,5 +80,5 @@
         <description>Symbian development files</description>
         <default-filename>bld.inf</default-filename>
     </format>
-
+    
 </bakefile-manifest>

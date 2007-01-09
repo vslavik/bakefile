@@ -1,0 +1,5 @@
+
+This directory contains modules that were added in Python 2.5 and are needed
+by Bakefile. They are licensed under Python's license.
+
+They are only used when using Python 2.3 or 2.4.

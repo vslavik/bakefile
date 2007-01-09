@@ -9,6 +9,8 @@ Version 0.2.2
 - added optional support for (un)installation targets in Windows
   formats (Francesco Montorsi)
 - added FORMAT_SUPPORTS_{ACTIONS,SUBPROJECTS} (Francesco Montorsi)
+- added initial support for MSVS2005 project files (based on heavily
+  modified patch by Kevin Powell, Steven Van Ingelgem and Kevin Ollivier)
 
 
 Version 0.2.1

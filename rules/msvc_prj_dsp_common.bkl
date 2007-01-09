@@ -1,0 +1,197 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <!-- code and settings shared by all the "old" project file formats
+         (DSP): -->
+
+
+    <!-- ### templates with DSP-specific initialization of rules: ### -->
+
+    <template id="_compiled_baset_projtype" template="_compiled_baset">
+        <set var="_outflag" eval="0">
+            /out:"$(_targetdir)$(_targetname)"
+        </set>
+        <ldflags>$(_outflag)</ldflags>
+            
+        <!-- precompiled headers support
+             (see also msvc_common.bkl, msvc_prj_common.bkl): -->
+        <set var="_pch_flags">/YX</set>
+    </template>
+    
+    <template id="_dll_baset_projtype" template="_dll_baset">
+        <set var="_ldflags">/dll $(_ldflags)</set>
+    </template>
+
+
+
+    <!-- ### include common MSVC projects code: ### -->
+    <include file="msvc_prj_common.bkl"/>
+
+
+
+    <!-- ### extensions of tags defined in msvc_prj_common.bkl for DSP: ### -->
+
+    <define-tag name="_define-no-res" rules="_compiled">
+        <set var="_defines" append="1">
+            $(addPrefixIfNotEmpty('/D ',value.replace('"', '\\"')))
+        </set>
+    </define-tag>
+    
+    <define-tag name="include" rules="_compiled">
+        <cppflags>
+            $(addPrefixIfNotEmpty('/I ',nativePaths(value)))
+        </cppflags>
+    </define-tag>
+
+    <define-tag name="lib-path" rules="_compiled">
+        <ldflags>/libpath:"$(nativePaths(value))"</ldflags>
+    </define-tag>
+    
+    <define-tag name="optimize" rules="_compiled">
+        <cppflags>
+            $(substituteFromDict(value,
+                  {'off':'/Od', 'speed':'/O2', 'size':'/O1'}))
+        </cppflags>
+    </define-tag>
+    
+    <define-tag name="debug-info" rules="_compiled">
+        <!-- NB: cppflags are set in ms{vc6,evc4}prj.bkl, they differ -->
+        <ldflags>
+            $(substituteFromDict(value, {'on':'/debug','off':''}))
+        </ldflags>
+    </define-tag>       
+    
+    <define-tag name="warnings" rules="_compiled">
+        <cppflags>
+            $(substituteFromDict(value,
+               {'no':'/w',
+                'default':'/W1',
+                'max':'/W4'}))
+        </cppflags>
+    </define-tag>
+
+    <define-tag name="cxx-rtti" rules="_compiled">
+        <cxxflags>
+            $(substituteFromDict(value, {'on':'/GR','off':''}))
+        </cxxflags>
+    </define-tag>
+    <define-tag name="cxx-exceptions" rules="_compiled">
+        <cxxflags>
+            $(substituteFromDict(value, {'on':'/EHsc','off':''}))
+        </cxxflags>
+    </define-tag>
+
+
+
+    <define-tag name="app-type" rules="exe">
+        <ldflags>
+            $(substituteFromDict(value,
+            {'console':'/subsystem:console',
+            'gui':'/subsystem:windows'}))
+        </ldflags>
+    </define-tag>
+
+
+
+    <define-tag name="libname" rules="dll">
+        <ldflags>/implib:"$(_targetdir)$(_linkname)"</ldflags>
+    </define-tag>
+    
+
+
+    
+    
+
+
+    <!-- ======= FIXME: temporary measure: before all makefiles are converted
+                 from using __ to using _ prefix, we need version of
+                 msvc_common.bkl that uses _, included here -->
+
+    <!--         FIXME: the two copies now differ -->
+
+    <!-- <include file="msvc_common.bkl"/> -->
+
+
+    <!-- some nontrivial settings shared by all msvc formats: -->
+
+    <if cond="FORMAT!='msevc4prj'">
+        <tag-info name="threading"
+                  position="before:runtime-libs"/>      
+        
+        <define-tag name="runtime-libs" rules="exe,dll,module,lib">
+            <set var="_rtl_type">
+                $(substituteFromDict(value,
+                  {'static':_rtl_static, 'dynamic':'D'}))
+            </set>
+        </define-tag>
+        <define-tag name="threading" rules="exe,dll,module,lib">
+            <set var="_rtl_static">
+                $(substituteFromDict(value, {'multi':'T', 'single':'L'}))
+            </set>
+        </define-tag>
+
+        <define-tag name="debug-runtime-libs" rules="exe,dll,module,lib">
+            <define>
+                $(substituteFromDict(value, {'on':'_DEBUG', 'off':''}))
+            </define>
+            <set var="_rtl_dbg">
+                $(substituteFromDict(value, {'on':'d', 'off':''}))
+            </set>
+        </define-tag>
+    </if>
+
+    <define-tag name="debug-info" rules="exe,dll,module,lib">
+        <cppflags>/Fd$(_pdbfile)</cppflags>
+    </define-tag>
+    
+    <!-- includes and defines should propagate to rc compilation, too: -->
+    
+    <define-tag name="res-include" rules="exe,dll,module">
+        <set var="_win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/i ',nativePaths(value)))</set>
+    </define-tag>
+    <define-tag name="res-define" rules="exe,dll,module">
+        <set var="_win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/d ',value))</set>
+    </define-tag>
+
+
+    <!-- precompiled headers: -->
+    <!-- (more things in makefile_defs_msvc.bkl and msvc6prj.bkl) -->
+    
+    <tag-info name="precomp-headers-gen"
+              position="after:precomp-headers-header"/>
+    <tag-info name="precomp-headers-file"
+              position="after:precomp-headers-header,after:precomp-headers-gen"/>
+    <tag-info name="precomp-headers"
+              position="after:precomp-headers-file,after:precomp-headers-header,after:precomp-headers-gen"/>
+
+    <define-tag name="precomp-headers-header" rules="exe,dll,module,lib">
+        <set var="_pch_header">$(value)</set>
+        <set var="_pch_flags">/YX"$(_pch_header)"</set>
+    </define-tag>
+
+    <define-tag name="precomp-headers-gen" rules="exe,dll,module,lib">
+        <set var="_pch_flags">/Yu"$(_pch_header)"</set>
+    </define-tag>
+    
+    <define-tag name="precomp-headers-file" rules="exe,dll,module,lib">
+        <set var="_pch_flags" append="1">
+            $(formatIfNotEmpty('/Fp"%s.pch"', mkPathPrefix(BUILDDIR)+value))
+        </set>
+    </define-tag>
+    
+    <define-tag name="precomp-headers" rules="exe,dll,module,lib">
+        <!-- FIXME: should be cppflags, this is temporary hack to
+        make wxWindows work -->
+        <cxxflags> 
+            $(substituteFromDict(value,{'on':_pch_flags, 'off':''}))
+        </cxxflags>
+    </define-tag>
+
+    
+    <!-- ================ end of included msvc_common.bkl copy ========= -->
+
+</makefile>

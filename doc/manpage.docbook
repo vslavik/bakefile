@@ -99,7 +99,7 @@
             </term>
             <listitem>
               <para>
-                Specify output format. Bakefile supports these formats:
+                Specify output format. Bakefile supports the following formats:
               </para>
 
               <para>
@@ -167,6 +167,13 @@
                         <entry>msevc4prj</entry>
                         <entry>Microsoft Embedded Visual C++ 4 project
                         files</entry>
+                      </row>
+
+                      <row>
+                        <entry>msvs2005prj</entry>
+                        <entry>
+                          MS Visual Studio 2005 project files
+                        </entry>
                       </row>
 
                       <row>

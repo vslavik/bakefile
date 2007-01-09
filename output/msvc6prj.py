@@ -1,59 +1,21 @@
 # MS Visual C++ projects generator script
 # $Id$
 
-import fnmatch, re, os, os.path
+import os, os.path
 import errors, utils
 
-# ------------------------------------------------------------------------
-#   helpers
-# ------------------------------------------------------------------------
-
-def sortedKeys(dic):
-    l = []
-    for c in configs_order:
-        if c in dic:
-            l.append(c)
-    # in VC++ IDE, the last config is the default one, i.e. what you would
-    # logically expect to be the first one => reverse the order:
-    l.reverse()
-    return l
-
-def filterGroups(groups, groupDefs, files):
-    """Returns dictionary with files sorted into groups (key: group name).
-       Groups are given in 'groups' list of names and 'groupDefs' directory
-       as ;-separated wildcards."""
-    ret = {}
-    used = {}
-    for g in groups:
-        ret[g] = []
-        wildcards = groupDefs[g].split()
-        for w in wildcards:
-            for f in files:
-                if f in used: continue
-                if fnmatch.fnmatch(f, w):
-                    used[f] = 1
-                    ret[g].append(f)
-    ret[None] = []
-    for f in files:
-        if f in used: continue
-        ret[None].append(f)
-    return ret
-
-def fixFlagsQuoting(text):
-    """Replaces e.g. /DFOO with /D "FOO" and /DFOO=X with /D FOO=X."""
-    return re.sub(r'\/([DIid]) ([^ \"=]+)([ $])', r'/\1 "\2"\3',
-           re.sub(r'\/([DIid]) ([^ \"=]+)=([^ \"]*)([ $])', r'/\1 \2=\3\4', text))
-    
-
-def sortByBasename(files):
-    def __sort(x1, x2):
-        f1 = x1.split('\\')[-1]
-        f2 = x2.split('\\')[-1]
-        if f1 == f2: return 0
-        elif f1 < f2: return -1
-        else: return 1
-    files.sort(__sort)
-
+import msvc_common
+from msvc_common import *
+        
+        
+DEFAULT_FILE_GROUPS = [
+    FilesGroup('Source Files',
+               '*.cpp *.c *.cxx *.rc *.def *.r *.odl *.idl *.hpj *.bat'),
+    FilesGroup('Header Files',
+               '*.h *.hpp *.hxx *.hm *.inl'),
+    FilesGroup('Resource Files',
+               '*.ico *.cur *.bmp *.dlg *.rc2 *.rct *.bin *.rgs *.gif *.jpg *.jpeg *.jpe')
+]
 
 # ------------------------------------------------------------------------
 #                              Generator class
@@ -69,9 +31,9 @@ class ProjectGeneratorMsvc6:
     #   basic configuration
     # --------------------------------------------------------------------
 
-    def getDswExtension(self):
+    def getSolutionExtension(self):
         return 'dsw'
-    def getDspExtension(self):
+    def getProjectExtension(self):
         return 'dsp'
     def getMakefileExtension(self):
         return 'mak'
@@ -105,7 +67,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
     def genDSW(self, dsw_targets, dsp_list, deps_translation):
         dsw = self.makeDswHeader()
         project = """
-Project: "%s"=%s.""" + self.getDspExtension() + """ - Package Owner=<4>
+Project: "%s"=%s.""" + self.getProjectExtension() + """ - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -141,7 +103,7 @@ Package=<4>
             dsw += project % (t.id, dsp_name, deps)
             dspfile = (t, 
                        os.path.join(self.dirname,
-                                    dsp_name + '.' + self.getDspExtension()),
+                                    dsp_name + '.' + self.getProjectExtension()),
                        dsp_name)
             if dspfile not in dsp_list:
                 dsp_list.append(dspfile)
@@ -165,7 +127,7 @@ Package=<4>
 
         writer.writeFile('%s.%s' % (
             os.path.join(self.dirname, self.basename),
-            self.getDswExtension()
+            self.getSolutionExtension()
             ), dsw)
 
 
@@ -351,72 +313,14 @@ Intermediate_Dir "%s\\%s"
         
         # Write source files:
 
-        # (find files from all configs, identify files not in all configs)
-        sources = {}
-        for c in sortedKeys(t.configs):
-            for s in t.configs[c]._sources.split():
-                snat = utils.nativePaths(s)
-                if snat not in sources:
-                    sources[snat] = [c]
-                else:
-                    sources[snat].append(c)
-        for s in sources:
-            if len(sources[s]) == len(t.configs):
-                sources[s] = None
-        # make copy of the sources specified using <sources>, so that we include
-        # them even when they don't match any file group (see below):
-        realSources = sources.keys()
-
-        # Add more files that are part of the project but are not built (e.g. 
-        # headers, READMEs etc.). They are included unconditionally to save some
-        # space.
-        for c in sortedKeys(t.configs):
-            for s in t.configs[c]._more_files.split():
-                snat = utils.nativePaths(s)
-                if snat not in sources:
-                    sources[snat] = None
-
-        # Find files with custom build associated with them and retrieve
-        # custom build's code
-        filesWithCustomBuild = {}
-        for c in sortedKeys(t.configs):
-            cbf = t.configs[c]._custom_build_files
-            if len(cbf) == 0 or cbf.isspace(): continue
-            for f in cbf.split():
-                filesWithCustomBuild[f] = {}
-        for f in filesWithCustomBuild:
-            fname = f.replace('.','_').replace('\\','_').replace('-','_')
-            for c in sortedKeys(t.configs):
-                filesWithCustomBuild[f][c] = \
-                       eval ('t.configs[c]._custom_build_%s' % fname)
-
-        # (sort the files into groups)
-        groups = []
-        groups_default= ['Source Files', 'Header Files', 'Resource Files']
-        group_defs = {
-            'Source Files'   : '*.cpp *.c *.cxx *.rc *.def *.r *.odl *.idl *.hpj *.bat',
-            'Header Files'   : '*.h *.hpp *.hxx *.hm *.inl',
-            'Resource Files' : '*.ico *.cur *.bmp *.dlg *.rc2 *.rct *.bin *.rgs *.gif *.jpg *.jpeg *.jpe',
-        }
-        if t._file_groups != '' and not t._file_groups.isspace():
-            for gr in t._file_groups.split('\n'):
-                grdef = gr.split(':')
-                groups.append(grdef[0])
-                group_defs[grdef[0]] = grdef[1]
-        groups += groups_default
-        
-        files = filterGroups(groups, group_defs, sources.keys())
-        # files that didn't match any group and were specified using <sources>
-        # should be added to 'Source Files' group:
-        for sf in files[None]:
-            if sf in realSources:
-                files['Source Files'].append(sf)
+        sources, groups, files, filesWithCustomBuild = \
+            organizeFilesIntoGroups(t, DEFAULT_FILE_GROUPS)
 
         # (some files-related settings:)
         pchExcluded = t._pch_excluded.split()
 
         # (write them)
-        for group in [g for g in groups if g in files]:
+        for group in [g.name for g in groups if g.name in files]:
             lst = files[group]
             sortByBasename(lst)
             if len(lst) == 0: continue
@@ -470,5 +374,6 @@ SOURCE=%s\\%s
         writer.writeFile(filename, dsp)
 
 def run():
+    msvc_common.__dict__.update(globals())
     generator = ProjectGeneratorMsvc6()
     generator.genWorkspaces()

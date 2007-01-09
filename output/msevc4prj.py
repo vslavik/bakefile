@@ -1,7 +1,7 @@
 # MS eMbedded Visual C++ projects generator script
 # $Id$
 
-import msvc6prj
+import msvc6prj, msvc_common
 from msvc6prj import ProjectGeneratorMsvc6
 
 class ProjectGeneratorEvc4(ProjectGeneratorMsvc6):
@@ -10,9 +10,9 @@ class ProjectGeneratorEvc4(ProjectGeneratorMsvc6):
     #   basic configuration
     # --------------------------------------------------------------------
 
-    def getDswExtension(self):
+    def getSolutionExtension(self):
         return 'vcw'
-    def getDspExtension(self):
+    def getProjectExtension(self):
         return 'vcp'
     def getMakefileExtension(self):
         return 'vcn'
@@ -77,6 +77,7 @@ Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
         return txt
 
 def run():
+    msvc_common.__dict__.update(globals())
     msvc6prj.__dict__.update(globals())
     generator = ProjectGeneratorEvc4()
     generator.genWorkspaces()

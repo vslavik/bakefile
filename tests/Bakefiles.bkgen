@@ -28,7 +28,7 @@
     </input>
     
     <add-formats>
-        autoconf,borland,cbuilderx,dmars,dmars_smake,gnu,mingw,msevc4prj,msvc,msvc6prj,symbian,watcom,xcode2
+        autoconf,borland,cbuilderx,dmars,dmars_smake,gnu,mingw,msevc4prj,msvc,msvc6prj,msvs2005prj,symbian,watcom,xcode2
     </add-formats>
     
     <!-- WinCE can't handle console-only apps (FIXME: build tests anyway!): -->
@@ -47,8 +47,12 @@
     <del-formats files="cond*/*.bkl">dmars</del-formats>
   
     <!-- Project files don't make sense for root makefile: -->
-    <del-formats files="root.bkl">msevc4prj,msvc6prj,cbuilderx</del-formats>
-    <del-formats files="gettext/*.bkl">msevc4prj,msvc6prj,cbuilderx</del-formats>
+    <del-formats files="root.bkl">
+        msevc4prj,msvc6prj,msvs2005prj,cbuilderx
+    </del-formats>
+    <del-formats files="gettext/*.bkl">
+        msevc4prj,msvc6prj,msvs2005prj,cbuilderx
+    </del-formats>
 
   
     <!-- Format specific settings: -->

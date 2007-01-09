@@ -7,6 +7,7 @@ rulesgettextdir = $(rulesdir)/gettext
 presetsdir = $(pkgdatadir)/presets
 codedir = $(pkglibdir)
 codeempydir = $(codedir)/empy
+codepy25modulesdir = $(codedir)/py25modules
 
 SUBDIRS = doc
 
@@ -25,8 +26,10 @@ output_DATA = output/autoconf.empy \
               output/dmars-opts.empy \
               output/msvc.empy \
               output/msvc-opts.empy \
+              output/msvc_common.py \
               output/msvc6prj.py \
               output/msevc4prj.py \
+			  output/msvs2005prj.py \
               output/gnumake.empy \
               output/gnumake-opts.empy \
               output/watcom.empy \
@@ -64,8 +67,11 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/msvc.bkl \
               rules/msvc_common.bkl \
               rules/msvc_prj_common.bkl \
+              rules/msvc_prj_dsp_common.bkl \
+              rules/msvc_prj_vcproj_common.bkl \
               rules/msvc6prj.bkl \
               rules/msevc4prj.bkl \
+              rules/msvs2005prj.bkl \
               rules/mingw.bkl \
               rules/gnu.bkl \
               rules/watcom.bkl \
@@ -102,6 +108,9 @@ code_PYTHON = src/config.py \
 codeempy_PYTHON = \
               src/empy/__init__.py \
               src/empy/em.py
+codepy25modules_PYTHON = \
+			  src/py25modules/__init__.py \
+			  src/py25modules/uuid.py
 
 code_LTLIBRARIES = _bottlenecks.la
 
@@ -116,6 +125,7 @@ EXTRA_DIST = \
 	bakefile.spec bakefile.iss bakefile.vim bash_completion \
     autoconf output rules presets tests \
     src/empy/README src/empy/COPYING \
+    src/py25modules/README src/py25modules/LICENSE \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
 	macosx/buildpkg.py macosx/makepkg.sh \

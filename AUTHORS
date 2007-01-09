@@ -20,11 +20,17 @@ Michael Wetherell <mike.wetherell@ntlworld.com>
 Warren Young <warren@etr-usa.com> (many manual changes)
 Dmitry Kononov <kdmix@fromru.com>
 Kevin Ollivier <kevino@theolliviers.com>
+Kevin Powell <KPowell@sirf.com>
+Steven Van Ingelgem <karel@linux.be>
 
 
  Reused code:
 --------------
 
-Empy:  by Erik Max Francis <software@alcyone.com> 
-       http://www.alcyone.com/pyos/empy
-macosx/buildpkg.py: by Dinu C. Gherman
+Empy:                        by Erik Max Francis <software@alcyone.com> 
+                             http://www.alcyone.com/pyos/empy
+
+uuid module from Python 2.5
+(src/py25modules/uuid.py):   by Ka-Ping Yee <ping@zesty.ca>
+
+macosx/buildpkg.py:          by Dinu C. Gherman

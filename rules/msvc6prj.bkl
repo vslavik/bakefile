@@ -44,7 +44,7 @@
         </define-tag>
     </define-rule>
 
-    <include file="msvc_prj_common.bkl"/>
+    <include file="msvc_prj_dsp_common.bkl"/>
 
     <output file="$(OUTPUT_FILE)" writer="msvc6prj.py"/>
 

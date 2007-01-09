@@ -1,0 +1,155 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+
+<makefile>
+    
+    <!-- code and settings shared by the "new", XML-based MSVC
+         project file formats -->
+     
+    <!-- ### templates with DSP-specific initialization of rules: ### -->
+
+    <template id="_compiled_baset_projtype">
+        <set var="_ldflags"/> 
+        <set var="_ldlibs"/> 
+        <set var="_lib_paths"/>
+        <set var="_pdbfile">vc80.pdb</set>
+        <set var="_cppflags"/>
+        <set var="_optimize">0</set>
+        <set var="_warnings">default</set>
+        <set var="_include_paths"/>
+
+        <set var="_default_builddir" eval="0">
+            $(substituteFromDict(_debug,{'0':'Release','1':'Debug'}))
+        </set>
+
+        <debug-runtime-libs>off</debug-runtime-libs>
+        <runtime-libs>dynamic</runtime-libs>
+    </template>
+    
+    <template id="_dll_baset_projtype"/>
+    <template id="_exe_baset"/>
+    
+    <define-rule name="_compiled_specific"/>
+
+
+
+    <!-- ### include common MSVC projects code: ### -->
+    <include file="msvc_prj_common.bkl"/>
+
+
+    <!-- ### extensions of tags defined in msvc_prj_common.bkl for
+             vcproj formats: ### -->
+
+    <define-tag name="_define-no-res" rules="_compiled">
+        <set var="_defines" append="1">
+            $(value.replace('"', '\\"'))
+        </set>
+    </define-tag>
+        
+    <define-tag name="include" rules="_compiled">
+        <set var="_include_paths" append="1">
+            $(nativePaths(value))
+        </set>
+    </define-tag>
+    
+    <define-tag name="lib-path" rules="_compiled">
+        <set var="_lib_paths" append="1">$(nativePaths(value))</set>
+    </define-tag>
+    
+    <define-tag name="optimize" rules="_compiled">
+        <set var="_optimize">
+            $(substituteFromDict(value,
+                {'off':'0', 'speed':'2', 'size':'1'}))
+        </set>
+    </define-tag>
+    
+    <define-tag name="warnings" rules="_compiled">
+        <set var="_warnings">$(value)</set>
+    </define-tag>
+    
+    <define-tag name="cxx-rtti" rules="_compiled">
+        <set var="_cxx_rtti">$(value)</set>
+    </define-tag>
+    <define-tag name="cxx-exceptions" rules="_compiled">
+        <set var="_cxx_exceptions">$(value)</set>
+    </define-tag>
+        
+
+
+    <!-- ======= FIXME: temporary measure: before all makefiles are converted
+                 from using __ to using _ prefix, we need version of
+                 msvc_common.bkl that uses _, included here -->
+    <!-- <include file="msvc_common.bkl"/> -->
+
+
+    <!-- some nontrivial settings shared by all msvc formats: -->
+
+    <define-tag name="runtime-libs" rules="exe,dll,module,lib">
+        <set var="_rtl_type">$(value)</set>
+    </define-tag>
+    <define-tag name="threading" rules="exe,dll,module,lib">
+        <set var="_rtl_threading">$(value)</set> <!-- single or multi -->
+    </define-tag>
+
+    <define-tag name="debug-runtime-libs" rules="exe,dll,module,lib">
+        <define>
+            $(substituteFromDict(value, {'on':'_DEBUG', 'off':''}))
+        </define>
+        <set var="_rtl_dbg">$(value)</set>
+    </define-tag>
+
+
+    
+    <!-- includes and defines should propagate to rc compilation, too: -->
+    
+    <define-tag name="res-include" rules="exe,dll,module">
+        <set var="_win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/i ',nativePaths(value)))</set>
+    </define-tag>
+    <define-tag name="res-define" rules="exe,dll,module">
+        <set var="_win32rc_flags" append="1">
+            $(addPrefixIfNotEmpty('/d ',value))</set>
+    </define-tag>
+
+
+    <!-- precompiled headers: -->
+    <!-- (more things in makefile_defs_msvc.bkl and msvc6prj.bkl) -->
+    
+    <define-tag name="precomp-headers-header" rules="exe,dll,module,lib">
+        <set var="_pch_header">$(value)</set>
+    </define-tag>
+
+    <define-tag name="precomp-headers-gen" rules="exe,dll,module,lib">
+    </define-tag>
+    
+    <define-tag name="precomp-headers-file" rules="exe,dll,module,lib">
+        <set var="_pch_file" append="1">
+            $(formatIfNotEmpty('%s.pch', mkPathPrefix(BUILDDIR)+value))
+        </set>
+    </define-tag>
+    
+    <define-tag name="precomp-headers" rules="exe,dll,module,lib">
+        <set var="_precomp-headers">$(value)</set>
+    </define-tag>
+
+    
+    <!-- =============================================================== -->
+    <!--                   Compiler-specific tags:                       -->
+    <!-- =============================================================== -->
+    
+    <define-tag name="cppflags-msvc" rules="exe,lib,dll,module">
+        <cppflags>$(value)</cppflags>
+    </define-tag>
+    <define-tag name="cflags-msvc" rules="exe,lib,dll,module">
+        <cflags>$(value)</cflags>
+    </define-tag>
+    <define-tag name="cxxflags-msvc" rules="exe,lib,dll,module">
+        <cxxflags>$(value)</cxxflags>
+    </define-tag>
+    <define-tag name="ldflags-msvc" rules="exe,dll,module">
+        <ldflags>$(value)</ldflags>
+    </define-tag>
+
+    <!-- ================ end of included msvc_common.bkl copy ========= -->
+
+</makefile>

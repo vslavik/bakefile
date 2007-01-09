@@ -309,7 +309,7 @@
     </template>
 
     <!-- Load common code and run it: -->
-    <include file="msvc_prj_common.bkl"/>
+    <include file="msvc_prj_dsp_common.bkl"/>
 
     <!-- Windows CE can't do console applications: -->
     <define-tag name="app-type" rules="exe">
