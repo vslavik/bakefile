@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ "$OSTYPE" = "darwin" ]; then
+    libtoolize=glibtoolize
+fi
+
 aclocal -I admin &&
 	libtoolize --automake -c -f &&
 	automake --foreign -a -c -f &&
