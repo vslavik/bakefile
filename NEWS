@@ -2,6 +2,7 @@
 Version 0.2.2
 --------------
 
+- Bakefile is now licensed under the MIT license
 - Python >= 2.3 is now required to run Bakefile
 - added --touch option to bakefile
 - fixed isdefined() to work with conditional variables (Francesco Montorsi)

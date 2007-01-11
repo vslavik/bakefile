@@ -14,7 +14,8 @@ SUBDIRS = doc
 bin_SCRIPTS = autoconf/bakefilize
 
 aclocal_DATA = autoconf/bakefile.m4 \
-               autoconf/bakefile-lang.m4
+               autoconf/bakefile-lang.m4 \
+               autoconf/bakefile-dllar.m4
 
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \

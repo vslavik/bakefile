@@ -6,7 +6,7 @@ Source:        %{name}-%{version}.tar.gz
 
 Prefix:        /usr
 Summary:       Cross-platform makefiles generator
-License:       GPL
+License:       MIT
 Group:         Development/Other
 URL:           http://bakefile.sourceforge.net
 Packager:      Vaclav Slavik <vslavik@fastmail.fm>

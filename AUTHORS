@@ -29,8 +29,15 @@ Steven Van Ingelgem <karel@linux.be>
 
 Empy:                        by Erik Max Francis <software@alcyone.com> 
                              http://www.alcyone.com/pyos/empy
+                             (LGPL)
 
 uuid module from Python 2.5
 (src/py25modules/uuid.py):   by Ka-Ping Yee <ping@zesty.ca>
+                             (Python license)
 
 macosx/buildpkg.py:          by Dinu C. Gherman
+                             (BSD)
+
+autoconf/dllar.sh,
+autoconf/bakefile-dllar.m4:  by Andrew Zabolotny, Stefan Neis
+                             (GPL)
