@@ -310,11 +310,6 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         else:
             t6.setAttribute("ExceptionHandling", "0")
 
-        try:
-            t6.setAttribute("EnableIntrinsicFunctions", cfg._intrinsic_functions)
-        except:
-            pass #prolly a name error, no big deal
-        
         #handle the run time library -- note that only multi thread is supported
         rtl = '3'        # default to debug
         rtl_opt = ' /MT' # default to multithreaded
