@@ -42,7 +42,10 @@
         <set var="_cppflags"/>
         <set var="_optimize">0</set>
         <set var="_warnings">default</set>
+        <set var="_defines"/>
         <set var="_include_paths"/>
+        <set var="_res_include_paths"/>
+        <set var="_res_defines"/>
 
         <set var="_default_builddir" eval="0">
             $(substituteFromDict(_debug,{'0':'Release','1':'Debug'}))
@@ -67,15 +70,19 @@
              vcproj formats: ### -->
 
     <define-tag name="_define-no-res" rules="_compiled">
-        <set var="_defines" append="1">
-            $(value.replace('"', '\\"'))
-        </set>
+        <set var="_defines" append="1">$(value.replace('"', '\\"'))</set>
     </define-tag>
         
     <define-tag name="include" rules="_compiled">
-        <set var="_include_paths" append="1">
-            $(nativePaths(value))
-        </set>
+        <set var="_include_paths" append="1">$(nativePaths(value))</set>
+    </define-tag>
+    
+    <define-tag name="res-define" rules="_compiled">
+        <set var="_res_defines" append="1">$(value.replace('"', '\\"'))</set>
+    </define-tag>
+
+    <define-tag name="res-include" rules="_compiled">
+        <set var="_res_include_paths" append="1">$(nativePaths(value))</set>
     </define-tag>
     
     <define-tag name="lib-path" rules="_compiled">
@@ -122,19 +129,6 @@
             $(substituteFromDict(value, {'on':'_DEBUG', 'off':''}))
         </define>
         <set var="_rtl_dbg">$(value)</set>
-    </define-tag>
-
-
-    
-    <!-- includes and defines should propagate to rc compilation, too: -->
-    
-    <define-tag name="res-include" rules="exe,dll,module">
-        <set var="_win32rc_flags" append="1">
-            $(addPrefixIfNotEmpty('/i ',nativePaths(value)))</set>
-    </define-tag>
-    <define-tag name="res-define" rules="exe,dll,module">
-        <set var="_win32rc_flags" append="1">
-            $(addPrefixIfNotEmpty('/d ',value))</set>
     </define-tag>
 
 

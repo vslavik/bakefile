@@ -300,7 +300,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
        
         t6.setAttribute("Optimization", cfg._optimize)
         t6.setAttribute("InlineFunctionExpansion", "1")
-        t6.setAttribute("AdditionalIncludeDirectories", ",".join(cfg._include_paths.split(" ")) )
+        t6.setAttribute("AdditionalIncludeDirectories", ",".join(cfg._include_paths.split()) )
 
         ## KLP -- this seems to cause wierd build behavior, omitting for now
         #t6.setAttribute("MinimalRebuild", "true")
@@ -403,6 +403,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t8 = doc.createElement("Tool")
         t8.setAttribute("Name", "VCResourceCompilerTool")
         t8.setAttribute("Culture", "1033")
+        t8.setAttribute("AdditionalIncludeDirectories", ",".join(cfg._res_include_paths.split()) )
+        t8.setAttribute("PreprocessorDefinitions", ";".join(cfg._res_defines.split()))
         return t8
 
     def buildPlatformsElement(self,doc):
