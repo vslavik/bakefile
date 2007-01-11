@@ -78,7 +78,7 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
     PLATFORM_OS2=0
     PLATFORM_BEOS=0
 
-    if test "x$BAKEFILE_FORCE_PLATFORM" = "x"; then 
+    if test "x$BAKEFILE_FORCE_PLATFORM" = "x"; then
         case "${BAKEFILE_HOST}" in
             *-*-mingw32* )
                 PLATFORM_WIN32=1
@@ -92,7 +92,7 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
             *-*-darwin* )
                 PLATFORM_MAC=1
                 PLATFORM_MACOSX=1
-            ;; 
+            ;;
             *-*-beos* )
                 PLATFORM_BEOS=1
             ;;
@@ -153,7 +153,7 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM_SPECIFICS],
     AC_ARG_ENABLE([omf], AS_HELP_STRING([--enable-omf],
                                         [use OMF object format (OS/2)]),
                   [bk_os2_use_omf="$enableval"])
-    
+
     case "${BAKEFILE_HOST}" in
       *-*-darwin* )
         dnl For Unix to MacOS X porting instructions, see:
@@ -180,7 +180,7 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM_SPECIFICS],
             OS2_LIBEXT="a"
         fi
         ;;
-      
+
       i*86-*-beos* )
         LDFLAGS="-L/boot/develop/lib/x86 $LDFLAGS"
         ;;
@@ -205,7 +205,7 @@ AC_DEFUN([AC_BAKEFILE_SUFFIXES],
     DLLPREFIX_MODULE=""
     DLLIMP_SUFFIX=""
     dlldir="$libdir"
-    
+
     case "${BAKEFILE_HOST}" in
         *-hp-hpux* )
             SO_SUFFIX="sl"
@@ -288,7 +288,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
         dnl the switch for gcc is the same under all platforms
         PIC_FLAG="-fPIC"
     fi
-    
+
     dnl Defaults for GCC and ELF .so shared libs:
     SHARED_LD_CC="\$(CC) -shared ${PIC_FLAG} -o"
     SHARED_LD_CXX="\$(CXX) -shared ${PIC_FLAG} -o"
@@ -546,7 +546,7 @@ AC_DEFUN([AC_BAKEFILE_DEPS],
                   AS_HELP_STRING([--disable-dependency-tracking],
                                  [don't use dependency tracking even if the compiler can]),
                   [bk_use_trackdeps="$enableval"])
-    
+
     AC_MSG_CHECKING([for dependency tracking method])
 
     BK_DEPS=""
@@ -622,14 +622,19 @@ AC_DEFUN([AC_BAKEFILE_CHECK_BASIC_STUFF],
 
     AC_PROG_MAKE_SET
     AC_SUBST(MAKE_SET)
-    
+
     if test "x$SUNCXX" = "xyes"; then
         dnl Sun C++ compiler requires special way of creating static libs;
         dnl see here for more details:
         dnl https://sourceforge.net/tracker/?func=detail&atid=109863&aid=1229751&group_id=9863
         AR=$CXX
-        AC_SUBST(AR)
         AROPTIONS="-xar -o"
+        AC_SUBST(AR)
+    elif test "x$SGICC" = "xyes"; then
+        dnl Almost the same as above for SGI mipsPro compiler
+        AR=$CXX
+        AROPTIONS="-ar -o"
+        AC_SUBST(AR)
     else
         AC_CHECK_TOOL(AR, ar, ar)
         AROPTIONS=rcu
@@ -670,12 +675,12 @@ dnl ---------------------------------------------------------------------------
 
 AC_DEFUN([AC_BAKEFILE_RES_COMPILERS],
 [
-    case ${BAKEFILE_HOST} in 
+    case ${BAKEFILE_HOST} in
         *-*-cygwin* | *-*-mingw32* )
             dnl Check for win32 resources compiler:
             AC_CHECK_TOOL(WINDRES, windres)
          ;;
- 
+
       *-*-darwin* | powerpc-apple-macos* )
             AC_CHECK_PROG(REZ, Rez, Rez, /Developer/Tools/Rez)
             AC_CHECK_PROG(SETFILE, SetFile, SetFile, /Developer/Tools/SetFile)
@@ -706,7 +711,7 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
     USE_PCH=0
     BK_MAKE_PCH=""
 
-    case ${BAKEFILE_HOST} in 
+    case ${BAKEFILE_HOST} in
         *-*-cygwin* )
             dnl PCH support is broken in cygwin gcc because of unportable
             dnl assumptions about mmap() in gcc code which make PCH generation
@@ -819,19 +824,19 @@ AC_DEFUN([AC_BAKEFILE],
     AC_BAKEFILE_RES_COMPILERS
 
     BAKEFILE_BAKEFILE_M4_VERSION="0.2.1"
-   
+
     dnl includes autoconf_inc.m4:
     $1
-    
+
     if test "$BAKEFILE_AUTOCONF_INC_M4_VERSION" = "" ; then
         AC_MSG_ERROR([No version found in autoconf_inc.m4 - bakefile macro was changed to take additional argument, perhaps configure.in wasn't updated (see the documentation)?])
     fi
-    
+
     if test "$BAKEFILE_BAKEFILE_M4_VERSION" != "$BAKEFILE_AUTOCONF_INC_M4_VERSION" ; then
         AC_MSG_ERROR([Versions of Bakefile used to generate makefiles ($BAKEFILE_AUTOCONF_INC_M4_VERSION) and configure ($BAKEFILE_BAKEFILE_M4_VERSION) do not match.])
     fi
 ])
-        
+
 
 dnl ---------------------------------------------------------------------------
 dnl              Embedded copies of helper scripts follow:
@@ -981,7 +986,7 @@ while test ${D}# -gt 0; do
         args="${D}{args} ${D}1 ${D}2"
         shift
         ;;
-       
+
        -s|-Wl,*)
         # collect these load args
         ldargs="${D}{ldargs} ${D}1"
