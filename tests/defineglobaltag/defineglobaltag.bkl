@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+
+<makefile>
+
+    <!-- test <define-global-tag> when used to create global tags -->
+
+    <define-global-tag name="test">
+        <echo>this is a global tag used as test</echo>
+    </define-global-tag>
+
+    <define-global-tag name="myrule">
+        <!-- inside global tags you can place any tag which is allowed
+             to be a child of <makefile>
+        -->
+        <exe id="test2">
+            <sources>$(value).c</sources>
+            <sources>$(attributes['a']).c</sources>
+        </exe>
+    </define-global-tag>
+
+    <define-global-tag name="set-multiple-vars">
+        <set var="var1_$(value)">$(attributes['content'])</set>
+        <set var="var2_$(value)">$(attributes['content'])</set>
+    </define-global-tag>
+
+    <test/>
+    <myrule a="source1">
+        source2
+    </myrule>
+    
+    <set-multiple-vars content="abcde">test</set-multiple-vars>
+    <echo>variable contents: '$(var1_test)' and '$(var2_test)' (should be 'abcde')</echo>
+    
+    
+    
+    <!-- test <define-global-tag> with conditional variables -->
+    
+    <option name="OPT">
+        <values>0,1</values>
+    </option>
+
+    <define-global-tag name="setcondvar">
+        <set var="PREFIX_$(value)_POSTFIX">
+            <if cond="OPT=='1'">value1</if>
+            <if cond="OPT=='0'">value0</if>
+        </set>
+    </define-global-tag>
+    
+    <setcondvar>VAR</setcondvar>
+    
+    <exe id="test3">
+        <sources>source1.c</sources>
+        <define>$(PREFIX_VAR_POSTFIX)</define>
+    </exe>
+    
+
+</makefile>
