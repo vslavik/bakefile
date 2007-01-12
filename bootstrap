@@ -1,11 +1,13 @@
 #!/bin/sh
 
 if [ "$OSTYPE" = "darwin" ]; then
-    libtoolize=glibtoolize
+    LIBTOOLIZE=glibtoolize
+else
+    LIBTOOLIZE=libtoolize
 fi
 
 aclocal -I admin &&
-	libtoolize --automake -c -f &&
+	$LIBTOOLIZE --automake -c -f &&
 	automake --foreign -a -c -f &&
 	autoconf && 
 	(cd src ; swig -python bottlenecks.i)
