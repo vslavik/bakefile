@@ -269,13 +269,6 @@ Microsoft Visual Studio Solution File, Format Version 9.00
     #   DSP files
     # ------------------------------------------------------------------------
 
-    def mapRTTI(self, val):
-        if val == 'on':
-            return 'true'
-        else :
-            return false
-
-
     #some helpers to build parts of the DSP file that change if you are doing PC vs WinCE
     def buildConfElement(self, doc, cfg, c, t):
         conf_name = self.mkConfigName(t.id, c)
@@ -341,8 +334,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             t6.setAttribute("BasicRuntimeChecks", "0")
             t6.setAttribute("DebugInformationFormat", "0")
             t6.setAttribute("BufferSecurityCheck","false")
-            
-        t6.setAttribute("RuntimeTypeInfo", self.mapRTTI(cfg._cxx_rtti))
+        
+        if cfg._cxx_rtti == 'on':
+            t6.setAttribute("RuntimeTypeInfo", "true")
+        else:
+            t6.setAttribute("RuntimeTypeInfo", "false")
 
         if cfg._pch_use_pch == '1':
             t6.setAttribute("UsePrecompiledHeader","2")
