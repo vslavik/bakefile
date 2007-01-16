@@ -543,7 +543,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             organizeFilesIntoGroups(t, DEFAULT_FILE_GROUPS, groupClass=MsvsFilesGroup)
        
         ##define a local helper function for building the files area
-        def makeFileConfig(t,cfg, c, src, group, sources):
+        def makeFileConfig(t, cfg, c, src, group, sources, pchExcluded):
             conf_name = self.mkConfigName(t.id, c)
             file_conf_el = doc.createElement("FileConfiguration")
             file_conf_el.setAttribute("Name", conf_name)
@@ -565,10 +565,14 @@ Microsoft Visual Studio Solution File, Format Version 9.00
                 except:
                     #keep going, even if we didn't set up the whole thing
                     pass
-            elif cfg._pch_use_pch and src == cfg._pch_generator:
+            elif (cfg._pch_use_pch and
+                  (src == cfg._pch_generator or src in pchExcluded)):
                 tool_el = doc.createElement("Tool")
                 tool_el.setAttribute("Name", "VCCLCompilerTool")
-                tool_el.setAttribute("UsePrecompiledHeader", "1")
+                if src == cfg._pch_generator:
+                    tool_el.setAttribute("UsePrecompiledHeader", "1")
+                elif src in pchExcluded:
+                    tool_el.setAttribute("UsePrecompiledHeader", "0")
             else:
                 tool_el = None
                 file_conf_el = None
@@ -576,6 +580,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             if tool_el != None:
                 file_conf_el.appendChild(tool_el)
             return file_conf_el
+        
+        pchExcluded = t._pch_excluded.split()
         
         for group in [g for g in groups if g.name in files]:
             lst = files[group.name]
@@ -594,7 +600,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
                    
                 for c in sortedKeys(t.configs):
                     cfg = t.configs[c]
-                    file_conf_el = makeFileConfig(t, cfg, c, src, group.name, sources)
+                    file_conf_el = makeFileConfig(t, cfg, c, src, group.name,
+                                                  sources, pchExcluded)
                     if ( file_conf_el != None ):
                         file_el.appendChild(file_conf_el)
                     
