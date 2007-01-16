@@ -44,7 +44,7 @@
                  out-of-tree compilation: -->
             <set var="SRCDIR">
                 <if cond="SRCDIR_RAW=='.'">$(srcdir)</if>
-                <if cond="SRCDIR_RAW!='.'">$(os.path.join(srcdir, SRCDIR_RAW))</if>
+                <if cond="SRCDIR_RAW!='.'">$(srcdir)/$(SRCDIR_RAW)</if>
             </set>
         </if>
     </define-global-tag>
