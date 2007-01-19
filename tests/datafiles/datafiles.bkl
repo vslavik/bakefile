@@ -17,4 +17,10 @@
         <files>datafiles/datafiles.bkl</files>
     </data-files>
 
+    <!-- Same test preserving directory structure: -->
+    <data-files-tree id="test2">
+        <install-to>$(DATADIR)/dummyfolder</install-to>
+        <files>datafiles/datafiles.bkl</files>
+    </data-files-tree>
+
 </makefile>
