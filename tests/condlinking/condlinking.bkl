@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <option name="USE_LIB">
+        <values>0,1</values>
+        <default-value>1</default-value>
+        <description>
+            Should use libhello or just single executable?
+        </description>
+    </option>
+
+    <lib id="libhello" cond="USE_LIB=='1'">
+        <sources>hello.c</sources>
+    </lib>
+
+    <set var="libhello_link">
+        <if cond="USE_LIB=='1'">libhello</if>
+    </set>
+
+    <exe id="hello">
+        <library>$(libhello_link)</library>
+        <sources>main.c</sources>
+    </exe>
+
+</makefile>

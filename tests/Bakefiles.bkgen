@@ -7,6 +7,7 @@
         root.bkl
         cond/hello.bkl
         cond_install/cond_install.bkl
+        condlinking/condlinking.bkl
         debug/debug.bkl
         dll/dll.bkl
         features/features.bkl
@@ -44,6 +45,11 @@
     <del-formats files="headers/*.bkl">msevc4prj</del-formats>
     <del-formats files="definetag/*.bkl">msevc4prj</del-formats>
     <del-formats files="defineglobaltag/*.bkl">msevc4prj</del-formats>
+    
+    <!-- MS IDEs don't support conditional dependencies: -->
+    <del-formats files="condlinking/*.bkl">
+        msvc6prj,msevc4prj,msvs2005prj
+    </del-formats>
 
     <!-- DigitalMars' make can't handle conditions: -->
     <del-formats files="cond*/*.bkl">dmars</del-formats>
