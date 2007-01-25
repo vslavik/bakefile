@@ -401,8 +401,11 @@ def cleanTargets(pretend=0):
             formats = files_all[f].formats
             absf = os.path.abspath(f)
             for fmt in formats:
-               for o,m in dependencies.deps_db[(absf,fmt)].outputs:
-                   if output == o: return 1
+                try:
+                    for o,m in dependencies.deps_db[(absf,fmt)].outputs:
+                        if output == o: return 1
+                except KeyError:
+                    pass # (absf,fmt) not in dependencies, that's OK
         return 0
 
     for f in files:

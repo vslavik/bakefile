@@ -13,6 +13,8 @@ Version 0.2.2
 - added initial support for MSVS2005 project files (based on heavily
   modified patch by Kevin Powell, Steven Van Ingelgem and Kevin Ollivier)
 - autoconf: fixed <set-srcdir> to generate correct code when ran on Windows
+- don't fail in bakefile_gen --clean if a new file or format was added
+  since .bakefile_gen.state was last updated
 
 
 Version 0.2.1
