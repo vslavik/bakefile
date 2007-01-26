@@ -500,6 +500,28 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         return conf_el
                 
+    def buildCustomBuildElement(self, doc, data):
+        # parse MSVC6-style custom build element code (FIXME: this is for compatibility,
+        # will be replaced with <action> handling in the future):
+        lines = data.split('\n')
+        description = lines[0]
+        assert lines[1].startswith('InputPath=')
+        assert lines[2] == ''
+        delim = lines[3].index(' : ')
+        output = lines[3][:delim].strip(' "')
+        deps = lines[3][delim+3:].strip()
+        cmdline = lines[4].strip()
+
+        # build the output:
+        el = doc.createElement("Tool")
+        el.setAttribute("Name", "VCCustomBuildTool")
+        el.setAttribute('Description', description)
+        el.setAttribute('CommandLine', cmdline)
+        el.setAttribute('Outputs', output)
+        if len(deps) > 0: 
+            el.setAttribute('AdditionalDependencies', deps)
+        return el
+            
     #this is just for derived classes that may want to add more tools to the config
     def additionalTools(self, doc, cfg, t):
         return []
@@ -554,17 +576,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             elif (src in filesWithCustomBuild.keys() and
                 c in filesWithCustomBuild[src].keys()):
                 #custom build for this file for this config
-                
-                strs = filesWithCustomBuild[src][c].split('|||')
-                tool_el = doc.createElement("Tool")
-                tool_el.setAttribute("Name", "VCCustomBuildTool")
-                try:
-                    tool_el.setAttribute('Description', strs[0])
-                    tool_el.setAttribute('CommandLine', strs[1])
-                    tool_el.setAttribute('Outputs', strs[2])
-                except:
-                    #keep going, even if we didn't set up the whole thing
-                    pass
+                data = filesWithCustomBuild[src][c]
+                if data != '':
+                    tool_el = self.buildCustomBuildElement(doc, data)
+                else:
+                    tool_el = None
             elif (cfg._pch_use_pch and
                   (src == cfg._pch_generator or src in pchExcluded)):
                 tool_el = doc.createElement("Tool")
