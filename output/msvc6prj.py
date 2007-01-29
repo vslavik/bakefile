@@ -178,6 +178,7 @@ Package=<4>
             
             t = targets[tg1]
             for c in targets[tg2].configs:
+                assert c not in t.configs # otherwise not mutually exclusive
                 t.configs[c] = targets[tg2].configs[c]
             t.id = tgR
             projects.remove(targets[tg2])

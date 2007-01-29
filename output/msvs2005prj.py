@@ -173,7 +173,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
                         d2 = deps_translation[d]
                     else:
                         d2 = d
-                    guid = guid_dict[d]
+                    guid = guid_dict[d2]
                     deps_str += "\t\t%s = %s\n" % (guid, guid)
                 deps_str += "\tEndProjectSection\n"
 
@@ -247,6 +247,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             
             t = targets[tg1]
             for c in targets[tg2].configs:
+                assert c not in t.configs # otherwise not mutually exclusive
                 t.configs[c] = targets[tg2].configs[c]
             t.id = tgR
             projects.remove(targets[tg2])
@@ -363,14 +364,18 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t10.setAttribute("AdditionalOptions", cfg._ldflags)
         t10.setAttribute("OutputFile", "%s%s" % (cfg._targetdir, cfg._targetname))
 
-        if t.type == 'exe':
-            t10.setAttribute("LinkIncremental", "2")
-            t10.setAttribute("SubSystem", "%s" % self.app_type_code[cfg._type_nick] )
-        elif t.type == 'dll':
+        if cfg._type_nick == 'dll':
             t10.setAttribute("LinkIncremental", "1")
-            if cfg._importlib != "": implib = cfg._importlib
-            else: implib = cfg._targetname.replace('.dll', '.lib')
-            t10.setAttribute("ImportLibrary", ".\\%s\\%s" % (cfg._targetdir, implib))
+            if cfg._importlib != "":
+                implib = cfg._importlib
+            else:
+                implib = cfg._targetname.replace('.dll', '.lib')
+            t10.setAttribute("ImportLibrary",
+                             ".\\%s\\%s" % (cfg._targetdir, implib))
+        else:
+            t10.setAttribute("LinkIncremental", "2")
+            t10.setAttribute("SubSystem",
+                             "%s" % self.app_type_code[cfg._type_nick])
             
         t10.setAttribute("SuppressStartupBanner", "true")
         t10.setAttribute("AdditionalLibraryDirectories", ",".join(cfg._lib_paths.split()))
@@ -457,10 +462,10 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t9.setAttribute("Name", "VCPreLinkEventTool")
         conf_el.appendChild(t9)
 
-        if (t.type == 'lib'):
+        if cfg._type_nick == 'lib':
             t10 = self.buildLibrarianToolElement(doc, cfg, t)
             conf_el.appendChild(t10)
-        elif ( (t.type == 'exe') or (t.type == 'dll') ):
+        else:
             t10 = self.buildLinkerToolElement(doc, cfg, t)
             conf_el.appendChild(t10)
 
@@ -482,7 +487,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t14.setAttribute("Name", "VCFxCopTool")
         conf_el.appendChild(t14)
 
-        if(t.type == 'exe'):
+        if cfg._type_nick in ['gui', 'console']:
             t16 = doc.createElement("Tool")
             t16.setAttribute("Name", "VCAppVerifierTool")
             conf_el.appendChild(t16)
