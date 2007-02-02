@@ -15,6 +15,7 @@ Version 0.2.2
 - autoconf: fixed <set-srcdir> to generate correct code when ran on Windows
 - don't fail in bakefile_gen --clean if a new file or format was added
   since .bakefile_gen.state was last updated
+- gnu, mingw: assign default options values using ':=' instead of '='
 
 
 Version 0.2.1
