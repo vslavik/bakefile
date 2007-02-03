@@ -368,10 +368,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             t10.setAttribute("LinkIncremental", "1")
             if cfg._importlib != "":
                 implib = cfg._importlib
-            else:
-                implib = cfg._targetname.replace('.dll', '.lib')
-            t10.setAttribute("ImportLibrary",
-                             ".\\%s\\%s" % (cfg._targetdir, implib))
+                t10.setAttribute("ImportLibrary",
+                                 ".\\%s\\%s" % (cfg._targetdir, implib))
         else:
             t10.setAttribute("LinkIncremental", "2")
             t10.setAttribute("SubSystem",

@@ -241,6 +241,7 @@
             </set>
             <set var="_type_code">$(_MSVC_TYPECODE_DLL)</set>
             <set var="_type_nick">dll</set>
+            <set var="_importlib"/> <!-- empty==no import lib -->
 
             <dllname>$(id)</dllname>
         </template>
