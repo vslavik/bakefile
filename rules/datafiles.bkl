@@ -42,7 +42,6 @@
         <template template="_installcmd">
             <set var="__iprg">$(INSTALL_DATA)</set>
             <set var="__uprg">$(UNINSTALL_DATA)</set>
-            <set var="__srcdir">$(SRCDIR)</set>
             <set var="__files"/>
             <set var="__copy_cmd" eval="0">$(__install_cmd)</set>
             <set var="__remove_cmd" eval="0">$(__uninstall_cmd)</set>
@@ -103,7 +102,6 @@
         <template template="_installcmd">
             <set var="__iprg">$(INSTALL_DATA)</set>
             <set var="__uprg">$(UNINSTALL_DATA)</set>
-            <set var="__srcdir"/>
             <set var="__copy_cmd" eval="0">$(__install_cmd_preservetree)</set>
             <set var="__remove_cmd" eval="0">$(__uninstall_cmd_preservetree)</set>
 
@@ -138,7 +136,7 @@
     <define-rule name="copy-files" extends="action">
         <template>
             <is-phony/>
-            <set var="__srcdir"/>
+            <set var="__srcdir">$(SRCDIR)</set>
 
             <!--
               DigitalMars' smake has problems with long command lines, so we
