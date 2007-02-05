@@ -121,7 +121,12 @@ def load(filename):
         raise IOError()
 
     def __loadDb(f, orig_db):
-        db = cPickle.load(f)
+        try:
+            db = cPickle.load(f)
+        except EOFError, e:
+            # so that the callers can only catch IOError
+            raise IOError(e)
+
         if len(orig_db) == 0:
             return db
         else:
