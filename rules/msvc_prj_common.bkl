@@ -218,11 +218,6 @@
             <set var="_targetname">$(value)$(EXEEXT)</set>
         </define-tag>
         <define-tag name="app-type">
-            <set var="_type">
-                $(substituteFromDict(value,
-                {'console':'"Win32 (%s) Console Application"' % _MSVC_CPU_NAME,
-                 'gui'    :'"Win32 (%s) Application"' % _MSVC_CPU_NAME}))
-            </set>
             <set var="_type_code">
                 $(substituteFromDict(value,
                 {'console':_MSVC_TYPECODE_CONSOLE,
@@ -236,9 +231,6 @@
         <template template="_dll_baset_projtype">
             <_define-no-res>_USRDLL</_define-no-res>
             <_define-no-res>DLL_EXPORTS</_define-no-res>
-            <set var="_type">
-                "Win32 ($(_MSVC_CPU_NAME)) Dynamic-Link Library"
-            </set>
             <set var="_type_code">$(_MSVC_TYPECODE_DLL)</set>
             <set var="_type_nick">dll</set>
             <set var="_importlib"/> <!-- empty==no import lib -->
@@ -264,9 +256,8 @@
     <define-rule name="module" extends="_dll"/>
     
     <define-rule name="lib" extends="_compiled,_compiled_specific">
-        <template>
+        <template template="_lib_baset_projtype">
             <_define-no-res>_LIB</_define-no-res>
-            <set var="_type">"Win32 ($(_MSVC_CPU_NAME)) Static Library"</set>
             <set var="_type_code">$(_MSVC_TYPECODE_LIB)</set>
             <set var="_type_nick">lib</set>
             <libname>$(id)</libname>

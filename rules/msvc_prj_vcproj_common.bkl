@@ -56,6 +56,7 @@
     </template>
     
     <template id="_dll_baset_projtype"/>
+    <template id="_lib_baset_projtype"/>
     <template id="_exe_baset"/>
     
     <define-rule name="_compiled_specific"/>

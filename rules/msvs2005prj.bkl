@@ -35,8 +35,6 @@
     <set var="_MSVC_TYPECODE_GUI">1</set>
     <set var="_MSVC_TYPECODE_DLL">2</set>
     <set var="_MSVC_TYPECODE_LIB">4</set>
-
-    <set var="_MSVC_CPU_NAME">x86</set>
     
     <include file="msvc_prj_vcproj_common.bkl"/>
 

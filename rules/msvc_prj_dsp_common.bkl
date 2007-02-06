@@ -46,9 +46,15 @@
     </template>
     
     <template id="_dll_baset_projtype" template="_dll_baset">
+        <set var="_type">
+            "Win32 ($(_MSVC_CPU_NAME)) Dynamic-Link Library"
+        </set>
         <set var="_ldflags">/dll $(_ldflags)</set>
     </template>
 
+    <template id="_lib_baset_projtype">
+        <set var="_type">"Win32 ($(_MSVC_CPU_NAME)) Static Library"</set>
+    </template>
 
 
     <!-- ### include common MSVC projects code: ### -->
@@ -111,6 +117,11 @@
 
 
     <define-tag name="app-type" rules="exe">
+        <set var="_type">
+            $(substituteFromDict(value,
+            {'console':'"Win32 (%s) Console Application"' % _MSVC_CPU_NAME,
+             'gui'    :'"Win32 (%s) Application"' % _MSVC_CPU_NAME}))
+        </set>
         <ldflags>
             $(substituteFromDict(value,
             {'console':'/subsystem:console',
