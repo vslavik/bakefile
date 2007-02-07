@@ -85,6 +85,8 @@
             </set>
             <set var="_targetdir">$(_builddir)$(DIRSEP)</set>
             
+            <set var="_pdbfile" eval="0">$(_targetdir)$(_name).pdb</set>
+            
             <!-- precompiled headers support (see also msvc_common.bkl): -->
             <set var="_pch_use_pch">0</set>
             <set var="_pch_header"/>
@@ -324,7 +326,6 @@
 
     <define-tag name="debug-info" rules="exe,dll,module,lib">
         <debug-runtime-libs>$(value)</debug-runtime-libs>
-        <set var="_pdbfile" eval="0">$(_targetdir)$(_name).pdb</set>
     </define-tag>
     
     <if cond="FORMAT!='msevc4prj'">
