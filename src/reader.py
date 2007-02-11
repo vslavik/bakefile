@@ -251,6 +251,7 @@ def handleOption(e):
     for c in e.children:
         if c.name == 'default-value':
             default = evalConstExpr(e, c.value)
+            force_default = 'force' in c.props and c.props['force'] == '1'
         elif c.name == 'description':
             desc = c.value
         elif c.name == 'values':
@@ -263,8 +264,10 @@ def handleOption(e):
     # if this is an option with listed values, then the default value
     # which has been specified must be in the list of allowed values:
     if default != None and values != None and default not in values:
-        raise ReaderError(e, "default value '%s' for option '%s' is not among allowed values (%s)" %
-                          (default, name, values))
+        # unless the user explicitely wanted to avoid this kind of check:
+        if not force_default:
+            raise ReaderError(e, "default value '%s' for option '%s' is not among allowed values (%s)" %
+                              (default, name, values))
 
     o = mk.Option(name, default, desc, values, values_desc)
     mk.addOption(o)

@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <option name="OPT1">
+        <values>one,two,three</values>
+        <!-- this is OK, we tell Bakefile we know what we're doing
+             via force=1: -->
+        <default-value force="1">$(DOLLAR)(OPT1_DEFAULT)</default-value>
+    </option>
+
+    <option name="OPT2">
+        <values>one,two,three</values>
+        <!-- this is not OK: -->
+        <default-value>four</default-value>
+    </option>
+
+</makefile>

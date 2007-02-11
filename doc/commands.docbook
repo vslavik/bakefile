@@ -298,7 +298,7 @@
           to the makefile.
           <programlisting><![CDATA[
 <option name="NAME" [never_empty="NEVER_EMPTY"] [category="CATEGORY"]>
-  [<default-value>DEFVALUE</default-value>]
+  [<default-value [force="FORCE"]>DEFVALUE</default-value>]
   [<description>DESC</description>]
   [<values>VALUES</values>]
   [<values-description>VALUES_DESC</values-description>]
@@ -315,6 +315,19 @@
           option, if appliable. It can be used by format backends that don't
           support options and it is used as default in those that do. Use it
           whenever possible.
+          Note that for options with listed values (see the <varname>VALUES</varname> 
+          parameter), the default value must be one of the values listed unless
+          <varname>FORCE</varname> is set to <literal>1</literal>.
+        </para>
+        <para>
+          <varname>FORCE</varname> can be <literal>0</literal> (the default) or 
+          <literal>1</literal> to indicate that Bakefile should not check that the 
+          default value is in the list of allowed values.
+          This is useful when you want to use e.g. a shell command as the default value
+          (<literal>$(shell some-command)</literal>) or an environment
+          variable <literal>$(MYENVVAR)</literal>. It is your responsibility
+          to ensure that the default value is a legal value if you use
+          <literal>force=1</literal>.
         </para>
         <para>
           <varname>NEVER_EMPTY</varname> may be set to <literal>1</literal> to

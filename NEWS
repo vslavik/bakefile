@@ -16,6 +16,8 @@ Version 0.2.2
 - don't fail in bakefile_gen --clean if a new file or format was added
   since .bakefile_gen.state was last updated
 - gnu, mingw: assign default options values using ':=' instead of '='
+- added force argument to <option>'s <default-value> to make bypassing
+  of the default value check possible (Francesco Montorsi)
 
 
 Version 0.2.1
