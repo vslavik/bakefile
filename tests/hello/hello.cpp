@@ -3,7 +3,7 @@
 
 #if defined(BUILD_AS_GUI) && defined(_WINDOWS)
 #include <windows.h>
-int WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+int WinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 #else
 int main()
 #endif
