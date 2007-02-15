@@ -1,3 +1,19 @@
+bakefile (0.2.2) unstable; urgency=low
+  * Bakefile is now licensed under the MIT license
+  * Python >= 2.3 is now required
+  * added initial support for MSVS2005 project files
+  * added --touch option
+  * fixed isdefined() to work with conditional variables
+  * added --dry-run option to bakefile_gen too
+  * added optional support for (un)installation targets in Windows formats
+  * added FORMAT_SUPPORTS_{ACTIONS,SUBPROJECTS}
+  * autoconf: fixed <set-srcdir> to generate correct code when ran on Windows
+  * don't fail in bakefile_gen --clean if a new file or format was added since .bakefile_gen.state was last updated
+  * gnu, mingw: assign default options values using ':=' instead of '='
+  * added force argument to <option>'s <default-value> to make bypassing of the default value check possible (Francesco Montorsi)
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Feb, 15 Thu 2007 02:38:05 +0100
+
 bakefile (0.2.0.928) unstable; urgency=low
   * added <define-global-tag> define tags with global * scope; this makes it
   * added <set-srcdir> for setting SRCDIR variable
