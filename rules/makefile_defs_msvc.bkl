@@ -188,22 +188,22 @@
             <set var="__MAKE_SUBPROJECT_CMD" eval="0">
                 cd $(__subdir)
                 $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) $(__subtarget)
-                cd $(DOLLAR)(MAKEDIR)
+                cd "$(DOLLAR)(MAKEDIR)"
             </set>
             <set var="__INSTALL_SUBPROJECT_CMD" eval="0">
                 cd $(__subdir)
                 $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) install
-                cd $(DOLLAR)(MAKEDIR)
+                cd "$(DOLLAR)(MAKEDIR)"
             </set>
             <set var="__UNINSTALL_SUBPROJECT_CMD" eval="0">
                 cd $(__subdir)
                 $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) uninstall
-                cd $(DOLLAR)(MAKEDIR)
+                cd "$(DOLLAR)(MAKEDIR)"
             </set>
             <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
                 cd $(__subdir)
                 $(DOLLAR)(MAKE) -f $(os.path.basename(OUTPUT_FILE)) $(MAKEARGS) clean
-                cd $(DOLLAR)(MAKEDIR)
+                cd "$(DOLLAR)(MAKEDIR)"
             </set>
         </template>
 
