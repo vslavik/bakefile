@@ -340,7 +340,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
         chmod +x shared-ld-sh
 
         SHARED_LD_MODULE_CC="`pwd`/shared-ld-sh -bundle -headerpad_max_install_names -o"
-        SHARED_LD_MODULE_CXX="$SHARED_LD_MODULE_CC"
+        SHARED_LD_MODULE_CXX="CXX=\$(CXX) $SHARED_LD_MODULE_CC"
 
         dnl Most apps benefit from being fully binded (its faster and static
         dnl variables initialized at startup work).
@@ -974,6 +974,10 @@ objects=""
 linking_flag="-dynamiclib"
 ldargs="-r -keep_private_externs -nostdlib"
 
+if test "x${D}CXX" = "x"; then
+    CXX="c++"
+fi
+
 while test ${D}# -gt 0; do
     case ${D}1 in
 
@@ -1032,9 +1036,9 @@ status=0
 # Link one module containing all the others
 #
 if test ${D}{verbose} = 1; then
-    echo "c++ ${D}{ldargs} ${D}{objects} -o master.${D}${D}.o"
+    echo "${D}CXX ${D}{ldargs} ${D}{objects} -o master.${D}${D}.o"
 fi
-c++ ${D}{ldargs} ${D}{objects} -o master.${D}${D}.o
+${D}CXX ${D}{ldargs} ${D}{objects} -o master.${D}${D}.o
 status=${D}?
 
 #
@@ -1043,9 +1047,9 @@ status=${D}?
 #
 if test ${D}{status} = 0; then
     if test ${D}{verbose} = 1; then
-        echo "c++ ${D}{linking_flag} master.${D}${D}.o ${D}{args}"
+        echo "${D}CXX ${D}{linking_flag} master.${D}${D}.o ${D}{args}"
     fi
-    c++ ${D}{linking_flag} master.${D}${D}.o ${D}{args}
+    ${D}CXX ${D}{linking_flag} master.${D}${D}.o ${D}{args}
     status=${D}?
 fi
 

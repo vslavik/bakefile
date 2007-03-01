@@ -13,6 +13,10 @@ objects=""
 linking_flag="-dynamiclib"
 ldargs="-r -keep_private_externs -nostdlib"
 
+if test "x$CXX" = "x"; then
+    CXX="c++"
+fi
+
 while test $# -gt 0; do
     case $1 in
 
@@ -71,9 +75,9 @@ status=0
 # Link one module containing all the others
 #
 if test ${verbose} = 1; then
-    echo "c++ ${ldargs} ${objects} -o master.$$.o"
+    echo "$CXX ${ldargs} ${objects} -o master.$$.o"
 fi
-c++ ${ldargs} ${objects} -o master.$$.o
+$CXX ${ldargs} ${objects} -o master.$$.o
 status=$?
 
 #
@@ -82,9 +86,9 @@ status=$?
 #
 if test ${status} = 0; then
     if test ${verbose} = 1; then
-        echo "c++ ${linking_flag} master.$$.o ${args}"
+        echo "$CXX ${linking_flag} master.$$.o ${args}"
     fi
-    c++ ${linking_flag} master.$$.o ${args}
+    $CXX ${linking_flag} master.$$.o ${args}
     status=$?
 fi
 
