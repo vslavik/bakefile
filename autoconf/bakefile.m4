@@ -986,6 +986,12 @@ while test ${D}# -gt 0; do
         args="${D}{args} ${D}1 ${D}2"
         shift
         ;;
+       
+       -arch|-isysroot)
+        # collect these options and values
+        ldargs="${D}{ldargs} ${D}1 ${D}2"
+        shift
+        ;;
 
        -s|-Wl,*)
         # collect these load args

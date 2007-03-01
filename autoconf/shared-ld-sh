@@ -26,6 +26,12 @@ while test $# -gt 0; do
         shift
         ;;
        
+       -arch|-isysroot)
+        # collect these options and values
+        ldargs="${ldargs} $1 $2"
+        shift
+        ;;
+
        -s|-Wl,*)
         # collect these load args
         ldargs="${ldargs} $1"
