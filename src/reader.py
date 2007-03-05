@@ -1,5 +1,5 @@
 #
-#  This file is part of Bakefile (http://bakefile.sourceforge.net)
+#  This file is part of Bakefile (http://www.bakefile.org)
 #
 #  Copyright (C) 2003-2007 Vaclav Slavik
 #
@@ -962,7 +962,7 @@ def handleRequires(e):
 -----------------------------------------------------------------------
 This file cannot be processed with Bakefile version older than %s.
 You are using Bakefile version %s. Please install the newest version
-from http://bakefile.sourceforge.net.
+from http://www.bakefile.org.
 -----------------------------------------------------------------------
 
 """ % (e.props['version'], mk.vars['BAKEFILE_VERSION']))

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-#  This file is part of Bakefile (http://bakefile.sourceforge.net) and can be
+#  This file is part of Bakefile (http://www.bakefile.org) and can be
 #  used to create the Debian package. Please update debian/changelog before
 #  running it and ensure that the working copy is not modified.
 #

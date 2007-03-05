@@ -1,5 +1,5 @@
 dnl
-dnl  This file is part of Bakefile (http://bakefile.sourceforge.net)
+dnl  This file is part of Bakefile (http://www.bakefile.org)
 dnl
 dnl  Copyright (C) 2003-2007 Vaclav Slavik and others
 dnl
@@ -851,7 +851,7 @@ D='$'
 cat <<EOF >bk-deps
 #!/bin/sh
 
-# This script is part of Bakefile (http://bakefile.sourceforge.net) autoconf
+# This script is part of Bakefile (http://www.bakefile.org) autoconf
 # script. It is used to track C/C++ files dependencies in portable way.
 #
 # Permission is given to use this file in any way.
@@ -1072,7 +1072,7 @@ D='$'
 cat <<EOF >bk-make-pch
 #!/bin/sh
 
-# This script is part of Bakefile (http://bakefile.sourceforge.net) autoconf
+# This script is part of Bakefile (http://www.bakefile.org) autoconf
 # script. It is used to generated precompiled headers.
 #
 # Permission is given to use this file in any way.

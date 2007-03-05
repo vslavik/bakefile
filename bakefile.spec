@@ -8,7 +8,7 @@ Prefix:        /usr
 Summary:       Cross-platform makefiles generator
 License:       MIT
 Group:         Development/Other
-URL:           http://bakefile.sourceforge.net
+URL:           http://www.bakefile.org
 Packager:      Vaclav Slavik <vslavik@fastmail.fm>
 BuildRoot:     /var/tmp/%{name}-%{version}-root
 
