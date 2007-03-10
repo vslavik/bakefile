@@ -1,4 +1,8 @@
 
+- removed support for C++ Builder X, it no longer exists and the format
+  wasn't used by anyone in practice
+
+
 Version 0.2.2
 --------------
 

@@ -125,11 +125,6 @@
                       </row>
 
                       <row>
-                        <entry>cbuilderx</entry>
-                        <entry>Borland C++Builder X project files</entry>
-                      </row>
-
-                      <row>
                         <entry>dmars</entry>
                         <entry>Generic Makefile for Digital Mars C/C++</entry>
                       </row>

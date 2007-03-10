@@ -30,7 +30,7 @@
     </input>
     
     <add-formats>
-        autoconf,borland,cbuilderx,dmars,dmars_smake,gnu,mingw,msevc4prj,msvc,msvc6prj,msvs2005prj,symbian,watcom,xcode2
+        autoconf,borland,dmars,dmars_smake,gnu,mingw,msevc4prj,msvc,msvc6prj,msvs2005prj,symbian,watcom,xcode2
     </add-formats>
     
     <!-- WinCE can't handle console-only apps (FIXME: build tests anyway!): -->
@@ -56,10 +56,10 @@
   
     <!-- Project files don't make sense for root makefile: -->
     <del-formats files="root.bkl">
-        msevc4prj,msvc6prj,msvs2005prj,cbuilderx
+        msevc4prj,msvc6prj,msvs2005prj
     </del-formats>
     <del-formats files="gettext/*.bkl">
-        msevc4prj,msvc6prj,msvs2005prj,cbuilderx
+        msevc4prj,msvc6prj,msvs2005prj
     </del-formats>
 
   

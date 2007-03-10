@@ -19,7 +19,6 @@ aclocal_DATA = autoconf/bakefile.m4 \
 
 output_DATA = output/autoconf.empy \
               output/autoconf-macros.empy \
-              output/cbuilderx.py \
               output/borland.empy \
               output/borland-opts.empy \
               output/dmars.empy \
@@ -42,7 +41,6 @@ output_DATA = output/autoconf.empy \
 
 rules_DATA =  rules/FORMATS.bkmanifest \
               rules/autoconf.bkl \
-			  rules/cbuilderx.bkl \
               rules/borland.bkl \
               rules/dmars.bkl \
               rules/dmars_smake.bkl \
