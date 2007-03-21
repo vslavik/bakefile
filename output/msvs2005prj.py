@@ -528,16 +528,6 @@ Microsoft Visual Studio Solution File, Format Version 9.00
     #this is just for derived classes that may want to add more tools to the config
     def additionalTools(self, doc, cfg, t):
         return []
-
-    def get_default_groups(self):
-            return ['Source Files', 'Header Files', 'Resource Files']
-
-    def get_group_defs(self):
-        return {
-            'Source Files'   : '*.cpp *.c *.cxx *.def *.r *.odl *.idl *.hpj *.bat',
-            'Header Files'   : '*.h *.hpp *.hxx *.hm *.inl',
-            'Resource Files' : '*.ico *.cur *.bmp *.dlg *.rc *.rc2 *.rct *.bin *.rgs *.gif *.jpg *.jpeg *.jpe',
-            }
     
     def genDSP(self, t, filename, prjname, guid):        
         #start a new xml document
