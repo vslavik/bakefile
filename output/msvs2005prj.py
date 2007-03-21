@@ -81,7 +81,7 @@ DEFAULT_FILE_GROUPS = [
                    extensions='cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx',
                    uuid='{4FC737F1-C7A5-4376-A066-2A32D752A2FF}'),
     MsvsFilesGroup('Header Files',
-                   extensions='',
+                   extensions='h;hpp;hxx;hm;inl;inc;xsd',
                    uuid='{93995380-89BD-4b04-88EB-625FBE52EBFB}'),
     MsvsFilesGroup('Resource Files',
                    extensions='rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav',
