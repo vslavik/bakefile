@@ -166,7 +166,13 @@ def run(args):
             else:
                 config.defines[d[0]] = '='.join(d[1:])
     
-    if not reader.read(args[0]):
+    try:
+        read_ok = reader.read(args[0])
+    finally:
+        if xmlparser.cache != None:
+            xmlparser.cache.close()
+
+    if not read_ok:
         sys.exit(1)
 
     if options.dump:
