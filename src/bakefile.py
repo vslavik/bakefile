@@ -32,6 +32,7 @@ import sys, os.path
 from optparse import OptionParser
 
 import formats
+import xmlparser
 
 def addIncludePaths(includes):
     import config
@@ -120,7 +121,7 @@ def run(args):
     
     if options.xml_cache != None:
         try:
-            import xmlparser, pickle, shelve
+            import pickle, shelve
             xmlparser.cache = shelve.open(options.xml_cache,
                                           protocol=pickle.HIGHEST_PROTOCOL)
         except ImportError:
