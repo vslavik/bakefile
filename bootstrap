@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ "$OSTYPE" = "darwin" ]; then
+if [ "${OSTYPE:0:6}" = "darwin" ]; then
     LIBTOOLIZE=glibtoolize
 else
     LIBTOOLIZE=libtoolize
