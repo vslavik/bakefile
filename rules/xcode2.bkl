@@ -3,7 +3,7 @@
 
   This file is part of Bakefile (http://www.bakefile.org)
 
-  Copyright (C) 2005 David F. Elliott
+  Copyright (C) 2005-2007 David F. Elliott, Kevin Ollivier
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to
@@ -38,8 +38,8 @@
     <set var="PLATFORM_MACOSX">1</set>
     <set var="FORMAT_SUPPORTS_CONDITIONS">0</set>
     <set var="FORMAT_HAS_MAKE_INSTALL">0</set>
-    <set var="FORMAT_SUPPORTS_ACTIONS">0</set> <!-- FIXME: is this true? -->
-    <set var="FORMAT_SUPPORTS_SUBPROJECTS">1</set>  <!-- FIXME: is this true? -->
+    <set var="FORMAT_SUPPORTS_ACTIONS">1</set>
+    <set var="FORMAT_SUPPORTS_SUBPROJECTS">0</set>  <!-- FIXME: is this true? -->
 
     <!-- =============================================================== -->
     <!--                       Compiler options:                         -->
@@ -107,8 +107,11 @@
     <define-rule name="action" extends="__any">
         <template>
             <set var="_kind">action</set>
+            <set var="_commands"></set>
         </template>
-        <define-tag name="command" />
+        <define-tag name="command">
+            <set var="_commands" append="1">$(value)\n</set>
+        </define-tag>
         <define-tag name="is-phony" />
     </define-rule>
     <define-rule name="subproject" extends="action">
@@ -125,43 +128,117 @@
             <set var="_xcode_target_group"></set>
             <set var="_defines"></set>
             <set var="_includes"></set>
+            <set var="_cxx_rtti"></set>
+            <set var="_cxx_exceptions"></set>
+            <set var="_debug_info"></set>
+            <set var="_optimize"></set>
+            <set var="_cflags"></set>
+            <set var="_cxxflags"></set>
+            <set var="_cppflags"></set>
+            <set var="_lib_path"></set>
+            <set var="_sys_libs"></set>
+            <set var="_warnings"></set>
+            <set var="_ldlibs"></set>
+            <set var="_ldflags"></set>
+            <set var="_pic"></set>
+            <set var="_dirname"></set>
+            <set var="_productname"></set>
+            <set var="_deps"></set>
+            <set var="_use_pch"></set>
+            <set var="_pch_header"></set>
+            <set var="_macvercur"></set>
+            <set var="_macvercompat"></set>
+            <set var="_postlink_command"></set>
         </template>
         <define-tag name="debug-info">
+            <set var="_debug_info">$(value)</set>
         </define-tag>
         <define-tag name="debug-runtime-libs"/>
-        <define-tag name="optimize"/>
+        <define-tag name="optimize">
+            <set var="_optimize">$(value)</set>
+        </define-tag>
         <define-tag name="threading" />
         <define-tag name="runtime-libs" />
-        <define-tag name="cxx-rtti" />
-        <define-tag name="cxx-exceptions" />
-        <define-tag name="cppflags" />
+        <define-tag name="cxx-rtti">
+            <set var="_cxx_rtti">$(value)</set>
+        </define-tag>
+        <define-tag name="cxx-exceptions">
+            <set var="_cxx_exceptions">$(value)</set>
+        </define-tag>
+        <define-tag name="cflags">
+            <set var="_cflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="cxxflags">
+            <set var="_cxxflags" append="1">$(value)</set>
+        </define-tag>
+        <!-- 
+             I couldn't find any Xcode setting for CPPFLAGS, the closest it has
+             is GCC_PREPROCESSOR_DEFINITIONS, but that assumes each item is a define.
+             Is this an appropriate solution, or should we look at other routes? 
+        -->
+        <define-tag name="cppflags">
+            <cflags>$(value)</cflags>
+            <cxxflags>$(value)</cxxflags>
+        </define-tag>
         <define-tag name="define">
             <set var="_defines" append="1">$(value)</set>
         </define-tag>
-        <define-tag name="dirname" />
+        <define-tag name="dirname">
+            <set var="_dirname">$(value)</set>
+        </define-tag>
         <define-tag name="libname">
-            <set var="_libname">$(value)</set>
+            <set var="_productname">$(value)</set>
         </define-tag>
         <define-tag name="install-to" />
         <define-tag name="install-if" />
-        <define-tag name="pic" />
+        <define-tag name="pic">
+            <set var="_pic">$(value)</set>
+        </define-tag>
         <define-tag name="include">
             <set var="_includes" append="1">$(value)</set>
         </define-tag>
         <define-tag name="sources">
             <set var="_sources" append="1">$(value)</set>
         </define-tag>
-        <define-tag name="lib-path" />
-        <define-tag name="warnings" />
-        <define-tag name="sys-lib" />
-        <define-tag name="ldlibs" />
-        <define-tag name="library" />
+        <define-tag name="lib-path">
+            <set var="_lib_path" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="warnings">
+            <set var="_warnings">$(value)</set>
+        </define-tag>
+        <define-tag name="sys-lib">
+            <ldlibs>-l$(value)</ldlibs>
+        </define-tag>
+        <define-tag name="ldlibs">
+            <set var="_ldlibs" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="ldflags">
+            <set var="_ldflags">$(value)</set>
+        </define-tag>
+        <define-tag name="depends">
+            <set var="_deps" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="library">
+            <depends>$(value)</depends>
+            <ldlibs>-l$(value)</ldlibs>
+        </define-tag>
+        <define-tag name="postlink-command">
+            <set var="_postlink_command">$(value)</set>
+        </define-tag>
 
 
-        <define-tag name="precomp-headers"/>
-        <define-tag name="precomp-headers-file"/>
-        <define-tag name="precomp-headers-header"/>
+        <define-tag name="precomp-headers">
+            <set var="_use_pch">$(value)</set>
+        </define-tag>
+        
+        <define-tag name="precomp-headers-header">
+            <set var="_pch_header">$(value)</set>
+        </define-tag>
+        
+        <!-- NB: AFAICT, Xcode doesn't give fine-tuned control over PCH,
+             so I'm not sure we can implement these settings. -->
         <define-tag name="precomp-headers-location"/>
+        <define-tag name="precomp-headers-file"/>
         <define-tag name="precomp-headers-gen"/>
         <define-tag name="precomp-headers-exclude"/>
 
@@ -174,9 +251,11 @@
         <template>
             <set var="_productType">com.apple.product-type.library.dynamic</set>
             <set var="_explicitFileType">compiled.mach-o.dylib</set>
-            <set var="_productname" eval="0">lib$(_libname).dylib</set>
+            <set var="_productname" eval="0">lib$(_libname)</set>
         </template>
-        <define-tag name="dllname" />
+        <define-tag name="dllname">
+            <set var="_productname">$(value)</set> 
+        </define-tag>
     </define-rule>
     <define-rule name="dll" extends="_dll">
         <template>
@@ -184,7 +263,10 @@
         </template>
         <define-tag name="version"/>
         <define-tag name="so_version"/>
-        <define-tag name="mac_version"/>
+        <define-tag name="mac_version">
+            <set var="_macvercur">$(value)</set>
+            <set var="_macvercompat">$('.'.join(value.split('.')[0:2]))</set>
+        </define-tag>
     </define-rule>
     <define-rule name="module" extends="_dll">
         <template>
@@ -195,7 +277,7 @@
         <template>
             <set var="_productType">com.apple.product-type.library.static</set>
             <set var="_explicitFileType">archive.ar</set>
-            <set var="_productname" eval="0">lib$(_libname).a</set>
+            <set var="_productname" eval="0">lib$(_libname)</set>
             <libname>$(id)</libname>
         </template>
     </define-rule>

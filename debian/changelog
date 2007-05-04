@@ -77,7 +77,7 @@ bakefile (0.1.9.1) unstable; urgency=low
   * fixed copy-files on Solaris
   * added dependencies tracking for Sun CC
   * msvc: fixed to work with free MS tools
-  * new format (unfinished!): xcode2 for XCode project files
+  * new format (unfinished!): xcode2 for Xcode project files
   * new format: symbian for Symbian tools
   * msevc4prj: support C++ exceptions and RTTI
   * autoconf: treat Cygwin as Unix
