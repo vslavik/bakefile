@@ -137,7 +137,7 @@ def loadTargets(filename, defaultFlags=''):
     root = _loadFile(filename)
     
     if root.name != 'bakefile-gen':
-        raise ReaderError(e, 'incorrect root node')
+        raise ReaderError(root, 'incorrect root node (not a bakefile_gen file?)')
     
     if verbose:
         print 'scanning directories for bakefiles...'
