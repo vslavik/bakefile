@@ -92,7 +92,7 @@
     <format id="xcode2">
         <description>Xcode 2.4 project files</description>
         <default-filename>
-            $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).xcode
+            $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).xcodeproj
         </default-filename>
     </format>
 
