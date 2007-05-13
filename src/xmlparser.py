@@ -53,7 +53,8 @@ class Element:
         if self.lineno != None:
             return "%s:%i" % (self.filename, self.lineno)
         else:
-            return self.filename
+            return "%s (%s)" % (self.filename,
+                                "line unknown, install libxml2 to show it")
 
 
 class ParsingError(Exception):
@@ -175,9 +176,6 @@ def __initParseFileXML():
         parseFileXML = __parseFileMinidom
         global xml
         import sys, xml.sax, xml.dom, xml.dom.minidom, xml.parsers.expat
-        import config
-        if not config.quiet:
-            sys.stderr.write("Warning: libxml2 missing, will not show line numbers on errors\n")
 
 def __parseFileXMLStub(filename):
     global parseFileXML
