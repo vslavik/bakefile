@@ -427,11 +427,13 @@ def _extractTargetNodes(parent, list, target, tags, index):
             index[name] = [n]
         else:
             if n.exclusive:
-                if config.debug:
-                    n2 = index[name][0]
-                    print '[dbg] (thrown away <%s> @%s in favour of @%s)' % \
-                                        (name, n2.node.location(), n.node.location())
-                _removeNode(index[name][0])
+                if len(index[name]) > 0:
+                    if config.debug:
+                        n2 = index[name][0]
+                        print '[dbg] (thrown away <%s> @%s in favor of @%s)' % \
+                              (name, n2.node.location(), n.node.location())
+                    _removeNode(index[name][0])
+                # else: this can happen if _removeNode was called recursively
                 index[name] = [n]
             else:
                 index[name].append(n)
