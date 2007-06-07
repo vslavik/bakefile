@@ -328,8 +328,14 @@ class ProjectGeneratorXcode2:
         groupObject["sourceTree"] = "<group>"
         groupObject["children"] = []
         parentGroupObject = self.objects[self.mainGroupId]
-        if parentdir != "":
-            parentGroupObject = self.objects[self.idForDirectoryGroup(parentdir)]
+        
+        # NB: Ideally, it'd be nice to have a directory hierarchy like the below
+        # code attempts to do, but it is not robust enough to handle multiple
+        # subdirs, and moreover, I'm not sure how relative dirs will be resolved 
+        # using nested file groups, so for the moment don't create a dir hierarchy.
+        
+        #if parentdir != "":
+        #    parentGroupObject = self.objects[self.idForDirectoryGroup(parentdir)]
         #groupObject["refType"] = 4 # Relative to enclosing group
         groupObject["path"] = dirname
         
@@ -360,7 +366,7 @@ class ProjectGeneratorXcode2:
         fileObject = {}
         fileObject["isa"] = "PBXFileReference"
         fileObject["path"] = basename
-        fileObject["sourceTree"] = "SOURCE_ROOT";
+        fileObject["sourceTree"] = "<group>";
         #fileObject["refType"] = 4 # Path relative to enclosing group
 
         self.objects[fileId] = fileObject
@@ -410,6 +416,7 @@ class ProjectGeneratorXcode2:
                 
             if config._dirname != "":
                 buildSettings["SYMROOT"] = config._dirname
+                buildSettings["CONFIGURATION_BUILD_DIR"] = config._dirname
             
             # currently we don't do anything with 'no' or 'default' values, like GNU format
             if config._warnings == "max":
