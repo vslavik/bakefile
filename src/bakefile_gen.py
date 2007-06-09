@@ -26,11 +26,17 @@
 #  $Id$
 #
 
-import sys, os, os.path, glob, fnmatch, threading, shutil
+import sys, os, os.path, glob, fnmatch, threading, shutil, re
 from optparse import OptionParser
 
 import xmlparser, dependencies, errors, portautils
 from errors import ReaderError
+
+try:
+    import subprocess
+except ImportError:
+    # the subprocess module wasn't available in 2.3, so use a bundle version:
+    import py25modules.subprocess as subprocess
 
 verbose = 0
 
@@ -47,23 +53,24 @@ disabled_formats = []
 
 _bakefileExecutable = None
 def _getBakefileExecutable():
-    """Returns command that should be used to run Bakefile. Makes sure same
-       Python version as for bakefile_gen is used (if you run it e.g.
-       "python2.3 bakefile_gen.py")."""
+    """Returns command(s) that should be used to run Bakefile as a list
+       suitable for subprocess.call. Makes sure same Python version as for
+       bakefile_gen is used (if you run it e.g.  "python2.3
+       bakefile_gen.py")."""
     global _bakefileExecutable
     if _bakefileExecutable == None:
         if os.path.basename(sys.executable).lower() == 'bakefile_gen.exe':
             # we're on Windows and using the wrapper binary, use bakefile.exe:
-            _bakefileExecutable = '"%s"' % \
-                                  os.path.join(os.path.dirname(sys.executable),
-                                               'bakefile.exe')
+            _bakefileExecutable = [os.path.join(os.path.dirname(sys.executable),
+                                                'bakefile.exe')]
         else:
             # find the location of bakefile.py:
             bakefile_py = os.path.normpath(os.path.join(
                             os.path.dirname(os.path.realpath(sys.argv[0])),
                             'bakefile.py'))
-            _bakefileExecutable = '%s "%s"' % (sys.executable, bakefile_py)
-    return _bakefileExecutable
+            _bakefileExecutable = [sys.executable, bakefile_py]
+    # make a copy of the list so that's not modified by the caller:
+    return [x for x in _bakefileExecutable]
 
 
 def _matchesWildcard(filename, wildcard, absolutize=0):
@@ -82,7 +89,7 @@ def _matchesWildcard(filename, wildcard, absolutize=0):
             return 0
     return 1
 
-def loadTargets(filename, defaultFlags=''):
+def loadTargets(filename, defaultFlags=[]):
 
     def _loadFile(filename):
         if verbose:
@@ -133,6 +140,13 @@ def loadTargets(filename, defaultFlags=''):
             for f in matches1:
                 matches2.append((f, f.formats))
         return matches2
+
+    def _parseFlags(cmdline):
+        """Splits command line into individual flag arguments. Handles quoting
+           with " properly."""
+        # findall returns list of tuples, 1st or 2nd item is empty, depending
+        # on which subexpression was matched:
+        return [a or b for a,b in re.findall(r'"(.*?)"|(\S+)', cmdline)]
    
     root = _loadFile(filename)
     
@@ -183,23 +197,28 @@ def loadTargets(filename, defaultFlags=''):
     
     for cmd in root.children:
         if cmd.name == 'add-flags':
+            flagsList = _parseFlags(cmd.value)
             for file, formats in _findMatchingFiles(cmd):
-                flags = cmd.value
-                flags = flags.replace('$(INPUT_FILE)', file.filename)
-                flags = flags.replace('$(INPUT_FILE_BASENAME)',
-                        os.path.basename(file.filename))
-                flags = flags.replace('$(INPUT_FILE_BASENAME_NOEXT)',
-                        os.path.splitext(os.path.basename(file.filename))[0])
-                inputdir = os.path.dirname(file.filename)
-                if inputdir == '': inputdir = '.'
-                flags = flags.replace('$(INPUT_FILE_DIR)', inputdir)
+                for f in flagsList:
+                    flags = f
+                    flags = flags.replace('$(INPUT_FILE)', file.filename)
+                    flags = flags.replace('$(INPUT_FILE_BASENAME)',
+                            os.path.basename(file.filename))
+                    flags = flags.replace('$(INPUT_FILE_BASENAME_NOEXT)',
+                            os.path.splitext(os.path.basename(file.filename))[0])
+                    inputdir = os.path.dirname(file.filename)
+                    if inputdir == '': inputdir = '.'
+                    flags = flags.replace('$(INPUT_FILE_DIR)', inputdir)
 
-                for fmt in formats:
-                    file.flags[fmt] = '%s %s' % (file.flags[fmt], flags)
+                    for fmt in formats:
+                        file.flags[fmt].append(flags)
+
         elif cmd.name == 'del-flags':
+            flagsList = _parseFlags(cmd.value)
             for file, formats in _findMatchingFiles(cmd):
                 for fmt in formats:
-                    file.flags[fmt] = file.flags[fmt].replace(cmd.value,'')
+                    for f in flagsList:
+                        file.flags[fmt].remove(f)
 
 
 
@@ -299,26 +318,32 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                 if not quiet:
                     print '%s[%i/%i] generating %s from %s' % (
                             threadId, i, state.totalCount, fmt, f)
-                cmd = '%s -f%s %s %s --output-deps=%s --output-changes=%s --xml-cache=%s' % \
-                        (_getBakefileExecutable(),
-                         fmt, files[f].flags[fmt], f,
-                         tempDeps, tempChanges, tempXmlCacheFile)
+                cmd = _getBakefileExecutable()
+                cmd.append('-f%s' % fmt)
+                cmd += files[f].flags[fmt]
+                cmd.append('--output-deps=%s' % tempDeps)
+                cmd.append('--output-changes=%s' % tempChanges)
+                cmd.append('--xml-cache=%s' % tempXmlCacheFile)
                 if quiet:
-                    cmd += ' --quiet'
+                    cmd.append('--quiet')
                 if dryRun:
-                    cmd += ' --dry-run'
-                elif verbose >= 2: cmd += ' -v'
+                    cmd.append('--dry-run')
+                elif verbose >= 2: cmd.append('-v')
+                cmd.append(f)
                 if verbose:
                     print cmd
                 if pretend: continue
 
-                if os.system(cmd) != 0:
-                    if keepGoing:
-                        sys.stderr.write(
-                          '[bakefile_gen] bakefile exited with error, ignoring')
-                        continue
-                    else:
-                        raise errors.Error('bakefile exited with error')
+                try:
+                    if subprocess.call(cmd) != 0:
+                        if keepGoing:
+                            sys.stderr.write(
+                              '[bakefile_gen] bakefile exited with error, ignoring')
+                            continue
+                        else:
+                            raise errors.Error('bakefile exited with error')
+                except IOError, e:
+                    raise errors.Error('failed to run bakefile: %s' % e)
                 modLinesCnt = __countLines(tempChanges)
                 try:
                     state.lock.acquire()
@@ -505,9 +530,9 @@ def run(args):
         options.bakefiles = options.bakefiles.replace('/',os.sep).split(',')
     options.jobs = int(options.jobs)
 
-    moreDefines=''
+    moreDefines=[]
     if options.defines != None:
-        moreDefines = ' '.join(['-D%s' % x for  x in options.defines])
+        moreDefines = ['-D%s' % x for x in options.defines]
  
     try:
         loadTargets(os.path.abspath(options.descfile), moreDefines)

@@ -109,7 +109,8 @@ codeempy_PYTHON = \
               src/empy/em.py
 codepy25modules_PYTHON = \
 			  src/py25modules/__init__.py \
-			  src/py25modules/uuid.py
+			  src/py25modules/uuid.py \
+			  src/py25modules/subprocess.py
 
 code_LTLIBRARIES = _bottlenecks.la
 
