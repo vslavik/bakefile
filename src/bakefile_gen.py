@@ -331,7 +331,7 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                 elif verbose >= 2: cmd.append('-v')
                 cmd.append(f)
                 if verbose:
-                    print cmd
+                    print ' '.join(cmd)
                 if pretend: continue
 
                 try:
