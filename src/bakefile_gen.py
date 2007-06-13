@@ -185,7 +185,7 @@ def loadTargets(filename, defaultFlags=[]):
                 for f in formats:
                     if f not in file.formats:
                         file.formats.append(f)
-                        file.flags[f] = defaultFlags
+                        file.flags[f] = [x for x in defaultFlags] # make copy
         elif cmd.name == 'del-formats':
             formats = [x for x in cmd.value.split(',') 
                                if x not in disabled_formats]
