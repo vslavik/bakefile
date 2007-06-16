@@ -180,6 +180,7 @@
 
     <define-tag name="debug-info" rules="exe,dll,module,lib">
         <cppflags>/Fd$(_pdbfile)</cppflags>
+        <ldflags>/pdb:"$(_pdbfile)"</ldflags>
     </define-tag>
     
     <!-- includes and defines should propagate to rc compilation, too: -->

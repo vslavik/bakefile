@@ -68,6 +68,7 @@
         <debug-runtime-libs>$(value)</debug-runtime-libs>
         <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
         <cppflags>/Fd$(__pdbfile)</cppflags>
+        <ldflags>/pdb:"$(_pdbfile)"</ldflags>
     </define-tag>
 
 

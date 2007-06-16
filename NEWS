@@ -3,6 +3,8 @@
   wasn't used by anyone in practice
 - significantly improved Xcode format (Kevin Ollivier)
 - fixed running bakefile_gen if the name of temporary directory contains spaces
+- msvc6prj: use /pdb linker option to make the projects work when imported
+  in MSVC7.1 (Scott Bailey, patch #1732354)
 
 
 Version 0.2.2
