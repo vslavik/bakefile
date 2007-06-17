@@ -576,6 +576,38 @@
       </para>
     </section>
 
+
+    <section>
+      <title>msvs2005prj</title>
+      <para>
+        <informaltable>
+          <tgroup cols='3'>
+            <thead>
+              <row>
+                <entry>Variable name</entry>
+                <entry>Description</entry>
+                <entry>Default</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row id="var.MSVS_PLATFORMS" xreflabel="MSVS_PLATFORMS">
+                <entry role="varname">MSVS_PLATFORMS</entry>
+                <entry>
+                  Comma-separated list of platforms to generate project
+                  configurations for. See
+                  <link linkend="format.msvs2005prj">
+                    MS VisualStudio 2005 format documentation
+                  </link>
+                  for details.
+                </entry>
+                <entry role="default">Win32</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </para>
+    </section>
+
   </section>
 
 </chapter>

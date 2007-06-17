@@ -5,7 +5,55 @@
     get extra functionality specific to this format.
   </para>
 
-  <section id="watcom">
+
+
+  <section id="format.msvs2005prj">
+    <title>MS VisualStudio 2005 extended functionality</title>
+    <para>
+      The <literal>msvs2005prj</literal> is capable of generating project
+      files both for Win32 PC platform and for embedded platform. By default,
+      only Win32 configurations are generated, embedded configurations must
+      be explicitly enabled.
+    </para>
+    <para>
+      This is done by setting the
+      <link  linkend="var.MSVS_PLATFORMS"><varname>MSVS_PLATFORMS</varname></link>
+      variable to comma-separated list of platforms to use. Accepted platform
+      names are:
+      <itemizedlist>
+        <listitem><para><literal>Win32</literal></para></listitem>
+          <listitem><para><literal>Pocket PC 2003 (ARMV4)</literal></para></listitem>
+      </itemizedlist>
+    </para>
+    <para>
+      The variable must be set before user bakefile file is processed, i.e.
+      it has to be done using command-line <literal>-D</literal> argument or
+      in the <filename>Bakefiles.bkgen</filename> file.
+    </para>
+    <para>
+      For example, the following command causes Bakefile to generate projects
+      for Pocket PC 2003: 
+    </para>
+    <para>
+      <prompt>$ </prompt>
+      <userinput>
+      bakefile -fmsvs2005prj -DMSVS_PLATFORMS="Pocket PC 2003 (ARMV4)" hello.bkl
+      </userinput>
+    </para>
+    <para>
+      And this generates hybrid project for both PocketPC and Win32 platforms:
+    </para>
+    <para>
+      <prompt>$ </prompt>
+      <userinput>
+      bakefile -fmsvs2005prj -DMSVS_PLATFORMS="Win32,Pocket PC 2003 (ARMV4)" hello.bkl
+      </userinput>
+    </para>
+  </section>
+
+
+
+  <section id="format.watcom">
 
     <title>Watcom format extended functionality</title>
     <para>

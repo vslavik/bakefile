@@ -116,13 +116,20 @@ class ProjectGeneratorMsvc9:
     #   helpers
     # --------------------------------------------------------------------
 
-    def mkConfigName(self, target, config):
-        return '%s|%s' % (config, self.getPlatform())
+    def mkConfigName(self, config):
+        # config name always contains the platform followed by "| " at the
+        # beginning of the string, so extract it and transform into
+        # "ConfigName|Platform":
+        idx = config.index('|')
+        platform = config[:idx]
+        name = config[idx+2:]
+        if name == '': name = 'Default'
+        return '%s|%s' % (name, platform)
 
-    def getPlatform(self):
-        # FIXME: should be configurable, so that other (embedded) platforms
-        # can be supported by this format as well
-        return "Win32"
+    def isEmbeddedConfig(self, config):
+        """Returns true if given config targets embedded device."""
+        cfg = configs[config][0]['_MSVS_PLATFORM']
+        return cfg != 'Win32'
 
     # --------------------------------------------------------------------
     #   DSW file
@@ -148,7 +155,6 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         for t in dsw_targets:
             guid_dict[t.id] = mk_proj_uuid(self.basename, t.id)
 
-        # FIXME: this is taken from msvc6 and slightly modified, should be
         #        moved to common code
         single_target = (len(dsw_targets) == 1)
         for t in dsw_targets:
@@ -197,7 +203,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         dsw += "Global\n"
         dsw += "\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n"
         for c in sortedKeys(configs):
-            cfg = '%s|%s' % (c, self.getPlatform())
+            cfg = self.mkConfigName(c)
             dsw += "\t\t%s = %s\n" % (cfg,cfg)
         dsw += "\tEndGlobalSection\n"
         
@@ -207,10 +213,12 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         for t in dsw_targets:
             guid = guid_dict[t.id]
             for c in sortedKeys(t.configs):
-                cfg = '%s|%s' % (c, self.getPlatform())
+                cfg = self.mkConfigName(c)
                 txt = "\t\t%(guid)s.%(cfg)s.%%s = %(cfg)s\n" % {'guid':guid, 'cfg':cfg}
                 dsw += txt % 'ActiveCfg'
                 dsw += txt % 'Build.0'
+                if self.isEmbeddedConfig(c):
+                    dsw += txt % 'Deploy.0'
 
         
         dsw += "\tEndGlobalSection\n"
@@ -272,11 +280,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
     #some helpers to build parts of the DSP file that change if you are doing PC vs WinCE
     def buildConfElement(self, doc, cfg, c, t):
-        conf_name = self.mkConfigName(t.id, c)
+        conf_name = self.mkConfigName(c)
         conf_el = doc.createElement("Configuration")
         conf_el.setAttribute("Name", conf_name)
-        conf_el.setAttribute("OutputDirectory", ".\\%s" % cfg._targetdir[:-1])
-        conf_el.setAttribute("IntermediateDirectory", ".\\%s\\%s" % (cfg._builddir, t.id) )
+        conf_el.setAttribute("OutputDirectory", "%s" % cfg._targetdir[:-1])
+        conf_el.setAttribute("IntermediateDirectory", "%s\\%s" % (cfg._builddir, t.id) )
         conf_el.setAttribute("ConfigurationType", "%s" % cfg._type_code)
         conf_el.setAttribute("UseOfMFC", "0")
         conf_el.setAttribute("ATLMinimizesCRunTimeLibraryUsage", "false")
@@ -329,11 +337,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         
         if cfg._debug == '1':
             t6.setAttribute("BasicRuntimeChecks", "3")
-            t6.setAttribute("DebugInformationFormat", "3")
+            t6.setAttribute("DebugInformationFormat", "3") # enabled
             t6.setAttribute("Detect64BitPortabilityProblems", "true")
         else:
             t6.setAttribute("BasicRuntimeChecks", "0")
-            t6.setAttribute("DebugInformationFormat", "0")
+            t6.setAttribute("DebugInformationFormat", "0") # no debug
             t6.setAttribute("BufferSecurityCheck","false")
         
         if cfg._cxx_rtti == 'on':
@@ -346,8 +354,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             t6.setAttribute("PrecompiledHeaderThrough", cfg._pch_header)
             t6.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
             
-        t6.setAttribute("AssemblerListingLocation", ".\\%s\\%s\\" % (cfg._builddir, t.id) )
-        t6.setAttribute("ObjectFile", ".\\%s\\%s\\" % (cfg._builddir, t.id) )
+        t6.setAttribute("AssemblerListingLocation", "%s\\%s\\" % (cfg._builddir, t.id) )
+        t6.setAttribute("ObjectFile", "%s\\%s\\" % (cfg._builddir, t.id) )
         t6.setAttribute("ProgramDataBaseFileName", cfg._pdbfile)
         if warnings_map.has_key(cfg._warnings):
             t6.setAttribute("WarningLevel", warnings_map[cfg._warnings])
@@ -357,10 +365,14 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         return t6
 
-    def buildLinkerToolElement(self, doc, cfg, t):
+    def buildLinkerToolElement(self, doc, cfg, c, t):
+        ldlibs = cfg._ldlibs
+        if cfg._cxx_rtti == 'on' and self.isEmbeddedConfig(c):
+            ldlibs += ' ccrtrtti.lib'
+
         t10 = doc.createElement("Tool")
         t10.setAttribute("Name", "VCLinkerTool")
-        t10.setAttribute("AdditionalDependencies", cfg._ldlibs)
+        t10.setAttribute("AdditionalDependencies", ldlibs)
         t10.setAttribute("AdditionalOptions", cfg._ldflags)
         t10.setAttribute("OutputFile", "%s%s" % (cfg._targetdir, cfg._targetname))
 
@@ -369,7 +381,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             if cfg._importlib != "":
                 implib = cfg._importlib
                 t10.setAttribute("ImportLibrary",
-                                 ".\\%s\\%s" % (cfg._targetdir, implib))
+                                 "%s%s" % (cfg._targetdir, implib))
         else:
             t10.setAttribute("LinkIncremental", "2")
             t10.setAttribute("SubSystem",
@@ -383,7 +395,17 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             t10.setAttribute("GenerateDebugInformation", "true")
             
         t10.setAttribute("ProgramDatabaseFile", cfg._pdbfile)
-        t10.setAttribute("TargetMachine", "1")
+
+        if self.isEmbeddedConfig(c):
+            t10.setAttribute("TargetMachine", "3")
+            t10.setAttribute("SubSystem","0")
+            t10.setAttribute("DelayLoadDLLs", "$(NOINHERIT)")
+            if cfg._debug == '0':
+                t10.setAttribute("OptimizeReferences", "2")
+                t10.setAttribute("EnableCOMDATFolding", "2")
+        else:
+            t10.setAttribute("TargetMachine", "1")
+
         return t10
 
     def buildLibrarianToolElement(self, doc, cfg, t):
@@ -401,12 +423,13 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t8.setAttribute("PreprocessorDefinitions", ";".join(cfg._res_defines.split()))
         return t8
 
-    def buildPlatformsElement(self,doc):
+    def buildPlatformsElement(self, doc):
         #Platforms Node
         plats_el = doc.createElement("Platforms")
-        plat_el = doc.createElement("Platform")
-        plat_el.setAttribute("Name", self.getPlatform())
-        plats_el.appendChild(plat_el)
+        for p in MSVS_PLATFORMS.split(','):
+            plat_el = doc.createElement("Platform")
+            plat_el.setAttribute("Name", p)
+            plats_el.appendChild(plat_el)
         return plats_el
 
     def buildToolFilesElement(self, doc):
@@ -464,7 +487,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             t10 = self.buildLibrarianToolElement(doc, cfg, t)
             conf_el.appendChild(t10)
         else:
-            t10 = self.buildLinkerToolElement(doc, cfg, t)
+            t10 = self.buildLinkerToolElement(doc, cfg, c, t)
             conf_el.appendChild(t10)
 
         t11 = doc.createElement("Tool")
@@ -477,7 +500,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         t13 = doc.createElement("Tool")
         t13.setAttribute("Name", "VCBscMakeTool")
-        t13.setAttribute("OutputFile", ".\\%s%s.bsc" % (cfg._targetdir, prjname))
+        t13.setAttribute("OutputFile", "%s%s.bsc" % (cfg._targetdir, prjname))
         t13.setAttribute("SuppressStartupBanner", "true")
         conf_el.appendChild(t13)
 
@@ -498,14 +521,15 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         conf_el.appendChild(t15)
 
         #additional tools
-        for ad_t in self.additionalTools(doc, cfg, t):
-                conf_el.appendChild(ad_t)
+        if self.isEmbeddedConfig(c):
+            self.buildEmbeddedTools(doc, conf_el)
 
         return conf_el
                 
     def buildCustomBuildElement(self, doc, data):
-        # parse MSVC6-style custom build element code (FIXME: this is for compatibility,
-        # will be replaced with <action> handling in the future):
+        # parse MSVC6-style custom build element code (FIXME: this is for
+        # compatibility, will be replaced with <action> handling in the
+        # future):
         lines = data.split('\n')
         description = lines[0]
         assert lines[1].startswith('InputPath=')
@@ -524,10 +548,18 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         if len(deps) > 0: 
             el.setAttribute('AdditionalDependencies', deps)
         return el
-            
-    #this is just for derived classes that may want to add more tools to the config
-    def additionalTools(self, doc, cfg, t):
-        return []
+
+
+    def buildEmbeddedTools(self, doc, conf_el):
+        deployment_tool_el = doc.createElement("DeploymentTool")
+        deployment_tool_el.setAttribute("ForceDirty", "-1")
+        deployment_tool_el.setAttribute("RemoteDirectory", "")
+        deployment_tool_el.setAttribute("RegisterOutput", "0")
+        deployment_tool_el.setAttribute("AdditionalFiles", "")
+        conf_el.appendChild(deployment_tool_el)
+
+        debugger_tool_el = doc.createElement("DebuggerTool")
+        conf_el.appendChild(debugger_tool_el)
     
     def genDSP(self, t, filename, prjname, guid):        
         #start a new xml document
@@ -567,7 +599,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
        
         ##define a local helper function for building the files area
         def makeFileConfig(t, cfg, c, src, group, sources, pchExcluded):
-            conf_name = self.mkConfigName(t.id, c)
+            conf_name = self.mkConfigName(c)
             file_conf_el = doc.createElement("FileConfiguration")
             file_conf_el.setAttribute("Name", conf_name)
 

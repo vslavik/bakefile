@@ -34,21 +34,17 @@
      
     <!-- ### templates with DSP-specific initialization of rules: ### -->
 
-    <template id="_compiled_baset_projtype">
-        <set var="_ldflags"/> 
+    <template id="_compiled_baset_projtype" template="_compiled_baset">
+        <set var="_ldflags" overwrite="0"/> 
         <set var="_ldlibs"/> 
         <set var="_lib_paths"/>
         <set var="_cppflags"/>
         <set var="_optimize">0</set>
         <set var="_warnings">default</set>
-        <set var="_defines"/>
+        <set var="_defines" overwrite="0"/>
         <set var="_include_paths"/>
         <set var="_res_include_paths"/>
         <set var="_res_defines"/>
-
-        <set var="_default_builddir" eval="0">
-            $(substituteFromDict(_debug,{'0':'Release','1':'Debug'}))
-        </set>
 
         <debug-runtime-libs>off</debug-runtime-libs>
         <runtime-libs>dynamic</runtime-libs>

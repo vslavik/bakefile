@@ -28,6 +28,67 @@
 
 -->
 <makefile>
+    
+    <!-- ============================================================== -->
+    <!--                    Platforms configuration                     -->
+    <!-- ============================================================== -->
+
+    <!-- comma-separated list of platforms to include in the project file;
+         by default, only PC Win32 targets are generated. Allowed values are:
+
+         "Win32"
+         "Pocket PC 2003 (ARMV4)"
+      -->
+    <set var="MSVS_PLATFORMS">Win32</set>
+
+    
+    
+    <!-- ============================================================== -->
+    <!--                   Platform-specific settings                   -->
+    <!-- ============================================================== -->
+
+    <option name="_MSVS_PLATFORM">
+        <values>$(MSVS_PLATFORMS)</values>
+        <!-- generate descriptions in the form "PlatformName|", this will be
+             parsed by ProjectGeneratorMsvc9.mkConfigName() in
+             output/msvs2005prj.py: -->
+        <values-description>
+            $(','.join(['%s|' % x for x in MSVS_PLATFORMS.split(',')]))
+        </values-description>
+    </option>
+    <set var="VARS_DONT_ELIMINATE" append="1">_MSVS_PLATFORM</set>
+
+    <set var="_default_builddir">
+        <!-- "standard" case: -->
+        <if cond="MSVS_PLATFORMS=='Win32'">
+            $(DOLLAR)(SolutionDir)$(DOLLAR)(ConfigurationName)
+        </if>
+        <!-- either embedded-only or mixed projects: -->
+        <if cond="MSVS_PLATFORMS!='Win32'">
+            $(DOLLAR)(PlatformName)\$(DOLLAR)(ConfigurationName)
+        </if>
+    </set>
+    
+    <template id="_compiled_baset">
+        <set var="_platform_extra_defines">
+            <if cond="_MSVS_PLATFORM=='Pocket PC 2003 (ARMV4)'">
+                _WIN32_WCE=$(DOLLAR)(CEVER) UNDER_CE $(DOLLAR)(PLATFORMDEFINES) $(DOLLAR)(ARCHFAM) $(DOLLAR)(_ARCHFAM_) _UNICODE UNICODE
+            </if>
+        </set>
+        <set var="_platform_extra_ldflags">
+            <if cond="_MSVS_PLATFORM=='Pocket PC 2003 (ARMV4)'">
+                /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE
+            </if>
+        </set>
+
+        <set var="_defines">$(_platform_extra_defines)</set>
+        <set var="_ldflags">$(_platform_extra_ldflags)</set>
+    </template>
+
+    
+    <!-- ============================================================== -->
+    <!--    Set format-specific settings and call common MSVC code:     -->
+    <!-- ============================================================== -->
 
     <set var="COMPILER">vc</set>
 

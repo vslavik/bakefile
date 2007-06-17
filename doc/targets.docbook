@@ -172,7 +172,7 @@
                   The default stack size varies for different platforms and
                   compilers. With too small stack you may get an error
                   indicating stack has overflowed. (Currently used by
-                  <link linkend="watcom">Watcom format</link> only.)
+                  <link linkend="format.watcom">Watcom format</link> only.)
                 </entry>
               </row>
 

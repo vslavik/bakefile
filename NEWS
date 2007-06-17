@@ -5,6 +5,7 @@
 - fixed running bakefile_gen if the name of temporary directory contains spaces
 - msvc6prj: use /pdb linker option to make the projects work when imported
   in MSVC7.1 (Scott Bailey, patch #1732354)
+- msvs2005prj: added support for Pocket PC platform
 
 
 Version 0.2.2
