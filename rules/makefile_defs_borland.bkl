@@ -92,14 +92,18 @@
     
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">
-            $(CC) -q -c -P- -o$@ $(__cflags) $**
+            $(CC) -q -c -P- -o$@ $(__cflags) $(src)
         </set>
+        <!-- FIXME: temporary hack, $(src) should be used only if there are
+                    object-dependencies, otherwise $** should be used -->
     </template>
     
     <template id="__commands_templ_CXX">
         <set var="__COMPILE_CXX_CMD" eval="0">
-            $(CXX) -q -c -P -o$@ $(__cxxflags) $**
+            $(CXX) -q -c -P -o$@ $(__cxxflags) $(src)
         </set>
+        <!-- FIXME: temporary hack, $(src) should be used only if there are
+                    object-dependencies, otherwise $** should be used -->
     </template>
 
     <!--

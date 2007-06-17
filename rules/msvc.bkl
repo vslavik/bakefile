@@ -73,7 +73,7 @@
     <define-rule name="__rc-to-res" extends="__any,compilation_rule">
         <template>
             <set var="__command" eval="0">
-                rc /fo$@ $(__win32rc_flags) $**
+                rc /fo$@ $(__win32rc_flags) $(src)
             </set>
         </template>
         <define-tag name="parent-target">
