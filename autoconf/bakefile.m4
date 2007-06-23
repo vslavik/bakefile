@@ -859,10 +859,8 @@ mkdir -p ${D}DEPSDIR
 if test ${D}DEPSMODE = gcc ; then
     ${D}* ${D}{DEPSFLAG}
     status=${D}?
-    if test ${D}{status} != 0 ; then
-        exit ${D}{status}
-    fi
-    # move created file to the location we want it in:
+
+    # determine location of created files:
     while test ${D}# -gt 0; do
         case "${D}1" in
             -o )
@@ -879,6 +877,14 @@ if test ${D}DEPSMODE = gcc ; then
     done
     depfile=\`basename ${D}srcfile | sed -e 's/\\..*${D}/.d/g'\`
     depobjname=\`echo ${D}depfile |sed -e 's/\\.d/.o/g'\`
+    
+    # if the compiler failed, we're done:
+    if test ${D}{status} != 0 ; then
+        rm -f ${D}depfile
+        exit ${D}{status}
+    fi
+
+    # move created file to the location we want it in:
     if test -f ${D}depfile ; then
         sed -e "s,${D}depobjname:,${D}objfile:,g" ${D}depfile >${D}{DEPSDIR}/${D}{objfile}.d
         rm -f ${D}depfile
