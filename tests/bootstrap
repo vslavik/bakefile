@@ -1,0 +1,5 @@
+#!/bin/bash
+
+../autoconf/bakefilize && \
+aclocal -I ../autoconf && \
+autoconf
