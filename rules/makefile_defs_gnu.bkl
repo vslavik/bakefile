@@ -88,10 +88,19 @@
         <set var="__DEFAULT_CXXFLAGS"></set>
         <set var="__DEFAULT_LDFLAGS"></set>
 
-        <set var="__DLL_LINKER_CC" eval="0">$(CC) -shared -fPIC -o</set>
-        <set var="__DLL_LINKER_CXX" eval="0">$(CXX) -shared -fPIC -o</set>
-        <set var="__MODULE_LINKER_CC">$(__DLL_LINKER_CC)</set>
-        <set var="__MODULE_LINKER_CXX">$(__DLL_LINKER_CXX)</set>
+        <!-- allow overriding the flags -->
+        <option name="LINK_DLL_FLAGS">
+            <description>Compiler flags to link shared library</description>
+            <default-value>-shared -fPIC</default-value>
+        </option>
+        <option name="LINK_MODULE_FLAGS">
+            <description>Compiler flags to link loadable module</description>
+            <default-value>-shared -fPIC</default-value>
+        </option>
+        <set var="__DLL_LINKER_CC" eval="0">$(CC) $(LINK_DLL_FLAGS) -o</set>
+        <set var="__DLL_LINKER_CXX" eval="0">$(CXX) $(LINK_DLL_FLAGS) -o</set>
+        <set var="__MODULE_LINKER_CC" eval="0">$(CC) $(LINK_MODULE_FLAGS) -o</set>
+        <set var="__MODULE_LINKER_CXX" eval="0">$(CXX) $(LINK_MODULE_FLAGS) -o</set>
 
         <!--
         basic compiler/linker flags (they are left almost empty because
