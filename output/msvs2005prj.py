@@ -375,15 +375,18 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t10.setAttribute("AdditionalDependencies", ldlibs)
         t10.setAttribute("AdditionalOptions", cfg._ldflags)
         t10.setAttribute("OutputFile", "%s%s" % (cfg._targetdir, cfg._targetname))
+        
+        if cfg._debug == '1':
+            t10.setAttribute("LinkIncremental", "2") # on
+        else:
+            t10.setAttribute("LinkIncremental", "1") # off
 
         if cfg._type_nick == 'dll':
-            t10.setAttribute("LinkIncremental", "1")
             if cfg._importlib != "":
                 implib = cfg._importlib
                 t10.setAttribute("ImportLibrary",
                                  "%s%s" % (cfg._targetdir, implib))
         else:
-            t10.setAttribute("LinkIncremental", "2")
             t10.setAttribute("SubSystem",
                              "%s" % self.app_type_code[cfg._type_nick])
             
