@@ -218,7 +218,12 @@ def loadTargets(filename, defaultFlags=[]):
             for file, formats in _findMatchingFiles(cmd):
                 for fmt in formats:
                     for f in flagsList:
-                        file.flags[fmt].remove(f)
+                        try:
+                            file.flags[fmt].remove(f)
+                        except ValueError:
+                            sys.stderr.write(
+                                "Warning: trying to remove flags '%s' that weren't added (current flags on file %s, format %s: '%s')\n" %
+                                (f, file.filename, fmt, ' '.join(file.flags[fmt])))
 
 
 
