@@ -222,8 +222,8 @@ def loadTargets(filename, defaultFlags=[]):
                             file.flags[fmt].remove(f)
                         except ValueError:
                             sys.stderr.write(
-                                "Warning: trying to remove flags '%s' that weren't added (current flags on file %s, format %s: '%s')\n" %
-                                (f, file.filename, fmt, ' '.join(file.flags[fmt])))
+                                "Warning: trying to remove flags '%s' that weren't added at %s (current flags on file %s, format %s: '%s')\n" %
+                                (f, cmd.location(), file.filename, fmt, ' '.join(file.flags[fmt])))
 
 
 
