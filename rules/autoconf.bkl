@@ -458,7 +458,7 @@
         <set var="__subdir">$(nativePaths(value))</set>
         <modify-target target="distclean">
             <command>
-                (cd $(value) &amp;&amp; $(DOLLAR)(MAKE) distclean)
+                -(cd $(value) &amp;&amp; $(DOLLAR)(MAKE) distclean)
             </command>
         </modify-target>
     </define-tag>
