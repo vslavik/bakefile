@@ -160,7 +160,7 @@
             (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) uninstall)
         </set>
         <set var="__CLEAN_SUBPROJECT_CMD" eval="0">
-            (cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) clean)
+            -(cd $(__subdir) &amp;&amp; $(DOLLAR)(MAKE) clean)
         </set>
     </template>
 
