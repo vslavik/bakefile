@@ -43,9 +43,7 @@ if searchPath == ['']: searchPath = []
 
 progdir = os.path.dirname(os.path.realpath(sys.argv[0]))
 datadir = os.path.join(progdir, '..', '..', 'share', 'bakefile')
-if ((os.path.normpath(
-        os.path.join(progdir, '..', '..', 'lib', 'bakefile')) != progdir) or
-        not os.path.isdir(datadir)):
+if not os.path.isfile(os.path.join(datadir, 'rules', 'FORMATS.bkmanifest')):
     datadir = os.path.join(progdir, '..')
 searchPath.append(os.path.normpath(os.path.join(datadir, 'rules')))
 searchPath.append(os.path.normpath(os.path.join(datadir, 'output')))
