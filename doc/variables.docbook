@@ -600,7 +600,20 @@
                   </link>
                   for details.
                 </entry>
-                <entry role="default">Win32</entry>
+                <entry role="default">win32</entry>
+              </row>
+              <row id="var.MSVS_PLATFORM" xreflabel="MSVS_PLATFORM">
+                <entry role="varname">MSVS_PLATFORM</entry>
+                <entry>
+                  This variable is not meant to be set by the user. It's
+                  an <link linkend="concept.option">option</link> created by
+                  the format itself. It's allowed values are values from
+                  <xref linkend="var.MSVS_PLATFORMS"/> variable set by the
+                  user. It can be used by the bakefiles to generate different
+                  project settings for different platform, in the same way
+                  user-added options are used.
+                </entry>
+                <entry role="default"></entry>
               </row>
             </tbody>
           </tgroup>

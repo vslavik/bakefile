@@ -128,8 +128,8 @@ class ProjectGeneratorMsvc9:
 
     def isEmbeddedConfig(self, config):
         """Returns true if given config targets embedded device."""
-        cfg = configs[config][0]['_MSVS_PLATFORM']
-        return cfg != 'Win32'
+        cfg = configs[config][0]['MSVS_PLATFORM']
+        return cfg != 'win32'
 
     # --------------------------------------------------------------------
     #   DSW file
@@ -429,7 +429,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
     def buildPlatformsElement(self, doc):
         #Platforms Node
         plats_el = doc.createElement("Platforms")
-        for p in MSVS_PLATFORMS.split(','):
+        for p in MSVS_PLATFORMS_DESC.split(','):
             plat_el = doc.createElement("Platform")
             plat_el.setAttribute("Name", p)
             plats_el.appendChild(plat_el)

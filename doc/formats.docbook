@@ -19,11 +19,27 @@
       This is done by setting the
       <link  linkend="var.MSVS_PLATFORMS"><varname>MSVS_PLATFORMS</varname></link>
       variable to comma-separated list of platforms to use. Accepted platform
-      names are:
-      <itemizedlist>
-        <listitem><para><literal>Win32</literal></para></listitem>
-          <listitem><para><literal>Pocket PC 2003 (ARMV4)</literal></para></listitem>
-      </itemizedlist>
+      identifiers are:
+      <informaltable>
+        <tgroup cols='2'>
+          <thead>
+            <row>
+              <entry>Platform identifier</entry>
+              <entry>Visual Studio name</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><literal>win32</literal></entry>
+              <entry>Win32</entry>
+            </row>
+            <row>
+              <entry><literal>pocketpc2003</literal></entry>
+              <entry>Pocket PC 2003 (ARMV4)</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
     </para>
     <para>
       The variable must be set before user bakefile file is processed, i.e.
@@ -37,7 +53,7 @@
     <para>
       <prompt>$ </prompt>
       <userinput>
-      bakefile -fmsvs2005prj -DMSVS_PLATFORMS="Pocket PC 2003 (ARMV4)" hello.bkl
+      bakefile -fmsvs2005prj -DMSVS_PLATFORMS=pocketpc2003 hello.bkl
       </userinput>
     </para>
     <para>
@@ -46,7 +62,7 @@
     <para>
       <prompt>$ </prompt>
       <userinput>
-      bakefile -fmsvs2005prj -DMSVS_PLATFORMS="Win32,Pocket PC 2003 (ARMV4)" hello.bkl
+      bakefile -fmsvs2005prj -DMSVS_PLATFORMS=win32,pocketpc2003 hello.bkl
       </userinput>
     </para>
   </section>
