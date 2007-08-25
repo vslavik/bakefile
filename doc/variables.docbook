@@ -620,6 +620,15 @@
         </informaltable>
       </para>
     </section>
+    
+    
+    <section>
+      <title>msvs2003prj</title>
+      <para>
+        The <xref linkend="var.MSVS_PLATFORM"/> option is present in
+        this format as well, but it is always set to <literal>win32</literal>.
+      </para>
+    </section>
 
   </section>
 

@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<!--
+
+  This file is part of Bakefile (http://www.bakefile.org)
+
+  Copyright (C) 2007 Vaclav Slavik, Kevin Powell, Steven Van Ingelgem,
+                     Kevin Ollivier
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to
+  deal in the Software without restriction, including without limitation the
+  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+  sell copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  IN THE SOFTWARE.
+
+  $Id$
+
+  Common file for msvs2005prj, msvs2003prj
+
+-->
+<makefile>
+
+    <option name="MSVS_PLATFORM">
+        <values>$(MSVS_PLATFORMS)</values>
+        <!-- generate descriptions in the form "PlatformName|", this will be
+             parsed by ProjectGeneratorMsvc9.mkConfigName() in
+             output/msvs2005prj.py: -->
+        <values-description>
+            $(','.join(['%s|' % x for x in MSVS_PLATFORMS_DESC.split(',')]))
+        </values-description>
+    </option>
+    <set var="VARS_DONT_ELIMINATE" append="1">MSVS_PLATFORM</set>
+
+
+    <set var="COMPILER">vc</set>
+
+    <set var="_MSVC_TYPECODE_CONSOLE">1</set>
+    <set var="_MSVC_TYPECODE_GUI">1</set>
+    <set var="_MSVC_TYPECODE_DLL">2</set>
+    <set var="_MSVC_TYPECODE_LIB">4</set>
+    
+    <include file="msvc_prj_vcproj_common.bkl"/>
+
+    <output file="$(OUTPUT_FILE)" writer="msvs200xprj.py"/>
+
+</makefile>

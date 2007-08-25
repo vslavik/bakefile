@@ -163,6 +163,13 @@
                         <entry>Microsoft Embedded Visual C++ 4 project
                         files</entry>
                       </row>
+                      
+                      <row>
+                        <entry>msvs2003prj</entry>
+                        <entry>
+                          MS Visual Studio 2003 project files
+                        </entry>
+                      </row>
 
                       <row>
                         <entry>msvs2005prj</entry>

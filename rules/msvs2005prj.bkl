@@ -4,7 +4,7 @@
   This file is part of Bakefile (http://www.bakefile.org)
 
   Copyright (C) 2006-2007 Vaclav Slavik, Kevin Powell, Steven Van Ingelgem,
-                          Kevin Ollivier
+                          Kevin Ollivier, Aleksander Jaromin
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to
@@ -55,17 +55,6 @@
     <!--                   Platform-specific settings                   -->
     <!-- ============================================================== -->
 
-    <option name="MSVS_PLATFORM">
-        <values>$(MSVS_PLATFORMS)</values>
-        <!-- generate descriptions in the form "PlatformName|", this will be
-             parsed by ProjectGeneratorMsvc9.mkConfigName() in
-             output/msvs2005prj.py: -->
-        <values-description>
-            $(','.join(['%s|' % x for x in MSVS_PLATFORMS_DESC.split(',')]))
-        </values-description>
-    </option>
-    <set var="VARS_DONT_ELIMINATE" append="1">MSVS_PLATFORM</set>
-
     <set var="_default_builddir">
         <!-- "standard" case: -->
         <if cond="MSVS_PLATFORMS=='win32'">
@@ -98,15 +87,9 @@
     <!--    Set format-specific settings and call common MSVC code:     -->
     <!-- ============================================================== -->
 
-    <set var="COMPILER">vc</set>
+    <set var="_MSVS_VCPROJ_VERSION">8.00</set>
+    <set var="_MSVS_SLN_VERSION">9.00</set>
 
-    <set var="_MSVC_TYPECODE_CONSOLE">1</set>
-    <set var="_MSVC_TYPECODE_GUI">1</set>
-    <set var="_MSVC_TYPECODE_DLL">2</set>
-    <set var="_MSVC_TYPECODE_LIB">4</set>
-    
-    <include file="msvc_prj_vcproj_common.bkl"/>
-
-    <output file="$(OUTPUT_FILE)" writer="msvs2005prj.py"/>
+    <include file="msvs200xprj.bkl"/>
 
 </makefile>

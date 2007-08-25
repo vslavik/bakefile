@@ -30,7 +30,7 @@
     </input>
     
     <add-formats>
-        autoconf,borland,dmars,dmars_smake,gnu,mingw,msevc4prj,msvc,msvc6prj,msvs2005prj,symbian,watcom,xcode2
+        autoconf,borland,dmars,dmars_smake,gnu,mingw,msevc4prj,msvc,msvc6prj,msvs2003prj,msvs2005prj,symbian,watcom,xcode2
     </add-formats>
     
     <!-- WinCE can't handle console-only apps (FIXME: build tests anyway!): -->
@@ -48,7 +48,7 @@
     
     <!-- MS IDEs don't support conditional dependencies: -->
     <del-formats files="condlinking/*.bkl">
-        msvc6prj,msevc4prj,msvs2005prj,xcode2
+        msvc6prj,msevc4prj,msvs2003prj,msvs2005prj,xcode2
     </del-formats>
 
     <!-- DigitalMars' make can't handle conditions: -->
@@ -56,16 +56,21 @@
   
     <!-- Project files don't make sense for root makefile: -->
     <del-formats files="root.bkl">
-        msevc4prj,msvc6prj,msvs2005prj
+        msevc4prj,msvc6prj,msvs2003prj,msvs2005prj
     </del-formats>
     <del-formats files="gettext/*.bkl">
-        msevc4prj,msvc6prj,msvs2005prj
+        msevc4prj,msvc6prj,msvs2003prj,msvs2005prj
     </del-formats>
 
   
     <!-- Format specific settings: -->
     <add-flags formats="autoconf">
         -DAUTOCONF_MACROS_FILE=./autoconf_inc.m4
+    </add-flags>
+
+    <!-- prevent conflict between VS2005 and VS2003 project files: -->
+    <add-flags formats="msvs2003prj">
+        -o $(INPUT_FILE_DIR)/$(INPUT_FILE_BASENAME_NOEXT)_vc7.sln
     </add-flags>
 
     <!-- This is for testing [un]install targets for win32 formats -->

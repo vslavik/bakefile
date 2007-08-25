@@ -2,7 +2,7 @@
 #  This file is part of Bakefile (http://www.bakefile.org)
 #
 #  Copyright (C) 2006-2007 Vaclav Slavik, Kevin Powell, Steven Van Ingelgem,
-#                          Kevin Ollivier
+#                          Kevin Ollivier, Aleksander Jaromin
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -24,15 +24,73 @@
 #
 #  $Id$
 #
-#  MS Visual Studio 2005 project files generator script
+#  MS Visual Studio 2003/2005 project files generator script
 #
 
 import os, os.path
 import errors, utils
-from xml.dom.minidom import getDOMImplementation
+from xml.dom.minidom import *
 
 import msvc_common
 from msvc_common import *
+
+# ------------------------------------------------------------------------
+#   extended minidom classes to create XML file with specified attributes 
+#   order (VC2003 projet file must have attribute "Name" as first)
+# ------------------------------------------------------------------------
+
+class ElementSorted(Element):
+    def __init__(self, tagName, namespaceURI=EMPTY_NAMESPACE, 
+                 prefix=None, localName=None):
+        Element.__init__(self, tagName, namespaceURI, prefix, localName)
+        self.order = []
+
+    def setAttribute(self, attname, value):
+        self.order.append(attname)
+        Element.setAttribute(self, attname, value)
+
+    def writexml(self, writer, indent="", addindent="", newl=""):
+        # This specialization does two things differently:
+        # 1) order of attributes is preserved
+        # 2) attributes are placed each on its own line and indented 
+        #    so that the output looks more like MSVC's native files
+        writer.write("%s<%s" % (indent, self.tagName))
+
+        attrs = self._get_attributes()
+
+        for attr in self.order:
+            writer.write("\n%s%s%s=\"%s\"" % (
+                         indent,
+                         addindent,
+                         attr,
+                         attrs[attr].value.replace('&', '&amp;').
+                                           replace('<', '&lt;').
+                                           replace('>', '&gt;').
+                                           replace('"', '&quot;')))
+
+        if self.childNodes:
+            if len(self.order) == 0:
+                writer.write(">%s" % newl)
+            else:
+                if _MSVS_VCPROJ_VERSION == "7.10":
+                    writer.write(">%s" % newl)
+                else:
+                    writer.write("%s%s%s>%s" % (newl, indent, addindent, newl))
+            for node in self.childNodes:
+                node.writexml(writer, indent + addindent, addindent, newl)
+            writer.write("%s</%s>%s" % (indent, self.tagName, newl))
+        else:
+            if _MSVS_VCPROJ_VERSION == "7.10":
+                writer.write("/>%s" % newl)
+            else:
+                writer.write("%s%s/>%s" % (newl, indent, newl))
+    
+
+class DocumentSorted(Document):
+    def createElement(self, tagName):
+        e = ElementSorted(tagName)
+        e.ownerDocument = self
+        return e
 
 # ------------------------------------------------------------------------
 #   helpers
@@ -136,10 +194,16 @@ class ProjectGeneratorMsvc9:
     # --------------------------------------------------------------------
 
     def makeDswHeader(self):
-        return """\
+        if _MSVS_SLN_VERSION == "8.00":
+            return "Microsoft Visual Studio Solution File, Format Version 8.00"
+        elif _MSVS_SLN_VERSION == "9.00":
+            return """\
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 """
+        else:
+            import errors
+            raise errors.Error("unexpected MSVS format version")
 
     def genDSW(self, dsw_targets, dsp_list, deps_translation):
         dsw = self.makeDswHeader()
@@ -350,7 +414,10 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             t6.setAttribute("RuntimeTypeInfo", "false")
 
         if cfg._pch_use_pch == '1':
-            t6.setAttribute("UsePrecompiledHeader","2")
+            if _MSVS_VCPROJ_VERSION == "7.10":
+                t6.setAttribute("UsePrecompiledHeader","3")
+            else:
+                t6.setAttribute("UsePrecompiledHeader","2")
             t6.setAttribute("PrecompiledHeaderThrough", cfg._pch_header)
             t6.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
             
@@ -392,7 +459,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             
         t10.setAttribute("SuppressStartupBanner", "true")
         t10.setAttribute("AdditionalLibraryDirectories", ",".join(cfg._lib_paths.split()))
-        t10.setAttribute("GenerateManifest", "true")
+        if _MSVS_VCPROJ_VERSION != "7.10":
+            t10.setAttribute("GenerateManifest", "true")
         
         if cfg._debug == '1':
             t10.setAttribute("GenerateDebugInformation", "true")
@@ -566,9 +634,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
     
     def genDSP(self, t, filename, prjname, guid):        
         #start a new xml document
-        impl = getDOMImplementation()
-        doc = impl.createDocument(None, "VisualStudioProject", None)
-        top_el = doc.documentElement
+        doc = DocumentSorted()
+        top_el = doc.createElement("VisualStudioProject")
+        doc.appendChild(top_el)
         comment = doc.createComment("""
 
   This makefile was generated by
@@ -580,7 +648,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         #fill in the attributes of the top element
         top_el.setAttribute("ProjectType", "Visual C++")
-        top_el.setAttribute("Version", "8.00")
+        top_el.setAttribute("Version", _MSVS_VCPROJ_VERSION)
         top_el.setAttribute("Name", t.id)
         top_el.setAttribute("ProjectGUID", "%s" % guid)
 

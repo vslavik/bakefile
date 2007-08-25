@@ -29,7 +29,7 @@ output_DATA = output/autoconf.empy \
               output/msvc_common.py \
               output/msvc6prj.py \
               output/msevc4prj.py \
-			  output/msvs2005prj.py \
+			  output/msvs200xprj.py \
               output/gnumake.empy \
               output/gnumake-opts.empy \
               output/watcom.empy \
@@ -70,6 +70,8 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/msvc_prj_vcproj_common.bkl \
               rules/msvc6prj.bkl \
               rules/msevc4prj.bkl \
+              rules/msvs200xprj.bkl \
+              rules/msvs2003prj.bkl \
               rules/msvs2005prj.bkl \
               rules/mingw.bkl \
               rules/gnu.bkl \
