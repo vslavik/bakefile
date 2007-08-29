@@ -195,7 +195,9 @@ class ProjectGeneratorMsvc9:
 
     def makeDswHeader(self):
         if _MSVS_SLN_VERSION == "8.00":
-            return "Microsoft Visual Studio Solution File, Format Version 8.00"
+            return """\
+Microsoft Visual Studio Solution File, Format Version 8.00
+"""
         elif _MSVS_SLN_VERSION == "9.00":
             return """\
 Microsoft Visual Studio Solution File, Format Version 9.00
