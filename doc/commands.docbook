@@ -1026,7 +1026,7 @@ will display "abc abc abc"
       <section id="cmd.add-target" xreflabel="add-target">
         <title>add-target</title>
         <para>
-          Creates a target programatically.
+          Creates a target programmatically.
         </para>
         <para>
           Using this command is equivalent to defining a target by using
@@ -1070,7 +1070,17 @@ will display "abc abc abc"
                 <row>
                     <entry role="paramname">cond</entry>
                     <entry>
-                      The condition under which the target is built.
+                        The condition under which the target is built.
+                        In addition to regular condition syntax, two special
+                        forms are supported. If the condition is
+                        <literal>target</literal>, the condition of the target
+                        within which the <xref linkend="cmd.add-target"/> tag
+                        has been used (if any). If the condition has the form
+                        of <literal>target and
+                        </literal><varname>someOtherCondition</varname>, then
+                        target's condition as described above will be appended
+                        with <literal>and
+                        </literal><varname>someOtherCondition</varname>.
                     </entry>
                     <entry role="default"><literal>1</literal></entry>
                 </row>
@@ -1091,6 +1101,26 @@ Creates a new EXE target 'myexe'; this is equivalent to
 <add-target target="myexe" type="exe">
   <sources>source1.c</sources>
 </add-target>
+
+
+<!--
+Now define a <do_special_cmd> tag which creates a target with
+a name dynamically defined by the target from which the tag is used
+-->
+<define-tag name="do_special_cmd" rules="exe">
+  <add-target target="do_special_for_$(id)" type="action" cond="target"/>
+  <modify-target target="do_special_for_$(id)">
+    <command>special_command $(id)</command>
+  </modify-target>
+</define-tag>
+
+<exe id="myapp" cond="BUILD_MYAPP=='1'">
+  ...
+
+  <!-- the following tag will create a target 'do_special_for_myapp' which will
+       be executed only when BUILD_MYAPP=='1' -->
+  <do_special_cmd/>
+</exe>
 ]]></programlisting>
         </para>
       </section>
