@@ -26,6 +26,9 @@
         <arg choice="plain">
           <option>-o</option><replaceable class="parameter">OUTFILE</replaceable>
         </arg>        
+        <arg choice="opt">
+          <option>--eol=[format|dos|unix|mac|native]</option>
+        </arg>
         <arg choice="opt" rep="repeat" id="bakefile.command.variable">
           <option>-D</option><replaceable
             class="parameter">VAR</replaceable>=<replaceable class="parameter">VALUE</replaceable>
@@ -198,7 +201,7 @@
               </para>
             </listitem>
           </varlistentry>
-          
+
           <varlistentry>
             <term>
               <option>-o</option><replaceable
@@ -225,6 +228,29 @@
                 Define Bakefile variable. This definition overrides any
                 definition from the ruleset or input makefile. You can use it
                 to customize generated output.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--eol</option>=<replaceable
+              class="parameter">[format|dos|unix|mac|native]</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Change the type of line endings used by general files.
+                <literal>dos</literal>, <literal>unix</literal> and
+                <literal>mac</literal> specify the line endings used by
+                respective platforms. <literal>native</literal> will use
+                line endings of the platform Bakefile is ran on (doing this is
+                usually a bad idea, but it is useful e.g. when checking
+                generated files into RCS system that can't deal with line
+                endings correctly, such as CVS). The default value is
+                <literal>format</literal> and means that the most appropriate
+                line endings for the output format will
+                be used - Windows makefiles will use DOS line endings,
+                Autoconf makefiles will use Unix ones and so on.
               </para>
             </listitem>
           </varlistentry>
@@ -371,7 +397,6 @@
     </refsect1>
 
   </refentry>
-
 
 
 

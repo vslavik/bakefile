@@ -33,6 +33,7 @@
     
     <set var="PLATFORM_UNIX">1</set>
     <set var="TOOLSET">unix</set>
+    <set var="EOL_STYLE">unix</set>
 
     
     <option name="INSTALL">

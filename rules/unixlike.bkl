@@ -32,6 +32,7 @@
 <makefile>
 
     <set var="TOOLSET">unix</set>
+    <set var="EOL_STYLE">unix</set>
 
     <set var="MAKEFILE_SYNTAX">unix</set>
     <include file="makefile.bkl"/>

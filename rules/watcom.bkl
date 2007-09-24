@@ -30,6 +30,7 @@
 
     <set var="COMPILER">wat</set>
     <set var="MAKEFILE_SYNTAX">watcom</set>
+    <set var="EOL_STYLE">dos</set>
 
     <include file="makefile.bkl"/>
 

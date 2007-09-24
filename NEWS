@@ -8,6 +8,9 @@
 - msvs2005prj: added support for Pocket PC platform
 - added support for MSVS2003 project files (based on patch by
   Aleksander Jaromin)
+- Bakefile now generates files with output format's platform's default
+  line endings; added --eol option to override this (based on patch by
+  Francesco Montorsi)
 
 
 Version 0.2.2

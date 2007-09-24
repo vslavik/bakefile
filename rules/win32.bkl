@@ -36,6 +36,7 @@
     <set var="PLATFORM_WIN32">1</set>
     <set var="TOOLSET">win32</set>
     <set var="DIRSEP">\</set>
+    <set var="EOL_STYLE">dos</set>
     
     <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
     

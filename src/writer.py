@@ -155,9 +155,9 @@ def __copyMkToVars():
 def __openFile(filename):
     """Opens (or creates) file for read/write access, lock it."""
     try:
-        f = open(filename, 'r+t')
+        f = open(filename, 'r+b')
     except IOError:
-        f = open(filename, 'w+t')
+        f = open(filename, 'w+b')
     portautils.lock(f)
     return f
 
@@ -252,6 +252,26 @@ def writeFile(filename, data, method = 'replace'):
     __output_methods[filename] = method
     __output_files[filename] = data
 
+
+def _getEolStyle():
+    if config.eol == "format":
+        try:
+            config.eol = mk.vars['EOL_STYLE']
+        except KeyError:
+            sys.stderr.write("Warning: format doesn't define EOL_STYLE, assuming 'native'\n")
+            config.eol = "native"
+    if config.eol == "native":
+        if os.name == "posix":
+            config.eol = "unix"
+        elif os.name == "nt":
+            config.eol = "dos"
+        elif os.name == "mac":
+            config.eol = "mac"
+        else:
+            sys.stderr.write("Warning: cannot determine native line endings, assuming 'unix' -- please report this bug\n")
+            config.eol = "unix"
+    return config.eol
+
 def write():
     if config.verbose: print 'preparing generator...'
 
@@ -286,6 +306,15 @@ def write():
         if __output_methods[file] != 'replace':
             __output_files[file] = \
                 eval('%s(txt, __output_files[file])' % __output_methods[file])
+
+        eol = _getEolStyle()
+        if eol == "dos":
+            __output_files[file] = [line.replace('\n', '\r\n') for line in __output_files[file]]
+        elif eol == "mac":
+            __output_files[file] = [line.replace('\n', '\r') for line in __output_files[file]]
+        # if eol is "unix" then there is no need to replace
+        # anything as __output_files[file] already uses '\n' as EOL
+
         # write the file out only if changed:
         if config.always_touch_output or __output_files[file] != txt:
             if not config.dry_run:

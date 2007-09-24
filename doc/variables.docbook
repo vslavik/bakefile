@@ -483,6 +483,15 @@
                   <literal>unix</literal>. Always a constanst expression.
                 </entry>
               </row>
+              
+              <row>
+                <entry role="varname">EOL_STYLE</entry>
+                <entry>
+                  Default line endings style for current format, one of
+                  <literal>unix</literal>, <literal>dos</literal> and
+                  <literal>mac</literal>.
+                </entry>
+              </row>
 
               <row>
                 <entry role="varname">LF</entry>

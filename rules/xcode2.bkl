@@ -33,6 +33,7 @@
     </option>
     <set var="COMPILER">gcc</set>
     <set var="TOOLSET">unix</set>
+    <set var="EOL_STYLE">unix</set>
     <include file="makefile_defs_unix.bkl"/>
     <set var="PLATFORM_MAC">1</set>
     <set var="PLATFORM_MACOSX">1</set>

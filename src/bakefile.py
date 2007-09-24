@@ -90,6 +90,11 @@ def run(args):
     parser.add_option('', '--output-changes',
                       action="store", dest='changes_file', metavar='MODSFILE',
                       help="output list of modified files to a file")
+    parser.add_option('', '--eol',
+                      default="format", action="store", dest='eol',
+                      metavar='STYLE', type='choice',
+                      choices=['format','dos','unix','mac','native'],
+                      help="line endings type to use in output files (format, dos, unix, mac, native) [default: format]")
     parser.add_option('', '--xml-cache',
                       action="store", dest='xml_cache', metavar='CACHEFILE',
                       help="cache file where bakefile_gen stores pre-parsed XML files")
@@ -157,6 +162,8 @@ def run(args):
         else:
             config.output_file = \
                 os.path.join(os.path.dirname(args[0]), fmt.defaultFile)
+
+    config.eol = options.eol
     
     config.defines = {}
     if options.defines != None:
