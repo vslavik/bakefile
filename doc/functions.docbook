@@ -43,6 +43,18 @@
         <para>
             The following Python functions are defined:
         </para>
+        
+        <section id="pyfunc.envvar" xreflabel="envvar">
+            <title>envvar</title>
+            <synopsis>envvar(<parameter>"name"</parameter>)</synopsis>
+            <para>
+              Returns reference to environment variable
+              <varname>name</varname>. This function should be used instead
+              of <literal>$(DOLLAR)(name)</literal> idiom, because some output
+              formats (namely, Watcom makefiles) use different syntax for
+              referencing environment variables.
+            </para>
+        </section>
 
         <section id="pyfunc.isconst" xreflabel="isconst">
             <title>isconst</title>

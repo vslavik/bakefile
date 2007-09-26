@@ -11,6 +11,7 @@
 - Bakefile now generates files with output format's platform's default
   line endings; added --eol option to override this (based on patch by
   Francesco Montorsi)
+- added envvar() convenience function for referencing environment variables
 
 
 Version 0.2.2

@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<makefile>
+    
+    <requires version="0.1.1"/>
+
+    <set var="OUT_NAME" make_var="1">build-$(envvar('MYNAME'))</set>
+
+    <exe id="hello">
+        <sources>hello.c</sources>
+        <app-type>console</app-type>
+        <exename>$(OUT_NAME)</exename>
+    </exe>
+
+</makefile>

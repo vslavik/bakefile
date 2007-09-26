@@ -64,6 +64,12 @@ def ifthenelse(cond, iftrue, iffalse):
     if eval(str(cond)): return iftrue
     else: return iffalse
 
+def envvar(name):
+    if mk.vars['FORMAT'] == 'watcom':
+        return '$(DOLLAR)(%%%s)' % name
+    else:
+        return '$(DOLLAR)(%s)' % name
+
 
 __refEval = 0
 __refContexts = {}

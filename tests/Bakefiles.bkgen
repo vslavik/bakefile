@@ -10,6 +10,7 @@
         condlinking/condlinking.bkl
         debug/debug.bkl
         dll/dll.bkl
+        envvar/envvar.bkl
         features/features.bkl
         gettext/gettext.bkl
         headers/headers.bkl
@@ -37,6 +38,7 @@
     <del-formats files="cond/*.bkl">msevc4prj</del-formats>
     <del-formats files="cond_install/*.bkl">msevc4prj</del-formats>
     <del-formats files="echo/*.bkl">msevc4prj</del-formats>
+    <del-formats files="envvar/*.bkl">msevc4prj</del-formats>
     <del-formats files="isdefined/*.bkl">msevc4prj,dmars</del-formats>
     <del-formats files="regressions/*.bkl">msevc4prj</del-formats>
     <del-formats files="pch/*.bkl">msevc4prj</del-formats>
