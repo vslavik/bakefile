@@ -710,7 +710,8 @@
             </term>
             <listitem>
               <para>
-                Number of jobs to run simultaneously. Default is 1.
+                Number of jobs to run simultaneously. Default is the number of
+                CPUs.
               </para>
             </listitem>
           </varlistentry>

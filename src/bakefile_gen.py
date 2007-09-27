@@ -40,6 +40,30 @@ except ImportError:
 
 verbose = 0
 
+def _get_num_of_cpus():
+    """Detects number of available processors/cores"""
+    if os.name == 'nt':
+        try:
+            return max(1, int(os.environ['NUMBER_OF_PROCESSORS']))
+        except KeyError: pass
+        except ValueError: pass
+    elif os.name == 'posix':
+        if sys.platform == 'darwin':
+            # OS X doesn't have useful values in os.sysconf()
+            try:
+                return max(1, int(os.popen2("sysctl -n hw.ncpu")[1].read().strip()))
+            except ValueError: pass
+        else:
+            try:
+                return max(1, int(os.sysconf('SC_NPROCESSORS_ONLN')))
+            except ValueError:
+                try:
+                    return max(1, int(os.sysconf('SC_NPROCESSORS_CONF')))
+                except ValueError:
+                    pass
+    return 1
+
+
 class FileInfo:
     def __init__(self, filename):
         self.filename = filename
@@ -492,8 +516,8 @@ def run(args):
                       help="print the list of output files that would be generated (given -f and -b arguments) instead of creating them")
     parser.add_option('-j', '--jobs',
                       action="store", dest='jobs',
-                      default='1',
-                      help='number of jobs to run simultaneously')
+                      default=_get_num_of_cpus(),
+                      help='number of jobs to run simultaneously [default: %default]')
     parser.add_option('-p', '--pretend',
                       action="store_true", dest='pretend',
                       default=0,
