@@ -656,7 +656,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         top_el.appendChild(self.buildPlatformsElement(doc))
         
-        top_el.appendChild(self.buildToolFilesElement(doc))
+        if _MSVS_VCPROJ_VERSION != "7.10":
+            top_el.appendChild(self.buildToolFilesElement(doc))
 
         top_el.appendChild(self.buildAllConfigurations(doc, prjname, t))
 
