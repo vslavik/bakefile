@@ -248,7 +248,7 @@ def findSources(filenames):
 def safeMakefileValue(s):
     # some makes (e.g. dmars's smake) don't like '-' character, because it has
     # another meaning; substitute it here
-    return s.replace('-','_')
+    return s.replace('-','_').replace('.','_')
 
 def getObjectName(source, target, ext, objSuffix=''):
     pos = source.rfind('.')
