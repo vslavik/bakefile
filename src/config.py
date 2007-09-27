@@ -46,6 +46,7 @@ datadir = os.path.join(progdir, '..', '..', 'share', 'bakefile')
 if not os.path.isfile(os.path.join(datadir, 'rules', 'FORMATS.bkmanifest')):
     datadir = os.path.join(progdir, '..')
 searchPath.append(os.path.normpath(os.path.join(datadir, 'rules')))
+searchPath.append(os.path.normpath(os.path.join(datadir, 'rules', 'modules')))
 searchPath.append(os.path.normpath(os.path.join(datadir, 'output')))
 searchPath.append(os.path.normpath(datadir))
 

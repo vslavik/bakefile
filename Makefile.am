@@ -3,7 +3,8 @@
 aclocaldir = $(datadir)/aclocal
 outputdir = $(pkgdatadir)/output
 rulesdir = $(pkgdatadir)/rules
-rulesgettextdir = $(rulesdir)/gettext
+rulesmodulesdir = $(rulesdir)/modules
+rulesgettextdir = $(rulesmodulesdir)/gettext
 presetsdir = $(pkgdatadir)/presets
 codedir = $(pkglibdir)
 codeempydir = $(codedir)/empy
@@ -47,7 +48,6 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/dmars_common.bkl \
               rules/common.bkl \
               rules/format_features.bkl \
-              rules/datafiles.bkl \
               rules/dirs.bkl \
               rules/makefile.bkl \
               rules/makefile_defs_borland.bkl \
@@ -81,9 +81,11 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/unixlike.bkl \
               rules/version.bkl \
               rules/win32.bkl
+rulesmodules_DATA = \
+              rules/modules/datafiles.bkl
 rulesgettext_DATA = \
-              rules/gettext/common.bkl \
-			  rules/gettext/autoconf.bkl
+              rules/modules/gettext/common.bkl \
+			  rules/modules/gettext/autoconf.bkl
 presets_DATA = \
               presets/fake.bkl \
 			  presets/simple.bkl

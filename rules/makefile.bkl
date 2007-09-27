@@ -497,8 +497,11 @@
     <define-rule name="action" extends="__any">
         <template>
             <set var="__command"/>
-            <set var="__targetname">$(id)</set>
+            <targetname>$(id)</targetname>
         </template>
+        <define-tag name="targetname">
+            <set var="__targetname">$(value)</set>
+        </define-tag>
         <define-tag name="command">
             <__command>$(value)</__command>
         </define-tag>
