@@ -20,6 +20,10 @@ _bakefile() {
         -f|--format)
             _bakefile_list_formats $cur
             ;;
+        --eol)
+            COMPREPLY=( $(compgen -W "format dos unix mac native" -- $cur ) )
+            ;;
+
         -D)
             # allow anything here
             ;;
@@ -28,6 +32,7 @@ _bakefile() {
                 -*) 
                     all_cmds="--version -h --help -f --format -o --output -D \
                               -I -v --verbose -q --quiet --dry-run --touch \
+                              --eol \
                               --output-deps --output-changes --xml-cache \
                               --debug --dump"
                     COMPREPLY=( $(compgen -W "$all_cmds" -- $cur ) )
