@@ -56,7 +56,6 @@ class BakefileOptionParser(OptionParser):
 
 
 def run(args):
-    import reader, writer
     import config
 
     parser = BakefileOptionParser()
@@ -186,6 +185,8 @@ def run(args):
                 config.defines[d[0]] = ''
             else:
                 config.defines[d[0]] = '='.join(d[1:])
+
+    import reader, writer
     
     try:
         read_ok = reader.read(args[0])
