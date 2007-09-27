@@ -48,9 +48,11 @@ class Option:
     CATEGORY_UNSPECIFICED = 'unspecified'
     CATEGORY_PATH = 'path'
 
-    def __init__(self, name, default, desc, values, values_desc):
+    def __init__(self, name, default, forceDefault, desc, values, values_desc, context):
+        self.context = context
         self.name = name
         self.default = default
+        self.forceDefault = forceDefault
         self.desc = desc
         self.values = values
         self.category = Option.CATEGORY_UNSPECIFICED
@@ -75,6 +77,28 @@ class Option:
                 if len(v.strip()) == 0: return 0
             return 1
         return 0
+
+    def evalDefault(self):
+        if self.default == None:
+            return
+
+        try:
+            self.default = evalExpr(self.default, use_options=0)
+        except NameError, err:
+            raise errors.Error("can't use options or conditional variables in default value of option '%s' (%s)" % (self.name, err),
+                               context=self.context)
+
+        # if this is an option with listed values, then the default value
+        # which has been specified must be in the list of allowed values:
+        if self.values != None and self.default not in self.values:
+            # unless the user explicitely wanted to avoid this kind of check:
+            if not self.forceDefault:
+                print self.context
+                raise errors.Error("default value '%s' for option '%s' is not among allowed values (%s)" %
+                                  (self.default, self.name, ','.join(self.values)),
+                                   context=self.context)
+
+
 
 
 class Condition:

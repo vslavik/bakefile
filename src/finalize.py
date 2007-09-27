@@ -125,6 +125,13 @@ def finalEvaluation(outputVarsOnly=1):
     if config.verbose: sys.stdout.write('\n')
 
 
+def finalizeOptions():
+    """Finalizes options by evaluating their default values."""
+    for opt in mk.options.values():
+        opt.evalDefault()
+
+
+
 def _getUneliminatableVars():
     """Returns list of variables that cannot be eliminated. This is union
        of VARS_DONT_ELIMINATE and FORMAT_OUTPUT_VARIABLES."""
@@ -385,6 +392,9 @@ def finalize():
     # eliminate references: 
     utils.__refEval = 1
     finalEvaluation()
+
+    # evaluate options default values:
+    finalizeOptions()
 
     # delete pseudo targets now:
     pseudos = [ t for t in mk.targets if mk.targets[t].pseudo ]

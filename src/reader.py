@@ -236,6 +236,9 @@ def handleUnset(e):
 
 
 def handleOption(e):
+    errors.pushCtx("when processing option '%s' at %s" %
+                   (e.name, e.location()))
+
     name = evalConstExpr(e, e.props['name'])
     if name in mk.options:
         raise ReaderError(e, "option '%s' already defined" % name)
@@ -244,13 +247,14 @@ def handleOption(e):
         return # user hardcoded the value with -D=xxx
 
     default = None
+    force_default = False
     desc = None
     values = None
     values_desc = None
     category = mk.Option.CATEGORY_UNSPECIFICED
     for c in e.children:
         if c.name == 'default-value':
-            default = evalConstExpr(e, c.value)
+            default = c.value
             force_default = 'force' in c.props and c.props['force'] == '1'
         elif c.name == 'description':
             desc = c.value
@@ -261,15 +265,8 @@ def handleOption(e):
         elif c.name == 'values-description':
             values_desc = evalConstExpr(e, c.value).split(',')
 
-    # if this is an option with listed values, then the default value
-    # which has been specified must be in the list of allowed values:
-    if default != None and values != None and default not in values:
-        # unless the user explicitely wanted to avoid this kind of check:
-        if not force_default:
-            raise ReaderError(e, "default value '%s' for option '%s' is not among allowed values (%s)" %
-                              (default, name, values))
-
-    o = mk.Option(name, default, desc, values, values_desc)
+    o = mk.Option(name, default, force_default, desc, values, values_desc,
+                  errors.getCtx())
     mk.addOption(o)
     
     if 'never_empty' in e.props and e.props['never_empty'] == '1':
@@ -288,6 +285,8 @@ def handleOption(e):
             utils.addSubstituteCallback(o.name, __pathOptionCallb)
         else:
             raise ReaderError(e, "unknown category '%s'" % category)
+
+    errors.popCtx()
 
 
 def extractTemplates(e, post):
