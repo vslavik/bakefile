@@ -29,6 +29,9 @@
         <arg choice="opt">
           <option>--eol=[format|dos|unix|mac|native]</option>
         </arg>
+        <arg choice="opt">
+          <option>--wrap-output=[no|<replaceable>LENGTH</replaceable>]</option>
+        </arg>
         <arg choice="opt" rep="repeat" id="bakefile.command.variable">
           <option>-D</option><replaceable
             class="parameter">VAR</replaceable>=<replaceable class="parameter">VALUE</replaceable>
@@ -251,6 +254,21 @@
                 line endings for the output format will
                 be used - Windows makefiles will use DOS line endings,
                 Autoconf makefiles will use Unix ones and so on.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry>
+            <term>
+              <option>--wrap-output</option>=<replaceable
+              class="parameter">[no|LENGTH]</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Change line wrappings behavior. By default, Bakefile wraps
+                generated makefiles so that lines don't exceed 75 characters.
+                Use this option to either change the limit or to disable
+                wrapping entirely by using <literal>no</literal> as the value.
               </para>
             </listitem>
           </varlistentry>
