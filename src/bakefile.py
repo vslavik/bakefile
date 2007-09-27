@@ -84,17 +84,17 @@ def run(args):
     parser.add_option('', '--touch',
                       action="store_true", dest='always_touch_output', default=0,
                       help="always touch output files, even if their content doesn't change")
+    parser.add_option('', '--eol',
+                      default="format", action="store", dest='eol',
+                      metavar='STYLE', type='choice',
+                      choices=['format','dos','unix','mac','native'],
+                      help="line endings type to use in output files (format, dos, unix, mac, native) [default: format]")
     parser.add_option('', '--output-deps',
                       action="store", dest='deps_file', metavar='DEPSFILE',
                       help="output dependencies information for bakefile_gen")
     parser.add_option('', '--output-changes',
                       action="store", dest='changes_file', metavar='MODSFILE',
                       help="output list of modified files to a file")
-    parser.add_option('', '--eol',
-                      default="format", action="store", dest='eol',
-                      metavar='STYLE', type='choice',
-                      choices=['format','dos','unix','mac','native'],
-                      help="line endings type to use in output files (format, dos, unix, mac, native) [default: format]")
     parser.add_option('', '--xml-cache',
                       action="store", dest='xml_cache', metavar='CACHEFILE',
                       help="cache file where bakefile_gen stores pre-parsed XML files")
