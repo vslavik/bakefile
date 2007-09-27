@@ -75,3 +75,6 @@ dry_run = False
 # If set to True, output files are always touched (written), even if their
 # content didn't change
 always_touch_output = False
+
+# Wrap output lines at given width. If "None", no wrapping is done
+wrap_lines_at = 75

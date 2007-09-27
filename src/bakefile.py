@@ -88,7 +88,11 @@ def run(args):
                       default="format", action="store", dest='eol',
                       metavar='STYLE', type='choice',
                       choices=['format','dos','unix','mac','native'],
-                      help="line endings type to use in output files (format, dos, unix, mac, native) [default: format]")
+                      help="line endings type to use in output files (format, dos, unix, mac, native) [default: %default]")
+    parser.add_option('', '--wrap-output',
+                      default="75", action="store", dest='wrap_lines_at',
+                      metavar='LENGTH',
+                      help="don't generate lines longer than LENGTH; set to \"no\" to disable wrapping [default: %default]")
     parser.add_option('', '--output-deps',
                       action="store", dest='deps_file', metavar='DEPSFILE',
                       help="output dependencies information for bakefile_gen")
@@ -164,6 +168,15 @@ def run(args):
                 os.path.join(os.path.dirname(args[0]), fmt.defaultFile)
 
     config.eol = options.eol
+
+    if options.wrap_lines_at == "no":
+        config.wrap_lines_at = None
+    else:
+        try:
+            config.wrap_lines_at = int(options.wrap_lines_at)
+        except ValueError:
+            parser.error('invalid --wrap-output value: must be an integer or "no"')
+
     
     config.defines = {}
     if options.defines != None:

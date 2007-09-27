@@ -563,15 +563,15 @@ def createMakeVar(target, var, makevar, hints=''):
 
 
 def wrapLongLine(prefix, line,
-                 continuation, indent='\t', maxChars=75, variable=None):
-    """Wraps the line so that it does not exceed 'maxChars' characters.
-       'continuation' is string appended to the end of unfinished line
-       that continues on the next line. 'indent' is the string inserted
-       before new line. The line is broken only at whitespaces.
-       It also discards whitespaces and replaces them with single ' '.
-       'variable' is a hint telling the function what variable's content is it
-       processing (if any). If the variable has "files" hint set, then only
-       one entry per line is written
+                 continuation, indent='\t', maxChars=None, variable=None):
+    """Wraps the line so that it does not exceed 'maxChars' characters (if not
+       specified, the default is used).  'continuation' is string appended to
+       the end of unfinished line that continues on the next line. 'indent' is
+       the string inserted before new line. The line is broken only at
+       whitespaces.  It also discards whitespaces and replaces them with single
+       ' '.  'variable' is a hint telling the function what variable's content
+       is it processing (if any). If the variable has "files" hint set, then
+       only one entry per line is written
     """
     if variable != None and variable in mk.vars_hints and \
                             'files' in mk.vars_hints[variable]:
@@ -579,10 +579,15 @@ def wrapLongLine(prefix, line,
         for w in line.split():
             s += '%s\n%s%s' % (continuation, indent, w)
         return s
-        
+
+    if maxChars == None: # "use the default"
+        maxChars = config.wrap_lines_at
+    wrapDisabled = (maxChars == None)
+    
     line = prefix+line
-    if len(line) <= maxChars:
+    if len(line) <= maxChars or wrapDisabled:
         return line.replace('\n', '%s\n%s' % (continuation, indent))
+    
     always_len = len(continuation) + len(indent)
     splitted = line.split()
     s = splitted[0]

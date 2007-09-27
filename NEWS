@@ -12,6 +12,8 @@
   line endings; added --eol option to override this (based on patch by
   Francesco Montorsi)
 - added envvar() convenience function for referencing environment variables
+- added --wrap-output command line option for tweaking line-wrapping
+  behavior (based on patch by Francesco Montorsi)
 
 
 Version 0.2.2
