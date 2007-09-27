@@ -1,0 +1,11 @@
+#!/bin/sh
+
+for f in `find . -name '*_vc7.vcproj'` ; do
+    xmllint --noout --schema vcproj2003.xsd $f || exit $?
+done
+
+for f in `find . -name '*.vcproj'` ; do
+    xmllint --noout --schema vcproj2005.xsd $f || exit $?
+done
+
+echo "All OK."

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Schema from http://msdn2.microsoft.com/en-us/library/2208a1f2%28vs.71%29.aspx
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:element name="VisualStudioProject" type="VisualStudioProjectType" />
+   <xs:complexType name="ConfigurationType">
+      <xs:sequence>
+         <xs:element name="Tool" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+               <xs:attribute name="Name" type="xs:string" use="required" />
+               <!-- NOTE: all other attributes are properties of that particular tool object. -->
+               <!--       any unrecognized attribute will be ignored. -->
+               <xs:anyAttribute processContents="skip" />
+            </xs:complexType>
+         </xs:element>
+      </xs:sequence>
+      <xs:attribute name="Name" type="xs:string" use="required" />
+      <!-- NOTE: all other attributes are properties of that particular configuration object. -->
+      <!--       any unrecognized attribute will be ignored. -->
+      <xs:anyAttribute processContents="skip" />
+   </xs:complexType>
+   <xs:complexType name="FilterType">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+         <xs:element name="Filter" type="FilterType" />
+         <xs:element name="File" type="FileType" />
+      </xs:choice>
+      <xs:attribute name="Name" type="xs:string" use="required" />
+      <!-- NOTE: all other attributes are properties of that particular filter object. -->
+      <!--       any unrecognized attribute will be ignored. -->
+      <xs:anyAttribute processContents="skip" />
+   </xs:complexType>
+   <xs:complexType name="FileType">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+         <xs:element name="File" type="FileType" />
+         <xs:element name="FileConfiguration" type="ConfigurationType" />
+      </xs:choice>
+      <xs:attribute name="RelativePath" type="xs:string" use="required" />
+      <!-- NOTE: all other attributes are properties of that particular file object. -->
+      <!--       any unrecognized attribute will be ignored. -->
+      <xs:anyAttribute processContents="skip" />
+   </xs:complexType>
+   <xs:complexType name="VisualStudioProjectType">
+      <xs:sequence>
+         <xs:element name="Platforms" minOccurs="1" maxOccurs="1">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element name="Platform" minOccurs="1" maxOccurs="unbounded">
+                     <xs:complexType>
+                        <!-- NOTE: the following attribute must match an existing platform on the system -->
+                        <xs:attribute name="Name" type="xs:string" use="required" />
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="Configurations" minOccurs="1" maxOccurs="1">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element name="Configuration" minOccurs="1" maxOccurs="unbounded" type="ConfigurationType" />
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="References" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+               <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element name="AssemblyReference">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="ReferenceConfiguration" minOccurs="0" maxOccurs="unbounded" type="ConfigurationType" />
+                        </xs:sequence>
+                        <xs:attribute name="RelativePath" type="xs:string" use="required" />
+                     </xs:complexType>
+                  </xs:element>
+                  <xs:element name="ProjectReference">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="ReferenceConfiguration" minOccurs="0" maxOccurs="unbounded" type="ConfigurationType" />
+                        </xs:sequence>
+                        <xs:attribute name="ReferencedProjectIdentifier" type="xs:string" use="required" />
+                        <xs:attribute name="Name" type="xs:string" use="optional" />
+                     </xs:complexType>
+                  </xs:element>
+                  <xs:element name="ActiveXReference">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="ReferenceConfiguration" minOccurs="0" maxOccurs="unbounded" type="ConfigurationType" />
+                        </xs:sequence>
+                        <xs:attribute name="ControlGUID" type="xs:string" use="required" />
+                        <xs:attribute name="ControlVersion" type="xs:string" use="required" />
+                        <xs:attribute name="WrapperTool" type="xs:string" use="required" />
+                     </xs:complexType>
+                  </xs:element>
+               </xs:choice>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="Files" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+               <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element name="Filter" type="FilterType" />
+                  <xs:element name="File" type="FileType" />
+               </xs:choice>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="Globals" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element name="Global" minOccurs="0" maxOccurs="unbounded">
+                     <xs:complexType>
+                        <xs:attribute name="Name" type="xs:string" use="required" />
+                        <xs:attribute name="Value" type="xs:string" use="required" />
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+      </xs:sequence>
+      <!-- NOTE: the ProjectType attribute is only for readability. -->
+      <xs:attribute name="ProjectType" type="xs:string" fixed="Visual C++" use="optional" />
+      <xs:attribute name="Version" use="optional" default="7.00">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="7.00" />
+               <xs:enumeration value="7.10" />
+               <xs:enumeration value="7,00" />
+               <xs:enumeration value="7,10" />
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <!-- NOTE: if the ProjectGUID attribute is missing, a new GUID will be generated. -->
+      <xs:attribute name="ProjectGUID" type="xs:string" use="optional" />
+      <xs:attribute name="RootNamespace" type="xs:string" use="optional" />
+      <xs:attribute name="Keyword" type="xs:string" use="optional" />
+      <!-- NOTE: if the Name attribute is missing, one will be created base on the .vcproj filename. -->
+      <xs:attribute name="Name" type="xs:string" use="optional" />
+      <!-- NOTE: all other attributes matched as project properties will be applied. -->
+      <!--       any unrecognized attribute will be ignored. -->
+      <xs:anyAttribute processContents="skip" />
+   </xs:complexType>
+</xs:schema>
