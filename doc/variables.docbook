@@ -543,7 +543,23 @@
 
   </section>
 
-
+  
+  
+  <section>
+    <title>Standard makefile variables</title>
+    <para>
+      Makefile-based formats (<literal>gnu</literal>, <literal>msvc</literal>
+      etc.) define standard options <literal>CC</literal>,
+      <literal>CXX</literal>, <literal>CFLAGS</literal>,
+      <literal>CXXFLAGS</literal>, <literal>CPPFLAGS</literal>,
+      <literal>LDFLAGS</literal> for specifying the compiler and its
+      flags. Their default values are set to the default or typical compiler.
+      If necessary, the defaults for <literal>FOO</literal> can be overriden
+      by setting the <literal>DEFAULT_FOO</literal> (e.g.
+      <literal>DEFAULT_CXX</literal> for the C++ compiler) variable to
+      a constant value anywhere in user bakefiles.
+    </para>
+  </section>
 
 
   <section>

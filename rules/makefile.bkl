@@ -49,38 +49,45 @@
     <!--                       Compiler options:                         -->
     <!-- =============================================================== -->
 
+    <set var="DEFAULT_CC">$(__DEFAULT_CC)</set>
+    <set var="DEFAULT_CXX">$(__DEFAULT_CXX)</set>
+    <set var="DEFAULT_CFLAGS">$(__DEFAULT_CFLAGS)</set>
+    <set var="DEFAULT_CXXFLAGS">$(__DEFAULT_CXXFLAGS)</set>
+    <set var="DEFAULT_CPPFLAGS">$(__DEFAULT_CPPFLAGS)</set>
+    <set var="DEFAULT_LDFLAGS">$(__DEFAULT_LDFLAGS)</set>
+
     <option name="CC">
-        <default-value>$(__DEFAULT_CC)</default-value>
+        <default-value>$(DEFAULT_CC)</default-value>
         <description>
             C compiler
         </description>
     </option>
     <option name="CXX">
-        <default-value>$(__DEFAULT_CXX)</default-value>
+        <default-value>$(DEFAULT_CXX)</default-value>
         <description>
             C++ compiler
         </description>
     </option>
     <option name="CFLAGS">
-        <default-value>$(__DEFAULT_CFLAGS)</default-value>
+        <default-value>$(DEFAULT_CFLAGS)</default-value>
         <description>
             Standard flags for CC
         </description>
     </option>
     <option name="CXXFLAGS">
-        <default-value>$(__DEFAULT_CXXFLAGS)</default-value>
+        <default-value>$(DEFAULT_CXXFLAGS)</default-value>
         <description>
             Standard flags for C++
         </description>
     </option>
     <option name="CPPFLAGS">
-        <default-value>$(__DEFAULT_CPPFLAGS)</default-value>
+        <default-value>$(DEFAULT_CPPFLAGS)</default-value>
         <description>
             Standard preprocessor flags (common for CC and CXX)
         </description>
     </option>
     <option name="LDFLAGS">
-        <default-value>$(__DEFAULT_LDFLAGS)</default-value>
+        <default-value>$(DEFAULT_LDFLAGS)</default-value>
         <description>
             Standard linker flags
         </description>
