@@ -488,7 +488,8 @@ AC_DEFUN([AC_BAKEFILE_SHARED_VERSIONS],
     SONAME_FLAG=
 
     case "${BAKEFILE_HOST}" in
-      *-*-linux* | *-*-freebsd* | *-*-k*bsd*-gnu )
+      *-*-linux* | *-*-freebsd* | *-*-openbsd* | *-*-netbsd* | \
+      *-*-k*bsd*-gnu | *-*-mirbsd* )
         if test "x$SUNCXX" = "xyes"; then
             SONAME_FLAG="-h "
         else

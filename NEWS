@@ -16,6 +16,7 @@
   behavior (based on patch by Francesco Montorsi)
 - bakefile_gen uses all available CPUs by default now; use explicit -j1
   flag to get the old behavior
+- autoconf: fixed shared libraries sonames on NetBSD and OpenBSD
 
 
 Version 0.2.2
