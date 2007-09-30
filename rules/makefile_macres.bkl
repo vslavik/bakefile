@@ -39,6 +39,7 @@
             </set>
             <set var="__mac_setfilecmd" eval="0">
                 <if cond="PLATFORM_MAC=='1'">$(__mac_setfile)</if>
+                <if cond="PLATFORM_MAC=='0'">@true</if>
             </set>
             <set var="__mac_rez"/>
             <set var="__rez_flags">-d __DARWIN__ -t APPL</set>
