@@ -347,6 +347,7 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                 if not quiet:
                     print '%s[%i/%i] generating %s from %s' % (
                             threadId, i, state.totalCount, fmt, f)
+                    sys.stdout.flush()
                 cmd = _getBakefileExecutable()
                 cmd.append('-f%s' % fmt)
                 cmd += files[f].flags[fmt]
