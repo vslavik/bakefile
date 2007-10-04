@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <define-tag name="foo" rules="lib">
+        <set var="foovar">$(value)</set>
+    </define-tag>
+
+    <lib id="test">
+        <set var="ok">1</set>
+        <foo>something</foo>
+        <foo>$(ok)</foo>
+        <foo>this is $(bad)...</foo>
+    </lib>
+</makefile>
