@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <option name="OPT1">
+        <values>0,1</values>
+    </option>
+    <option name="OPT2">
+        <values>0,1</values>
+    </option>
+
+    <set var="TEST">
+        <if cond="OPT1=='1' or OPT2=='1'">on</if>
+        <if cond="OPT1=='0' and OPT2=='0'">off</if>
+    </set>
+
+    <lib id="test">
+        <define>TEST=$(TEST)</define>
+        <sources>x.cpp</sources>
+    </lib>
+</makefile>

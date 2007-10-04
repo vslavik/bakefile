@@ -298,6 +298,9 @@ def setTargetVars(target, src):
     target.vars = v
     
 def __splitConjunction(expr):
+    if expr.find(' or ') != -1:
+        raise errors.Error(
+                "'%s': only 'and' operator allowed when creating a conditional variable" % expr)
     pos = expr.find(' and ')
     if pos == -1:
         return [expr]
