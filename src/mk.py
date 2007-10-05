@@ -338,7 +338,10 @@ def makeCondition(cond_str):
                 value = int(value)
             except ValueError:
                 return None
-        condexpr_list.append(Condition.Expr(options[name], value))
+        try:
+            condexpr_list.append(Condition.Expr(options[name], value))
+        except KeyError, e:
+            raise errors.Error("conditional variables can only depend on options and '%s' is not one" % name)
 
     def safeValue(s):
         return str(s).replace('.','_').replace('/','').replace('\\','').upper()
