@@ -142,9 +142,13 @@ def handleSet(e, target=None, add_dict=None):
             typ = mk.evalCondition(condstr)
             # Condition never met when generating this target:
             if typ == '0':
+                if config.debug:
+                    print "[dbg] removing never-met condition '%s' for variable '%s'" % (condstr, name)
                 continue
             # Condition always met:
             elif typ == '1':
+                if config.debug:
+                    print "[dbg] condition '%s' for variable '%s' is always met" % (condstr, name)
                 noValueSet = 0
                 isCond = 0
                 value = e_if.value
