@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<makefile>
+    <set var="FOO">
+        <if cond="DOLLAR">x</if>
+    </set>
+</makefile>

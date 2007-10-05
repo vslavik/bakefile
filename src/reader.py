@@ -154,7 +154,7 @@ def handleSet(e, target=None, add_dict=None):
                 value = e_if.value
                 break
             elif typ != None:
-                raise ReaderError(e, "malformed condition: '%s'" % condstr)
+                raise ReaderError(e, "malformed condition '%s': doesn't evaluate to boolean value" % condstr)
             cond = mk.makeCondition(condstr)
 
             noValueSet = 0
@@ -176,7 +176,7 @@ def handleSet(e, target=None, add_dict=None):
                              eval=0, target=target,
                              add_dict=add_dict, hints=hints)
             if cond == None:
-                raise ReaderError(e, "malformed condition: '%s'" % condstr)
+                raise ReaderError(e, "malformed condition: '%s': must be constant expression, equality test or conjunction of them" % condstr)
             if name in mk.cond_vars:
                 if not overwrite:
                     errors.popCtx()
