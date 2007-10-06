@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<makefile>
+    
+    <!-- Tests for conditional variable handling -->
+    <!-- ======================================= -->
+
+    <option name="TOOLKIT">
+        <values>MSW,GTK</values>
+        <default-value>GTK</default-value>
+    </option>
+    <set var="FOO_3">
+        <!-- test if Bakefile is able to simplify this to a single
+                                     TOOLKIT=='MSW'
+             expression...
+        -->
+        <if cond="TOOLKIT=='MSW' and TOOLKIT=='MSW' and TOOLKIT=='MSW'">dummy</if>
+    </set>
+
+
+
+    <!-- Tests the conditional variables defined from other conditional variables -->
+    <!-- ======================================================================== -->
+
+    <option name="OPT1">
+        <values>opt1_value1,opt1_value2</values>
+        <description>Dummy option to test conditional variables</description>
+    </option>
+    <option name="OPT2">
+        <values>opt2_value1,opt2_value2</values>
+        <description>Dummy option to test conditional variables</description>
+    </option>
+
+    <!-- this is a conditional variable defined from an option -->
+    <set var="CONDVAR">
+        <if cond="OPT1=='opt1_value1'">condvar_value1</if>
+        <if cond="OPT1=='opt1_value2' and OPT2=='opt2_value1'">condvar_value2</if>
+    </set>
+
+    <!-- try to create a conditional variable based over another conditional variable -->
+    <set var="CONDCONDVAR">
+        <if cond="CONDVAR=='condvar_value1'">condcondvar_value1</if>
+        <if cond="CONDVAR=='condvar_value2'">condcondvar_value2</if>
+    </set>
+    <!-- FIXME: this doesn't yet work 
+    <set var="CONDCONDVAR">
+        $(substituteFromDict(CONDVAR, {'condvar_value1':'condcondvar_value1',
+                                         'condvar_value2':'condcondvar_value2'}))
+    </set>
+     -->
+
+
+
+    <!-- try to create a conditional variable based over another conditional variable
+         which is itself based over another conditional variable (3 "indirection" levels) -->
+    <set var="CONDCONDCONDVAR">
+
+        <!-- this one should simplify to:
+                     FORMAT=='msvc' and OPT1=='opt1_value1'
+        -->
+        <if cond="CONDCONDVAR=='condcondvar_value1'">condcondcondvar_value1</if>
+
+        <!-- this one should simplify to:
+                     OPT1=='opt1_value2' and OPT2=='opt2_value1'
+        -->
+        <if cond="CONDCONDVAR=='condcondvar_value2'">condcondcondvar_value2</if>
+    </set>
+
+    <exe id="hello">
+
+
+        <!-- this is required to
+             1) make sure bakefile won't remove the CONDCONDVAR as unused
+             2) to easily check if the final behaviour is the expected one.
+                In fact, all the set of conditions above should yield to (in MSVC format syntax):
+
+                !if "$(OPT1)" == "opt1_value1"
+                __CONDCONDVAR_p = /Dcondcondvar_value1
+                !endif
+                !if "$(OPT1)" == "opt1_value2" && "$(OPT2)" == "opt2_value1"
+                __CONDCONDVAR_p = /Dcondcondvar_value2
+                !endif
+
+                !if "$(OPT1)" == "opt1_value1"
+                __CONDCONDCONDVAR_p = /Dcondcondcondvar_value1
+                !endif
+                !if "$(OPT1)" == "opt1_value2" && "$(OPT2)" == "opt2_value1"
+                __CONDCONDCONDVAR_p = /Dcondcondcondvar_value2
+                !endif
+        -->
+        <define>C1=$(CONDCONDVAR)</define>
+        <define>C2=$(CONDCONDCONDVAR)</define>
+        <define>C3=$(FOO_3)</define>
+
+        <app-type>gui</app-type>
+        <uid type="symbian2">0x100039CE</uid>
+        <uid type="symbian3">0x10005B91</uid>
+        <define>SOMEMACRO</define>
+        <define>BUILD_AS_GUI</define>
+        <sources>hello.cpp</sources>
+        <headers>hello.h</headers>
+        <win32-res>hello.rc</win32-res>
+        <symbian-res>hello.rss</symbian-res>
+    </exe>
+</makefile>

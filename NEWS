@@ -17,6 +17,9 @@
 - bakefile_gen uses all available CPUs by default now; use explicit -j1
   flag to get the old behavior
 - autoconf: fixed shared libraries sonames on NetBSD and OpenBSD
+- added limited support for conditional variables dependent on other
+  conditional variables based by Francesco Montorsi (previously, only
+  dependency on options was possible)
 
 
 Version 0.2.2

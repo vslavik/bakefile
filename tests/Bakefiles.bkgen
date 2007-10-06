@@ -8,6 +8,7 @@
         cond/hello.bkl
         cond_install/cond_install.bkl
         condlinking/condlinking.bkl
+        condvar_transitivity/condvar_transitivity.bkl
         debug/debug.bkl
         dll/dll.bkl
         envvar/envvar.bkl

@@ -106,6 +106,9 @@ class Condition:
         def __init__(self, option, value):
             self.option = option
             self.value = value
+
+        def __cmp__(self, other):
+            return cmp((self.option, self.value), (other.option, other.value))
         
     def __init__(self, name, exprs):
         self.name = name
@@ -320,9 +323,68 @@ def evalCondition(cond, target=None, add_dict=None):
             except NameError: pass
         return None
 
+def removeCondVarDependencyFromCondition(condvar, condvarvalue):
+    """
+        Simplifies the condition 'condvar==condvarvalue' to a list of
+        conditions referring directly to the option which defines the
+        given condvar.
+
+        E.g.
+        given a conditional variable defined as:
+            <set var="CONDVAR">
+            *   <if cond="OPTION1=='Opt1Value1' and
+            *             OPTION2=='Opt2Value2'">CondVarValue1</if>
+                <if cond="OPTION1=='Opt1Value2'">CondVarValue2</if>
+            </set>
+        the conditional variable defined as:
+            <set var="CONDCONDVAR">
+            *   <if cond="CONDVAR=='CondVarValue1'">CondCondVarValue1</if>
+                <if cond="CONDVAR=='CondVarValue2'">CondCondVarValue2</if>
+            </set>
+        is translated by this function to:
+            <set var="CONDCONDVAR">
+            *   <if cond="OPTION1=='Opt1Value1' and
+            *             OPTION2=='Opt2Value2'">CondCondVarValue1</if>
+                <if cond="OPTION1=='Opt1Value2'">CondCondVarValue2</if>
+            </set>
+
+        i.e. this function operates on the lines marked with *
+    """
+    # as in example above a single condition for CONDCONDVAR (like
+    # CONDVAR=='CondVarValue1') can be translated into multiple conditions
+    # against one or more options (like OPTION1=='Opt1Value1' and
+    # OPTION2=='Opt2Value2'):
+    condexpr_list = []
+    converted_cond = ""
+    for v in condvar.values:
+        if v.value == condvarvalue:
+            # ok, we've found the value for CONDVAR which we are
+            # searching (i.e. in the sample above 'CondVarValue1')
+            for expression in v.cond.exprs:
+                # now convert our CONDVAR=='CondVarValue1' expression to
+                # the expression which sets CONDVAR deriving it from OPTION*
+                condexpr_list.append(Condition.Expr(expression.option,
+                                                    expression.value))
+
+                # keep track of the conversion we're doing for debug purpose
+                # (see below)
+                if config.debug:
+                    if converted_cond != "":
+                        converted_cond += " and "
+                    converted_cond += "%s==%s" % \
+                            (expression.option.name, expression.value)
+
+            # conversion done - do not check other possible values of CONDVAR
+            break
+
+    # notify the user about this conversion
+    if config.debug:
+        print "[dbg] the '%s==%s' expression has been converted to '%s'" \
+                % (condvar.name, condvarvalue, converted_cond)
+    return condexpr_list
+
 def makeCondition(cond_str):
     cond_list = __splitConjunction(cond_str)
-    cond_list.sort()
     condexpr_list = []
     for cond in cond_list:
         if evalCondition(cond) == '1': continue
@@ -332,19 +394,35 @@ def makeCondition(cond_str):
         name = cond[:pos]
         value = cond[pos+2:]
         if value[0] == value[-1] and value[0] in ['"',"'"]:
+            # strip quotes from value
             value = value[1:-1]
         else:
             try:
                 value = int(value)
             except ValueError:
                 return None
-        try:
+        
+        if name in options:
             condexpr_list.append(Condition.Expr(options[name], value))
-        except KeyError, e:
-            raise errors.Error("conditional variables can only depend on options and '%s' is not one" % name)
+        elif name in cond_vars:
+            cvar = cond_vars[name]
+            convlist = removeCondVarDependencyFromCondition(cvar, value)
+            condexpr_list = condexpr_list + convlist
+        else:
+            raise errors.Error("conditional variables can only depend on options or other conditional variables and '%s' is not one" % name)
+
+    # optimization: simplify expressions removing redundant terms (A and A => A)
+    optimized_list = []
+    for a in condexpr_list:
+        # add to the optimized list only non-redundant tokens
+        if a not in optimized_list:
+            optimized_list.append(a)
+    condexpr_list = optimized_list
 
     def safeValue(s):
         return str(s).replace('.','_').replace('/','').replace('\\','').upper()
+    
+    condexpr_list.sort()
     cname = '_'.join(['%s_%s' % (e.option.name.upper(), safeValue(e.value)) \
                       for e in condexpr_list])
     if cname in conditions:
@@ -417,7 +495,7 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     
     if __trackUsage:
         __usageTracker.pyexprs += 1
- 
+
     global __curNamespace, __pyExprPrecompiled
     oldNS = __curNamespace
     __curNamespace = vdict
