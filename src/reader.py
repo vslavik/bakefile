@@ -932,13 +932,7 @@ def handleFragment(e):
 
 def handleError(e, target=None, add_dict=None):
     text = evalConstExpr(e, e.value, target=target, add_dict=add_dict)
-    sys.stderr.write("""
------------------------------------------------------------------------
-%s
------------------------------------------------------------------------
-
-""" % text)
-    raise ReaderError(e, "an error occured during processing")
+    raise ReaderError(e, text)
 
 
 def handleEcho(e, target=None, add_dict=None):
