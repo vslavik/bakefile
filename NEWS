@@ -21,6 +21,7 @@
   conditional variables based by Francesco Montorsi (previously, only
   dependency on options was possible)
 - added "debug" level to the <echo> command
+- deprecated <echo level="warning"> in favor of new <warning> command
 
 
 Version 0.2.2

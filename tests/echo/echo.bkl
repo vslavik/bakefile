@@ -5,7 +5,7 @@
 
     <echo level="normal">this is a simple echo test</echo>
     <echo level="verbose">VAR value is '$(VAR)'</echo>
-    <echo level="warning">warning...</echo>
+    <warning>warning...</warning>
 
     <exe id="test">
         <echo>VAR value is '$(VAR)' (inside target)</echo>

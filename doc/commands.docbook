@@ -706,6 +706,28 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
           </para>
       </section>
 
+      
+      <!-- //////////////////        error          ////////////////// -->
+
+      
+      
+      
+      <section id="cmd.warning" xreflabel="warning">
+          <title>warning</title>
+          <para>
+              Reports warning to output and exits. This command is useful for
+              adding sanity checks to bakefiles (both user bakefiles and
+              format definitions).
+              <programlisting><![CDATA[
+<if cond="FORMAT=='msvc'">
+    <warning>msvc support is experimental</warning>
+</if>]]>
+</programlisting>
+          </para>
+      </section>
+
+
+
       <!-- //////////////////        echo          ////////////////// -->
 
 
@@ -738,10 +760,7 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
                   <row>
                       <entry role="paramname">level</entry>
                       <entry>
-                        Can be <literal>warning</literal>
-                        (in which case the message is printed to
-                        stderr and prefixed with <literal>warning:</literal>),
-                        <literal>verbose</literal> (in which case the
+                        Can be <literal>verbose</literal> (in which case the
                         message is printed only when <xref
                         linkend='man.bakefile'/> is run with
                       <literal>--verbose</literal> argument),

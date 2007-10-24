@@ -43,6 +43,14 @@ def popCtx():
 def getCtx():
     return copy.deepcopy(_readerContext)
 
+def getCtxLocationStr(context=None):
+    if context == None:
+        context = getCtx()
+    s = ''
+    for ctx in range(len(context)-1,-1,-1):
+        s += "    %s\n" % context[ctx]
+    return s
+
 class ErrorBase(Exception):
     def __init__(self, desc, context=None):
         if context == None: context = _readerContext
@@ -51,10 +59,7 @@ class ErrorBase(Exception):
     def getErrorMessage(self):
         return self.desc
     def __str__(self):
-        s = ''
-        for ctx in range(len(self.context)-1,-1,-1):
-            s += "    %s\n" % self.context[ctx]
-        return s
+        return getCtxLocationStr(self.context)
 
 class Error(ErrorBase):
     def __init__(self, desc, context=None):

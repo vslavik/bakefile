@@ -377,7 +377,7 @@ def handleModifyTarget(e, dict=None):
     _processTargetNodes(e, target, tags, dict)
 
 
-COMMANDS = ['set', 'modify-target', 'add-target', 'error', 'echo']
+COMMANDS = ['set', 'modify-target', 'add-target', 'error', 'warning', 'echo']
 
 class TgtCmdNode:
     # node types:
@@ -564,6 +564,8 @@ def _processTargetNodes(node, target, tags, dict):
             handleTarget(e2)
         elif e.name == 'error':
             handleError(e, target=target, add_dict=dict)
+        elif e.name == 'warning':
+            handleWarning(e, target=target, add_dict=dict)
         elif e.name == 'echo':
             handleEcho(e, target=target, add_dict=dict)
         else:
@@ -930,10 +932,23 @@ def handleFragment(e):
         mk.addFragment(mk.Fragment(content))
 
 
+def _printWarning(e, text):
+    #FIXME: DEPRECATED -- e can't be None, unless in <echo>
+    text = 'warning: %s' % text
+    if e != None:
+        text = '%s: %s\n' % (e.location(), text)
+        text += errors.getCtxLocationStr(errors.getCtx())
+    else:
+        text += '\n'
+    sys.stderr.write(text)
+
 def handleError(e, target=None, add_dict=None):
     text = evalConstExpr(e, e.value, target=target, add_dict=add_dict)
     raise ReaderError(e, text)
 
+def handleWarning(e, target=None, add_dict=None):
+    text = evalConstExpr(e, e.value, target=target, add_dict=add_dict)
+    _printWarning(e, text)
 
 def handleEcho(e, target=None, add_dict=None):
     text = evalConstExpr(e, e.value, target=target, add_dict=add_dict)
@@ -953,7 +968,9 @@ def handleEcho(e, target=None, add_dict=None):
     elif level == 'debug' and config.debug:
         print text
     elif level == 'warning':
-        sys.stderr.write('WARNING: %s\n' % text)
+        # FIXME: DEPRECATED (since 0.2.3)
+        _printWarning(None, text)
+        _printWarning(e, '<echo level="warning"> syntax is deprecated, use <warning> instead')
 
 
 def handleRequires(e):
@@ -985,6 +1002,7 @@ HANDLERS = {
     'fragment':          handleFragment,
     'modify-target':     handleModifyTarget,
     'error':             handleError,
+    'warning':           handleWarning,
     'echo' :             handleEcho,
     'requires':          handleRequires,
     }
