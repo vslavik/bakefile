@@ -941,7 +941,7 @@ def handleEcho(e, target=None, add_dict=None):
     # extract echo level
     if 'level' in e.props:
         level = e.props['level']
-        if level not in ['verbose', 'warning', 'normal']:
+        if level not in ['verbose', 'warning', 'normal', 'debug']:
             raise ReaderError(e, "unknown echo level '%s'" % level)
     else:
         level = 'normal'
@@ -949,6 +949,8 @@ def handleEcho(e, target=None, add_dict=None):
     if level == 'normal':
         print text
     elif level == 'verbose' and config.verbose:
+        print text
+    elif level == 'debug' and config.debug:
         print text
     elif level == 'warning':
         sys.stderr.write('WARNING: %s\n' % text)

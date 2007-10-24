@@ -740,11 +740,13 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
                       <entry>
                         Can be <literal>warning</literal>
                         (in which case the message is printed to
-                        stderr and prefixed with <literal>WARNING:</literal>),
+                        stderr and prefixed with <literal>warning:</literal>),
                         <literal>verbose</literal> (in which case the
                         message is printed only when <xref
                         linkend='man.bakefile'/> is run with
-                        <literal>--verbose</literal> argument) or
+                      <literal>--verbose</literal> argument),
+                      <literal>debug</literal> (printed only when using the
+                      <literal>--debug</literal> flag) or
                         <literal>normal</literal> (message is printed
                         in any case to stdout).
                       </entry>
