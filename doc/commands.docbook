@@ -89,8 +89,10 @@
                   <listitem>
                       <para>
                           If 1, the value is appended to previous value of the
-                          variable if it is already defined (otherwise the
-                          command behaves as if append=0).
+                          variable if it is already defined, with a space
+                          inserted between them. If the variable
+                          wasn't defined yet, the command behaves as if
+                          append=0.
                           Following two <function>set</function>
                           commands are equivalent:
                           <programlisting><![CDATA[
