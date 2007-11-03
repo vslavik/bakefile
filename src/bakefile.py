@@ -45,14 +45,19 @@ class BakefileOptionParser(OptionParser):
                               version='Bakefile %s' % BAKEFILE_VERSION,
                               usage='usage: %prog [options] inputfile.bkl')
     def print_help(self, file=None):
+        # prepare list of available formats; we have to do it here, because
+        # showFormats() may print warnings or errors to stderr and we don't
+        # want that to happen in the middle of printing help
+        if self.values.includes != None:
+            addIncludePaths(self.values.includes)
+        formatsList = formats.showFormats()
+
         if file is None:
             file = sys.stdout
         OptionParser.print_help(self, file)
    
         # show all available formats:
-        if self.values.includes != None:
-            addIncludePaths(self.values.includes)
-        file.write('\n%s' % formats.showFormats())
+        file.write('\n%s' % formatsList)
 
 
 def run(args):

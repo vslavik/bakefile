@@ -40,6 +40,7 @@ Source: rules\*; DestDir: {app}\rules; Flags: recursesubdirs; Components: base
 Source: presets\*; DestDir: {app}\presets; Flags: recursesubdirs; Components: base
 Source: output\*; DestDir: {app}\output; Flags: recursesubdirs; Components: base
 Source: tests\*; DestDir: {app}\tests; Flags: recursesubdirs; Components: tests
+Source: schema\*; DestDir: {app}\schema; Flags: recursesubdirs; Components: base
 Source: doc\*; DestDir: {app}\doc; Flags: recursesubdirs; Components: doc
 Source: ..\minipython\*; DestDir: {app}\src; Flags: recursesubdirs; Components: python; Excludes: *.pyc
 Source: README; DestDir: {app}; Components: base

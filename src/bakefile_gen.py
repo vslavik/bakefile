@@ -119,7 +119,7 @@ def loadTargets(filename, defaultFlags=[]):
         if verbose:
             print 'loading task description from %s...' % filename
         try:
-            root = xmlparser.parseFile(filename)
+            root = xmlparser.parseFile(filename, xmlparser.NS_BAKEFILE_GEN)
         except xmlparser.ParsingError:
             raise errors.Error("can't load file '%s'" % filename)
         ret = []

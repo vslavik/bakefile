@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!-- $Id$ -->
 
-<bakefile-gen>
+<bakefile-gen xmlns="http://www.bakefile.org/schema/bakefile-gen">
 
     <input>
         root.bkl
@@ -30,11 +30,11 @@
         definetag/definetag.bkl
         defineglobaltag/defineglobaltag.bkl
     </input>
-    
+
     <add-formats>
         autoconf,borland,dmars,dmars_smake,gnu,mingw,msevc4prj,msvc,msvc6prj,msvs2003prj,msvs2005prj,symbian,watcom,xcode2
     </add-formats>
-    
+
     <!-- WinCE can't handle console-only apps (FIXME: build tests anyway!): -->
     <del-formats files="cond/*.bkl">msevc4prj</del-formats>
     <del-formats files="cond_install/*.bkl">msevc4prj</del-formats>
@@ -48,7 +48,7 @@
     <del-formats files="headers/*.bkl">msevc4prj</del-formats>
     <del-formats files="definetag/*.bkl">msevc4prj</del-formats>
     <del-formats files="defineglobaltag/*.bkl">msevc4prj,dmars</del-formats>
-    
+
     <!-- MS IDEs don't support conditional dependencies: -->
     <del-formats files="condlinking/*.bkl">
         msvc6prj,msevc4prj,msvs2003prj,msvs2005prj,xcode2
@@ -56,7 +56,7 @@
 
     <!-- DigitalMars' make can't handle conditions: -->
     <del-formats files="cond*/*.bkl">dmars</del-formats>
-  
+
     <!-- Project files don't make sense for root makefile: -->
     <del-formats files="root.bkl">
         msevc4prj,msvc6prj,msvs2003prj,msvs2005prj
@@ -65,7 +65,7 @@
         msevc4prj,msvc6prj,msvs2003prj,msvs2005prj
     </del-formats>
 
-  
+
     <!-- Format specific settings: -->
     <add-flags formats="autoconf">
         -DAUTOCONF_MACROS_FILE=./autoconf_inc.m4

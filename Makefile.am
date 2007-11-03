@@ -9,6 +9,7 @@ presetsdir = $(pkgdatadir)/presets
 codedir = $(pkglibdir)
 codeempydir = $(codedir)/empy
 codepy25modulesdir = $(codedir)/py25modules
+schemadir = $(pkgdatadir)/schema
 
 SUBDIRS = doc
 
@@ -90,6 +91,10 @@ presets_DATA = \
               presets/fake.bkl \
 			  presets/simple.bkl
 
+schema_DATA = \
+			  schema/bakefile-gen.xsd \
+			  schema/bakefile-manifest.xsd
+
 code_PYTHON = src/config.py \
               src/bakefile.py \
               src/bakefile_gen.py \
@@ -127,7 +132,7 @@ EXTRA_DIST = \
     bootstrap chversion.sh \
 	$(srcdir)/admin/*.m4 \
 	bakefile.spec bakefile.iss bakefile.vim bash_completion \
-    autoconf output rules presets tests \
+    autoconf output rules presets tests schema \
     src/empy/README src/empy/COPYING \
     src/py25modules/README src/py25modules/LICENSE \
 	src/bottlenecks.i \

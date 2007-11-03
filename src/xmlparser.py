@@ -27,6 +27,12 @@
 #  module (which uses expat)
 #
 
+import sys
+
+# namespaces used by Bakefile:
+NS_FORMATS_MANIFEST = "http://www.bakefile.org/schema/bakefile-formats"
+NS_BAKEFILE_GEN     = "http://www.bakefile.org/schema/bakefile-gen"
+
 # (optional) database with pre-parsed XML files:
 cache = None
 
@@ -65,7 +71,45 @@ def __libxml2err(ctx, str):
     print str
     raise ParsingError()
 
-def __parseFileLibxml2(filename):
+def __libxml2schemaErr(msg, filename):
+    sys.stderr.write("error: file %s doesn't conform to schema: %s\n" % (filename, msg))
+
+def __validateSchema(doc, namespace):
+    if namespace == None:
+        return
+    root = doc.getRootElement()
+    ns = root.ns()
+    if ns == None:
+        sys.stderr.write("%s:%i: warning: missing namespace declaration, should be \"%s\"\n" % (doc.name, root.lineNo(), namespace))
+        return # we can't validate it without namespace
+    elif ns.content != namespace:
+        sys.stderr.write("%s:%i: error: document has wrong namespace \"%s\", should be \"%s\"\n" % (doc.name, root.lineNo(), ns.content, namespace))
+        raise ParsingError()
+
+    import os.path
+    from config import datadir
+
+    if namespace == NS_FORMATS_MANIFEST:
+        schemaFile = os.path.join(datadir, 'schema', 'bakefile-manifest.xsd')
+    elif namespace == NS_BAKEFILE_GEN:
+        schemaFile = os.path.join(datadir, 'schema', 'bakefile-gen.xsd')
+    else:
+        return
+
+    if not os.path.isfile(schemaFile):
+        sys.stderr.write("warning: can't find schema definition %s, skipping validation\n" % schemaFile)
+        return
+
+    ctxt = libxml2.schemaNewParserCtxt(schemaFile)
+    schema = ctxt.schemaParse()
+    valid = schema.schemaNewValidCtxt()
+    valid.setValidityErrorHandler(__libxml2schemaErr, __libxml2schemaErr, doc.name)
+    if doc.schemaValidateDoc(valid) != 0:
+        raise ParsingError()
+
+
+
+def __parseFileLibxml2(filename, namespace):
     
     def handleNode(filename, n):
         if n.isBlankNode(): return None
@@ -101,6 +145,7 @@ def __parseFileLibxml2(filename):
         ctxt.lineNumbers(1)
         ctxt.parseDocument()
         doc = ctxt.doc()
+        __validateSchema(doc, namespace)
         t = handleNode(filename, doc.getRootElement())  
         doc.freeDoc()
         return t
@@ -153,7 +198,7 @@ def __doParseMinidom(func, src):
         print e
         raise ParsingError()
 
-def __parseFileMinidom(filename):
+def __parseFileMinidom(filename, namespace):
     return __doParseMinidom(xml.dom.minidom.parse, filename)
 
 def __parseStringMinidom(data):
@@ -177,20 +222,20 @@ def __initParseFileXML():
         global xml
         import sys, xml.sax, xml.dom, xml.dom.minidom, xml.parsers.expat
 
-def __parseFileXMLStub(filename):
+def __parseFileXMLStub(filename, namespace):
     global parseFileXML
     __initParseFileXML()
-    return parseFileXML(filename)
+    return parseFileXML(filename, namespace)
 
 parseFileXML = __parseFileXMLStub
 
-def parseFile(filename):
+def parseFile(filename, namespace=None):
     if cache == None:
-        return parseFileXML(filename)
+        return parseFileXML(filename, namespace)
     else:
         if filename in cache:
             return cache[filename]
         else:
-            data = parseFileXML(filename)
+            data = parseFileXML(filename, namespace)
             cache[filename] = data
             return data

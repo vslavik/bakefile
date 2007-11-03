@@ -41,7 +41,7 @@ class FormatInfo:
 
 def loadManifestFile(filename):
     """Loads manifest from file 'filename'."""
-    manifest = xmlparser.parseFile(filename)
+    manifest = xmlparser.parseFile(filename, xmlparser.NS_FORMATS_MANIFEST)
     if manifest.name != 'bakefile-manifest':
         raise errors.ReaderError(manifest, 'invalid manifest file')
     for fmt in manifest.children:
@@ -65,7 +65,10 @@ def loadFormats():
     for path in config.searchPath:
         manifest = os.path.join(path, 'FORMATS.bkmanifest')
         if os.path.isfile(manifest):
-            loadManifestFile(manifest)
+            try:
+                loadManifestFile(manifest)
+            except xmlparser.ParsingError:
+                raise errors.Error("malformed format manifest file %s" % manifest)
 
 def isValidFormat(f):
     return f in formats

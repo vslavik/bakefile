@@ -26,7 +26,7 @@
   $Id$
 
 -->
-<bakefile-manifest>
+<bakefile-manifest xmlns="http://www.bakefile.org/schema/bakefile-formats">
 
     <format id="autoconf">
         <description>GNU autoconf Makefile.in files</description>

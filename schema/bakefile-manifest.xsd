@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+    targetNamespace="http://www.bakefile.org/schema/bakefile-formats"
+    elementFormDefault="qualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://www.bakefile.org/schema/bakefile-formats">
+
+    <complexType name="BakefileManifestRoot">
+        <annotation>
+            <documentation>
+                Bakefile formats manifest -- list of all output formats
+                available in this directory.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="format" type="tns:FormatSpec"
+                maxOccurs="unbounded" minOccurs="1">
+            </element>
+        </sequence>
+    </complexType>
+
+    <simpleType name="FormatName">
+        <restriction base="string">
+            <pattern value="[\w_-]+"></pattern>
+        </restriction>
+    </simpleType>
+
+    <element name="bakefile-manifest" type="tns:BakefileManifestRoot"></element>
+
+    <complexType name="FormatSpec">
+        <annotation>
+            <documentation>
+                Entry for one implemented output format.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="description" maxOccurs="1" minOccurs="1">
+                <annotation>
+                    <documentation>
+                        Human-readable name of the format.
+                    </documentation>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <whiteSpace value="collapse"></whiteSpace>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="default-filename">
+                <annotation>
+                    <documentation>
+                        Default filename to be used by the format.
+                    </documentation>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <whiteSpace value="collapse"></whiteSpace>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+        <attribute name="id" type="tns:FormatName"></attribute>
+    </complexType>
+</schema>
+

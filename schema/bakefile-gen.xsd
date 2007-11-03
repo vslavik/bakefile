@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.bakefile.org/schema/bakefile-gen"
+    elementFormDefault="qualified"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://www.bakefile.org/schema/bakefile-gen">
+
+    <complexType name="BakefileGenRoot">
+        <sequence minOccurs="0" maxOccurs="unbounded">
+            <element name="input" minOccurs="0" maxOccurs="unbounded">
+                <simpleType>
+                    <restriction base="string">
+                        <pattern value="(\s*[^\s]*\.bkl\s*)+"></pattern>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="disable-formats" type="tns:FormatsList"
+                minOccurs="0" maxOccurs="unbounded">
+            </element>
+            <element name="add-formats" type="tns:FormatsChanger"
+                maxOccurs="unbounded" minOccurs="0">
+            </element>
+            <element name="del-formats" type="tns:FormatsChanger"
+                maxOccurs="unbounded" minOccurs="0">
+            </element>
+            <element name="add-flags" type="tns:FlagsChanger"
+                maxOccurs="unbounded" minOccurs="0">
+            </element>
+            <element name="del-flags" type="tns:FlagsChanger"
+                maxOccurs="unbounded" minOccurs="0">
+            </element>
+            <element name="include" type="tns:IncludeStatement"
+                maxOccurs="unbounded" minOccurs="0">
+            </element>
+        </sequence>
+    </complexType>
+
+    <simpleType name="FormatsList">
+        <restriction base="string">
+            <pattern value="[\w_-]+(,[\w_-]+)*"></pattern>
+            <whiteSpace value="collapse"></whiteSpace>
+        </restriction>
+    </simpleType>
+
+    <complexType name="FormatsChanger">
+        <simpleContent>
+            <extension base="tns:FormatsList">
+                <attribute name="files" type="tns:FilesSpec"
+                    use="optional">
+                </attribute>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <complexType name="FlagsChanger">
+        <simpleContent>
+            <extension base="string">
+                <attribute name="files" type="tns:FilesSpec"
+                    use="optional">
+                </attribute>
+                <attribute name="formats" type="tns:FormatsList"
+                    use="optional">
+                </attribute>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <simpleType name="FilesSpec">
+        <restriction base="string">
+            <whiteSpace value="collapse"></whiteSpace>
+        </restriction>
+    </simpleType>
+
+    <complexType name="IncludeStatement">
+        <attribute name="file" type="anyURI" use="required"></attribute>
+        <attribute name="ignore_missing" type="tns:Boolean01"
+            use="optional">
+        </attribute>
+    </complexType>
+
+    <simpleType name="Boolean01">
+        <restriction base="string">
+            <enumeration value="0"></enumeration>
+            <enumeration value="1"></enumeration>
+            <whiteSpace value="collapse"></whiteSpace>
+        </restriction>
+    </simpleType>
+
+    <element name="bakefile-gen" type="tns:BakefileGenRoot"></element>
+</schema>
+

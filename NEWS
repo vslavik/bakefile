@@ -22,6 +22,7 @@
   dependency on options was possible)
 - added "debug" level to the <echo> command
 - deprecated <echo level="warning"> in favor of new <warning> command
+- added XML Schema for FORMATS.bkmanifest and Bakefiles.bkgen files
 
 
 Version 0.2.2
