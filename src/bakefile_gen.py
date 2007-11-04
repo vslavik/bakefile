@@ -356,9 +356,10 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                 cmd.append('--xml-cache=%s' % tempXmlCacheFile)
                 if quiet:
                     cmd.append('--quiet')
+                elif verbose >= 2:
+                    cmd.append('-v')
                 if dryRun:
                     cmd.append('--dry-run')
-                elif verbose >= 2: cmd.append('-v')
                 cmd.append(f)
                 if verbose:
                     print ' '.join(cmd)
