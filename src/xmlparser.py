@@ -68,7 +68,7 @@ class ParsingError(Exception):
         pass
 
 def __libxml2err(ctx, str):
-    print str
+    sys.stderr.write("%s\n" % str)
     raise ParsingError()
 
 def __libxml2schemaErr(msg, filename):
@@ -186,16 +186,16 @@ def __doParseMinidom(func, src):
         dom.unlink()
         return t
     except xml.dom.DOMException, e:
-        print e
+        sys.stderr.write("%s: error: %s\n" % (src, e))
         raise ParsingError()
     except xml.sax.SAXException, e:
-        print e
+        sys.stderr.write("%s: error: %s\n" % (src, e))
         raise ParsingError()
     except xml.parsers.expat.ExpatError, e:
-        print e
+        sys.stderr.write("%s: error: %s\n" % (src, e))
         raise ParsingError()
     except IOError, e:
-        print e
+        sys.stderr.write("%s: error: %s\n" % (src, e))
         raise ParsingError()
 
 def __parseFileMinidom(filename, namespace):
