@@ -31,6 +31,7 @@ BAKEFILE_VERSION = "0.2.2"
 import sys, os.path
 from optparse import OptionParser
 
+import errors
 import formats
 import xmlparser
 
@@ -228,6 +229,9 @@ if __name__ == '__main__':
             prof.close()
         else:
             run(sys.argv[1:])    
+    except errors.ErrorBase, e:
+        sys.stderr.write('%s\n' % e)
+        sys.exit(1)
     except KeyboardInterrupt:
         sys.stderr.write('\nerror: bakefile cancelled by user\n')
-        sys.exit(1)
+        sys.exit(2)
