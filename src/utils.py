@@ -685,6 +685,7 @@ def fileList(pathlist):
         # remove prefix, normalize the filepath and use / for separator:
         files = [os.path.normpath(f[srcdirPrefix:]).replace(os.sep, '/')
                  for f in files]
+        files.sort()
 
         if config.debug:
             print "fileList('%s'): matches for '%s' pattern found: '%s'" % \
