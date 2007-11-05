@@ -23,6 +23,7 @@
 - added "debug" level to the <echo> command
 - deprecated <echo level="warning"> in favor of new <warning> command
 - added XML Schema for FORMATS.bkmanifest and Bakefiles.bkgen files
+- autoconf: check if install -d works (patch by Warren Young)
 
 
 Version 0.2.2
