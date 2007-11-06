@@ -24,6 +24,7 @@
 - deprecated <echo level="warning"> in favor of new <warning> command
 - added XML Schema for FORMATS.bkmanifest and Bakefiles.bkgen files
 - autoconf: check if install -d works (patch by Warren Young)
+- dmars: always use -HP99 switch; made the value configurable (#160)
 
 
 Version 0.2.2

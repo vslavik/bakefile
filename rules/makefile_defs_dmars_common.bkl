@@ -37,11 +37,14 @@
     <set var="__INCLUDE_ARG">-I</set>
     <set var="__LIB_ARG">%s.lib</set>
 
+    <set var="DMARS_MEM_POOL_SIZE">99</set>
+    <set var="_DMARS_MEM_POOL_FLAG" eval="0">-HP$(DMARS_MEM_POOL_SIZE)</set>
+
     <set var="__DEFAULT_CC">dmc</set>
     <set var="__DEFAULT_CXX">dmc</set>
-    <set var="__DEFAULT_CFLAGS"></set>
     <set var="__DEFAULT_CPPFLAGS"></set>
-    <set var="__DEFAULT_CXXFLAGS"></set>
+    <set var="__DEFAULT_CFLAGS">$(_DMARS_MEM_POOL_FLAG)</set>
+    <set var="__DEFAULT_CXXFLAGS">$(_DMARS_MEM_POOL_FLAG)</set>
     <set var="__DEFAULT_LDFLAGS"></set>
 
     <set var="__LINKER">link /NOLOGO /SILENT /NOI /DELEXECUTABLE</set>
@@ -169,7 +172,7 @@
                      exclude certain files from using PCH -->
                 <cxxflags>
                     $(substituteFromDict(value,
-                            {'on':'-H -HP99 -HO- -HH$(__pch_sym_file)',
+                            {'on':'-H -HO- -HH$(__pch_sym_file)',
                              'off':''}))
                 </cxxflags>
 
@@ -180,7 +183,7 @@
                 <set var="__pch_cmd" eval="0">
                     $(ifthenelse(__uses_cxx,CXX,CC)+' '+ifthenelse(__uses_cxx,
                                  '$(%s_CXXFLAGS)' % id.upper(),
-                                 '$(%s_CFLAGS)' % id.upper())) -mn $(ifthenelse(__uses_cxx,'-cpp','')) -HP99 -HF$(__pch_sym_file) $(__pch_location)$(nativePaths(__pch_header))
+                                 '$(%s_CFLAGS)' % id.upper())) -mn $(ifthenelse(__uses_cxx,'-cpp','')) -HF$(__pch_sym_file) $(__pch_location)$(nativePaths(__pch_header))
                 </set>
 
                 <if cond="__pch_sym_tgt not in targets">

@@ -600,6 +600,37 @@
         </informaltable>
       </para>
     </section>
+    
+    
+    <section>
+      <title>dmars, dmars_smake</title>
+      <para>
+        <informaltable>
+          <tgroup cols='3'>
+            <thead>
+              <row>
+                <entry>Variable name</entry>
+                <entry>Description</entry>
+                <entry>Default</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry role="varname">DMARS_MEM_POOL_SIZE</entry>
+                <entry>
+                  Specifies size of memory pool used by the
+                  <command>dmc</command> compiler. The default should be
+                  sufficient most of the time and only needs increasing if the
+                  compiler fails to compile source code with out of memory
+                  errors.
+                </entry>
+                <entry role="default">99</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </para>
+    </section>
 
 
     <section>
