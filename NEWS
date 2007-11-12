@@ -25,6 +25,7 @@
 - added XML Schema for FORMATS.bkmanifest and Bakefiles.bkgen files
 - autoconf: check if install -d works (patch by Warren Young)
 - dmars: always use -HP99 switch; made the value configurable (#160)
+- autoconf: fixed warning about datarootdir variable with autoconf-2.61+
 
 
 Version 0.2.2

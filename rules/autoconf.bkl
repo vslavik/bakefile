@@ -87,6 +87,7 @@
     <option name="bindir"/>
     <option name="libdir"/>
     <option name="dlldir"/>
+    <option name="datarootdir"/>
     <option name="datadir"/>
     <option name="includedir"/>
     <set var="PREFIX">$(prefix)</set>
