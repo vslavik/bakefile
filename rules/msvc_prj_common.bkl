@@ -293,9 +293,9 @@
             <set var="_kind">action</set>
         </template>
         <define-tag name="command">
-            <echo level="warning">
+            <warning>
                 Arbitrary commands are not implemented for project files.
-            </echo>
+            </warning>
         </define-tag>
         <define-tag name="is-phony">
         </define-tag>
