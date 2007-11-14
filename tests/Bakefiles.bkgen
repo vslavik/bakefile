@@ -22,6 +22,7 @@
         paths/paths.bkl
         pch/pch.bkl
         regressions/regressions.bkl
+        regressions/*/*.bkl
         datafiles/datafiles.bkl
         filelist/filelist.bkl
         echo/echo.bkl

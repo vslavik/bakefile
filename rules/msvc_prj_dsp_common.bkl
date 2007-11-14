@@ -77,7 +77,9 @@
     </define-tag>
 
     <define-tag name="lib-path" rules="_compiled">
-        <ldflags>/libpath:"$(nativePaths(value))"</ldflags>
+        <ldflags>
+            $(formatIfNotEmpty('/libpath:"%s"', nativePaths(value)))
+        </ldflags>
     </define-tag>
     
     <define-tag name="optimize" rules="_compiled">

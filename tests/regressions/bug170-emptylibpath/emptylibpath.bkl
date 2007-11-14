@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<!--
+Bug tested: http://www.bakefile.org/ticket/170
+
+$Id$
+-->
+<makefile>
+
+    <!-- mysql option -->
+    <option name="myoption">
+      <values>0,1</values>
+      <default-value>0</default-value>
+      <values-description>,use MY OPTION</values-description>
+      <description>Set value to 1 to enable MY OPTION, default is 0</description>
+    </option>
+
+
+    <!-- myoption-define -->
+    <define-tag name="myoption-define" rules="exe,lib,dll">
+      <define>$(substituteFromDict(myoption,{'0':'','1':value}))</define>    
+    </define-tag>
+    <!-- myoption-include -->
+    <define-tag name="myoption-include" rules="exe,lib,dll">
+      <include>$(substituteFromDict(myoption,{'0':'','1':value}))</include>    
+    </define-tag>
+    <!-- myoption-lib-path -->
+    <define-tag name="myoption-lib-path" rules="exe,lib,dll">
+      <lib-path>$(substituteFromDict(myoption,{'0':'','1':value}))</lib-path>
+    </define-tag>
+    <!-- myoption-lib -->
+    <define-tag name="myoption-lib" rules="exe,lib,dll">
+      <sys-lib>$(substituteFromDict(myoption,{'0':'','1':value}))</sys-lib>
+    </define-tag>
+
+
+    <!-- Set location of object files -->
+    <set var="BUILDDIR"> 
+      $(BUILDDIR)$(substituteFromDict(myoption,{'0':'','1':'-myoption'}))
+    </set>
+
+    <!-- myoption template -->
+    <exe id="myexe">
+      <app-type>gui</app-type>
+
+      <myoption-define>USING_MYOPTION</myoption-define>
+      <myoption-include>my_option_include_dir</myoption-include>
+      <myoption-lib-path>my_option_lib_dir</myoption-lib-path>     
+      <myoption-lib>mo</myoption-lib>
+
+      <sys-lib>pthread</sys-lib>
+      
+      <sources>main.cpp</sources>
+
+    </exe>
+
+
+</makefile>
+
+
+
+
+
+

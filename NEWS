@@ -26,6 +26,8 @@
 - autoconf: check if install -d works (patch by Warren Young)
 - dmars: always use -HP99 switch; made the value configurable (#160)
 - autoconf: fixed warning about datarootdir variable with autoconf-2.61+
+- fixed <lib-path> to generated correct output when passed empty string
+  as argument (#170; based on patch by Scott Bailey)
 
 
 Version 0.2.2
