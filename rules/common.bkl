@@ -190,6 +190,16 @@
     <template id="_installcmd">
         <set var="__iprg">$(INSTALL_DATA)</set>
         <set var="__uprg">$(UNINSTALL_DATA)</set>
+
+        <!-- the following variables must all use "native" path separators
+             only (i.e. they should have been filtered with nativePaths()).
+             
+             Also note that the __*dir vars should never end with a path
+             separator.
+             
+             NOTE: the $(SRCDIR) variable always contain a path with native
+                   path separators!
+        -->
         <set var="__srcdir">$(SRCDIR)</set>
         <set var="__dstdir"/>
         <set var="__files"/>
@@ -201,7 +211,7 @@
           -->
         <if cond="TOOLSET=='win32' and FORMAT=='dmars_smake'">
             <set var="__copy_depends" eval="0">
-                $(''.join(['$(__srcdir)%s ' % (x) for x in __files.split()]))
+                $(''.join(['$(__srcdir)\%s ' % (x) for x in __files.split()]))
             </set>
             <set var="__deps" append="1">$(__copy_depends)</set>
             <set var="__copy_script_name">$(FORMAT)_copy_$(id).bat</set>
@@ -217,7 +227,7 @@
             </if>
             <if cond="TOOLSET=='win32'">
                 $(INSTALL_DIR) $(__dstdir)
-                ( cd $(__srcdir) &amp;&amp; $(__iprg) $(__files) $(__dstdir))
+                ( cd $(__srcdir) &amp;&amp; $(__iprg) $(__files) $(__dstdir) )
             </if>
         </set>
         <set var="__install_cmd_preservetree" eval="0">
@@ -241,10 +251,13 @@
                 if not exist $(__dstdir) mkdir $(__dstdir)
                 $('\n'.join([('if not exist %s\%s mkdir %s\%s' % (__dstdir, x, __dstdir, x)) \
                   for x in getDirsFromList(__files).split()]))
-                $('\n'.join([('copy %s %s' % ( \
-                    os.path.join(__srcdir, x), os.path.normpath(os.path.join(   \
-                                               __dstdir, os.path.dirname(x)) ))) \
-                    for x in __files.split()]))
+                $('\n'.join(                                        \
+                      [('copy %s %s' %                              \
+                          (__srcdir + '\\' + x,                     \
+                           __dstdir + '\\' + dirName(x)             \
+                          ))                                        \
+                       for x in __files.split()]                    \
+                 ))
             </if>
         </set>
         
@@ -266,7 +279,12 @@
         </set>
         <set var="__uninstall_cmd" eval="0">
             <if cond="TOOLSET=='unix'">
-                $('(cd %s ; %s %s)' % (__dstdir, __uprg, ' '.join([os.path.basename(x) for x in safeSplit(__files)])))
+
+                <!-- the following os.path.basename is safe also when generating Unix formats
+                     from a Windows system because on Windows the os.path.* functions understand
+                     both the Windows path and the Unix paths: -->
+                $('(cd %s ; %s %s)' % (__dstdir, __uprg, ' '.join([os.path.basename(x) \
+                  for x in safeSplit(__files)])))
             </if>
             <if cond="TOOLSET=='win32'">
                 <!-- in case __files is a list of files, we split all the tokens of the

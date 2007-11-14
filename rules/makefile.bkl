@@ -728,9 +728,10 @@
 
                 <modify-target target="install_$(id)_headers">
                     <set var="__iprg">$(INSTALL_DATA)</set>
+
+                    <!-- both __dstdir and __files must be using native path separators -->
                     <set var="__dstdir">$(DESTDIR)$(nativePaths(value))</set>
                     <set var="__files">
-                        <!-- FIXME: always use __headers_var -->
                         <if cond="TOOLSET=='unix'">$(__headers_var)</if>
                         <if cond="TOOLSET!='unix'">$(__headers)</if>
                     </set>
@@ -740,9 +741,10 @@
                 </modify-target>
                 <modify-target target="uninstall_$(id)_headers">
                     <set var="__uprg">$(UNINSTALL_DATA)</set>
+
+                    <!-- both __dstdir and __files must be using native path separators -->
                     <set var="__dstdir">$(DESTDIR)$(nativePaths(value))</set>
                     <set var="__files">
-                        <!-- FIXME: always use __headers_var -->
                         <if cond="TOOLSET=='unix'">$(__headers_var)</if>
                         <if cond="TOOLSET!='unix'">$(__headers)</if>
                     </set>

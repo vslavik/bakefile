@@ -744,3 +744,9 @@ def getDirsFromList(filedirlist):
         if d!=None:
             ret.append(d)
     return removeDuplicates(' '.join(ret))
+
+def dirName(path):
+    """ Like os.path.dirname but uses DIRSEP and not os.sep """
+    sep = mk.vars['DIRSEP']
+    path = os.path.dirname(path.replace(sep, os.sep))
+    return path.replace(os.sep, sep)

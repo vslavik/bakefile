@@ -53,11 +53,11 @@
         </define-tag>
         <define-tag name="srcdir">
             <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
-                <set var="__srcdir">$(nativePaths(value))$(DIRSEP)</set>
+                <set var="__srcdir">$(nativePaths(value))</set>
             </if>
         </define-tag>
         <define-tag name="files">
-            <set var="__files" append="1">$(' '.join(value.split()))</set>
+            <set var="__files" append="1">$(' '.join(nativePaths(value).split()))</set>
         </define-tag>
     </define-rule>
 
@@ -115,13 +115,17 @@
             </if>
         </template>
         <define-tag name="install-to">
-            <set var="__dstdir">$(DESTDIR)$(value)</set>
+            <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+                <set var="__dstdir">$(DESTDIR)$(nativePaths(value))</set>
+            </if>
         </define-tag>
         <define-tag name="srcdir">
-            <set var="__srcdir">$(value)$(DIRSEP)</set>
+            <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
+                <set var="__srcdir">$(nativePaths(value))</set>
+            </if>
         </define-tag>
         <define-tag name="files">
-            <set var="__files">$(' '.join(value.split()))</set>
+            <set var="__files">$(' '.join(nativePaths(value).split()))</set>
         </define-tag>
     </define-rule>
 
@@ -131,7 +135,7 @@
 
 
     <!-- Copying files around as part of the build process:
-         NOTE: this rules do not modify 'install' or 'uninstall' targets -->
+         NOTE: these rules do not modify 'install' or 'uninstall' targets -->
 
     <define-rule name="copy-files" extends="action">
         <template>
