@@ -301,9 +301,7 @@ def setTargetVars(target, src):
     target.vars = v
     
 def __splitConjunction(expr):
-    if expr.find(' or ') != -1:
-        raise errors.Error(
-                "'%s': only 'and' operator allowed when creating a conditional variable" % expr)
+    # FIXME: this is broken
     pos = expr.find(' and ')
     if pos == -1:
         return [expr]
@@ -316,6 +314,12 @@ def evalCondition(cond, target=None, add_dict=None):
                         target=target, add_dict=add_dict)
     except NameError:
         # it may be a "() and () and ()" statement with some part = 0:
+    
+        # we can't handle embedded 'or' yet (FIXME: this is broken)
+        if cond.find(' or ') != -1:
+            raise errors.Error(
+                    "'%s': cannot process expression with 'or' operator here" % cond)
+
         for c in __splitConjunction(cond):
             try:
                 if evalExpr('$(%s)' % c, use_options=0) == '0':
@@ -384,10 +388,15 @@ def removeCondVarDependencyFromCondition(condvar, condvarvalue):
     return condexpr_list
 
 def makeCondition(cond_str):
+    # FIXME: this is broken
+    if cond_str.find(' or ') != -1:
+        raise errors.Error(
+                "'%s': only 'and' operator allowed when creating a conditional variable" % cond_str)
     cond_list = __splitConjunction(cond_str)
     condexpr_list = []
     for cond in cond_list:
         if evalCondition(cond) == '1': continue
+        # FIXME: this is broken
         pos = cond.find('==')
         if pos == -1:
             return None
