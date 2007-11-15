@@ -315,10 +315,10 @@ def evalCondition(cond, target=None, add_dict=None):
     except NameError:
         # it may be a "() and () and ()" statement with some part = 0:
     
-        # we can't handle embedded 'or' yet (FIXME: this is broken)
+        # we can't handle embedded "or" yet, so we need to return "undecided"
+        # status here (FIXME: this is broken)
         if cond.find(' or ') != -1:
-            raise errors.Error(
-                    "'%s': cannot process expression with 'or' operator here" % cond)
+            return None
 
         for c in __splitConjunction(cond):
             try:
