@@ -13,6 +13,9 @@
                     </restriction>
                 </simpleType>
             </element>
+            <element name="enable-formats" type="tns:FormatsList"
+                minOccurs="0" maxOccurs="unbounded">
+            </element>
             <element name="disable-formats" type="tns:FormatsList"
                 minOccurs="0" maxOccurs="unbounded">
             </element>
