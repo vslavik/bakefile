@@ -264,9 +264,9 @@
     <!-- Convenience rule for C/C++ header files to be installed: -->
     <define-rule name="headers" extends="data-files-tree" pseudo="1"> 	 
         <template> 	 
-            <echo level="warning">
+            <warning>
                 &lt;headers&gt; rule is deprecated and will be removed, use per-target &lt;headers&gt; tag instead.
-            </echo>
+            </warning>
             <srcdir>$(SRCDIR)</srcdir> 	 
             <install-to>$(INCLUDEDIR)</install-to> 	 
         </template> 	 
