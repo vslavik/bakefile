@@ -353,19 +353,19 @@ def sources2objects(sources, target, ext, objSuffix=''):
             if e.option in all:
                 if e.value == all[e.option].value:
                     values[e.option] = all[e.option].value
-                    all[e.option] = 1
+                    all[e.option] = True
                 elif e.value != all[e.option].value and \
                      e.option.values != None and len(e.option.values) == 2:
-                    all[e.option] = 0
+                    all[e.option] = False
                 else:
                     return None
             else:
                 return None
         ret = []
         for e in all:
-            if all[e] == 0:
+            if all[e] is False:
                 pass
-            elif all[e] == 1:
+            elif all[e] is True:
                 ret.append("%s=='%s'" % (e.name, values[e]))
             else:
                 return None                
