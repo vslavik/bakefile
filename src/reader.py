@@ -839,6 +839,7 @@ def handleTagInfo(e):
     tagInfos[name] = info
 
 
+# FIXME: document modules loading mechanism
 loadedModules = []
 availableFiles = []
 
