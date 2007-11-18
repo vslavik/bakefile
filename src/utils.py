@@ -441,18 +441,41 @@ def sources2objects(sources, target, ext, objSuffix=''):
     return retval
 
 
-class __CounterHelper: pass
-def __containsLiteral(expr):
-    counter = __CounterHelper()
-    counter.c = 0
-    def textCb(counter, txt):
-        if len(txt) > 0: counter.c = 1
+def __certainlyNotEmpty(value):
+    """Returns True if the given expression can be determined to be non-empty.
+       Returns False if it is either empty or we don't know for sure.
+       Input is non-empty, with surrounding whitespace already stripped."""
+
+    if value[0] != '$': # the simple case
+        return True
+
+    class __Helper: pass
+    helper = __Helper()
+    helper.ok = False
+
+    def varCb(helper, expr, use_options, target, add_dict):
+        if not helper.ok: # don't waste time otherwise
+            if expr in mk.options:
+                if mk.options[expr].isNeverEmpty():
+                    helper.ok = True
+            # FIXME: it would be nice to be able to do this for condvars too,
+            #        but they default to empty value if the set of its
+            #        conditions is not exhaustive and so checking all items
+            #        of its 'values' members is not enough, we'd have to verify
         return ''
-    mk.__doEvalExpr(expr, lambda a,b,c,d,e: '', textCb, counter,
-                           1,    # use_options
-                           None, # target
-                           None) # add_dict
-    return counter.c > 0
+
+    def textCb(helper, txt):
+        if len(txt) > 0:
+            helper.ok = True
+        return ''
+
+    mk.__doEvalExpr(value, varCb, textCb,
+                    helper, # extra argument passed to callbacks
+                    1,    # use_options
+                    None, # target
+                    None) # add_dict
+    return helper.ok
+
 
 def formatIfNotEmpty(fmt, value):
     """Return fmt % value (prefix: e.g. "%s"), unless value is empty string
@@ -464,19 +487,17 @@ def formatIfNotEmpty(fmt, value):
            - $(cv) where cv is conditional variable
     """
 
-    def __isNotEmpty(value):
-        return ((value[0] != '$') or
-                (value[-1] != ')' and not value[-1].isspace()) or
-                __containsLiteral(value))
-
     if fmt == '': return ''
     value = value.strip()
     if value == '' or value.isspace():
         return ''
-    if __isNotEmpty(value):
+
+    if __certainlyNotEmpty(value):
         return fmt % value
     
     if value.startswith('$(') and value[-1] == ')':
+        # FIXME: this is too limited, it should be done inside __doEvalExpr
+        #        callbacks instead.
         condname = value[2:-1]
         if condname in mk.options:
             if mk.options[condname].isNeverEmpty():
