@@ -110,127 +110,131 @@ def checkConditionsSupport(e):
 
 
 def handleSet(e, target=None, add_dict=None):
-    errors.pushCtx(e)
-    name = basename = evalConstExpr(e, e.props['var'], target)
-    if (name in mk.override_vars) and target == None:
-        errors.popCtx()
-        return # can't change value of variable overriden with -D=xxx
-    
-    doEval = not ('eval' in e.props and e.props['eval'] == '0')
-    overwrite = not ('overwrite' in e.props and e.props['overwrite'] == '0')
-    isCond = (len(e.children) > 0)
-    isMakeVar = 'make_var' in e.props and e.props['make_var'] == '1'
-    value = e.value
-    if 'hints' in e.props:
-        hints = e.props['hints']
-    else:
-        hints = ''
+    try:
+        errors.pushCtx("in <set> at %s" % e.location())
 
-    # Handle conditions:
-    if isCond:
-        noValueSet = 1
-        for e_if in e.children:
-            if e_if.name != 'if':
-                raise ReaderError(e_if, "malformed <set> command")
+        name = basename = evalConstExpr(e, e.props['var'], target)
+        if (name in mk.override_vars) and target == None:
+            return # can't change value of variable overriden with -D=xxx
         
-            # Preprocess always true or always false conditions:
-
-            condstr = evalConstExpr(e_if, e_if.props['cond'],
-                                    target=target, add_dict=add_dict)
-            condstr = translateSpecialCondition(e_if, condstr, target)
-             
-            typ = mk.evalCondition(condstr)
-            # Condition never met when generating this target:
-            if typ == '0':
-                if config.debug:
-                    print "[dbg] removing never-met condition '%s' for variable '%s'" % (condstr, name)
-                continue
-            # Condition always met:
-            elif typ == '1':
-                if config.debug:
-                    print "[dbg] condition '%s' for variable '%s' is always met" % (condstr, name)
-                noValueSet = 0
-                isCond = 0
-                value = e_if.value
-                break
-            elif typ != None:
-                raise ReaderError(e, "malformed condition '%s': doesn't evaluate to boolean value" % condstr)
-            cond = mk.makeCondition(condstr)
-
-            noValueSet = 0
-            
-            # Real conditions:
-
-            checkConditionsSupport(e)
-            
-            if 'scope' in e.props:
-                raise ReaderError(e, "conditional variable can't have nondefault scope ('%s')" % e.props['scope'])
-
-            if target != None:
-                if (not overwrite) and (name in target.vars):
-                    errors.popCtx()
-                    return
-                name = '__%s_%s' % (target.id.replace('-','_').replace('.','_').replace('/','_'),
-                                    basename)
-                mk.setVar(e.props['var'], '$(%s)' % name,
-                             eval=0, target=target,
-                             add_dict=add_dict, hints=hints)
-            if cond == None:
-                raise ReaderError(e, "malformed condition: '%s': must be constant expression, equality test or conjunction of them" % condstr)
-            if name in mk.cond_vars:
-                if not overwrite:
-                    errors.popCtx()
-                    return
-                var = mk.cond_vars[name]
-            else:
-                var = mk.CondVar(name, target)
-                mk.addCondVar(var, hints)
-            if doEval:
-                value = mk.evalExpr(e_if.value,target=target,add_dict=add_dict)
-            else:
-                value = e_if.value
-            var.add(cond, value)
-        
-        if noValueSet:
-            isCond = 0
-            value = ''
-        
-        if isCond: 
-            errors.popCtx()
-            return
-
-    # Non-conditional variables:
-    if value == None: value = ''
-    if 'append' in e.props and e.props['append'] == '1':
-        doAppend = 1
-    else:
-        doAppend = 0
-    if 'prepend' in e.props and e.props['prepend'] == '1':
-        doPrepend = 1
-    else:
-        doPrepend = 0
-    store_in = None
-    if 'scope' in e.props:
-        sc = evalConstExpr(e, e.props['scope'], target=target)
-        if sc == 'local':
-            pass
-        elif sc == 'global':
-            store_in = mk.vars
+        doEval = not ('eval' in e.props and e.props['eval'] == '0')
+        overwrite = not ('overwrite' in e.props and e.props['overwrite'] == '0')
+        isCond = (len(e.children) > 0)
+        isMakeVar = 'make_var' in e.props and e.props['make_var'] == '1'
+        value = e.value
+        if 'hints' in e.props:
+            hints = e.props['hints']
         else:
-            if sc in mk.targets:
-                store_in = mk.targets[sc].vars
-            else:
-                raise ReaderError(e, "invalid scope '%s': must be 'global', 'local' or target name" % sc)
+            hints = ''
 
-    if isMakeVar:
-        if doAppend or store_in != None or not doEval:
-            raise ReaderError(e, "make variable (%s) can't be appended or stored in nondefault scope or not evaluated" % name)
- 
-    mk.setVar(name, value, eval=doEval, target=target,
-              add_dict=add_dict, store_in=store_in,
-              append=doAppend, prepend=doPrepend, overwrite=overwrite,
-              makevar=isMakeVar, hints=hints)
-    errors.popCtx()
+        # Handle conditions:
+        if isCond:
+            noValueSet = 1
+            for e_if in e.children:
+                try:
+                    errors.pushCtx(e_if)
+
+                    if e_if.name != 'if':
+                        raise ReaderError(e_if, "malformed <set> command")
+                
+                    # Preprocess always true or always false conditions:
+
+                    condstr = evalConstExpr(e_if, e_if.props['cond'],
+                                            target=target, add_dict=add_dict)
+                    condstr = translateSpecialCondition(e_if, condstr, target)
+                     
+                    typ = mk.evalCondition(condstr)
+                    # Condition never met when generating this target:
+                    if typ == '0':
+                        if config.debug:
+                            print "[dbg] removing never-met condition '%s' for variable '%s'" % (condstr, name)
+                        continue
+                    # Condition always met:
+                    elif typ == '1':
+                        if config.debug:
+                            print "[dbg] condition '%s' for variable '%s' is always met" % (condstr, name)
+                        noValueSet = 0
+                        isCond = 0
+                        value = e_if.value
+                        break
+                    elif typ != None:
+                        raise ReaderError(e, "malformed condition '%s': doesn't evaluate to boolean value" % condstr)
+                    cond = mk.makeCondition(condstr)
+
+                    noValueSet = 0
+                    
+                    # Real conditions:
+
+                    checkConditionsSupport(e)
+                    
+                    if 'scope' in e.props:
+                        raise ReaderError(e, "conditional variable can't have nondefault scope ('%s')" % e.props['scope'])
+
+                    if target != None:
+                        if (not overwrite) and (name in target.vars):
+                            return
+                        name = '__%s_%s' % (target.id.replace('-','_').replace('.','_').replace('/','_'),
+                                            basename)
+                        mk.setVar(e.props['var'], '$(%s)' % name,
+                                     eval=0, target=target,
+                                     add_dict=add_dict, hints=hints)
+                    if cond == None:
+                        raise ReaderError(e, "malformed condition: '%s': must be constant expression, equality test or conjunction of them" % condstr)
+                    if name in mk.cond_vars:
+                        if not overwrite:
+                            return
+                        var = mk.cond_vars[name]
+                    else:
+                        var = mk.CondVar(name, target)
+                        mk.addCondVar(var, hints)
+                    if doEval:
+                        value = mk.evalExpr(e_if.value,target=target,add_dict=add_dict)
+                    else:
+                        value = e_if.value
+                    var.add(cond, value)
+                finally:
+                    errors.popCtx()
+            
+            if noValueSet:
+                isCond = 0
+                value = ''
+            
+            if isCond: 
+                return
+
+        # Non-conditional variables:
+        if value == None: value = ''
+        if 'append' in e.props and e.props['append'] == '1':
+            doAppend = 1
+        else:
+            doAppend = 0
+        if 'prepend' in e.props and e.props['prepend'] == '1':
+            doPrepend = 1
+        else:
+            doPrepend = 0
+        store_in = None
+        if 'scope' in e.props:
+            sc = evalConstExpr(e, e.props['scope'], target=target)
+            if sc == 'local':
+                pass
+            elif sc == 'global':
+                store_in = mk.vars
+            else:
+                if sc in mk.targets:
+                    store_in = mk.targets[sc].vars
+                else:
+                    raise ReaderError(e, "invalid scope '%s': must be 'global', 'local' or target name" % sc)
+
+        if isMakeVar:
+            if doAppend or store_in != None or not doEval:
+                raise ReaderError(e, "make variable (%s) can't be appended or stored in nondefault scope or not evaluated" % name)
+     
+        mk.setVar(name, value, eval=doEval, target=target,
+                  add_dict=add_dict, store_in=store_in,
+                  append=doAppend, prepend=doPrepend, overwrite=overwrite,
+                  makevar=isMakeVar, hints=hints)
+    finally:
+        errors.popCtx()
 
 
 def handleUnset(e):
