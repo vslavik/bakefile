@@ -83,13 +83,13 @@
       <link linkend="platform">platform</link> variable.
       <programlisting><![CDATA[
 # generate makefile.wat dedicated to windows development
-bakefile file.bkl -f watcom
+bakefile -f watcom file.bkl
 
 # generate makefile.wat dedicated to DOS development in extended 32-bit mode
-bakefile file.bkl -f watcom -DPLATFORM_MSDOS=1
+bakefile -f watcom -DPLATFORM_MSDOS=1 file.bkl
 
 # generate makefile.wat dedicated to OS/2 development
-bakefile file.bkl -f watcom -DPLATFORM_OS2=1
+bakefile -f watcom -DPLATFORM_OS2=1 file.bkl
 ]]></programlisting>
       <note>
         <title>PLATFORM_MSDOS note</title>
