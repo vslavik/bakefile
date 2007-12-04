@@ -16,9 +16,10 @@ On Unix or in Unix-like environment, do ./configure && make && make install.
 Requirements: installed Python (including headers).
 
 On Windows, either download installer package or compile it by running
-nmake -f makefile.vc (you will need MSVC++ 6 and Python installed in directory
-specified at the beginning of makefile.vc). Note that makefile.vc builds
-bakefile.exe and bakefile_gen.exe binaries that work only if you have 
+nmake -f makefile.vc. You will need Python installed in directory
+specified at the beginning of makefile.vc and the same Visual C++ version that
+was used to build Python (VC7 for 2.4+, VC6 for 2.3).  Note that makefile.vc
+builds bakefile.exe and bakefile_gen.exe binaries that work only if you have
 Python installed in the same directory where they are!
 
 
