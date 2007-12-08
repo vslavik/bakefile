@@ -66,23 +66,23 @@
              vcproj formats: ### -->
 
     <define-tag name="_define-no-res" rules="_compiled">
-        <set var="_defines" append="1">$(value.replace('"', '\\"'))</set>
+        <set var="_defines">$(_defines);$(value.replace('"', '\\"'))</set>
     </define-tag>
         
     <define-tag name="include" rules="_compiled">
-        <set var="_include_paths" append="1">$(nativePaths(value))</set>
+        <set var="_include_paths">$(_include_paths);$(nativePaths(value))</set>
     </define-tag>
     
     <define-tag name="res-define" rules="_compiled">
-        <set var="_res_defines" append="1">$(value.replace('"', '\\"'))</set>
+        <set var="_res_defines">$(_res_defines);$(value.replace('"', '\\"'))</set>
     </define-tag>
 
     <define-tag name="res-include" rules="_compiled">
-        <set var="_res_include_paths" append="1">$(nativePaths(value))</set>
+        <set var="_res_include_paths">$(_res_include_paths);$(nativePaths(value))</set>
     </define-tag>
     
     <define-tag name="lib-path" rules="_compiled">
-        <set var="_lib_paths" append="1">$(nativePaths(value))</set>
+        <set var="_lib_paths">$(_lib_paths);$(nativePaths(value))</set>
     </define-tag>
     
     <define-tag name="optimize" rules="_compiled">

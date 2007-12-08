@@ -146,6 +146,9 @@ DEFAULT_FILE_GROUPS = [
                    uuid='{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}')
 ]
 
+def mk_list(list):
+    # remove empty items from the list:
+    return ";".join([x for x in list.split(";") if len(x) > 0])
 
 # ------------------------------------------------------------------------
 #                              Generator class
@@ -368,7 +371,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
        
         t6.setAttribute("Optimization", cfg._optimize)
         t6.setAttribute("InlineFunctionExpansion", "1")
-        t6.setAttribute("AdditionalIncludeDirectories", ",".join(cfg._include_paths.split()) )
+        t6.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
 
         ## KLP -- this seems to cause wierd build behavior, omitting for now
         #t6.setAttribute("MinimalRebuild", "true")
@@ -399,7 +402,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t6.setAttribute("AdditionalOptions", cfg._cppflags + rtl_opt + rtl_opt_debug)
         t6.setAttribute("RuntimeLibrary", rtl)
 
-        t6.setAttribute("PreprocessorDefinitions", ";".join(cfg._defines.split()))
+        t6.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
         
         if cfg._debug == '1':
             t6.setAttribute("BasicRuntimeChecks", "3")
@@ -460,7 +463,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
                              "%s" % self.app_type_code[cfg._type_nick])
             
         t10.setAttribute("SuppressStartupBanner", "true")
-        t10.setAttribute("AdditionalLibraryDirectories", ",".join(cfg._lib_paths.split()))
+        t10.setAttribute("AdditionalLibraryDirectories", mk_list(cfg._lib_paths))
         if _MSVS_VCPROJ_VERSION != "7.10":
             t10.setAttribute("GenerateManifest", "true")
         
@@ -492,8 +495,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t8 = doc.createElement("Tool")
         t8.setAttribute("Name", "VCResourceCompilerTool")
         t8.setAttribute("Culture", "1033")
-        t8.setAttribute("AdditionalIncludeDirectories", ",".join(cfg._res_include_paths.split()) )
-        t8.setAttribute("PreprocessorDefinitions", ";".join(cfg._res_defines.split()))
+        t8.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._res_include_paths))
+        t8.setAttribute("PreprocessorDefinitions", mk_list(cfg._res_defines))
         return t8
 
     def buildPlatformsElement(self, doc):

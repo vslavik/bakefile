@@ -28,6 +28,7 @@
 - autoconf: fixed warning about datarootdir variable with autoconf-2.61+
 - fixed <lib-path> to generated correct output when passed empty string
   as argument (#170; based on patch by Scott Bailey)
+- msvs2005prj: fixed handling of include and library paths with spaces
 
 
 Version 0.2.2
