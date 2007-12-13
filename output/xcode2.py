@@ -35,12 +35,7 @@ XCODE_BAKEFILE_NAMESPACE = "{3dfbab82-f4ee-11db-abee-0013d4abf640}"
 def mk_uuid(namespace, seed):
     # NB: we want to have the GUID strings be repeatable so, generate them
     #     from a repeatable seed
-    try:
-        from uuid import uuid5, UUID
-    except ImportError:
-        # the uuid module is only available since Python 2.5, so use
-        # bundled version of the module:
-        from py25modules.uuid import uuid5, UUID
+    from uuid import uuid5, UUID
 
     guid = uuid5(UUID(namespace), seed)
     return '%s' % str(guid).upper() # MSVS uses upper-case strings for GUIDs

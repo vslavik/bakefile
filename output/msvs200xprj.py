@@ -106,12 +106,7 @@ NAMESPACE_BAKEFILE_FILTERS = "{0e8f53b3-f09d-40b1-b248-66f80b72e654}"
 def mk_uuid(namespace, seed):
     # NB: we want to have the GUID strings be repeatable so, generate them
     #     from a repeatable seed
-    try:
-        from uuid import uuid5, UUID
-    except ImportError:
-        # the uuid module is only available since Python 2.5, so use
-        # bundled version of the module:
-        from py25modules.uuid import uuid5, UUID
+    from uuid import uuid5, UUID
 
     guid = uuid5(UUID(namespace), seed)
     return '{%s}' % str(guid).upper() # MSVS uses upper-case strings for GUIDs

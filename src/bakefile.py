@@ -64,6 +64,9 @@ class BakefileOptionParser(OptionParser):
 def run(args):
     import config
 
+    if sys.version_info < (2,5):
+        sys.path.append(os.path.join(config.progdir, 'py25modules'))
+
     parser = BakefileOptionParser()
     parser.add_option('-f', '--format',
                       action="store", dest='format',

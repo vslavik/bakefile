@@ -29,14 +29,15 @@
 import sys, os, os.path, glob, fnmatch, threading, shutil, re
 from optparse import OptionParser
 
+if sys.version_info < (2,5):
+    import config
+    sys.path.append(os.path.join(config.progdir, 'py25modules'))
+
+
 import xmlparser, dependencies, errors, portautils
 from errors import ReaderError
 
-try:
-    import subprocess
-except ImportError:
-    # the subprocess module wasn't available in 2.3, so use a bundle version:
-    import py25modules.subprocess as subprocess
+import subprocess
 
 verbose = 0
 
