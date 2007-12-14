@@ -122,7 +122,6 @@ def run(args):
 
     if len(args) != 1:
         parser.error('incorrect number of arguments, exactly 1 .bkl required')
-        sys.exit(1)
 
     config.dry_run = options.dry_run
     config.always_touch_output = options.always_touch_output
