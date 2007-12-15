@@ -49,18 +49,23 @@ def evalConstExpr(e, str, target=None, add_dict=None):
 def evalWeakConditionDontRaise(e, target=None, add_dict=None):
     """Same as evalWeakCondition() but returns None instead of raising
        an exception."""
-    if 'cond' not in e.props:
-        return 1
-    condstr = e.props['cond']
-    typ = mk.evalCondition(condstr, target=target, add_dict=add_dict)
-    # Condition never met when generating this target:
-    if typ == '0':
-        return 0
-    # Condition always met:
-    elif typ == '1':
-        return 1
-    else:
-        return None
+    try:
+        errors.pushCtx(e)
+
+        if 'cond' not in e.props:
+            return 1
+        condstr = e.props['cond']
+        typ = mk.evalCondition(condstr, target=target, add_dict=add_dict)
+        # Condition never met when generating this target:
+        if typ == '0':
+            return 0
+        # Condition always met:
+        elif typ == '1':
+            return 1
+        else:
+            return None
+    finally:
+        errors.popCtx()
 
 def evalWeakCondition(e, target=None, add_dict=None):
     """Evaluates e's 'cond' property, if present, and returns 0 or 1 if it
