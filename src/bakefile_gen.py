@@ -26,7 +26,7 @@
 #  $Id$
 #
 
-import sys, os, os.path, glob, fnmatch, threading, shutil, re
+import sys, os, os.path, glob, fnmatch, shutil, re
 from optparse import OptionParser
 
 if sys.version_info < (2,5):
@@ -271,6 +271,15 @@ def filterFiles(bakefiles, formats):
             f.formats = [x for x in f.formats if x in formats]
 
 
+def _countLines(fn):
+    try:
+        f = open(fn, 'rt')
+        cnt = len(f.readlines())
+        f.close()
+        return cnt
+    except IOError:
+        return 0
+
 
 def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                   dryRun=False, quiet=False):
@@ -307,142 +316,136 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                                             fmt,
                                             cmdline=files[f].flags[fmt]):
                     needUpdate.append((f,fmt))
-    
+   
+    totalNeedUpdate = len(needUpdate)
+
     if verbose:
-        print '    ...%i out of %i will be updated' % (len(needUpdate),total)
-    
-    def __countLines(fn):
-        try:
-            f = open(fn, 'rt')
-            cnt = len(f.readlines())
-            f.close()
-            return cnt
-        except IOError:
-            return 0
+        print '    ...%i out of %i will be updated' % (totalNeedUpdate, total)
 
-    class UpdateState:
-        def __init__(self):
-            self.modifiedFiles = 0
-            self.needUpdate = []
-            self.totalCount = 0
-            self.done = 0
+    class JobDesc:
+        def __init__(self, data, jobNum, xmlcache, pretend=False):
+            self.filename, self.format = data
+            self.jobNum = jobNum
+            self.xmlcache = xmlcache
+            self.pretend = pretend
+            self.tempDeps = portautils.mktemp('bakefile')
+            self.tempChanges = portautils.mktemp('bakefile')
+            self.process = None
+        
+        def run(self):
+            """Starts the subprocess."""
+            if not quiet:
+                print '[%i/%i] generating %s from %s' % (
+                        self.jobNum, totalNeedUpdate, self.format, self.filename)
+                sys.stdout.flush()
+            cmd = _getBakefileExecutable()
+            cmd.append('-f%s' % self.format)
+            cmd += files[f].flags[self.format]
+            cmd.append('--output-deps=%s' % self.tempDeps)
+            cmd.append('--output-changes=%s' % self.tempChanges)
+            cmd.append('--xml-cache=%s' % self.xmlcache)
+            if quiet:
+                cmd.append('--quiet')
+            elif verbose >= 2:
+                cmd.append('-v')
+            if dryRun:
+                cmd.append('--dry-run')
+            cmd.append(self.filename)
+            if verbose:
+                print ' '.join(cmd)
+            if not pretend:
+                self.process = subprocess.Popen(cmd)
 
-    def _doUpdate(state, job, pretend=0):
-        if job == None: threadId = ''
-        else: threadId = '(%i)' % job
-        tempDeps = portautils.mktemp('bakefile')
-        tempChanges = portautils.mktemp('bakefile')
-        tempXmlCacheDir = portautils.mktempdir('bakefile')
-        tempXmlCacheFile = os.path.join(tempXmlCacheDir, 'xmlcache')
-
-        try:
-            while 1:
+        def poll(self):
+                if self.pretend:
+                    return True
+                return self.process.poll() != None
+        
+        def wait(self):
+                if self.pretend:
+                    return True
+                return self.process.wait() != None
+        
+        def finish(self):
+            try:
                 try:
-                    state.lock.acquire()
-                    if len(state.needUpdate) == 0: break
-                    f, fmt = state.needUpdate.pop()
-                    state.done += 1
-                    i = state.done
-                finally:
-                    state.lock.release()
-                if not quiet:
-                    print '%s[%i/%i] generating %s from %s' % (
-                            threadId, i, state.totalCount, fmt, f)
-                    sys.stdout.flush()
-                cmd = _getBakefileExecutable()
-                cmd.append('-f%s' % fmt)
-                cmd += files[f].flags[fmt]
-                cmd.append('--output-deps=%s' % tempDeps)
-                cmd.append('--output-changes=%s' % tempChanges)
-                cmd.append('--xml-cache=%s' % tempXmlCacheFile)
-                if quiet:
-                    cmd.append('--quiet')
-                elif verbose >= 2:
-                    cmd.append('-v')
-                if dryRun:
-                    cmd.append('--dry-run')
-                cmd.append(f)
-                if verbose:
-                    print ' '.join(cmd)
-                if pretend: continue
-
-                try:
-                    if subprocess.call(cmd) != 0:
+                    if self.process.returncode == 0:
+                        dependencies.load(self.tempDeps)
+                        dependencies.addCmdLine(os.path.abspath(self.filename), self.format,
+                                                files[self.filename].flags[self.format])
+                        return _countLines(self.tempChanges)
+                    else: # failed, returncode != 0
                         if keepGoing:
                             sys.stderr.write(
-                              '[bakefile_gen] bakefile exited with error, ignoring')
-                            continue
+                              '[bakefile_gen] bakefile exited with error, ignoring\n')
+                            return 0 # no modified files
                         else:
                             raise errors.Error('bakefile exited with error')
                 except IOError, e:
                     raise errors.Error('failed to run bakefile: %s' % e)
-                modLinesCnt = __countLines(tempChanges)
-                try:
-                    state.lock.acquire()
-                    dependencies.load(tempDeps)
-                    dependencies.addCmdLine(os.path.abspath(f), fmt,
-                                            files[f].flags[fmt])
-                    state.modifiedFiles += modLinesCnt
-                finally:
-                    state.lock.release()
-        finally:
-            os.remove(tempDeps)
-            os.remove(tempChanges)
-            shutil.rmtree(tempXmlCacheDir)
-            try:
-                state.lock.acquire()
-                state.activeThreads -= 1
-                if state.activeThreads == 0:
-                    state.lockAllDone.release()
             finally:
-                state.lock.release()
+                os.remove(self.tempDeps)
+                os.remove(self.tempChanges)
+            
+  
 
-    class UpdateThread(threading.Thread):
-        def __init__(self, state, job):
-            threading.Thread.__init__(self)
-            self.state = state
-            self.job = job
-        def run(self):
-            _doUpdate(self.state, self.job)
-
-    state = UpdateState()
-    state.needUpdate = needUpdate
-    state.totalCount = len(needUpdate)
-    state.lock = threading.Lock()
-    state.lockAllDone = threading.Lock()
-    state.activeThreads = jobs
-
-    if pretend: jobs = 1
+    modifiedFiles = 0
+    jobNum = 0 
+    childProcessesCnt = 0
+    childProcesses = [None for i in range(0,jobs)]
+   
+    # NB: Pre-parsed XML cache doesn't use file locking, so we have to ensure
+    #     only one bakefile process will be using it at a time, by having #jobs
+    #     caches. Hopefully no big deal, the cache is only really useful on
+    #     large projects with shared fies and it fills pretty quickly in that
+    #     case (FIXME?)
+    tempXmlCacheDir = portautils.mktempdir('bakefile')
+    tempXmlCacheFiles = [os.path.join(tempXmlCacheDir, 'xmlcache%i' % i) for i in range(0,jobs)]
 
     try:
-        state.lockAllDone.acquire()
-        if jobs == 1:
-            _doUpdate(state, None, pretend=pretend)
-        else:
-            for i in range(0, jobs-1):
-                t = UpdateThread(state, i)
-                t.setDaemon(1)
-                t.start()
-            
-            _doUpdate(state, jobs-1)                
-            # wait until everybody finishes (the thread that sets
-            # activeThreads to 0 will release the lock):
-            state.lockAllDone.acquire()
-            state.lockAllDone.release()
-        if pretend:
-            return
-    finally:
         try:
-            state.lock.acquire()
-            dependencies.save('.bakefile_gen.state')
-        finally:
-            state.lock.release()
+            while len(needUpdate) > 0 or childProcessesCnt > 0:
+                # start new processes:
+                for p in range(0,jobs):
+                    if len(needUpdate) > 0 and childProcesses[p] == None:
+                        jobNum += 1
+                        childProcessesCnt += 1
+                        childProcesses[p] = JobDesc(needUpdate.pop(),
+                                                    jobNum,
+                                                    tempXmlCacheFiles[p],
+                                                    pretend)
+                        childProcesses[p].run()
+
+                # check for finished processes:
+                for p in range(0,jobs):
+                    pr = childProcesses[p]
+                    if pr != None and pr.poll():
+                        childProcessesCnt -= 1
+                        childProcesses[p] = None
+                        modifiedFiles += pr.finish()
+        
+        except Exception, e:
+            left = [p for p in childProcesses if p != None]
+            if len(left) > 0:
+                print '[bakefile_gen] waiting for remaining jobs to finish after error...'
+                for p in left:
+                    if p != None:
+                        p.wait()
+                        try:
+                            modifiedFiles += p.finish()
+                        except Exception:
+                            pass # ignore further errors
+            raise e
+
+    finally:
+        shutil.rmtree(tempXmlCacheDir)
+        dependencies.save('.bakefile_gen.state')
 
     if not quiet:
         if dryRun:
-            print '%i files would be modified' % state.modifiedFiles
+            print '%i files would be modified' % modifiedFiles
         else:
-            print '%i files modified' % state.modifiedFiles
+            print '%i files modified' % modifiedFiles
 
 
 def cleanTargets(pretend=0):
