@@ -368,8 +368,10 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t6.setAttribute("InlineFunctionExpansion", "1")
         t6.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
 
-        ## KLP -- this seems to cause wierd build behavior, omitting for now
-        #t6.setAttribute("MinimalRebuild", "true")
+        if cfg._optimize == "0":
+            t6.setAttribute("MinimalRebuild", "true")
+        else:
+            t6.setAttribute("MinimalRebuild", "false")
 
         if cfg._cxx_exceptions == 'on':
             t6.setAttribute("ExceptionHandling", "1")

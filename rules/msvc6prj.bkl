@@ -63,7 +63,7 @@
     <define-rule name="_compiled_specific">
         <define-tag name="debug-info">
             <cppflags>
-                $(substituteFromDict(value, {'on':'/Zi /Gm /GZ', 'off':''}))
+                $(substituteFromDict(value, {'on':'/Zi', 'off':''}))
             </cppflags>
             <!-- NB: rest of handling is done in msvc_prj_common.bkl -->
         </define-tag>
