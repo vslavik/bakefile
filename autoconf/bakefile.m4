@@ -801,6 +801,12 @@ AC_DEFUN([AC_BAKEFILE],
 [
     AC_PREREQ([2.58])
 
+    dnl We need to always run C/C++ compiler tests, but it's also possible
+    dnl for the user to call these macros manually, hence this instead of
+    dnl simply calling these macros. See http://www.bakefile.org/ticket/64
+    AC_REQUIRE([AC_BAKEFILE_PROG_CC])
+    AC_REQUIRE([AC_BAKEFILE_PROG_CXX])
+
     if test "x$BAKEFILE_HOST" = "x"; then
                if test "x${host}" = "x" ; then
                        AC_MSG_ERROR([You must call the autoconf "CANONICAL_HOST" macro in your configure.ac (or .in) file.])
