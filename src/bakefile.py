@@ -26,7 +26,7 @@
 #  $Id$
 #
 
-BAKEFILE_VERSION = "0.2.2"
+BAKEFILE_VERSION = "0.2.3"
 
 import sys, os.path
 from optparse import OptionParser

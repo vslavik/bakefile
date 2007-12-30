@@ -10,7 +10,7 @@ PROGDIR=$PWD
 PYTHON=python
 
 PRODUCT=Bakefile
-VERSION="0.2.2"
+VERSION="0.2.3"
 PKGNAME="bakefile-$VERSION"
 
 mkdir -p $INSTALLROOT/usr
