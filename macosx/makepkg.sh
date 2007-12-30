@@ -3,6 +3,11 @@
 OSX_SDK="/Developer/SDKs/MacOSX10.4u.sdk"
 OSX_PYTHON_VER="2.3"
 
+PYTHON="/System/Library/Frameworks/Python.framework/Versions/$OSX_PYTHON_VER/bin/python"
+UNIV_BIN_FLAGS="-isysroot $OSX_SDK -arch ppc -arch i386"
+
+export MACOSX_DEPLOYMENT_TARGET="10.4"
+
 OLDPWD=$PWD
 DELIVERDIR=deliver
 BAKEFILEDIR=$PWD/..
@@ -10,9 +15,6 @@ BUILDROOT=bld-osx
 INSTALLROOT=$PWD/$BUILDROOT/distrib
 PREFIX=/usr/local
 PROGDIR=$PWD
-
-PYTHON="/System/Library/Frameworks/Python.framework/Versions/$OSX_PYTHON_VER/bin/python"
-UNIV_BIN_FLAGS="-isysroot $OSX_SDK -arch ppc -arch i386"
 
 PRODUCT=Bakefile
 VERSION="0.2.2"
