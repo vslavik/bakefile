@@ -375,7 +375,21 @@ class Rule:
         else:
             return self.cacheTagsDict
 
+    def getAllRuleNames(self):
+        yield self.name
+        for r in self.baserules:
+            for n in r.getAllRuleNames():
+                yield n
     
+def findMatchingTagInfo(rule, tag):
+    for r in rules[rule].getAllRuleNames():
+        local = "%s.%s" % (r, tag)
+        if local in tagInfos:
+            return tagInfos[local]
+    if tag in tagInfos:
+        return tagInfos[tag]
+    return None
+
 
 def handleModifyTarget(e, dict=None):
     tg = mk.evalExpr(e.props['target'], use_options=0, add_dict=dict)
@@ -395,7 +409,7 @@ class TgtCmdNode:
     COMMAND = 2
     IF      = 3
     
-    def __init__(self, parent, type, node):
+    def __init__(self, target, parent, type, node):
         self.parent = parent
         if parent != None:
             self.position = parent.position + [len(parent.children)]
@@ -406,8 +420,10 @@ class TgtCmdNode:
         self.node = node
         self.dict = None
         self.children = []
-        if node.name in tagInfos:
-            tinfo = tagInfos[node.name]
+
+        tinfo = findMatchingTagInfo(target.type, node.name)
+        if tinfo != None:
+            print target.id, target.type, node.name, "X", tinfo.__dict__
             self.exclusive = tinfo.exclusive
             self.stayBefore = tinfo.before
         else:
@@ -456,12 +472,12 @@ def _extractTargetNodes(parent, list, target, tags, index):
             if condType == 1:
                 _extractTargetNodes(parent, node.children, target, tags, index)
             elif condType == None:
-                n = TgtCmdNode(parent, TgtCmdNode.IF, node)
+                n = TgtCmdNode(target, parent, TgtCmdNode.IF, node)
                 _removeDuplicates(n)
                 _extractTargetNodes(n, node.children, target, tags, index)
             # else: condition evaluated to False, ignore this part
         elif node.name in COMMANDS:
-            n = TgtCmdNode(parent, TgtCmdNode.COMMAND, node)
+            n = TgtCmdNode(target, parent, TgtCmdNode.COMMAND, node)
             _removeDuplicates(n)
         else:
             if node.name not in tags:
@@ -469,7 +485,7 @@ def _extractTargetNodes(parent, list, target, tags, index):
                                       "unknown target tag '%s'" % node.name)
             if evalWeakCondition(node) == 0:
                 continue
-            n = TgtCmdNode(parent, TgtCmdNode.TAG, node)
+            n = TgtCmdNode(target, parent, TgtCmdNode.TAG, node)
             _removeDuplicates(n)
             _extractTargetNodes(n, tags[node.name], target, tags, index)
 
@@ -586,7 +602,7 @@ def _processTargetNodes(node, target, tags, dict):
         print '[dbg] * tags tree for target %s:' % target.id
         print '[dbg] -----------------------------------------'
 
-    root = TgtCmdNode(None, TgtCmdNode.TARGET, node)
+    root = TgtCmdNode(target, None, TgtCmdNode.TARGET, node)
     root.dict = dict
     index = {}
     _extractTargetNodes(root, node.children, target, tags, index)
@@ -844,7 +860,7 @@ def handleTagInfo(e):
                     tagInfos[param].before.append(name)
             else:
                 raise ReaderError(e, "unrecognized position token '%s'" % token)
-        
+
     tagInfos[name] = info
 
 

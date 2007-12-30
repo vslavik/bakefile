@@ -40,6 +40,6 @@ works with autoconf only.
         </define-tag>
     </define-rule>
 
-    <tag-info name="src" exclusive="1"/>
+    <tag-info name="pkgconfig.src" exclusive="1"/>
 
 </makefile>
