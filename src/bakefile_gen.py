@@ -340,7 +340,7 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                 sys.stdout.flush()
             cmd = _getBakefileExecutable()
             cmd.append('-f%s' % self.format)
-            cmd += files[f].flags[self.format]
+            cmd += files[self.filename].flags[self.format]
             cmd.append('--output-deps=%s' % self.tempDeps)
             cmd.append('--output-changes=%s' % self.tempChanges)
             cmd.append('--xml-cache=%s' % self.xmlcache)
