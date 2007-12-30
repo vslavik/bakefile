@@ -138,7 +138,7 @@ EXTRA_DIST = \
     src/py25modules/README src/py25modules/LICENSE \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
-	macosx/buildpkg.py macosx/makepkg.sh \
+	macosx/buildpkg.py macosx/makepkg.sh macosx/bakefile-wrapper \
     makefile.vc
 
 install-data-hook:
