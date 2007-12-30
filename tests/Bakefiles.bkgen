@@ -24,6 +24,7 @@
         regressions/regressions.bkl
         regressions/*/*.bkl
         datafiles/datafiles.bkl
+        pkgconfig/pkgconfig.bkl
         filelist/filelist.bkl
         echo/echo.bkl
         isdefined/isdefined.bkl

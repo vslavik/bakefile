@@ -21,6 +21,7 @@
   <chapter id="ch.modules">
     <title>Modules</title>
     <xi:include href="datafiles.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="pkgconfig.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   </chapter>
 
   <xi:include href="manpage.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>

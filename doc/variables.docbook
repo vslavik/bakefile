@@ -151,7 +151,7 @@
               </row>
 
               <row>
-                <entry role="varname">BUILDDIR</entry>
+                <entry id="var.BUILDDIR" xreflabel="BUILDDIR" role="varname">BUILDDIR</entry>
                 <entry>
                   Directory where object files and executables are built.
                   This value is relative to <xref linkend="var.OUTPUT_FILE"/>.
@@ -186,25 +186,25 @@
               <tbody>
 
                 <row>
-                  <entry role="varname">PREFIX</entry>
+                  <entry id="var.PREFIX" xreflabel="PREFIX" role="varname">PREFIX</entry>
                   <entry>Base directory for installed files.</entry>
                   <entry role="default">/usr/local on Unix</entry>
                 </row>
 
                 <row>
-                  <entry role="varname">BINDIR</entry>
+                  <entry id="var.BINDIR" xreflabel="BINDIR" role="varname">BINDIR</entry>
                   <entry>Directory where programs are installed.</entry>
                   <entry role="default">$(PREFIX)/bin on Unix</entry>
                 </row>
 
                 <row>
-                  <entry role="varname">LIBDIR</entry>
+                  <entry id="var.LIBDIR" xreflabel="LIBDIR" role="varname">LIBDIR</entry>
                   <entry>Directory where libraries are installed.</entry>
                   <entry role="default">$(PREFIX)/lib on Unix</entry>
                 </row>
 
                 <row>
-                  <entry role="varname">DLLDIR</entry>
+                  <entry id="var.DLLDIR" xreflabel="DLLDIR" role="varname">DLLDIR</entry>
                   <entry>Directory where DLLs are installed.</entry>
                   <entry role="default">
                     $(PREFIX)/lib on Unix, $(PREFIX)/bin when targetting
@@ -219,7 +219,7 @@
                 </row>
 
                 <row>
-                  <entry role="varname">DATADIR</entry>
+                  <entry id="var.DATADIR" xreflabel="DATADIR" role="varname">DATADIR</entry>
                   <entry>Directory where data files are installed.</entry>
                   <entry role="default">$(PREFIX)/share on Unix</entry>
                 </row>

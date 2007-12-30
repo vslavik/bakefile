@@ -22,6 +22,7 @@
     <subproject id="library" template="sub"/>
     <subproject id="module" template="sub"/>
     <subproject id="paths" template="sub"/>
+    <subproject id="pkgconfig" template="sub"/>
     <subproject id="pch" template="sub"/>
     <subproject id="regressions" template="sub"/>
 

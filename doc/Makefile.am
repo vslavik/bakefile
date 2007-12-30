@@ -15,6 +15,7 @@ MAINDBFILE=$(srcdir)/$(BASENAME).docbook
 SUBDBFILES=$(srcdir)/commands.docbook \
 		   $(srcdir)/concepts.docbook \
 		   $(srcdir)/datafiles.docbook \
+		   $(srcdir)/pkgconfig.docbook \
 		   $(srcdir)/faq.docbook \
 		   $(srcdir)/intro.docbook \
 		   $(srcdir)/manpage.docbook \

@@ -83,7 +83,8 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/version.bkl \
               rules/win32.bkl
 rulesmodules_DATA = \
-              rules/modules/datafiles.bkl
+              rules/modules/datafiles.bkl \
+              rules/modules/pkgconfig.bkl
 rulesgettext_DATA = \
               rules/modules/gettext/common.bkl \
 			  rules/modules/gettext/autoconf.bkl

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <using module="pkgconfig"/>
+
+    <!-- pkg-config files are useful only with autoconf format
+         and thus the pkgconfig rule generates something only
+         when FORMAT=='autoconf' -->
+    <pkgconfig id="test"/>
+
+</makefile>

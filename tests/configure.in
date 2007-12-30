@@ -56,4 +56,6 @@ AC_OUTPUT([
            pch/Makefile
            regressions/Makefile
            subproject/Makefile
+           pkgconfig/Makefile
+           pkgconfig/test.pc
          ])

@@ -1,0 +1,59 @@
+<!-- $Id: datafiles.docbook,v 1.4 2004/04/14 09:41:50 vaclavslavik Exp $ -->
+<section id="module.pkgconfig">
+  <title>pkgconfig</title>
+
+  <para>
+    This module provides a simple rule for installing and uninstalling
+    <ulink url="http://pkgconfig.freedesktop.org/wiki/">pkg-config</ulink>
+    template files.
+
+    <note>
+      <title>Implementation Note</title>
+      <para>
+        This module currently works only with the <literal>autoconf</literal>
+        format because pkg-config files contain values such as prefix that are
+        set by configure.
+      </para>
+    </note>
+  </para>
+  <para>
+    The following targets are defined in <literal>pkgconfig</literal> module:
+  </para>
+
+
+  <!--                         Installing files:                     -->
+
+
+
+  <section id="rule.pkgconfig.pkgconfig" xreflabel="pkgconfig">
+    <title>pkgconfig</title>
+    <para>
+      Installs a .pc template file in the standard location of the pkgconfig files
+      (i.e. <xref linkend="var.LIBDIR"/>/pkgconfig).
+      <informaltable>
+        <tgroup cols='2'>
+          <thead>
+            <row>
+              <entry>Tag</entry>
+              <entry>Description</entry>
+              <entry>Default</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry role="tagname">src</entry>
+              <entry>
+                <para>
+                  Name of the pkgconfig file to install. Can contain a relative path.
+                  E.g. <literal>build/myprj.pc</literal>
+                </para>
+              </entry>
+              <entry role="default">$(id).pc</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </para>
+  </section>
+
+</section>
