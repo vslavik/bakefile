@@ -423,7 +423,6 @@ class TgtCmdNode:
 
         tinfo = findMatchingTagInfo(target.type, node.name)
         if tinfo != None:
-            print target.id, target.type, node.name, "X", tinfo.__dict__
             self.exclusive = tinfo.exclusive
             self.stayBefore = tinfo.before
         else:
