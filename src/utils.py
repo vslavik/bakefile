@@ -26,7 +26,10 @@
 #  Misc utility functions for use in Bakefiles
 #
 
-import sys, os, os.path, string, glob, sets
+import sys, os, os.path, string, glob
+if sys.version_info < (2,4):
+    from sets import Set as set
+
 import mk, errors, config
 import containers
 import dependencies
@@ -729,7 +732,7 @@ def removeDuplicates(list):
         Returns a copy of the given (space-separed) list with all 
         duplicate tokens removed.
     """
-    retlist = sets.Set(list.split())
+    retlist = set(list.split())
     return ' '.join(retlist)
 
 def getDirsFromList(filedirlist):
