@@ -39,7 +39,7 @@
 
     <simpleType name="FormatsList">
         <restriction base="string">
-            <pattern value="[\w_-]+(,[\w_-]+)*"></pattern>
+            <pattern value="[\w_-]+(\([\w_-]+\))?(,[\w_-]+(\([\w_-]+\))?)*"></pattern>
             <whiteSpace value="collapse"></whiteSpace>
         </restriction>
     </simpleType>
