@@ -153,6 +153,9 @@ install-data-hook:
 	chmod +x $(DESTDIR)$(codedir)/bakefile.py
 	chmod +x $(DESTDIR)$(codedir)/bakefile_gen.py
 
+dist-hook:
+	rm -rf `find $(distdir) -name .svn`
+
 ACLOCAL_AMFLAGS = -I admin
 
 .PHONY: doc
