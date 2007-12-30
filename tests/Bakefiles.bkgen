@@ -31,6 +31,7 @@
         subproject/subproject.bkl
         definetag/definetag.bkl
         defineglobaltag/defineglobaltag.bkl
+        variants/variants.bkl
     </input>
 
     <add-formats>
@@ -50,6 +51,7 @@
     <del-formats files="headers/*.bkl">msevc4prj</del-formats>
     <del-formats files="definetag/*.bkl">msevc4prj</del-formats>
     <del-formats files="defineglobaltag/*.bkl">msevc4prj,dmars</del-formats>
+    <del-formats files="variants/*.bkl">msevc4prj,dmars</del-formats>
 
     <!-- MS IDEs don't support conditional dependencies: -->
     <del-formats files="condlinking/*.bkl">
@@ -81,6 +83,16 @@
     <!-- This is for testing [un]install targets for win32 formats -->
     <add-flags formats="msvc,mingw,borland,watcom">
         -DFORMAT_HAS_MAKE_INSTALL=1
+    </add-flags>
+
+    <!-- Test variants feature: -->
+    <add-flags files="variants/*.bkl">-DSOMETHING=1</add-flags>
+    <add-formats files="variants/*.bkl">gnu(var1),gnu(var2)</add-formats>
+    <add-flags files="variants/*.bkl" formats="gnu(var1)">
+        -DMESSAGE="variant1" -o $(INPUT_FILE_DIR)/Makefile.gnu1
+    </add-flags>
+    <add-flags files="variants/*.bkl" formats="gnu(var2)">
+        -DMESSAGE="variant2" -o $(INPUT_FILE_DIR)/Makefile.gnu2
     </add-flags>
 
 </bakefile-gen>

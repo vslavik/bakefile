@@ -114,6 +114,22 @@ def _matchesWildcard(filename, wildcard, absolutize=0):
             return 0
     return 1
 
+
+def _split_format(format):
+    """Splits format specification into (base) format and variant; e.g. "watcom(os2)"
+       is separated into "watcom" (base format) and "os2" (variant)."""
+    pos = format.find("(")
+    if pos == -1:
+        return (format, None)
+    if format[-1] != ")":
+        raise errors.Error("invalid format specification: '%s'" % format)
+    return (format[:pos], format[pos+1:-1])
+
+def _get_base_format(format):
+    """Returns format's base format value (i.e. without variant)."""
+    return _split_format(format)[0]
+
+
 def loadTargets(filename, defaultFlags=[]):
 
     def _loadFile(filename):
@@ -268,7 +284,7 @@ def filterFiles(bakefiles, formats):
     
     if formats != None:
         for f in files.values():
-            f.formats = [x for x in f.formats if x in formats]
+            f.formats = [x for x in f.formats if _get_base_format(x) in formats]
 
 
 def _countLines(fn):
@@ -306,6 +322,7 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
         for f in files:
             for fmt in files[f].formats:
                 total += 1
+                print (f, fmt)
                 needUpdate.append((f,fmt))
     else:
         # load bakefile_gen state file and choose only bakefiles out of date:
@@ -339,7 +356,7 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                         self.jobNum, totalNeedUpdate, self.format, self.filename)
                 sys.stdout.flush()
             cmd = _getBakefileExecutable()
-            cmd.append('-f%s' % self.format)
+            cmd.append('-f%s' % _get_base_format(self.format))
             cmd += files[self.filename].flags[self.format]
             cmd.append('--output-deps=%s' % self.tempDeps)
             cmd.append('--output-changes=%s' % self.tempChanges)

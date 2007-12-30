@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <!-- This bakefile is trivial, it's testing bakefile_gen's variants support,
+         so the code of interest is in ../Bakefiles.bkgen. -->
+
+    <exe id="hello">
+        <sources>hello.c</sources>
+        <define>SOMETHING=$(SOMETHING)</define>
+        <if cond="isdefined('MESSAGE')">
+            <define>MESSAGE=$(MESSAGE)</define>
+        </if>
+    </exe>
+
+</makefile>

@@ -32,6 +32,8 @@
 - msvc6prj: fixed to not use minimal rebuild with optimization (#42)
 - autoconf: call AC_BAKEFILE_PROG_CC/CXX from AC_BAKEFILE (#64)
 - autoconf: added pkgconfig module (Francesco Montorsi, #105)
+- added preliminary support for generating multiple variants
+  of makefiles in the same format (#156)
 
 
 Version 0.2.2
