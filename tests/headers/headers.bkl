@@ -6,8 +6,8 @@
              exec_prefix fixed to a dummy value: variables override options thus 
              PREFIX and EXEC_PREFIX options will be just dropped.
         -->
-        <set var="PREFIX">C:</set>
-        <set var="EXEC_PREFIX">C:</set>
+        <set var="PREFIX">C:\TestPrefix</set>
+        <set var="EXEC_PREFIX">C:\TestPrefix</set>
     </if>
 
     <if cond="FORMAT!='dmars'">
@@ -52,6 +52,8 @@
         <headers>hello.h test/hello.h</headers>
         <sources>hello.c</sources>
         <install-to>$(BINDIR)</install-to>
+        
+        <define>MAKING_THE_DLL</define>
 
         <!-- change default installation folder for headers... -->
         <install-headers-to>$(INCLUDEDIR)/myfolder</install-headers-to>
