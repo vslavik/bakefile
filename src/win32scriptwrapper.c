@@ -45,7 +45,6 @@ int IsPythonEmbedded(const char *dirname)
     char dllname[2048];
     sprintf(dllname, "%spython%i%i.dll", dirname,
             PY_MAJOR_VERSION, PY_MINOR_VERSION);
-    puts(dllname);
     return _access(dllname, 0) == 0;
 }
 
@@ -107,7 +106,6 @@ int main(int argc, char** argv)
 
     if ( IsPythonEmbedded(dirname) )
     {
-        puts("embedding");
         /* set PYTHONHOME so that system-wide installed copy of Python is
            never used; we want to use embedded one: */
         SetEnvironmentVariable("PYTHONHOME", dirname);
