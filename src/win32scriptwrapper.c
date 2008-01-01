@@ -40,6 +40,16 @@
 #define SCRIPT_DIRECTORY    "src\\"
 
 
+int IsPythonEmbedded(const char *dirname)
+{
+    char dllname[2048];
+    sprintf(dllname, "%spython%i%i.dll", dirname,
+            PY_MAJOR_VERSION, PY_MINOR_VERSION);
+    puts(dllname);
+    return _access(dllname, 0) == 0;
+}
+
+
 /* ----------------------------------------------------------------------- */
 /*       main() - sets PYTHONHOME and calls PyRun_SimpleFile on            */
 /*               script with same name but .py extension                   */
@@ -95,15 +105,19 @@ int main(int argc, char** argv)
         return 2;
     }
 
-    /* set PYTHONHOME so that system-wide installed copy of Python is
-       never used; we want to use embedded one: */
-    SetEnvironmentVariable("PYTHONHOME", dirname);
-    sprintf(envvar, "PYTHONHOME=%s", dirname);
-    _putenv(envvar);
+    if ( IsPythonEmbedded(dirname) )
+    {
+        puts("embedding");
+        /* set PYTHONHOME so that system-wide installed copy of Python is
+           never used; we want to use embedded one: */
+        SetEnvironmentVariable("PYTHONHOME", dirname);
+        sprintf(envvar, "PYTHONHOME=%s", dirname);
+        _putenv(envvar);
 
-    /* ditto with PYTHONPATH, but make it empty: */
-    SetEnvironmentVariable("PYTHONPATH", "");
-    _putenv("PYTHONPATH=");
+        /* ditto with PYTHONPATH, but make it empty: */
+        SetEnvironmentVariable("PYTHONPATH", "");
+        _putenv("PYTHONPATH=");
+    }
 
     Py_Initialize();
     argv[0] = (char*)filename;
