@@ -35,6 +35,7 @@ SolidCompression=true
 InternalCompressLevel=max
 ShowLanguageDialog=yes
 [Files]
+Source: *.exe; DestDir: {app}; Flags: recursesubdirs; Components: base
 Source: src\*; DestDir: {app}\src; Flags: recursesubdirs; Components: base
 Source: rules\*; DestDir: {app}\rules; Flags: recursesubdirs; Components: base
 Source: presets\*; DestDir: {app}\presets; Flags: recursesubdirs; Components: base
@@ -395,7 +396,7 @@ var
   p : string;
   scope : integer;
 begin
-  p:= ExpandConstant('{app}\src');
+  p:= ExpandConstant('{app}');
   if IsAdminLoggedOn then
     scope:= psAllUsers
   else

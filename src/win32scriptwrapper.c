@@ -35,6 +35,11 @@
 #include <stdlib.h>
 #include <windows.h>
 
+
+/* directory where to look for .py file, relative to .exe location: */
+#define SCRIPT_DIRECTORY    "src\\"
+
+
 /* ----------------------------------------------------------------------- */
 /*       main() - sets PYTHONHOME and calls PyRun_SimpleFile on            */
 /*               script with same name but .py extension                   */
@@ -43,27 +48,31 @@
 int main(int argc, char** argv)
 {
     int ret;
+    char exename[2048];
     char filename[2048];
     char dirname[2048];
+    char basename[2048];
     char envvar[2048];
     FILE *fp;
     char *lastp = NULL;
 
-    strncpy(filename, argv[0], 2048);
-    if (GetModuleFileName(NULL, (char*)filename, 2048) != 0)
+    strncpy(exename, argv[0], 2048);
+    if (GetModuleFileName(NULL, (char*)exename, 2048) != 0)
     {
-        lastp = strrchr(filename, '\\');
+        lastp = strrchr(exename, '\\');
         if (lastp == NULL)
         {
-            strncpy(dirname, ".", 2048);
+            strncpy(dirname, ".\\", 2048);
+            strncpy(basename, exename, 2048);
         }
         else
         {
-            strncpy(dirname, filename, lastp - filename);
-            dirname[lastp - filename] = 0;
+            strncpy(dirname, exename, lastp - exename + 1);
+            dirname[lastp - exename + 1] = 0;
+            strncpy(basename, lastp+1, 2048);
         }
 
-        lastp = strrchr(filename, '.');
+        lastp = strrchr(basename, '.');
     }
     if (lastp == NULL)
     {
@@ -71,7 +80,13 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    strncpy(lastp, ".py", 2048-(2+lastp-filename));
+    strncpy(lastp, ".py", 2048-(2+lastp-basename));
+
+
+    strncpy(filename, dirname, 2048);
+    strncat(filename, SCRIPT_DIRECTORY, 2048 - strlen(filename));
+    strncat(filename, basename, 2048 - strlen(filename));
+
 
     fp = fopen(filename, "rb");
     if (fp == NULL)
