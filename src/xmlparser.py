@@ -100,12 +100,16 @@ def __validateSchema(doc, namespace):
         sys.stderr.write("warning: can't find schema definition %s, skipping validation\n" % schemaFile)
         return
 
-    ctxt = libxml2.schemaNewParserCtxt(schemaFile)
-    schema = ctxt.schemaParse()
-    valid = schema.schemaNewValidCtxt()
-    valid.setValidityErrorHandler(__libxml2schemaErr, __libxml2schemaErr, doc.name)
-    if doc.schemaValidateDoc(valid) != 0:
-        raise ParsingError()
+    try:
+        ctxt = libxml2.schemaNewParserCtxt(schemaFile)
+        schema = ctxt.schemaParse()
+        valid = schema.schemaNewValidCtxt()
+        valid.setValidityErrorHandler(__libxml2schemaErr, __libxml2schemaErr, doc.name)
+        if doc.schemaValidateDoc(valid) != 0:
+            raise ParsingError()
+    except AttributeError:
+        # libxml2 is too old to have schema validation
+        return
 
 
 
