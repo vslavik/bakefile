@@ -15,11 +15,10 @@ DefaultDirName={pf}\Bakefile
 
 DefaultGroupName=Bakefile
 AllowNoIcons=true
-UninstallStyle=modern
 
 OutputDir=.
 
-Compression=lzma
+Compression=lzma/ultra64
 
 WindowShowCaption=true
 WindowStartMaximized=false
@@ -32,18 +31,31 @@ LicenseFile=COPYING
 
 
 SolidCompression=true
-InternalCompressLevel=max
-ShowLanguageDialog=yes
+InternalCompressLevel=ultra64
+ShowLanguageDialog=no
+VersionInfoVersion={#VERSION}
+PrivilegesRequired=none
+AppSupportURL=http://www.bakefile.org
+AppUpdatesURL=http://www.bakefile.org/download.html
+AppVersion={#VERSION}
+AppID={{AD092360-A98A-4CDC-BDAA-5CB09C593AC2}
+AppContact=http://www.bakefile.org/wiki
+UninstallDisplayName=Bakefile
+ChangesEnvironment=true
+UninstallFilesDir={app}\uninst
 [Files]
-Source: *.exe; DestDir: {app}; Flags: recursesubdirs; Components: base
-Source: src\*; DestDir: {app}\src; Flags: recursesubdirs; Components: base
+Source: bakefile.exe; DestDir: {app}; Components: base
+Source: bakefile_gen.exe; DestDir: {app}; Components: base
+Source: src\*.py; DestDir: {app}\src; Components: base
+Source: src\*.pyd; DestDir: {app}\src; Components: base
+Source: src\empy\*; DestDir: {app}\src\empy; Flags: recursesubdirs; Components: base
 Source: rules\*; DestDir: {app}\rules; Flags: recursesubdirs; Components: base
 Source: presets\*; DestDir: {app}\presets; Flags: recursesubdirs; Components: base
 Source: output\*; DestDir: {app}\output; Flags: recursesubdirs; Components: base
 Source: tests\*; DestDir: {app}\tests; Flags: recursesubdirs; Components: tests
 Source: schema\*; DestDir: {app}\schema; Flags: recursesubdirs; Components: base
 Source: doc\*; DestDir: {app}\doc; Flags: recursesubdirs; Components: doc
-Source: ..\minipython\*; DestDir: {app}\src; Flags: recursesubdirs; Components: python; Excludes: *.pyc
+Source: py-runtime\*; DestDir: {app}; Flags: recursesubdirs; Components: python
 Source: README; DestDir: {app}; Components: base
 Source: NEWS; DestDir: {app}; Components: base; AfterInstall: InstallSetupPath
 Source: THANKS; DestDir: {app}; Components: base
@@ -60,7 +72,6 @@ Source: AUTHORS; DestDir: {app}; Components: base
 EnableISX=true
 UseAbsolutePaths=false
 
-Use7zip=false
 [Dirs]
 
 [_ISToolPreCompile]
@@ -77,8 +88,10 @@ BeveledLabel=Bakefile
 [UninstallDelete]
 Name: {app}\src; Type: filesandordirs
 Name: {app}\output; Type: filesandordirs
+Name: {app}\lib; Type: filesandordirs
+
 [Tasks]
-Name: addpath; Description: Add Bakefile to PATH environment variable (may not work); Flags: unchecked
+Name: addpath; Description: Add Bakefile to PATH environment variable; Flags: checkedonce
 [Code]
 // -----------------------------------------------------------------
 //                    code for changing PATH
@@ -406,6 +419,6 @@ end;
 
 procedure InstallSetupPath;
 begin
-    if ShouldProcessEntry('', 'addpath') = srYes then
+    if IsTaskSelected('addpath') then
 		SetupPATH;
 end;
