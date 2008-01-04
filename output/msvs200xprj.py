@@ -276,13 +276,14 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         for t in dsw_targets:
             guid = guid_dict[t.id]
-            for c in sortedKeys(t.configs):
+            for c in sortedKeys(configs):
                 cfg = self.mkConfigName(c)
                 txt = "\t\t%(guid)s.%(cfg)s.%%s = %(cfg)s\n" % {'guid':guid, 'cfg':cfg}
                 dsw += txt % 'ActiveCfg'
-                dsw += txt % 'Build.0'
-                if self.isEmbeddedConfig(c):
-                    dsw += txt % 'Deploy.0'
+                if c in t.configs:
+                    dsw += txt % 'Build.0'
+                    if self.isEmbeddedConfig(c):
+                        dsw += txt % 'Deploy.0'
 
         
         dsw += "\tEndGlobalSection\n"
