@@ -1,0 +1,10 @@
+
+OS X 10.4 ships with Python 2.3 and OS X 10.5 contains both Python 2.3 and 2.5.
+Unfortunately it does *not* contain python2.3 program, only the runtime
+framework. This makes it impossible to build Python modules for OS X 10.4 on
+10.5 if building them depends on having 'python' program (as it does in most
+cases).
+
+To work around this without having to use two machines to build OSX package,
+this file is a copy of 'python2.3' from OS X 10.4. It's original location is
+/System/Library/Frameworks/Python.framework/Versions/2.3/Resources/Python.app/Contents/MacOS.

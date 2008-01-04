@@ -1,0 +1,30 @@
+diff -ru libxml2-2.6.30.orig/python/setup.py.in libxml2-2.6.30/python/setup.py.in
+--- libxml2-2.6.30.orig/python/setup.py.in	2007-01-03 14:07:43.000000000 +0100
++++ libxml2-2.6.30/python/setup.py.in	2008-01-01 20:38:51.000000000 +0100
+@@ -65,23 +65,15 @@
+ 
+ xml_includes=""
+ for dir in includes_dir:
+-    if not missing(dir + "/libxml2/libxml/tree.h"):
+-        xml_includes=dir + "/libxml2"
++    if not missing(dir + "/libxml/tree.h"):
++        xml_includes=dir
+ 	break;
+ 
+ if xml_includes == "":
+     print "failed to find headers for libxml2: update includes_dir"
+     sys.exit(1)
+ 
+-iconv_includes=""
+-for dir in includes_dir:
+-    if not missing(dir + "/iconv.h"):
+-        iconv_includes=dir
+-	break;
+-
+-if iconv_includes == "":
+-    print "failed to find headers for libiconv: update includes_dir"
+-    sys.exit(1)
++iconv_includes=xml_includes
+ 
+ # those are added in the linker search path for libraries
+ libdirs = [

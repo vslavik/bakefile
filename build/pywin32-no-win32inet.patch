@@ -1,0 +1,14 @@
+diff -ru pywin32-210.orig/setup.py pywin32-210/setup.py
+--- pywin32-210.orig/setup.py	2006-09-23 00:49:04.000000000 +0200
++++ pywin32-210/setup.py	2008-01-01 20:37:36.000000000 +0100
+@@ -1038,10 +1038,6 @@
+         ("win32service", "advapi32 oleaut32 user32", True, 0x0500),
+         ("win32trace", "advapi32", False),
+         ("win32wnet", "netapi32 mpr", False),
+-        ("win32inet", "wininet", False, 0x500, """
+-            win32/src/win32inet.i           win32/src/win32inetmodule.cpp
+-            win32/src/win32inet_winhttp.cpp"""
+-                        ),
+         ("win32console", "kernel32", True, 0x0501, "win32/src/win32consolemodule.cpp"),
+         ("win32ts", "WtsApi32", True, 0x0501, "win32/src/win32tsmodule.cpp"),
+         ("_win32sysloader", "", False, 0x0501, "win32/src/_win32sysloader.cpp"),

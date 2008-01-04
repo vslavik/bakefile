@@ -1,0 +1,28 @@
+
+What is this?
+-------------
+
+This directory contains build script to build complete binary distribution of
+Bakefile for all platforms. It uses Rlsbot (http://rlsbot.bakefile.org) to do
+all the work.
+
+
+Instructions
+------------
+
+1) Install Rlsbot master and agents on Unix, OS X and Windows machines.
+
+2) Configure ~/.rlsbot/agents.conf so that it sets same tags and environment
+   variables as in the agents.conf.example file. In particular, the Windows
+   machine must have Visual Studio 2003 installed.
+   
+   OS X machine must have 10.5 SDK installed (it's possible to build using
+   10.4, but the resulting binary won't work on 10.5).
+
+   On the VS2003 machine, MSVS_PATH variable must be set and point to Visual
+   Studio directory.
+
+   The Unix machine must have Mono installed (it's needed to unpack Python's
+   MSI package).
+
+3) Run rlsbot-scons with its 1st argument SConstruct file in this directory.

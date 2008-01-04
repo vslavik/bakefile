@@ -1,0 +1,257 @@
+
+LIBXML2_VERSION = "2.6.30"
+LIBXML2_URL = "ftp://xmlsoft.org/libxml2/libxml2-%s.tar.gz" % LIBXML2_VERSION
+LIBXML2_PATCHES = ["libxml2-setup.py-fixes.patch"]
+LIBXML2_CONFIGURE = "--disable-static --enable-python --disable-ftp --disable-http --disable-dependency-tracking"
+LIBXML2_WINCONFIGURE = "ftp=no http=no html=no iconv=no python=yes"
+
+PYTHON_VERSION = "2.5.1"
+PYTHON_URL = "http://www.python.org/ftp/python/%(ver)s/python-%(ver)s.msi" % {"ver":PYTHON_VERSION}
+PYTHON_FILES = ["python-makezip.py"]
+
+PYWIN32_VERSION = "210"
+PYWIN32_URL = "http://downloads.sourceforge.net/pywin32/pywin32-%s.zip" % PYWIN32_VERSION
+PYWIN32_PATCHES = ["pywin32-no-win32inet.patch"]
+
+LESSMSI_VERSION = "20051110"
+LESSMSI_URL = "http://blogs.pingpoet.com/overflow/pubfiles/lessmsierables-%s.zip" % LESSMSI_VERSION
+LESSMSI_PATCHES = ["lessmsi-no-gui.patch"]
+
+INNOSETUP_VERSION = '5.2.2'
+INNOSETUP_URL = 'http://files.jrsoftware.org/ispack/ispack-%s.exe' % INNOSETUP_VERSION
+INNOUNP_URL = 'http://innounp.sf.net/test020.rar'
+
+
+from rlsbot import BuildEnvironment
+env = BuildEnvironment()
+
+# -----------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------
+
+src_lessmsi = env.ComponentSources(
+        name="lessmsi",
+        source=LESSMSI_URL,
+        patches=LESSMSI_PATCHES,
+        post_commands=["rm -f lessmsi.{exe,pdb}"])
+
+lessmsi = env.BuildComponent(
+        name="lessmsi",
+        agent="mono",
+        sources=src_lessmsi,
+        deps=None,
+        commands=[
+            "mcs /target:exe /out:lessmsi.exe /r:wix /r:System.Windows.Forms /r:System.Drawing Source/*.cs",
+        ],
+        outputs=["*.exe", "*.dll"])
+
+
+
+src_python = env.ComponentSources(
+        name="python",
+        source=PYTHON_URL,
+        morefiles=PYTHON_FILES)
+
+python_devel_win32 = env.BuildComponent(
+        name="python-devel-win32",
+        agent="win32",
+        sources=src_python,
+        deps=[lessmsi],
+        commands=[
+            "lessmsi /x python-%s.msi python" % PYTHON_VERSION,
+        ],
+        outputs=["python/SourceDir/*", "*.py"])
+
+
+
+src_pywin32 = env.ComponentSources(
+        name="pywin32",
+        source=PYWIN32_URL,
+        patches=PYWIN32_PATCHES)
+
+pywin32 = env.BuildComponent(
+        name="pywin32",
+        agent="vs2003",
+        sources=src_pywin32,
+        deps=[(python_devel_win32, "py")],
+        toolchain=env.VisualStudioToolchain,
+        commands=[
+            "py\\python setup.py build",
+        ],
+        outputs=["build/lib.win32-*/*"])
+
+
+
+# -----------------------------------------------------------------
+# libxml2 Python module
+# -----------------------------------------------------------------
+
+src_libxml2 = env.ComponentSources(
+        name="libxml2",
+        source=LIBXML2_URL,
+        patches=LIBXML2_PATCHES,
+        morefiles=["mac-python2.3.tar.gz"],
+        post_commands=[
+            "mv mac-python2.3 libxml2-*",
+            "mv libxml2-*/* .",
+            "rmdir libxml2-*",
+        ])
+
+libxml2_win32 = env.BuildComponent(
+        name="libxml2-win32",
+        agent="vs2003",
+        sources=src_libxml2,
+        deps=[(python_devel_win32, "py")],
+        toolchain=env.VisualStudioToolchain,
+        commands=[
+            "cd win32",
+            "cscript configure.js prefix=..\\dist %s sodir=..\\dist\\lib\\libxmlmods" % LIBXML2_WINCONFIGURE,
+            "nmake -f makefile.msvc",
+            "nmake -f makefile.msvc install",
+            "cd ..\\python",
+            "..\\py\\python setup.py build",
+        ],
+        outputs=["python/build/lib.win32-*/*", "dist/lib/libxmlmods"])
+
+
+
+OSX_10_5_FLAGS="-O2 -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk"
+OSX_10_4_FLAGS="-O2 -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
+
+libxml2_osx = env.BuildComponent(
+        name="libxml2-osx",
+        agent="osx10.5",
+        sources=src_libxml2,
+        deps=None,
+        commands=[
+            # Build 10.5 version first, then install 10.4 version on top of it.
+            # This way, libxml2.dylib will be usable on both systems (and py
+            # modules are installed in different places)
+            "mkdir B10.5",
+            "cd B10.5",
+            "../configure --libdir=/usr/local/lib/bakefile/binmodules %s CFLAGS='%s' LDFLAGS='%s'" % (LIBXML2_CONFIGURE, OSX_10_5_FLAGS, OSX_10_5_FLAGS),
+            "make install-strip DESTDIR=`pwd`/../DESTDIR",
+            "cd ..",
+
+            "mkdir B10.4",
+            "cd B10.4",
+            "../configure --libdir=/usr/local/lib/bakefile/binmodules %s CFLAGS='%s' LDFLAGS='%s' --with-python=`pwd`/../mac-python2.3" % (LIBXML2_CONFIGURE, OSX_10_4_FLAGS, OSX_10_4_FLAGS),
+            "make install-strip DESTDIR=`pwd`/../DESTDIR",
+            "cd ..",
+
+            "cd DESTDIR/usr/local/lib/bakefile/binmodules",
+            "mv python2.5/site-packages 2.5",
+            "mv python2.3/site-packages 2.3",
+            "rm -rf python* pkgconfig *.la */*.la libxml2.dylib *.sh",
+        ],
+        environment={"MACOSX_DEPLOYMENT_TARGET":"10.4"},
+        outputs=["DESTDIR/usr/local/lib/bakefile/binmodules/*"])
+
+
+
+# -----------------------------------------------------------------
+# Python distributable runtime
+# -----------------------------------------------------------------
+
+python_runtime_win32 = env.BuildComponent(
+        name="python-runtime-win32",
+        agent="win32",
+        sources=[],
+        deps=[python_devel_win32,
+              (pywin32, "pywin32"),
+              (libxml2_win32, "dist/lib")],
+        commands=[
+            #"mkdir dist",
+            #"mkdir dist\\lib",
+            "copy *.dll dist",
+            "copy LICENSE.txt dist\\Python-LICENSE.txt",
+            "copy DLLS\\_bsddb.pyd dist\\lib",
+            "python python-makezip.py",
+            "copy *.zip dist",
+            "copy pywin32\\pywin32_system32\\pywintypes* dist\\lib",
+            "copy pywin32\\win32\\win32file.pyd dist\\lib",
+            "copy pywin32\\win32\\_win32sysloader.pyd dist\\lib",
+            "copy pywin32\\win32\\lib\\win32con.py dist\\lib",
+            "copy pywin32\\win32\\lib\\pywintypes.py dist\\lib",
+        ],
+        outputs=["dist/*"])
+
+
+# -----------------------------------------------------------------
+# innosetup
+# -----------------------------------------------------------------
+
+src_innounp = env.ComponentSources(
+        name='innounp',
+        source=INNOUNP_URL)
+
+src_innosetup = env.ComponentSources(
+        name='innosetup',
+        source=INNOSETUP_URL)
+
+innosetup = env.BuildComponent(
+        name='innosetup',
+        agent='win32',
+        sources=src_innosetup,
+        deps=[src_innounp],
+        commands=[
+            'innounp -x ispack-5.2.2.exe',
+            'move {app}\\ISCC?2.exe {app}\\ISCC.exe',
+            'del {app}\\ISCC?1.exe',
+            'move {app}\\ISCmplr?2.dll {app}\\ISCmplr.dll',
+            'move {app}\\ISCmplr?1.dll {app}\\ISCmplr.dls',
+        ],
+        outputs=['{app}/*'])
+
+
+# -----------------------------------------------------------------
+# bakefile
+# -----------------------------------------------------------------
+
+src_bakefile = env.ComponentSources(
+        name="bakefile",
+        source="..",
+        post_commands=["./bootstrap"])
+
+bakefile_tarball = env.BuildComponent(
+        name="bakefile-tarball",
+        agent="unix",
+        sources=src_bakefile,
+        deps=None,
+        commands=[
+            "./configure --enable-maintainer-mode",
+            "make doc",
+            "make dist",
+        ],
+        outputs=["bakefile-*.tar.gz"])
+
+src_bakefile_official = env.ComponentSources(
+        name="bakefile-official",
+        source=bakefile_tarball)
+
+
+bakefile_osx = env.BuildComponent(
+        name="bakefile-osx",
+        agent="osx",
+        sources=src_bakefile_official,
+        deps=[(libxml2_osx, "pyextras")],
+        commands=[
+            "cd macosx",
+            "EXTRA_BINMODULES=`pwd`/../pyextras ./makepkg.sh",
+            ],
+        outputs=["macosx/bakefile-*.dmg"])
+
+
+bakefile_win32 = env.BuildComponent(
+        name="bakefile-win32",
+        agent="vs2003",
+        sources=src_bakefile_official,
+        deps=[(python_devel_win32, "py-dev"),
+              (python_runtime_win32, "py-runtime"),
+              (innosetup, 'inno')],
+        toolchain=env.VisualStudioToolchain,
+        commands=[
+            "nmake -f makefile.vc PYTHONDIR=py-dev",
+            "inno\\iscc bakefile.iss",
+            ],
+        outputs=["bakefile-*-setup.exe"])

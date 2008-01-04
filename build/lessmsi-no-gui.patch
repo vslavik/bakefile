@@ -1,0 +1,58 @@
+diff -ru LessMSIerables.orig/Source/Program.cs LessMSIerables/Source/Program.cs
+--- LessMSIerables.orig/Source/Program.cs	2005-11-10 20:23:56.000000000 +0100
++++ LessMSIerables/Source/Program.cs	2008-01-01 20:36:27.000000000 +0100
+@@ -12,9 +12,6 @@
+ {
+ 	class Program
+ 	{
+-		[DllImport("kernel32.dll", SetLastError = true)]
+-		static extern int FreeConsole();
+-
+ 		/// <summary>
+ 		/// The main entry point for the application.
+ 		/// </summary>
+@@ -23,8 +20,6 @@
+ 		{
+ 			try
+ 			{
+-				RegistryTool.RegisterShortcutmenu();
+-				
+ 				// Handle args:
+ 				for (int i = 0; i < args.Length; i++)
+ 				{
+@@ -65,8 +60,6 @@
+ 			catch (Exception eCatchAll)
+ 			{
+ 				Console.WriteLine("Error: " + eCatchAll.ToString());
+-				Console.WriteLine("Press a key to continue...");
+-				Console.ReadLine();
+ 				return -1;
+ 			}
+ 			return LaunchForm("");
+@@ -84,11 +77,10 @@
+ 			Application.DoEvents();
+ 
+ 			MainForm form = new MainForm(inputFile);
+-			FreeConsole();
+ 			
+ 			
+ 			Application.Run(form);
+ 			return 0;
+ 		}
+ 	}
+-}
+\ No newline at end of file
++}
+diff -ru LessMSIerables.orig/Source/RegistryTools.cs LessMSIerables/Source/RegistryTools.cs
+--- LessMSIerables.orig/Source/RegistryTools.cs	2005-11-04 03:03:10.000000000 +0100
++++ LessMSIerables/Source/RegistryTools.cs	2008-01-01 20:36:16.000000000 +0100
+@@ -1,3 +1,4 @@
++/*
+ using Microsoft.Win32;
+ 
+ namespace Willeke.Scott.LessMSIerables
+@@ -24,3 +25,4 @@
+ 		}
+ 	}
+ }
++*/
