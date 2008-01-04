@@ -172,15 +172,39 @@ class ProjectGeneratorMsvc9:
     #   helpers
     # --------------------------------------------------------------------
 
+    def splitConfigName(self, config):
+        idx = config.index('|')
+        platform = config[:idx]
+        name = config[idx+2:]
+        if name == '':
+            name = 'Default'
+        return (platform, name)
+
     def mkConfigName(self, config):
         # config name always contains the platform followed by "| " at the
         # beginning of the string, so extract it and transform into
         # "ConfigName|Platform":
-        idx = config.index('|')
-        platform = config[:idx]
-        name = config[idx+2:]
-        if name == '': name = 'Default'
+        platform, name = self.splitConfigName(config)
         return '%s|%s' % (name, platform)
+        
+    def sortConfigsForSLN(self, configs):
+        # .sln files have configs grouped, all platforms for one config
+        # are together, but our "natural" sort order is different:
+        sortedConfigs = []
+        todo = [c for c in sortedKeys(configs)]
+        while len(todo) > 0:
+            c = todo.pop(0)
+            if c in sortedConfigs:
+                continue
+            plat, nm = self.splitConfigName(c)
+            sortedConfigs.append(c)
+            for c2 in todo:
+                if c2 in sortedConfigs:
+                    continue
+                plat2, nm2 = self.splitConfigName(c2)
+                if nm == nm2:
+                    sortedConfigs.append(c2)
+        return sortedConfigs
 
     def isEmbeddedConfig(self, config):
         """Returns true if given config targets embedded device."""
@@ -263,10 +287,12 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             
         # end of FIXME
 
+        sortedConfigs = self.sortConfigsForSLN(configs)
+
         # generate configurations listing:
         dsw += "Global\n"
         dsw += "\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n"
-        for c in sortedKeys(configs):
+        for c in sortedConfigs:
             cfg = self.mkConfigName(c)
             dsw += "\t\t%s = %s\n" % (cfg,cfg)
         dsw += "\tEndGlobalSection\n"
@@ -276,7 +302,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         for t in dsw_targets:
             guid = guid_dict[t.id]
-            for c in sortedKeys(configs):
+            for c in sortedConfigs:
                 cfg = self.mkConfigName(c)
                 txt = "\t\t%(guid)s.%(cfg)s.%%s = %(cfg)s\n" % {'guid':guid, 'cfg':cfg}
                 dsw += txt % 'ActiveCfg'
