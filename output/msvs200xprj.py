@@ -471,7 +471,6 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         if self.isEmbeddedConfig(c):
             t10.setAttribute("TargetMachine", "3")
-            t10.setAttribute("SubSystem","0")
             t10.setAttribute("DelayLoadDLLs", "$(NOINHERIT)")
             if cfg._debug == '0':
                 t10.setAttribute("OptimizeReferences", "2")
