@@ -49,19 +49,21 @@ def _get_num_of_cpus():
         except KeyError: pass
         except ValueError: pass
     elif os.name == 'posix':
-        if sys.platform == 'darwin':
-            # OS X doesn't have useful values in os.sysconf()
+        try:
+            return max(1, int(os.sysconf('SC_NPROCESSORS_ONLN')))
+        except ValueError:
             try:
-                return max(1, int(os.popen2("sysctl -n hw.ncpu")[1].read().strip()))
-            except ValueError: pass
-        else:
-            try:
-                return max(1, int(os.sysconf('SC_NPROCESSORS_ONLN')))
+                return max(1, int(os.sysconf('SC_NPROCESSORS_CONF')))
             except ValueError:
-                try:
-                    return max(1, int(os.sysconf('SC_NPROCESSORS_CONF')))
-                except ValueError:
-                    pass
+                pass
+        
+        if sys.platform == 'darwin':
+            # OS X < 10.5 doesn't have useful values in os.sysconf()
+            try:
+                if os.path.exists("/usr/sbin/sysctl"):
+                    return max(1, int(os.popen2("/usr/sbin/sysctl -n hw.ncpu")[1].read().strip()))
+            except ValueError:
+                pass
     return 1
 
 
