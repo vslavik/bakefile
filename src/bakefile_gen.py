@@ -324,7 +324,6 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
         for f in files:
             for fmt in files[f].formats:
                 total += 1
-                print (f, fmt)
                 needUpdate.append((f,fmt))
     else:
         # load bakefile_gen state file and choose only bakefiles out of date:
