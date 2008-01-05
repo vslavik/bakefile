@@ -35,6 +35,8 @@
 
     <include file="win32.bkl"/>
 
+    <set var="EOL_STYLE">native</set>
+
     <set var="CC">cc</set>
     <set var="CXX">c++</set>
     <set var="CPPFLAGS"/>
