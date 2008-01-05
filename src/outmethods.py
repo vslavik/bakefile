@@ -156,8 +156,10 @@ def insertBetweenMarkers(old, new):
     begin = new[0]
     end = new[-1]
 
-    if (begin not in old) or (end not in old):
-        raise errors.Error('markers not present in the file')
+    if begin not in old:
+        raise errors.Error('marker \"%s\" not present in the file' % begin.strip())
+    if end not in old:
+        raise errors.Error('marker \"%s\" not present in the file' % end.strip())
 
     out = []
     i = 0
