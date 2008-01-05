@@ -384,6 +384,8 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                 return self.process.wait() != None
         
         def finish(self):
+            if self.pretend:
+                return 0
             try:
                 try:
                     if self.process.returncode == 0:
