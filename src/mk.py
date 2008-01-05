@@ -108,7 +108,8 @@ class Condition:
             self.value = value
 
         def __cmp__(self, other):
-            return cmp((self.option, self.value), (other.option, other.value))
+            return cmp((self.option.name, self.value), 
+                       (other.option.name, other.value))
         
     def __init__(self, name, exprs):
         self.name = name
