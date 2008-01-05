@@ -302,11 +302,6 @@ def write():
             f = __openFile(file)
             txt = f.readlines()
 
-        # if old and new content should be combined, do it:
-        if __output_methods[file] != 'replace':
-            __output_files[file] = \
-                eval('%s(txt, __output_files[file])' % __output_methods[file])
-
         eol = _getEolStyle()
         if eol == "dos":
             __output_files[file] = [line.replace('\n', '\r\n') for line in __output_files[file]]
@@ -314,6 +309,11 @@ def write():
             __output_files[file] = [line.replace('\n', '\r') for line in __output_files[file]]
         # if eol is "unix" then there is no need to replace
         # anything as __output_files[file] already uses '\n' as EOL
+
+        # if old and new content should be combined, do it:
+        if __output_methods[file] != 'replace':
+            __output_files[file] = \
+                eval('%s(txt, __output_files[file])' % __output_methods[file])
 
         # write the file out only if changed:
         if config.always_touch_output or __output_files[file] != txt:
