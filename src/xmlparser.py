@@ -78,7 +78,14 @@ def __validateSchema(doc, namespace):
     if namespace == None:
         return
     root = doc.getRootElement()
-    ns = root.ns()
+
+    try:
+        ns = root.ns()
+    except libxml2.treeError:
+        # some libxml2 versions throw instead of returning None if the node
+        # doesn't have namespace
+        ns = None
+
     if ns == None:
         sys.stderr.write("%s:%i: warning: missing namespace declaration, should be \"%s\"\n" % (doc.name, root.lineNo(), namespace))
         return # we can't validate it without namespace
