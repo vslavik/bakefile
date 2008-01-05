@@ -36,6 +36,7 @@
   of makefiles in the same format (#156)
 - msvs2005prj: fixed to correctly exclude conditional targets from
   configurations they aren't built in (#181, John Ralls)
+- msvs2005prj: fixed runtime library selection
 
 
 Version 0.2.2

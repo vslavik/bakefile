@@ -35,6 +35,17 @@ import msvc_common
 from msvc_common import *
 
 # ------------------------------------------------------------------------
+#   misc .vcproj constants:
+# ------------------------------------------------------------------------
+
+rtMultiThreaded         = '0'
+rtMultiThreadedDebug    = '1'
+rtMultiThreadedDLL      = '2'
+rtMultiThreadedDebugDLL = '3'
+rtSingleThreaded        = '4'
+rtSingleThreadedDebug   = '5'
+
+# ------------------------------------------------------------------------
 #   extended minidom classes to create XML file with specified attributes 
 #   order (VC2003 projet file must have attribute "Name" as first)
 # ------------------------------------------------------------------------
@@ -404,26 +415,28 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             t6.setAttribute("ExceptionHandling", "1")
         else:
             t6.setAttribute("ExceptionHandling", "0")
+        
+        t6.setAttribute("AdditionalOptions", cfg._cppflags)
 
-        #handle the run time library -- note that only multi thread is supported
-        rtl = '3'        # default to debug
-        rtl_opt = ' /MT' # default to multithreaded
-        if cfg._rtl_dbg == 'on':
-            rtl_opt_debug = 'd'
-        else:
-            rtl_opt_debug = ''
-
-        if cfg._rtl_type == 'dynamic':
-            rtl_opt = ' /MD'
-            if ( cfg._rtl_dbg != 'on' ):
-                rtl = '2'
-        elif cfg._rtl_type == 'static':
+        # choose runtime library
+        if cfg._rtl_threading == 'multi':
             if cfg._rtl_dbg == 'on':
-                rtl = '1'
+                if cfg._rtl_type == 'static':
+                    rtl = rtMultiThreadedDebug
+                else:
+                    rtl = rtMultiThreadedDebugDLL
+            else: # debug off
+                if cfg._rtl_type == 'static':
+                    rtl = rtMultiThreaded
+                else:
+                    rtl = rtMultiThreadedDLL
+        else: # single-threaded
+            if cfg._rtl_type == 'dynamic':
+                print "warning: single-threaded dynamic runtime doesn't exist, using static"
+            if cfg._rtl_dbg:
+                rtl = rtSingleThreadedDebug
             else:
-                rtl = '0'
-
-        t6.setAttribute("AdditionalOptions", cfg._cppflags + rtl_opt + rtl_opt_debug)
+                rtl = rtSingleThreaded
         t6.setAttribute("RuntimeLibrary", rtl)
 
         t6.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))

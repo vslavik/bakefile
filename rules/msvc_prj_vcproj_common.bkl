@@ -48,6 +48,7 @@
 
         <debug-runtime-libs>off</debug-runtime-libs>
         <runtime-libs>dynamic</runtime-libs>
+        <threading>multi</threading>
     </template>
     
     <template id="_dll_baset_projtype"/>
