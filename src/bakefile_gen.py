@@ -541,10 +541,11 @@ def run(args):
                       action="store_true", dest='list_files',
                       default=0,
                       help="print the list of output files that would be generated (given -f and -b arguments) instead of creating them")
+    jobsDefault = _get_num_of_cpus()
     parser.add_option('-j', '--jobs',
                       action="store", dest='jobs',
-                      default=_get_num_of_cpus(),
-                      help='number of jobs to run simultaneously [default: %default]')
+                      default=jobsDefault,
+                      help='number of jobs to run simultaneously [default: %i]' % jobsDefault)
     parser.add_option('-p', '--pretend',
                       action="store_true", dest='pretend',
                       default=0,

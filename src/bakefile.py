@@ -96,11 +96,11 @@ def run(args):
                       default="format", action="store", dest='eol',
                       metavar='STYLE', type='choice',
                       choices=['format','dos','unix','mac','native'],
-                      help="line endings type to use in output files (format, dos, unix, mac, native) [default: %default]")
+                      help="line endings type to use in output files (format, dos, unix, mac, native) [default: format]")
     parser.add_option('', '--wrap-output',
                       default="75", action="store", dest='wrap_lines_at',
                       metavar='LENGTH',
-                      help="don't generate lines longer than LENGTH; set to \"no\" to disable wrapping [default: %default]")
+                      help="don't generate lines longer than LENGTH; set to \"no\" to disable wrapping [default: 75]")
     parser.add_option('', '--output-deps',
                       action="store", dest='deps_file', metavar='DEPSFILE',
                       help="output dependencies information for bakefile_gen")
