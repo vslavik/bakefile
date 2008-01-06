@@ -196,11 +196,11 @@
              
              Also note that the __*dir vars should never end with a path
              separator.
-             
-             NOTE: the $(SRCDIR) variable always contain a path with native
-                   path separators!
+
+             NOTE: the $(SRCDIR) variable always contain a path with Unix-style 
+                   path separators and thus must be nativePaths-filtered!
         -->
-        <set var="__srcdir">$(SRCDIR)</set>
+        <set var="__srcdir">$(nativePaths(SRCDIR))</set>
         <set var="__dstdir"/>
         <set var="__files"/>
 

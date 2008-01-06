@@ -758,7 +758,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
             for src in lst:
                 file_el = doc.createElement("File")
-                file_el.setAttribute("RelativePath", "%s\\%s" % (SRCDIR, src))
+                file_el.setAttribute("RelativePath", "%s\\%s" % (SRCDIR.replace('/','\\'), src))
                    
                 for c in sortedKeys(t.configs):
                     cfg = t.configs[c]

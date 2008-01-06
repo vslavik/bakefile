@@ -245,7 +245,7 @@ def findSources(filenames):
     """Adds source filename prefix to files."""
     return substitute(filenames,
                       lambda x: '%s%s%s' % \
-                             (mk.vars['SRCDIR'], mk.vars['DIRSEP'], x),
+                             (nativePaths(mk.vars['SRCDIR']), mk.vars['DIRSEP'], x),
                       'SOURCEFILES')
 
 def safeMakefileValue(s):

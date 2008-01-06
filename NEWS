@@ -37,6 +37,7 @@
 - msvs2005prj: fixed to correctly exclude conditional targets from
   configurations they aren't built in (#181, John Ralls)
 - msvs2005prj: fixed runtime library selection
+- SRCDIR variable now uses Unix and not native paths like other variables
 
 
 Version 0.2.2

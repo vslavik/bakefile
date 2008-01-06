@@ -33,7 +33,7 @@
     <define-rule name="gettext-catalogs" extends="phony" pseudo="1">
         
         <template>
-            <set var="__srcdir">$(SRCDIR)</set>
+            <set var="__srcdir">$(nativePaths(SRCDIR))</set>
             <set var="catalog">noname</set>
             
             <set var="linguas_value"/>
@@ -44,7 +44,7 @@
         </template>
         
         <define-tag name="srcdir">
-            <set var="__srcdir">$(value)</set>
+            <set var="__srcdir">$(nativePaths(value))</set>
         </define-tag>
         
         <define-tag name="catalog-name">

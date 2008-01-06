@@ -37,7 +37,7 @@
         </if>
 
         <set var="SRCDIR_RAW">$(value)</set>
-        <set var="SRCDIR">$(nativePaths(SRCDIR_RAW))</set>
+        <set var="SRCDIR">$(value)</set>
         
         <if cond="FORMAT=='autoconf'">
             <!-- autoconf is an exception, it has to use $(srcdir) to support
@@ -51,8 +51,8 @@
 
     <!-- set the default value of SRCDIR; note that we don't use <set-srcdir>
          here even though it would be nicer, because its implementation
-         requires TOOLSET to be set and this file is processed too early
-         for that:
+         requires $(srcdir) variable for autoconf and that's not defined yet at
+         this point:
       -->
     <!-- equivalent of <set-srcdir>.</set-srcdir> : -->
     <set var="SRCDIR_RAW">.</set>

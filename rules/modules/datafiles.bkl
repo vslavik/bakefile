@@ -140,7 +140,7 @@
     <define-rule name="copy-files" extends="action">
         <template>
             <is-phony/>
-            <set var="__srcdir">$(SRCDIR)</set>
+            <set var="__srcdir">$(nativePaths(SRCDIR))</set>
 
             <!--
               DigitalMars' smake has problems with long command lines, so we

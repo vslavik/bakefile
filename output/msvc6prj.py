@@ -361,7 +361,7 @@ Intermediate_Dir "%s\\%s"
 # Begin Source File
 
 SOURCE=%s\\%s
-""" % (SRCDIR,src)
+""" % (SRCDIR.replace('/','\\'),src)
                 file_flags = ''
                 if src == t._pch_generator:
                     file_flags += '# ADD BASE CPP /Yc"%s"\n' % t._pch_header

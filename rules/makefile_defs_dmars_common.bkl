@@ -134,7 +134,7 @@
     <define-rule name="__dmars_comp">
         <template>
             <set var="__pch_header"/>
-            <set var="__pch_location">$(SRCDIR)$(DIRSEP)</set>
+            <set var="__pch_location">$(nativePaths(SRCDIR))$(DIRSEP)</set>
             <set var="__pch_file">hdr</set>
         </template>
 
@@ -143,7 +143,9 @@
         </define-tag>
 
         <define-tag name="precomp-headers-location" rules="__compiled">
-            <set var="__pch_location">$(SRCDIR)$(DIRSEP)$(nativePaths(value))$(DIRSEP)</set>
+            <set var="__pch_location">
+                $(nativePaths(SRCDIR))$(DIRSEP)$(nativePaths(value))$(DIRSEP)
+            </set>
         </define-tag>
 
         <define-tag name="precomp-headers-header" rules="__compiled">
