@@ -252,4 +252,13 @@
     </para>
   </section>
 
+  <section id="concept.paths">
+    <title>Paths</title>
+    <para>
+      Regardless of the operating system where Bakefile is running, the convention
+      respected by all Bakefile tags and variables is to use Unix-style paths, i.e. to
+      use forward slash (<literal>/</literal>) as the path separator.
+    </para>
+  </section>
+
 </chapter>
