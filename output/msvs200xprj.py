@@ -390,6 +390,12 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         conf_el.setAttribute("ConfigurationType", "%s" % cfg._type_code)
         conf_el.setAttribute("UseOfMFC", "0")
         conf_el.setAttribute("ATLMinimizesCRunTimeLibraryUsage", "false")
+
+        # VC++ 2008 needs CharacterSet set, definining _UNICODE is not enough,
+        # see http://comments.gmane.org/gmane.comp.sysutils.bakefile.devel/1145
+        if "_UNICODE" in cfg._defines.split(";"):
+            conf_el.setAttribute("CharacterSet", "1")
+
         return conf_el
 
     def buildIDLToolElement(self, doc, cfg, t):
