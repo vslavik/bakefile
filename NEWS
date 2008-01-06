@@ -1,4 +1,7 @@
 
+Version 0.2.3
+--------------
+
 - removed support for C++ Builder X, it no longer exists and the format
   wasn't used by anyone in practice
 - significantly improved Xcode format (Kevin Ollivier)
@@ -38,6 +41,7 @@
   configurations they aren't built in (#181, John Ralls)
 - msvs2005prj: fixed runtime library selection
 - SRCDIR variable now uses Unix and not native paths like other variables
+- fixes to win32 install target support (Francesco Montorsi)
 
 
 Version 0.2.2

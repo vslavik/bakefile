@@ -246,17 +246,25 @@
                  (because we need to preserve directory tree and thus handle the 
                  directories eventually specified as part of __files paths) and a 
                  'copy' command for each file in __files list...
+                 
+                 WARNING: we must be careful NOT to end any of these commands with the
+                          Windows path separator \ otherwise some MAKE programs will
+                          interpret them as continuation characters joining the next
+                          line of the makefile resulting in an error!
+                          This is accomplished through dirName() function.
             -->
             <if cond="TOOLSET in ['win32','os2','dos']">
                 if not exist $(__dstdir) mkdir $(__dstdir)
-                $('\n'.join([('if not exist %s\%s mkdir %s\%s' % (__dstdir, x, __dstdir, x)) \
-                  for x in getDirsFromList(__files).split()]))
-                $('\n'.join(                                        \
-                      [('copy %s %s' %                              \
-                          (__srcdir + '\\' + x,                     \
-                           __dstdir + '\\' + dirName(x)             \
-                          ))                                        \
-                       for x in __files.split()]                    \
+                $('\n'.join(                                                                 \
+                            [('if not exist %s\%s mkdir %s\%s' % (__dstdir, x, __dstdir, x)) \
+                             for x in getDirsFromList(__files).split()]                      \
+                            ))
+                $('\n'.join(                                                                 \
+                      [('copy %s %s' %                                                       \
+                          (normPath(joinPaths(__srcdir, x)),                                 \
+                           normPath(joinPaths(__dstdir, dirName(x)))                         \
+                          ))                                                                 \
+                       for x in __files.split()]                                             \
                  ))
             </if>
         </set>

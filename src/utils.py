@@ -241,6 +241,22 @@ def nativePaths(filenames):
                           'FILENAMES',
                           caller='nativePaths')
 
+def currentosPaths(filenames):
+    """
+       Translates filenames from the Unix-style format (which is also the
+       Bakefile-style!) to the format for the OS running at bake-time.
+       This utility should be used in all functions which perform some kind of
+       tests on files/directories at bake-time.
+    """
+    nativeSep = mk.vars['DIRSEP']
+    if nativeSep == os.sep:
+        return filenames
+    else:
+        return substitute(filenames,
+                          lambda x: x.replace(nativeSep, os.sep),
+                          'FILENAMES',
+                          caller='currentosPaths')
+
 def findSources(filenames):
     """Adds source filename prefix to files."""
     return substitute(filenames,
@@ -661,6 +677,22 @@ def safeSplit(str):
             bracketNestLevel -= 1
     return lst
 
+def getOutputFileAbsPath():
+    """ Returns the absolute path of the output file using the os.sep
+        for currently-running OS """
+    outputFile = mk.evalExpr(config.output_file, use_options=0)
+    finalmakefile = os.path.abspath(
+                os.path.split(currentosPaths(outputFile))[0])
+    return finalmakefile
+
+def getSrcDirAbsPath():
+    """ Returns the output file's absolute path concatenated with SRCDIR
+        using the os.sep for currently-running OS """
+    finalmakefile = getOutputFileAbsPath()
+
+    # convert SRCDIR_RAW to the path separator for the currently running OS:
+    srcdir = currentosPaths(mk.vars['SRCDIR_RAW'])
+    return os.path.join(finalmakefile, srcdir)
 
 def fileList(pathlist):
     """
@@ -681,21 +713,16 @@ def fileList(pathlist):
             <sources>$(fileList(['../src/*.cpp', '../src/*.c']))</sources>
     """
     def __fileList(path):
-        # get the absolute path for the generated makefile
-        finalmakefile = os.path.abspath(
-                    os.path.split(config.output_file.replace('/', os.sep))[0])
+        # convert all vars to the path separator for the currently running OS:
+        srcdir = getSrcDirAbsPath()
+        path = currentosPaths(path)
 
-        # make the user path relative to SRCDIR_RAW and then absolute using
-        # the generated makefile path (unless already absolute):
-        srcdir = mk.vars['SRCDIR_RAW'].replace('/', os.sep)
-
-        # we need OS' native separator for glob():
-        p = path.replace('/', os.sep)
-        p = os.path.join(finalmakefile, srcdir, p)
+        # the absolute path where we need to search files:
+        p = os.path.join(srcdir, path)
 
         # NB: do not normalize the path since this could interfere with the
         #     prefix detection & removal later...
-        prefix = os.path.join(finalmakefile, srcdir) + os.sep
+        prefix = srcdir + os.sep
         if p.startswith(prefix):
             srcdirPrefix = len(prefix)
         else:
@@ -709,6 +736,10 @@ def fileList(pathlist):
         # remove prefix, normalize the filepath and use / for separator:
         files = [os.path.normpath(f[srcdirPrefix:]).replace(os.sep, '/')
                  for f in files]
+                 
+        # sort the files so that fileList() always give the same
+        # orderered list for a given set of files regardless of the OS
+        # (and of the specific glob() implementation) where it's running under
         files.sort()
 
         if config.debug:
@@ -744,20 +775,15 @@ def getDirsFromList(filedirlist):
         This mostly makes sense only for internal use of Bakefile.
     """
     def __isDir(path):
-        dir = os.path.dirname(path)
+        dir = os.path.dirname(currentosPaths(path))
         if dir=='' or dir=='.':
-            return None;
-
-        # get the absolute path to the generated makefile
-        finalmakefile = os.path.abspath(
-                    os.path.split(config.output_file.replace('/', os.sep))[0])
+            return None
     
-        # get the SRCDIR in a format suitable for the currently running OS
-        srcdir = mk.vars['SRCDIR'].replace('/', os.sep)
-    
-        # we need OS' native separator for os.path.isdir:
-        tocheck = os.path.join(finalmakefile, srcdir, dir.replace('/', os.sep))
+        # get the absolute SRCDIR in a format suitable for the currently running OS
+        srcdir = getSrcDirAbsPath()
         
+        # all variables used here have the right path separator for currently running OS:
+        tocheck = os.path.join(srcdir, dir)
         if os.path.isdir(tocheck):
             return dir
         return None
@@ -773,4 +799,21 @@ def dirName(path):
     """ Like os.path.dirname but uses DIRSEP and not os.sep """
     sep = mk.vars['DIRSEP']
     path = os.path.dirname(path.replace(sep, os.sep))
+    return path.replace(os.sep, sep)
+    
+def joinPaths(path1, path2, path3='', path4=''):
+    """ Mostly like os.path.join but uses DIRSEP and not os.sep """
+    
+    def _realjoin(path1, path2):
+        sep = mk.vars['DIRSEP']
+        if path1[-2:-1]!=sep:
+            return path1 + sep + path2
+        return path1 + path2
+
+    return _realjoin(_realjoin(_realjoin(path1, path2), path3), path4)
+
+def normPath(path):
+    """ Like os.path.normpath but uses DIRSEP and not os.sep """
+    sep = mk.vars['DIRSEP']
+    path = os.path.normpath(path.replace(sep, os.sep))
     return path.replace(os.sep, sep)
