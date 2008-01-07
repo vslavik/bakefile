@@ -53,6 +53,7 @@
     <del-formats files="definetag/*.bkl">msevc4prj</del-formats>
     <del-formats files="defineglobaltag/*.bkl">msevc4prj,dmars</del-formats>
     <del-formats files="variants/*.bkl">msevc4prj,dmars</del-formats>
+    <del-formats files="filelist/*.bkl">msevc4prj</del-formats>
 
     <!-- MS IDEs don't support conditional dependencies: -->
     <del-formats files="condlinking/*.bkl">

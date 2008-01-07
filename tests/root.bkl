@@ -14,17 +14,30 @@
 
     <subproject id="cond" template="sub"/>
     <subproject id="cond_install" template="sub"/>
+    <subproject id="condlinking" template="sub"/>
+    <subproject id="condvar_transitivity" template="sub"/>
     <subproject id="debug" template="sub"/>
+    <subproject id="definetag" template="sub"/>
+    <subproject id="defineglobaltag" template="sub"/>
     <subproject id="dll" template="sub"/>
+    <subproject id="envvar" template="sub"/>
+    <subproject id="echo" template="sub"/>
+    <subproject id="features" template="sub"/>
+    <subproject id="filelist" template="sub"/>
     <subproject id="gettext" template="sub"/>
+    <subproject id="headers" template="sub"/>
     <subproject id="hello" template="sub"/>
     <subproject id="includeonce" template="sub"/>
+    <subproject id="isdefined" template="sub"/>
     <subproject id="library" template="sub"/>
     <subproject id="module" template="sub"/>
     <subproject id="paths" template="sub"/>
     <subproject id="pkgconfig" template="sub"/>
     <subproject id="pch" template="sub"/>
     <subproject id="regressions" template="sub"/>
+    <subproject id="subproject" template="sub"/>
+    <subproject id="variants" template="sub"/>
+	
 
     <if cond="FORMAT=='dmars'">
         <!-- dmars doesn't support conditions -->

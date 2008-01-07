@@ -9,5 +9,6 @@ $Id$
         <app-type>gui</app-type>
         <sources>../hello/hello.cpp</sources>
         <win32-res>../hello/hello.rc</win32-res>
+		<define>BUILD_AS_GUI</define>
     </exe>
 </makefile>

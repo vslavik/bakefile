@@ -7,7 +7,7 @@
     <echo>SRCDIR is $(SRCDIR)</echo>
     
     <exe id="filelist">
-        <app-type>gui</app-type>
+        <app-type>console</app-type>
         <sources>$(fileList('*.c'))</sources>
     </exe>
 
