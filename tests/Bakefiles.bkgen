@@ -9,28 +9,29 @@
         cond_install/cond_install.bkl
         condlinking/condlinking.bkl
         condvar_transitivity/condvar_transitivity.bkl
+        datafiles/datafiles.bkl
         debug/debug.bkl
+        definetag/definetag.bkl
+        defineglobaltag/defineglobaltag.bkl
         dll/dll.bkl
+        echo/echo.bkl
         envvar/envvar.bkl
         features/features.bkl
+        filelist/filelist.bkl
         gettext/gettext.bkl
         headers/headers.bkl
         hello/hello.bkl
         includeonce/includeonce.bkl
+        isdefined/isdefined.bkl
         library/library.bkl
         module/module.bkl
         paths/paths.bkl
         pch/pch.bkl
+        pkgconfig/pkgconfig.bkl
         regressions/regressions.bkl
         regressions/*/*.bkl
-        datafiles/datafiles.bkl
-        pkgconfig/pkgconfig.bkl
-        filelist/filelist.bkl
-        echo/echo.bkl
-        isdefined/isdefined.bkl
         subproject/subproject.bkl
-        definetag/definetag.bkl
-        defineglobaltag/defineglobaltag.bkl
+        subproject/subdir/*.bkl
         variants/variants.bkl
     </input>
 
