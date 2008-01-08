@@ -342,3 +342,18 @@ def write():
         changes_f.close()
 
     return 1
+
+
+def Mkdir(dirname):
+    """Creates output directory if it doesn't exist yet. This should only
+       be used if the output is self-contained directory, not for creating
+       output directory for file-based outputs if it doesn't exist. For
+       example, Xcode projects are directories (aka bundles) and so they
+       have to be created with Mkdir."""
+    # FIXME: this needs to be recorded in .bakefile_gen.state
+    #        (see http://www.bakefile.org/ticket/171)
+    if config.dry_run:
+        return
+
+    if not os.path.isdir(dirname):
+        os.mkdir(dirname)

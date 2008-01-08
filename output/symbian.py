@@ -27,7 +27,7 @@
 #  Symbian development files generator script
 #
 
-import fnmatch, re, os, os.path
+import fnmatch, re, os.path
 import errno, errors, utils
 from utils import *
 
@@ -323,11 +323,7 @@ class SymbianGenerator:
         for s in selected_projects:
             project_name = s._targetname
             dir_name = os.path.join(self.dirname, project_name)
-            try:
-                os.mkdir(dir_name)
-            except OSError, e:
-                # Ignore directory exists error
-                if e.errno <> errno.EEXIST: raise
+            writer.Mkdir(dir_name)
             self.genMMP(s, project_name )
             project = 'PRJ_MMPFILES\n'
             if build != "default":

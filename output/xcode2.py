@@ -307,8 +307,7 @@ class ProjectGeneratorXcode2:
         pbxprojData += serializeDictionary(pbxprojDict,0)
 
         #TODO: Check if FILE (foo.xcode) is a directory and make it if necessary
-        if not os.path.isdir(self.xcodeProjectDirname):
-            os.mkdir(self.xcodeProjectDirname)
+        writer.Mkdir(self.xcodeProjectDirname)
         writer.writeFile(self.pbxprojFilename, pbxprojData)
 
     def idForDirectoryGroup(self, dirname):
