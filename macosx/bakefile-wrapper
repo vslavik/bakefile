@@ -4,7 +4,7 @@
 #
 
 prefix="@prefix@"
-python=python
+python="/usr/bin/python"
 program="`basename $0`"
 pyver=`"$python" -c "from distutils import sysconfig; print sysconfig.get_python_version()"`
 
