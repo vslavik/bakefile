@@ -42,6 +42,7 @@ Version 0.2.3
 - msvs2005prj: fixed runtime library selection
 - SRCDIR variable now uses Unix and not native paths like other variables
 - fixes to win32 install target support (Francesco Montorsi)
+- mingw: ensure win32 shell is used even if sh.exe is on PATH
 
 
 Version 0.2.2
