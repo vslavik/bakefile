@@ -375,12 +375,12 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                 self.process = subprocess.Popen(cmd)
 
         def poll(self):
-                if self.pretend:
+                if self.pretend or self.process == None:
                     return True
                 return self.process.poll() != None
         
         def wait(self):
-                if self.pretend:
+                if self.pretend or self.process == None:
                     return True
                 return self.process.wait() != None
         
@@ -389,6 +389,9 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                 return 0
             try:
                 try:
+                    if self.process == None:
+                        return 0
+
                     if self.process.returncode == 0:
                         dependencies.load(self.tempDeps)
                         dependencies.addCmdLine(os.path.abspath(self.filename), self.format,
@@ -443,22 +446,24 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                         childProcessesCnt -= 1
                         childProcesses[p] = None
                         modifiedFiles += pr.finish()
-        
-        except Exception, e:
+
+        # NB: using "finally" instead of "except" so that we can easily handle
+        #     both Exception and KeyboardInterrupt (which is not Exception)
+        #     and also to preserve exception stack trace
+        finally:
             left = [p for p in childProcesses if p != None]
             if len(left) > 0:
                 print '[bakefile_gen] waiting for remaining jobs to finish after error...'
                 for p in left:
-                    if p != None:
+                    try:
                         p.wait()
-                        try:
-                            modifiedFiles += p.finish()
-                        except Exception:
-                            pass # ignore further errors
-            raise e
+                        modifiedFiles += p.finish()
+                    except Exception, e:
+                        pass # ignore further errors
+
 
     finally:
-        shutil.rmtree(tempXmlCacheDir)
+        shutil.rmtree(tempXmlCacheDir, ignore_errors=True)
         dependencies.save('.bakefile_gen.state')
 
     if not quiet:
