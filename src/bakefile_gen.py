@@ -385,10 +385,12 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                 return self.process.wait() != None
         
         def finish(self):
-            if self.pretend:
-                return 0
             try:
                 try:
+                    # NB: "finally" section below is still called after these
+                    #     return statements
+                    if self.pretend:
+                        return 0
                     if self.process == None:
                         return 0
 
