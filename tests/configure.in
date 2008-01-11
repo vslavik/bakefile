@@ -36,26 +36,40 @@ DO_INSTALL=1
 
 AC_BAKEFILE([m4_include(autoconf_inc.m4)])
 
+
+#
+# NOTE: when updating the following list remember to update also
+#       the list in the root.bkl and Bakefile.bkgen files.
+#
 AC_OUTPUT([
            Makefile
            cond/Makefile
            cond_install/Makefile
+           condlinking/Makefile
+           condvar_transitivity/Makefile
            datafiles/Makefile
            debug/Makefile
            definetag/Makefile
+           defineglobaltag/Makefile
            dll/Makefile
            echo/Makefile
+           envvar/Makefile
+           features/Makefile
            filelist/Makefile
            gettext/Makefile
            headers/Makefile
            hello/Makefile
            includeonce/Makefile
+           isdefined/Makefile
            library/Makefile
            module/Makefile
            paths/Makefile
+           pkgconfig/Makefile
+           pkgconfig/test.pc
            pch/Makefile
            regressions/Makefile
            subproject/Makefile
-           pkgconfig/Makefile
-           pkgconfig/test.pc
+           subproject/subdir/Makefile
+           variants/Makefile
          ])
+

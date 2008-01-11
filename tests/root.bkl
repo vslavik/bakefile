@@ -12,6 +12,11 @@
         <installable>yes</installable>
     </template>
 
+    <!-- 
+         NOTE: when updating the following list remember to update
+         also the list in Bakefiles.bkgen and configure.in files.
+    -->
+    
     <subproject id="cond" template="sub"/>
     <subproject id="cond_install" template="sub"/>
     <subproject id="condlinking" template="sub"/>
@@ -46,5 +51,7 @@
     <if cond="FORMAT!='dmars'">
         <subproject id="datafiles" template="sub" cond="DATAFILES=='1'"/>
     </if>
+    
+    
 
 </makefile>

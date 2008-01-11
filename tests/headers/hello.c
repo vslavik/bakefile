@@ -17,14 +17,20 @@ int main()
 // target will fail!)
 #ifdef MAKING_THE_DLL
 
-#    if defined(WIN32) && (defined(_MSC_VER) || defined(__BORLANDC__) || defined(__GNUC__) || defined(__WATCOMC__))
+#  if defined(WIN32)
+#    if (defined(_MSC_VER) || defined(__BORLANDC__) || defined(__GNUC__) || defined(__WATCOMC__))
 #        define EXPORT __declspec(dllexport)
 #        define IMPORT __declspec(dllimport)
 #    else /* compiler doesn't support __declspec() */
 #        define EXPORT
 #        define IMPORT
-#        error The import library won't be created
+#        error The import library won't be created and the 'install' target will fail
 #    endif
+#  else
+   /* in linux typically the compiler (GCC) will export everything by default */
+#    define EXPORT
+#    define IMPORT
+#  endif
 
 void EXPORT doReallyNothing()
 {

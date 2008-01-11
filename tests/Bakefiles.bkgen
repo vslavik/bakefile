@@ -3,6 +3,10 @@
 
 <bakefile-gen xmlns="http://www.bakefile.org/schema/bakefile-gen">
 
+    <!-- 
+       NOTE: when updating the following list remember to update
+             also the list in root.bkl and configure.in files.
+    -->
     <input>
         root.bkl
         cond/hello.bkl
