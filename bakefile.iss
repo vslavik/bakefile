@@ -49,6 +49,7 @@ Source: bakefile_gen.exe; DestDir: {app}; Components: base
 Source: src\*.py; DestDir: {app}\src; Components: base
 Source: src\*.pyd; DestDir: {app}\src; Components: base
 Source: src\empy\*; DestDir: {app}\src\empy; Flags: recursesubdirs; Components: base
+Source: autoconf\*; DestDir: {app}\autoconf; Flags: recursesubdirs; Components: base
 Source: rules\*; DestDir: {app}\rules; Flags: recursesubdirs; Components: base
 Source: presets\*; DestDir: {app}\presets; Flags: recursesubdirs; Components: base
 Source: output\*; DestDir: {app}\output; Flags: recursesubdirs; Components: base
