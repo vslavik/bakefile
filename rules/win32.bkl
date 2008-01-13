@@ -51,13 +51,18 @@
                    should provide valid replacements for PREFIX and EXEC_PREFIX
                    options
         -->
+		
+		<set var="PREFIX_DEFAULT" overwrite="0">C:\opt</set>
+		<set var="EXEC_PREFIX_DEFAULT" overwrite="0">C:\opt\bin</set>
         
         <option name="PREFIX" category="path">
+			<default-value>$(PREFIX_DEFAULT)</default-value>
             <description>
                 The common installation prefix for header, data and library files
             </description>
         </option>
         <option name="EXEC_PREFIX" category="path">
+			<default-value>$(EXEC_PREFIX_DEFAULT)</default-value>
             <description>
                 The common installation prefix for binary and DLL files
             </description>
@@ -76,7 +81,7 @@
     
         <set var="DLLDIR" eval="0">$(EXEC_PREFIX)</set>
         <set var="BINDIR" eval="0">$(EXEC_PREFIX)</set>
-    </if>
+    </if> <!-- FORMAT_HAS_MAKE_INSTALL==1 -->
     
 	
     <set var="OBJEXT" overwrite="0">.obj</set>

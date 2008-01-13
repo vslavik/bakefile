@@ -53,5 +53,12 @@
     </if>
     
     
+    <if cond="FORMAT_HAS_MAKE_INSTALL=='1' and FORMAT in ['msvc','mingw','borland','watcom']">
+        <!-- to test win32 [un]installation support, we will make the PREFIX and
+             EXEC_PREFIX options default to a dummy value. -->
+        <set var="PREFIX_DEFAULT">C:\TestPrefix</set>
+        <set var="EXEC_PREFIX_DEFAULT">C:\TestPrefix</set>
+    </if>
+
 
 </makefile>
