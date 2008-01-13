@@ -142,7 +142,7 @@ EXTRA_DIST = \
 	macosx/scripts/preflight \
     makefile.vc
 
-install-data-hook:
+install-data-hook: install-delete-obsolete-files
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	ln -sf $(codedir)/bakefile.py $(DESTDIR)$(bindir)/bakefile
 	ln -sf $(codedir)/bakefile_gen.py $(DESTDIR)$(bindir)/bakefile_gen
@@ -154,11 +154,16 @@ install-data-hook:
 	chmod +x $(DESTDIR)$(codedir)/bakefile.py
 	chmod +x $(DESTDIR)$(codedir)/bakefile_gen.py
 
+# this target deletes obsolete files from older versions; this is to prevent
+# conflicts when the wrong file could be picked:
+install-delete-obsolete-files:
+	@rm -rf $(DESTDIR)$(rulesdir)/datafiles.bkl $(DESTDIR)$(rulesdir)/gettext
+
 dist-hook:
 	rm -rf `find $(distdir) -name .svn`
 
 ACLOCAL_AMFLAGS = -I admin
 
-.PHONY: doc
+.PHONY: doc install-delete-obsolete-files
 doc:
 	( cd doc ; $(MAKE) )
