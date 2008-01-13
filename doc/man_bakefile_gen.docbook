@@ -1,0 +1,254 @@
+  <refentry id="man.bakefile_gen">
+    <refmeta>
+      <refentrytitle>bakefile_gen</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </refmeta>
+    <refnamediv>
+      <refname>bakefile_gen</refname>
+      <refpurpose>batch bakefile generation</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>bakefile_gen</command>
+        <arg choice="opt" rep="repeat" id="bakefile_gen.command.descfile">
+          <option>-d</option><replaceable
+            class="parameter">DESCFILE</replaceable>
+        </arg>
+        <arg choice="opt" rep="repeat" id="bakefile_gen.command.formats">
+          <option>-F</option><replaceable
+            class="parameter">FORMATS</replaceable>
+        </arg>
+        <arg choice="opt" rep="repeat" id="bakefile_gen.command.variable">
+          <option>-D</option><replaceable
+            class="parameter">VAR</replaceable>=<replaceable class="parameter">VALUE</replaceable>
+        </arg>
+        <arg choice="opt">
+          <option>-c</option>
+        </arg>
+        <arg choice="opt">
+          <option>--list-files</option>
+        </arg>
+        <arg choice="opt">
+          <option>-j</option>
+        </arg>
+        <arg choice="opt">
+          <option>-p</option>
+        </arg>
+        <arg choice="opt">
+          <option>--dry-run</option>
+        </arg>        
+        <arg choice="opt">
+          <option>-k</option>
+        </arg>
+        <arg choice="opt">
+          <option>-n</option>
+        </arg>
+        <arg choice="opt">
+          <option>-v</option>
+        </arg>
+        <arg choice="opt">
+          <option>-V</option>
+        </arg>
+    </cmdsynopsis>
+    </refsynopsisdiv>
+
+    <refsect1>
+      <title>Description</title>
+      <para>
+        Calls <command>bakefile</command> with flags listed in
+        description file (<filename>Bakefiles.bkgen</filename> or file
+        specified using the --desc option).
+      </para>
+    </refsect1>
+
+    <refsect1>
+      <title>Command Line Options</title>
+      <para>
+        <variablelist>
+
+          <varlistentry>
+            <term>
+              <option>--desc</option>=<replaceable
+              class="parameter">DESCFILE</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Uses given description file instead of 
+                <filename>Bakefiles.bkgen</filename>.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--formats</option>=<replaceable
+              class="parameter">FORMATS</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Calls Bakefile to generate only makefiles for specified
+                formats.
+                <replaceable class="parameter">FORMATS</replaceable>
+                is comma-separed list of format names. Formats not included
+                in the list are ignored even if they are listed
+                in &lt;add-formats&gt; tags in the description file.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--bakefiles</option>=<replaceable
+              class="parameter">BAKEFILES</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Calls Bakefile to generate makefiles only from bakefiles 
+                that match any wildcard in comma-separed list of wildcards
+                in <replaceable class="parameter">BAKEFILES</replaceable>.
+                Input files specified using the
+                &lt;input&gt; tag in the description file that don't match
+                any of the wildcards are not processed.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-D</option><replaceable
+            class="parameter">VAR</replaceable>=<replaceable class="parameter">VALUE</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Pass variable definition to Bakefile, overriding any
+                definition in description file or the input bakefile.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-c</option>, <option>--clean</option>
+            </term>
+            <listitem>
+              <para>
+                Removes all output files instead of generating them.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--list-files</option>
+            </term>
+            <listitem>
+              <para>
+                Prints the list of output files that would be generated
+                instead of creating them. This command respects the
+                constraints specified using the <option>--format</option>
+                and <option>--bakefile</option> options. It can be used
+                for example to create the list of all makefiles for given
+                format.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-j</option>, <option>--jobs</option>
+            </term>
+            <listitem>
+              <para>
+                Number of jobs to run simultaneously. Default is the number of
+                CPUs.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-p</option>, <option>--pretend</option>
+            </term>
+            <listitem>
+              <para>
+                Don't do anything, only display actions that would be performed.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry>
+            <term>
+              <option>--dry-run</option>
+            </term>
+            <listitem>
+              <para>
+                Process the bakefile normally, but instead of creating or
+                modifying files, just print which files would be changed
+                without actually modifying them.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-k</option>, <option>--keep-going</option>
+            </term>
+            <listitem>
+              <para>
+                Do not stop when a target fails.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-B</option>, <option>--always-make</option>
+            </term>
+            <listitem>
+              <para>
+                Pretend that all makefiles are out of date and regenerate all
+                of them. <option>-f</option> and <option>-b</option> options
+                are respected.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-v</option>, <option>--verbose</option>
+            </term>
+            <listitem>
+              <para>
+                Display detailed information.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-V</option>, <option>--very-verbose</option>
+            </term>
+            <listitem>
+              <para>
+                Display even more detailed information.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--help</option>
+            </term>
+            <listitem>
+              <para>
+                Display usage information for <command>bakefile_gen</command>
+              </para>
+            </listitem>
+          </varlistentry>
+
+        </variablelist>
+      </para>
+    </refsect1>
+
+  </refentry>

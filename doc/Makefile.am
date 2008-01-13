@@ -18,7 +18,10 @@ SUBDBFILES=$(srcdir)/commands.docbook \
 		   $(srcdir)/pkgconfig.docbook \
 		   $(srcdir)/faq.docbook \
 		   $(srcdir)/intro.docbook \
-		   $(srcdir)/manpage.docbook \
+		   $(srcdir)/manpages.docbook \
+		   $(srcdir)/man_bakefile.docbook \
+		   $(srcdir)/man_bakefile_gen.docbook \
+		   $(srcdir)/man_bakefilize.docbook \
 		   $(srcdir)/targets.docbook \
 		   $(srcdir)/tutorial.docbook \
     	   $(srcdir)/variables.docbook \

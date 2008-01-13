@@ -1,0 +1,125 @@
+  <refentry id="man.bakefilize">
+    <refmeta>
+      <refentrytitle>bakefilize</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </refmeta>
+    <refnamediv>
+      <refname>bakefilize</refname>
+      <refpurpose>prepare Bakefile project for use with Autoconf</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>bakefile</command>
+        <arg choice="opt">
+          <option>--copy</option>
+        </arg>
+        <arg choice="opt">
+          <option>--dry-run</option>
+        </arg>
+        <arg choice="opt">
+          <option>--force</option>
+        </arg>
+        <arg choice="opt">
+          <option>--verbose</option>
+        </arg>
+        <arg choice="opt">
+          <option>--help</option>
+        </arg>
+    </cmdsynopsis>
+    </refsynopsisdiv>
+
+    <refsect1>
+      <title>Description</title>
+      <para>
+      For the "autoconf" format, Bakefile creates Makefile.in
+      files that depend on the availability of common pieces
+      of a GNU build system. (<filename>config.guess</filename>, 
+    <filename>install-sh</filename>, etc.) These tools
+    are part of Automake, which can copy these files
+    into a project's directory during processing.
+    <command>bakefilize</command> effectively replaces
+    the <command>automake --add-missing</command> feature.
+    </para>
+
+    <para>
+      It is standard practice in Autoconf-based projects to
+      provide a "bootstrap" script (commonly called
+    either <command>bootstrap</command> or
+    <command>autogen.sh</command>) to run commands
+    like <command>autoconf</command> with the proper
+    flags and in the proper order. You should run
+    <command>bakefilize</command> in that script, at
+    some point before the <command>configure</command>
+    script runs.
+    </para>
+    </refsect1>
+
+    <refsect1>
+      <title>Command Line Options</title>
+      <para>
+        <variablelist>
+
+          <varlistentry>
+            <term>
+              <option>-c</option>, <option>--copy</option>
+            </term>
+            <listitem>
+              <para>
+                Copy the files from the Automake directory, rather than
+        the default behavior of making symbolic links.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-n</option>, <option>--dry-run</option>
+            </term>
+            <listitem>
+              <para>
+                Only show the commands that would be executed.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-f</option>, <option>--force</option>
+            </term>
+            <listitem>
+              <para>
+                Replace all existing files, instead of only adding
+        missing files.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-v</option>, <option>--verbose</option>
+            </term>
+            <listitem>
+              <para>
+                Show debugging messages.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>--help</option>
+            </term>
+            <listitem>
+              <para>
+                Display usage information for
+        <command>bakefilize</command>
+              </para>
+            </listitem>
+          </varlistentry>
+          
+        </variablelist>
+      </para>
+    </refsect1>
+    
+  </refentry>

@@ -1,0 +1,7 @@
+<reference>
+  <title>Running Bakefile</title>
+  
+  <xi:include href="man_bakefile.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="man_bakefile_gen.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  <xi:include href="man_bakefilize.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+</reference>
