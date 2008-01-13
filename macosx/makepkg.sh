@@ -11,7 +11,8 @@ PYTHON=python
 
 PRODUCT=Bakefile
 VERSION="0.2.3"
-PKGNAME="bakefile-$VERSION"
+PKGNAME="Bakefile"
+DMGNAME="bakefile-$VERSION"
 
 mkdir -p $INSTALLROOT/usr
 cd $BUILDROOT
@@ -82,19 +83,19 @@ $PYTHON $PROGDIR/buildpkg.py \
 	--InstallOnly="YES" \
 	$INSTALLROOT
 
-mkdir -p $PKGNAME
-rm -rf $PKGNAME/*
+mkdir -p $DMGNAME
+rm -rf $DMGNAME/*
 
-mv $PKGNAME.pkg $PKGNAME
+mv $PKGNAME.pkg $DMGNAME
 
-DMG_NAME=$PKGNAME.dmg
+DMG_NAME=$DMGNAME.dmg
 if [ -f $DMG_NAME ]; then
    rm $DMG_NAME
 fi
      
-hdiutil create -srcfolder $PKGNAME -volname "$PKGNAME" -imagekey zlib-level=9 $DMG_NAME
+hdiutil create -srcfolder $DMGNAME -volname "$DMGNAME" -imagekey zlib-level=9 $DMG_NAME
 
 rm -rf $BUILDROOT
-rm -rf $PKGNAME
+rm -rf $DMGNAME
 
 # end script
