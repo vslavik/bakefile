@@ -265,18 +265,60 @@
               <row id="tags.dll.version" xreflabel="version">
                 <entry role="tagname">version</entry>
                 <entry>
+                  Portable platform-independent shared library version.
+                  <emphasis>Not yet implemented.</emphasis>
                 </entry>
               </row>
               
               <row id="tags.dll.so_version" xreflabel="so_version">
                 <entry role="tagname">so_version</entry>
                 <entry>
+                  <para>
+                  The value consists of three numbers separated by dots.
+                  Library name plus the first component of the version
+                  together form <emphasis>soname</emphasis> (e.g.
+                  <literal>libfoo.so.1</literal> on Linux) which is used
+                  for runtime resolution of dependencies. Libraries with
+                  different <emphasis>sonames</emphasis> are binary
+                  incompatible and cannot be used interchangeable. On the
+                  other hand, the remaining two components contain information
+                  about minor versions that don't change backward
+                  compatibility and aren't used by runtime linker.
+                  </para>
+                  <para>
+                  Note that this version number is strictly for runtime
+                  linker's use and for maintaining binary compatiblity, it
+                  should <emphasis>not</emphasis> be version number of your
+                  library.
+                  </para>
+                  <para>
+                  This tag is only implemented in the
+                  <literal>autoconf</literal> format.
+                  </para>
                 </entry>
               </row>
               
               <row id="tags.dll.mac_version" xreflabel="mac_version">
                 <entry role="tagname">mac_version</entry>
                 <entry>
+                  <para>
+                    This tag is used to specify shared library version for
+                    runtime linker on Darwin platforms. Similarly to
+                    <xref linkend="tags.dll.so_version"/>, it expects three
+                    numbers separated by dots, but their interpretation is
+                    different. The value is passed as-is to compilers
+                    <literal>-current_version</literal> argument and the
+                    first two components are passed to
+                    <literal>--compatibility_version</literal>. See
+                    See <ulink
+                    url="http://developer.apple.com/documentation/Darwin/Reference/ManPages/man1/ld.1.html">Apple's
+                    ld documentation</ulink> for details.
+                  </para>
+                  <para>
+                  This tag is only implemented in the
+                  <literal>autoconf</literal> and <literal>xcode2</literal>
+                  formats.
+                  </para>
                 </entry>
               </row>
               
