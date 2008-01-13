@@ -27,9 +27,6 @@ WindowResizable=false
 ShowTasksTreeLines=false
 DisableProgramGroupPage=true
 LicenseFile=COPYING
-
-
-
 SolidCompression=true
 InternalCompressLevel=ultra64
 ShowLanguageDialog=no
@@ -43,6 +40,7 @@ AppContact=http://www.bakefile.org/wiki
 UninstallDisplayName=Bakefile
 ChangesEnvironment=true
 UninstallFilesDir={app}\uninst
+
 [Files]
 Source: bakefile.exe; DestDir: {app}; Components: base
 Source: bakefile_gen.exe; DestDir: {app}; Components: base
@@ -86,6 +84,20 @@ Name: tests; Description: Tests and examples; Types: custom full
 [Messages]
 BeveledLabel=Bakefile
 
+[InstallDelete]
+; these are deprecated files from older Bakefile versions; some of
+; them are just useless junk, some (datafiles, gettext) would cause
+; conflicts and break Bakefile
+Name: {app}\rules\datafiles.bkl; Type: files
+Name: {app}\rules\gettext; Type: filesandordirs
+Name: {app}\src\bakefile.exe; Type: files
+Name: {app}\src\bakefile_gen.exe; Type: files
+Name: {app}\src\python*; Type: files
+Name: {app}\src\w9xpopen.exe; Type: files
+Name: {app}\src\lib; Type: filesandordirs
+Name: {app}\src\DLLs; Type: filesandordirs
+Name: {app}\src\py25modules; Type: filesandordirs
+
 [UninstallDelete]
 Name: {app}\src; Type: filesandordirs
 Name: {app}\output; Type: filesandordirs
@@ -93,6 +105,7 @@ Name: {app}\lib; Type: filesandordirs
 
 [Tasks]
 Name: addpath; Description: Add Bakefile to PATH environment variable; Flags: checkedonce
+
 [Code]
 // -----------------------------------------------------------------
 //                    code for changing PATH
