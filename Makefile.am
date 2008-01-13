@@ -161,6 +161,7 @@ install-delete-obsolete-files:
 
 dist-hook:
 	rm -rf `find $(distdir) -name .svn`
+	rm -rf `find $(distdir) -name '*.py[co]'`
 
 ACLOCAL_AMFLAGS = -I admin
 
