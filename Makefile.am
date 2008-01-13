@@ -139,6 +139,7 @@ EXTRA_DIST = \
 	src/bottlenecks.i \
 	src/win32scriptwrapper.c \
 	macosx/buildpkg.py macosx/makepkg.sh macosx/bakefile-wrapper \
+	macosx/scripts/preflight \
     makefile.vc
 
 install-data-hook:

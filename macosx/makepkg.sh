@@ -3,6 +3,7 @@
 OLDPWD=$PWD
 DELIVERDIR=deliver
 BAKEFILEDIR=$PWD/..
+RESOURCESDIR=$PWD/scripts
 BUILDROOT=bld-osx
 INSTALLROOT=$PWD/$BUILDROOT/distrib
 PREFIX=/usr/local
@@ -81,7 +82,7 @@ $PYTHON $PROGDIR/buildpkg.py \
 	--NeedsAuthorization="YES" \
 	--Relocatable="NO" \
 	--InstallOnly="YES" \
-	$INSTALLROOT
+	$INSTALLROOT $RESOURCESDIR
 
 mkdir -p $DMGNAME
 rm -rf $DMGNAME/*

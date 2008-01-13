@@ -1,0 +1,13 @@
+#!/bin/sh
+
+prefix=/usr/local
+
+libdir=$prefix/lib/bakefile
+rulesdir=$prefix/share/bakefile/rules
+
+# *** Upgrading from Bakefile 0.2.2 ***
+
+# remove python modules and other files that were moved to another location
+# from their old place so that we don't get conflicts:
+rm -rf $libdir/_bottlenecks.*
+rm -rf $rulesdir/datafiles.bkl $rulesdir/gettext
