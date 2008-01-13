@@ -65,9 +65,9 @@ fi
 rm -rf $bindir/bakefile
 rm -rf $bindir/bakefile_gen
 sed -e "s,@prefix@,$PREFIX,g" $BAKEFILEDIR/macosx/bakefile-wrapper >$pydir/bakefile-wrapper
-ls -l $BAKEFILEDIR/macosx/bakefile-wrapper
-ls -l $pydir/bakefile-wrapper
 chmod +x $pydir/bakefile-wrapper
+ln -s ../lib/bakefile/bakefile-wrapper $bindir/bakefile
+ln -s ../lib/bakefile/bakefile-wrapper $bindir/bakefile_gen
 
 
 # now build installer package
