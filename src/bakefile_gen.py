@@ -475,7 +475,7 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
             print '%i files modified' % modifiedFiles
 
 
-def cleanTargets(pretend=0):
+def cleanTargets(pretend=False, dryRun=False):
     try:
         dependencies.load('.bakefile_gen.state')
     except IOError: pass
@@ -508,7 +508,7 @@ def cleanTargets(pretend=0):
                     if verbose: print 'deleting %s' % o
                     if pretend:
                         print 'rm %s' % o
-                    else:
+                    elif not dryRun:
                         os.remove(o)
 
 def listOutputFiles(jobs, alwaysMakeAll=0):
@@ -601,7 +601,7 @@ def run(args):
         loadTargets(os.path.abspath(options.descfile), moreDefines)
         filterFiles(options.bakefiles, options.formats)
         if options.clean:
-            cleanTargets(pretend=options.pretend)
+            cleanTargets(pretend=options.pretend, dryRun=options.dryRun)
         elif options.list_files:
             listOutputFiles(jobs=options.jobs,
                             alwaysMakeAll=options.alwaysMakeAll)
