@@ -90,7 +90,7 @@
     <!-- this is so that mingw-make won't use sh.exe as shell, mingw format
          assumes win32 shell -->
     <fragment format="mingw">
-        SHELL := $(DOLLAR)(COMSPEC)
+        SHELL := $(COMSPEC)
     </fragment>
     
     <!-- see format_features.bkl for explanation: -->
