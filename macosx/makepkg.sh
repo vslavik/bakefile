@@ -56,7 +56,7 @@ build_with_sdk()
 }
 
 build_with_sdk "10.4u"  "10.4"  "2.3"  "ppc i386"
-build_with_sdk "10.5"   "10.5"  "2.5"  "ppc i386 ppc64 x86_64"
+build_with_sdk "10.5"   "10.5"  "2.5"  "ppc i386"
 
 if [ -n "$EXTRA_BINMODULES" ] ; then
     (cd $EXTRA_BINMODULES ; tar c .) | (cd $pydir/binmodules ; tar x)
