@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://www.bakefile.org)
 #
-#  Copyright (C) 2003-2007 Vaclav Slavik
+#  Copyright (C) 2003-2008 Vaclav Slavik
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -650,6 +650,16 @@ def handleTarget(e):
     if e.name not in rules:
         raise ReaderError(e, "unknown target type")
 
+    rule = rules[e.name]
+    if rule.pseudo and 'id' not in e.props:
+        global _pseudoTargetLastID
+        id = 'pseudotgt%i' % _pseudoTargetLastID
+        _pseudoTargetLastID += 1
+    else:
+        if 'id' not in e.props:
+            raise ReaderError(e, "target doesn't have id")
+        id = e.props['id']
+
     cond = None
     if 'cond' in e.props:
         isCond = 1
@@ -658,7 +668,7 @@ def handleTarget(e):
         typ = mk.evalCondition(condstr)
         # Condition never met, ignore the target:
         if typ == '0':
-            utils.deadTargets.append(e.props['id'])
+            utils.deadTargets.append(id)
             return
         # Condition always met:
         elif typ == '1':
@@ -672,17 +682,10 @@ def handleTarget(e):
             if cond == None:
                 raise ReaderError(e, "malformed condition: '%s'" % condstr)
         
-    rule = rules[e.name]
     tags = rule.getTagsDict()
     e = applyTemplates(e, rule.getTemplates() + extractTemplates(e, post=0),
                           extractTemplates(e, post=1))
 
-    if rule.pseudo and 'id' not in e.props:
-        global _pseudoTargetLastID
-        id = 'pseudotgt%i' % _pseudoTargetLastID
-        _pseudoTargetLastID += 1
-    else:
-        id = e.props['id']
     if id in mk.targets:
         raise ReaderError(e, "duplicate target name '%s'" % id)
 
