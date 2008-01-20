@@ -1,4 +1,7 @@
 
+- autoconf: fixes for non-default BUILDDIR
+
+
 Version 0.2.3
 --------------
 

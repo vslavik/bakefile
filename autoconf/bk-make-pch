@@ -10,6 +10,8 @@ header="${2}"
 shift
 shift
 
+builddir=`echo $outfile | sed -e 's,/\.pch/.*$,,g'`
+
 compiler=""
 headerfile=""
 
@@ -41,8 +43,8 @@ else
     else
         mkdir -p `dirname ${outfile}`
     fi
-    depsfile=".deps/`echo ${outfile} | tr '/.' '__'`.d"
-    mkdir -p .deps
+    depsfile="${builddir}/.deps/`echo ${outfile} | tr '/.' '__'`.d"
+    mkdir -p ${builddir}/.deps
     if test "x@GCC_PCH@" = "x1" ; then
         # can do this because gcc is >= 3.4:
         ${compiler} -o ${outfile} -MMD -MF "${depsfile}" "${headerfile}"

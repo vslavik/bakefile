@@ -362,7 +362,7 @@
             </if>
             
             <set var="__gcc_pch_dir">
-                .pch$(addPrefixIfNotEmpty('/', __pch_file))
+                $(BUILDDIR)/.pch$(addPrefixIfNotEmpty('/', __pch_file))
             </set>
             <set var="__gcc_pch_file">
                 $(__gcc_pch_dir)/$(__pch_header).gch
