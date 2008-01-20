@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://www.bakefile.org)
 #
-#  Copyright (C) 2003,2004 Vaclav Slavik
+#  Copyright (C) 2003,2004,2008 Vaclav Slavik
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -32,44 +32,17 @@ import os, tempfile
 # Secure temporary file creation:
 #
 
-def __mktemp_secure(prefix):
+def mktemp(prefix):
     """Uses tempfile.mkstemp() to atomically create named file, but works
        only with Python 2.3+."""
     handle, filename = tempfile.mkstemp(prefix=prefix)
     os.close(handle)
     return filename
     
-def __mktemp_insecure(prefix):
-    """Fallback version for older Python."""
-    filename = tempfile.mktemp(prefix)
-    # reduce (not eliminate!) the risk of race condition by immediately
-    # creating the file:
-    tmpf = open(filename, 'wb')
-    tmpf.close()
-    os.chmod(filename, 0600)
-    return filename
-
-def __mktempdir_secure(prefix):
+def mktempdir(prefix):
     """Uses tempfile.mkdtemp() to atomically create named directory, but works
        only with Python 2.3+."""
     return tempfile.mkdtemp(prefix=prefix)
-
-def __mktempdir_insecure(prefix):
-    """Fallback version for older Python."""
-    filename = tempfile.mktemp(prefix)
-    # reduce (not eliminate!) the risk of race condition by immediately
-    # creating the directory:
-    os.mkdir(filename, 0700)
-    return filename
-    
-
-try:
-    mktemp = tempfile.mkstemp # triggers exception if not available
-    mktemp = __mktemp_secure
-    mktempdir = __mktempdir_secure
-except AttributeError:
-    mktemp = __mktemp_insecure
-    mktempdir = __mktempdir_insecure
 
 
 #
