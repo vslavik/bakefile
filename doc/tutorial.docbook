@@ -6,7 +6,7 @@
 <chapter id="ch.tutorial">
   <title>Tutorial</title>
 
-  <section>
+  <section id="sec.helloworld">
     <title>Hello, world</title>
 
     <para>

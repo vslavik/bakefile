@@ -3,10 +3,10 @@
     "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <!-- $Id$ -->
 
-<chapter>
+<chapter id="ch.faq">
   <title>Frequently encountered issues</title>
 
-  <section>
+  <section id="sec.faq1">
     <title>FIXME</title>
 
     <para>

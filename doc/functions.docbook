@@ -6,7 +6,7 @@
 <chapter id="ch.functions">
   <title>Python functions</title>
 
-    <section id="intro">
+    <section id="sec.intro">
         <title>Introduction</title>
 
         <para>
@@ -23,7 +23,7 @@
         </para>
     </section>
 
-    <section>
+    <section id="sec.pyfn.howto">
         <title>How to use a Python function in a bakefile</title>
         <para>
             Python instructions and thus also Python calls to functions, can
@@ -42,7 +42,7 @@
 
 
 
-    <section>
+    <section id="sec.py.fn">
         <title>Python functions</title>
         <para>
             The following Python functions are defined:

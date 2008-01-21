@@ -3,7 +3,7 @@
     "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <!-- $Id$ -->
 
-<reference>
+<reference id="ref.running.bkl">
   <title>Running Bakefile</title>
   
   <xi:include href="man_bakefile.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>

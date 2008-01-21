@@ -3,7 +3,7 @@
     "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <!-- $Id$ -->
 
-<chapter>
+<chapter id="ch.intro">
   <title>Introduction</title>
 
   <para>
@@ -11,7 +11,7 @@
     <!-- FEATURES LIST -->
   </para>
 
-  <section>
+  <section id="sec.flow">
     <title>Flow</title>
     <para>
       FIXME: XML makefile -> ruleset -> variables expansion ->

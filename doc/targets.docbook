@@ -528,7 +528,7 @@
 
 
     
-	<section>
+	<section id="sec.commontags">
 		<title>Common tags</title>
 		<para>
 			These are tags you can use with any of the above target types.

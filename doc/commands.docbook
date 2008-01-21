@@ -17,7 +17,7 @@
     </para>
 
 
-    <section>
+    <section id="sec.makefile.cmds">
       <title>Makefile Commands</title>
 
     
@@ -806,7 +806,7 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
     </section>
     
     
-    <section>
+    <section id="sec.extending.bkl">
       <title>Commands for Extending Bakefile</title>
 
       

@@ -10,14 +10,14 @@
     summary of variables that are available for makefile writers.
   </para>
 
-  <section>
+  <section id="sec.noformat.vars">
     <title>Format independent variables</title>
 
     <!-- =============================================================== -->
     <!--                   Changing Bakefile behaviour                   -->
     <!-- =============================================================== -->
 
-    <section>
+    <section id="sec.change.bkl.behavior">
       <title>Changing Bakefile behaviour</title>
       <para>
         These variables are meant to be changed using <literal>-D</literal>
@@ -110,7 +110,7 @@
     <!--                        Directories                              -->
     <!-- =============================================================== -->
 
-    <section>
+    <section id="sec.dirs">
       <title>Directories</title>
 
       <para>
@@ -170,7 +170,7 @@
 
       </para>
 
-      <section>
+      <section id="sec.install.dirs">
         <title>Installation Directories</title>
 
         <para>
@@ -311,7 +311,7 @@
     <!--                      Format feature tests                       -->
     <!-- =============================================================== -->
 
-    <section>
+    <section id="sec.format.features">
       <title>Format features</title>
 
       <para>
@@ -402,7 +402,7 @@
     <!--                        Miscellaneous                            -->
     <!-- =============================================================== -->
 
-    <section>
+    <section id="sec.misc.vars">
       <title>Miscellaneous</title>
 
       <para>
@@ -550,7 +550,7 @@
 
   
   
-  <section>
+  <section id="sec.make.vars">
     <title>Standard makefile variables</title>
     <para>
       Makefile-based formats (<literal>gnu</literal>, <literal>msvc</literal>
@@ -567,11 +567,11 @@
   </section>
 
 
-  <section>
+  <section id="sec.format.vars">
     <title>Format specific variables</title>
 
 
-    <section>
+    <section id="sec.autoconf.vars">
       <title>autoconf</title>
       <para>
         <informaltable>
@@ -607,7 +607,7 @@
     </section>
     
     
-    <section>
+    <section id="sec.dmars.vars">
       <title>dmars, dmars_smake</title>
       <para>
         <informaltable>
@@ -638,7 +638,7 @@
     </section>
 
 
-    <section>
+    <section id="sec.msvs2005prj.vars">
       <title>msvs2005prj</title>
       <para>
         <informaltable>
@@ -683,7 +683,7 @@
     </section>
     
     
-    <section>
+    <section id="sec.msvs2003prj.vars">
       <title>msvs2003prj</title>
       <para>
         The <xref linkend="var.MSVS_PLATFORM"/> option is present in
