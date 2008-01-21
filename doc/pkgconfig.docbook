@@ -1,4 +1,8 @@
-<!-- $Id: datafiles.docbook,v 1.4 2004/04/14 09:41:50 vaclavslavik Exp $ -->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+    "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<!-- $Id$ -->
+
 <section id="module.pkgconfig">
   <title>pkgconfig</title>
 
