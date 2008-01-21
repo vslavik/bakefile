@@ -908,7 +908,6 @@ if test ${D}DEPSMODE = gcc ; then
             depfile="${D}objfile.d"
         fi
         if test -f ${D}depfile ; then
-            cat ${D}depfile
             sed -e "\\,^${D}objfile,!s,${D}depobjname:,${D}objfile:,g" ${D}depfile >${D}{depsdir}/${D}{objfilebase}.d
             rm -f ${D}depfile
         fi

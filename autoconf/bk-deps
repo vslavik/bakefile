@@ -53,7 +53,6 @@ if test $DEPSMODE = gcc ; then
             depfile="$objfile.d"
         fi
         if test -f $depfile ; then
-            cat $depfile
             sed -e "\,^$objfile,!s,$depobjname:,$objfile:,g" $depfile >${depsdir}/${objfilebase}.d
             rm -f $depfile
         fi
