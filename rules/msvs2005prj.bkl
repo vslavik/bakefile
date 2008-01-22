@@ -69,7 +69,7 @@
     <template id="_compiled_baset">
         <set var="_platform_extra_defines">
             <if cond="MSVS_PLATFORM=='pocketpc2003'">
-                _WIN32_WCE=$(DOLLAR)(CEVER) UNDER_CE $(DOLLAR)(PLATFORMDEFINES) $(DOLLAR)(ARCHFAM) $(DOLLAR)(_ARCHFAM_) _UNICODE UNICODE
+                _WIN32_WCE=$(DOLLAR)(CEVER);UNDER_CE;$(DOLLAR)(PLATFORMDEFINES);$(DOLLAR)(ARCHFAM);$(DOLLAR)(_ARCHFAM_);_UNICODE;UNICODE
             </if>
         </set>
         <set var="_platform_extra_ldflags">

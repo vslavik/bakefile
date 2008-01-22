@@ -1,5 +1,6 @@
 
 - autoconf: fixes for non-default BUILDDIR
+- msvs2005prj: fixed _WIN32_WCE define for PocketPC 2003 platform (#187)
 
 
 Version 0.2.3
