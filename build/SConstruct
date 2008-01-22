@@ -1,5 +1,5 @@
 
-LIBXML2_VERSION = "2.6.30"
+LIBXML2_VERSION = "2.6.31"
 LIBXML2_URL = "ftp://xmlsoft.org/libxml2/libxml2-%s.tar.gz" % LIBXML2_VERSION
 LIBXML2_PATCHES = ["libxml2-setup.py-fixes.patch"]
 LIBXML2_CONFIGURE = "--disable-static --enable-python --disable-ftp --disable-http --disable-dependency-tracking"
