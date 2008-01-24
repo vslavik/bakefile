@@ -663,7 +663,15 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         el.setAttribute('Description', description)
         el.setAttribute('CommandLine', cmdline)
         el.setAttribute('Outputs', output)
-        if len(deps) > 0: 
+        if len(deps) > 0:
+            # FIXME: remove this hack once custom build steps are
+            #        implemented properly
+            # these are VC6-specific things that VC7+ doesn't recognize
+            if deps.startswith('"$(SOURCE)" '):
+                deps = deps[len('"$(SOURCE)" '):]
+            elif deps.startswith('$(SOURCE) '):
+                deps = deps[len('$(SOURCE) '):]
+
             el.setAttribute('AdditionalDependencies', deps)
         return el
 
