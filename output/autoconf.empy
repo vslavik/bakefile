@@ -77,4 +77,4 @@ else: condstr='@COND_%s@' % t.cond.name
 # Include dependency info, if present:
 @@IF_GNU_MAKE@@-include @BUILDDIR/.deps/*.d
 
-.PHONY: @(' '.join([t.__targetdir+t.__targetname for t in targets if t.__is_phony=='1']))
+@utils.wrapLongLine('.PHONY: ', ' '.join([t.__targetdir+t.__targetname for t in targets if t.__is_phony=='1']), ' \\')

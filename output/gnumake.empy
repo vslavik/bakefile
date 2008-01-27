@@ -85,7 +85,7 @@ all: @BUILDDIR
 @[end if]@
 @[end for]@
 
-.PHONY: @(' '.join([t.__targetdir+t.__targetname for t in targets if t.__is_phony=='1']))
+@utils.wrapLongLine('.PHONY: ', ' '.join([t.__targetdir+t.__targetname for t in targets if t.__is_phony=='1']), ' \\')
 
 @[for f in fragments]
 @f.content
