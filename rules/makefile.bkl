@@ -3,7 +3,7 @@
 
   This file is part of Bakefile (http://www.bakefile.org)
 
-  Copyright (C) 2003-2007 Vaclav Slavik
+  Copyright (C) 2003-2008 Vaclav Slavik
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to
@@ -158,12 +158,17 @@
             <set var="__targetdir">$(mkPathPrefix(BUILDDIR))</set>
             <set var="__targetdir_dironly">$(BUILDDIR)</set>
             <set var="__uses_cxx">0</set>
-            <set var="__ldflags">$(LDFLAGS)</set>
+            <set var="__ldflags"/>
             <set var="__ldlibs"/>
             <set var="__cppflags"/>
             <set var="__cflags"/>
             <set var="__cxxflags"/>
             <set var="__win32rc_flags"/>
+
+            <!-- this should be used when __ldflags is referenced, so that
+                 user-provided additional flags always come last (see
+                 http://www.bakefile.org/attachment/ticket/182) -->
+            <set var="__ldflags_all" eval="0">$(__ldflags) $(LDFLAGS)</set>
 
             <!-- cflags, cxxflags make variables (CFLAGS etc. options must
                  be last, so that e.g. headers from -I passed by configure

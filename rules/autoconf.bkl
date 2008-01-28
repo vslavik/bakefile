@@ -3,7 +3,7 @@
 
   This file is part of Bakefile (http://www.bakefile.org)
 
-  Copyright (C) 2003-2007 Vaclav Slavik
+  Copyright (C) 2003-2008 Vaclav Slavik
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to
@@ -142,8 +142,6 @@
     <template id="__autoconf_baset">
         <set var="__pch_header"/>
         <set var="__pch_file"/>
-
-        <set var="__ldlibs" append="1">$(LIBS)</set>
     </template>
     <set var="__macexe_baset">__autoconf_baset</set>
     <set var="__dll_baset">__autoconf_baset</set>
@@ -314,7 +312,7 @@
          -->
         
         <!-- It has to be inserted as the first -L, so the we won't
-             link against library version in some system directory: -->
+             link against library version in some other directory: -->
         <set var="__ldflags" prepend="1">
             $(substitute(value,
                          lambda x: '-L'+ref('__targetdir_dironly', x),

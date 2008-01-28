@@ -3,7 +3,7 @@
 
   This file is part of Bakefile (http://www.bakefile.org)
 
-  Copyright (C) 2003-2007 Vaclav Slavik
+  Copyright (C) 2003-2008 Vaclav Slavik
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to
@@ -251,7 +251,7 @@
             @%append $(__lbc_file) option quiet
             @%append $(__lbc_file) name $^@
             @%append $(__lbc_file) option caseexact
-            @%append $(__lbc_file) $(__ldflags)
+            @%append $(__lbc_file) $(__ldflags_all)
             @for %i in ($(__objects_var)) do @%append $(__lbc_file) file %i
             @for %i in ($(__ldlibs)) do @%append $(__lbc_file) library %i
             @%append $(__lbc_file) $(__win32res_flag)

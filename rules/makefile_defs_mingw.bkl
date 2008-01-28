@@ -3,7 +3,7 @@
 
   This file is part of Bakefile (http://www.bakefile.org)
 
-  Copyright (C) 2003-2007 Vaclav Slavik
+  Copyright (C) 2003-2008 Vaclav Slavik
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to
@@ -66,7 +66,7 @@
     </template>
     <template id="__commands_templ">
         <set var="__LINK_EXE_CMD" eval="0">
-            $(__linker) -o $@ $(__objects_var) $(__ldflags) $(__ldlibs)
+            $(__linker) -o $@ $(__objects_var) $(__ldflags_all) $(__ldlibs)
         </set>        
         <set var="__LINK_LIB_CMD" eval="0">
             if exist $@ del $@
@@ -74,10 +74,10 @@
             $(RANLIB) $@
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) $@ $(__objects_var) $(__ldflags) $(__ldlibs)
+            $(__dll_linker) $@ $(__objects_var) $(__ldflags_all) $(__ldlibs)
         </set>
         <set var="__LINK_MODULE_CMD" eval="0">
-            $(__module_linker) $@ $(__objects_var) $(__ldflags) $(__ldlibs)
+            $(__module_linker) $@ $(__objects_var) $(__ldflags_all) $(__ldlibs)
         </set>
     </template>
 
