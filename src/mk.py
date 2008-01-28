@@ -27,7 +27,7 @@
 #
 
 import utils, errors, config, containers
-import bottlenecks
+import bkl_c
 from utils import *
 
 vars = containers.OrderedDict()
@@ -529,7 +529,7 @@ def __evalPyExpr(nothing, expr, use_options=1, target=None, add_dict=None):
     __curNamespace = oldNS
     return str(val)
 
-__doEvalExpr = bottlenecks.doEvalExpr
+__doEvalExpr = bkl_c.doEvalExpr
 
 def evalExpr(e, use_options=1, target=None, add_dict=None):    
     try:

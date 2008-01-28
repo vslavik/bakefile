@@ -167,11 +167,11 @@ else:
 
     # MergedDict implementation for Python <= 2.3, which depends on an ugly
     # hack from bottlenecks.c:
-    import bottlenecks
+    import bkl_c
 
     class MergedDict:
         def __init__(self):
-            self.proxy = bottlenecks.ProxyDictionary()
+            self.proxy = bkl_c.ProxyDictionary()
             self.dicts = []
 
         def add(self, dict):

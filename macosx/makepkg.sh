@@ -27,8 +27,8 @@ make install DESTDIR=$INSTALLROOT || exit 1
 pydir=$INSTALLROOT$PREFIX/lib/bakefile
 bindir=$INSTALLROOT$PREFIX/bin
 
-# remove _bottlenecks module and rebuild it for all target archs and versions
-rm -rf $pydir/_bottlenecks*
+# remove _bkl_c module and rebuild it for all target archs and versions
+rm -rf $pydir/_bkl_c*
 
 build_with_sdk()
 {
@@ -48,9 +48,9 @@ build_with_sdk()
         flags="$flags -I$sdkdir/System/Library/Frameworks/Python.framework/Headers"
         mkdir -p $outdir
         gcc -bundle -undefined dynamic_lookup \
-            -o $outdir/_bottlenecks.so $flags \
+            -o $outdir/_bkl_c.so $flags \
             $BAKEFILEDIR/src/bottlenecks.c \
-            $BAKEFILEDIR/src/bottlenecks_wrap.c \
+            $BAKEFILEDIR/src/bkl_c_wrap.c \
             || exit 1
     fi
 }

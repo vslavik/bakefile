@@ -10,7 +10,7 @@ SWIG=swig
 CFLAGS=/nologo /O2 /I$(PYTHONDIR)\include /MD
 LDFLAGS=$(PYTHONDIR)\libs\python$(PYTHONVERSION).lib
 
-all: bakefile.exe bakefile_gen.exe src\_bottlenecks.pyd
+all: bakefile.exe bakefile_gen.exe src\_bkl_c.pyd
 
 bakefile.exe: src\win32scriptwrapper.c
 	cl $(CFLAGS) $(LDFLAGS) /Fe$@ src\win32scriptwrapper.c
@@ -18,17 +18,17 @@ bakefile.exe: src\win32scriptwrapper.c
 bakefile_gen.exe: src\win32scriptwrapper.c
 	cl $(CFLAGS) $(LDFLAGS) /Fe$@ src\win32scriptwrapper.c
 
-EXTENSION_SRC = src\bottlenecks.c src\bottlenecks_wrap.c
+EXTENSION_SRC = src\bottlenecks.c src\bkl_c_wrap.c
 
-src\bottlenecks_wrap.c: src\bottlenecks.i
-	$(SWIG) -python src\bottlenecks.i
+src\bkl_c_wrap.c: src\bkl_c.i
+	$(SWIG) -python src\bkl_c.i
 
-src\_bottlenecks.pyd: $(EXTENSION_SRC)
+src\_bkl_c.pyd: $(EXTENSION_SRC)
 	cl $(CFLAGS) $(LDFLAGS) /LD /Fe$@ $(EXTENSION_SRC)
 
 clean:
 	-erase *.obj
 	-erase bakefile.exe
 	-erase bakefile_gen.exe
-	-erase src\_bottlenecks.lib src\_bottlenecks.exp src\_bottlenecks.pyd
-	-erase src\bottlenecks_wrap.c
+	-erase src\_bkl_c.lib src\_bkl_c.exp src\_bkl_c.pyd
+	-erase src\bkl_c_wrap.c

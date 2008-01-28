@@ -111,7 +111,7 @@ code_PYTHON = src/config.py \
               src/xmlparser.py \
 			  src/dependencies.py \
               src/outmethods.py \
-			  src/bottlenecks.py \
+			  src/bkl_c.py \
 			  src/containers.py \
 			  src/portautils.py
 codeempy_PYTHON = \
@@ -122,11 +122,11 @@ codepy25modules_PYTHON = \
 			  src/py25modules/uuid.py \
 			  src/py25modules/subprocess.py
 
-code_LTLIBRARIES = _bottlenecks.la
+code_LTLIBRARIES = _bkl_c.la
 
-_bottlenecks_la_SOURCES = src/bottlenecks.c src/bottlenecks_wrap.c
-_bottlenecks_la_LDFLAGS = -module -avoid-version
-_bottlenecks_la_CFLAGS = $(PYTHON_CPPFLAGS)
+_bkl_c_la_SOURCES = src/bottlenecks.c src/bkl_c_wrap.c
+_bkl_c_la_LDFLAGS = -module -avoid-version
+_bkl_c_la_CFLAGS = $(PYTHON_CPPFLAGS)
 
 EXTRA_DIST = \
     README THANKS \
@@ -136,7 +136,7 @@ EXTRA_DIST = \
     autoconf output rules presets tests schema build \
     src/empy/README src/empy/COPYING \
     src/py25modules/README src/py25modules/LICENSE \
-	src/bottlenecks.i \
+	src/bkl_c.i \
 	src/win32scriptwrapper.c \
 	macosx/buildpkg.py macosx/makepkg.sh macosx/bakefile-wrapper \
 	macosx/scripts/preflight \
