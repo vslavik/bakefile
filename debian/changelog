@@ -1,3 +1,50 @@
+bakefile (0.2.3) unstable; urgency=low
+
+  * removed support for C++ Builder X, it no longer exists and the format
+    wasn't used by anyone in practice
+  * significantly improved Xcode format (Kevin Ollivier)
+  * fixed running bakefile_gen if the name of temporary directory contains
+    spaces
+  * msvc6prj: use /pdb linker option to make the projects work when imported
+    in MSVC7.1 (Scott Bailey, patch #1732354)
+  * msvs2005prj: added support for Pocket PC platform
+  * added support for MSVS2003 project files (based on patch by Aleksander
+    Jaromin)
+  * Bakefile now generates files with output format's platform's default line
+    endings; added --eol option to override this (based on patch by Francesco
+    Montorsi)
+  * added envvar() convenience function for referencing environment variables
+  * added --wrap-output command line option for tweaking line-wrapping
+    behavior (based on patch by Francesco Montorsi)
+  * bakefile_gen uses all available CPUs by default now; use explicit -j1 flag
+    to get the old behavior
+  * autoconf: fixed shared libraries sonames on NetBSD and OpenBSD
+  * added limited support for conditional variables dependent on other
+    conditional variables based by Francesco Montorsi (previously, only
+    dependency on options was possible)
+  * added "debug" level to the <echo> command
+  * deprecated <echo level="warning"> in favor of new <warning> command
+  * added XML Schema for FORMATS.bkmanifest and Bakefiles.bkgen files
+  * autoconf: check if install -d works (patch by Warren Young)
+  * dmars: always use -HP99 switch; made the value configurable (#160)
+  * autoconf: fixed warning about datarootdir variable with autoconf-2.61+
+  * fixed <lib-path> to generated correct output when passed empty string as
+    argument (#170; based on patch by Scott Bailey)
+  * msvs2005prj: fixed handling of include and library paths with spaces
+  * msvc6prj: fixed to not use minimal rebuild with optimization (#42)
+  * autoconf: call AC_BAKEFILE_PROG_CC/CXX from AC_BAKEFILE (#64)
+  * autoconf: added pkgconfig module (Francesco Montorsi, #105)
+  * added preliminary support for generating multiple variants of makefiles in
+    the same format (#156)
+  * msvs2005prj: fixed to correctly exclude conditional targets from
+    configurations they aren't built in (#181, John Ralls)
+  * msvs2005prj: fixed runtime library selection
+  * SRCDIR variable now uses Unix and not native paths like other variables
+  * fixes to win32 install target support (Francesco Montorsi)
+  * mingw: ensure win32 shell is used even if sh.exe is on PATH
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Feb, 04 Mon 2008 01:05:50 +0100
+
 bakefile (0.2.2) unstable; urgency=low
   * Bakefile is now licensed under the MIT license
   * Python >= 2.3 is now required
