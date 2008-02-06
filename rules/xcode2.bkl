@@ -214,7 +214,7 @@
             <set var="_ldlibs" append="1">$(value)</set>
         </define-tag>
         <define-tag name="ldflags">
-            <set var="_ldflags">$(value)</set>
+            <set var="_ldflags" append="1">$(value)</set>
         </define-tag>
         <define-tag name="depends">
             <set var="_deps" append="1">$(value)</set>

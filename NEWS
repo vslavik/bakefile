@@ -3,6 +3,7 @@
 - msvs2005prj: fixed _WIN32_WCE define for PocketPC 2003 platform (#187)
 - put user- or configure-provided LDFLAGS and LIBS to the end of linker
   command line to avoid conflicts of local libraries with system-wide (#182)
+- xcode2: fixed <ldflags> to not delete previously specified flags (#192)
 
 
 Version 0.2.3
