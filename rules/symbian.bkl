@@ -63,6 +63,12 @@
                 <depends>$(id)</depends>
             </modify-target>
         </define-tag>
+        <define-tag name="depends-on-file">
+            <warning>
+                &lt;depends-on-file&gt; not implemented for Xcode
+            </warning>
+        </define-tag>
+
         <define-tag name="dirname">
             <set var="_targetdir">$(nativePaths(value))$(DIRSEP)</set>
         </define-tag>

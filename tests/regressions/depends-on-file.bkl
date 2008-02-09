@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<!-- See this bug: http://www.bakefile.org/ticket/190 -->
+
+<makefile>
+
+		<include file="presets/simple.bkl"/>
+		
+		<action id="generated-header.h">
+			<command>./header-generator.pl</command>
+			<depends-on-file>header-generator.pl</depends-on-file>
+		</action>
+		
+		<exe id="agilent11713a" template="simple">
+				<include>makefileUtils.bkl</include>
+
+				<sources>agilent11713a.cpp</sources>
+				<headers>agilent11713a.h</headers>			
+		 </exe>
+
+</makefile>

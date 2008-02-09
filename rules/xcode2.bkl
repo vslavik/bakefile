@@ -98,6 +98,16 @@
             </modify-target>
         </define-tag>
         <define-tag name="depends">
+            <if cond="_kind!='binary_product'">
+                <warning>
+                    dependencies not implemented for this type of targets in Xcode format
+                </warning>
+            </if>
+        </define-tag>
+        <define-tag name="depends-on-file">
+            <warning>
+                &lt;depends-on-file&gt; not implemented for Xcode
+            </warning>
         </define-tag>
     </define-rule>
     <define-rule name="phony" extends="__any">

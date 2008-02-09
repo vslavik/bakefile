@@ -70,6 +70,12 @@
             <set var="_dsp_deps" append="1">$(value)</set>
         </define-tag>
         
+        <define-tag name="depends-on-file">
+            <warning>
+                &lt;depends-on-file&gt; not implemented for this format
+            </warning>
+        </define-tag>
+        
     </define-rule>
 
     <define-rule name="_compiled" extends="_any">
