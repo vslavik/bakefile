@@ -4,6 +4,7 @@
 - put user- or configure-provided LDFLAGS and LIBS to the end of linker
   command line to avoid conflicts of local libraries with system-wide (#182)
 - xcode2: fixed <ldflags> to not delete previously specified flags (#192)
+- xcode2: fixed <cxxflags> and <cppflags> for C++ files (Scott Bailey, #194)
 
 
 Version 0.2.3

@@ -135,7 +135,6 @@
             <set var="_optimize"/>
             <set var="_cflags"/>
             <set var="_cxxflags"/>
-            <set var="_cppflags"/>
             <set var="_lib_path"/>
             <set var="_sys_libs"/>
             <set var="_warnings"/>

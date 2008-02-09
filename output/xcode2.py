@@ -405,8 +405,8 @@ class ProjectGeneratorXcode2:
             if config._cflags != "":
                 buildSettings["OTHER_CFLAGS"] = config._cflags
                 
-            if config._cppflags != "":
-                buildSettings["OTHER_CPLUSPLUSFLAGS"] = config._cppflags
+            if config._cxxflags != "":
+                buildSettings["OTHER_CPLUSPLUSFLAGS"] = config._cxxflags
                 
             if config._dirname != "":
                 buildSettings["SYMROOT"] = config._dirname
