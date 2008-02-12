@@ -80,6 +80,22 @@
             Standard flags for C++
         </description>
     </option>
+    
+    <if cond="MAKEFILE_SYNTAX=='unix'">
+        <option name="OBJCFLAGS">
+            <default-value>$(__DEFAULT_OBJCFLAGS)</default-value>
+            <description>
+                Standard flags for Objective-C
+            </description>
+        </option>
+        <option name="OBJCXXFLAGS">
+            <default-value>$(__DEFAULT_OBJCXXFLAGS)</default-value>
+            <description>
+                Standard flags for Objective-C++
+            </description>
+        </option>
+    </if>
+
     <option name="CPPFLAGS">
         <default-value>$(DEFAULT_CPPFLAGS)</default-value>
         <description>
@@ -157,12 +173,17 @@
             <set var="__install_if_cond"/>
             <set var="__targetdir">$(mkPathPrefix(BUILDDIR))</set>
             <set var="__targetdir_dironly">$(BUILDDIR)</set>
+            <set var="__uses_c">0</set>
+            <set var="__uses_objc">0</set>
             <set var="__uses_cxx">0</set>
+            <set var="__uses_objcxx">0</set>
             <set var="__ldflags"/>
             <set var="__ldlibs"/>
             <set var="__cppflags"/>
             <set var="__cflags"/>
             <set var="__cxxflags"/>
+            <set var="__objcflags"/>
+            <set var="__objcxxflags"/>
             <set var="__win32rc_flags"/>
 
             <!-- this should be used when __ldflags is referenced, so that
@@ -179,12 +200,28 @@
             <set var="__cxxflags_mv" eval="0">
                 $(__cppflags) $(__cxxflags) $(CPPFLAGS) $(CXXFLAGS)
             </set>
+            
             <set var="__cflags_var">
                 $(createMakeVar(id, '__cflags_mv', 'CFLAGS'))
             </set>
             <set var="__cxxflags_var">
                 $(createMakeVar(id, '__cxxflags_mv', 'CXXFLAGS'))
             </set>
+            
+            <if cond="MAKEFILE_SYNTAX=='unix'">
+                <set var="__objcflags_mv" eval="0">
+                    $(__cppflags) $(__objcflags) $(CPPFLAGS) $(OBJCFLAGS)
+                </set>
+                <set var="__objcxxflags_mv" eval="0">
+                    $(__cppflags) $(__objcxxflags) $(CPPFLAGS) $(OBJCXXFLAGS)
+                </set>
+                <set var="__objcflags_var">
+                    $(createMakeVar(id, '__objcflags_mv', 'OBJCFLAGS'))
+                </set>
+                <set var="__objcxxflags_var">
+                    $(createMakeVar(id, '__objcxxflags_mv', 'OBJCXXFLAGS'))
+                </set>
+            </if>
 
             <set var="__objects"/>
             <!-- access __objects as global make variable: -->
@@ -253,11 +290,30 @@
             </if>
         </define-tag>
 
+        <!-- FIXME: This can just go away once compiler-flags is done right -->
+        <define-tag name="FIXME-cxx-type-compiler-flags">
+            <cxxflags>$(value)</cxxflags>
+            <objcxxflags>$(value)</objcxxflags>
+        </define-tag>
+        <!-- FIXME: This needs to parse its languages attribute but I can't figure out how to do it -->
+        <define-tag name="FIXME-compiler-flags">
+            <cflags>$(value)</cflags>
+            <cxxflags>$(value)</cxxflags>
+            <objcflags>$(value)</objcflags>
+            <objcxxflags>$(value)</objcxxflags>
+        </define-tag>
+
         <define-tag name="cflags">
             <set var="__cflags" append="1">$(value)</set>
         </define-tag>
         <define-tag name="cxxflags">
             <set var="__cxxflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="objcflags">
+            <set var="__objcflags" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="objcxxflags">
+            <set var="__objcxxflags" append="1">$(value)</set>
         </define-tag>
         <define-tag name="cppflags">
             <set var="__cppflags" append="1">$(value)</set>
@@ -334,8 +390,7 @@
                       {'on':PIC_CFLAGS,
                        'off':''}))
             </set>
-            <cflags>$(__picflag)</cflags>
-            <cxxflags>$(__picflag)</cxxflags>
+            <FIXME-compiler-flags>$(__picflag)</FIXME-compiler-flags>
         </define-tag>
 
         <define-tag name="debug-info">
@@ -374,19 +429,19 @@
         </define-tag>
 
         <define-tag name="cxx-rtti">
-            <cxxflags>
+            <FIXME-cxx-type-compiler-flags>
                 $(substituteFromDict(value,
                         {'on':__FLAG_RTTI_ON,
                          'off':__FLAG_RTTI_OFF}))
-            </cxxflags>
+            </FIXME-cxx-type-compiler-flags>
         </define-tag>
 
         <define-tag name="cxx-exceptions">
-            <cxxflags>
+            <FIXME-cxx-type-compiler-flags languages="c++,objc++">
                 $(substituteFromDict(value,
                         {'on':__FLAG_EXCEPTIONS_ON,
                          'off':__FLAG_EXCEPTIONS_OFF}))
-            </cxxflags>
+            </FIXME-cxx-type-compiler-flags>
         </define-tag>
 
         <define-tag name="runtime-libs"/>
@@ -593,6 +648,7 @@
             <set var="__command">$(__COMPILE_C_CMD)</set>
         </template>
         <define-tag name="parent-target">
+            <set var="__uses_c" scope="$(__parent)">1</set>
             <set var="__cflags">$(targets[__parent].__cflags_var)</set>
         </define-tag>
     </define-rule>
@@ -610,9 +666,33 @@
     <define-rule name="__cxx-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
     <define-rule name="__cc-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
     <define-rule name="__C-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
-    <!-- this is Objective-C++, not C++, but c++ can handle it: -->
-    <define-rule name="__mm-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
-    <define-rule name="__M-to-$(OBJEXT[1:])" extends="__cpp-to-$(OBJEXT[1:])"/>
+
+    <!-- non-Unix formats don't have native ObjC/C++ compilers -->
+    <if cond="MAKEFILE_SYNTAX=='unix'">
+        <!-- Objective-C -->
+        <define-rule name="__m-to-$(OBJEXT[1:])" extends="__any,compilation_rule">
+            <template template="__commands_templ_OBJC">
+                <set var="__command">$(__COMPILE_OBJC_CMD)</set>
+            </template>
+            <define-tag name="parent-target">
+                <set var="__uses_objc" scope="$(__parent)">1</set>
+                <set var="__objcflags">$(targets[__parent].__objcflags_var)</set>
+            </define-tag>
+        </define-rule>
+
+        <!-- Objective-C++ -->
+        <define-rule name="__mm-to-$(OBJEXT[1:])" extends="__any,compilation_rule">
+            <template template="__commands_templ_OBJCXX">
+                <set var="__command">$(__COMPILE_OBJCXX_CMD)</set>
+            </template>
+            <define-tag name="parent-target">
+                <set var="__uses_objcxx" scope="$(__parent)">1</set>
+                <set var="__objcxxflags">$(targets[__parent].__objcxxflags_var)</set>
+            </define-tag>
+        </define-rule>
+        <!-- more Objective-C++ extensions: -->
+        <define-rule name="__M-to-$(OBJEXT[1:])" extends="__mm-to-$(OBJEXT[1:])"/>
+    </if>
 
 
     <!-- =============================================================== -->

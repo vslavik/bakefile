@@ -71,6 +71,8 @@
     <set var="__DEFAULT_CFLAGS"></set>
     <set var="__DEFAULT_CPPFLAGS"></set>
     <set var="__DEFAULT_CXXFLAGS"></set>
+    <set var="__DEFAULT_OBJCFLAGS"></set>
+    <set var="__DEFAULT_OBJCXXFLAGS"></set>
     <set var="__DEFAULT_LDFLAGS"></set>
     
     <set var="__LINKER_CC" eval="0">$(CC)</set>
@@ -126,6 +128,18 @@
         <template id="__commands_templ_CXX">
             <set var="__COMPILE_CXX_CMD" eval="0">
                 $(CXXC) -c -o $@ $(__cxxflags) $(src)
+            </set>
+        </template>
+        <!-- FIXME: We should allow for a different Objective-C compiler -->
+        <template id="__commands_templ_OBJC">
+            <set var="__COMPILE_OBJC_CMD" eval="0">
+                $(CCC) -c -o $@ $(__objcflags) $(src)
+            </set>
+        </template>
+        <!-- FIXME: We should allow for a different Objective-C++ compiler -->
+        <template id="__commands_templ_OBJCXX">
+            <set var="__COMPILE_OBJCXX_CMD" eval="0">
+                $(CXXC) -c -o $@ $(__objcxxflags) $(src)
             </set>
         </template>
     </if>
