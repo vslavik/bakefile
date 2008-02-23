@@ -5,7 +5,7 @@ LIBXML2_PATCHES = ["libxml2-setup.py-fixes.patch"]
 LIBXML2_CONFIGURE = "--disable-static --enable-python --disable-ftp --disable-http --disable-dependency-tracking"
 LIBXML2_WINCONFIGURE = "ftp=no http=no html=no iconv=no python=yes"
 
-PYTHON_VERSION = "2.5.1"
+PYTHON_VERSION = "2.5.2"
 PYTHON_URL = "http://www.python.org/ftp/python/%(ver)s/python-%(ver)s.msi" % {"ver":PYTHON_VERSION}
 PYTHON_FILES = ["python-makezip.py"]
 
