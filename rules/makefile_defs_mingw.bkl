@@ -52,7 +52,7 @@
     <set var="__FLAG_EXE_GUI">-Wl,--subsystem,windows -mwindows</set>
     
     <!-- dependency tracking: -->
-    <set var="CPPDEPS" make_var="1">-MT$(DOLLAR)@ -MF$(DOLLAR)@.d -MD</set>
+    <set var="CPPDEPS" make_var="1">-MT$(DOLLAR)@ -MF$(DOLLAR)@.d -MD -MP</set>
 
     <template id="__commands_templ_C">
         <set var="__COMPILE_C_CMD" eval="0">

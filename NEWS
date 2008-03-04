@@ -7,6 +7,8 @@
 - xcode2: fixed <cxxflags> and <cppflags> for C++ files (Scott Bailey, #194)
 - added <depends-on-file> to all formats, with warnings if it's not
   implemented (#190)
+- mingw, gnu: avoid "No rule to make target ..." errors in generated makefiles
+  when dependency header is removed (#201)
 
 
 Version 0.2.3
