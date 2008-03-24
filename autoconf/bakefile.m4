@@ -827,10 +827,11 @@ AC_DEFUN([AC_BAKEFILE],
     AC_BAKEFILE_DEPS
     AC_BAKEFILE_RES_COMPILERS
 
-    BAKEFILE_BAKEFILE_M4_VERSION="0.2.3"
-
     dnl OBJCFLAGS is set by Autoconf, but OBJCXXFLAGS is not:
     AC_SUBST(OBJCXXFLAGS)
+
+
+    BAKEFILE_BAKEFILE_M4_VERSION="0.2.3"
 
     dnl includes autoconf_inc.m4:
     $1
