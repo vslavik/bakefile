@@ -10,6 +10,8 @@
   implemented (#190)
 - mingw, gnu: avoid "No rule to make target ..." errors in generated makefiles
   when dependency header is removed (#201)
+- msvs2003prj, msvs2005prj: don't use /RTC1 flag in release builds with debug
+  information enabled (#202)
 
 
 Version 0.2.3

@@ -446,16 +446,19 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t6.setAttribute("RuntimeLibrary", rtl)
 
         t6.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
-        
+
         if cfg._debug == '1':
-            t6.setAttribute("BasicRuntimeChecks", "3")
             t6.setAttribute("DebugInformationFormat", "3") # enabled
+        else:
+            t6.setAttribute("DebugInformationFormat", "0") # no debug
+
+        if cfg._rtl_dbg == 'on':
+            t6.setAttribute("BasicRuntimeChecks", "3")
             t6.setAttribute("Detect64BitPortabilityProblems", "true")
         else:
             t6.setAttribute("BasicRuntimeChecks", "0")
-            t6.setAttribute("DebugInformationFormat", "0") # no debug
             t6.setAttribute("BufferSecurityCheck","false")
-        
+
         if cfg._cxx_rtti == 'on':
             t6.setAttribute("RuntimeTypeInfo", "true")
         else:
