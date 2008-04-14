@@ -5,6 +5,7 @@
   command line to avoid conflicts of local libraries with system-wide (#182)
 - xcode2: fixed <ldflags> to not delete previously specified flags (#192)
 - xcode2: fixed <cxxflags> and <cppflags> for C++ files (Scott Bailey, #194)
+- xcode2: fixed <library> handling (Scott Bailey, #199)
 - added <depends-on-file> to all formats, with warnings if it's not
   implemented (#190)
 - mingw, gnu: avoid "No rule to make target ..." errors in generated makefiles

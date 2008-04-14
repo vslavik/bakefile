@@ -196,9 +196,6 @@
         <define-tag name="dirname">
             <set var="_dirname">$(value)</set>
         </define-tag>
-        <define-tag name="libname">
-            <set var="_productname">$(value)</set>
-        </define-tag>
         <define-tag name="install-to" />
         <define-tag name="install-if" />
         <define-tag name="pic">
@@ -230,7 +227,11 @@
         </define-tag>
         <define-tag name="library">
             <depends>$(value)</depends>
-            <ldlibs>-l$(value)</ldlibs>
+            <ldlibs>
+                $(substitute(value,
+                  lambda x: ref('_dirname',x)+'/'+ref('_linkname', x),
+                             'LIBR'))
+            </ldlibs>
         </define-tag>
         <define-tag name="postlink-command">
             <set var="_postlink_command">$(value)</set>
@@ -240,11 +241,11 @@
         <define-tag name="precomp-headers">
             <set var="_use_pch">$(value)</set>
         </define-tag>
-        
+
         <define-tag name="precomp-headers-header">
             <set var="_pch_header">$(value)</set>
         </define-tag>
-        
+
         <!-- NB: AFAICT, Xcode doesn't give fine-tuned control over PCH,
              so I'm not sure we can implement these settings. -->
         <define-tag name="precomp-headers-location"/>
@@ -261,16 +262,20 @@
         <template>
             <set var="_productType">com.apple.product-type.library.dynamic</set>
             <set var="_explicitFileType">compiled.mach-o.dylib</set>
-            <set var="_productname" eval="0">lib$(_libname)</set>
+            <dllname>$(id)</dllname>
         </template>
-        <define-tag name="dllname">
-            <set var="_productname">$(value)</set> 
-        </define-tag>
     </define-rule>
     <define-rule name="dll" extends="_dll">
         <template>
-            <libname>$(id)</libname>
+            <dllname>$(id)</dllname>
         </template>
+        <define-tag name="dllname">
+            <set var="_productname">$(value)</set>
+            <set var="_linkname">lib$(value).dylib</set>
+        </define-tag>
+        <define-tag name="libname">
+            <!-- can't use libname!=dllname on this platform -->
+        </define-tag>
         <define-tag name="version"/>
         <define-tag name="so_version"/>
         <define-tag name="mac_version">
@@ -279,21 +284,24 @@
         </define-tag>
     </define-rule>
     <define-rule name="module" extends="_dll">
-        <template>
-            <libname>$(id)</libname>
-        </template>
+        <template/>
+        <define-tag name="dllname">
+            <set var="_productname">$(value)</set>
+        </define-tag>
     </define-rule>
     <define-rule name="lib" extends="__compiled">
         <template>
             <set var="_productType">com.apple.product-type.library.static</set>
             <set var="_explicitFileType">archive.ar</set>
-            <set var="_productname" eval="0">lib$(_libname)</set>
             <libname>$(id)</libname>
         </template>
+        <define-tag name="libname">
+            <set var="_productname">$(value)</set>
+            <set var="_linkname">lib$(value).a</set>
+        </define-tag>
     </define-rule>
     <define-rule name="exe" extends="__compiled">
         <template>
-            <set var="_productname" eval="0">$(_exename)</set>
             <exename>$(id)</exename>
             <app-type>console</app-type>
         </template>
@@ -310,6 +318,7 @@
             </set>
         </define-tag>
         <define-tag name="exename">
+            <set var="_productname">$(value)</set>
             <set var="_exename">$(value)</set>
         </define-tag>
     </define-rule>
