@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://www.bakefile.org)
 #
-#  Copyright (C) 2006-2007 Vaclav Slavik, Kevin Powell, Steven Van Ingelgem,
+#  Copyright (C) 2006-2008 Vaclav Slavik, Kevin Powell, Steven Van Ingelgem,
 #                          Kevin Ollivier, Aleksander Jaromin
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -439,7 +439,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         else: # single-threaded
             if cfg._rtl_type == 'dynamic':
                 print "warning: single-threaded dynamic runtime doesn't exist, using static"
-            if cfg._rtl_dbg:
+            if cfg._rtl_dbg == 'on':
                 rtl = rtSingleThreadedDebug
             else:
                 rtl = rtSingleThreaded
