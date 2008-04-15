@@ -618,8 +618,8 @@ def run(args):
 
 
 if __name__ == '__main__':
-    if sys.version_info[0:3] < (2,2,2):
-        sys.stderr.write('error: Bakefile requires at least Python 2.2.2\n')
+    if sys.version_info[0:3] < (2,3,0):
+        sys.stderr.write('error: Bakefile requires at least Python 2.3.0\n')
         sys.exit(1)
         
     try:
