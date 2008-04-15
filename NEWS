@@ -12,6 +12,8 @@
   when dependency header is removed (#201)
 - msvs2003prj, msvs2005prj: don't use /RTC1 flag in release builds with debug
   information enabled (#202)
+- msvs2003prj, msvs2005prj: enable functions inlining iff optimization is
+  enabled instead of doing it unconditionally (#205)
 
 
 Version 0.2.3

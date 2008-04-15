@@ -409,7 +409,10 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t6.setAttribute("Name", "VCCLCompilerTool")
        
         t6.setAttribute("Optimization", cfg._optimize)
-        t6.setAttribute("InlineFunctionExpansion", "1")
+        if cfg._optimize == "0":
+            t6.setAttribute("InlineFunctionExpansion", "0")
+        else:
+            t6.setAttribute("InlineFunctionExpansion", "2")
         t6.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
 
         if cfg._optimize == "0":
