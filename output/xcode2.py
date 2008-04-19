@@ -588,7 +588,13 @@ class ProjectGeneratorXcode2:
             buildFileId = self.objectIdGenerator.getNextObjectId()
             self.objects[buildFileId] = buildFile
             compileBuildPhase["files"].append(buildFileId)
-            
+
+        # Now run through the header files
+        for sourceFile in target._headers.split():
+            # Add as a file ref (if it isn't already)
+            # The ref ids are per project basically
+            fileRefId = self.idForSourceFile(sourceFile)
+
         mydeps = target._deps.split(" ")
         for dep in mydeps:
             if dep != "" and self.targets[dep]._kind == "action":

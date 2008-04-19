@@ -14,6 +14,7 @@
   information enabled (#202)
 - msvs2003prj, msvs2005prj: enable functions inlining iff optimization is
   enabled instead of doing it unconditionally (#205)
+- xcode2: added support for <headers> (Scott Bailey, #208)
 
 
 Version 0.2.3

@@ -91,6 +91,7 @@
         <template>
             <set var="_targetname">$(id)</set>
             <set var="_sources"/>
+            <set var="_headers"/>
         </template>
         <define-tag name="dependency-of">
             <modify-target target="$(value)">
@@ -206,6 +207,9 @@
         </define-tag>
         <define-tag name="sources">
             <set var="_sources" append="1">$(value)</set>
+        </define-tag>
+        <define-tag name="headers">
+            <set var="_headers" append="1">$(value)</set>
         </define-tag>
         <define-tag name="lib-path">
             <set var="_lib_path" append="1">$(value)</set>
