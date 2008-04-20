@@ -797,7 +797,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         globals_el.appendChild(doc.createTextNode(""))
         top_el.appendChild(globals_el)
             
-        dsp = doc.toprettyxml()
+        dsp = doc.toprettyxml(encoding="Windows-1252")
 
         writer.writeFile(filename, dsp)
         
