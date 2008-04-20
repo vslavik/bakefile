@@ -91,11 +91,19 @@ class ElementSorted(Element):
                 node.writexml(writer, indent + addindent, addindent, newl)
             writer.write("%s</%s>%s" % (indent, self.tagName, newl))
         else:
-            if _MSVS_VCPROJ_VERSION == "7.10":
-                writer.write("/>%s" % newl)
+            # <File> is serialized differently, see the discussion in
+            # http://www.bakefile.org/ticket/210
+            if self.tagName == "File":
+                if _MSVS_VCPROJ_VERSION == "7.10":
+                    writer.write(">%s%s</%s>%s" % (newl, indent, self.tagName, newl))
+                else:
+                    writer.write("%s%s%s>%s%s</%s>%s" % (newl, indent, addindent, newl, indent, self.tagName, newl))
             else:
-                writer.write("%s%s/>%s" % (newl, indent, newl))
-    
+                if _MSVS_VCPROJ_VERSION == "7.10":
+                    writer.write("/>%s" % newl)
+                else:
+                    writer.write("%s%s/>%s" % (newl, indent, newl))
+
 
 class DocumentSorted(Document):
     def createElement(self, tagName):
