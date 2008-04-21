@@ -72,6 +72,11 @@
                 _WIN32_WCE=$(DOLLAR)(CEVER);UNDER_CE;$(DOLLAR)(PLATFORMDEFINES);$(DOLLAR)(ARCHFAM);$(DOLLAR)(_ARCHFAM_);_UNICODE;UNICODE
             </if>
         </set>
+        <set var="_platform_extra_res_defines">
+            <if cond="MSVS_PLATFORM=='pocketpc2003'">
+                _WIN32_WCE=$(DOLLAR)(CEVER);UNDER_CE;$(DOLLAR)(PLATFORMDEFINES)
+            </if>
+        </set>
         <set var="_platform_extra_ldflags">
             <if cond="MSVS_PLATFORM=='pocketpc2003'">
                 /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE
@@ -79,6 +84,7 @@
         </set>
 
         <set var="_defines">$(_platform_extra_defines)</set>
+        <set var="_res_defines">$(_platform_extra_res_defines)</set>
         <set var="_ldflags">$(_platform_extra_ldflags)</set>
     </template>
 
