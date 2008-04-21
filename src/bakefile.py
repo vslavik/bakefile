@@ -131,15 +131,19 @@ def run(args):
         config.verbose = 0
     else:
         config.verbose = options.verbose
-    
+
     if options.includes != None:
         addIncludePaths(options.includes)
-    
+
     if options.xml_cache != None:
         try:
-            import pickle, shelve
-            xmlparser.cache = shelve.open(options.xml_cache,
-                                          protocol=pickle.HIGHEST_PROTOCOL)
+            # don't use shelve.open(), limit ourselves to dbhash version by
+            # using the Shelf class explicitly; that's because we store large
+            # chunks of data in the shelve and some dbm implementations can't
+            # handle it -- see http://www.bakefile.org/ticket/214
+            import pickle, shelve, dbhash
+            xmlparser.cache = shelve.Shelf(dbhash.open(options.xml_cache, 'c'),
+                                           protocol=pickle.HIGHEST_PROTOCOL)
         except ImportError:
             sys.stderr.write("Warning: disabling XML cache because it's not supported by this version of Python\n")
         except AttributeError: # python < 2.3 didn't have HIGHEST_PROTOCOL
