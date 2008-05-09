@@ -603,7 +603,7 @@ qt/cxx-python.bakefile        # qt,cxx,python</programlisting>
       <section id="cmd.fragment" xreflabel="fragment">
         <title>fragment</title>
         <para>
-          Inserts text into generated native makefile verbatim, so that it is
+          Inserts text into generated native makefile verbosely, so that it is
           possible to include things not yet supported by Bakefile in the
           makefiles. The text can be either read from a file or is taken from
           command node's content. Variables are <emphasis>not</emphasis>
