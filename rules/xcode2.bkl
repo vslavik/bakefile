@@ -274,7 +274,7 @@
             <dllname>$(id)</dllname>
         </template>
         <define-tag name="dllname">
-            <set var="_productname">$(value)</set>
+            <set var="_productname">lib$(value)</set>
             <set var="_linkname">lib$(value).dylib</set>
         </define-tag>
         <define-tag name="libname">

@@ -18,6 +18,7 @@
 - msvs2003prj, msvs2005prj: improvements to make generated projects more
   similar to natively created projects (#210)
 - fixes for running on Solaris (#214)
+- xcode2: fixed naming of <dll> targets (Scott Bailey, #218)
 
 
 Version 0.2.3
