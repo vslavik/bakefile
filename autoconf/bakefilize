@@ -47,10 +47,8 @@ dry_run=0
 force=0
 verbose=0
 
-for arg in $* ; do
-    case "$arg" in
-        --help | -h )
-            cat <<END
+give_help_and_exit() {
+    cat >&2 <<END
 Usage: bakefilize [OPTION]...
 
 Prepare a package to use Autoconf+Bakefile.
@@ -64,7 +62,13 @@ Prepare a package to use Autoconf+Bakefile.
 You must 'cd' to the top directory of your package before you run
 'bakefilize'.
 END
-            exit 0
+    exit $1
+}
+
+for arg in $* ; do
+    case "$arg" in
+        --help | -h )
+            give_help_and_exit 0
         ;;
         --copy | -c )
             symlink=0
@@ -78,6 +82,9 @@ END
         --verbose | -v )
             verbose=1
         ;;
+        * )
+            echo "Unknown option: \"$arg\"" >&2
+            give_help_and_exit 1
     esac
 done
 
