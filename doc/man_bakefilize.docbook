@@ -15,7 +15,7 @@
 
     <refsynopsisdiv>
       <cmdsynopsis>
-        <command>bakefile</command>
+        <command>bakefilize</command>
         <arg choice="opt">
           <option>--copy</option>
         </arg>
