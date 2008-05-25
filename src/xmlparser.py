@@ -136,15 +136,20 @@ def __parseFileLibxml2(filename, namespace):
             e.props[prop.name] = prop.content
             prop = prop.next
 
+        e.value = ''
         c = n.children
         while c != None:
-            l = handleNode(filename, c)
-            if l != None:
-                e.children.append(l)
+            if c.type == 'text':
+                e.value += str(c.content)
+            else:
+                l = handleNode(filename, c)
+                if l != None:
+                    e.children.append(l)
             c = c.next
 
-        if len(e.children) == 0:
-            e.value = n.content.strip()
+        e.value = e.value.strip()
+        if not e.value:
+            e.value = None
 
         return e
    
@@ -187,6 +192,8 @@ def __doParseMinidom(func, src):
                 if l != None:
                     e.children.append(l)
         e.value = e.value.strip()
+        if not e.value:
+            e.value = None
 
         return e
    

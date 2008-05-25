@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<makefile>
+    <set var="SRC" hints="files">
+        boo.cpp
+        <if cond="PLATFORM_WIN32=='0'">unix.cpp</if>
+        <if cond="PLATFORM_WIN32=='1'">win32.cpp</if>
+    </set>
+
+    <dll id="foo">
+        <sources>$(SRC)</sources>
+    </dll>
+</makefile>

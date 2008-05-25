@@ -134,6 +134,10 @@ def handleSet(e, target=None, add_dict=None):
 
         # Handle conditions:
         if isCond:
+
+            if e.value:
+                raise ReaderError(e, "cannot set unconditional value when <if> is used")
+
             noValueSet = 1
             for e_if in e.children:
                 try:
@@ -765,28 +769,30 @@ globalTags = {}
 def handleGlobalTag(e):
     errors.pushCtx("when processing global tag '%s' at %s" %
                    (e.name, e.location()))
-        
+
     dict = _extractDictForTag(e, target=None, dict=None)
 
-    # FIXME: This is hack, it would be better to pass the dict to
-    #        __doProcess(). But we don't have an easy way of doing it,
-    #        so we modify the main variables dictionary mk.vars instead
-    #        and then restore its original content.
-    old_vars = {}
-    for key in dict:
-        if key in mk.vars:
-            old_vars[key] = mk.vars[key]
-        mk.vars[key] = dict[key]
-    
+    if dict:
+        # FIXME: This is hack, it would be better to pass the dict to
+        #        __doProcess(). But we don't have an easy way of doing it,
+        #        so we modify the main variables dictionary mk.vars instead
+        #        and then restore its original content.
+        old_vars = {}
+        for key in dict:
+            if key in mk.vars:
+                old_vars[key] = mk.vars[key]
+            mk.vars[key] = dict[key]
+
     # execute the tag's commands now:
     __doProcess(xmldata=globalTags[e.name])
 
-    # restore the original content of mk.vars:
-    for key in dict:
-        if key in old_vars:
-            mk.vars[key] = old_vars[key]
-        else:
-            del mk.vars[key]
+    if dict:
+        # restore the original content of mk.vars:
+        for key in dict:
+            if key in old_vars:
+                mk.vars[key] = old_vars[key]
+            else:
+                del mk.vars[key]
 
     errors.popCtx()
 
