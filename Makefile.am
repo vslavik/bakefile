@@ -94,7 +94,7 @@ presets_DATA = \
 
 schema_DATA = \
 			  schema/bakefile-gen.xsd \
-			  schema/bakefile-manifest.xsd
+			  schema/bakefile-formats.xsd
 
 code_PYTHON = src/config.py \
               src/bakefile.py \

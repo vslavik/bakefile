@@ -97,7 +97,7 @@ def __validateSchema(doc, namespace):
     from config import datadir
 
     if namespace == NS_FORMATS_MANIFEST:
-        schemaFile = os.path.join(datadir, 'schema', 'bakefile-manifest.xsd')
+        schemaFile = os.path.join(datadir, 'schema', 'bakefile-formats.xsd')
     elif namespace == NS_BAKEFILE_GEN:
         schemaFile = os.path.join(datadir, 'schema', 'bakefile-gen.xsd')
     else:
