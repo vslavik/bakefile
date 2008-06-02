@@ -3,7 +3,7 @@
 #
 #  This file is part of Bakefile (http://www.bakefile.org)
 #
-#  Copyright (C) 2003-2007 Vaclav Slavik
+#  Copyright (C) 2003-2008 Vaclav Slavik
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -402,10 +402,10 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                     else: # failed, returncode != 0
                         if keepGoing:
                             sys.stderr.write(
-                              '[bakefile_gen] bakefile exited with error, ignoring\n')
+                              '[bakefile_gen] bakefile exited with error (%i), ignoring\n' % self.process.returncode)
                             return 0 # no modified files
                         else:
-                            raise errors.Error('bakefile exited with error')
+                            raise errors.Error('bakefile exited with error (%i)' % self.process.returncode)
                 except IOError, e:
                     raise errors.Error('failed to run bakefile: %s' % e)
             finally:
