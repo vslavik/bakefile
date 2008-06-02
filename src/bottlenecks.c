@@ -83,6 +83,8 @@ const char *doEvalExpr(const char *expr,
                        PyObject *target,
                        PyObject *add_dict)
 {
+    assert(expr != NULL);
+
     int len = strlen(expr);
     int i;
     char *output, *txtbuf;

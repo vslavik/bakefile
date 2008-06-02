@@ -148,8 +148,6 @@ def __parseFileLibxml2(filename, namespace):
             c = c.next
 
         e.value = e.value.strip()
-        if not e.value:
-            e.value = None
 
         return e
    
@@ -192,8 +190,6 @@ def __doParseMinidom(func, src):
                 if l != None:
                     e.children.append(l)
         e.value = e.value.strip()
-        if not e.value:
-            e.value = None
 
         return e
    
