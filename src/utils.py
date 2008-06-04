@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://www.bakefile.org)
 #
-#  Copyright (C) 2003-2007 Vaclav Slavik
+#  Copyright (C) 2003-2008 Vaclav Slavik
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -231,6 +231,46 @@ def substituteFromDict(str, dict, desc=None):
     return substitute(str, _getValue, desc)
 
 
+def getPossibleValues(expr):
+    """Attempts to get all possible values of 'str' expansion.
+
+       For now, this function assumes that variable parts (condvars references)
+       are separated from other parts with whitespace.
+
+       Returns generator for list of values as split on whitespace.
+    """
+    # FIXME: see docstring
+
+    def callbackVar(nothing, expr, use_options, target, add_dict):
+        ret = []
+        if expr in mk.cond_vars:
+            cond = mk.cond_vars[expr]
+            for v in cond.values:
+                if '$' in v.value:
+                    ret += getPossibleValues(v.value)
+                else:
+                    ret.append(v.value)
+            return ' '.join(ret)
+
+        if expr in mk.options and mk.options[expr].values != None:
+            opt = mk.options[expr]
+            for v in opt.values:
+                if '$' in v.value:
+                    ret += getPossibleValues(v)
+                else:
+                    ret.append(v)
+            return ' '.join(ret)
+
+        # don't know what else to try, return as-is
+        return expr
+
+    def callbackTxt(nothing, expr):
+        return expr
+
+    return mk.__doEvalExpr(expr, callbackVar, callbackTxt,
+                           None, 1, None, None).split()
+
+
 def nativePaths(filenames):
     """Translates filenames from Unix to native filenames."""
     if mk.vars['TOOLSET'] == 'unix':
@@ -269,13 +309,38 @@ def safeMakefileValue(s):
     # another meaning; substitute it here
     return s.replace('-','_').replace('.','_')
 
-def getObjectName(source, target, ext, objSuffix=''):
+
+def getObjectName(source, target, ext, objSuffix, allNames):
+
+    dirsep = mk.vars['DIRSEP']
+
+    def _makeUniqueName(name, all):
+        """Finds the shortest path suffix that is unique in given set."""
+        if not name in all:
+            print "****",repr(name),repr(all)
+            assert name in all
+        split = name.split(dirsep)
+        # try adding path components
+        for i in range(2, len(split)+1):
+            x = dirsep.join(split[-i:])
+            conflicts = len([n for n in all if n.endswith(x)])
+            if conflicts == 1: # only this one
+                return x.replace(dirsep, '_')
+        raise errors.Error("don't know how to create object file name for \"%s\"" % name)
+
     pos = source.rfind('.')
     srcext = source[pos:]
-    base = source[:pos]
-    pos = max(base.rfind('/'), base.rfind(mk.vars['DIRSEP']))
-    base = safeMakefileValue(base[pos+1:])
-    
+    noext = source[:pos]
+    pos = max(noext.rfind('/'), noext.rfind(dirsep))
+    base = noext[pos+1:]
+
+    # if the same basename is used by more objects (see bug #92), create
+    # longer-but-unique object names:
+    if base in allNames and len(allNames[base]) > 1:
+        base = _makeUniqueName(noext, allNames[base])
+
+    base = safeMakefileValue(base)
+
     objdir = mkPathPrefix(mk.vars['BUILDDIR'])
     objname = '%s%s_%s%s%s' % (objdir,
                                safeMakefileValue(mk.targets[target].id),
@@ -284,7 +349,7 @@ def getObjectName(source, target, ext, objSuffix=''):
                                ext)
     return objname
 
-    
+
 def sources2objects(sources, target, ext, objSuffix=''):
     """Adds rules to compile object files from source files listed in
        'sources', when compiling target 'target', with object files extension
@@ -324,13 +389,26 @@ def sources2objects(sources, target, ext, objSuffix=''):
 
     files = containers.OrderedDict()
 
-    def callback(cond, sources):
+    sources2 = nativePaths(sources)
+
+    # used to resolve conflicting names, see http://www.bakefile.org/ticket/92:
+    # key: basename, value: set of full names w/o extension
+    basenames = {}
+    dirsep = mk.vars['DIRSEP']
+    for s in getPossibleValues(sources):
+        full = s[:s.rfind('.')]
+        base = full[full.rfind(dirsep)+1:]
+        if base not in basenames:
+            basenames[base] = set()
+        basenames[base].add(full)
+
+    def callback_objnames(cond, sources):
         prefix = suffix = ''
         if sources[0].isspace(): prefix=' '
         if sources[-1].isspace(): suffix=' '
         retval = []
         for s in sources.split():
-            objname = getObjectName(s, target, ext, objSuffix)
+            objname = getObjectName(s, target, ext, objSuffix, basenames)
             if objname in files:
                 files[objname].append((s,cond))
             else:
@@ -393,8 +471,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
         else:
             return mk.makeCondition(' and '.join(ret))
  
-    sources2 = nativePaths(sources)
-    retval = substitute2(sources2, callback, 'OBJECTS', hints='files')
+    retval = substitute2(sources2, callback_objnames, 'OBJECTS', hints='files')
 
     easyFiles = []
     hardFiles = []

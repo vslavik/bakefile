@@ -9,6 +9,8 @@
             hello2.c
             src/hello4.c
             hello3.c
+            src/linux/platform.c
+            src/win/platform.c
         </sources>
         <include>src</include>
         <app-type>console</app-type>

@@ -20,6 +20,7 @@
 - fixes for running on Solaris (#214)
 - xcode2: fixed naming of <dll> targets (Scott Bailey, #218)
 - check for incorrect used of conditional <set> (#220)
+- added support for multiple source files with the same name (#92)
 
 
 Version 0.2.3
