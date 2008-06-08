@@ -120,7 +120,13 @@
 
     <!-- List of additional checks that bakefile.m4 should run: -->
     <set var="AUTOCONF_CHECKS"/>
-    
+
+    <define-global-tag name="autoconf-needs-macro">
+        <if cond="value not in AUTOCONF_CHECKS.split()">
+            <set var="AUTOCONF_CHECKS" scope="global" append="1">$(value)</set>
+        </if>
+    </define-global-tag>
+
     <!-- =============================================================== -->
     <!--                     C/C++ dependency tracking:                  -->
     <!-- =============================================================== -->
@@ -330,8 +336,6 @@
     <!--              GCC >= 3.4 precompiled headers support:            -->
     <!-- =============================================================== -->
 
-    <set var="__added_pch_ac_check">0</set>
-
     <tag-info name="precomp-headers-file"
               position="before:precomp-headers-header"/>
     <tag-info name="precomp-headers-header"
@@ -346,13 +350,7 @@
 
     <define-tag name="precomp-headers" rules="__compiled">
         <if cond="value=='on'">
-            <if cond="__added_pch_ac_check=='0'">
-                <set var="__added_pch_ac_check" scope="global">1</set>
-                <set var="AUTOCONF_CHECKS" scope="global" append="1">
-                    AC_BAKEFILE_PRECOMP_HEADERS$(LF)
-                </set>
-            </if>
-
+            <autoconf-needs-macro>AC_BAKEFILE_PRECOMP_HEADERS</autoconf-needs-macro>
             <if cond="__pch_header==''">
                 <error>
                 Precompiled header must explicitly be provided using &lt;precomp-headers-header&gt; for Autoconf backend.
