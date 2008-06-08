@@ -310,15 +310,16 @@ def safeMakefileValue(s):
     return s.replace('-','_').replace('.','_')
 
 
-def getObjectName(source, target, ext, objSuffix, allNames):
+allObjectsBasenames = {}
 
+def getObjectName(source, target, ext, objSuffix=''):
+
+    allNames = allObjectsBasenames[target]
     dirsep = mk.vars['DIRSEP']
 
     def _makeUniqueName(name, all):
         """Finds the shortest path suffix that is unique in given set."""
-        if not name in all:
-            print "****",repr(name),repr(all)
-            assert name in all
+        assert name in all
         split = name.split(dirsep)
         # try adding path components
         for i in range(2, len(split)+1):
@@ -393,7 +394,9 @@ def sources2objects(sources, target, ext, objSuffix=''):
 
     # used to resolve conflicting names, see http://www.bakefile.org/ticket/92:
     # key: basename, value: set of full names w/o extension
-    basenames = {}
+    if target not in allObjectsBasenames:
+        allObjectsBasenames[target] = {}
+    basenames = allObjectsBasenames[target]
     dirsep = mk.vars['DIRSEP']
     for s in getPossibleValues(sources):
         full = s[:s.rfind('.')]
@@ -408,7 +411,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
         if sources[-1].isspace(): suffix=' '
         retval = []
         for s in sources.split():
-            objname = getObjectName(s, target, ext, objSuffix, basenames)
+            objname = getObjectName(s, target, ext, objSuffix)
             if objname in files:
                 files[objname].append((s,cond))
             else:
