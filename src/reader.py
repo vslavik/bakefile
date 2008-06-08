@@ -482,15 +482,18 @@ def _extractTargetNodes(parent, list, target, tags, index):
         elif node.name in COMMANDS:
             n = TgtCmdNode(target, parent, TgtCmdNode.COMMAND, node)
             _removeDuplicates(n)
-        else:
-            if node.name not in tags:
-                raise ReaderError(node,
-                                      "unknown target tag '%s'" % node.name)
+        elif node.name in tags:
             if evalWeakCondition(node) == 0:
                 continue
             n = TgtCmdNode(target, parent, TgtCmdNode.TAG, node)
             _removeDuplicates(n)
             _extractTargetNodes(n, tags[node.name], target, tags, index)
+        elif node.name in globalTags:
+            n = TgtCmdNode(target, parent, TgtCmdNode.COMMAND, node)
+            _removeDuplicates(n)
+        else:
+            raise ReaderError(node,
+                              "unknown target tag '%s'" % node.name)
 
 
 def _reorderTargetNodes(node, index):
@@ -596,7 +599,8 @@ def _processTargetNodes(node, target, tags, dict):
             handleWarning(e, target=target, add_dict=dict)
         elif e.name == 'echo':
             handleEcho(e, target=target, add_dict=dict)
-        else:
+        elif e.name in globalTags:
+            handleGlobalTag(e)
             return 0
         return 1
     
