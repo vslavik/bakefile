@@ -417,13 +417,15 @@ def makeCondition(cond_str):
                 value = int(value)
             except ValueError:
                 return None
-        
+
         if name in options:
             condexpr_list.append(Condition.Expr(options[name], value))
         elif name in cond_vars:
             cvar = cond_vars[name]
             convlist = removeCondVarDependencyFromCondition(cvar, value)
             condexpr_list = condexpr_list + convlist
+        elif name not in vars:
+            raise errors.Error("undefined variable '%s' in condition" % name)
         else:
             raise errors.Error("conditional variables can only depend on options or other conditional variables and '%s' is not one" % name)
 
