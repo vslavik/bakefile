@@ -267,6 +267,12 @@ def setVar(name, value, eval=1, target=None, add_dict=None, store_in=None,
         if config.debug:
             print "[dbg] overwriting option/condvar %s" % name
 
+    # if this is files list, we certainly don't want to use any other
+    # separators than single space; but don't do this if there's an embedded
+    # expression, because it may use whitespace for something
+    if hints != '' and 'files' in mk.vars_hints[name] and '$' not in value:
+        value = ' '.join(value.split())
+
     if eval:
         try:
             v = evalExpr(value, target=target, add_dict=add_dict)
