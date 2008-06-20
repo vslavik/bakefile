@@ -476,13 +476,13 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             t6.setAttribute("RuntimeTypeInfo", "false")
 
         if cfg._pch_use_pch == '1':
-            if _MSVS_VCPROJ_VERSION == "7.10":
+            if cfg._pch_generator:
                 t6.setAttribute("UsePrecompiledHeader","3")
             else:
                 t6.setAttribute("UsePrecompiledHeader","2")
             t6.setAttribute("PrecompiledHeaderThrough", cfg._pch_header)
             t6.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
-            
+
         t6.setAttribute("AssemblerListingLocation", "%s\\%s\\" % (cfg._builddir, t.id) )
         t6.setAttribute("ObjectFile", "%s\\%s\\" % (cfg._builddir, t.id) )
         t6.setAttribute("ProgramDataBaseFileName", cfg._pdbfile)

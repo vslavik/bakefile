@@ -21,6 +21,8 @@
 - xcode2: fixed naming of <dll> targets (Scott Bailey, #218)
 - check for incorrect used of conditional <set> (#220)
 - added support for multiple source files with the same name (#92)
+- msvs2003prj, msvs2005prj: fixed to generate correct precompiled headers
+  setting for auto vs. manual PCH creation
 
 
 Version 0.2.3
