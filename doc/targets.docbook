@@ -902,6 +902,61 @@
 						</row>
 						
 						
+						<row id="tag.precomp-headers-file"
+							xreflabel="precomp-headers-file">
+							<entry role="tagname">precomp-headers-file</entry>
+							<entry>
+								Use this tag to fine-tune where precompiled headers are
+								stored. The compiler must support this and the value passed
+								to <function>precomp-headers-file</function> can be modified
+								by Bakefile, e.g. by apending <literal>.pch</literal>
+								extension to it.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row id="tag.precomp-headers-gen"
+							xreflabel="precomp-headers-gen">
+							<entry role="tagname">precomp-headers-gen</entry>
+              <entry>
+                For compilers that support it, specify which source file
+                should be used to generate precompiled headers.
+								<programlisting><![CDATA[
+<exe id="myapp">
+  <sources>foo.cpp bar.cpp</sources>
+  <precomp-headers>on</precomp-headers>
+  <precomp-headers-gen>foo.cpp</precomp-headers-gen>
+  <precomp-headers-header>mypch.h</precomp-headers-header>
+</exe>
+]]></programlisting>
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
+						<row id="tag.precomp-headers-header"
+							xreflabel="precomp-headers-header">
+							<entry role="tagname">precomp-headers-header</entry>
+              <entry>
+                For compilers that support it, specify which header file
+                should be used as the precompiled header. Typically, this
+                header must be the first header included and it must be
+                included by all source files. Some compilers (GCC in
+                particular) ignore this, because they use different PCH model.
+								<programlisting><![CDATA[
+<exe id="myapp">
+  <sources>foo.cpp bar.cpp</sources>
+  <precomp-headers>on</precomp-headers>
+  <precomp-headers-gen>foo.cpp</precomp-headers-gen>
+  <precomp-headers-header>mypch.h</precomp-headers-header>
+</exe>
+]]></programlisting>
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
+						
+						
 						<row id="tag.cxx-rtti" xreflabel="cxx-rtti">
 							<entry role="tagname">cxx-rtti</entry>
 							<entry>
@@ -917,20 +972,6 @@
 							<entry>
 								Enable or disable C++ exceptions handling. Can be either
 								<literal>on</literal> or <literal>off</literal>.
-							</entry>
-							<entry role="availability">exe, dll, module, lib</entry>
-						</row>
-						
-						
-						<row id="tag.precomp-headers-file"
-							xreflabel="precomp-headers-file">
-							<entry role="tagname">precomp-headers-file</entry>
-							<entry>
-								Use this tag to fine-tune where precompiled headers are
-								stored. The compiler must support this and the value passed
-								to <function>precomp-headers-file</function> can be modified
-								by Bakefile, e.g. by apending <literal>.pch</literal>
-								extension to it.
 							</entry>
 							<entry role="availability">exe, dll, module, lib</entry>
 						</row>
