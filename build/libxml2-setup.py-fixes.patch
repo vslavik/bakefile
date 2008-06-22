@@ -1,6 +1,6 @@
-diff -ru libxml2-2.6.30.orig/python/setup.py.in libxml2-2.6.30/python/setup.py.in
---- libxml2-2.6.30.orig/python/setup.py.in	2007-01-03 14:07:43.000000000 +0100
-+++ libxml2-2.6.30/python/setup.py.in	2008-01-01 20:38:51.000000000 +0100
+diff -ru libxml2-2.6.32.orig/python/setup.py.in libxml2-2.6.32/python/setup.py.in
+--- libxml2-2.6.32.orig/python/setup.py.in	2007-01-03 14:07:43.000000000 +0100
++++ libxml2-2.6.32/python/setup.py.in	2008-01-01 20:38:51.000000000 +0100
 @@ -65,23 +65,15 @@
  
  xml_includes=""

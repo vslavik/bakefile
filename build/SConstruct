@@ -1,5 +1,5 @@
 
-LIBXML2_VERSION = "2.6.31"
+LIBXML2_VERSION = "2.6.32"
 LIBXML2_URL = "ftp://xmlsoft.org/libxml2/libxml2-%s.tar.gz" % LIBXML2_VERSION
 LIBXML2_PATCHES = ["libxml2-setup.py-fixes.patch"]
 LIBXML2_CONFIGURE = "--disable-static --enable-python --disable-ftp --disable-http --disable-dependency-tracking"
@@ -17,9 +17,9 @@ LESSMSI_VERSION = "20051110"
 LESSMSI_URL = "http://blogs.pingpoet.com/overflow/pubfiles/lessmsierables-%s.zip" % LESSMSI_VERSION
 LESSMSI_PATCHES = ["lessmsi-no-gui.patch"]
 
-INNOSETUP_VERSION = '5.2.2'
+INNOSETUP_VERSION = '5.2.3'
 INNOSETUP_URL = 'http://files.jrsoftware.org/ispack/ispack-%s.exe' % INNOSETUP_VERSION
-INNOUNP_URL = 'http://innounp.sf.net/test020.rar'
+INNOUNP_URL = 'http://downloads.sourceforge.net/innounp/innounp020.rar'
 
 
 from rlsbot import BuildEnvironment
@@ -195,7 +195,7 @@ innosetup = env.BuildComponent(
         sources=src_innosetup,
         deps=[src_innounp],
         commands=[
-            'innounp -x ispack-5.2.2.exe',
+            'innounp -x ispack-%s.exe' % INNOSETUP_VERSION,
             'move {app}\\ISCC?2.exe {app}\\ISCC.exe',
             'del {app}\\ISCC?1.exe',
             'move {app}\\ISCmplr?2.dll {app}\\ISCmplr.dll',
