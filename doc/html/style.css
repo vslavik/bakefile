@@ -8,8 +8,10 @@ body
 {
     font-family: sans-serif;
     background: white;
-  
+
     margin: 2em 1em 2em 1em;
+
+    font-size: 10pt;
 }
 
 h1,h2,h3
@@ -80,9 +82,9 @@ div.note h3
     font-size: 75%;
 }
 
-div.navfooter *
+.navfooter, .navheader
 {
-    font-size: 90%;
+    font-size: 80%;
 }
 
 
