@@ -83,14 +83,15 @@ const char *doEvalExpr(const char *expr,
                        PyObject *target,
                        PyObject *add_dict)
 {
-    assert(expr != NULL);
-
-    int len = strlen(expr);
+    int len;
     int i;
     char *output, *txtbuf;
     const char *text_begin, *code_begin;
     unsigned brackets = 0;
     const char *origexpr = expr;
+
+    assert(expr != NULL);
+    len = strlen(expr);
 
     ACQUIRE_BUFFER();
     ENSURE_BUFFER(len);
