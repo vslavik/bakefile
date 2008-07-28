@@ -154,6 +154,9 @@ install-data-hook: install-delete-obsolete-files
 	chmod +x $(DESTDIR)$(codedir)/bakefile.py
 	chmod +x $(DESTDIR)$(codedir)/bakefile_gen.py
 
+uninstall-hook:
+	rm -f $(DESTDIR)$(bindir)/bakefile $(DESTDIR)$(bindir)/bakefile_gen
+
 # this target deletes obsolete files from older versions; this is to prevent
 # conflicts when the wrong file could be picked:
 install-delete-obsolete-files:
