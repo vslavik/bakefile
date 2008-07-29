@@ -423,34 +423,33 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         return conf_el
 
-    def buildIDLToolElement(self, doc, cfg, t):
-        t5 = doc.createElement("Tool")
-        t5.setAttribute("Name", "VCIDLTool")
-        return t5
 
-    def buildCompilerToolElement(self, doc, cfg, c, t):
+    def buildBscMakeToolElement(self, tool, prjname, cfg, c, t):
+        tool.setAttribute("OutputFile", "%s%s.bsc" % (cfg._targetdir, prjname))
+        tool.setAttribute("SuppressStartupBanner", bool2vcstr(True))
+
+
+    def buildCompilerToolElement(self, tool, prjname, cfg, c, t):
         warnings_map = { 'no':'0', 'default':'1', 'max':'4'}
-        t6 = doc.createElement("Tool")
-        t6.setAttribute("Name", "VCCLCompilerTool")
 
-        t6.setAttribute("Optimization", cfg._optimize)
+        tool.setAttribute("Optimization", cfg._optimize)
         if cfg._optimize == "0":
-            t6.setAttribute("InlineFunctionExpansion", "0")
+            tool.setAttribute("InlineFunctionExpansion", "0")
         else:
-            t6.setAttribute("InlineFunctionExpansion", "2")
-        t6.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
+            tool.setAttribute("InlineFunctionExpansion", "2")
+        tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
 
         if cfg._optimize == "0":
-            t6.setAttribute("MinimalRebuild", bool2vcstr(True))
+            tool.setAttribute("MinimalRebuild", bool2vcstr(True))
         else:
-            t6.setAttribute("MinimalRebuild", bool2vcstr(False))
+            tool.setAttribute("MinimalRebuild", bool2vcstr(False))
 
         if cfg._cxx_exceptions == 'on':
-            t6.setAttribute("ExceptionHandling", "1")
+            tool.setAttribute("ExceptionHandling", "1")
         else:
-            t6.setAttribute("ExceptionHandling", "0")
+            tool.setAttribute("ExceptionHandling", "0")
 
-        t6.setAttribute("AdditionalOptions", cfg._cppflags)
+        tool.setAttribute("AdditionalOptions", cfg._cppflags)
 
         # choose runtime library
         if cfg._rtl_threading == 'multi':
@@ -471,106 +470,98 @@ Microsoft Visual Studio Solution File, Format Version 9.00
                 rtl = rtSingleThreadedDebug
             else:
                 rtl = rtSingleThreaded
-        t6.setAttribute("RuntimeLibrary", rtl)
+        tool.setAttribute("RuntimeLibrary", rtl)
 
-        t6.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
+        tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
 
         if cfg._debug == '1':
-            t6.setAttribute("DebugInformationFormat", "3") # enabled
+            tool.setAttribute("DebugInformationFormat", "3") # enabled
         else:
-            t6.setAttribute("DebugInformationFormat", "0") # no debug
+            tool.setAttribute("DebugInformationFormat", "0") # no debug
 
         if cfg._rtl_dbg == 'on':
-            t6.setAttribute("BasicRuntimeChecks", "3")
-            t6.setAttribute("Detect64BitPortabilityProblems", bool2vcstr(True))
+            tool.setAttribute("BasicRuntimeChecks", "3")
+            tool.setAttribute("Detect64BitPortabilityProblems", bool2vcstr(True))
         else:
-            t6.setAttribute("BasicRuntimeChecks", "0")
-            t6.setAttribute("BufferSecurityCheck",bool2vcstr(False))
+            tool.setAttribute("BasicRuntimeChecks", "0")
+            tool.setAttribute("BufferSecurityCheck",bool2vcstr(False))
 
         if cfg._cxx_rtti == 'on':
-            t6.setAttribute("RuntimeTypeInfo", bool2vcstr(True))
+            tool.setAttribute("RuntimeTypeInfo", bool2vcstr(True))
         else:
-            t6.setAttribute("RuntimeTypeInfo", bool2vcstr(False))
+            tool.setAttribute("RuntimeTypeInfo", bool2vcstr(False))
 
         if cfg._pch_use_pch == '1':
             if cfg._pch_generator:
-                t6.setAttribute("UsePrecompiledHeader","3")
+                tool.setAttribute("UsePrecompiledHeader","3")
             else:
-                t6.setAttribute("UsePrecompiledHeader","2")
-            t6.setAttribute("PrecompiledHeaderThrough", cfg._pch_header)
-            t6.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
+                tool.setAttribute("UsePrecompiledHeader","2")
+            tool.setAttribute("PrecompiledHeaderThrough", cfg._pch_header)
+            tool.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
 
-        t6.setAttribute("AssemblerListingLocation", "%s\\%s\\" % (cfg._builddir, t.id) )
-        t6.setAttribute("ObjectFile", "%s\\%s\\" % (cfg._builddir, t.id) )
-        t6.setAttribute("ProgramDataBaseFileName", cfg._pdbfile)
+        tool.setAttribute("AssemblerListingLocation", "%s\\%s\\" % (cfg._builddir, t.id) )
+        tool.setAttribute("ObjectFile", "%s\\%s\\" % (cfg._builddir, t.id) )
+        tool.setAttribute("ProgramDataBaseFileName", cfg._pdbfile)
         if warnings_map.has_key(cfg._warnings):
-            t6.setAttribute("WarningLevel", warnings_map[cfg._warnings])
+            tool.setAttribute("WarningLevel", warnings_map[cfg._warnings])
         else:
-            t6.setAttribute("WarningLevel", "1")
-        t6.setAttribute("SuppressStartupBanner", bool2vcstr(True))
+            tool.setAttribute("WarningLevel", "1")
+        tool.setAttribute("SuppressStartupBanner", bool2vcstr(True))
 
-        return t6
 
-    def buildLinkerToolElement(self, doc, cfg, c, t):
+    def buildLinkerToolElement(self, tool, prjname, cfg, c, t):
         ldlibs = cfg._ldlibs
         if cfg._cxx_rtti == 'on' and self.isEmbeddedConfig(c):
             ldlibs += ' ccrtrtti.lib'
 
-        t10 = doc.createElement("Tool")
-        t10.setAttribute("Name", "VCLinkerTool")
-        t10.setAttribute("AdditionalDependencies", ldlibs)
-        t10.setAttribute("AdditionalOptions", cfg._ldflags)
-        t10.setAttribute("OutputFile", "%s%s" % (cfg._targetdir, cfg._targetname))
+        tool.setAttribute("AdditionalDependencies", ldlibs)
+        tool.setAttribute("AdditionalOptions", cfg._ldflags)
+        tool.setAttribute("OutputFile", "%s%s" % (cfg._targetdir, cfg._targetname))
 
         if cfg._debug == '1':
-            t10.setAttribute("LinkIncremental", "2") # on
+            tool.setAttribute("LinkIncremental", "2") # on
         else:
-            t10.setAttribute("LinkIncremental", "1") # off
+            tool.setAttribute("LinkIncremental", "1") # off
 
         if cfg._type_nick == 'dll':
             if cfg._importlib != "":
                 implib = cfg._importlib
-                t10.setAttribute("ImportLibrary",
+                tool.setAttribute("ImportLibrary",
                                  "%s%s" % (cfg._targetdir, implib))
         else:
-            t10.setAttribute("SubSystem",
+            tool.setAttribute("SubSystem",
                              "%s" % self.app_type_code[cfg._type_nick])
 
-        t10.setAttribute("SuppressStartupBanner", bool2vcstr(True))
-        t10.setAttribute("AdditionalLibraryDirectories", mk_list(cfg._lib_paths))
+        tool.setAttribute("SuppressStartupBanner", bool2vcstr(True))
+        tool.setAttribute("AdditionalLibraryDirectories", mk_list(cfg._lib_paths))
         if _MSVS_VCPROJ_VERSION != "7.10":
-            t10.setAttribute("GenerateManifest", bool2vcstr(True))
+            tool.setAttribute("GenerateManifest", bool2vcstr(True))
 
         if cfg._debug == '1':
-            t10.setAttribute("GenerateDebugInformation", bool2vcstr(True))
+            tool.setAttribute("GenerateDebugInformation", bool2vcstr(True))
 
-        t10.setAttribute("ProgramDatabaseFile", cfg._pdbfile)
+        tool.setAttribute("ProgramDatabaseFile", cfg._pdbfile)
 
         if self.isEmbeddedConfig(c):
-            t10.setAttribute("TargetMachine", "3")
-            t10.setAttribute("DelayLoadDLLs", "$(NOINHERIT)")
+            tool.setAttribute("TargetMachine", "3")
+            tool.setAttribute("DelayLoadDLLs", "$(NOINHERIT)")
             if cfg._debug == '0':
-                t10.setAttribute("OptimizeReferences", "2")
-                t10.setAttribute("EnableCOMDATFolding", "2")
+                tool.setAttribute("OptimizeReferences", "2")
+                tool.setAttribute("EnableCOMDATFolding", "2")
         else:
-            t10.setAttribute("TargetMachine", "1")
+            tool.setAttribute("TargetMachine", "1")
 
-        return t10
 
-    def buildLibrarianToolElement(self, doc, cfg, t):
-        t10 = doc.createElement("Tool")
-        t10.setAttribute("Name", "VCLibrarianTool")
-        t10.setAttribute("OutputFile","%s%s" % (cfg._targetdir, cfg._targetname) )
-        t10.setAttribute("SuppressStartupBanner", bool2vcstr(True))
-        return t10
+    def buildLibrarianToolElement(self, tool, prjname, cfg, c, t):
+        tool.setAttribute("OutputFile","%s%s" % (cfg._targetdir, cfg._targetname) )
+        tool.setAttribute("SuppressStartupBanner", bool2vcstr(True))
 
-    def buildResourceCompilerToolElement(self, doc, cfg, t):
-        t8 = doc.createElement("Tool")
-        t8.setAttribute("Name", "VCResourceCompilerTool")
-        t8.setAttribute("Culture", "1033")
-        t8.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._res_include_paths))
-        t8.setAttribute("PreprocessorDefinitions", mk_list(cfg._res_defines))
-        return t8
+
+    def buildResourceCompilerToolElement(self, tool, prjname, cfg, c, t):
+        tool.setAttribute("Culture", "1033")
+        tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._res_include_paths))
+        tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._res_defines))
+
 
     def buildPlatformsElement(self, doc):
         #Platforms Node
@@ -597,79 +588,87 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
     def buildSingleConfiguration(self, doc, prjname, cfg, c, t):
         conf_el = self.buildConfElement(doc, cfg, c, t)
-        #add all the tools
-        t1 = doc.createElement("Tool")
-        t1.setAttribute("Name", "VCPreBuildEventTool")
-        conf_el.appendChild(t1)
 
-        t2 = doc.createElement("Tool")
-        t2.setAttribute("Name", "VCCustomBuildTool")
-        conf_el.appendChild(t2)
-
-        t3 = doc.createElement("Tool")
-        t3.setAttribute("Name", "VCXMLDataGeneratorTool")
-        conf_el.appendChild(t3)
-
-        t4 = doc.createElement("Tool")
-        t4.setAttribute("Name", "VCWebServiceProxyGeneratorTool")
-        conf_el.appendChild(t4)
-
-        t5 = self.buildIDLToolElement(doc, cfg, t)
-        conf_el.appendChild(t5)
-
-        t6 = self.buildCompilerToolElement(doc, cfg, c, t)
-
-        conf_el.appendChild(t6)
-
-        t7 = doc.createElement("Tool")
-        t7.setAttribute("Name", "VCManagedResourceCompilerTool")
-        conf_el.appendChild(t7)
-
-        t8 = self.buildResourceCompilerToolElement(doc, cfg, t)
-        conf_el.appendChild(t8)
-
-        t9 = doc.createElement("Tool")
-        t9.setAttribute("Name", "VCPreLinkEventTool")
-        conf_el.appendChild(t9)
+        # this dict is indexed by the names of the tools which need special
+        # treatment, i.e. should be non-empty in the generated file: the value
+        # of the corresponding dict element is our method which is called with
+        # tool itself as well as prjname, cfg, c and t as parameters and should
+        # fill in the tool with contents
+        #
+        # NB: order here doesn't matter so we sort tools alphabetically, the
+        #     order in the file is determined by the tools list below
+        toolHandlers = {
+                         'VCBscMakeTool'    : self.buildBscMakeToolElement,
+                         'VCCLCompilerTool' : self.buildCompilerToolElement,
+                         'VCLibrarianTool'  : self.buildLibrarianToolElement,
+                         'VCLinkerTool'     : self.buildLinkerToolElement,
+                         'VCResourceCompilerTool'
+                                            : self.buildResourceCompilerToolElement,
+                       }
 
         if cfg._type_nick == 'lib':
-            t10 = self.buildLibrarianToolElement(doc, cfg, t)
-            conf_el.appendChild(t10)
+            linkTool = 'VCLibrarianTool'
         else:
-            t10 = self.buildLinkerToolElement(doc, cfg, c, t)
-            conf_el.appendChild(t10)
+            linkTool = 'VCLinkerTool'
 
-        t11 = doc.createElement("Tool")
-        t11.setAttribute("Name", "VCALinkTool")
-        conf_el.appendChild(t11)
+        # this list contains the tools in the order appropriate for the current
+        # project file version
+        if _MSVS_VCPROJ_VERSION == "7.10":
+            tools = [
+                        'VCCLCompilerTool',
+                        'VCCustomBuildTool',
+                        linkTool,
+                        'VCMIDLTool',
+                        'VCPostBuildEventTool',
+                        'VCPreBuildEventTool',
+                        'VCPreLinkEventTool',
+                        'VCResourceCompilerTool',
+                        'VCWebServiceProxyGeneratorTool',
+                        'VCXMLDataGeneratorTool',
+                        'VCManagedWrapperGeneratorTool',
+                        'VCAuxiliaryManagedWrapperGeneratorTool',
+                    ]
+        else:
+            tools = [
+                        'VCPreBuildEventTool',
+                        'VCCustomBuildTool',
+                        'VCXMLDataGeneratorTool',
+                        'VCWebServiceProxyGeneratorTool',
+                        'VCMIDLTool',
+                        'VCCLCompilerTool',
+                        'VCManagedResourceCompilerTool',
+                        'VCResourceCompilerTool',
+                        'VCPreLinkEventTool',
+                        linkTool,
+                        'VCALinkTool',
+                        'VCManifestTool',
+                        'VCXDCMakeTool',
+                        'VCBscMakeTool',
+                        'VCFxCopTool',
+                        'VCAppVerifierTool',
+                        'VCWebDeploymentTool',
+                        'VCPostBuildEventTool',
+                    ]
 
-        t12 = doc.createElement("Tool")
-        t12.setAttribute("Name", "VCXDCMakeTool")
-        conf_el.appendChild(t12)
+            if _MSVS_VCPROJ_VERSION != "8.00":
+                # this tool was removed in VS 2008
+                tools.pop('VCWebDeploymentTool')
 
-        t13 = doc.createElement("Tool")
-        t13.setAttribute("Name", "VCBscMakeTool")
-        t13.setAttribute("OutputFile", "%s%s.bsc" % (cfg._targetdir, prjname))
-        t13.setAttribute("SuppressStartupBanner", bool2vcstr(True))
-        conf_el.appendChild(t13)
+            if cfg._type_nick not in ['gui', 'console']:
+                # these tools only make sense for the applications, not libraries
+                tools.pop('VCAppVerifierTool')
+                tools.pop('VCWebDeploymentTool')
 
-        t14 = doc.createElement("Tool")
-        t14.setAttribute("Name", "VCFxCopTool")
-        conf_el.appendChild(t14)
+        # add all the tools
+        for tool in tools:
+            node = doc.createElement("Tool")
+            node.setAttribute("Name", tool)
+            if tool in toolHandlers:
+                toolHandlers[tool](node, prjname, cfg, c, t)
+            conf_el.appendChild(node)
 
-        if cfg._type_nick in ['gui', 'console']:
-            t16 = doc.createElement("Tool")
-            t16.setAttribute("Name", "VCAppVerifierTool")
-            conf_el.appendChild(t16)
-            t17 = doc.createElement("Tool")
-            t17.setAttribute("Name", "VCWebDeploymentTool")
-            conf_el.appendChild(t17)
 
-        t15 = doc.createElement("Tool")
-        t15.setAttribute("Name", "VCPostBuildEventTool")
-        conf_el.appendChild(t15)
-
-        #additional tools
+        # additional tools
         if self.isEmbeddedConfig(c):
             self.buildEmbeddedTools(doc, conf_el)
 
