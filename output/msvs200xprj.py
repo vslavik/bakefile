@@ -411,9 +411,14 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         conf_el.setAttribute("UseOfMFC", "0")
         conf_el.setAttribute("ATLMinimizesCRunTimeLibraryUsage", bool2vcstr(False))
 
+        # allow specifying CharacterSet value, it's not really clear what is
+        # the difference between specifying it as 0 (not specified), 2 (MBCS)
+        # or not using it at all, let the user decide
+        if globals().has_key('MSVS_CHARACTER_SET'):
+            conf_el.setAttribute("CharacterSet", MSVS_CHARACTER_SET)
         # VC++ 2008 needs CharacterSet set, definining _UNICODE is not enough,
         # see http://comments.gmane.org/gmane.comp.sysutils.bakefile.devel/1145
-        if "_UNICODE" in cfg._defines.split(";"):
+        elif "_UNICODE" in cfg._defines.split(";"):
             conf_el.setAttribute("CharacterSet", "1")
 
         return conf_el
