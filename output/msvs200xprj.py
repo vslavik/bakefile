@@ -46,12 +46,12 @@ rtSingleThreaded        = '4'
 rtSingleThreadedDebug   = '5'
 
 # ------------------------------------------------------------------------
-#   extended minidom classes to create XML file with specified attributes 
+#   extended minidom classes to create XML file with specified attributes
 #   order (VC2003 projet file must have attribute "Name" as first)
 # ------------------------------------------------------------------------
 
 class ElementSorted(Element):
-    def __init__(self, tagName, namespaceURI=EMPTY_NAMESPACE, 
+    def __init__(self, tagName, namespaceURI=EMPTY_NAMESPACE,
                  prefix=None, localName=None):
         Element.__init__(self, tagName, namespaceURI, prefix, localName)
         self.order = []
@@ -63,7 +63,7 @@ class ElementSorted(Element):
     def writexml(self, writer, indent="", addindent="", newl=""):
         # This specialization does two things differently:
         # 1) order of attributes is preserved
-        # 2) attributes are placed each on its own line and indented 
+        # 2) attributes are placed each on its own line and indented
         #    so that the output looks more like MSVC's native files
         writer.write("%s<%s" % (indent, self.tagName))
 
@@ -143,7 +143,7 @@ class MsvsFilesGroup(FilesGroup):
             files = ' '.join(['*.%s' % x for x in extensions.split(';')])
         if uuid == None:
             uuid = mk_filter_uuid(name, files)
-        
+
         FilesGroup.__init__(self, name, files)
         self.uuid = uuid
         self.extensions = extensions
@@ -164,6 +164,18 @@ def mk_list(list):
     # remove empty items from the list:
     return ";".join([x for x in list.split(";") if len(x) > 0])
 
+def bool2vcstr(value):
+    """Returns "true"/"false" or "TRUE"/"FALSE" string depending on format
+       version."""
+    if value:
+        s = 'true'
+    else:
+        s = 'false'
+    if _MSVS_VCPROJ_VERSION == "7.10":
+        return s.upper()
+    else:
+        return s
+
 # ------------------------------------------------------------------------
 #                              Generator class
 # ------------------------------------------------------------------------
@@ -171,11 +183,11 @@ def mk_list(list):
 class ProjectGeneratorMsvc9:
 
     app_type_code = { 'console' : '1', 'gui' : '2' }
-    
+
     def __init__(self):
         self.basename = os.path.splitext(os.path.basename(FILE))[0]
         self.dirname = os.path.dirname(FILE)
- 
+
     # --------------------------------------------------------------------
     #   basic configuration
     # --------------------------------------------------------------------
@@ -205,7 +217,7 @@ class ProjectGeneratorMsvc9:
         # "ConfigName|Platform":
         platform, name = self.splitConfigName(config)
         return '%s|%s' % (name, platform)
-        
+
     def sortConfigsForSLN(self, configs):
         # .sln files have configs grouped, all platforms for one config
         # are together, but our "natural" sort order is different:
@@ -250,7 +262,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
     def genDSW(self, dsw_targets, dsp_list, deps_translation):
         dsw = self.makeDswHeader()
-        prj_base_string = 'Project("%s") = "%s", "%s", "%s"\n%sEndProject\n' 
+        prj_base_string = 'Project("%s") = "%s", "%s", "%s"\n%sEndProject\n'
         projects_section = "" #this string will hold the projects
         globals_section = "" #this string will hold the globals section
 
@@ -271,11 +283,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             else:
                 dsp_name = '%s_%s' % (self.basename, t.id)
             deplist = t._deps.split()
-            
+
             # add external dsp dependencies:
             for d in t._dsp_deps.split():
                 deplist.append(d.split(':')[0])
-            
+
             # write dependencies:
             deps_str = ""
             if len(deplist) != 0:
@@ -295,15 +307,15 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             #build the projects section
             prj_str = prj_base_string % (GUID_SOLUTION, t.id, dsp_name + '.' + self.getProjectExtension(), guid, deps_str)
             dsw += prj_str
-            
-            dspfile = (t, 
+
+            dspfile = (t,
                        os.path.join(self.dirname,
                                     dsp_name + '.' + self.getProjectExtension()),
                        dsp_name, guid)
-            
+
             if dspfile not in dsp_list:
                 dsp_list.append(dspfile)
-            
+
         # end of FIXME
 
         sortedConfigs = self.sortConfigsForSLN(configs)
@@ -315,7 +327,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             cfg = self.mkConfigName(c)
             dsw += "\t\t%s = %s\n" % (cfg,cfg)
         dsw += "\tEndGlobalSection\n"
-        
+
         # ...and configurations binding to vcproj configurations:
         dsw += "\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n"
 
@@ -330,18 +342,18 @@ Microsoft Visual Studio Solution File, Format Version 9.00
                     if self.isEmbeddedConfig(c):
                         dsw += txt % 'Deploy.0'
 
-        
+
         dsw += "\tEndGlobalSection\n"
         dsw += "\tGlobalSection(SolutionProperties) = preSolution\n"
         dsw += "\t\tHideSolutionNode = FALSE\n"
         dsw += "\tEndGlobalSection\n"
         dsw += "EndGlobal\n"
-        
+
         writer.writeFile('%s.%s' % (
             os.path.join(self.dirname, self.basename),
             self.getSolutionExtension()
             ), dsw)
-   
+
 
     def genWorkspaces(self):
         dsp_list = []
@@ -362,7 +374,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             # the targets may be disabled by some (weak) condition:
             if tg1 not in targets and tg2 not in targets:
                 continue
-            
+
             t = targets[tg1]
             for c in targets[tg2].configs:
                 assert c not in t.configs # otherwise not mutually exclusive
@@ -374,11 +386,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             del targets[tg2]
             deps_translation[tg1] = tgR
             deps_translation[tg2] = tgR
-        
+
         self.genDSW(projects, dsp_list, deps_translation)
         for t, filename, prjname, guid in dsp_list:
             self.genDSP(t, filename, prjname, guid)
-            
+
         # warn about <action> targets that we can't handle (yet):
         for t in [t for t in targets if t._kind == 'action']:
             print "warning: ignoring action target '%s'" % t.id
@@ -397,7 +409,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         conf_el.setAttribute("IntermediateDirectory", "%s\\%s" % (cfg._builddir, t.id) )
         conf_el.setAttribute("ConfigurationType", "%s" % cfg._type_code)
         conf_el.setAttribute("UseOfMFC", "0")
-        conf_el.setAttribute("ATLMinimizesCRunTimeLibraryUsage", "false")
+        conf_el.setAttribute("ATLMinimizesCRunTimeLibraryUsage", bool2vcstr(False))
 
         # VC++ 2008 needs CharacterSet set, definining _UNICODE is not enough,
         # see http://comments.gmane.org/gmane.comp.sysutils.bakefile.devel/1145
@@ -415,7 +427,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         warnings_map = { 'no':'0', 'default':'1', 'max':'4'}
         t6 = doc.createElement("Tool")
         t6.setAttribute("Name", "VCCLCompilerTool")
-       
+
         t6.setAttribute("Optimization", cfg._optimize)
         if cfg._optimize == "0":
             t6.setAttribute("InlineFunctionExpansion", "0")
@@ -424,15 +436,15 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t6.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
 
         if cfg._optimize == "0":
-            t6.setAttribute("MinimalRebuild", "true")
+            t6.setAttribute("MinimalRebuild", bool2vcstr(True))
         else:
-            t6.setAttribute("MinimalRebuild", "false")
+            t6.setAttribute("MinimalRebuild", bool2vcstr(False))
 
         if cfg._cxx_exceptions == 'on':
             t6.setAttribute("ExceptionHandling", "1")
         else:
             t6.setAttribute("ExceptionHandling", "0")
-        
+
         t6.setAttribute("AdditionalOptions", cfg._cppflags)
 
         # choose runtime library
@@ -465,15 +477,15 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         if cfg._rtl_dbg == 'on':
             t6.setAttribute("BasicRuntimeChecks", "3")
-            t6.setAttribute("Detect64BitPortabilityProblems", "true")
+            t6.setAttribute("Detect64BitPortabilityProblems", bool2vcstr(True))
         else:
             t6.setAttribute("BasicRuntimeChecks", "0")
-            t6.setAttribute("BufferSecurityCheck","false")
+            t6.setAttribute("BufferSecurityCheck",bool2vcstr(False))
 
         if cfg._cxx_rtti == 'on':
-            t6.setAttribute("RuntimeTypeInfo", "true")
+            t6.setAttribute("RuntimeTypeInfo", bool2vcstr(True))
         else:
-            t6.setAttribute("RuntimeTypeInfo", "false")
+            t6.setAttribute("RuntimeTypeInfo", bool2vcstr(False))
 
         if cfg._pch_use_pch == '1':
             if cfg._pch_generator:
@@ -490,7 +502,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             t6.setAttribute("WarningLevel", warnings_map[cfg._warnings])
         else:
             t6.setAttribute("WarningLevel", "1")
-        t6.setAttribute("SuppressStartupBanner", "true")
+        t6.setAttribute("SuppressStartupBanner", bool2vcstr(True))
 
         return t6
 
@@ -504,7 +516,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t10.setAttribute("AdditionalDependencies", ldlibs)
         t10.setAttribute("AdditionalOptions", cfg._ldflags)
         t10.setAttribute("OutputFile", "%s%s" % (cfg._targetdir, cfg._targetname))
-        
+
         if cfg._debug == '1':
             t10.setAttribute("LinkIncremental", "2") # on
         else:
@@ -518,15 +530,15 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         else:
             t10.setAttribute("SubSystem",
                              "%s" % self.app_type_code[cfg._type_nick])
-            
-        t10.setAttribute("SuppressStartupBanner", "true")
+
+        t10.setAttribute("SuppressStartupBanner", bool2vcstr(True))
         t10.setAttribute("AdditionalLibraryDirectories", mk_list(cfg._lib_paths))
         if _MSVS_VCPROJ_VERSION != "7.10":
-            t10.setAttribute("GenerateManifest", "true")
-        
+            t10.setAttribute("GenerateManifest", bool2vcstr(True))
+
         if cfg._debug == '1':
-            t10.setAttribute("GenerateDebugInformation", "true")
-            
+            t10.setAttribute("GenerateDebugInformation", bool2vcstr(True))
+
         t10.setAttribute("ProgramDatabaseFile", cfg._pdbfile)
 
         if self.isEmbeddedConfig(c):
@@ -544,7 +556,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t10 = doc.createElement("Tool")
         t10.setAttribute("Name", "VCLibrarianTool")
         t10.setAttribute("OutputFile","%s%s" % (cfg._targetdir, cfg._targetname) )
-        t10.setAttribute("SuppressStartupBanner", "true")
+        t10.setAttribute("SuppressStartupBanner", bool2vcstr(True))
         return t10
 
     def buildResourceCompilerToolElement(self, doc, cfg, t):
@@ -576,7 +588,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         for c in sortedKeys(t.configs):
             cfg = t.configs[c]
             confs_el.appendChild(self.buildSingleConfiguration(doc, prjname, cfg, c, t))
-        return confs_el    
+        return confs_el
 
     def buildSingleConfiguration(self, doc, prjname, cfg, c, t):
         conf_el = self.buildConfElement(doc, cfg, c, t)
@@ -633,7 +645,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         t13 = doc.createElement("Tool")
         t13.setAttribute("Name", "VCBscMakeTool")
         t13.setAttribute("OutputFile", "%s%s.bsc" % (cfg._targetdir, prjname))
-        t13.setAttribute("SuppressStartupBanner", "true")
+        t13.setAttribute("SuppressStartupBanner", bool2vcstr(True))
         conf_el.appendChild(t13)
 
         t14 = doc.createElement("Tool")
@@ -657,7 +669,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             self.buildEmbeddedTools(doc, conf_el)
 
         return conf_el
-                
+
     def buildCustomBuildElement(self, doc, data):
         # parse MSVC6-style custom build element code (FIXME: this is for
         # compatibility, will be replaced with <action> handling in the
@@ -700,8 +712,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         debugger_tool_el = doc.createElement("DebuggerTool")
         conf_el.appendChild(debugger_tool_el)
-    
-    def genDSP(self, t, filename, prjname, guid):        
+
+    def genDSP(self, t, filename, prjname, guid):
         #start a new xml document
         doc = DocumentSorted()
         top_el = doc.createElement("VisualStudioProject")
@@ -722,7 +734,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         top_el.setAttribute("ProjectGUID", "%s" % guid)
 
         top_el.appendChild(self.buildPlatformsElement(doc))
-        
+
         if _MSVS_VCPROJ_VERSION != "7.10":
             top_el.appendChild(self.buildToolFilesElement(doc))
 
@@ -737,7 +749,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         #munge the source files around so we can write them to the file
         sources, groups, files, filesWithCustomBuild = \
             organizeFilesIntoGroups(t, DEFAULT_FILE_GROUPS, groupClass=MsvsFilesGroup)
-       
+
         ##define a local helper function for building the files area
         def makeFileConfig(t, cfg, c, src, group, sources, pchExcluded):
             conf_name = self.mkConfigName(c)
@@ -745,7 +757,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             file_conf_el.setAttribute("Name", conf_name)
 
             if sources[src] != None and c not in sources[src]:
-                file_conf_el.setAttribute("ExcludedFromBuild", "true")
+                file_conf_el.setAttribute("ExcludedFromBuild", bool2vcstr(True))
                 tool_el = None
             elif (src in filesWithCustomBuild.keys() and
                 c in filesWithCustomBuild[src].keys()):
@@ -770,9 +782,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             if tool_el != None:
                 file_conf_el.appendChild(tool_el)
             return file_conf_el
-        
+
         pchExcluded = t._pch_excluded.split()
-        
+
         for group in [g for g in groups if g.name in files]:
             lst = files[group.name]
             sortByBasename(lst)
@@ -787,14 +799,14 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             for src in lst:
                 file_el = doc.createElement("File")
                 file_el.setAttribute("RelativePath", "%s\\%s" % (SRCDIR.replace('/','\\'), src))
-                   
+
                 for c in sortedKeys(t.configs):
                     cfg = t.configs[c]
                     file_conf_el = makeFileConfig(t, cfg, c, src, group.name,
                                                   sources, pchExcluded)
                     if ( file_conf_el != None ):
                         file_el.appendChild(file_conf_el)
-                    
+
                 filt_el.appendChild(file_el)
 
             files_el.appendChild(filt_el)
@@ -804,11 +816,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         globals_el = doc.createElement("Globals")
         globals_el.appendChild(doc.createTextNode(""))
         top_el.appendChild(globals_el)
-            
+
         dsp = doc.toprettyxml(encoding="Windows-1252")
 
         writer.writeFile(filename, dsp)
-        
+
 def run():
     msvc_common.__dict__.update(globals())
     generator = ProjectGeneratorMsvc9()
