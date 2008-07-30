@@ -38,12 +38,46 @@ from msvc_common import *
 #   misc .vcproj constants:
 # ------------------------------------------------------------------------
 
+# compiler options
+
 rtMultiThreaded         = '0'
 rtMultiThreadedDebug    = '1'
 rtMultiThreadedDLL      = '2'
 rtMultiThreadedDebugDLL = '3'
 rtSingleThreaded        = '4'
 rtSingleThreadedDebug   = '5'
+
+debugDisabled           = '0'
+debugOldStyleInfo       = '1'
+debugLineInfoOnly       = '2'
+debugEnabled            = '3'
+debugEditAndContinue    = '4'
+
+runtimeBasicCheckNone       = '0'
+runtimeCheckStackFrame      = '1'
+runtimeCheckUninitVariables = '2'
+runtimeBasicCheckAll        = '3'
+
+optimizeDisabled        = '0'
+optimizeMinSpace        = '1'
+optimizeMaxSpeed        = '2'
+optimizeFull            = '3'
+optimizeCustom          = '4'
+
+pchNone                 = '0'
+pchCreateUsingSpecific  = '1'
+pchGenerateAuto         = '2'
+pchUseUsingSpecific     = '3'
+
+# linker options
+
+linkIncrementalDefault  = '0'
+linkIncrementalNo       = '1'
+linkIncrementalYes      = '2'
+
+optReferencesDefault    = '0'
+optNoReferences         = '1'
+optReferences           = '2'
 
 # ------------------------------------------------------------------------
 #   extended minidom classes to create XML file with specified attributes
@@ -430,26 +464,29 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
 
     def buildCompilerToolElement(self, tool, prjname, cfg, c, t):
-        warnings_map = { 'no':'0', 'default':'1', 'max':'4'}
+        # the order of attributes here is the same as used in the projects
+        # created by MSVS itself
+
+        if cfg._cppflags != '':
+            tool.setAttribute("AdditionalOptions", cfg._cppflags)
 
         tool.setAttribute("Optimization", cfg._optimize)
-        if cfg._optimize == "0":
-            tool.setAttribute("InlineFunctionExpansion", "0")
-        else:
-            tool.setAttribute("InlineFunctionExpansion", "2")
         tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
+        tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
 
         if cfg._optimize == "0":
             tool.setAttribute("MinimalRebuild", bool2vcstr(True))
-        else:
-            tool.setAttribute("MinimalRebuild", bool2vcstr(False))
 
-        if cfg._cxx_exceptions == 'on':
-            tool.setAttribute("ExceptionHandling", "1")
+        # this property type has changed from int to bool since VC7
+        eh = cfg._cxx_exceptions == 'on'
+        if _MSVS_VCPROJ_VERSION == "7.10":
+            eh = bool2vcstr(eh)     # True/False -> 'TRUE'/'FALSE'
         else:
-            tool.setAttribute("ExceptionHandling", "0")
+            eh = str(int(eh))       # True/False -> '1'/'0'
+        tool.setAttribute("ExceptionHandling", eh)
 
-        tool.setAttribute("AdditionalOptions", cfg._cppflags)
+        if cfg._rtl_dbg == 'on':
+            tool.setAttribute("BasicRuntimeChecks", runtimeBasicCheckAll)
 
         # choose runtime library
         if cfg._rtl_threading == 'multi':
@@ -472,19 +509,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
                 rtl = rtSingleThreaded
         tool.setAttribute("RuntimeLibrary", rtl)
 
-        tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
-
-        if cfg._debug == '1':
-            tool.setAttribute("DebugInformationFormat", "3") # enabled
-        else:
-            tool.setAttribute("DebugInformationFormat", "0") # no debug
-
-        if cfg._rtl_dbg == 'on':
-            tool.setAttribute("BasicRuntimeChecks", "3")
-            tool.setAttribute("Detect64BitPortabilityProblems", bool2vcstr(True))
-        else:
-            tool.setAttribute("BasicRuntimeChecks", "0")
-            tool.setAttribute("BufferSecurityCheck",bool2vcstr(False))
+        if cfg._optimize == "0":
+            tool.setAttribute("BufferSecurityCheck",bool2vcstr(True))
 
         if cfg._cxx_rtti == 'on':
             tool.setAttribute("RuntimeTypeInfo", bool2vcstr(True))
@@ -493,20 +519,30 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         if cfg._pch_use_pch == '1':
             if cfg._pch_generator:
-                tool.setAttribute("UsePrecompiledHeader","3")
+                tool.setAttribute("UsePrecompiledHeader", pchUseUsingSpecific)
             else:
-                tool.setAttribute("UsePrecompiledHeader","2")
+                tool.setAttribute("UsePrecompiledHeader", pchGenerateAuto)
             tool.setAttribute("PrecompiledHeaderThrough", cfg._pch_header)
             tool.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
 
         tool.setAttribute("AssemblerListingLocation", "%s\\%s\\" % (cfg._builddir, t.id) )
         tool.setAttribute("ObjectFile", "%s\\%s\\" % (cfg._builddir, t.id) )
         tool.setAttribute("ProgramDataBaseFileName", cfg._pdbfile)
+
+        warnings_map = { 'no':'0', 'default':'3', 'max':'4'}
         if warnings_map.has_key(cfg._warnings):
             tool.setAttribute("WarningLevel", warnings_map[cfg._warnings])
         else:
-            tool.setAttribute("WarningLevel", "1")
+            tool.setAttribute("WarningLevel", warnings_map['default'])
+
         tool.setAttribute("SuppressStartupBanner", bool2vcstr(True))
+
+        tool.setAttribute("Detect64BitPortabilityProblems", bool2vcstr(True))
+
+        if cfg._debug == '1':
+            tool.setAttribute("DebugInformationFormat", debugEnabled)
+        else:
+            tool.setAttribute("DebugInformationFormat", debugDisabled)
 
 
     def buildLinkerToolElement(self, tool, prjname, cfg, c, t):
@@ -519,9 +555,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         tool.setAttribute("OutputFile", "%s%s" % (cfg._targetdir, cfg._targetname))
 
         if cfg._debug == '1':
-            tool.setAttribute("LinkIncremental", "2") # on
+            tool.setAttribute("LinkIncremental", linkIncrementalYes)
         else:
-            tool.setAttribute("LinkIncremental", "1") # off
+            tool.setAttribute("LinkIncremental", linkIncrementalNo)
 
         if cfg._type_nick == 'dll':
             if cfg._importlib != "":
@@ -546,7 +582,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             tool.setAttribute("TargetMachine", "3")
             tool.setAttribute("DelayLoadDLLs", "$(NOINHERIT)")
             if cfg._debug == '0':
-                tool.setAttribute("OptimizeReferences", "2")
+                tool.setAttribute("OptimizeReferences", optReferences)
                 tool.setAttribute("EnableCOMDATFolding", "2")
         else:
             tool.setAttribute("TargetMachine", "1")
@@ -558,9 +594,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
 
     def buildResourceCompilerToolElement(self, tool, prjname, cfg, c, t):
+        tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._res_defines))
         tool.setAttribute("Culture", "1033")
         tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._res_include_paths))
-        tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._res_defines))
 
 
     def buildPlatformsElement(self, doc):
