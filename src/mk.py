@@ -108,13 +108,13 @@ class Condition:
             self.value = value
 
         def __cmp__(self, other):
-            return cmp((self.option.name, self.value), 
+            return cmp((self.option.name, self.value),
                        (other.option.name, other.value))
-        
+
     def __init__(self, name, exprs):
         self.name = name
         self.exprs = exprs
-                    
+
     def tostr(self):
         parts = [ "%s=='%s'" % (x.option.name,x.value) for x in self.exprs ]
         return ' and '.join(parts)
@@ -438,12 +438,13 @@ def makeCondition(cond_str):
     condexpr_list = optimized_list
 
     def safeValue(s):
-        return str(s).replace('.','_').replace('/','').replace('\\','').upper()
-    
+        return str(s).replace('.','_').replace('/','').replace('\\','')
+
     condexpr_list.sort()
-    cname = '_'.join(['%s_%s' % (e.option.name.upper(), safeValue(e.value)) \
+    cname = '_'.join(['%s_%s' % (e.option.name, safeValue(e.value)) \
                       for e in condexpr_list])
     if cname in conditions:
+        assert conditions[cname].exprs == condexpr_list
         return conditions[cname]
     else:
         c = Condition(cname, condexpr_list)
