@@ -10,8 +10,20 @@
         <title>Introduction</title>
 
         <para>
-            Bakefile provides miscellaneous utilities in the form of Python
-            functions which can be used in your bakefiles. Unlike tags and
+            In Bakefile, the expression inside <literal>$(...)</literal>
+            doesn't have to be a variable name, it can be
+            <emphasis>any</emphasis> Python expression. Expressions that
+            cannot be evaluated at runtime and are translated into output
+            format conditions are more limited, but as long as the expression
+            is evaluated only at Bakefile execution time, it can be any valid
+            Python expression.  In particular, any Python functions may be
+            called.
+        </para>
+
+        <para>
+            In order to make common tasks easier, Bakefile provides
+            miscellaneous utility functions which can
+            be used in your bakefiles. Unlike tags and
             rules provided through <link linkend="ch.modules">modules</link>,
             the functions documented in this section are available everywhere
             in Bakefile.
