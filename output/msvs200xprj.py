@@ -277,10 +277,10 @@ class ProjectGeneratorMsvc9:
         return cfg != 'win32'
 
     # --------------------------------------------------------------------
-    #   DSW file
+    #   Solution file (.sln)
     # --------------------------------------------------------------------
 
-    def makeDswHeader(self):
+    def makeSlnHeader(self):
         if _MSVS_SLN_VERSION == "8.00":
             return """\
 Microsoft Visual Studio Solution File, Format Version 8.00
@@ -294,31 +294,31 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             import errors
             raise errors.Error("unexpected MSVS format version")
 
-    def genDSW(self, dsw_targets, dsp_list, deps_translation):
-        dsw = self.makeDswHeader()
+    def genSln(self, sln_targets, vcproj_list, deps_translation):
+        sln = self.makeSlnHeader()
         prj_base_string = 'Project("%s") = "%s", "%s", "%s"\n%sEndProject\n'
         projects_section = "" #this string will hold the projects
         globals_section = "" #this string will hold the globals section
 
-        if len(dsw_targets) == 0:
+        if len(sln_targets) == 0:
             return
 
         ## loop over the targets and assign everyone a guid
         guid_dict = {}
-        for t in dsw_targets:
+        for t in sln_targets:
             guid_dict[t.id] = mk_proj_uuid(self.basename, t.id)
 
         #        moved to common code
-        single_target = (len(dsw_targets) == 1)
-        for t in dsw_targets:
+        single_target = (len(sln_targets) == 1)
+        for t in sln_targets:
             deps = ''
             if single_target:
-                dsp_name = self.basename
+                vcproj_name = self.basename
             else:
-                dsp_name = '%s_%s' % (self.basename, t.id)
+                vcproj_name = '%s_%s' % (self.basename, t.id)
             deplist = t._deps.split()
 
-            # add external dsp dependencies:
+            # add external project dependencies:
             for d in t._dsp_deps.split():
                 deplist.append(d.split(':')[0])
 
@@ -339,58 +339,58 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             guid = guid_dict[t.id]
 
             #build the projects section
-            prj_str = prj_base_string % (GUID_SOLUTION, t.id, dsp_name + '.' + self.getProjectExtension(), guid, deps_str)
-            dsw += prj_str
+            prj_str = prj_base_string % (GUID_SOLUTION, t.id, vcproj_name + '.' + self.getProjectExtension(), guid, deps_str)
+            sln += prj_str
 
-            dspfile = (t,
+            vcproj_file = (t,
                        os.path.join(self.dirname,
-                                    dsp_name + '.' + self.getProjectExtension()),
-                       dsp_name, guid)
+                                    vcproj_name + '.' + self.getProjectExtension()),
+                       vcproj_name, guid)
 
-            if dspfile not in dsp_list:
-                dsp_list.append(dspfile)
+            if vcproj_file not in vcproj_list:
+                vcproj_list.append(vcproj_file)
 
         # end of FIXME
 
         sortedConfigs = self.sortConfigsForSLN(configs)
 
         # generate configurations listing:
-        dsw += "Global\n"
-        dsw += "\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n"
+        sln += "Global\n"
+        sln += "\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n"
         for c in sortedConfigs:
             cfg = self.mkConfigName(c)
-            dsw += "\t\t%s = %s\n" % (cfg,cfg)
-        dsw += "\tEndGlobalSection\n"
+            sln += "\t\t%s = %s\n" % (cfg,cfg)
+        sln += "\tEndGlobalSection\n"
 
         # ...and configurations binding to vcproj configurations:
-        dsw += "\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n"
+        sln += "\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n"
 
-        for t in dsw_targets:
+        for t in sln_targets:
             guid = guid_dict[t.id]
             for c in sortedConfigs:
                 cfg = self.mkConfigName(c)
                 txt = "\t\t%(guid)s.%(cfg)s.%%s = %(cfg)s\n" % {'guid':guid, 'cfg':cfg}
-                dsw += txt % 'ActiveCfg'
+                sln += txt % 'ActiveCfg'
                 if c in t.configs:
-                    dsw += txt % 'Build.0'
+                    sln += txt % 'Build.0'
                     if self.isEmbeddedConfig(c):
-                        dsw += txt % 'Deploy.0'
+                        sln += txt % 'Deploy.0'
 
 
-        dsw += "\tEndGlobalSection\n"
-        dsw += "\tGlobalSection(SolutionProperties) = preSolution\n"
-        dsw += "\t\tHideSolutionNode = FALSE\n"
-        dsw += "\tEndGlobalSection\n"
-        dsw += "EndGlobal\n"
+        sln += "\tEndGlobalSection\n"
+        sln += "\tGlobalSection(SolutionProperties) = preSolution\n"
+        sln += "\t\tHideSolutionNode = FALSE\n"
+        sln += "\tEndGlobalSection\n"
+        sln += "EndGlobal\n"
 
         writer.writeFile('%s.%s' % (
             os.path.join(self.dirname, self.basename),
             self.getSolutionExtension()
-            ), dsw)
+            ), sln)
 
 
     def genWorkspaces(self):
-        dsp_list = []
+        vcproj_list = []
 
         # find all projects. Beware ugly hack here: MSVC6PRJ_MERGED_TARGETS is
         # used to create fake targets as a merge of two (mutually exclusive)
@@ -421,9 +421,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             deps_translation[tg1] = tgR
             deps_translation[tg2] = tgR
 
-        self.genDSW(projects, dsp_list, deps_translation)
-        for t, filename, prjname, guid in dsp_list:
-            self.genDSP(t, filename, prjname, guid)
+        self.genSln(projects, vcproj_list, deps_translation)
+        for t, filename, prjname, guid in vcproj_list:
+            self.genVCProj(t, filename, prjname, guid)
 
         # warn about <action> targets that we can't handle (yet):
         for t in [t for t in targets if t._kind == 'action']:
@@ -431,10 +431,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
 
     # ------------------------------------------------------------------------
-    #   DSP files
+    #   Project files (.vcproj)
     # ------------------------------------------------------------------------
 
-    #some helpers to build parts of the DSP file that change if you are doing PC vs WinCE
+    # some helpers to build parts of the project file that change if you are
+    # doing PC vs WinCE
     def buildConfElement(self, doc, cfg, c, t):
         conf_name = self.mkConfigName(c)
         conf_el = doc.createElement("Configuration")
@@ -753,7 +754,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         debugger_tool_el = doc.createElement("DebuggerTool")
         conf_el.appendChild(debugger_tool_el)
 
-    def genDSP(self, t, filename, prjname, guid):
+    def genVCProj(self, t, filename, prjname, guid):
         #start a new xml document
         doc = DocumentSorted()
         top_el = doc.createElement("VisualStudioProject")
@@ -857,9 +858,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         globals_el.appendChild(doc.createTextNode(""))
         top_el.appendChild(globals_el)
 
-        dsp = doc.toprettyxml(encoding="Windows-1252")
+        vcprojText = doc.toprettyxml(encoding="Windows-1252")
 
-        writer.writeFile(filename, dsp)
+        writer.writeFile(filename, vcprojText)
 
 def run():
     msvc_common.__dict__.update(globals())
