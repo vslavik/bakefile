@@ -689,12 +689,12 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
             if _MSVS_VCPROJ_VERSION != "8.00":
                 # this tool was removed in VS 2008
-                tools.pop('VCWebDeploymentTool')
+                tools.remove('VCWebDeploymentTool')
 
             if cfg._type_nick not in ['gui', 'console']:
                 # these tools only make sense for the applications, not libraries
-                tools.pop('VCAppVerifierTool')
-                tools.pop('VCWebDeploymentTool')
+                tools.remove('VCAppVerifierTool')
+                tools.remove('VCWebDeploymentTool')
 
         # add all the tools
         for tool in tools:
