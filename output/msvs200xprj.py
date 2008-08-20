@@ -219,8 +219,14 @@ class ProjectGeneratorMsvc9:
     app_type_code = { 'console' : '1', 'gui' : '2' }
 
     def __init__(self):
-        self.basename = os.path.splitext(os.path.basename(FILE))[0]
+        self.basename, ext = os.path.splitext(os.path.basename(FILE))
         self.dirname = os.path.dirname(FILE)
+        if ext.lower() == '.vcproj':
+            self.onlyProject = True
+        else:
+            if ext.lower() != '.sln' and ext != '':
+                print 'warning: ignoring extension "%s"' % ext[1:] # drop dot
+            self.onlyProject = False
 
     # --------------------------------------------------------------------
     #   basic configuration
@@ -276,6 +282,68 @@ class ProjectGeneratorMsvc9:
         cfg = configs[config][0]['MSVS_PLATFORM']
         return cfg != 'win32'
 
+
+    def assignGUIDs(self, sln_targets):
+        """Returns the dictionary containing GUIDs indexed by target ids."""
+        guid_dict = {}
+        for t in sln_targets:
+            guid_dict[t.id] = mk_proj_uuid(self.basename, t.id)
+        return guid_dict
+
+    def createVCProjList(self, sln_targets, guid_dict, vcproj_list, deps_translation):
+        """Fills the project list and also returns the SLN projects sections as
+           a side effect."""
+        sln = ''
+        single_target = (len(sln_targets) == 1)
+        for t in sln_targets:
+            deps = ''
+            if single_target:
+                vcproj_name = self.basename
+            else:
+                vcproj_name = '%s_%s' % (self.basename, t.id)
+            deplist = t._deps.split()
+
+            # add external project dependencies:
+            for d in t._dsp_deps.split():
+                deplist.append(d.split(':')[0])
+
+            # create the dependencies section, if any:
+            deps_str = ""
+            if len(deplist) != 0:
+                deps_str = "\tProjectSection(ProjectDependencies) = postProject\n"
+
+                for d in deplist:
+                    if d in deps_translation:
+                        d2 = deps_translation[d]
+                    else:
+                        d2 = d
+                    guid = guid_dict[d2]
+                    deps_str += "\t\t%s = %s\n" % (guid, guid)
+                deps_str += "\tEndProjectSection\n"
+
+            guid = guid_dict[t.id]
+
+            # create the project section:
+            sln += 'Project("%s") = "%s", "%s", "%s"\n' % (
+                        GUID_SOLUTION,
+                        t.id,
+                        vcproj_name + '.' + self.getProjectExtension(),
+                        guid
+                    )
+            sln += deps_str
+            sln += 'EndProject\n'
+
+            vcproj_file = (t,
+                       os.path.join(self.dirname,
+                                    vcproj_name + '.' + self.getProjectExtension()),
+                       vcproj_name, guid)
+
+            if vcproj_file not in vcproj_list:
+                vcproj_list.append(vcproj_file)
+
+        return sln
+
+
     # --------------------------------------------------------------------
     #   Solution file (.sln)
     # --------------------------------------------------------------------
@@ -294,63 +362,13 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             import errors
             raise errors.Error("unexpected MSVS format version")
 
-    def genSln(self, sln_targets, vcproj_list, deps_translation):
-        sln = self.makeSlnHeader()
-        prj_base_string = 'Project("%s") = "%s", "%s", "%s"\n%sEndProject\n'
-        projects_section = "" #this string will hold the projects
-        globals_section = "" #this string will hold the globals section
-
+    def genSln(self, sln_targets, guid_dict, vcproj_list, deps_translation):
         if len(sln_targets) == 0:
             return
 
-        ## loop over the targets and assign everyone a guid
-        guid_dict = {}
-        for t in sln_targets:
-            guid_dict[t.id] = mk_proj_uuid(self.basename, t.id)
+        sln = self.makeSlnHeader()
 
-        #        moved to common code
-        single_target = (len(sln_targets) == 1)
-        for t in sln_targets:
-            deps = ''
-            if single_target:
-                vcproj_name = self.basename
-            else:
-                vcproj_name = '%s_%s' % (self.basename, t.id)
-            deplist = t._deps.split()
-
-            # add external project dependencies:
-            for d in t._dsp_deps.split():
-                deplist.append(d.split(':')[0])
-
-            # write dependencies:
-            deps_str = ""
-            if len(deplist) != 0:
-                deps_str = "\tProjectSection(ProjectDependencies) = postProject\n"
-
-                for d in deplist:
-                    if d in deps_translation:
-                        d2 = deps_translation[d]
-                    else:
-                        d2 = d
-                    guid = guid_dict[d2]
-                    deps_str += "\t\t%s = %s\n" % (guid, guid)
-                deps_str += "\tEndProjectSection\n"
-
-            guid = guid_dict[t.id]
-
-            #build the projects section
-            prj_str = prj_base_string % (GUID_SOLUTION, t.id, vcproj_name + '.' + self.getProjectExtension(), guid, deps_str)
-            sln += prj_str
-
-            vcproj_file = (t,
-                       os.path.join(self.dirname,
-                                    vcproj_name + '.' + self.getProjectExtension()),
-                       vcproj_name, guid)
-
-            if vcproj_file not in vcproj_list:
-                vcproj_list.append(vcproj_file)
-
-        # end of FIXME
+        sln += self.createVCProjList(sln_targets, guid_dict, vcproj_list, deps_translation)
 
         sortedConfigs = self.sortConfigsForSLN(configs)
 
@@ -421,7 +439,13 @@ Microsoft Visual Studio Solution File, Format Version 9.00
             deps_translation[tg1] = tgR
             deps_translation[tg2] = tgR
 
-        self.genSln(projects, vcproj_list, deps_translation)
+        guid_dict = self.assignGUIDs(projects)
+        if self.onlyProject:
+            self.createVCProjList(projects, guid_dict, vcproj_list, deps_translation)
+            if len(vcproj_list) != 1:
+                raise errors.Error("Single project name specified for multiple targets.")
+        else:
+            self.genSln(projects, guid_dict, vcproj_list, deps_translation)
         for t, filename, prjname, guid in vcproj_list:
             self.genVCProj(t, filename, prjname, guid)
 

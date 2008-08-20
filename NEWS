@@ -1,4 +1,6 @@
 
+- msvs200xprj: if "-o foo.vcproj" is specified on the command line, only
+  generate foo.vcproj and not foo.sln (#174)
 - autoconf: fixes for non-default BUILDDIR
 - msvs2005prj: fixed _WIN32_WCE define for PocketPC 2003 platform (#187)
 - put user- or configure-provided LDFLAGS and LIBS to the end of linker

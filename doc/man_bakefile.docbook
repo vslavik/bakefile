@@ -27,7 +27,7 @@
         </arg>
         <arg choice="plain">
           <option>-o</option><replaceable class="parameter">OUTFILE</replaceable>
-        </arg>        
+        </arg>
         <arg choice="opt">
           <option>--eol=[format|dos|unix|mac|native]</option>
         </arg>
@@ -43,25 +43,25 @@
         </arg>
         <arg choice="opt">
           <option>-v</option>
-        </arg>        
+        </arg>
         <arg choice="opt">
           <option>-q</option>
-        </arg>        
+        </arg>
         <arg choice="opt">
           <option>--dry-run</option>
-        </arg>        
+        </arg>
         <arg choice="opt">
           <option>--touch</option>
-        </arg>        
+        </arg>
         <arg choice="opt">
           <option>--dump</option>
-        </arg>        
+        </arg>
         <arg choice="plain">
           <replaceable class="parameter">file.bkl</replaceable>
         </arg>
       </cmdsynopsis>
     </refsynopsisdiv>
-    
+
     <refsect1>
       <title>Description</title>
       <para>
@@ -86,7 +86,7 @@
               </para>
             </listitem>
           </varlistentry>
-          
+
           <varlistentry>
             <term>
               <option>-h</option>, <option>--help</option>
@@ -97,11 +97,11 @@
               </para>
             </listitem>
           </varlistentry>
-          
+
           <varlistentry>
             <term>
               <option>-f</option><replaceable
-                class="parameter">FORMAT</replaceable>, 
+                class="parameter">FORMAT</replaceable>,
               <option>--format</option>=<replaceable
                 class="parameter">FORMAT</replaceable>
             </term>
@@ -171,7 +171,7 @@
                         <entry>Microsoft Embedded Visual C++ 4 project
                         files</entry>
                       </row>
-                      
+
                       <row>
                         <entry>msvs2003prj</entry>
                         <entry>
@@ -210,7 +210,7 @@
           <varlistentry>
             <term>
               <option>-o</option><replaceable
-                class="parameter">OUTFILE</replaceable>, 
+                class="parameter">OUTFILE</replaceable>,
               <option>--output</option>=<replaceable
                 class="parameter">OUTFILE</replaceable>
             </term>
@@ -220,9 +220,16 @@
                 that generate more than one file, this option specifies
                 the name of the main makefile.
               </para>
+              <para>
+                This option has special meaning for msvs200xprj formats: by
+                default, both the project files (one for each target) and a
+                solution file, containing all the project files, are generated.
+                However if OUTFILE is a file with .vcproj extension, then only
+                the (necessarily unique) project file will be generated.
+              </para>
             </listitem>
           </varlistentry>
-          
+
           <varlistentry>
             <term>
               <option>-D</option><replaceable
@@ -259,7 +266,7 @@
               </para>
             </listitem>
           </varlistentry>
-          
+
           <varlistentry>
             <term>
               <option>--wrap-output</option>=<replaceable
@@ -274,11 +281,11 @@
               </para>
             </listitem>
           </varlistentry>
-          
-          
+
+
           <varlistentry>
             <term>
-              <option>-I</option><replaceable class="parameter">PATH</replaceable>            
+              <option>-I</option><replaceable class="parameter">PATH</replaceable>
             </term>
             <listitem>
               <para>
@@ -300,7 +307,7 @@
               </para>
             </listitem>
           </varlistentry>
-          
+
           <varlistentry>
             <term>
               <option>-v</option>, <option>--verbose</option>
@@ -339,7 +346,7 @@
               <para>show internal debugging information</para>
             </listitem>
           </varlistentry>
-                    
+
           <varlistentry>
             <term>
               <option>--dump</option>
@@ -352,7 +359,7 @@
               </para>
             </listitem>
           </varlistentry>
-          
+
 
           <varlistentry>
             <term>
@@ -366,7 +373,7 @@
               </para>
             </listitem>
           </varlistentry>
-          
+
           <varlistentry>
             <term>
               <option>--output-changes</option>=<replaceable
@@ -378,7 +385,7 @@
               </para>
             </listitem>
           </varlistentry>
-          
+
           <varlistentry>
             <term>
               <option>--xml-cache</option>=<replaceable
@@ -391,11 +398,11 @@
               </para>
             </listitem>
           </varlistentry>
-          
+
         </variablelist>
       </para>
     </refsect1>
-    
+
     <refsect1>
       <title>Environment Variables</title>
       <para>
