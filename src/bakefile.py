@@ -37,8 +37,8 @@ import xmlparser
 
 def addIncludePaths(includes):
     import config
-    for p in includes:
-        config.searchPath.append(os.path.normpath(p))
+    normalized = [os.path.normpath(p) for p in includes]
+    config.searchPath = normalized + config.searchPath
 
 class BakefileOptionParser(OptionParser):
     def __init__(self):
