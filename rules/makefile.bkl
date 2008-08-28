@@ -734,6 +734,7 @@
             <modify-target target="install_$(id)">
                 <command>$(INSTALL_DIR) $(DESTDIR)$(nativePaths(value))</command>
                 <dependency-of>install</dependency-of>
+                <depends>$(id)</depends>
             </modify-target>
             <modify-target target="uninstall_$(id)">
                 <!-- we won't uninstall the $(DESTDIR)$(value) folder that we
@@ -851,9 +852,7 @@
     <phony id="all" category="all"/>
 
     <if cond="FORMAT_HAS_MAKE_INSTALL=='1'">
-        <action id="install" template="__phony">
-            <depends>all</depends>
-        </action>
+        <action id="install" template="__phony"/>
 
         <action id="uninstall" template="__phony"/>
     </if>

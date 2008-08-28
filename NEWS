@@ -25,6 +25,7 @@
 - added support for multiple source files with the same name (#92)
 - msvs2003prj, msvs2005prj: fixed to generate correct precompiled headers
   setting for auto vs. manual PCH creation
+- fixed incorrect dependencies of the "install" target (#225)
 
 
 Version 0.2.3
