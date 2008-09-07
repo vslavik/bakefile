@@ -499,7 +499,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
         tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
 
-        if cfg._optimize == "0":
+        if cfg._optimize == "0" and cfg._debug == '1':
             tool.setAttribute("MinimalRebuild", bool2vcstr(True))
 
         # this property type has changed from int to bool since VC7
