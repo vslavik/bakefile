@@ -13,12 +13,13 @@
 
 
   <section id="format.msvs2005prj">
-    <title>MS VisualStudio 2005 extended functionality</title>
+    <title>MS VisualStudio 2005/2008 extended functionality</title>
     <para>
-      The <literal>msvs2005prj</literal> is capable of generating project
-      files both for Win32 PC platform and for embedded platform. By default,
-      only Win32 configurations are generated, embedded configurations must
-      be explicitly enabled.
+      The <literal>msvs2005prj</literal> and <literal>msvs2008prj</literal>
+      formats are capable of generating project files both for Win32 PC
+      platform and for embedded platform. By default, only Win32
+      configurations are generated, embedded configurations must be explicitly
+      enabled.
     </para>
     <para>
       This is done by setting the

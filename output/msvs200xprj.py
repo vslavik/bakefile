@@ -358,6 +358,11 @@ Microsoft Visual Studio Solution File, Format Version 8.00
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 """
+        elif _MSVS_SLN_VERSION == "10.00":
+            return """\
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+"""
         else:
             import errors
             raise errors.Error("unexpected MSVS format version")
@@ -492,8 +497,14 @@ Microsoft Visual Studio Solution File, Format Version 9.00
         # the order of attributes here is the same as used in the projects
         # created by MSVS itself
 
-        if cfg._cppflags != '':
-            tool.setAttribute("AdditionalOptions", cfg._cppflags)
+        if _MSVS_VCPROJ_VERSION not in ["7.10", "8.00"]:
+            extra_cppflags = "/MP" # parallel compilation
+            if cfg._cppflags:
+                extra_cppflags = "%s %s" % (extra_cppflags, cfg._cppflags)
+        else:
+            extra_cppflags = cfg._cppflags
+        if extra_cppflags:
+            tool.setAttribute("AdditionalOptions", extra_cppflags)
 
         tool.setAttribute("Optimization", cfg._optimize)
         tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
@@ -562,7 +573,10 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 
         tool.setAttribute("SuppressStartupBanner", bool2vcstr(True))
 
-        tool.setAttribute("Detect64BitPortabilityProblems", bool2vcstr(True))
+        # Detect64BitPortabilityProblems is deprecated in VS2008 and will
+        # be removed in the future:
+        if _MSVS_VCPROJ_VERSION in ["7.10", "8.00"]:
+            tool.setAttribute("Detect64BitPortabilityProblems", bool2vcstr(True))
 
         if cfg._debug == '1':
             tool.setAttribute("DebugInformationFormat", debugEnabled)
@@ -690,12 +704,16 @@ Microsoft Visual Studio Solution File, Format Version 9.00
                         'VCAuxiliaryManagedWrapperGeneratorTool',
                     ]
         else:
+            if _MSVS_VCPROJ_VERSION == "8.00":
+                idlTool = "VCMIDLTool"
+            else:
+                idlTool = "VCIDLTool"
             tools = [
                         'VCPreBuildEventTool',
                         'VCCustomBuildTool',
                         'VCXMLDataGeneratorTool',
                         'VCWebServiceProxyGeneratorTool',
-                        'VCMIDLTool',
+                        idlTool,
                         'VCCLCompilerTool',
                         'VCManagedResourceCompilerTool',
                         'VCResourceCompilerTool',
@@ -711,14 +729,14 @@ Microsoft Visual Studio Solution File, Format Version 9.00
                         'VCPostBuildEventTool',
                     ]
 
-            if _MSVS_VCPROJ_VERSION != "8.00":
-                # this tool was removed in VS 2008
-                tools.remove('VCWebDeploymentTool')
-
             if cfg._type_nick not in ['gui', 'console']:
                 # these tools only make sense for the applications, not libraries
                 tools.remove('VCAppVerifierTool')
                 tools.remove('VCWebDeploymentTool')
+            else:
+                if _MSVS_VCPROJ_VERSION != "8.00":
+                    # this tool was removed in VS 2008
+                    tools.remove('VCWebDeploymentTool')
 
         # add all the tools
         for tool in tools:

@@ -187,6 +187,13 @@
                       </row>
 
                       <row>
+                        <entry>msvs2008prj</entry>
+                        <entry>
+                          MS Visual Studio 2008 project files
+                        </entry>
+                      </row>
+
+                      <row>
                         <entry>symbian</entry>
                         <entry>Symbian development files</entry>
                       </row>

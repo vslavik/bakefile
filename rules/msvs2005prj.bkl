@@ -93,8 +93,8 @@
     <!--    Set format-specific settings and call common MSVC code:     -->
     <!-- ============================================================== -->
 
-    <set var="_MSVS_VCPROJ_VERSION">8.00</set>
-    <set var="_MSVS_SLN_VERSION">9.00</set>
+    <set var="_MSVS_VCPROJ_VERSION" overwrite="0">8.00</set>
+    <set var="_MSVS_SLN_VERSION" overwrite="0">9.00</set>
 
     <include file="msvs200xprj.bkl"/>
 

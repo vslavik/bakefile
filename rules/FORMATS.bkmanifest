@@ -66,7 +66,7 @@
             $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).vcw
         </default-filename>
     </format>
-    
+
     <format id="msvs2003prj">
         <description>MS Visual Studio 2003 project files</description>
         <default-filename>
@@ -76,6 +76,13 @@
 
     <format id="msvs2005prj">
         <description>MS Visual Studio 2005 project files</description>
+        <default-filename>
+            $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).sln
+        </default-filename>
+    </format>
+
+    <format id="msvs2008prj">
+        <description>MS Visual Studio 2008 project files</description>
         <default-filename>
             $(os.path.splitext(os.path.basename(INPUT_FILE))[0]).sln
         </default-filename>

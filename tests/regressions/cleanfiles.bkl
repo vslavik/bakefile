@@ -4,7 +4,8 @@
 
         <!-- FIXME: use IDE feature test? -->
         <if cond="FORMAT not in ['xcode2', 'symbian', 'msvc6prj',
-                                 'msevc4prj', 'msvs2003prj','msvs2005prj']">
+                                 'msevc4prj',
+                                 'msvs2003prj','msvs2005prj','msvs2008prj']">
             <clean-files>file1.txt file2.txt</clean-files>
             <clean-files>file3.txt file4.txt</clean-files>
             <clean-files>file5.txt</clean-files>

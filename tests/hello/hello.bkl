@@ -3,14 +3,14 @@
 
     <requires version="0.1.1"/>
 
-    <if cond="FORMAT!='msvs2005prj' and FORMAT!='msvs2003prj'">
+    <if cond="FORMAT not in ['msvs2003prj','msvs2005prj','msvs2008prj']">
         <set var="BUILDDIR">
             <if cond="TOOLSET=='win32'">build-$(COMPILER)</if>
             <if cond="TOOLSET!='win32'">.</if>
         </set>
     </if>
 
-    <if cond="FORMAT not in ['msevc4prj','msvs2005prj','msvs2003prj']">
+    <if cond="FORMAT not in ['msevc4prj','msvs2003prj','msvs2005prj','msvs2008prj']">
         <exe id="hello">
             <define>SOMEMACRO</define>
             <sources>hello.c</sources>

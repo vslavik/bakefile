@@ -656,7 +656,7 @@
 
 
     <section id="sec.msvs2005prj.vars">
-      <title>msvs2005prj</title>
+      <title>msvs2005prj, msvs2008prj</title>
       <para>
         <informaltable>
           <tgroup cols='3'>
@@ -674,7 +674,7 @@
                   Comma-separated list of platforms to generate project
                   configurations for. See
                   <link linkend="format.msvs2005prj">
-                    MS VisualStudio 2005 format documentation
+                    MS VisualStudio 2005/2008 format documentation
                   </link>
                   for details.
                 </entry>

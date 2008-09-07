@@ -74,6 +74,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/msvs200xprj.bkl \
               rules/msvs2003prj.bkl \
               rules/msvs2005prj.bkl \
+              rules/msvs2008prj.bkl \
               rules/mingw.bkl \
               rules/gnu.bkl \
               rules/watcom.bkl \
