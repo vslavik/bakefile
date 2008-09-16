@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+    "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<!-- $Id$ -->
+<chapter id="ch.bakefile_gen">
+  <title>Batch bakefile generation with bakefile_gen</title>
+
+  <section>
+    <title>Introduction</title>
+
+    <para>
+        As soon as you start using Bakefile for your project and you need to
+        generate many makefile formats from your bakefiles (after all, this is
+        the purpose of Bakefile!), you'll find very useful to automate the
+        regeneration process.
+    </para>
+    <para>
+        Here is where <xref linkend="man.bakefile_gen"/> comes into play.
+        You can script all the bakefile calls you would have to do manually in a
+        single <filename>Bakefiles.bkgen</filename> file and then just call:
+
+        <userinput>bakefile_gen</userinput>
+
+        to run Bakefile for all the formats you need to regenerate on all the
+        bakefiles which are required by your project.
+    </para>
+
+    <para>
+      <filename>Bakefiles.bkgen</filename> files use a simple XML format to
+      describe what outputs and how to generate.
+        The root tag is called <literal>bakefile-gen</literal> and inside it
+        you can use any of the tags described below.
+    </para>
+  </section>
+
+
+  <section>
+    <title>bakefile_gen tags</title>
+    <para>
+        In addition to the following tags, bakefile_gen also supports the
+        <xref linkend="cmd.include"/> tag.
+
+        <informaltable>
+            <tgroup cols='3'>
+                <thead>
+                    <row>
+                        <entry>Tag</entry>
+                        <entry>Description</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row id="tag.input" xreflabel="input">
+                        <entry role="tagname">input</entry>
+                        <entry>
+                            <para>
+                                Adds the given list of whitespace-separed bakefiles to
+                                the list of bakefiles which must be regenerated.
+                            </para>
+                            <para>
+                                You can use wildcards and relative paths to match all the
+                                bakefiles scattered in the directory tree of your project.
+                                Example:
+                            </para>
+                            <programlisting><![CDATA[
+<!-- tell bakefile_gen to regenerate all the bakefiles of this project -->
+<input>
+    mybakefile1.bkl
+    ../mybakefile2.bkl
+    ../../../build/bakefiles/*.bkl
+</input>
+]]></programlisting>
+                        </entry>
+                    </row>
+
+                    <row id="tag.add-formats" xreflabel="add-formats">
+                        <entry role="tagname">add-formats</entry>
+                        <entry>
+                            <para>
+                                Adds the comma-separed list of formats contained in
+                                this tag, to the list of formats to regenerate.
+                            </para>
+                            <para>
+                                You can use the <emphasis>files</emphasis> attribute
+                                of this tag to selectively add the listed formats to
+                                a (set of) bakefile(s) only.
+                            </para>
+                            <programlisting><![CDATA[
+<!-- add the GNU format to all bakefiles under 'build/bakefiles' -->
+<add-formats files="build/bakefiles/*.bkl">gnu</add-formats>
+]]></programlisting>
+                        </entry>
+                    </row>
+
+
+                    <row id="tag.del-formats" xreflabel="del-formats">
+                        <entry role="tagname">del-formats</entry>
+                        <entry>
+                            <para>
+                                Removes the comma-separed list of formats contained in
+                                this tag, from the list of formats to regenerate.
+                            </para>
+                            <para>
+                                You can use the <literal>files</literal> attribute
+                                of this tag to selectively add the listed formats to
+                                a (set of) bakefile(s) only.
+                            </para>
+                            <programlisting><![CDATA[
+<!-- remove some rarely used formats from the bakefiles under the 'a' and 'b' subfolders -->
+<del-formats files="a/*.bkl,b/*.bkl">cbuilderx,dmars,dmars_smake,msevc4prj,symbian,xcode2</disable-formats>
+]]></programlisting>
+                        </entry>
+                    </row>
+
+
+
+                    <row id="tag.enable-formats" xreflabel="enable-formats">
+                        <entry role="tagname">enable-formats</entry>
+                        <entry>
+                            <para>
+                                Enables the regeneration of the comma-separed list of
+                                formats contained in this tag.
+                            </para>
+                            <para>
+                                Note that by default all formats supported by Bakefile
+                                are enabled, thus this tag will actually have some effect
+                                only if you used the <xref linkend="tag.disable-formats"/>
+                                tag before.
+                            </para>
+                            <programlisting><![CDATA[
+<disable-formats>msvc,gnu</disable-formats>
+...
+<!-- we've changed idea; turn GNU format on -->
+<enable-formats>gnu</enable-formats>
+]]></programlisting>
+                        </entry>
+                    </row>
+
+
+
+                    <row id="tag.disable-formats" xreflabel="disable-formats">
+                        <entry role="tagname">disable-formats</entry>
+                        <entry>
+                            <para>
+                                Disables the regeneration of the comma-separed list of
+                                formats contained in this tag.
+                            </para>
+                            <para>
+                                Typically you'll want to use this tag to disable all
+                                those formats you are not interested to.
+                            </para>
+                            <programlisting><![CDATA[
+<!-- disable rarely used formats: -->
+<disable-formats>cbuilderx,dmars,dmars_smake,msevc4prj,symbian,xcode2</disable-formats>
+]]></programlisting>
+                        </entry>
+                    </row>
+
+
+
+
+                    <row id="tag.add-flags" xreflabel="add-flags">
+                        <entry role="tagname">add-flags</entry>
+                        <entry>
+                            <para>
+                                Adds some flags to the command executed to regenerate
+                                the bakefiles.
+                            </para>
+                            <para>
+                                You can use the <literal>files</literal> attribute
+                                of this tag to selectively add the flags to
+                                a (set of) bakefile(s) only.
+                            </para>
+                            <para>
+                                You can use the <literal>formats</literal> attribute
+                                of this tag to selectively add the flags to
+                                a (set of) format(s) only.
+                            </para>
+                            <para>
+                                Additionally, inside this tag, bakefile_gen recognizes
+                                various variables:
+                                <literal>$(INPUT_FILE)</literal> is the path of the bakefile being processed;
+                                <literal>$(INPUT_FILE_BASENAME)</literal> is the filename of the bakefile being processed;
+                                <literal>$(INPUT_FILE_BASENAME_NOEXT)</literal> is the filename of the bakefile being processed without the extension;
+                                <literal>$(INPUT_FILE_DIR)</literal> is the directory of the bakefile being processed.
+                            </para>
+                            <programlisting><![CDATA[
+<!-- tell bakefile to output the generated Makefile.in for bake.bkl two levels up -->
+<add-flags files="bake.bkl" formats="autoconf">
+    -o../../Makefile.in
+</add-flags>
+
+<!-- always generate the windows makefiles in ../msw respect the bakefile's being processed: -->
+<add-flags formats="borland">-o$(INPUT_FILE_DIR)/../msw/makefile.bcc</add-flags>
+<add-flags formats="mingw">-o$(INPUT_FILE_DIR)/../msw/makefile.gcc</add-flags>
+<add-flags formats="msvc">-o$(INPUT_FILE_DIR)/../msw/makefile.vc</add-flags>
+<add-flags formats="watcom">-o$(INPUT_FILE_DIR)/../msw/makefile.wat</add-flags>
+]]></programlisting>
+                        </entry>
+                    </row>
+
+
+
+                    <row id="tag.del-flags" xreflabel="del-flags">
+                        <entry role="tagname">del-flags</entry>
+                        <entry>
+                            <para>
+                                Removes some flags to the command executed to regenerate
+                                the bakefiles.
+                            </para>
+                            <para>
+                                You can use the <literal>files</literal> attribute
+                                of this tag to selectively remove the flags to
+                                a (set of) bakefile(s) only.
+                            </para>
+                            <para>
+                                You can use the <literal>formats</literal> attribute
+                                of this tag to selectively remove the flags to
+                                a (set of) format(s) only.
+                            </para>
+                            <programlisting><![CDATA[
+<add-flags>-DVARIABLE1=value</add-flags>
+
+<!-- delete the -DVARIABLE1=value option from the MSVC and BORLAND formats -->
+<del-flags formats="msvc,borland">
+    -DVARIABLE1=value
+</del-flags>
+]]></programlisting>
+                        </entry>
+                    </row>
+
+                </tbody>
+            </tgroup>
+        </informaltable>
+    </para>
+  </section>
+
+  <section>
+    <title>Processing order</title>
+    <para>
+      <filename>Bakefiles.bkgen</filename> file is processed in the following
+      order:
+
+      <orderedlist>
+        <listitem>
+          <para>
+            <literal>disable-formats</literal> entries are read into blacklist
+            of formats to globally ignore 
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <literal>enable-formats</literal> entries are read and the formats
+            listed are <emphasis>removed</emphasis> from the blacklist (so
+            that your <filename>Bakefiles.local.bkgen</filename> file can
+            re-enable something disabled by default).
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <literal>add-formats</literal> and <literal>del-formats</literal>
+            are processed in the order they appear in the file. They specify
+            which formats should be generated for which files (the default
+            being all files), assuming the blacklist is empty (in other words,
+            they describe what this <filename>Bakefiles.bkgen</filename> is
+            <emphasis>capable</emphasis> of generating).
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            The list from step 3. is filtered using the blacklist from steps
+            1. and 2.
+          </para>
+        </listitem>
+      </orderedlist>
+    </para>
+  </section>
+
+</chapter>
