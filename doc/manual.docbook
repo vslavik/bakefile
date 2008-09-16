@@ -24,5 +24,7 @@
     <xi:include href="pkgconfig.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
   </chapter>
 
+  <xi:include href="bakefile_gen.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
   <xi:include href="manpages.docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 </book>

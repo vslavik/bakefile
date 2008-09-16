@@ -26,7 +26,8 @@ SUBDBFILES=$(srcdir)/commands.docbook \
 		   $(srcdir)/tutorial.docbook \
     	   $(srcdir)/variables.docbook \
     	   $(srcdir)/formats.docbook \
-    	   $(srcdir)/functions.docbook
+    	   $(srcdir)/functions.docbook \
+		   $(srcdir)/bakefile_gen.docbook
 DBFILES=$(MAINDBFILE) $(SUBDBFILES)
 
 FOFILE=$(BASENAME).fo
