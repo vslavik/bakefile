@@ -27,6 +27,7 @@
   setting for auto vs. manual PCH creation
 - fixed incorrect dependencies of the "install" target (#225)
 - added support for Visual Studio 2008 (#186)
+- bakefile_gen --clean removes directories created by Bakefile (#171)
 
 
 Version 0.2.3

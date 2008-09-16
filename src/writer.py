@@ -357,3 +357,8 @@ def Mkdir(dirname):
 
     if not os.path.isdir(dirname):
         os.mkdir(dirname)
+
+    if config.track_deps:
+        dependencies.addOutputDir(mk.vars['INPUT_FILE'],
+                                  config.format,
+                                  os.path.abspath(dirname))

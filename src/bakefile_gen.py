@@ -502,7 +502,8 @@ def cleanTargets(pretend=False, dryRun=False):
                 sys.stderr.write("ERROR: don't know how to clean %s generated from %s\n" % (fmt, f))
             else:
                 for o, method in dependencies.deps_db[key].outputs:
-                    if not os.path.isfile(o): continue
+                    if not os.path.isfile(o):
+                        continue
                     if method not in ['replace','mergeBlocks']: continue
                     if _isGeneratedBySomethingElse(o): continue
                     if verbose: print 'deleting %s' % o
@@ -510,6 +511,18 @@ def cleanTargets(pretend=False, dryRun=False):
                         print 'rm %s' % o
                     elif not dryRun:
                         os.remove(o)
+            if key in dependencies.dirs_db:
+                for d in dependencies.dirs_db[key]:
+                    if not os.path.isdir(d):
+                        continue
+                    if verbose: print 'deleting %s' % d
+                    if pretend:
+                        print 'rmdir %s' % d
+                    elif not dryRun:
+                        try:
+                            os.rmdir(d)
+                        except OSError, e:
+                            sys.stderr.write("Warning: cannot delete %s: %s\n" % (d, e))
 
 def listOutputFiles(jobs, alwaysMakeAll=0):
     # make sure all data are current:
