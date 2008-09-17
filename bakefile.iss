@@ -53,7 +53,7 @@ Source: presets\*; DestDir: {app}\presets; Flags: recursesubdirs; Components: ba
 Source: output\*; DestDir: {app}\output; Flags: recursesubdirs; Components: base
 Source: tests\*; DestDir: {app}\tests; Flags: recursesubdirs; Components: tests
 Source: schema\*; DestDir: {app}\schema; Flags: recursesubdirs; Components: base
-Source: doc\*; DestDir: {app}\doc; Flags: recursesubdirs; Components: doc
+Source: doc\html\*; DestDir: {app}\doc; Flags: recursesubdirs; Components: doc
 Source: py-runtime\*; DestDir: {app}; Flags: recursesubdirs; Components: python
 Source: README; DestDir: {app}; Components: base
 Source: NEWS; DestDir: {app}; Components: base; AfterInstall: InstallSetupPath
