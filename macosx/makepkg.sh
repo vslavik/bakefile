@@ -23,6 +23,8 @@ $BAKEFILEDIR/configure \
             --disable-dependency-tracking
 make || exit 1
 make install DESTDIR=$INSTALLROOT || exit 1
+mkdir -p $INSTALLROOT$PREFIX/share/doc/bakefile
+cp -r $BAKEFILEDIR/doc/html/* $INSTALLROOT$PREFIX/share/doc/bakefile
 
 pydir=$INSTALLROOT$PREFIX/lib/bakefile
 bindir=$INSTALLROOT$PREFIX/bin
