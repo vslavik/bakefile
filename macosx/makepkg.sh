@@ -11,7 +11,7 @@ PROGDIR=$PWD
 PYTHON=python
 
 PRODUCT=Bakefile
-VERSION="0.2.3"
+VERSION="0.2.4"
 PKGNAME="Bakefile"
 DMGNAME="bakefile-$VERSION"
 
