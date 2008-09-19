@@ -589,8 +589,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         if cfg._cxx_rtti == 'on' and self.isEmbeddedConfig(c):
             ldlibs += ' ccrtrtti.lib'
 
-        tool.setAttribute("AdditionalDependencies", ldlibs)
         tool.setAttribute("AdditionalOptions", cfg._ldflags)
+        tool.setAttribute("AdditionalDependencies", ldlibs)
         tool.setAttribute("OutputFile", "%s%s" % (cfg._targetdir, cfg._targetname))
 
         if cfg._debug == '1':
@@ -603,9 +603,6 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                 implib = cfg._importlib
                 tool.setAttribute("ImportLibrary",
                                  "%s%s" % (cfg._targetdir, implib))
-        else:
-            tool.setAttribute("SubSystem",
-                             "%s" % self.app_type_code[cfg._type_nick])
 
         tool.setAttribute("SuppressStartupBanner", bool2vcstr(True))
         tool.setAttribute("AdditionalLibraryDirectories", mk_list(cfg._lib_paths))
@@ -616,6 +613,10 @@ Microsoft Visual Studio Solution File, Format Version 10.00
             tool.setAttribute("GenerateDebugInformation", bool2vcstr(True))
 
         tool.setAttribute("ProgramDatabaseFile", cfg._pdbfile)
+
+        if cfg._type_nick != 'dll':
+            tool.setAttribute("SubSystem",
+                             "%s" % self.app_type_code[cfg._type_nick])
 
         if self.isEmbeddedConfig(c):
             tool.setAttribute("TargetMachine", "3")
@@ -700,6 +701,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                         'VCResourceCompilerTool',
                         'VCWebServiceProxyGeneratorTool',
                         'VCXMLDataGeneratorTool',
+                        'VCWebDeploymentTool',
                         'VCManagedWrapperGeneratorTool',
                         'VCAuxiliaryManagedWrapperGeneratorTool',
                     ]
@@ -823,6 +825,12 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 
         top_el.appendChild(self.buildAllConfigurations(doc, prjname, t))
 
+        # MSVC insists on having these tags even though they are empty and
+        # moreover, it wants to have "<References>\n</References>" and not
+        # just "<References/>" so we need to add a dummy text element in the
+        # middle to make it closer, although still not perfect because it
+        # results in an extra one line which native project files don't have
+        # (TODO: is there a way to avoid this extra blank line?)
         refs_el = doc.createElement("References")
         refs_el.appendChild(doc.createTextNode(""))
         top_el.appendChild(refs_el)
@@ -875,9 +883,9 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 
             filt_el = doc.createElement("Filter")
             filt_el.setAttribute("Name", group.name)
-            filt_el.setAttribute("UniqueIdentifier", group.uuid)
             if group.extensions != None:
                 filt_el.setAttribute("Filter", group.extensions)
+            filt_el.setAttribute("UniqueIdentifier", group.uuid)
 
             for src in lst:
                 file_el = doc.createElement("File")
@@ -896,6 +904,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 
         top_el.appendChild(files_el)
 
+        # see comment for refs_el above
         globals_el = doc.createElement("Globals")
         globals_el.appendChild(doc.createTextNode(""))
         top_el.appendChild(globals_el)
