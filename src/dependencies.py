@@ -148,6 +148,7 @@ def load(filename):
     modtimes_db = __loadDb(f, modtimes_db)
     cmdlines_db = __loadDb(f, cmdlines_db)
     dirs_db = __loadDb(f, dirs_db)
+    f.close()
 
 
 def needsUpdate(bakefile, format, cmdline):
