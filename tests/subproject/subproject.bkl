@@ -2,6 +2,7 @@
 <makefile>
     <subproject id="sub">
         <dir>subdir</dir>
+        <target>all</target>
         <dependency-of>all</dependency-of>
     </subproject>
 </makefile>

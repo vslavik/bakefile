@@ -132,6 +132,7 @@
         </template>
         <define-tag name="dir" />
         <define-tag name="installable" />
+        <define-tag name="target" />
     </define-rule>
 
     <define-rule name="__compiled" extends="__any">

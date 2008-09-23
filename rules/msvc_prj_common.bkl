@@ -313,6 +313,7 @@
         </template>
         <define-tag name="installable"/>
         <define-tag name="dir"/>
+        <define-tag name="target"/>
     </define-rule>
 
     <define-tag name="version" rules="dll"/>

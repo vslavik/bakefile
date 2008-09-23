@@ -239,6 +239,7 @@
         </template>
         <define-tag name="installable"/>
         <define-tag name="dir"/>
+        <define-tag name="target"/>
     </define-rule>
 
     <define-rule name="exe" extends="_compiled">
