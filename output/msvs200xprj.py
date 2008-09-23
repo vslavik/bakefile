@@ -511,7 +511,10 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
 
         if cfg._optimize == "0" and cfg._debug == '1':
-            tool.setAttribute("MinimalRebuild", bool2vcstr(True))
+            # VC2008 projects use /MP switch, which is incompatible with
+            # MinimalRebuild; /MP is more useful, so omit MinimalRebuild:
+            if _MSVS_VCPROJ_VERSION in ["7.10", "8.00"]:
+                tool.setAttribute("MinimalRebuild", bool2vcstr(True))
 
         # this property type has changed from int to bool since VC7
         eh = cfg._cxx_exceptions == 'on'
