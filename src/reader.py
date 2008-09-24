@@ -905,13 +905,13 @@ def loadModule(m):
         return
     if config.verbose: print "loading module '%s'..." % m
     loadedModules.append(m)
-    
+
     # set USING_<MODULENAME> variable:
     mk.setVar('USING_%s' % m.upper(), '1')
-    
+
     # import module's py utilities:
-    mk.importPyModule(m)
-    
+    imported = mk.importPyModule(m)
+
     # include module-specific makefiles:
     global availableFiles
     for f in availableFiles:
@@ -919,13 +919,21 @@ def loadModule(m):
             f.modules.remove(m)
             if len(f.modules) == 0:
                 processFile(f.file)
+                imported = True
     availableFiles = [f for f in availableFiles if len(f.modules)>0]
+
+    if not imported:
+        raise ReaderError(None, "unknown module '%s'" % m)
 
 
 def handleUsing(e):
-    modules = e.props['module'].split(',')
-    for m in modules:
-        loadModule(m)
+    try:
+        errors.pushCtx(e)
+        modules = e.props['module'].split(',')
+        for m in modules:
+            loadModule(m)
+    finally:
+        errors.popCtx()
 
 
 def handleInclude(e):

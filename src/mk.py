@@ -563,13 +563,16 @@ def __recordDeps(mod):
             return
 
 def importPyModule(modname):
+    imported = False
     try:
         exec('import utils.%s' % modname, globals())
         if config.verbose:
             print 'imported python module utils.%s' % modname
         if config.track_deps:
             __recordDeps('utils/%s' % modname)
-    except ImportError: pass
+        imported = True
+    except ImportError:
+        pass
 
     try:
         exec('import %s' % modname, globals())
@@ -577,7 +580,10 @@ def importPyModule(modname):
             print 'imported python module %s' % modname
         if config.track_deps:
             __recordDeps(modname)
-    except ImportError: pass
+        imported = True
+    except ImportError:
+        pass
+
     if config.debug:
         print '[dbg] --- after importing module %s --' % modname
         print '[dbg] sys.path=%s' % sys.path
@@ -585,3 +591,5 @@ def importPyModule(modname):
             print '[dbg] sys.modules[%s]=%s' % (modname,sys.modules[modname])
         else:
             print '[dbg] module not loaded!'
+
+    return imported
