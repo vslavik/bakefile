@@ -542,9 +542,6 @@ def _reorderTargetNodes(node, index):
 
 
 def _extractDictForTag(e, target, dict):
-    if not e.value:
-        return dict
-
     # $(value) expands to the thing passed as tag's text value:
     try:
         dict2 = {'value' : mk.evalExpr(e.value, target=target, add_dict=dict)}
