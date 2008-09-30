@@ -1,4 +1,7 @@
 
+Version 0.2.4
+--------------
+
 - msvs200xprj: if "-o foo.vcproj" is specified on the command line, only
   generate foo.vcproj and not foo.sln (#174)
 - autoconf: fixes for non-default BUILDDIR
