@@ -46,7 +46,7 @@ build-stamp:  config.status
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp 
+	rm -f build-stamp
 
 	-$(MAKE) distclean
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
@@ -57,17 +57,17 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 endif
 
 
-	dh_clean 
+	dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k 
+	dh_clean -k
 	dh_installdirs
 
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/bakefile
 	mkdir -p $(CURDIR)/debian/bakefile/usr/share/doc/bakefile/html/images
-	cp doc/html/*.{html,css} $(CURDIR)/debian/bakefile/usr/share/doc/bakefile/html
+	cp doc/html/*.html doc/html/*.css $(CURDIR)/debian/bakefile/usr/share/doc/bakefile/html
 	cp doc/html/images/*.png $(CURDIR)/debian/bakefile/usr/share/doc/bakefile/html/images
 	mkdir -p $(CURDIR)/debian/bakefile/etc/bash_completion.d
 	cp bash_completion $(CURDIR)/debian/bakefile/etc/bash_completion.d/bakefile
@@ -80,12 +80,12 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs 
+	dh_installchangelogs
 	dh_installdocs
 	dh_installexamples
 #	dh_install
 #	dh_installmenu
-#	dh_installdebconf	
+#	dh_installdebconf
 #	dh_installlogrotate
 #	dh_installemacsen
 #	dh_installpam
@@ -108,4 +108,4 @@ binary-arch: build install
 	dh_builddeb
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install 
+.PHONY: build clean binary-indep binary-arch binary install
