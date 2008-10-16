@@ -1,3 +1,38 @@
+bakefile (0.2.4) unstable; urgency=low
+
+  * added support for Visual Studio 2008 (#186).
+  * msvs200xprj: if "-o foo.vcproj" is specified on the command line, only
+    generate foo.vcproj and not foo.sln (#174).
+  * autoconf: fixes for non-default BUILDDIR.
+  * msvs2005prj: fixed _WIN32_WCE define for PocketPC 2003 platform (#187).
+  * put user- or configure-provided LDFLAGS and LIBS to the end of linker
+    command line to avoid conflicts of local libraries with system-wide
+    (#182).
+  * xcode2: fixed <ldflags> to not delete previously specified flags (#192).
+  * xcode2: fixed <cxxflags> and <cppflags> for C++ files (#194).
+  * xcode2: fixed <library> handling (#199).
+  * added <depends-on-file> to all formats (#190).
+  * mingw, gnu: avoid "No rule to make target ..." errors in generated
+    makefiles when dependency header is removed (#201).
+  * msvs200xprj: don't use /RTC1 flag in release builds with debug information
+    enabled (#202).
+  * msvs200xprj: enable functions inlining if and only optimization is enabled
+    instead of doing it unconditionally (#205).
+  * xcode2: added support for <headers> (#208).
+  * msvs200xprj: improvements to make generated projects more similar to
+    natively created projects (#210).
+  * fixes for running on Solaris (#214).
+  * xcode2: fixed naming of <dll> targets (#218).
+  * check for incorrect used of conditional <set> (#220).
+  * added support for multiple source files with the same name (#92).
+  * msvs200xprj: fixed to generate correct precompiled headers setting for
+    auto vs. manual PCH creation.
+  * fixed incorrect dependencies of the "install" target (#225).
+  * bakefile_gen --clean removes directories created by Bakefile (#171).
+  * fixed <subproject>'s <target> tag to work with all formats (#226).
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Oct, 07 Tue 2008 10:49:39 +0200
+
 bakefile (0.2.3) unstable; urgency=low
 
   * removed support for C++ Builder X, it no longer exists and the format
