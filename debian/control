@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Vadim Zeitlin <vadim@wxwindows.org>
 Build-Depends: debhelper (>= 4.1.67), autoconf, automake|automake1.7|automake1.8|automake1.9,
- python2.3|python2.4, python2.3-dev|python2.4-dev,
+ python2.3|python2.4|python2.5, python2.3-dev|python2.4-dev|python2.5-dev,
  docbook-xml, docbook-xsl, libxml2-utils, xsltproc, swig
 Standards-Version: 3.6.1
 
