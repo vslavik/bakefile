@@ -66,8 +66,6 @@ optimizeCustom          = '4'
 
 pchNone                 = '0'
 pchCreateUsingSpecific  = '1'
-pchGenerateAuto         = '2'
-pchUseUsingSpecific     = '3'
 
 # linker options
 
@@ -556,13 +554,33 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         else:
             tool.setAttribute("RuntimeTypeInfo", bool2vcstr(False))
 
+        # the values of this enum changed in VC8 where pchGenerateAuto simply
+        # disappeared (and so the value of subsequent element shifted), so
+        # define separate constants for VC7 ...
+        if _MSVS_VCPROJ_VERSION == "7.10":
+            pchGenerateAuto     = '2'
+            pchUseUsingSpecific = '3'
+        else:
+        # ... and for the later versions
+            pchUseUsingSpecific = '2'
+
         if cfg._pch_use_pch == '1':
+            do_use_pch = True
             if cfg._pch_generator:
                 tool.setAttribute("UsePrecompiledHeader", pchUseUsingSpecific)
             else:
-                tool.setAttribute("UsePrecompiledHeader", pchGenerateAuto)
-            tool.setAttribute("PrecompiledHeaderThrough", cfg._pch_header)
-            tool.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
+                if _MSVS_VCPROJ_VERSION == "7.10":
+                    tool.setAttribute("UsePrecompiledHeader", pchGenerateAuto)
+                else:
+                    # automatic PCH support (/YX option) was removed in VC8, so
+                    # disable the use of PCH completely when this option is
+                    # specified (what else can we do?)
+                    do_use_pch = False
+
+            if do_use_pch:
+                tool.setAttribute("PrecompiledHeaderThrough", cfg._pch_header)
+                tool.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
+
 
         tool.setAttribute("AssemblerListingLocation", "%s\\%s\\" % (cfg._builddir, t.id) )
         tool.setAttribute("ObjectFile", "%s\\%s\\" % (cfg._builddir, t.id) )
@@ -866,9 +884,9 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                 tool_el = doc.createElement("Tool")
                 tool_el.setAttribute("Name", "VCCLCompilerTool")
                 if src == cfg._pch_generator:
-                    tool_el.setAttribute("UsePrecompiledHeader", "1")
+                    tool_el.setAttribute("UsePrecompiledHeader", pchCreateUsingSpecific)
                 elif src in pchExcluded:
-                    tool_el.setAttribute("UsePrecompiledHeader", "0")
+                    tool_el.setAttribute("UsePrecompiledHeader", pchNone)
             else:
                 tool_el = None
                 file_conf_el = None
