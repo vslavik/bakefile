@@ -2,6 +2,7 @@ Version 0.2.5
 -------------
 
 - msvs2003prj, msvs2005prj: fixed PCH handling broken in 0.2.4
+- mingw: fixed C compiler invocation broken in 0.2.4 (#231)
 
 
 Version 0.2.4

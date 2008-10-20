@@ -31,6 +31,10 @@
 
 @[for o in options]@
 # @o.descStr.replace('\n','\n# ') @o.valuesStr
+@[if o.name=='CC' or o.name=='CXX']@
+@o.name = @o.defaultStr
+@[else]@
 @o.name ?= @o.defaultStr
+@[end if]@
 
 @[end for]@
