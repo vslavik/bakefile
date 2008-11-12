@@ -1,3 +1,10 @@
+bakefile (0.2.5) unstable; urgency=low
+
+  * msvs2003prj, msvs2005prj: fixed PCH handling broken in 0.2.4.
+  * mingw: fixed C compiler invocation broken in 0.2.4 (#231).
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Oct, 22 Wed 2008 17:17:22 +0200
+
 bakefile (0.2.4) unstable; urgency=low
 
   * added support for Visual Studio 2008 (#186).
