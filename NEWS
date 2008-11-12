@@ -2,6 +2,7 @@ Version 0.2.6
 -------------
 
 - autoconf: fixed dependencies support for traditional Unix compilers.
+- autoconf: correct shared library extension under HP-UX ia64.
 
 Version 0.2.5
 -------------
