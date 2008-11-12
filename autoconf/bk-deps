@@ -78,7 +78,7 @@ elif test $DEPSMODE = mwcc ; then
         fi
         prevarg="$arg"
     done
-    
+
     objfilebase=`basename $objfile`
     builddir=`dirname $objfile`
     depsdir=$builddir/$DEPSDIRBASE
@@ -107,13 +107,13 @@ elif test $DEPSMODE = unixcc; then
         esac
         shift
     done
-    
+
     objfilebase=`basename $objfile`
     builddir=`dirname $objfile`
     depsdir=$builddir/$DEPSDIRBASE
     mkdir -p $depsdir
-    
-    eval "$cmd $DEPSFLAG" | sed "s|.*:|$objfile:|" >${DEPSDIR}/${objfilebase}.d
+
+    eval "$cmd $DEPSFLAG" | sed "s|.*:|$objfile:|" >${depsdir}/${objfilebase}.d
     exit 0
 
 else

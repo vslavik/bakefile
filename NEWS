@@ -1,3 +1,8 @@
+Version 0.2.6
+-------------
+
+- autoconf: fixed dependencies support for traditional Unix compilers.
+
 Version 0.2.5
 -------------
 
