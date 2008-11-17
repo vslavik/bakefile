@@ -24,7 +24,7 @@ while test ${#} -gt 0; do
                 headerfile="${incdir}/${header}"
             fi
         ;;
-        -use-pch|-use_pch )
+        -use-pch|-use_pch|-pch-use )
             shift
             add_to_cmdline=0
         ;;
@@ -56,7 +56,7 @@ else
 #include "$header"
 EOT
         # using -MF icc complains about differing command lines in creation/use
-        $compiler -c -create_pch $outfile -MMD $file && \
+        $compiler -c @ICC_PCH_CREATE_SWITCH@ $outfile -MMD $file && \
           sed -e "s,^.*:,$outfile:," -e "s, $file,," < $dfile > $depsfile && \
           rm -f $file $dfile ${filename}.o
     fi

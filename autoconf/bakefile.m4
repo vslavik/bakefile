@@ -312,7 +312,9 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
       ;;
 
       *-*-linux* )
-        if test "$INTELCC" = "yes"; then
+        dnl newer icc versions use -fPIC just as gcc does and, in fact, the
+        dnl newest (v10+) ones don't even understand -KPIC any longer
+        if test "$INTELCC" = "yes" -a "$INTELCC8" != "yes"; then
             PIC_FLAG="-KPIC"
         elif test "x$SUNCXX" = "xyes"; then
             SHARED_LD_CC="${CC} -G -o"
@@ -746,20 +748,19 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
                     GCC_PCH=1
                 ],
                 [
-                    AC_TRY_COMPILE([],
-                        [
-                            #if !defined(__INTEL_COMPILER) || \
-                                (__INTEL_COMPILER < 800)
-                                There is no PCH support
-                            #endif
-                        ],
-                        [
-                            AC_MSG_RESULT([yes])
-                            ICC_PCH=1
-                        ],
-                        [
-                            AC_MSG_RESULT([no])
-                        ])
+                    if test "$INTELCXX8" = "yes"; then
+                        AC_MSG_RESULT([yes])
+                        ICC_PCH=1
+                        if test "$INTELCXX10" = "yes"; then
+                            ICC_PCH_CREATE_SWITCH="-pch-create"
+                            ICC_PCH_USE_SWITCH="-pch-use"
+                        else
+                            ICC_PCH_CREATE_SWITCH="-create-pch"
+                            ICC_PCH_USE_SWITCH="-use-pch"
+                        fi
+                    else
+                        AC_MSG_RESULT([no])
+                    fi
                 ])
             if test $GCC_PCH = 1 -o $ICC_PCH = 1 ; then
                 USE_PCH=1
@@ -775,6 +776,8 @@ AC_DEFUN([AC_BAKEFILE_PRECOMP_HEADERS],
 
     AC_SUBST(GCC_PCH)
     AC_SUBST(ICC_PCH)
+    AC_SUBST(ICC_PCH_CREATE_SWITCH)
+    AC_SUBST(ICC_PCH_USE_SWITCH)
     AC_SUBST(BK_MAKE_PCH)
 ])
 
@@ -1131,7 +1134,7 @@ while test ${D}{#} -gt 0; do
                 headerfile="${D}{incdir}/${D}{header}"
             fi
         ;;
-        -use-pch|-use_pch )
+        -use-pch|-use_pch|-pch-use )
             shift
             add_to_cmdline=0
         ;;
@@ -1163,7 +1166,7 @@ else
 #include "${D}header"
 EOT
         # using -MF icc complains about differing command lines in creation/use
-        ${D}compiler -c -create_pch ${D}outfile -MMD ${D}file && \\
+        ${D}compiler -c ${ICC_PCH_CREATE_SWITCH} ${D}outfile -MMD ${D}file && \\
           sed -e "s,^.*:,${D}outfile:," -e "s, ${D}file,," < ${D}dfile > ${D}depsfile && \\
           rm -f ${D}file ${D}dfile ${D}{filename}.o
     fi
