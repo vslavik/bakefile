@@ -26,8 +26,6 @@
 #  $Id$
 #
 
-BAKEFILE_VERSION = "0.2.5"
-
 import sys, os.path
 from optparse import OptionParser
 
@@ -42,6 +40,7 @@ def addIncludePaths(includes):
 
 class BakefileOptionParser(OptionParser):
     def __init__(self):
+        from version import BAKEFILE_VERSION
         OptionParser.__init__(self,
                               version='Bakefile %s' % BAKEFILE_VERSION,
                               usage='usage: %prog [options] inputfile.bkl')

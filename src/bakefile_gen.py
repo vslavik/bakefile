@@ -538,7 +538,8 @@ def listOutputFiles(jobs, alwaysMakeAll=0):
 
 
 def run(args):
-    parser = OptionParser()
+    from version import BAKEFILE_VERSION
+    parser = OptionParser(version='Bakefile %s' % BAKEFILE_VERSION)
     parser.add_option('-d', '--desc',
                       action="store", dest='descfile',
                       default='Bakefiles.bkgen',

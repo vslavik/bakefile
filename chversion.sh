@@ -17,7 +17,7 @@ replace_ver bakefile.iss \
             '\(#define VERSION *"\).*\("\)' "\1$VER\2"
 replace_ver configure.in \
             '\(AC_INIT(\[bakefile\], \[\)[^]]*\(\],.*\)' "\1$VER\2"
-replace_ver src/bakefile.py \
+replace_ver src/version.py \
             '\(BAKEFILE_VERSION = "\).*\("\)' "\1$VER\2"
 replace_ver rules/version.bkl \
             '\(>\).*\(<\)' "\1$VER\2"

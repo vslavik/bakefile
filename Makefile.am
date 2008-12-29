@@ -114,7 +114,8 @@ code_PYTHON = src/config.py \
               src/outmethods.py \
 			  src/bkl_c.py \
 			  src/containers.py \
-			  src/portautils.py
+			  src/portautils.py \
+			  src/version.py
 codeempy_PYTHON = \
               src/empy/__init__.py \
               src/empy/em.py
