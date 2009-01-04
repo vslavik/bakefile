@@ -55,7 +55,11 @@ def makeCondEnd(c):
 !  loaddll wpp      wppdi86
 !  loaddll wppaxp   wppdaxp
 !  loaddll wpp386   wppd386
+! if $(__VERSION__) >= 1280
+!  loaddll wlink    wlinkd
+! else
 !  loaddll wlink    wlink
+! endif
 !  loaddll wlib     wlibd
 !endif
 
