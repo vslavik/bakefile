@@ -5,6 +5,7 @@ Version 0.2.6
 - autoconf: correct shared library extension under HP-UX ia64
 - autoconf: added support for new (10 and 11) Intel C/C++ compiler versions
 - watcom: fixes for OpenWatcom 1.8 (Jiri Malak, #238)
+- fixed assert failure with wxWidgets' presets (#230)
 
 
 Version 0.2.5

@@ -414,7 +414,7 @@ def makeCondition(cond_str):
             value = value[1:-1]
         else:
             try:
-                value = int(value)
+                value = str(int(value))
             except ValueError:
                 return None
 
