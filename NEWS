@@ -6,6 +6,7 @@ Version 0.2.6
 - autoconf: added support for new (10 and 11) Intel C/C++ compiler versions
 - watcom: fixes for OpenWatcom 1.8 (Jiri Malak, #238)
 - fixed assert failure with wxWidgets' presets (#230)
+- msvs*prj: pass preprocessor flags to IDL compiler (#240)
 
 
 Version 0.2.5

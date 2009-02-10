@@ -660,6 +660,11 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._res_include_paths))
 
 
+    def buildIdlToolElement(self, tool, prjname, cfg, c, t):
+        tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
+        tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
+
+
     def buildPlatformsElement(self, doc):
         #Platforms Node
         plats_el = doc.createElement("Platforms")
@@ -697,6 +702,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         toolHandlers = {
                          'VCBscMakeTool'    : self.buildBscMakeToolElement,
                          'VCCLCompilerTool' : self.buildCompilerToolElement,
+                         'VCIDLTool'        : self.buildIdlToolElement, 
+                         'VCMIDLTool'       : self.buildIdlToolElement, 
                          'VCLibrarianTool'  : self.buildLibrarianToolElement,
                          'VCLinkerTool'     : self.buildLinkerToolElement,
                          'VCResourceCompilerTool'
