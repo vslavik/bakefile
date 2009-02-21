@@ -8,6 +8,7 @@ Version 0.2.6
 - fixed assert failure with wxWidgets' presets (#230)
 - msvs*prj: pass preprocessor flags to IDL compiler (#240)
 - msvs*prj: define WIN32 preprocessor symbol
+- fixed 100% CPU usage in bakefile_gen
 
 
 Version 0.2.5

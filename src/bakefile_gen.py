@@ -26,7 +26,7 @@
 #  $Id$
 #
 
-import sys, os, os.path, glob, fnmatch, shutil, re
+import sys, os, os.path, glob, fnmatch, shutil, re, time
 from optparse import OptionParser
 
 if sys.version_info < (2,5):
@@ -448,6 +448,11 @@ def updateTargets(jobs, pretend=False, keepGoing=False, alwaysMakeAll=False,
                         childProcessesCnt -= 1
                         childProcesses[p] = None
                         modifiedFiles += pr.finish()
+                # FIXME: Unfortunately, Python's subprocess module doesn't
+                #        provide any way to get notified about child process'
+                #        termination, so we have to poll it. Wait a bit here to
+                #        avoid 100% CPU usage.
+                time.sleep(0.01)
 
         # NB: using "finally" instead of "except" so that we can easily handle
         #     both Exception and KeyboardInterrupt (which is not Exception)
