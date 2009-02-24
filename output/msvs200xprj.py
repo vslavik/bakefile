@@ -155,7 +155,7 @@ NAMESPACE_BAKEFILE_PROJ = "{b0c737d9-df87-4499-b156-418baa078a12}"
 NAMESPACE_BAKEFILE_FILTERS = "{0e8f53b3-f09d-40b1-b248-66f80b72e654}"
 
 def mk_uuid(namespace, seed):
-    # NB: we want to have the GUID strings be repeatable so, generate them
+    # NB: we want to have the GUID strings be repeatable, so generate them
     #     from a repeatable seed
     from uuid import uuid5, UUID
 
@@ -285,7 +285,10 @@ class ProjectGeneratorMsvc9:
         """Returns the dictionary containing GUIDs indexed by target ids."""
         guid_dict = {}
         for t in sln_targets:
-            guid_dict[t.id] = mk_proj_uuid(self.basename, t.id)
+            if '_msvc_guid' in t.__dict__:
+                guid_dict[t.id] = '{%s}' % t._msvc_guid.upper()
+            else:
+                guid_dict[t.id] = mk_proj_uuid(self.basename, t.id)
         return guid_dict
 
     def createVCProjList(self, sln_targets, guid_dict, vcproj_list, deps_translation):

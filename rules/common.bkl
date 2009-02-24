@@ -126,6 +126,7 @@
     <define-tag name="ldflags-dmars" rules="exe,dll,module"/>
 
     <define-tag name="uid" rules="exe,dll,module"/>
+    <define-tag name="msvc-guid" rules="exe,lib,dll,module"/>
     <define-tag name="headers" rules="exe,lib,dll,module"/>
     <define-tag name="install-to" rules="exe,lib,dll,module"/>
     <define-tag name="install-headers-to" rules="exe,lib,dll,module"/>

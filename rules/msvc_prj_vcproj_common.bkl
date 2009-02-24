@@ -155,6 +155,10 @@
     <!--                   Compiler-specific tags:                       -->
     <!-- =============================================================== -->
     
+    <define-tag name="msvc-guid" rules="_compiled">
+        <set var="_msvc_guid">$(value)</set>
+    </define-tag>
+    
     <define-tag name="cppflags-msvc" rules="exe,lib,dll,module">
         <cppflags>$(value)</cppflags>
     </define-tag>

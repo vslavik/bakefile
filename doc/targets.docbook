@@ -1164,6 +1164,15 @@
 							</entry>
 							<entry role="availability">exe, dll, module</entry>
 						</row>
+
+
+            <row id="tag.msvc-guid" xreflabel="msvc-guid">
+							<entry role="tagname">msvc-guid</entry>
+							<entry>
+                (Visual C++ project formats only.) Sets project's GUID.
+							</entry>
+							<entry role="availability">exe, lib, dll, module</entry>
+						</row>
 		
 					</tbody>
 				</tgroup>
