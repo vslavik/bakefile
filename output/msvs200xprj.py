@@ -234,8 +234,6 @@ class ProjectGeneratorMsvc9:
         return 'sln'
     def getProjectExtension(self):
         return 'vcproj'
-    def getMakefileExtension(self):
-        return 'mak'
 
     # --------------------------------------------------------------------
     #   helpers
