@@ -132,6 +132,8 @@
     <define-tag name="install-headers-to" rules="exe,lib,dll,module"/>
     <define-tag name="install-if" rules="exe,lib,dll,module"/>
 
+    <define-tag name="debug-info-edit-and-continue" rules="exe,lib,dll,module"/>
+
 
     <!-- =============================================================== -->
     <!--                     Common tags description:                    -->
@@ -148,6 +150,7 @@
 
     <tag-info name="app-type" exclusive="1"/>
     <tag-info name="debug-info" exclusive="1"/>
+    <tag-info name="debug-info-edit-and-continue" exclusive="1"/>
     <tag-info name="debug-runtime-libs" exclusive="1"/>
     <tag-info name="optimize" exclusive="1"/>
     <tag-info name="arch" exclusive="1"/>

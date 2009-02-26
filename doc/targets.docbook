@@ -840,6 +840,23 @@
 							</entry>
 							<entry role="availability">exe, dll, module, lib</entry>
 						</row>
+            
+            
+            
+            <row id="tag.debug-info-edit-and-continue" xreflabel="debug-info-edit-and-continue">
+							<entry role="tagname">debug-info-edit-and-continue</entry>
+							<entry>
+                Enable or disable additional debugging information to support
+                <ulink
+                  url="http://msdn.microsoft.com/en-us/library/bcew296c(VS.80).aspx">Edit
+                  and Continue</ulink> feature of Visual C++ compilers.
+                  Can be either
+                  <literal>on</literal> or <literal>off</literal> (default).
+                  Only supported by Visual C++ project files, does nothing
+                  in other formats.
+							</entry>
+							<entry role="availability">exe, dll, module, lib</entry>
+						</row>
 						
 						
 						<row id="tag.arch" xreflabel="arch">

@@ -9,6 +9,8 @@ Version 0.2.6
 - msvs*prj: pass preprocessor flags to IDL compiler (#240)
 - msvs*prj: define WIN32 preprocessor symbol
 - fixed 100% CPU usage in bakefile_gen
+- added <debug-info-edit-and-continue> tag to support Visual Studio
+  debugger's Edit and Continue feature
 
 
 Version 0.2.5

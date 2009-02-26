@@ -85,6 +85,8 @@
             <set var="_more_files"/>
             
             <set var="_debug">0</set>            
+            <set var="_debug_edit_and_continue">0</set>            
+            
             <set var="_builddir">
                 <if cond="BUILDDIR=='.'">$(_default_builddir)</if>
                 <if cond="BUILDDIR!='.'">$(nativePaths(BUILDDIR))</if>
@@ -185,7 +187,13 @@
             <set var="_debug">
                 $(substituteFromDict(value, {'on':'1','off':'0'}))
             </set>
-        </define-tag>       
+        </define-tag> 
+        
+        <define-tag name="debug-info-edit-and-continue">
+            <set var="_debug_edit_and_continue">
+                $(substituteFromDict(value, {'on':'1','off':'0'}))
+            </set>
+        </define-tag> 
  
         <define-tag name="install-to"/>
         <define-tag name="install-if"/>

@@ -601,7 +601,10 @@ Microsoft Visual Studio Solution File, Format Version 10.00
             tool.setAttribute("Detect64BitPortabilityProblems", bool2vcstr(True))
 
         if cfg._debug == '1':
-            tool.setAttribute("DebugInformationFormat", debugEnabled)
+            if cfg._debug_edit_and_continue == '1':
+                tool.setAttribute("DebugInformationFormat", debugEditAndContinue)
+            else:
+                tool.setAttribute("DebugInformationFormat", debugEnabled)
         else:
             tool.setAttribute("DebugInformationFormat", debugDisabled)
 
