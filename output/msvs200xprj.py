@@ -276,7 +276,7 @@ class ProjectGeneratorMsvc9:
     def isEmbeddedConfig(self, config):
         """Returns true if given config targets embedded device."""
         cfg = configs[config][0]['MSVS_PLATFORM']
-        return cfg != 'win32'
+        return cfg == 'pocketpc2003'
 
 
     def assignGUIDs(self, sln_targets):
