@@ -46,7 +46,7 @@
         <set var="_include_paths"/>
         <set var="_res_include_paths"/>
 
-        <define>WIN32</define>
+        <_define-no-res>WIN32</_define-no-res>
         <debug-runtime-libs>off</debug-runtime-libs>
         <runtime-libs>dynamic</runtime-libs>
         <threading>multi</threading>
