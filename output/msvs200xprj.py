@@ -585,7 +585,6 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                 tool.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
 
 
-        tool.setAttribute("AssemblerListingLocation", "%s\\%s\\" % (cfg._builddir, t.id) )
         tool.setAttribute("ObjectFile", "%s\\%s\\" % (cfg._builddir, t.id) )
         tool.setAttribute("ProgramDataBaseFileName", cfg._pdbfile)
 
