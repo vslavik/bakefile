@@ -155,6 +155,9 @@ def __copyMkToVars():
 def __openFile(filename):
     """Opens (or creates) file for read/write access, lock it."""
     try:
+        dirname = os.path.dirname(filename)
+        if dirname and not os.path.isdir(dirname):
+            os.mkdir(dirname)
         f = open(filename, 'r+b')
     except IOError:
         f = open(filename, 'w+b')

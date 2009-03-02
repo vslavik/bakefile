@@ -296,10 +296,12 @@ class ProjectGeneratorMsvc9:
         single_target = (len(sln_targets) == 1)
         for t in sln_targets:
             deps = ''
-            if single_target:
-                vcproj_name = self.basename
+            if 'MSVS_PROJECT_FILE' in t.__dict__:
+                vcproj_name = t.MSVS_PROJECT_FILE
+            elif single_target:
+                vcproj_name = self.basename + '.' + self.getProjectExtension()
             else:
-                vcproj_name = '%s_%s' % (self.basename, t.id)
+                vcproj_name = '%s_%s.%s' % (self.basename, t.id, self.getProjectExtension())
             deplist = t._deps.split()
 
             # add external project dependencies:
@@ -326,16 +328,16 @@ class ProjectGeneratorMsvc9:
             sln += 'Project("%s") = "%s", "%s", "%s"\n' % (
                         GUID_SOLUTION,
                         t.id,
-                        vcproj_name + '.' + self.getProjectExtension(),
+                        vcproj_name,
                         guid
                     )
             sln += deps_str
             sln += 'EndProject\n'
 
             vcproj_file = (t,
-                       os.path.join(self.dirname,
-                                    vcproj_name + '.' + self.getProjectExtension()),
-                       vcproj_name, guid)
+                           os.path.join(self.dirname, vcproj_name),
+                           os.path.basename(os.path.splitext(vcproj_name)[0]),
+                           guid)
 
             if vcproj_file not in vcproj_list:
                 vcproj_list.append(vcproj_file)

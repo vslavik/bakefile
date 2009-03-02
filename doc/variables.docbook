@@ -672,9 +672,10 @@
                 <entry role="varname">MSVS_PLATFORMS</entry>
                 <entry>
                   Comma-separated list of platforms to generate project
-                  configurations for. See
-                  <link linkend="format.msvs2005prj">
-                    MS VisualStudio 2005/2008 format documentation
+                  configurations for. Can be set by the user using the
+                  <literal>-D</literal> command line argument.
+                  See <link linkend="format.msvs2005prj">
+                  MS VisualStudio 2005/2008 format documentation
                   </link>
                   for details.
                 </entry>
@@ -693,18 +694,37 @@
                 </entry>
                 <entry role="default"></entry>
               </row>
+              <row id="var.MSVS_PROJECT_FILE" xreflabel="MSVS_PROJECT_FILE">
+                <entry role="varname">MSVS_PROJECT_FILE</entry>
+                <entry>
+                  Unlike other variables in this section, this variable can
+                  optionally be set <emphasis>on targets</emphasis> to specify
+                  the location of <literal>.vcproj</literal> file created for
+                  them. The location is relative to
+                  <xref linkend="var.OUTPUT_FILE"/>. See an example:
+                  <programlisting><![CDATA[
+<exe id="hello_world">
+  ...
+  <!-- create subdirectory for projects if needed and put it there -->
+  <set var="MSVS_PROJECT_FILE">examples/HelloWorld.vcproj</set>
+</exe>
+]]></programlisting>
+                </entry>
+                <entry role="default">(derived from <xref linkend="var.OUTPUT_FILE"/>)</entry>
+              </row>
             </tbody>
           </tgroup>
         </informaltable>
       </para>
     </section>
-    
-    
+
+
     <section id="sec.msvs2003prj.vars">
       <title>msvs2003prj</title>
       <para>
         The <xref linkend="var.MSVS_PLATFORM"/> option is present in
         this format as well, but it is always set to <literal>win32</literal>.
+        <xref linkend="var.MSVS_PROJECT_FILE"/> is fully supported.
       </para>
     </section>
 

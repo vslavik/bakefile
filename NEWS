@@ -11,6 +11,8 @@ Version 0.2.6
 - fixed 100% CPU usage in bakefile_gen
 - added <debug-info-edit-and-continue> tag to support Visual Studio
   debugger's Edit and Continue feature
+- msvs*prj: allow overriding names of .vcproj files using MSVS_PROJECT_FILE
+  variable (#224)
 
 
 Version 0.2.5
