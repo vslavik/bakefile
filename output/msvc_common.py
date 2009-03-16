@@ -32,7 +32,7 @@ import fnmatch, re
 #   helpers
 # ------------------------------------------------------------------------
 
-def sortedKeys(dic):
+def sortedConfigKeys(dic):
     l = []
     for c in configs_order:
         if c in dic:
@@ -97,7 +97,7 @@ def organizeFilesIntoGroups(t, defaultGroups, groupClass=FilesGroup):
 
     # (find files from all configs, identify files not in all configs)
     sources = {}
-    for c in sortedKeys(t.configs):
+    for c in sortedConfigKeys(t.configs):
         for s in t.configs[c]._sources.split():
             snat = utils.nativePaths(s)
             if snat not in sources:
@@ -114,7 +114,7 @@ def organizeFilesIntoGroups(t, defaultGroups, groupClass=FilesGroup):
     # Add more files that are part of the project but are not built (e.g. 
     # headers, READMEs etc.). They are included unconditionally to save some
     # space.
-    for c in sortedKeys(t.configs):
+    for c in sortedConfigKeys(t.configs):
         for s in t.configs[c]._more_files.split():
             snat = utils.nativePaths(s)
             if snat not in sources:
@@ -123,14 +123,14 @@ def organizeFilesIntoGroups(t, defaultGroups, groupClass=FilesGroup):
     # Find files with custom build associated with them and retrieve
     # custom build's code
     filesWithCustomBuild = {}
-    for c in sortedKeys(t.configs):
+    for c in sortedConfigKeys(t.configs):
         cbf = t.configs[c]._custom_build_files
         if len(cbf) == 0 or cbf.isspace(): continue
         for f in cbf.split():
             filesWithCustomBuild[f] = {}
     for f in filesWithCustomBuild:
         fname = f.replace('.','_').replace('\\','_').replace('-','_')
-        for c in sortedKeys(t.configs):
+        for c in sortedConfigKeys(t.configs):
             filesWithCustomBuild[f][c] = \
                    eval ('t.configs[c]._custom_build_%s' % fname)
 

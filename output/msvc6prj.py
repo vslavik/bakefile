@@ -276,7 +276,7 @@ BSC32=bscmake.exe
     def genDSP(self, t, filename, prjname):
         # Create header and list of configurations:
         
-        default_cfg = sortedKeys(t.configs)[-1]
+        default_cfg = sortedConfigKeys(t.configs)[-1]
         dsp = self.makeDspHeader(prjname)
         targ_types = []
         for c in t.configs:
@@ -303,7 +303,7 @@ BSC32=bscmake.exe
 """ % (prjname, self.getMakefileExtension(),
        prjname, self.getMakefileExtension(),
        self.mkConfigName(t.id, default_cfg))
-        for c in sortedKeys(t.configs):
+        for c in sortedConfigKeys(t.configs):
             dsp += '!MESSAGE "%s" (based on %s)\n' % (self.mkConfigName(t.id, c), t.configs[c]._type)
         dsp += """\
 !MESSAGE 
@@ -315,7 +315,7 @@ BSC32=bscmake.exe
 
         # Output settings for all configurations:
         flags = []
-        for c in sortedKeys(t.configs):
+        for c in sortedConfigKeys(t.configs):
             cfg = t.configs[c]
             fl = '  "$(CFG)" == "%s"' % self.mkConfigName(t.id, c) + '\n\n'
             fl += self.mkFlags('PROP',"""\
@@ -334,7 +334,7 @@ Intermediate_Dir "%s\\%s"
         dsp += '\n\n# Begin Target\n\n'
 
         # Output list of configs one more:
-        for c in sortedKeys(t.configs):
+        for c in sortedConfigKeys(t.configs):
             dsp += '# Name "%s"\n' % self.mkConfigName(t.id, c)
         
         # Write source files:
@@ -374,7 +374,7 @@ SOURCE=%s\\%s
                 if sources[src] != None or src in filesWithCustomBuild:
                     flags = []
                     old_file_flags = file_flags
-                    for c in sortedKeys(t.configs):
+                    for c in sortedConfigKeys(t.configs):
                         if sources[src] != None and c not in sources[src]:
                             file_flags += '# PROP Exclude_From_Build 1\n'
                         if src in filesWithCustomBuild:

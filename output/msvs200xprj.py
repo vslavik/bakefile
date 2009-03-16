@@ -258,7 +258,7 @@ class ProjectGeneratorMsvc9:
         # .sln files have configs grouped, all platforms for one config
         # are together, but our "natural" sort order is different:
         sortedConfigs = []
-        todo = [c for c in sortedKeys(configs)]
+        todo = [c for c in sortedConfigKeys(configs)]
         while len(todo) > 0:
             c = todo.pop(0)
             if c in sortedConfigs:
@@ -688,7 +688,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
     def buildAllConfigurations(self, doc, prjname, t):
         #Configurations Node
         confs_el = doc.createElement("Configurations")
-        for c in sortedKeys(t.configs):
+        for c in sortedConfigKeys(t.configs):
             cfg = t.configs[c]
             confs_el.appendChild(self.buildSingleConfiguration(doc, prjname, cfg, c, t))
         return confs_el
@@ -927,7 +927,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                     relpath = relpath[2:]
                 file_el.setAttribute("RelativePath", relpath)
 
-                for c in sortedKeys(t.configs):
+                for c in sortedConfigKeys(t.configs):
                     cfg = t.configs[c]
                     file_conf_el = makeFileConfig(t, cfg, c, src, group.name,
                                                   sources, pchExcluded)
