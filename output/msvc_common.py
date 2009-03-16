@@ -37,9 +37,12 @@ def sortedKeys(dic):
     for c in configs_order:
         if c in dic:
             l.append(c)
+
     # in VC++ IDE, the last config is the default one, i.e. what you would
     # logically expect to be the first one => reverse the order:
-    l.reverse()
+    if FORMAT in ['msvc6prj', 'msevc4prj']:
+        l.reverse()
+
     return l
 
 def fixFlagsQuoting(text):
