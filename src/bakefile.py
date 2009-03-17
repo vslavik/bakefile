@@ -204,6 +204,7 @@ def run(args):
     finally:
         if xmlparser.cache != None:
             xmlparser.cache.close()
+            xmlparser.cache = None
 
     if not read_ok:
         sys.exit(1)
