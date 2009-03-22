@@ -31,6 +31,7 @@ import os, os.path
 import errors, utils
 from xml.dom.minidom import *
 
+import mk
 import msvc_common
 from msvc_common import *
 
@@ -143,6 +144,16 @@ class DocumentSorted(Document):
         e.ownerDocument = self
         return e
 
+
+class VerbatimFragment(Text):
+    def __init__(self, markup):
+        self.markup = markup
+    def writexml(self, writer, indent="", addindent="", newl=""):
+        writer.write(indent)
+        writer.write(self.markup)
+        writer.write(newl)
+
+
 # ------------------------------------------------------------------------
 #   helpers
 # ------------------------------------------------------------------------
@@ -225,6 +236,13 @@ class ProjectGeneratorMsvc9:
             if ext.lower() != '.sln' and ext != '':
                 print 'warning: ignoring extension "%s"' % ext[1:] # drop dot
             self.onlyProject = False
+
+        self.fragments = {}
+        for f in mk.fragments:
+            prj, filename = f.location.split(':')
+            filename = filename.replace('/', '\\')
+            self.fragments[(prj, filename)] = f.content
+
 
     # --------------------------------------------------------------------
     #   basic configuration
@@ -933,6 +951,10 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                                                   sources, pchExcluded)
                     if ( file_conf_el != None ):
                         file_el.appendChild(file_conf_el)
+
+                if (t.id, src) in self.fragments:
+                    f = VerbatimFragment(self.fragments[(t.id, src)])
+                    file_el.appendChild(f)
 
                 filt_el.appendChild(file_el)
 

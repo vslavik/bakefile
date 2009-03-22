@@ -972,7 +972,11 @@ def handleFragment(e):
                                            os.path.abspath(filename))
         else:
             content = e.value
-        mk.addFragment(mk.Fragment(content))
+        if 'location' in e.props:
+            loc = e.props['location']
+        else:
+            loc = None
+        mk.addFragment(mk.Fragment(content, loc))
 
 
 def _printWarning(e, text):

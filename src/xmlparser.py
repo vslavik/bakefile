@@ -139,7 +139,7 @@ def __parseFileLibxml2(filename, namespace):
         e.value = ''
         c = n.children
         while c != None:
-            if c.type == 'text':
+            if c.type == 'text' or c.type == 'cdata':
                 e.value += str(c.content)
             else:
                 l = handleNode(filename, c)

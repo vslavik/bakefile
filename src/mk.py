@@ -187,8 +187,9 @@ targets = containers.OrderedDictWithClasification(
 
 class Fragment:
     """Part of native makefile copied as-is into generated output."""
-    def __init__(self, content):
+    def __init__(self, content, location=None):
         self.content = content
+        self.location = location
 
 
 # Like mk.vars, but for mk.options (i.e. not "real" variables). It's only
