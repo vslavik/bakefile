@@ -1,3 +1,20 @@
+bakefile (0.2.6) unstable; urgency=low
+
+  * autoconf: fixed dependencies support for traditional Unix compilers
+  * autoconf: correct shared library extension under HP-UX ia64
+  * autoconf: added support for new (10 and 11) Intel C/C++ compiler versions
+  * watcom: fixes for OpenWatcom 1.8 (Jiri Malak, #238)
+  * fixed assert failure with wxWidgets' presets (#230)
+  * msvs*prj: pass preprocessor flags to IDL compiler (#240)
+  * msvs*prj: define WIN32 preprocessor symbol
+  * fixed 100% CPU usage in bakefile_gen
+  * added <debug-info-edit-and-continue> tag to support Visual Studio
+    debugger's Edit and Continue feature
+  * msvs*prj: allow overriding names of .vcproj files using MSVS_PROJECT_FILE
+    variable (#224)
+
+ -- Scott Bailey <Bailey@InsaneGenius.org>  Fri, 27 Mar 2009 09:33:32 -0700
+
 bakefile (0.2.5) unstable; urgency=low
 
   * msvs2003prj, msvs2005prj: fixed PCH handling broken in 0.2.4.
