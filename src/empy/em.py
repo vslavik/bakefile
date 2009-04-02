@@ -1,4 +1,3 @@
-#!/usr/local/bin/python
 #
 # $Id$ $Date: 2003/10/27 $
 
