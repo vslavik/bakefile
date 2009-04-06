@@ -310,24 +310,27 @@ def safeMakefileValue(s):
     return s.replace('-','_').replace('.','_')
 
 
+def makeUniqueName(name, all):
+    """Finds the shortest path suffix that is unique in given set."""
+    assert name in all
+    dirsep = mk.vars['DIRSEP']
+    split = name.split(dirsep)
+    # try adding path components
+    for i in range(2, len(split)+1):
+        x = dirsep.join(split[-i:])
+        conflicts = len([n for n in all if n.endswith(x)])
+        if conflicts == 1: # only this one
+            return x.replace(dirsep, '_')
+    raise errors.Error("don't know how to create object file name for \"%s\"" % name)
+
+
 allObjectsBasenames = {}
+
 
 def getObjectName(source, target, ext, objSuffix=''):
 
     allNames = allObjectsBasenames[target]
     dirsep = mk.vars['DIRSEP']
-
-    def _makeUniqueName(name, all):
-        """Finds the shortest path suffix that is unique in given set."""
-        assert name in all
-        split = name.split(dirsep)
-        # try adding path components
-        for i in range(2, len(split)+1):
-            x = dirsep.join(split[-i:])
-            conflicts = len([n for n in all if n.endswith(x)])
-            if conflicts == 1: # only this one
-                return x.replace(dirsep, '_')
-        raise errors.Error("don't know how to create object file name for \"%s\"" % name)
 
     pos = source.rfind('.')
     srcext = source[pos:]
@@ -338,7 +341,7 @@ def getObjectName(source, target, ext, objSuffix=''):
     # if the same basename is used by more objects (see bug #92), create
     # longer-but-unique object names:
     if base in allNames and len(allNames[base]) > 1:
-        base = _makeUniqueName(noext, allNames[base])
+        base = makeUniqueName(noext, allNames[base])
 
     base = safeMakefileValue(base)
 

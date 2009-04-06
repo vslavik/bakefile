@@ -191,9 +191,12 @@ class MsvsFilesGroup(FilesGroup):
         self.uuid = uuid
         self.extensions = extensions
 
+SOURCE_FILES_EXTENSIONS = [
+            'cpp','c','cc','cxx','def','odl','idl','hpj','bat','asm','asmx']
+
 DEFAULT_FILE_GROUPS = [
     MsvsFilesGroup('Source Files',
-                   extensions='cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx',
+                   extensions=';'.join(SOURCE_FILES_EXTENSIONS),
                    uuid='{4FC737F1-C7A5-4376-A066-2A32D752A2FF}'),
     MsvsFilesGroup('Header Files',
                    extensions='h;hpp;hxx;hm;inl;inc;xsd',
@@ -218,6 +221,28 @@ def bool2vcstr(value):
         return s.upper()
     else:
         return s
+
+
+def isSourceFile(filename):
+    """Is this file a source file (and not e.g. a header)?"""
+    ext = filename.split('.')[-1]
+    return ext in SOURCE_FILES_EXTENSIONS
+
+
+def findConflictingNames(sources):
+    """Finds source files that have conflicting basenames, i.e. that would be
+       compiled into the same file without special handling."""
+    all_bases = {}
+    for s in sources:
+        base = s.split('\\')[-1]
+        all_bases.setdefault(base, [])
+        all_bases[base].append(s)
+    conflict_bases = [i for i in all_bases if len(all_bases[i]) > 1]
+    conflict_names = []
+    for x in conflict_bases:
+        conflict_names += all_bases[x]
+    return conflict_names
+
 
 # ------------------------------------------------------------------------
 #                              Generator class
@@ -892,8 +917,10 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         sources, groups, files, filesWithCustomBuild = \
             organizeFilesIntoGroups(t, DEFAULT_FILE_GROUPS, groupClass=MsvsFilesGroup)
 
+        conflictingNames = findConflictingNames(sources.keys())
+
         ##define a local helper function for building the files area
-        def makeFileConfig(t, cfg, c, src, group, sources, pchExcluded):
+        def makeFileConfig(t, cfg, c, src, group, sources, pchExcluded, conflictingNames):
             conf_name = self.mkConfigName(c)
             file_conf_el = doc.createElement("FileConfiguration")
             file_conf_el.setAttribute("Name", conf_name)
@@ -917,6 +944,13 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                     tool_el.setAttribute("UsePrecompiledHeader", pchCreateUsingSpecific)
                 elif src in pchExcluded:
                     tool_el.setAttribute("UsePrecompiledHeader", pchNone)
+            elif src in conflictingNames and isSourceFile(src):
+                # allow source files with same name but in different directory
+                # (see bug #92):
+                obj = os.path.splitext(utils.makeUniqueName(src, conflictingNames))[0] + '.obj'
+                tool_el = doc.createElement("Tool")
+                tool_el.setAttribute("Name", "VCCLCompilerTool")
+                tool_el.setAttribute("ObjectFile", "%s\\%s\\%s" % (cfg._builddir, t.id, obj))
             else:
                 tool_el = None
                 file_conf_el = None
@@ -948,7 +982,10 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                 for c in sortedConfigKeys(t.configs):
                     cfg = t.configs[c]
                     file_conf_el = makeFileConfig(t, cfg, c, src, group.name,
-                                                  sources, pchExcluded)
+                                                  sources,
+                                                  pchExcluded,
+                                                  conflictingNames
+                                                  )
                     if ( file_conf_el != None ):
                         file_el.appendChild(file_conf_el)
 
