@@ -23,7 +23,7 @@
 #
 
 import os.path
-import bakefile.parser
+import bakefile.parser, bakefile.error
 from glob import glob
 
 
@@ -40,14 +40,6 @@ def test_parser():
 
 def _test_parser_on_file(input):
     print 'parsing %s' % input
-    t = bakefile.parser.parse_file(input)
-    as_text = t.toStringTree()
-    print """
-parsed tree:
----
-%s
----
-""" % as_text
 
     ast = os.path.splitext(input)[0] + '.ast'
     expected = file(ast, "rt").read().strip()
@@ -57,5 +49,17 @@ expected tree:
 %s
 ---
 """ % expected
+
+    try:
+        t = bakefile.parser.parse_file(input)
+        as_text = t.toStringTree()
+    except bakefile.error.Error, e:
+        as_text = "ERROR:\n%s" % e
+    print """
+parsed tree:
+---
+%s
+---
+""" % as_text
 
     assert as_text == expected

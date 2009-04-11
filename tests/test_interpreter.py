@@ -22,7 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
-import bakefile.parser, bakefile.interpreter
+import bakefile.parser, bakefile.interpreter, bakefile.error
 import dumper
 
 import os.path
@@ -42,16 +42,6 @@ def test_interpreter():
 
 def _test_parser_on_file(input):
     print 'interpreting %s' % input
-    t = bakefile.parser.parse_file(input)
-    i = bakefile.interpreter.Interpreter(t)
-    model = i.create_model()
-    as_text = dumper.dump_model(model)
-    print """
-created model:
----
-%s
----
-""" % as_text
 
     model_file = os.path.splitext(input)[0] + '.model'
     expected = file(model_file, "rt").read().strip()
@@ -61,5 +51,19 @@ expected model:
 %s
 ---
 """ % expected
+
+    try:
+        t = bakefile.parser.parse_file(input)
+        i = bakefile.interpreter.Interpreter(t)
+        model = i.create_model()
+        as_text = dumper.dump_model(model)
+    except bakefile.error.Error, e:
+        as_text = "ERROR:\n%s" % e
+    print """
+created model:
+---
+%s
+---
+""" % as_text
 
     assert as_text == expected
