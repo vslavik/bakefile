@@ -41,15 +41,6 @@ def test_parser():
 def _test_parser_on_file(input):
     print 'parsing %s' % input
 
-    ast = os.path.splitext(input)[0] + '.ast'
-    expected = file(ast, "rt").read().strip()
-    print """
-expected tree:
----
-%s
----
-""" % expected
-
     try:
         t = bakefile.parser.parse_file(input)
         as_text = t.toStringTree()
@@ -61,5 +52,14 @@ parsed tree:
 %s
 ---
 """ % as_text
+
+    ast = os.path.splitext(input)[0] + '.ast'
+    expected = file(ast, "rt").read().strip()
+    print """
+expected tree:
+---
+%s
+---
+""" % expected
 
     assert as_text == expected
