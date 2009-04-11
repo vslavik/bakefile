@@ -27,13 +27,7 @@ import ast
 from BakefileLexer import BakefileLexer
 from BakefileParser import BakefileParser
 from BakefileTokenSource import BakefileTokenSource
-
-
-class ParserException(Exception):
-    """
-    Exception class for errors encountered by the Bakefile parser.
-    """
-    pass
+from bakefile.error import ParserError
 
 
 class Parser(BakefileParser):
@@ -58,7 +52,7 @@ class Parser(BakefileParser):
 
 
     def emitErrorMessage(self, msg):
-        raise ParserException(msg)
+        raise ParserError(msg)
 
 
 def parse(code, filename=None):
