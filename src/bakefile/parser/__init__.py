@@ -47,7 +47,9 @@ class Parser(BakefileParser):
             hdr = "%s:" % self.filename
         else:
             hdr = ""
-        hdr += "%d:%d:" % (e.line, e.charPositionInLine)
+        hdr += "%d:" % e.line
+        if e.charPositionInLine != -1:
+            hdr += "%d:" % e.charPositionInLine
         return hdr
 
 
