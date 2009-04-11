@@ -28,16 +28,50 @@ from BakefileLexer import BakefileLexer
 from BakefileParser import BakefileParser
 from BakefileTokenSource import BakefileTokenSource
 
-def parse(code):
+
+class ParserException(Exception):
+    """
+    Exception class for errors encountered by the Bakefile parser.
+    """
+    pass
+
+
+class Parser(BakefileParser):
+    """
+    The parser used to parse .bkl files.
+
+    Do not use directly, use parse() function instead.
+    """
+
+    def __init__(self, stream, filename):
+        BakefileParser.__init__(self, stream)
+        self.filename = filename
+
+
+    def getErrorHeader(self, e):
+        if self.filename:
+            hdr = "%s:" % self.filename
+        else:
+            hdr = ""
+        hdr += "%d:%d:" % (e.line, e.charPositionInLine)
+        return hdr
+
+
+    def emitErrorMessage(self, msg):
+        raise ParserException(msg)
+
+
+def parse(code, filename=None):
     """
     Reads Bakefile code from string argument passed in and returns parsed AST.
+    The optional filename argument allows specifying input file name for the purpose
+    of errors reporting.
     """
     cStream = antlr3.StringStream(code)
     lexer = BakefileLexer(cStream)
     tStream = antlr3.CommonTokenStream(BakefileTokenSource(lexer))
-    parser = BakefileParser(tStream)
+    parser = Parser(tStream, filename)
     parser.adaptor = ast._TreeAdaptor()
-    # FIXME: error handling
     return parser.program().tree
 
 
@@ -47,6 +81,6 @@ def parse_file(filename):
     """
     f = file(filename, 'rt')
     try:
-        return parse(f.read())
+        return parse(f.read(), filename)
     finally:
         f.close()
