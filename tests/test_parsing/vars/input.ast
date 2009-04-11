@@ -1,0 +1,41 @@
+RootNode
+    AssignmentNode
+        IdNode FOO
+        AssignedValueNode
+            ValueNode "value1"
+            ValueNode "value2"
+    AssignmentNode
+        IdNode SINGLE
+        AssignedValueNode
+            ValueNode "one"
+    AssignmentNode
+        IdNode BAR
+        AssignedValueNode
+            ValueNode "bar"
+            ValueNode "zar    foo"
+            ValueNode "let"
+            ValueNode "x"
+    AssignmentNode
+        IdNode END
+        AssignedValueNode
+            ValueNode "end1"
+            ValueNode "end2"
+    AssignmentNode
+        IdNode END2
+        AssignedValueNode
+            ValueNode "end1"
+            ValueNode "end2"
+            ValueNode "end3"
+    AssignmentNode
+        IdNode END3
+        AssignedValueNode
+            ValueNode "end1"
+            ValueNode "xxx"
+            ValueNode "end2"
+            ValueNode "end3"
+    AssignmentNode
+        IdNode END4
+        AssignedValueNode
+            ValueNode "end1"
+            ValueNode "xxx"
+            ValueNode "end2"
