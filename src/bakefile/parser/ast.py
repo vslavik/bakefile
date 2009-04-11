@@ -67,8 +67,8 @@ class RootNode(Node):
 
 class NilNode(Node):
     """Empty node."""
-    def __init__(self):
-        Node.__init__(self, None)
+    def __init__(self, payload=None):
+        Node.__init__(self, payload)
 
 
 class ValueNode(Node):
@@ -131,6 +131,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.ASSIGNED_VALUE : AssignedValueNode,
         BakefileParser.ASSIGN         : AssignmentNode,
         BakefileParser.TARGET         : TargetNode,
+        BakefileParser.EMPTY_BLOCK    : NilNode,
     }
 
     def createWithPayload(self, payload):

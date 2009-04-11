@@ -65,11 +65,6 @@ assignment_stmt
     ;
 
 
-target_stmt
-    : type=identifier id=identifier ':' -> ^(TARGET $type $id)
-    ;
-
-
 // ---------------------------------------------------------------------------
 // Expressions
 // ---------------------------------------------------------------------------
@@ -92,10 +87,29 @@ expression
 element: value -> value;
 
 
+// ---------------------------------------------------------------------------
+// Targets
+// ---------------------------------------------------------------------------
+
+// examples:
+//
+//     Exe hello:
+//         pass
+
+target_stmt
+    : type=identifier id=identifier ':' INDENT target_content DEDENT -> ^(TARGET $type $id target_content)
+    ;
+
+target_content
+    : EMPTY_BLOCK
+    ;
+
 
 // ---------------------------------------------------------------------------
 // Basic tokens
 // ---------------------------------------------------------------------------
+
+EMPTY_BLOCK: 'pass';
 
 QUOTED_TEXT: '"' ( ~('"') )* '"';
 

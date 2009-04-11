@@ -2,3 +2,4 @@ RootNode
     TargetNode
         IdNode Exe
         IdNode hello
+        NilNode
