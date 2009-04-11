@@ -44,11 +44,23 @@ def _dump_makefile(makefile):
     for name in keys:
         out += "    %s\n" % _dump_variable(makefile.variables[name])
     out +=  "  }\n"
+
+    out += "  targets {\n"
+    keys = list(makefile.targets.iterkeys())
+    keys.sort()
+    for name in keys:
+        out += "    %s\n" % _dump_target(makefile.targets[name])
+    out +=  "  }\n"
+
     return out
 
 
 def _dump_variable(var):
     return "%s = %s" % (var.name, _dump_expression(var.value))
+
+
+def _dump_target(target):
+    return "%s %s" % (target.type, target.name)
 
 
 def _dump_expression(expr):

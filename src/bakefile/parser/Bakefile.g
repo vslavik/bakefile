@@ -45,6 +45,7 @@ tokens {
     ASSIGN;
     ASSIGNED_VALUE;
     VALUE;
+    TARGET;
 }
 
 // ---------------------------------------------------------------------------
@@ -55,11 +56,17 @@ program: stmt+ EOF -> ^(PROGRAM stmt+);
 
 stmt
     : assignment_stmt
+    | target_stmt
     ;
 
 
 assignment_stmt
     : identifier '=' expression -> ^(ASSIGN identifier expression)
+    ;
+
+
+target_stmt
+    : type=identifier id=identifier ':' -> ^(TARGET $type $id)
     ;
 
 

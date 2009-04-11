@@ -8,4 +8,6 @@ makefile {
     FOO = ["value1", "value2"]
     SINGLE = "one"
   }
+  targets {
+  }
 }

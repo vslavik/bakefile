@@ -111,6 +111,15 @@ class AssignmentNode(Node):
                      doc="Value being assigned, AssignedValueNode")
 
 
+class TargetNode(Node):
+    """Creation of a makefile target."""
+
+    type = property(lambda self: self.children[0],
+                    doc="Type of the target")
+    name = property(lambda self: self.children[1],
+                    doc="Name of the target")
+
+
 class _TreeAdaptor(CommonTreeAdaptor):
     """Adaptor for ANTLR3 AST tree creation."""
 
@@ -121,6 +130,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.ID             : IdNode,
         BakefileParser.ASSIGNED_VALUE : AssignedValueNode,
         BakefileParser.ASSIGN         : AssignmentNode,
+        BakefileParser.TARGET         : TargetNode,
     }
 
     def createWithPayload(self, payload):

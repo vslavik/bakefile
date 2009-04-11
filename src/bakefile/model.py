@@ -46,12 +46,17 @@ class Makefile(object):
     .. attribute:: variables
 
        Dictionary of all variables defined in global scope in this makefile
+
+    .. attribute:: targets
+
+       Dictionary of all targets defined in this makefile
     """
     # FIXME: terminology: would be better to use some term that means
     #        "makefile or solution/project file" for this class' name
 
     def __init__(self):
         self.variables = {}
+        self.targets = {}
 
 
     def get_variable(self, name):
@@ -70,6 +75,12 @@ class Makefile(object):
         """Adds a new variable object."""
         assert var.name not in self.variables
         self.variables[var.name] = var
+
+
+    def add_target(self, target):
+        """Adds a new target object."""
+        assert target.name not in self.targets
+        self.targets[target.name] = target
 
 
 class Variable(object):
@@ -126,3 +137,23 @@ class ListExpr(Expr):
     """
     def __init__(self, items):
         self.items = items
+
+
+class Target(object):
+    """
+    A Bakefile target.
+
+    Variables are typed.
+
+    .. attribute:: name
+
+       Name of the target.
+
+    .. attribute:: type
+
+       Type of the target, as string (FIXME).
+    """
+
+    def __init__(self, name, type):
+        self.name = name
+        self.type = type

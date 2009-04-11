@@ -1,0 +1,8 @@
+makefile {
+  variables {
+  }
+  targets {
+    Exe one
+    Exe two
+  }
+}

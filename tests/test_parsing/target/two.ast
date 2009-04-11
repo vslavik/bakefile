@@ -1,0 +1,7 @@
+RootNode
+    TargetNode
+        IdNode Exe
+        IdNode one
+    TargetNode
+        IdNode Exe
+        IdNode two

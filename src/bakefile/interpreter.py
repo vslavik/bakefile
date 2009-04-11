@@ -39,6 +39,7 @@ class Interpreter(object):
         self.ast = ast
         self._ast_dispatch = {
             AssignmentNode : self.on_assignment,
+            TargetNode     : self.on_target,
         }
 
 
@@ -66,6 +67,14 @@ class Interpreter(object):
             var = model.Variable(node.var.text,
                                  self._build_assigned_value(node.value))
             self.context.add_variable(var)
+
+
+    def on_target(self, node):
+        name = node.name.text
+        # FIXME: don't pass target type as string, obtain target-type object
+        type = node.type.text
+        target = model.Target(name, type)
+        self.context.add_target(target)
 
 
     def _build_assigned_value(self, ast, result_type=None):

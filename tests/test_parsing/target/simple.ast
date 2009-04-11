@@ -1,0 +1,4 @@
+RootNode
+    TargetNode
+        IdNode Exe
+        IdNode hello
