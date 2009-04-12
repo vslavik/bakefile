@@ -404,7 +404,8 @@ def handleModifyTarget(e, dict=None):
     _processTargetNodes(e, target, tags, dict)
 
 
-COMMANDS = ['set', 'modify-target', 'add-target', 'error', 'warning', 'echo']
+COMMANDS = ['set', 'modify-target', 'add-target', 'error', 'warning', 'echo',
+            'fragment']
 
 class TgtCmdNode:
     # node types:
@@ -596,6 +597,8 @@ def _processTargetNodes(node, target, tags, dict):
             handleWarning(e, target=target, add_dict=dict)
         elif e.name == 'echo':
             handleEcho(e, target=target, add_dict=dict)
+        elif e.name == 'fragment':
+            handleFragment(e, target=target, add_dict=dict)
         elif e.name in globalTags:
             handleGlobalTag(e)
             return 0
@@ -959,7 +962,7 @@ def handleOutput(e):
     config.to_output.append((file, writer, method))
 
 
-def handleFragment(e):
+def handleFragment(e, target=None, add_dict=None):
     if e.props['format'] == config.format:
         if 'file' in e.props:
             filename = e.props['file']
@@ -973,7 +976,7 @@ def handleFragment(e):
         else:
             content = e.value
         if 'location' in e.props:
-            loc = e.props['location']
+            loc = evalConstExpr(e, e.props['location'], target, add_dict)
         else:
             loc = None
         mk.addFragment(mk.Fragment(content, loc))
