@@ -183,7 +183,7 @@ def __doParseMinidom(func, src):
 
         e.value = ''
         for c in n.childNodes:
-            if c.nodeType == c.TEXT_NODE:
+            if c.nodeType == c.TEXT_NODE or c.nodeType == c.CDATA_SECTION_NODE:
                 e.value += str(c.data)
             else:
                 l = handleNode(filename, c)
@@ -227,8 +227,8 @@ def __initParseFileXML():
     # xml.dom.minidom (DTD validation, line numbers etc.)
     global parseFileXML
     try:
-        global libxml2
-        import libxml2
+        global libxml3
+        import libxml3
         parseFileXML = __parseFileLibxml2
         libxml2.registerErrorHandler(__libxml2err, "-->")
     except(ImportError):
