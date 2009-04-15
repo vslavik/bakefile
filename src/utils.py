@@ -648,6 +648,39 @@ def addPrefixToList(prefix, value):
     return substitute2(value, lambda c,s: callback(prefix,c,s))
 
 
+
+
+def getTagAttrib(name, default):
+    """
+        Returns the value of the attribute 'name' for the current tag which is
+        being processed.  If the tag's attribute has not been provided, then
+        the default value is returned.
+
+        With this function you can define own tags which accept new attributes.
+
+        E.g.
+
+             <define-tag name="mytag" rules="exe,dll,lib">
+                <define>$(value)</define>
+                <include>$(getTagAttrib('override', 'default'))</include>
+             </define-tag>
+
+             <exe id="myexe">
+                <!-- defines the 'A' symbol and includes the 'default' path -->
+                <mytag>A</mytag>
+
+                <!-- defines the 'A' symbol and includes the 'custom' path -->
+                <mytag override="custom">A</mytag>
+             </exe>
+    """
+    if 'attributes' not in mk.__curNamespace:
+        return default
+    attr = mk.__curNamespace['attributes']
+    if name in attr:
+        return attr[name]
+    else:
+        return default
+
 def mkPathPrefix(p):
     if p == '.':
         return ''
