@@ -227,8 +227,8 @@ def __initParseFileXML():
     # xml.dom.minidom (DTD validation, line numbers etc.)
     global parseFileXML
     try:
-        global libxml3
-        import libxml3
+        global libxml2
+        import libxml2
         parseFileXML = __parseFileLibxml2
         libxml2.registerErrorHandler(__libxml2err, "-->")
     except(ImportError):
