@@ -1,2 +1,2 @@
 ERROR:
-/home/vasek/devel/bakefile/bakefile-ng/tests/test_parsing/target/nopass.bkl:0: mismatched input '<EOF>' expecting INDENT
+target/nopass.bkl:0: mismatched input '<EOF>' expecting INDENT

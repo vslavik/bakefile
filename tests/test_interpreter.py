@@ -25,7 +25,7 @@
 import bakefile.parser, bakefile.interpreter, bakefile.error
 import dumper
 
-import os.path
+import os, os.path
 from glob import glob
 
 
@@ -36,11 +36,21 @@ def test_interpreter():
     """
     import test_parsing
     d = os.path.dirname(test_parsing.__file__)
-    for f in glob('%s/*/*.bkl' % d):
-        yield _test_parser_on_file, str(f)
+    for f in glob("%s/*/*.bkl" % d):
+        yield _test_interpreter_on_file, d, str(f)
 
 
-def _test_parser_on_file(input):
+def _test_interpreter_on_file(testdir, input):
+    assert input.startswith(testdir)
+    f = input[len(testdir)+1:]
+    cwd = os.getcwd()
+    os.chdir(testdir)
+    try:
+        _do_test_interpreter_on_file(f)
+    finally:
+        os.chdir(cwd)
+
+def _do_test_interpreter_on_file(input):
     print 'interpreting %s' % input
 
     try:

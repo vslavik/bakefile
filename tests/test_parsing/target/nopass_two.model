@@ -1,2 +1,2 @@
 ERROR:
-/home/vasek/devel/bakefile/bakefile-ng/tests/test_parsing/target/nopass_two.bkl:3:0: mismatched input u'Exe' expecting INDENT
+target/nopass_two.bkl:3:0: mismatched input u'Exe' expecting INDENT
