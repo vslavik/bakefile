@@ -629,7 +629,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 
             if do_use_pch:
                 tool.setAttribute("PrecompiledHeaderThrough", cfg._pch_header)
-                tool.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
+                if cfg._pch_file:
+                    tool.setAttribute("PrecompiledHeaderFile", cfg._pch_file)
 
 
         tool.setAttribute("ObjectFile", "%s\\%s\\" % (cfg._builddir, t.id) )

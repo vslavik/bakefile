@@ -100,6 +100,7 @@
             <set var="_pch_header"/>
             <set var="_pch_generator"/>   <!-- if set generates pch -->
             <set var="_pch_excluded"/> <!-- files that don't use it -->
+            <set var="_pch_file"/>
 
             <!-- 
             Support for custom build steps, needed for not-C/C++ files
