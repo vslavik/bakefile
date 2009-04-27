@@ -621,6 +621,10 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                     # automatic PCH support (/YX option) was removed in VC8, so
                     # disable the use of PCH completely when this option is
                     # specified (what else can we do?)
+                    #
+                    # FIXME: instead, we could pick a source file that includes
+                    #        _pch_header (if specified) at random and use that;
+                    #        or at least issue a warning
                     do_use_pch = False
 
             if do_use_pch:
