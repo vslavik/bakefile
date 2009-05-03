@@ -56,9 +56,20 @@ class _ExtensionMetaclass(type):
 
 
 
+# instances of all already requested extensions, keyed by (type,name)
+_extension_instances = {}
+
+
 class Extension(object):
     """
     Base class for all Bakefile extensions.
+
+    Extensions are singletons, there's always only one instance of given
+    extension at runtime. Use the get() method called on appropriate extension
+    type to obtain it. For example:
+
+        exe = TargetType.get("exe")
+        # ...do something with it...
 
     .. attribute:: name
 
@@ -72,6 +83,21 @@ class Extension(object):
     """
 
     __metaclass__ = _ExtensionMetaclass
+
+    @classmethod
+    def get(cls, name):
+        """
+        Returns instance of extension with given name and of the extension
+        type on which this classmethod was called.
+
+        :param name: name of the extension to read; this corresponds to
+            class' "name" attribute
+        """
+        global _extension_instances
+        key = (cls, name)
+        if key not in _extension_instances:
+            _extension_instances[key] = cls.implementations[name]()
+        return _extension_instances[key]
 
     name = None
     implementations = {}
