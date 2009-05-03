@@ -25,7 +25,35 @@
 class Error(Exception):
     """
     Base class for all Bakefile errors.
+
+    .. attribute:: pos
+
+        Position object with location of the error.
+
+    .. attribute:: msg
+
+        Error message.
     """
+    def __init__(self, pos, msg):
+        """
+        Constructor
+
+        :param pos: position of the error, may be None
+        :param msg: error message to show to the user
+        """
+        if not pos:
+            pos = Position()
+        self.pos = pos
+        self.msg = msg
+
+
+    def __str__(self):
+        if self.pos:
+            return "%s: %s" % (self.pos, self.msg)
+        else:
+            return self.msg
+
+
 
 class ParserError(Error):
     """

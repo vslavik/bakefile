@@ -80,7 +80,7 @@ class Interpreter(object):
             self.context.add_target(target)
         except KeyError:
             # FIXME: include location information
-            raise ParserError("unknown target type \"%s\"" % type_name)
+            raise ParserError(node.pos, "unknown target type \"%s\"" % type_name)
 
 
     def _build_assigned_value(self, ast, result_type=None):

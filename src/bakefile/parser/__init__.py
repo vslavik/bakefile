@@ -42,19 +42,15 @@ class Parser(BakefileParser):
         self.filename = filename
 
 
-    def getErrorHeader(self, e):
-        if self.filename:
-            hdr = "%s:" % self.filename
-        else:
-            hdr = ""
-        hdr += "%d:" % e.line
+    def displayRecognitionError(self, tokenNames, e):
+        pos = ast.Position()
+        pos.filename = self.filename
+        pos.line = e.line
         if e.charPositionInLine != -1:
-            hdr += "%d:" % e.charPositionInLine
-        return hdr
+            pos.column = e.charPositionInLine
 
-
-    def emitErrorMessage(self, msg):
-        raise ParserError(msg)
+        msg = self.getErrorMessage(e, tokenNames)
+        raise ParserError(pos, msg)
 
 
 def parse(code, filename=None):
@@ -67,7 +63,7 @@ def parse(code, filename=None):
     lexer = BakefileLexer(cStream)
     tStream = antlr3.CommonTokenStream(BakefileTokenSource(lexer))
     parser = Parser(tStream, filename)
-    parser.adaptor = ast._TreeAdaptor()
+    parser.adaptor = ast._TreeAdaptor(filename)
     return parser.program().tree
 
 

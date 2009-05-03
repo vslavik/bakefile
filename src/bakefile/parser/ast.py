@@ -25,22 +25,58 @@
 from antlr3.tree import CommonTree, CommonTreeAdaptor
 import BakefileParser
 
+
+class Position(object):
+    """
+    Location of an error in input file.
+
+    All of its attributes are optional and may be None. Convert the object
+    to string to get human-readable output.
+
+    .. attribute:: filename
+
+       Name of the source file.
+
+    .. attribute:: line
+
+       Line number.
+
+    .. attribute:: column
+
+       Column on the line.
+    """
+    def __init__(self):
+        self.filename = None
+        self.line = None
+        self.column = None
+
+    def __str__(self):
+        hdr = []
+        if self.filename:
+            hdr.append(self.filename)
+        if self.line is not None:
+            hdr.append(str(self.line))
+        if self.column is not None:
+            hdr.append(str(self.column))
+        return ":".join(hdr)
+
 class Node(CommonTree):
-    """Base class for Bakefile AST tree node."""
+    """
+    Base class for Bakefile AST tree node.
+    """
 
     def _get_pos(self):
-        if self.token is None:
-            return None
-        if self.line is None or self.charPositionInLine is None:
-            return None
-        return (self.line, self.charPositionInLine)
+        pos = Position()
+        pos.filename = self.filename
+        if self.token:
+            pos.line = self.line
+            pos.column = self.charPositionInLine
+        return pos
 
-    # Position of the node in source code. Returns None if it cannot be
-    # determined or (line,posInLine) tuple.
-    # FIXME: change this to return string, include filename, line, posInLine
-    # only if !=-1; if it doesn't have position, look at siblings in the tree
+    # Position of the node in source code, as parser.Position object.
+    # FIXME: if it doesn't have position, look at siblings in the tree
     # and return "near $foo.pos" for some foo parent or sibling
-    pos = property(_get_pos)
+    pos = property(_get_pos, "position of the node in source code")
 
     def __str__(self):
         return self.__class__.__name__
@@ -123,6 +159,9 @@ class TargetNode(Node):
 class _TreeAdaptor(CommonTreeAdaptor):
     """Adaptor for ANTLR3 AST tree creation."""
 
+    def __init__(self, filename):
+        self.filename = filename
+
     # mapping of token types to AST node classes
     TOKENS_MAP = {
         BakefileParser.PROGRAM        : RootNode,
@@ -138,4 +177,6 @@ class _TreeAdaptor(CommonTreeAdaptor):
         if payload is None:
             return NilNode()
         else:
-            return self.TOKENS_MAP[payload.type](payload)
+            n = self.TOKENS_MAP[payload.type](payload)
+            n.filename = self.filename
+            return n
