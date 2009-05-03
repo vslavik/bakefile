@@ -101,3 +101,11 @@ class Extension(object):
 
     name = None
     implementations = {}
+
+
+
+class TargetType(Extension):
+    """
+    Base class for implementation of a new target type.
+    """
+    pass

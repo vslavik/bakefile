@@ -60,7 +60,7 @@ def _dump_variable(var):
 
 
 def _dump_target(target):
-    return "%s %s" % (target.type, target.name)
+    return "%s %s" % (target.type.name, target.name)
 
 
 def _dump_expression(expr):

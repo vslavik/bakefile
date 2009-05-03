@@ -151,9 +151,16 @@ class Target(object):
 
     .. attribute:: type
 
-       Type of the target, as string (FIXME).
+       Type of the target, as api.TargetType instance.
     """
 
     def __init__(self, name, type):
+        """
+        Target constructor.
+
+        :param name: name (ID) of the target; this must be unique in the
+            entire project
+        :param type: api.TargetType instance identifying the type
+        """
         self.name = name
         self.type = type

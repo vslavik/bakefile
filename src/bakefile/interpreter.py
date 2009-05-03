@@ -22,8 +22,10 @@
 #  IN THE SOFTWARE.
 #
 
+import api
 import model
 from parser.ast import *
+from error import ParserError
 
 class Interpreter(object):
     """
@@ -71,10 +73,14 @@ class Interpreter(object):
 
     def on_target(self, node):
         name = node.name.text
-        # FIXME: don't pass target type as string, obtain target-type object
-        type = node.type.text
-        target = model.Target(name, type)
-        self.context.add_target(target)
+        type_name = node.type.text
+        try:
+            type = api.TargetType.get(type_name)
+            target = model.Target(name, type)
+            self.context.add_target(target)
+        except KeyError:
+            # FIXME: include location information
+            raise ParserError("unknown target type \"%s\"" % type_name)
 
 
     def _build_assigned_value(self, ast, result_type=None):
