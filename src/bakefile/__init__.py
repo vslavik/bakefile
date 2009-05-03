@@ -22,7 +22,8 @@
 #  IN THE SOFTWARE.
 #
 
-import os, os.path
+import sys, os, os.path
+import imp
 
 
 def load_plugin(filename):
@@ -31,7 +32,6 @@ def load_plugin(filename):
     """
     basename = os.path.splitext(os.path.basename(filename))[0]
     modname = "bakefile.plugins.%s" % basename
-    import imp
     imp.load_source(modname, filename)
 
 
@@ -50,6 +50,8 @@ def load_plugins_from_dir(dirname):
 # import all plugins:
 
 PLUGINS_PATH = [os.path.join(p, "plugins") for p in __path__]
+
+sys.modules["bakefile.plugins"] = imp.new_module("bakefile.plugins")
 
 for p in PLUGINS_PATH:
     load_plugins_from_dir(p)
