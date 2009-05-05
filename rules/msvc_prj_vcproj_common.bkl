@@ -142,7 +142,7 @@
     
     <define-tag name="precomp-headers-file" rules="exe,dll,module,lib">
         <set var="_pch_file">
-            $(formatIfNotEmpty('%s.pch', mkPathPrefix(BUILDDIR)+value))
+            $(formatIfNotEmpty('%s.pch', value))
         </set>
     </define-tag>
     
