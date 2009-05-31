@@ -52,7 +52,7 @@
     <option name="USE_SOVERLINUX"><values>0,1</values></option>
     <option name="USE_SOVERSOLARIS"><values>0,1</values></option>
     <option name="USE_SOVERCYGWIN"><values>0,1</values></option>
-    <option name="USE_SOSYMLINKS"><values>0,1</values></option>
+    <option name="USE_SOTWOSYMLINKS"><values>0,1</values></option>
     <option name="USE_MACVERSION"><values>0,1</values></option>
     <option name="SONAME_FLAG"/>
     <option name="STRIP"/>
@@ -220,6 +220,9 @@
             <if cond="USE_SOVERSION=='1' and PLATFORM_MACOSX=='1'">
                 .$(__soversion1).$(__soversion2).$(__soversion3)$(DLLEXT)
             </if>
+            <if cond="USE_SOVERSION=='1' and USE_SOVERSOLARIS=='1'">
+                $(DLLEXT).$(__soversion1)
+            </if>
             <if cond="USE_SOVERSION=='1' and USE_SOVERCYGWIN=='1'">
                 -$(__soversion1)$(DLLEXT)
             </if>
@@ -240,23 +243,35 @@
         <ldflags>$(__soname_flags)</ldflags>
 
         <set var="__so_symlinks_cmd">
-            <if cond="USE_SOSYMLINKS=='1'">
+            <if cond="USE_SOTWOSYMLINKS=='1'">
                 (cd $(pathPrefixToPath(__targetdir));
                 $(RM) $(__linkname1) $(__linkname2);
                 $(LN_S) $(__targetname) $(__linkname2);
                 $(LN_S) $(__linkname2) $(__linkname1))
             </if>
+            <if cond="USE_SOVERSOLARIS=='1'">
+                (cd $(pathPrefixToPath(__targetdir));
+                $(RM) $(__linkname1);
+                $(LN_S) $(__targetname) $(__linkname1))
+            </if>
         </set>
         <set var="__so_symlinks_inst_cmd">
-            <if cond="USE_SOSYMLINKS=='1'">
+            <if cond="USE_SOTWOSYMLINKS=='1'">
                 $(RM) $(__linkname1) $(__linkname2);
                 $(LN_S) $(__targetname) $(__linkname2);
                 $(LN_S) $(__linkname2) $(__linkname1)
             </if>
+            <if cond="USE_SOVERSOLARIS=='1'">
+                $(RM) $(__linkname1);
+                $(LN_S) $(__targetname) $(__linkname1);
+            </if>
         </set>
         <set var="__so_symlinks_uninst_cmd">
-            <if cond="USE_SOSYMLINKS=='1'">
+            <if cond="USE_SOTWOSYMLINKS=='1'">
                 $(RM) $(__linkname2) $(__linkname1)
+            </if>
+            <if cond="USE_SOVERSOLARIS=='1'">
+                $(RM) $(__linkname1)
             </if>
         </set>
         <__command>$(LF)$(__so_symlinks_cmd)</__command>
