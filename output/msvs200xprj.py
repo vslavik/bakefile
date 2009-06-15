@@ -715,7 +715,21 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 
 
     def buildIdlToolElement(self, tool, prjname, cfg, c, t):
-        tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
+        # MIDL compiler has a bug in it that prevents quoted values in
+        # PreprocessorDefinitions from being passed correctly to the compiler.
+        # We work around it by using AdditionalOptions.
+        # See http://www.vtk.org/Bug/view.php?id=8165 for the gory details.
+        all_defines = [x for x in cfg._defines.split(";") if len(x) > 0]
+        extras = []
+        simple_defines = []
+        for d in all_defines:
+            if '"' in d:
+                extras.append("/D %s" % d)
+            else:
+                simple_defines.append(d)
+        if extras:
+            tool.setAttribute("AdditionalOptions", " ".join(extras))
+        tool.setAttribute("PreprocessorDefinitions", ";".join(simple_defines))
         tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
 
 
