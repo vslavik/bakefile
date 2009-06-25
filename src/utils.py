@@ -321,7 +321,9 @@ def makeUniqueName(name, all):
         conflicts = len([n for n in all if n.endswith(x)])
         if conflicts == 1: # only this one
             return x.replace(dirsep, '_')
-    raise errors.Error("don't know how to create object file name for \"%s\"" % name)
+
+    # as the last resort, use full path - ugly, but works:
+    return '_'.join(split).replace('..','__')
 
 
 allObjectsBasenames = {}
