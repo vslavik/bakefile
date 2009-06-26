@@ -3,6 +3,7 @@
 - fixed shared library names and sonames on Solaris to use only one version
   number: use libfoo.so.1 for the file and the soname and libfoo.so for the
   only symlink
+- msvs2008prj: fixed MIDL compiler settings
 
 
 Version 0.2.6

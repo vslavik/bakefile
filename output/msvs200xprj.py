@@ -770,7 +770,6 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         toolHandlers = {
                          'VCBscMakeTool'    : self.buildBscMakeToolElement,
                          'VCCLCompilerTool' : self.buildCompilerToolElement,
-                         'VCIDLTool'        : self.buildIdlToolElement, 
                          'VCMIDLTool'       : self.buildIdlToolElement, 
                          'VCLibrarianTool'  : self.buildLibrarianToolElement,
                          'VCLinkerTool'     : self.buildLinkerToolElement,
@@ -802,16 +801,12 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                         'VCAuxiliaryManagedWrapperGeneratorTool',
                     ]
         else:
-            if _MSVS_VCPROJ_VERSION == "8.00":
-                idlTool = "VCMIDLTool"
-            else:
-                idlTool = "VCIDLTool"
             tools = [
                         'VCPreBuildEventTool',
                         'VCCustomBuildTool',
                         'VCXMLDataGeneratorTool',
                         'VCWebServiceProxyGeneratorTool',
-                        idlTool,
+                        'VCMIDLTool',
                         'VCCLCompilerTool',
                         'VCManagedResourceCompilerTool',
                         'VCResourceCompilerTool',
