@@ -146,6 +146,11 @@
                      (FIXME: make it configurable) -->
                 <cxx-rtti>on</cxx-rtti>
                 <cxx-exceptions>on</cxx-exceptions>
+
+                <set var="__win32_resources"/>
+                <set var="__win32_resources_var">
+                    $(createMakeVar(id, '__win32_resources', 'RESOURCES', hints='files'))
+                </set>
             </template>
 
             <define-tag name="precomp-headers-gen">
@@ -166,23 +171,23 @@
         <template id="__commands_templ">
             <set var="__LINK_EXE_CMD" eval="0">
                 $(__linker) /NOLOGO /OUT:$@ $(__ldflags_all) @&lt;&lt;
-                $(__objects_var) $(__ldlibs)
+                $(__objects_var) $(__win32_resources_var) $(__ldlibs)
                 &lt;&lt;NOKEEP
             </set>
             <set var="__LINK_LIB_CMD" eval="0">
                 if exist $@ del $@
                 $(__LIB_TOOL) /NOLOGO /OUT:$@ @&lt;&lt;
-                $(__objects_var)
+                $(__objects_var) $(__win32_resources_var)
                 &lt;&lt;NOKEEP
             </set>
             <set var="__LINK_DLL_CMD" eval="0">
                 $(__dll_linker) /NOLOGO /OUT:$@ $(__ldflags_all) @&lt;&lt;
-                $(__objects_var) $(__ldlibs) /IMPLIB:$(__targetdir)$(__libname).lib
+                $(__objects_var) $(__win32_resources_var) $(__ldlibs) /IMPLIB:$(__targetdir)$(__libname).lib
                 &lt;&lt;NOKEEP
             </set>
             <set var="__LINK_MODULE_CMD" eval="0">
                 $(__dll_linker) /NOLOGO /OUT:$@ $(__ldflags_all) @&lt;&lt;
-                $(__objects_var) $(__ldlibs)
+                $(__objects_var) $(__win32_resources_var) $(__ldlibs)
                 &lt;&lt;NOKEEP
             </set>
         </template>

@@ -65,7 +65,7 @@
         <set var="__restmp">
             $(sources2objects(value, id, '.res'))
         </set>
-        <set var="__objects" append="1">$(__restmp)</set>
+        <set var="__win32_resources" append="1">$(__restmp)</set>
         <set var="__deps" append="1">$(__restmp)</set>
     </define-tag>
 
