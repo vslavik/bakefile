@@ -965,7 +965,7 @@ def handleOutput(e):
 def handleFragment(e, target=None, add_dict=None):
     if e.props['format'] == config.format:
         if 'file' in e.props:
-            filename = e.props['file']
+            filename = os.path.join(os.path.dirname(e.filename), e.props['file'])
             f = open(filename)
             content = f.read()
             f.close()
