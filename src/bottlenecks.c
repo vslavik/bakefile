@@ -47,16 +47,17 @@ static int textbufCurrent = -1;
 
 #define ENSURE_BUFFER(size) \
     { \
-        if (TEXTBUF_SIZE < size + 1) \
+        if (textbufSize[textbufCurrent] < size + 1) \
         { \
-            PyErr_SetString(PyExc_RuntimeError, \
-       "bottlenecks.doEvalExpr: too large variables, increase TEXTBUF_SIZE"); \
-            return NULL; \
+            textbufSize[textbufCurrent] += TEXTBUF_SIZE; \
+            if (textbufSize[textbufCurrent] < size + 1) \
+                textbufSize[textbufCurrent] = size + 1; \
+            textbuf[textbufCurrent] = realloc(textbuf[textbufCurrent], textbufSize[textbufCurrent]); \
         } \
     }
 
 /* safety checks against re-entrancy (shouldn't ever happen): */
-#define ACQUIRE_BUFFER() \
+#define ACQUIRE_BUFFER(len) \
     { \
         if (++textbufCurrent >= TEXTBUF_COUNT) \
         { \
@@ -65,7 +66,11 @@ static int textbufCurrent = -1;
             return NULL; \
         } \
         if (textbuf[textbufCurrent] == NULL) \
-            textbuf[textbufCurrent] = malloc(TEXTBUF_SIZE); \
+        { \
+            textbufSize[textbufCurrent] = \
+                len+1 > TEXTBUF_SIZE ? len+1 : TEXTBUF_SIZE; \
+            textbuf[textbufCurrent] = malloc(textbufSize[textbufCurrent]); \
+        } \
     }
 #define RELEASE_BUFFER() \
     textbufCurrent--
@@ -93,7 +98,7 @@ const char *doEvalExpr(const char *expr,
     assert(expr != NULL);
     len = strlen(expr);
 
-    ACQUIRE_BUFFER();
+    ACQUIRE_BUFFER(len);
     ENSURE_BUFFER(len);
     output = txtbuf = textbuf[textbufCurrent];
 
