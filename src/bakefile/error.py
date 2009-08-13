@@ -47,6 +47,9 @@ class Error(Exception):
         self.msg = msg
 
 
+    def __unicode__(self):
+        return str(self)
+
     def __str__(self):
         if self.pos:
             return "%s: %s" % (self.pos, self.msg)
