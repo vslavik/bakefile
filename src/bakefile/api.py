@@ -39,6 +39,12 @@ class _ExtensionMetaclass(type):
             cls.implementations = {}
             return
 
+        if cls.name is None:
+            # This must be a helper class derived from a particular extension,
+            # but not a fully implemented extension; see e.g. MakefileToolset
+            # base class for MingwToolset, BorlandToolset etc.
+            return
+
         # for "normal" implementations of extensions, find the extension
         # type class (we need to handle the case of deriving from an existing
         # extension):
