@@ -29,7 +29,7 @@ from error import ParserError
 
 class Interpreter(object):
     """
-    Interpreter processes parsed AST and constructs a Makefile model from it.
+    Interpreter processes parsed AST and constructs a project model from it.
 
     It doesn't do anything smart like optimizing things, it does only the
     minimal processing needed to produce a valid model. This includes checking
@@ -46,8 +46,8 @@ class Interpreter(object):
 
 
     def create_model(self):
-        """Returns constructed model."""
-        self.model = model.Model()
+        """Returns constructed model, as model.Project instance."""
+        self.model = model.Project()
         self.context = model.Makefile()
         self.model.makefiles.append(self.context)
 

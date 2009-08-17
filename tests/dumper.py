@@ -24,13 +24,13 @@
 
 from bakefile import model
 
-def dump_model(model):
+def dump_model(project):
     """
-    Returns string with dumped, human-readable description of 'model', which
-    is an instance of bakefile.model.Model.
+    Returns string with dumped, human-readable description of 'project', which
+    is an instance of bakefile.model.Project.
     """
     out = ""
-    for mk in model.makefiles:
+    for mk in project.makefiles:
         out += "makefile {\n%s}\n" % _dump_makefile(mk)
     return out.strip()
 

@@ -131,11 +131,11 @@ class Toolset(Extension):
     invocation, ...) together and writes out the makefiles or projects.
     """
 
-    def generate(self, model):
+    def generate(self, project):
         """
         Generates all output files for this toolset.
 
-        :param model: model.Model instance with complete description of the
+        :param project: model.Project instance with complete description of the
             output. It was already preprocessed to remove content not relevant
             for this toolset (targets or sub-makefiles (FIXME-term)
             built conditionally only for other toolsets, conditionals that are

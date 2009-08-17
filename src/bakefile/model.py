@@ -23,14 +23,14 @@
 #
 
 
-class Model(object):
+class Project(object):
     """
     Abstract model that completely describes state of loaded and processed
-    Bakefile file(s).
+    Bakefile file(s) within the project.
 
-    .. attribute: makefiles
+    .. attribute: makefiles (FIXME)
 
-       List of all makefiles included in the model.
+       List of all makefiles included in the project.
     """
     def __init__(self):
         self.makefiles = []
