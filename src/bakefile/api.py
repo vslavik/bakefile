@@ -109,3 +109,30 @@ class TargetType(Extension):
     Base class for implementation of a new target type.
     """
     pass
+
+
+
+class Toolset(Extension):
+    """
+    This class encapsulates generating of the project files or makefiles.
+
+    The term "toolset" refers to collection of tools (compiler, linker, make,
+    IDE, ...) used to compile programs. For example, "Visual C++ 2008",
+    "Visual C++ 2005", "Xcode" or "Borland C++" are toolsets.
+
+    In Bakefile API, this class is responsible for creation of the output. It
+    puts all the components (platform-specific commands, make syntax, compiler
+    invocation, ...) together and writes out the makefiles or projects.
+    """
+
+    def generate(self, model):
+        """
+        Generates all output files for this toolset.
+
+        :param model: model.Model instance with complete description of the
+            output. It was already preprocessed to remove content not relevant
+            for this toolset (targets or sub-makefiles (FIXME-term)
+            built conditionally only for other toolsets, conditionals that are
+            always true or false within the toolset and so on).
+        """
+        raise NotImplementedError
