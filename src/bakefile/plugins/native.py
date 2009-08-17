@@ -33,4 +33,4 @@ class ExeType(TargetType):
     """
     Executable program.
     """
-    name = "Exe"
+    name = "exe"

@@ -93,7 +93,7 @@ element: value -> value;
 
 // examples:
 //
-//     Exe hello:
+//     exe hello:
 //         pass
 
 target_stmt

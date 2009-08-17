@@ -1,9 +1,9 @@
 RootNode
     TargetNode
-        IdNode Exe
+        IdNode exe
         IdNode one
         NilNode
     TargetNode
-        IdNode Exe
+        IdNode exe
         IdNode two
         NilNode

@@ -2,6 +2,6 @@ makefile {
   variables {
   }
   targets {
-    Exe hello
+    exe hello
   }
 }
