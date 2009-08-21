@@ -38,6 +38,7 @@ class Project(object):
         self.modules = []
 
 
+
 class Module(object):
     """
     Representation of single compilation unit. Corresponds to one Bakefile
@@ -94,6 +95,7 @@ class Module(object):
         self.targets[target.name] = target
 
 
+
 class Variable(object):
     """
     A Bakefile variable.
@@ -118,6 +120,7 @@ class Variable(object):
         self.value = value
 
 
+
 class Expr(object):
     """
     Value expression.
@@ -134,6 +137,7 @@ class Expr(object):
     pass
 
 
+
 class ConstExpr(Expr):
     """
     Constant expression -- holds a literal.
@@ -142,12 +146,14 @@ class ConstExpr(Expr):
         self.value = value
 
 
+
 class ListExpr(Expr):
     """
     List expression -- list of several values of the same type.
     """
     def __init__(self, items):
         self.items = items
+
 
 
 class Target(object):
