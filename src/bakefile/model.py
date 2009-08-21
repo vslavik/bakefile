@@ -22,6 +22,8 @@
 #  IN THE SOFTWARE.
 #
 
+import error
+
 
 class Project(object):
     """
@@ -67,6 +69,17 @@ class Module(object):
             return self.variables[name]
         else:
             return None
+
+
+    def get_variable_value(self, name):
+        """
+        Similar to get_variable(), but returns the expression with variable's
+        value. Throws and exception if the variable isn't defined.
+        """
+        var = self.get_variable(name)
+        if not var:
+            raise error.Error(None, "unknown variable \"%s\"" % name)
+        return var.value
 
 
     def add_variable(self, var):
