@@ -48,8 +48,8 @@ class Interpreter(object):
     def create_model(self):
         """Returns constructed model, as model.Project instance."""
         self.model = model.Project()
-        self.context = model.Makefile()
-        self.model.makefiles.append(self.context)
+        self.context = model.Module()
+        self.model.modules.append(self.context)
 
         for n in self.ast.children:
             self._handle_node(n)

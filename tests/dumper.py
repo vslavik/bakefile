@@ -30,8 +30,8 @@ def dump_model(project):
     is an instance of bakefile.model.Project.
     """
     out = ""
-    for mk in project.makefiles:
-        out += "makefile {\n%s}\n" % _dump_makefile(mk)
+    for mk in project.modules:
+        out += "module {\n%s}\n" % _dump_makefile(mk)
     return out.strip()
 
 

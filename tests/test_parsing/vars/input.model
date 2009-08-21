@@ -1,4 +1,4 @@
-makefile {
+module {
   variables {
     BAR = ["bar", "zar    foo", "let", "x"]
     END = ["end1", "end2"]

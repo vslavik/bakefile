@@ -28,31 +28,29 @@ class Project(object):
     Abstract model that completely describes state of loaded and processed
     Bakefile file(s) within the project.
 
-    .. attribute: makefiles (FIXME)
+    .. attribute: modules
 
-       List of all makefiles included in the project.
+       List of all modules included in the project.
     """
     def __init__(self):
-        self.makefiles = []
+        self.modules = []
 
 
-class Makefile(object):
+class Module(object):
     """
     Representation of single compilation unit. Corresponds to one Bakefile
     input file (either specified on command line or imported using `import`
     command; files included using `include` from other files are *not*
-    represented by Makefile object) and typically to one generated output file.
+    represented by Module object) and typically to one generated output file.
 
     .. attribute:: variables
 
-       Dictionary of all variables defined in global scope in this makefile
+       Dictionary of all variables defined in global scope in this module
 
     .. attribute:: targets
 
-       Dictionary of all targets defined in this makefile
+       Dictionary of all targets defined in this module
     """
-    # FIXME: terminology: would be better to use some term that means
-    #        "makefile or solution/project file" for this class' name
 
     def __init__(self):
         self.variables = {}

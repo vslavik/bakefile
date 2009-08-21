@@ -1,4 +1,4 @@
-makefile {
+module {
   variables {
   }
   targets {
