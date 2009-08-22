@@ -73,13 +73,15 @@ class Interpreter(object):
 
     def on_target(self, node):
         name = node.name.text
+        if name in self.context.targets:
+            raise ParserError(node.pos, "target ID \"%s\" not unique" % name)
+
         type_name = node.type.text
         try:
             type = api.TargetType.get(type_name)
             target = model.Target(name, type)
             self.context.add_target(target)
         except KeyError:
-            # FIXME: include location information
             raise ParserError(node.pos, "unknown target type \"%s\"" % type_name)
 
 
