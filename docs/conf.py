@@ -36,7 +36,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'Bakefile'
-copyright = '2008, Vaclav Slavik'
+copyright = '2009, Vaclav Slavik'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -63,7 +63,7 @@ today_fmt = '%B %d, %Y'
 #default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
-#add_function_parentheses = True
+add_function_parentheses = True
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
@@ -83,7 +83,7 @@ pygments_style = 'sphinx'
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
-html_style = 'default.css'
+html_theme = 'sphinxdoc'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
