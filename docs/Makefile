@@ -6,7 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 
 # Internal variables.
-ALLSPHINXOPTS   = -d .build/doctrees $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -d .doctrees $(SPHINXOPTS) .
 
 GENERATED_TS = ref/timestamp
 GENERATED_DOCS_SOURCES = $(wildcard ../src/bakefile/*.py) \
@@ -24,7 +24,8 @@ help:
 	@echo "  linkcheck to check all external links for integrity"
 
 clean:
-	rm -rf .build/*
+	rm -rf .build .doctrees
+	rm -rf html
 	rm -rf ref
 
 $(GENERATED_TS): $(GENERATED_DOCS_SOURCES) gen_reference.py
@@ -32,26 +33,26 @@ $(GENERATED_TS): $(GENERATED_DOCS_SOURCES) gen_reference.py
 	@touch $(GENERATED_TS)
 
 html: $(GENERATED_TS)
-	mkdir -p .build/html .build/doctrees
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) .build/html
+	mkdir -p html .doctrees
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) html
 	@echo
-	@echo "Build finished. The HTML pages are in .build/html."
+	@echo "Build finished. The HTML pages are in ./html."
 
 htmlhelp: $(GENERATED_TS)
-	mkdir -p .build/htmlhelp .build/doctrees
+	mkdir -p .build/htmlhelp .doctrees
 	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) .build/htmlhelp
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
 	      ".hhp project file in .build/htmlhelp."
 
 changes: $(GENERATED_TS)
-	mkdir -p .build/changes .build/doctrees
+	mkdir -p .build/changes .doctrees
 	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) .build/changes
 	@echo
 	@echo "The overview file is in .build/changes."
 
 linkcheck: $(GENERATED_TS)
-	mkdir -p .build/linkcheck .build/doctrees
+	mkdir -p .build/linkcheck .doctrees
 	$(SPHINXBUILD) -b linkcheck $(ALLSPHINXOPTS) .build/linkcheck
 	@echo
 	@echo "Link check complete; look for any errors in the above output " \

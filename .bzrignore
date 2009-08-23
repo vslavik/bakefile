@@ -2,3 +2,6 @@ src/bakefile/parser/Bakefile.tokens
 src/bakefile/parser/BakefileLexer.py
 src/bakefile/parser/BakefileParser.py
 docs/ref
+docs/.doctrees
+docs/.build
+docs/html
