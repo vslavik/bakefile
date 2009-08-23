@@ -22,13 +22,22 @@
 #  IN THE SOFTWARE.
 #
 
+"""
+This module contains helper classes for simple handling of errors. In
+particular, the :exc:`Error` class keeps track of the position in source code
+where the error occurred or to which it relates to.
+"""
+
 class Error(Exception):
     """
     Base class for all Bakefile errors.
 
+    When converted to string, the message is formatted in the usual way of
+    compilers, as ``file:line: error``.
+
     .. attribute:: pos
 
-        Position object with location of the error.
+        :class:`bakefile.parser.ast.Position` object with location of the error.
 
     .. attribute:: msg
 
