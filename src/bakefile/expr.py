@@ -28,6 +28,13 @@ condition or variable value) is defined in this module, together with
 useful functions for evaluating and simplifying expressions.
 """
 
+
+#: Boolean value of "true".
+TRUE = "true"
+#: Boolean value of "false".
+FALSE = "false"
+
+
 class Expr(object):
     """
     Value expression.
@@ -40,8 +47,15 @@ class Expr(object):
     Note that expression objects are immutable: if you need to modify an
     expression, replace it with a new object.
     """
-    # FIXME: type handling
-    pass
+
+    def is_const(self):
+        """
+        Returns True if the expression evaluates to a constant. If this method
+        returns False, it means that the expression can only be evaluated
+        at make-time. Such expressions cannot be used in some situations, e.g.
+        to specify output files.
+        """
+        raise NotImplementedError
 
 
 
@@ -52,6 +66,9 @@ class ConstExpr(Expr):
     def __init__(self, value):
         self.value = value
 
+    def is_const(self):
+        return True
+
 
 
 class ListExpr(Expr):
@@ -60,3 +77,9 @@ class ListExpr(Expr):
     """
     def __init__(self, items):
         self.items = items
+
+    def is_const(self):
+        for i in self.items:
+            if not i.is_const():
+                return False
+        return True
