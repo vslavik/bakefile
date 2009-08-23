@@ -23,6 +23,7 @@
 #
 
 import api
+import expr
 import model
 from parser.ast import *
 from error import ParserError
@@ -87,7 +88,8 @@ class Interpreter(object):
 
     def _build_assigned_value(self, ast, result_type=None):
         """
-        Build model.Expr from given AST node of AssignedValueNode type.
+        Build :class:`bakefile.expr.Expr` from given AST node of
+        AssignedValueNode type.
 
         If result_type is specified, then the expression will be of that
         type, or the function will throw an exception.
@@ -99,11 +101,11 @@ class Interpreter(object):
         else:
             assert result_type==None # FIXME: handle nested type correctly
             items = [self._build_expression(e, result_type) for e in values]
-            return model.ListExpr(items)
+            return expr.ListExpr(items)
 
 
     def _build_expression(self, ast, result_type=None):
         if isinstance(ast, ValueNode):
             # FIXME: type handling
-            return model.ConstExpr(ast.text)
+            return expr.ConstExpr(ast.text)
         assert False, "unrecognized AST node"

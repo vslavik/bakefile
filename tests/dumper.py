@@ -22,7 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
-from bakefile import model
+from bakefile import model, expr
 
 def dump_model(project):
     """
@@ -63,12 +63,12 @@ def _dump_target(target):
     return "%s %s" % (target.type.name, target.name)
 
 
-def _dump_expression(expr):
-    if isinstance(expr, model.ConstExpr):
+def _dump_expression(e):
+    if isinstance(e, expr.ConstExpr):
         # FIXME: handle types
-        return '"%s"' % expr.value
-    if isinstance(expr, model.ListExpr):
-        items = [_dump_expression(e) for e in expr.items]
+        return '"%s"' % e.value
+    if isinstance(e, expr.ListExpr):
+        items = [_dump_expression(x) for x in e.items]
         return "[%s]" % ", ".join(items)
     else:
         assert False, "unknown expression type"

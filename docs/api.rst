@@ -10,6 +10,13 @@ API reference documentation
         :members:
 
 
+:mod:`bakefile.expr` -- representation of expressions
+-----------------------------------------------------
+
+.. automodule:: bakefile.expr
+        :members:
+
+
 :mod:`bakefile.api` -- public extensions API
 --------------------------------------------
 

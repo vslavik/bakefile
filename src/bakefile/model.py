@@ -112,47 +112,12 @@ class Variable(object):
 
     .. attribute:: value
 
-       Value of the variable, as :class:`Expr` object.
+       Value of the variable, as :class:`bakefile.expr.Expr` object.
     """
 
     def __init__(self, name, value):
         self.name = name
         self.value = value
-
-
-
-class Expr(object):
-    """
-    Value expression.
-
-    Represents a value (typically assigned to a variable, but also expressions
-    used somewhere else, e.g. as conditions) as tree of expression objects. In
-    Bakefile, the expressions are kept in tree representation until the last
-    possible moment, and are manipulated in this form.
-
-    Note that expression objects are immutable: if you need to modify an
-    expression, replace it with a new object.
-    """
-    # FIXME: type handling
-    pass
-
-
-
-class ConstExpr(Expr):
-    """
-    Constant expression -- holds a literal.
-    """
-    def __init__(self, value):
-        self.value = value
-
-
-
-class ListExpr(Expr):
-    """
-    List expression -- list of several values of the same type.
-    """
-    def __init__(self, items):
-        self.items = items
 
 
 
