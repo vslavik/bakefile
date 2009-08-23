@@ -10,6 +10,7 @@ Contents:
 
    ref
    devel
+   glossary
 
 
 Indices and tables
