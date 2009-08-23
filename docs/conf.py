@@ -145,4 +145,4 @@ html_last_updated_fmt = '%b %d, %Y'
 htmlhelp_basename = 'Bakefiledoc'
 
 
-
+autodoc_member_order = "groupwise"
