@@ -1,7 +1,7 @@
 
 
 API reference documentation
-=======================
+===========================
 
 :mod:`bakefile.model` -- project model
 --------------------------------------

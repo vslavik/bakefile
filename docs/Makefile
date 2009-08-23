@@ -11,7 +11,13 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d .build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html web pickle htmlhelp latex changes linkcheck
+GENERATED_TS = ref/timestamp
+GENERATED_DOCS_SOURCES = $(wildcard ../src/bakefile/*.py) \
+                         $(wildcard ../src/bakefile/plugins/*.py)
+
+.PHONY: all help clean html web pickle htmlhelp latex changes linkcheck
+
+all: html
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -23,15 +29,20 @@ help:
 	@echo "  linkcheck to check all external links for integrity"
 
 clean:
-	-rm -rf .build/*
+	rm -rf .build/*
+	rm -rf ref
 
-html:
+$(GENERATED_TS): $(GENERATED_DOCS_SOURCES) gen_reference.py
+	./gen_reference.py
+	@touch $(GENERATED_TS)
+
+html: $(GENERATED_TS)
 	mkdir -p .build/html .build/doctrees
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) .build/html
 	@echo
 	@echo "Build finished. The HTML pages are in .build/html."
 
-pickle:
+pickle: $(GENERATED_TS)
 	mkdir -p .build/pickle .build/doctrees
 	$(SPHINXBUILD) -b pickle $(ALLSPHINXOPTS) .build/pickle
 	@echo
@@ -41,14 +52,14 @@ pickle:
 
 web: pickle
 
-htmlhelp:
+htmlhelp: $(GENERATED_TS)
 	mkdir -p .build/htmlhelp .build/doctrees
 	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) .build/htmlhelp
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
 	      ".hhp project file in .build/htmlhelp."
 
-latex:
+latex: $(GENERATED_TS)
 	mkdir -p .build/latex .build/doctrees
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) .build/latex
 	@echo
@@ -56,13 +67,13 @@ latex:
 	@echo "Run \`make all-pdf' or \`make all-ps' in that directory to" \
 	      "run these through (pdf)latex."
 
-changes:
+changes: $(GENERATED_TS)
 	mkdir -p .build/changes .build/doctrees
 	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) .build/changes
 	@echo
 	@echo "The overview file is in .build/changes."
 
-linkcheck:
+linkcheck: $(GENERATED_TS)
 	mkdir -p .build/linkcheck .build/doctrees
 	$(SPHINXBUILD) -b linkcheck $(ALLSPHINXOPTS) .build/linkcheck
 	@echo
