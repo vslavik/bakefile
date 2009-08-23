@@ -8,6 +8,7 @@ API reference documentation
 
 .. automodule:: bakefile.model
         :members:
+        :show-inheritance:
 
 
 :mod:`bakefile.expr` -- representation of expressions
@@ -15,6 +16,7 @@ API reference documentation
 
 .. automodule:: bakefile.expr
         :members:
+        :show-inheritance:
 
 
 :mod:`bakefile.api` -- public extensions API
@@ -22,6 +24,7 @@ API reference documentation
 
 .. automodule:: bakefile.api
         :members:
+        :show-inheritance:
 
 
 :mod:`bakefile.error` -- exceptions and errors handling
@@ -29,6 +32,7 @@ API reference documentation
 
 .. automodule:: bakefile.error
         :members:
+        :show-inheritance:
 
 
 :mod:`bakefile.io` -- I/O helpers
@@ -36,6 +40,7 @@ API reference documentation
 
 .. automodule:: bakefile.io
         :members:
+        :show-inheritance:
 
 
 :mod:`bakefile.makefile` -- support for implementing makefiles toolsets
@@ -43,3 +48,4 @@ API reference documentation
 
 .. automodule:: bakefile.makefile
         :members:
+        :show-inheritance:

@@ -8,6 +8,7 @@ Internals reference documentation
 
 .. automodule:: bakefile
         :members:
+        :show-inheritance:
 
 
 :mod:`bakefile.parser` -- language parser
@@ -15,6 +16,7 @@ Internals reference documentation
 
 .. automodule:: bakefile.parser
         :members:
+        :show-inheritance:
 
 
 :mod:`bakefile.parser.ast` -- AST representation
@@ -22,6 +24,7 @@ Internals reference documentation
 
 .. automodule:: bakefile.parser.ast
         :members:
+        :show-inheritance:
 
 
 :mod:`bakefile.interpreter` -- language interpreter
@@ -29,3 +32,4 @@ Internals reference documentation
 
 .. automodule:: bakefile.interpreter
         :members:
+        :show-inheritance:
