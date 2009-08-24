@@ -22,28 +22,36 @@
 #  IN THE SOFTWARE.
 #
 
-"""
-GNU tools (GCC, GNU Make, ...) toolset.
-"""
-
-from bakefile.makefile import MakefileToolset, MakefileFormatter
+import sys, os, os.path
+import imp
 
 
-
-class GnuMakefileFormatter(MakefileFormatter):
+def load_plugin(filename):
     """
-    Formatter for the GNU Make syntax.
+    Loads Bakefile plugin from given file.
     """
-    # The basics are common to all makes, nothing to add (yet)
-    pass
+    basename = os.path.splitext(os.path.basename(filename))[0]
+    modname = "bkl.plugins.%s" % basename
+    imp.load_source(modname, filename)
 
 
-
-class GnuToolset(MakefileToolset):
+def load_plugins_from_dir(dirname):
     """
-    GNU toolset.
+    Loads all Bakefile plugins from given directory, recursively.
     """
+    for root, dirs, files in os.walk(dirname):
+        for f in files:
+            if not f.endswith(".py"):
+                continue
+            filename = os.path.join(root, f)
+            load_plugin(filename)
 
-    name = "gnu"
 
-    Formatter = GnuMakefileFormatter
+# import all plugins:
+
+PLUGINS_PATH = [os.path.join(p, "plugins") for p in __path__]
+
+sys.modules["bkl.plugins"] = imp.new_module("bkl.plugins")
+
+for p in PLUGINS_PATH:
+    load_plugins_from_dir(p)

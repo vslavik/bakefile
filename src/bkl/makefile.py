@@ -30,7 +30,7 @@ in this module.
 """
 
 import io
-from bakefile.api import Extension, Toolset
+from bkl.api import Extension, Toolset
 
 
 class MakefileFormatter(Extension):

@@ -22,7 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
-from bakefile import model, expr
+from bkl import model, expr
 
 def dump_model(project):
     """

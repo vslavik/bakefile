@@ -3,33 +3,33 @@ Internals reference documentation
 =================================
 
 
-:mod:`bakefile` -- bootstrapping Bakefile
+:mod:`bkl` -- bootstrapping Bakefile
 -----------------------------------------
 
-.. automodule:: bakefile
+.. automodule:: bkl
         :members:
         :show-inheritance:
 
 
-:mod:`bakefile.parser` -- language parser
+:mod:`bkl.parser` -- language parser
 -----------------------------------------
 
-.. automodule:: bakefile.parser
+.. automodule:: bkl.parser
         :members:
         :show-inheritance:
 
 
-:mod:`bakefile.parser.ast` -- AST representation
+:mod:`bkl.parser.ast` -- AST representation
 ------------------------------------------------
 
-.. automodule:: bakefile.parser.ast
+.. automodule:: bkl.parser.ast
         :members:
         :show-inheritance:
 
 
-:mod:`bakefile.interpreter` -- language interpreter
+:mod:`bkl.interpreter` -- language interpreter
 ---------------------------------------------------
 
-.. automodule:: bakefile.interpreter
+.. automodule:: bkl.interpreter
         :members:
         :show-inheritance:

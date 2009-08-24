@@ -23,7 +23,7 @@
 #
 
 import os, os.path
-import bakefile.parser, bakefile.error
+import bkl.parser, bkl.error
 from glob import glob
 
 
@@ -53,9 +53,9 @@ def _do_test_parser_on_file(input):
     print 'parsing %s' % input
 
     try:
-        t = bakefile.parser.parse_file(input)
+        t = bkl.parser.parse_file(input)
         as_text = t.toStringTree()
-    except bakefile.error.Error, e:
+    except bkl.error.Error, e:
         as_text = "ERROR:\n%s" % e
     print """
 parsed tree:

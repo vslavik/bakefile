@@ -112,7 +112,7 @@ class Variable(object):
 
     .. attribute:: value
 
-       Value of the variable, as :class:`bakefile.expr.Expr` object.
+       Value of the variable, as :class:`bkl.expr.Expr` object.
     """
 
     def __init__(self, name, value):

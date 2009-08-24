@@ -88,7 +88,7 @@ class Interpreter(object):
 
     def _build_assigned_value(self, ast, result_type=None):
         """
-        Build :class:`bakefile.expr.Expr` from given AST node of
+        Build :class:`bkl.expr.Expr` from given AST node of
         AssignedValueNode type.
 
         If result_type is specified, then the expression will be of that

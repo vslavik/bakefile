@@ -3,49 +3,49 @@
 API reference documentation
 ===========================
 
-:mod:`bakefile.model` -- project model
+:mod:`bkl.model` -- project model
 --------------------------------------
 
-.. automodule:: bakefile.model
+.. automodule:: bkl.model
         :members:
         :show-inheritance:
 
 
-:mod:`bakefile.expr` -- representation of expressions
+:mod:`bkl.expr` -- representation of expressions
 -----------------------------------------------------
 
-.. automodule:: bakefile.expr
+.. automodule:: bkl.expr
         :members:
         :show-inheritance:
 
 
-:mod:`bakefile.api` -- public extensions API
+:mod:`bkl.api` -- public extensions API
 --------------------------------------------
 
-.. automodule:: bakefile.api
+.. automodule:: bkl.api
         :members:
         :show-inheritance:
 
 
-:mod:`bakefile.error` -- exceptions and errors handling
+:mod:`bkl.error` -- exceptions and errors handling
 -------------------------------------------------------
 
-.. automodule:: bakefile.error
+.. automodule:: bkl.error
         :members:
         :show-inheritance:
 
 
-:mod:`bakefile.io` -- I/O helpers
+:mod:`bkl.io` -- I/O helpers
 ---------------------------------
 
-.. automodule:: bakefile.io
+.. automodule:: bkl.io
         :members:
         :show-inheritance:
 
 
-:mod:`bakefile.makefile` -- support for implementing makefiles toolsets
+:mod:`bkl.makefile` -- support for implementing makefiles toolsets
 -----------------------------------------------------------------------
 
-.. automodule:: bakefile.makefile
+.. automodule:: bkl.makefile
         :members:
         :show-inheritance:

@@ -27,7 +27,7 @@ import ast
 from BakefileLexer import BakefileLexer
 from BakefileParser import BakefileParser
 from BakefileTokenSource import BakefileTokenSource
-from bakefile.error import ParserError
+from bkl.error import ParserError
 
 
 class Parser(BakefileParser):

@@ -22,7 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
-import bakefile.parser, bakefile.interpreter, bakefile.error
+import bkl.parser, bkl.interpreter, bkl.error
 import dumper
 
 import os, os.path
@@ -54,11 +54,11 @@ def _do_test_interpreter_on_file(input):
     print 'interpreting %s' % input
 
     try:
-        t = bakefile.parser.parse_file(input)
-        i = bakefile.interpreter.Interpreter(t)
+        t = bkl.parser.parse_file(input)
+        i = bkl.interpreter.Interpreter(t)
         model = i.create_model()
         as_text = dumper.dump_model(model)
-    except bakefile.error.Error, e:
+    except bkl.error.Error, e:
         as_text = "ERROR:\n%s" % e
     print """
 created model:

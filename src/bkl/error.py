@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://www.bakefile.org)
 #
-#  Copyright (C) 2009 Vaclav Slavik
+#  Copyright (C) 2008-2009 Vaclav Slavik
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -23,14 +23,52 @@
 #
 
 """
-Targets for natively built binaries (executables, static and shared libraries).
+This module contains helper classes for simple handling of errors. In
+particular, the :exc:`Error` class keeps track of the position in source code
+where the error occurred or to which it relates to.
 """
 
-from bakefile.api import TargetType
+class Error(Exception):
+    """
+    Base class for all Bakefile errors.
+
+    When converted to string, the message is formatted in the usual way of
+    compilers, as ``file:line: error``.
+
+    .. attribute:: pos
+
+        :class:`bkl.parser.ast.Position` object with location of the error.
+
+    .. attribute:: msg
+
+        Error message.
+    """
+    def __init__(self, pos, msg):
+        """
+        Constructor
+
+        :param pos: position of the error, may be None
+        :param msg: error message to show to the user
+        """
+        if not pos:
+            pos = Position()
+        self.pos = pos
+        self.msg = msg
 
 
-class ExeType(TargetType):
+    def __unicode__(self):
+        return str(self)
+
+    def __str__(self):
+        if self.pos:
+            return "%s: %s" % (self.pos, self.msg)
+        else:
+            return self.msg
+
+
+
+class ParserError(Error):
     """
-    Executable program.
+    Exception class for errors encountered by the Bakefile parser.
     """
-    name = "exe"
+    pass

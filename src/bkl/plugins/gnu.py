@@ -1,7 +1,7 @@
 #
 #  This file is part of Bakefile (http://www.bakefile.org)
 #
-#  Copyright (C) 2008-2009 Vaclav Slavik
+#  Copyright (C) 2009 Vaclav Slavik
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -23,52 +23,27 @@
 #
 
 """
-This module contains helper classes for simple handling of errors. In
-particular, the :exc:`Error` class keeps track of the position in source code
-where the error occurred or to which it relates to.
+GNU tools (GCC, GNU Make, ...) toolset.
 """
 
-class Error(Exception):
+from bkl.makefile import MakefileToolset, MakefileFormatter
+
+
+
+class GnuMakefileFormatter(MakefileFormatter):
     """
-    Base class for all Bakefile errors.
-
-    When converted to string, the message is formatted in the usual way of
-    compilers, as ``file:line: error``.
-
-    .. attribute:: pos
-
-        :class:`bakefile.parser.ast.Position` object with location of the error.
-
-    .. attribute:: msg
-
-        Error message.
+    Formatter for the GNU Make syntax.
     """
-    def __init__(self, pos, msg):
-        """
-        Constructor
-
-        :param pos: position of the error, may be None
-        :param msg: error message to show to the user
-        """
-        if not pos:
-            pos = Position()
-        self.pos = pos
-        self.msg = msg
-
-
-    def __unicode__(self):
-        return str(self)
-
-    def __str__(self):
-        if self.pos:
-            return "%s: %s" % (self.pos, self.msg)
-        else:
-            return self.msg
-
-
-
-class ParserError(Error):
-    """
-    Exception class for errors encountered by the Bakefile parser.
-    """
+    # The basics are common to all makes, nothing to add (yet)
     pass
+
+
+
+class GnuToolset(MakefileToolset):
+    """
+    GNU toolset.
+    """
+
+    name = "gnu"
+
+    Formatter = GnuMakefileFormatter

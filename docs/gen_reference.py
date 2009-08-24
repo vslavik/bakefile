@@ -37,8 +37,8 @@ docs_path = os.path.dirname(sys.argv[0])
 bkl_path = os.path.normpath(os.path.join(docs_path, "..", "src"))
 sys.path = [bkl_path] + sys.path
 
-import bakefile
-import bakefile.api
+import bkl
+import bkl.api
 
 OUT_DIR = os.path.join(docs_path, "ref")
 shutil.rmtree(OUT_DIR, ignore_errors=True)
@@ -79,9 +79,9 @@ def write_docs(kind, extension):
 
 
 # write docs for all targets:
-for t in bakefile.api.TargetType.implementations.values():
+for t in bkl.api.TargetType.implementations.values():
     write_docs("target", t)
 
 # write docs for all toolsets:
-for t in bakefile.api.Toolset.implementations.values():
+for t in bkl.api.Toolset.implementations.values():
     write_docs("toolset", t)

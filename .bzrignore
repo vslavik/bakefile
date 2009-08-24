@@ -1,6 +1,6 @@
-src/bakefile/parser/Bakefile.tokens
-src/bakefile/parser/BakefileLexer.py
-src/bakefile/parser/BakefileParser.py
+src/bkl/parser/Bakefile.tokens
+src/bkl/parser/BakefileLexer.py
+src/bkl/parser/BakefileParser.py
 docs/ref
 docs/.doctrees
 docs/.build

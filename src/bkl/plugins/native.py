@@ -22,36 +22,15 @@
 #  IN THE SOFTWARE.
 #
 
-import sys, os, os.path
-import imp
+"""
+Targets for natively built binaries (executables, static and shared libraries).
+"""
+
+from bkl.api import TargetType
 
 
-def load_plugin(filename):
+class ExeType(TargetType):
     """
-    Loads Bakefile plugin from given file.
+    Executable program.
     """
-    basename = os.path.splitext(os.path.basename(filename))[0]
-    modname = "bakefile.plugins.%s" % basename
-    imp.load_source(modname, filename)
-
-
-def load_plugins_from_dir(dirname):
-    """
-    Loads all Bakefile plugins from given directory, recursively.
-    """
-    for root, dirs, files in os.walk(dirname):
-        for f in files:
-            if not f.endswith(".py"):
-                continue
-            filename = os.path.join(root, f)
-            load_plugin(filename)
-
-
-# import all plugins:
-
-PLUGINS_PATH = [os.path.join(p, "plugins") for p in __path__]
-
-sys.modules["bakefile.plugins"] = imp.new_module("bakefile.plugins")
-
-for p in PLUGINS_PATH:
-    load_plugins_from_dir(p)
+    name = "exe"
