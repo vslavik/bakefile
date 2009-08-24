@@ -189,8 +189,8 @@ class Toolset(Extension):
 
         :param project: model.Project instance with complete description of the
             output. It was already preprocessed to remove content not relevant
-            for this toolset (targets or sub-makefiles (FIXME-term)
-            built conditionally only for other toolsets, conditionals that are
-            always true or false within the toolset and so on).
+            for this toolset (e.g. targets or sub-modules built conditionally
+            only for other toolsets, conditionals that are always true or false
+            within the toolset and so on).
         """
         raise NotImplementedError
