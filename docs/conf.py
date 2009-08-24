@@ -146,3 +146,4 @@ htmlhelp_basename = 'Bakefiledoc'
 
 
 autodoc_member_order = "groupwise"
+autoclass_content = "both"

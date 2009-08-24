@@ -110,11 +110,57 @@ class Extension(object):
 
 
 
+class Property(object):
+    """
+    Properties describe variables on targets etc. that are part of the API --
+    that is, they have special meaning for the toolset and.
+    Unlike free-form variables, properties have a type associated with them
+    and any values assigned to them are checked for type correctness. They
+    can optionally have a default value, too.
+
+    .. attribute:: name
+
+       Name of the property/variable.
+
+    .. attribute:: default
+
+       Default value of the property or :const:`None`.
+
+    .. attribute:: doc
+
+       Optional documentation for the property.
+
+    Example usage:
+
+    .. code-block:: python
+
+       class FooTarget(bkl.api.TargetType):
+           name = "foo"
+           properties = [
+               Property("defines", default="",
+                        doc="compiler predefined symbols for the foo compiler")
+           ]
+           ...
+
+    """
+
+    def __init__(self, name, default=None, doc=None):
+        # FIXME: add type handling
+        self.name = name
+        self.default = default
+        self.__doc__ = doc
+
+
+
 class TargetType(Extension):
     """
     Base class for implementation of a new target type.
     """
-    pass
+
+    #: List of all properties supported on this target type,
+    #: as :class:`Property` instances. Note that properties list is
+    #: automagically inherited from base classes, if any.
+    properties = []
 
 
 
@@ -130,6 +176,12 @@ class Toolset(Extension):
     puts all the components (platform-specific commands, make syntax, compiler
     invocation, ...) together and writes out the makefiles or projects.
     """
+
+    #: List of all properties supported on this target type,
+    #: as :class:`Property` instances. Note that properties list is
+    #: automagically inherited from base classes, if any.
+    properties = []
+
 
     def generate(self, project):
         """

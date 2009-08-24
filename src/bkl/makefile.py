@@ -30,7 +30,7 @@ in this module.
 """
 
 import io
-from bkl.api import Extension, Toolset
+from bkl.api import Extension, Toolset, Property
 
 
 class MakefileFormatter(Extension):
@@ -108,19 +108,22 @@ class MakefileFormatter(Extension):
 class MakefileToolset(Toolset):
     """
     Base class for makefile-based toolsets.
-
-
-    .. attribute:: Formatter
-
-       MakefileFormatter class for this toolset.
     """
 
+    #: :class:`MakefileFormatter` class for this toolset.
     Formatter = None
+
+    properties = [
+            Property("makefile",
+                     doc="Name of output file for module's makefile."),
+    ]
+
 
     def generate(self, project):
         for m in project.modules:
             self._gen_makefile(m)
         pass
+
 
     def _gen_makefile(self, module):
         output = module.get_variable_value("makefile").as_const()
