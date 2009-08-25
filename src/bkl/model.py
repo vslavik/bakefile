@@ -78,9 +78,15 @@ class ModelPart(object):
         .. seealso:: :class:`bkl.api.TargetType`
         """
         t = type(props_source)
+        prev_props = None
         while "properties" in dir(t):
-            for p in t.properties:
-                self.add_variable(Variable(p.name, p.default_expr()))
+            if t.properties is not prev_props:
+                prev_props = t.properties
+                for p in t.properties:
+                    self.add_variable(Variable(p.name, p.default_expr(self)))
+            # else:
+            #   derived class didn't define properties of its own and we don't
+            #   want to add the same properties twice
             t = t.__base__
 
 
