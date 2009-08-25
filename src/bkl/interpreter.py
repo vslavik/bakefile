@@ -33,8 +33,8 @@ class Interpreter(object):
     Interpreter processes parsed AST and constructs a project model from it.
 
     It doesn't do anything smart like optimizing things, it does only the
-    minimal processing needed to produce a valid model. This includes checking
-    variables scopes etc.
+    minimal processing needed to produce a valid, albeit suboptimal, model.
+    This includes checking variables scopes and type correctness etc.
     """
 
     def __init__(self, ast):

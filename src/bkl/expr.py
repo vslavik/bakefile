@@ -83,3 +83,12 @@ class ListExpr(Expr):
             if not i.is_const():
                 return False
         return True
+
+
+
+class NullExpr(Expr):
+    """
+    Empty/unset value.
+    """
+    def is_const(self):
+        return True

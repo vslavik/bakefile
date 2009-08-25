@@ -124,7 +124,8 @@ class Property(object):
 
     .. attribute:: default
 
-       Default value of the property or :const:`None`.
+       Default value of the property (as :class:`bkl.expr.Expr`)
+       or :const:`None`.
 
     .. attribute:: doc
 
@@ -147,8 +148,17 @@ class Property(object):
     def __init__(self, name, default=None, doc=None):
         # FIXME: add type handling
         self.name = name
+        # FIXME: if 'default' is a string, parse it into an expression
         self.default = default
         self.__doc__ = doc
+
+
+    def default_expr(self):
+        """
+        Returns the value of :attr:`default` expression. Always returns
+        an :class:`bkl.expr.Expr` instance, even if the default is
+        :const:`None`.
+        """
 
 
 

@@ -23,41 +23,65 @@
 #
 
 import error
+import expr
 
 
-class Project(object):
+class Variable(object):
     """
-    Abstract model that completely describes state of loaded and processed
-    Bakefile file(s) within the project.
+    A Bakefile variable.
 
-    .. attribute: modules
+    Variables can be either global or target-specific. Value held by a variable
+    is stored as expression tree, it isn't evaluated into string form until
+    the final stage of processing, when output is generated.
 
-       List of all modules included in the project.
+    Variables are typed.
+
+    .. attribute:: name
+
+       Name of the variable.
+
+    .. attribute:: value
+
+       Value of the variable, as :class:`bkl.expr.Expr` object.
     """
-    def __init__(self):
-        self.modules = []
+
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
 
 
 
-class Module(object):
+class ModelPart(object):
     """
-    Representation of single compilation unit. Corresponds to one Bakefile
-    input file (either specified on command line or imported using `import`
-    command; files included using `include` from other files are *not*
-    represented by Module object) and typically to one generated output file.
+    Base class for model "parts", i.e. projects, modules or targets. Basically,
+    anything that can have variables on it.
 
     .. attribute:: variables
 
        Dictionary of all variables defined in global scope in this module
-
-    .. attribute:: targets
-
-       Dictionary of all targets defined in this module
     """
 
     def __init__(self):
         self.variables = {}
-        self.targets = {}
+
+
+    def _init_from_properties(self, props_source):
+        """
+        Creates variables for properties with default values. Properties are
+        taken from a "type" object (e.g. :class:`bkl.api.TargetType` or
+        :class:`bkl.api.Toolset`). This object must have *class* member variable
+        var:`properties` with a list of :class:`bkl.api.Property` instances
+        (base class' properties are automagically scanned too).
+
+        :param type: Object with the properties definition.
+
+        .. seealso:: :class:`bkl.api.TargetType`
+        """
+        t = type(props_source)
+        while "properties" in dir(t):
+            for p in t.properties:
+                self.add_variable(Variable(p.name, p.default_expr()))
+            t = t.__base__
 
 
     def get_variable(self, name):
@@ -89,6 +113,39 @@ class Module(object):
         self.variables[var.name] = var
 
 
+
+class Project(ModelPart):
+    """
+    Abstract model that completely describes state of loaded and processed
+    Bakefile file(s) within the project.
+
+    .. attribute: modules
+
+       List of all modules included in the project.
+    """
+    def __init__(self):
+        super(Project, self).__init__()
+        self.modules = []
+
+
+
+class Module(ModelPart):
+    """
+    Representation of single compilation unit. Corresponds to one Bakefile
+    input file (either specified on command line or imported using `import`
+    command; files included using `include` from other files are *not*
+    represented by Module object) and typically to one generated output file.
+
+    .. attribute:: targets
+
+       Dictionary of all targets defined in this module
+    """
+
+    def __init__(self):
+        super(Module, self).__init__()
+        self.targets = {}
+
+
     def add_target(self, target):
         """Adds a new target object."""
         assert target.name not in self.targets
@@ -96,32 +153,7 @@ class Module(object):
 
 
 
-class Variable(object):
-    """
-    A Bakefile variable.
-
-    Variables can be either global or target-specific. Value held by a variable
-    is stored as expression tree, it isn't evaluated into string form until
-    the final stage of processing, when output is generated.
-
-    Variables are typed.
-
-    .. attribute:: name
-
-       Name of the variable.
-
-    .. attribute:: value
-
-       Value of the variable, as :class:`bkl.expr.Expr` object.
-    """
-
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-
-
-
-class Target(object):
+class Target(ModelPart):
     """
     A Bakefile target.
 
@@ -129,20 +161,15 @@ class Target(object):
 
     .. attribute:: name
 
-       Name of the target.
+       Name (ID) of the target. This must be unique in the entire project.
 
-    .. attribute:: type
+    .. attribute:: target_type
 
-       Type of the target, as api.TargetType instance.
+       Type of the target, as :class:`bkl.api.TargetType` instance.
     """
 
-    def __init__(self, name, type):
-        """
-        Target constructor.
-
-        :param name: name (ID) of the target; this must be unique in the
-            entire project
-        :param type: api.TargetType instance identifying the type
-        """
+    def __init__(self, name, target_type):
+        super(Target, self).__init__()
         self.name = name
-        self.type = type
+        self.type = target_type
+        self._init_from_properties(target_type)
