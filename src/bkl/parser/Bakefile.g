@@ -52,7 +52,7 @@ tokens {
 // Overall program structure
 // ---------------------------------------------------------------------------
 
-program: stmt+ EOF -> ^(PROGRAM stmt+);
+program: stmt* EOF -> ^(PROGRAM stmt*);
 
 stmt
     : assignment_stmt
