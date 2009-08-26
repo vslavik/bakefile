@@ -36,22 +36,36 @@ def dump_model(project):
 
 
 def _dump_makefile(makefile):
-    out = ""
+    out = "  variables {\n"
 
-    out += "  variables {\n"
-    keys = list(makefile.variables.iterkeys())
-    keys.sort()
-    for name in keys:
-        out += "    %s\n" % _dump_variable(makefile.variables[name])
-    out +=  "  }\n"
+    out += _indent(_dump_vars(makefile))
 
-    out += "  targets {\n"
+    out += "  }\n  targets {\n"
     keys = list(makefile.targets.iterkeys())
     keys.sort()
     for name in keys:
-        out += "    %s\n" % _dump_target(makefile.targets[name])
+        out += _indent(_indent(_dump_target(makefile.targets[name])))
     out +=  "  }\n"
 
+    return out
+
+
+def _indent(text):
+    lines = text.split("\n")
+    out = ""
+    for x in lines:
+        if x != "":
+            x = "  %s" % x
+            out += "%s\n" % x
+    return out
+
+
+def _dump_vars(part):
+    out = ""
+    keys = list(part.variables.iterkeys())
+    keys.sort()
+    for name in keys:
+        out += "  %s\n" % _dump_variable(part.variables[name])
     return out
 
 
@@ -60,7 +74,10 @@ def _dump_variable(var):
 
 
 def _dump_target(target):
-    return "%s %s" % (target.type.name, target.name)
+    out = "%s %s {\n" % (target.type.name, target.name)
+    out += _indent(_dump_vars(target))
+    out += "\n}"
+    return out
 
 
 def _dump_expression(e):
