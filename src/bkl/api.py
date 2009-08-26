@@ -22,6 +22,9 @@
 #  IN THE SOFTWARE.
 #
 
+import types
+import expr
+
 # Metaclass used for all extensions in order to implement automatic
 # extensions registration. For internal use only.
 class _ExtensionMetaclass(type):
@@ -148,17 +151,30 @@ class Property(object):
     def __init__(self, name, default=None, doc=None):
         # FIXME: add type handling
         self.name = name
-        # FIXME: if 'default' is a string, parse it into an expression
         self.default = default
         self.__doc__ = doc
 
 
-    def default_expr(self):
+    def default_expr(self, for_obj):
         """
         Returns the value of :attr:`default` expression. Always returns
         an :class:`bkl.expr.Expr` instance, even if the default is
         :const:`None`.
+
+        :param for_obj: The class:`bkl.model.ModelPart` object to return
+            the default for. If the default value is defined, its expression
+            is evaluated in the context of *for_obj*.
         """
+        if self.default is None:
+            return expr.NullExpr()
+        elif (type(self.default) is types.FunctionType or
+              type(self.default) is types.MethodType):
+            # default is defined as a callback function
+            return self.default(for_obj)
+        else:
+            # FIXME: if 'default' is a string, parse it into an expression
+            #        (in context of `for_obj`!)
+            return self.default
 
 
 
@@ -170,7 +186,12 @@ class TargetType(Extension):
     #: List of all properties supported on this target type,
     #: as :class:`Property` instances. Note that properties list is
     #: automagically inherited from base classes, if any.
-    properties = []
+    properties = [
+            Property("id",
+                     default=lambda t: expr.ConstExpr(t.name),
+                     doc="Target's unique name (ID)."),
+            # FIXME: make this read-only
+    ]
 
 
 

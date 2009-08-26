@@ -3,6 +3,7 @@ module {
   }
   targets {
     exe hello {
+        id = "hello"
     }
   }
 }

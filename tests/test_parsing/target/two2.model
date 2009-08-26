@@ -3,8 +3,10 @@ module {
   }
   targets {
     exe one {
+        id = "one"
     }
     exe two {
+        id = "two"
     }
   }
 }
