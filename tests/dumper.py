@@ -41,9 +41,7 @@ def _dump_makefile(makefile):
     out += _indent(_dump_vars(makefile))
 
     out += "  }\n  targets {\n"
-    keys = list(makefile.targets.iterkeys())
-    keys.sort()
-    for name in keys:
+    for name in makefile.targets.iterkeys():
         out += _indent(_indent(_dump_target(makefile.targets[name])))
     out +=  "  }\n"
 
@@ -62,9 +60,7 @@ def _indent(text):
 
 def _dump_vars(part):
     out = ""
-    keys = list(part.variables.iterkeys())
-    keys.sort()
-    for name in keys:
+    for name in part.variables.iterkeys():
         out += "  %s\n" % _dump_variable(part.variables[name])
     return out
 

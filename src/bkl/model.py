@@ -22,8 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
-import error
-import expr
+import error, expr, utils
 
 
 class Variable(object):
@@ -62,7 +61,7 @@ class ModelPart(object):
     """
 
     def __init__(self):
-        self.variables = {}
+        self.variables = utils.OrderedDict()
 
 
     def _init_from_properties(self, props_source):
@@ -149,7 +148,7 @@ class Module(ModelPart):
 
     def __init__(self):
         super(Module, self).__init__()
-        self.targets = {}
+        self.targets = utils.OrderedDict()
 
 
     def add_target(self, target):
