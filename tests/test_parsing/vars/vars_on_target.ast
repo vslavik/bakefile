@@ -1,0 +1,12 @@
+RootNode
+    TargetNode
+        IdNode exe
+        IdNode foo
+        AssignmentNode
+            IdNode my_var
+            AssignedValueNode
+                ValueNode "42"
+        AssignmentNode
+            IdNode my_name
+            AssignedValueNode
+                ValueNode "a_name"

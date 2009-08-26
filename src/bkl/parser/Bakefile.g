@@ -101,7 +101,8 @@ target_stmt
     ;
 
 target_content
-    : EMPTY_BLOCK
+    : assignment_stmt+
+    | EMPTY_BLOCK
     ;
 
 

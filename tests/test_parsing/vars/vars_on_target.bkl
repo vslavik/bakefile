@@ -1,0 +1,5 @@
+
+exe foo:
+    my_var = 42
+    my_name = a_name
+

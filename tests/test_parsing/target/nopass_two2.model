@@ -1,2 +1,2 @@
 ERROR:
-target/nopass_two2.bkl:2:0: mismatched input u'exe' expecting INDENT
+target/nopass_two2.bkl:2:0: missing INDENT at u'exe'

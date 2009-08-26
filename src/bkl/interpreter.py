@@ -35,27 +35,52 @@ class Interpreter(object):
     It doesn't do anything smart like optimizing things, it does only the
     minimal processing needed to produce a valid, albeit suboptimal, model.
     This includes checking variables scopes and type correctness etc.
+
+    .. attribute:: context
+
+       Current context. This is the inner-most :class:`bkl.model.ModelPart`
+       at the time of parsing. Initially, it is set to a new
+       :class:`bkl.model.Module` instance by :meth:`create_model`. When
+       descending into a target, it is temporarily set to said target and
+       then restored and so on.
     """
 
     def __init__(self, ast):
-        """Creates interpreter for given AST."""
+        """Constructor creates interpreter for given AST."""
         self.ast = ast
         self._ast_dispatch = {
             AssignmentNode : self.on_assignment,
             TargetNode     : self.on_target,
+            NilNode        : lambda x: x, # do nothing
         }
 
 
     def create_model(self):
-        """Returns constructed model, as model.Project instance."""
+        """Returns constructed model, as :class:`bkl.model.Project` instance."""
         self.model = model.Project()
         self.context = model.Module()
         self.model.modules.append(self.context)
 
-        for n in self.ast.children:
-            self._handle_node(n)
+        self.handle_children(self.ast.children, self.context)
 
         return self.model
+
+
+    def handle_children(self, children, context):
+        """
+        Runs model creation of all children nodes.
+
+        :param children: List of AST nodes to treat as children.
+        :param context:  Context (aka "local scope"). Interpreter's
+               :attr:`context` is set to it for the duration of the call.
+        """
+        try:
+            old_ctxt = self.context
+            self.context = context
+            for n in children:
+                self._handle_node(n)
+        finally:
+            self.context = old_ctxt
 
 
     def _handle_node(self, node):
@@ -79,11 +104,14 @@ class Interpreter(object):
 
         type_name = node.type.text
         try:
-            type = api.TargetType.get(type_name)
-            target = model.Target(name, type)
+            target_type = api.TargetType.get(type_name)
+            target = model.Target(name, target_type)
             self.context.add_target(target)
         except KeyError:
             raise ParserError(node.pos, "unknown target type \"%s\"" % type_name)
+
+        # handle target-specific variables assignments etc:
+        self.handle_children(node.content, target)
 
 
     def _build_assigned_value(self, ast, result_type=None):

@@ -154,6 +154,8 @@ class TargetNode(Node):
                     doc="Type of the target")
     name = property(lambda self: self.children[1],
                     doc="Name of the target")
+    content = property(lambda self: self.children[2:],
+                       doc="Other content: variables assignments and such")
 
 
 class _TreeAdaptor(CommonTreeAdaptor):
