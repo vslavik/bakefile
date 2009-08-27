@@ -1,0 +1,8 @@
+RootNode
+    TargetNode
+        IdNode exe
+        IdNode foo
+        AssignmentNode
+            IdNode id
+            AssignedValueNode
+                ValueNode "cant_change_this"

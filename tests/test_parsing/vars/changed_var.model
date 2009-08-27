@@ -1,0 +1,12 @@
+module {
+  variables {
+    foo = "changed"
+    bar = "changed_too"
+  }
+  targets {
+    exe a_target {
+        id = "a_target"
+        my_var = "my_take_2"
+    }
+  }
+}

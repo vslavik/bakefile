@@ -26,7 +26,7 @@ import api
 import expr
 import model
 from parser.ast import *
-from error import ParserError
+from error import Error, ParserError
 
 class Interpreter(object):
     """
@@ -89,12 +89,19 @@ class Interpreter(object):
 
 
     def on_assignment(self, node):
-        var = self.context.get_variable(node.var.text)
-        assert not var # FIXME: implement changing variable too, with typecheck
-        if not var:
-            var = model.Variable(node.var.text,
-                                 self._build_assigned_value(node.value))
+        varname = node.var.text
+        value = self._build_assigned_value(node.value)
+
+        var = self.context.get_variable(varname)
+        if var is None:
+            # create new variable
+            var = model.Variable(varname, value)
             self.context.add_variable(var)
+        else:
+            # modify existing variable
+            if var.readonly:
+                raise Error(node.pos, "variable \"%s\" is read-only" % varname)
+            var.set_value(value)
 
 
     def on_target(self, node):

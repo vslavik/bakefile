@@ -130,6 +130,13 @@ class Property(object):
        Default value of the property (as :class:`bkl.expr.Expr`)
        or :const:`None`.
 
+    .. attribute:: readonly
+
+       Indicates if the property is read-only. Read-only properties can only
+       have the default value and cannot be modified. They are typically
+       derived from some other value and exist as a convenience. An example
+       of read-only property is the ``id`` property on targets.
+
     .. attribute:: doc
 
        Optional documentation for the property.
@@ -148,10 +155,11 @@ class Property(object):
 
     """
 
-    def __init__(self, name, default=None, doc=None):
+    def __init__(self, name, default=None, readonly=False, doc=None):
         # FIXME: add type handling
         self.name = name
         self.default = default
+        self.readonly = readonly
         self.__doc__ = doc
 
 
@@ -189,6 +197,7 @@ class TargetType(Extension):
     properties = [
             Property("id",
                      default=lambda t: expr.ConstExpr(t.name),
+                     readonly=True,
                      doc="Target's unique name (ID)."),
             # FIXME: make this read-only
     ]

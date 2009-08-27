@@ -1,0 +1,28 @@
+RootNode
+    AssignmentNode
+        IdNode foo
+        AssignedValueNode
+            ValueNode "a_foo"
+    AssignmentNode
+        IdNode bar
+        AssignedValueNode
+            ValueNode "a_bar"
+    AssignmentNode
+        IdNode foo
+        AssignedValueNode
+            ValueNode "changed"
+    AssignmentNode
+        IdNode bar
+        AssignedValueNode
+            ValueNode "changed_too"
+    TargetNode
+        IdNode exe
+        IdNode a_target
+        AssignmentNode
+            IdNode my_var
+            AssignedValueNode
+                ValueNode "my"
+        AssignmentNode
+            IdNode my_var
+            AssignedValueNode
+                ValueNode "my_take_2"

@@ -42,10 +42,28 @@ class Variable(object):
     .. attribute:: value
 
        Value of the variable, as :class:`bkl.expr.Expr` object.
+
+    .. attribute:: readonly
+
+       Indicates if the variable is read-only. Read-only variables can only
+       be assigned once and cannot be modified afterwards.
     """
 
-    def __init__(self, name, value):
+    def __init__(self, name, value, readonly=False):
         self.name = name
+        self.value = value
+        self.readonly = readonly
+
+
+    def set_value(self, value):
+        """
+        Sets new value on the variable. The new value must have same type
+        as current value. An exception is thrown if the variable is read-only.
+
+        :param value: New value as :class:`bkl.expr.Expr` object.
+        """
+        assert not self.readonly
+        # FIXME: type checks
         self.value = value
 
 
@@ -82,7 +100,9 @@ class ModelPart(object):
             if t.properties is not prev_props:
                 prev_props = t.properties
                 for p in t.properties:
-                    self.add_variable(Variable(p.name, p.default_expr(self)))
+                    self.add_variable(Variable(p.name,
+                                               value=p.default_expr(self),
+                                               readonly=p.readonly))
             # else:
             #   derived class didn't define properties of its own and we don't
             #   want to add the same properties twice
