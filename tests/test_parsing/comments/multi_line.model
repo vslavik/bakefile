@@ -1,0 +1,7 @@
+module {
+  variables {
+    x = "1"
+  }
+  targets {
+  }
+}

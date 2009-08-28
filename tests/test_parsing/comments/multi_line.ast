@@ -1,0 +1,5 @@
+RootNode
+    AssignmentNode
+        IdNode x
+        AssignedValueNode
+            ValueNode "1"

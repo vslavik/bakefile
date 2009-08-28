@@ -1,0 +1,10 @@
+module {
+  variables {
+  }
+  targets {
+    exe foo {
+        id = "foo"
+        my_var = "42"
+    }
+  }
+}
