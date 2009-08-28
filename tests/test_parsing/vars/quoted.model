@@ -1,0 +1,8 @@
+module {
+  variables {
+    foo = "one  two"
+    bar = "1 2 3"
+  }
+  targets {
+  }
+}
