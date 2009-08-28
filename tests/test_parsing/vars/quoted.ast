@@ -2,7 +2,8 @@ RootNode
     AssignmentNode
         IdNode foo
         AssignedValueNode
-            ValueNode "one  two"
+            ValueNode "one two"
+            ValueNode "three"
     AssignmentNode
         IdNode bar
         AssignedValueNode
