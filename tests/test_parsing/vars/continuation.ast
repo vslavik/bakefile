@@ -1,0 +1,8 @@
+RootNode
+    AssignmentNode
+        IdNode foo
+        AssignedValueNode
+            ValueNode "one"
+            ValueNode "two"
+            ValueNode "three"
+            ValueNode "four"

@@ -143,3 +143,7 @@ NEWLINE
     : ('\n' | '\r')  { if self.implicitLineJoiningLevel > 0:
                            $channel = HIDDEN
                      };
+
+// C-style continuations for escaping of newlines:
+CONTINUATION
+    : '\\' WHITESPACE* NEWLINE { $channel = HIDDEN };
