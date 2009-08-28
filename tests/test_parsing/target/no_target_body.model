@@ -1,2 +1,2 @@
 ERROR:
-target/no_target_body.bkl:1:9: missing '{' at u'\n'
+target/no_target_body.bkl:1:9: missing '{' at '\n'

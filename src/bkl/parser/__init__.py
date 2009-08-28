@@ -52,6 +52,17 @@ class Parser(BakefileParser):
         raise ParserError(pos, msg)
 
 
+    def getTokenErrorDisplay(self, t):
+        # workaround for an ugly behavior in ANTLRv3's Python bindings: it
+        # formats tokens as e.g. u'exe', we prefer 'exe':
+        s = t.text
+        if s is None:
+            return str(super(Parser, self).getTokenErrorDisplay(t))
+        else:
+            return repr(str(s))
+
+
+
 def parse(code, filename=None):
     """
     Reads Bakefile code from string argument passed in and returns parsed AST.
