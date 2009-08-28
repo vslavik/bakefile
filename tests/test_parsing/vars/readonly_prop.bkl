@@ -1,2 +1,3 @@
-exe foo:
+exe foo {
     id = cant_change_this
+}

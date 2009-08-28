@@ -2,4 +2,3 @@ RootNode
     TargetNode
         IdNode SillyTargetName
         IdNode foo
-        NilNode

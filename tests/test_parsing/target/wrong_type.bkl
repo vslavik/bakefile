@@ -1,2 +1,1 @@
-SillyTargetName foo:
-    pass
+SillyTargetName foo {}

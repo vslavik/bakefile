@@ -6,7 +6,7 @@ foo = changed
 bar = changed_too
 
 
-exe a_target:
+exe a_target {
     my_var = my
     my_var = my_take_2
-
+    }

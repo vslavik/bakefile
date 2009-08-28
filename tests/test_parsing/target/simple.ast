@@ -2,4 +2,3 @@ RootNode
     TargetNode
         IdNode exe
         IdNode hello
-        NilNode

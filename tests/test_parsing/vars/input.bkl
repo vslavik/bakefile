@@ -1,17 +1,19 @@
 FOO = value1 value2
 SINGLE = one
-BAR = bar
-      "zar    foo"
-      let
-      x
-END =
+BAR = (bar
+       "zar    foo"
+         let
+       x)
+END = (
     end1
-    end2
-END2 = end1
-    end2
-    end3
-END3 = end1 xxx
+    end2)
+END2 =(end1
     end2
     end3
-END4 = end1 xxx
+    )
+END3 = (end1 xxx
     end2
+    end3)
+END4 = (end1 xxx
+ end2
+ )

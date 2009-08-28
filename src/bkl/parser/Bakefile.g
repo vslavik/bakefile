@@ -31,14 +31,6 @@ options {
 }
 
 tokens {
-    // Imaginary tokens for indentation increase and indentation decrease.
-    // These are not recognized by the lexer described in the grammar, but
-    // are synthesized by BakefileTokenSource class, which *must* be plugged
-    // in between the lexer and the parser. See the comments near LEADING_WS
-    // below for more information.
-    INDENT;
-    DEDENT;
-
     // Tokens used in the output AST, but not in lexer:
     PROGRAM;
     ID;
@@ -46,6 +38,17 @@ tokens {
     ASSIGNED_VALUE;
     VALUE;
     TARGET;
+}
+
+@lexer::init {
+    # Bakefile grammar uses newlines to terminate statements, unlike C and like
+    # e.g. Python. Like Python, it also treats newlines as any other whitespace
+    # inside ( ... ) blocks such as this:
+    #   sources += (foo.cpp
+    #               bar.cpp)
+    # This solution to the problem was strongly inspired by Terence Parr's and
+    # Loring Craymer's ANTLR Python grammar.
+    self.implicitLineJoiningLevel = 0
 }
 
 // ---------------------------------------------------------------------------
@@ -57,11 +60,12 @@ program: stmt* EOF -> ^(PROGRAM stmt*);
 stmt
     : assignment_stmt
     | target_stmt
+    | NEWLINE -> // empty statement
     ;
 
 
 assignment_stmt
-    : identifier '=' expression -> ^(ASSIGN identifier expression)
+    : identifier '=' expression NEWLINE -> ^(ASSIGN identifier expression)
     ;
 
 
@@ -76,11 +80,10 @@ value
     | t=QUOTED_TEXT            -> VALUE[$t, $t.text[1:-1\]]
     ;
 
-// expression may span multiple lines, but with one indentation only
+// expression may span multiple lines, but only if enclosed in ( ... )
 expression
     : element+                               -> ^(ASSIGNED_VALUE element+)
-    | INDENT element+ DEDENT                 -> ^(ASSIGNED_VALUE element+)
-    | a+=element+ INDENT b+=element+ DEDENT  -> ^(ASSIGNED_VALUE $a+ $b+)
+    | LPAREN expression RPAREN               -> expression
     ;
 
 // single element of an expression
@@ -93,16 +96,15 @@ element: value -> value;
 
 // examples:
 //
-//     exe hello:
-//         pass
+//     exe hello {}
 
 target_stmt
-    : type=identifier id=identifier ':' INDENT target_content DEDENT -> ^(TARGET $type $id target_content)
+    : type=identifier id=identifier '{' target_content* '}' NEWLINE -> ^(TARGET $type $id target_content*)
     ;
 
 target_content
-    : assignment_stmt+
-    | EMPTY_BLOCK
+    : assignment_stmt
+    | NEWLINE -> // empty statement
     ;
 
 
@@ -110,40 +112,23 @@ target_content
 // Basic tokens
 // ---------------------------------------------------------------------------
 
-EMPTY_BLOCK: 'pass';
+LPAREN: '(' {self.implicitLineJoiningLevel += 1};
+RPAREN: ')' {self.implicitLineJoiningLevel -= 1};
 
 QUOTED_TEXT: '"' ( ~('"') )* '"';
 
 // a chunk of simple text, used for identifiers, values etc.
 TEXT: ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')+;
 
+
 // ---------------------------------------------------------------------------
 // Whitespace handling
 // ---------------------------------------------------------------------------
 
-// Bakefile uses Python-style meaningful indentation and this is impossible
-// to handle nicely in LL(*) grammar without some help. So we use the same
-// mechanism as used by Terence Parr's example Python grammar from ANTLR3
-// distribution:
-//
-// The lexer only detects newlines and leading whitespace and doesn't do
-// anything special about them (except for the predicate used to differentiate
-// between leading and "ordinary" whitespace). Lexer's tokenized output is
-// then passed through BakefileTokenSource filter, which uses LEADING_WS and
-// NEWLINE tokens to detect indentation changes and inserts imaginary
-// INDENT (indentation increased) and DEDENT (indentation decreased) tokens
-// that the parser needs.
-
-LEADING_WS
-    : {self.getCharPositionInLine()==0}? => (' ' | '\t' )+ { $channel = HIDDEN };
-
 WHITESPACE
-    : (' ' | '\t')+ { $channel = HIDDEN };
+    : (' ' | '\t')+  { $channel = HIDDEN };
 
 NEWLINE
-    : ('\n' | '\r')+ { $channel = HIDDEN };
-
-
-// never-matched INDENT/DEDENT lexer rules to silence antlr warnings
-INDENT: '<INDENT>';
-DEDENT: '<DEDENT>';
+    : ('\n' | '\r')  { if self.implicitLineJoiningLevel > 0:
+                           $channel = HIDDEN
+                     };

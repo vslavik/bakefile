@@ -172,7 +172,6 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.ASSIGNED_VALUE : AssignedValueNode,
         BakefileParser.ASSIGN         : AssignmentNode,
         BakefileParser.TARGET         : TargetNode,
-        BakefileParser.EMPTY_BLOCK    : NilNode,
     }
 
     def createWithPayload(self, payload):

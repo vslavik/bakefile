@@ -1,2 +1,1 @@
-exe hello:
-    pass
+exe hello {}

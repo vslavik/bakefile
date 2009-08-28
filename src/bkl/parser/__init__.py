@@ -26,7 +26,6 @@ import antlr3
 import ast
 from BakefileLexer import BakefileLexer
 from BakefileParser import BakefileParser
-from BakefileTokenSource import BakefileTokenSource
 from bkl.error import ParserError
 
 
@@ -61,7 +60,7 @@ def parse(code, filename=None):
     """
     cStream = antlr3.StringStream(code)
     lexer = BakefileLexer(cStream)
-    tStream = antlr3.CommonTokenStream(BakefileTokenSource(lexer))
+    tStream = antlr3.CommonTokenStream(lexer)
     parser = Parser(tStream, filename)
     parser.adaptor = ast._TreeAdaptor(filename)
     return parser.program().tree

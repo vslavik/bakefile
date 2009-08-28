@@ -1,4 +1,4 @@
-exe one:
-    pass
-exe two:
-    pass
+exe one {
+}
+exe two {
+}

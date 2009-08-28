@@ -1,0 +1,13 @@
+RootNode
+    AssignmentNode
+        IdNode foo
+        AssignedValueNode
+            ValueNode "one"
+            ValueNode "two"
+            ValueNode "three"
+    AssignmentNode
+        IdNode bar
+        AssignedValueNode
+            ValueNode "one"
+            ValueNode "two"
+            ValueNode "three"
