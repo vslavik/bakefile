@@ -115,7 +115,7 @@ target_content
 LPAREN: '(' {self.implicitLineJoiningLevel += 1};
 RPAREN: ')' {self.implicitLineJoiningLevel -= 1};
 
-QUOTED_TEXT: '"' ( ~('"') )* '"';
+QUOTED_TEXT: '"' (options{greedy=false;}:.)* '"';
 
 // a chunk of simple text, used for identifiers, values etc.
 TEXT: ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')+;
