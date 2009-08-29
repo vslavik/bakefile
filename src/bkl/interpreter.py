@@ -88,7 +88,16 @@ class Interpreter(object):
 
     def _handle_node(self, node):
         func = self._ast_dispatch[type(node)]
-        func(node)
+        try:
+            func(node)
+        except Error as e:
+            # Assign position to the error if it wasn't done already; it's
+            # often more convenient to do it here than to keep track of the
+            # position across a hierarchy of nested calls.
+            if e.pos is None and node.pos is not None:
+                e.pos = node.pos
+            raise e
+
 
 
     def on_assignment(self, node):
@@ -102,15 +111,13 @@ class Interpreter(object):
             self.context.add_variable(var)
         else:
             # modify existing variable
-            if var.readonly:
-                raise Error(node.pos, "variable \"%s\" is read-only" % varname)
             var.set_value(value)
 
 
     def on_target(self, node):
         name = node.name.text
         if name in self.context.targets:
-            raise ParserError(node.pos, "target ID \"%s\" not unique" % name)
+            raise ParserError("target ID \"%s\" not unique" % name)
 
         type_name = node.type.text
         try:
@@ -118,7 +125,7 @@ class Interpreter(object):
             target = model.Target(name, target_type)
             self.context.add_target(target)
         except KeyError:
-            raise ParserError(node.pos, "unknown target type \"%s\"" % type_name)
+            raise ParserError("unknown target type \"%s\"" % type_name)
 
         # handle target-specific variables assignments etc:
         self.handle_children(node.content, target)

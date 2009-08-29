@@ -24,7 +24,6 @@
 
 import error, expr, vartypes, utils
 
-
 class Variable(object):
     """
     A Bakefile variable.
@@ -67,7 +66,8 @@ class Variable(object):
 
         :param value: New value as :class:`bkl.expr.Expr` object.
         """
-        assert not self.readonly
+        if self.readonly:
+            raise error.Error("variable \"%s\" is read-only" % self.name)
         # FIXME: type checks
         self.value = value
 
@@ -133,7 +133,7 @@ class ModelPart(object):
         """
         var = self.get_variable(name)
         if not var:
-            raise error.Error(None, "unknown variable \"%s\"" % name)
+            raise error.Error("unknown variable \"%s\"" % name)
         return var.value
 
 

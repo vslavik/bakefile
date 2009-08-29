@@ -35,21 +35,18 @@ class Error(Exception):
     When converted to string, the message is formatted in the usual way of
     compilers, as ``file:line: error``.
 
-    .. attribute:: pos
-
-        :class:`bkl.parser.ast.Position` object with location of the error.
-        If given as :const:`None` to the constructor, uninitialized Position
-        instance will be used.
-
     .. attribute:: msg
 
         Error message to show to the user.
+
+    .. attribute:: pos
+
+        :class:`bkl.parser.ast.Position` object with location of the error.
+        May be :const:`None`.
     """
-    def __init__(self, pos, msg):
-        if not pos:
-            pos = Position()
-        self.pos = pos
+    def __init__(self, msg, pos=None):
         self.msg = msg
+        self.pos = pos
 
 
     def __unicode__(self):
@@ -77,7 +74,7 @@ class TypeError(Error):
 
     .. seealso:: :class:`bkl.vartypes.Type`
     """
-    def __init__(self, type, expr, msg=None):
+    def __init__(self, type, expr, msg=None, pos=None):
         """
         Convenience constructor creates error message appropriate for the
         type and expression test, in the form of ``expression expr is not
@@ -91,4 +88,4 @@ class TypeError(Error):
         text = "expression \"%s\" is not %s" % (expr, type.name)
         if msg:
             text += ": %s" % msg
-        super(TypeError, self).__init__(pos=None, msg=text)
+        super(TypeError, self).__init__(text, pos)

@@ -49,7 +49,7 @@ class Parser(BakefileParser):
             pos.column = e.charPositionInLine
 
         msg = self.getErrorMessage(e, tokenNames)
-        raise ParserError(pos, msg)
+        raise ParserError(msg, pos=pos)
 
 
     def getTokenErrorDisplay(self, t):
