@@ -22,7 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
-import error, expr, utils
+import error, expr, vartypes, utils
 
 
 class Variable(object):
@@ -39,6 +39,10 @@ class Variable(object):
 
        Name of the variable.
 
+    .. attribute:: type
+
+       Type of the property, as :class:`bkl.vartypes.Type` instance.
+
     .. attribute:: value
 
        Value of the variable, as :class:`bkl.expr.Expr` object.
@@ -49,8 +53,9 @@ class Variable(object):
        be assigned once and cannot be modified afterwards.
     """
 
-    def __init__(self, name, value, readonly=False):
+    def __init__(self, name, value, type=vartypes.AnyType(), readonly=False):
         self.name = name
+        self.type = type
         self.value = value
         self.readonly = readonly
 
@@ -58,7 +63,7 @@ class Variable(object):
     def set_value(self, value):
         """
         Sets new value on the variable. The new value must have same type
-        as current value. An exception is thrown if the variable is read-only.
+        as current value. Read-only variable cannot be set.
 
         :param value: New value as :class:`bkl.expr.Expr` object.
         """

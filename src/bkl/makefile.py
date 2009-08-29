@@ -31,6 +31,7 @@ in this module.
 
 import io
 from bkl.api import Extension, Toolset, Property
+from bkl.vartypes import AnyType
 
 
 class MakefileFormatter(Extension):
@@ -115,6 +116,7 @@ class MakefileToolset(Toolset):
 
     properties = [
             Property("makefile",
+                     type=AnyType(), # Make this a path!
                      doc="Name of output file for module's makefile."),
     ]
 

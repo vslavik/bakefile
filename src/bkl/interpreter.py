@@ -34,7 +34,10 @@ class Interpreter(object):
 
     It doesn't do anything smart like optimizing things, it does only the
     minimal processing needed to produce a valid, albeit suboptimal, model.
-    This includes checking variables scopes and type correctness etc.
+
+    This includes checking variables scopes etc., but does *not* involve
+    checks for type correctness. Passes further in the pipeline
+    (FIXME - reference the "compiler" pass that does it) handle that.
 
     .. attribute:: context
 

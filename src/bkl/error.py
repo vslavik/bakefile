@@ -38,18 +38,14 @@ class Error(Exception):
     .. attribute:: pos
 
         :class:`bkl.parser.ast.Position` object with location of the error.
+        If given as :const:`None` to the constructor, uninitialized Position
+        instance will be used.
 
     .. attribute:: msg
 
-        Error message.
+        Error message to show to the user.
     """
     def __init__(self, pos, msg):
-        """
-        Constructor
-
-        :param pos: position of the error, may be None
-        :param msg: error message to show to the user
-        """
         if not pos:
             pos = Position()
         self.pos = pos
@@ -72,3 +68,27 @@ class ParserError(Error):
     Exception class for errors encountered by the Bakefile parser.
     """
     pass
+
+
+
+class TypeError(Error):
+    """
+    Exception class for variable type errors.
+
+    .. seealso:: :class:`bkl.vartypes.Type`
+    """
+    def __init__(self, type, expr, msg=None):
+        """
+        Convenience constructor creates error message appropriate for the
+        type and expression test, in the form of ``expression expr is not
+        type`` or ``expression expr is not type: msg`` if additional message is
+        supplied.
+
+        :param type: :class:`bkl.vartypes.Type` instance the error is related to.
+        :param expr: :class:`bkl.expr.Expr` expression that caused the error.
+        :param msg:  Optional error message detailing reasons for the error.
+        """
+        text = "expression \"%s\" is not %s" % (expr, type.name)
+        if msg:
+            text += ": %s" % msg
+        super(TypeError, self).__init__(pos=None, msg=text)

@@ -19,6 +19,14 @@ API reference documentation
         :show-inheritance:
 
 
+:mod:`bkl.vartypes` -- variables types
+--------------------------------------
+
+.. automodule:: bkl.vartypes
+        :members:
+        :show-inheritance:
+
+
 :mod:`bkl.api` -- public extensions API
 ---------------------------------------
 

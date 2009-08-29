@@ -28,13 +28,6 @@ condition or variable value) is defined in this module, together with
 useful functions for evaluating and simplifying expressions.
 """
 
-
-#: Boolean value of "true".
-TRUE = "true"
-#: Boolean value of "false".
-FALSE = "false"
-
-
 class Expr(object):
     """
     Value expression.

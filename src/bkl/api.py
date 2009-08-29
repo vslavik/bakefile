@@ -23,7 +23,7 @@
 #
 
 import types
-import expr
+import expr, vartypes
 
 # Metaclass used for all extensions in order to implement automatic
 # extensions registration. For internal use only.
@@ -125,6 +125,10 @@ class Property(object):
 
        Name of the property/variable.
 
+    .. attribute:: type
+
+       Type of the property, as :class:`bkl.vartypes.Type` instance.
+
     .. attribute:: default
 
        Default value of the property (as :class:`bkl.expr.Expr`)
@@ -155,9 +159,9 @@ class Property(object):
 
     """
 
-    def __init__(self, name, default=None, readonly=False, doc=None):
-        # FIXME: add type handling
+    def __init__(self, name, type, default=None, readonly=False, doc=None):
         self.name = name
+        self.type = type
         self.default = default
         self.readonly = readonly
         self.__doc__ = doc
@@ -196,10 +200,10 @@ class TargetType(Extension):
     #: automagically inherited from base classes, if any.
     properties = [
             Property("id",
+                     type=vartypes.IdType(),
                      default=lambda t: expr.ConstExpr(t.name),
                      readonly=True,
                      doc="Target's unique name (ID)."),
-            # FIXME: make this read-only
     ]
 
 
