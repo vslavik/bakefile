@@ -4,7 +4,7 @@ API reference documentation
 ===========================
 
 :mod:`bkl.model` -- project model
---------------------------------------
+---------------------------------
 
 .. automodule:: bkl.model
         :members:
@@ -12,7 +12,7 @@ API reference documentation
 
 
 :mod:`bkl.expr` -- representation of expressions
------------------------------------------------------
+------------------------------------------------
 
 .. automodule:: bkl.expr
         :members:
@@ -20,7 +20,7 @@ API reference documentation
 
 
 :mod:`bkl.api` -- public extensions API
---------------------------------------------
+---------------------------------------
 
 .. automodule:: bkl.api
         :members:
@@ -28,7 +28,7 @@ API reference documentation
 
 
 :mod:`bkl.error` -- exceptions and errors handling
--------------------------------------------------------
+--------------------------------------------------
 
 .. automodule:: bkl.error
         :members:
@@ -36,7 +36,7 @@ API reference documentation
 
 
 :mod:`bkl.io` -- I/O helpers
----------------------------------
+----------------------------
 
 .. automodule:: bkl.io
         :members:
@@ -44,7 +44,7 @@ API reference documentation
 
 
 :mod:`bkl.makefile` -- support for implementing makefiles toolsets
------------------------------------------------------------------------
+------------------------------------------------------------------
 
 .. automodule:: bkl.makefile
         :members:
