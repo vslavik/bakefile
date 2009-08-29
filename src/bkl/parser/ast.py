@@ -50,6 +50,7 @@ class Position(object):
         self.line = None
         self.column = None
 
+
     def __str__(self):
         hdr = []
         if self.filename:
@@ -59,6 +60,8 @@ class Position(object):
         if self.column is not None:
             hdr.append(str(self.column))
         return ":".join(hdr)
+
+
 
 class Node(CommonTree):
     """
@@ -81,10 +84,12 @@ class Node(CommonTree):
     def __str__(self):
         return self.__class__.__name__
 
+
     # CommonTree methods:
 
     def toString(self):
         return str(self)
+
 
     def toStringTree(self, indent=''):
         s = self.toString()
@@ -96,15 +101,18 @@ class Node(CommonTree):
         return '%s\n%s' % (s, '\n'.join(_formatNode(c) for c in self.children))
 
 
+
 class RootNode(Node):
     """Root node of loaded .bkl file."""
     pass
+
 
 
 class NilNode(Node):
     """Empty node."""
     def __init__(self, payload=None):
         Node.__init__(self, payload)
+
 
 
 class ValueNode(Node):
@@ -115,6 +123,7 @@ class ValueNode(Node):
 
     def __str__(self):
         return '%s "%s"' % (self.__class__.__name__, self.text)
+
 
 
 class AssignedValueNode(Node):
@@ -128,6 +137,7 @@ class AssignedValueNode(Node):
     values = property(lambda self: self.children)
 
 
+
 class IdNode(Node):
     """Identifier (variable, target, template, ...)."""
 
@@ -138,6 +148,7 @@ class IdNode(Node):
         return '%s %s' % (self.__class__.__name__, self.text)
 
 
+
 class AssignmentNode(Node):
     """Assignment of value to a variable."""
 
@@ -145,6 +156,7 @@ class AssignmentNode(Node):
                    doc="Variable assigning to")
     value = property(lambda self: self.children[1],
                      doc="Value being assigned, AssignedValueNode")
+
 
 
 class TargetNode(Node):
@@ -158,11 +170,13 @@ class TargetNode(Node):
                        doc="Other content: variables assignments and such")
 
 
+
 class _TreeAdaptor(CommonTreeAdaptor):
     """Adaptor for ANTLR3 AST tree creation."""
 
     def __init__(self, filename):
         self.filename = filename
+
 
     # mapping of token types to AST node classes
     TOKENS_MAP = {
@@ -173,6 +187,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.ASSIGN         : AssignmentNode,
         BakefileParser.TARGET         : TargetNode,
     }
+
 
     def createWithPayload(self, payload):
         if payload is None:
