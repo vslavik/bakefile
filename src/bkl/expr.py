@@ -55,6 +55,10 @@ class Expr(object):
 class ConstExpr(Expr):
     """
     Constant expression -- holds a literal.
+
+    .. attribute:: value
+
+       Value of the literal.
     """
     def __init__(self, value):
         self.value = value
