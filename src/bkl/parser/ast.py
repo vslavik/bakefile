@@ -152,7 +152,7 @@ class IdNode(Node):
 class AssignmentNode(Node):
     """Assignment of value to a variable."""
 
-    var = property(lambda self: self.children[0],
+    var = property(lambda self: self.children[0].text,
                    doc="Variable assigning to")
     value = property(lambda self: self.children[1],
                      doc="Value being assigned, AssignedValueNode")
@@ -162,7 +162,7 @@ class AssignmentNode(Node):
 class VarReferenceNode(Node):
     """Reference to a variable."""
 
-    var = property(lambda self: self.children[0],
+    var = property(lambda self: self.children[0].text,
                    doc="Referenced variable")
 
 

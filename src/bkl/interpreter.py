@@ -101,7 +101,7 @@ class Interpreter(object):
 
 
     def on_assignment(self, node):
-        varname = node.var.text
+        varname = node.var
         value = self._build_assigned_value(node.value)
 
         var = self.context.get_variable(varname)
@@ -154,5 +154,5 @@ class Interpreter(object):
             # FIXME: type handling
             return expr.ConstExpr(ast.text)
         elif isinstance(ast, VarReferenceNode):
-            return expr.ReferenceExpr(ast.var.text)
+            return expr.ReferenceExpr(ast.var)
         assert False, "unrecognized AST node"
