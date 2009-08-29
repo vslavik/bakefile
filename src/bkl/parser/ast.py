@@ -159,6 +159,14 @@ class AssignmentNode(Node):
 
 
 
+class VarReferenceNode(Node):
+    """Reference to a variable."""
+
+    var = property(lambda self: self.children[0],
+                   doc="Referenced variable")
+
+
+
 class TargetNode(Node):
     """Creation of a makefile target."""
 
@@ -185,6 +193,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.ID             : IdNode,
         BakefileParser.ASSIGNED_VALUE : AssignedValueNode,
         BakefileParser.ASSIGN         : AssignmentNode,
+        BakefileParser.VAR_REFERENCE  : VarReferenceNode,
         BakefileParser.TARGET         : TargetNode,
     }
 

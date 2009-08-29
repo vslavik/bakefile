@@ -153,4 +153,6 @@ class Interpreter(object):
         if isinstance(ast, ValueNode):
             # FIXME: type handling
             return expr.ConstExpr(ast.text)
+        elif isinstance(ast, VarReferenceNode):
+            return expr.ReferenceExpr(ast.var.text)
         assert False, "unrecognized AST node"

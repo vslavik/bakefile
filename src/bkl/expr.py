@@ -89,3 +89,18 @@ class NullExpr(Expr):
     """
     def is_const(self):
         return True
+
+
+
+class ReferenceExpr(Expr):
+    """
+    Reference to a variable.
+
+    .. attribute:: var
+
+       Name of referenced variable.
+    """
+
+    def __init__(self, var):
+        # FIXME: use reference to variable object instead?
+        self.var = var

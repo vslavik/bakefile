@@ -38,6 +38,7 @@ tokens {
     ASSIGNED_VALUE;
     VALUE;
     TARGET;
+    VAR_REFERENCE;
 }
 
 @lexer::init {
@@ -87,7 +88,10 @@ expression
     ;
 
 // single element of an expression
-element: value -> value;
+element
+    : value                    -> value
+    | '$(' identifier ')'      -> ^(VAR_REFERENCE identifier) 
+    ;
 
 
 // ---------------------------------------------------------------------------
@@ -119,7 +123,6 @@ QUOTED_TEXT: '"' (options{greedy=false;}:.)* '"';
 
 // a chunk of simple text, used for identifiers, values etc.
 TEXT: ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')+;
-
 
 // ---------------------------------------------------------------------------
 // Comments:

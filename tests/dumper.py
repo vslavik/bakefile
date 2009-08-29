@@ -80,7 +80,9 @@ def _dump_expression(e):
     if isinstance(e, expr.ConstExpr):
         # FIXME: handle types
         return '"%s"' % e.value
-    if isinstance(e, expr.ListExpr):
+    elif isinstance(e, expr.ReferenceExpr):
+        return "$(%s)" % e.var
+    elif isinstance(e, expr.ListExpr):
         items = [_dump_expression(x) for x in e.items]
         return "[%s]" % ", ".join(items)
     else:
