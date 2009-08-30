@@ -30,26 +30,30 @@ from glob import glob
 def test_parser():
     """
     Tests Bakefile parser and compares resulting AST with a copy saved
-    in .ast file. Does this for all .bkl files under tests/parser directory.
+    in .ast file. Does this for all .bkl files under tests/parser directory
+    that have .ast present.
     """
     import test_parsing
     d = os.path.dirname(test_parsing.__file__)
-    for f in glob("%s/*/*.bkl" % d):
+    for f in glob("%s/*/*.ast" % d):
         yield _test_parser_on_file, d, str(f)
 
 
-def _test_parser_on_file(testdir, input):
-    assert input.startswith(testdir)
+def _test_parser_on_file(testdir, ast_file):
+    assert ast_file.startswith(testdir)
+
+    input = os.path.splitext(ast_file)[0] + '.bkl'
+
     f = input[len(testdir)+1:]
     cwd = os.getcwd()
     os.chdir(testdir)
     try:
-        _do_test_parser_on_file(f)
+        _do_test_parser_on_file(f, ast_file)
     finally:
         os.chdir(cwd)
 
 
-def _do_test_parser_on_file(input):
+def _do_test_parser_on_file(input, ast_file):
     print 'parsing %s' % input
 
     try:
@@ -64,8 +68,7 @@ parsed tree:
 ---
 """ % as_text
 
-    ast = os.path.splitext(input)[0] + '.ast'
-    expected = file(ast, "rt").read().strip()
+    expected = file(ast_file, "rt").read().strip()
     print """
 expected tree:
 ---

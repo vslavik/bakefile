@@ -32,25 +32,29 @@ from glob import glob
 def test_interpreter():
     """
     Tests Bakefile parser and compares resulting model with a copy saved
-    in .model file. Does this for all .bkl files under tests/parser directory.
+    in .model file. Does this for all .bkl files under tests/parser directory
+    that have a model dump present.
     """
     import test_parsing
     d = os.path.dirname(test_parsing.__file__)
-    for f in glob("%s/*/*.bkl" % d):
+    for f in glob("%s/*/*.model" % d):
         yield _test_interpreter_on_file, d, str(f)
 
 
-def _test_interpreter_on_file(testdir, input):
-    assert input.startswith(testdir)
+def _test_interpreter_on_file(testdir, model_file):
+    assert model_file.startswith(testdir)
+
+    input = os.path.splitext(model_file)[0] + '.bkl'
+
     f = input[len(testdir)+1:]
     cwd = os.getcwd()
     os.chdir(testdir)
     try:
-        _do_test_interpreter_on_file(f)
+        _do_test_interpreter_on_file(f, model_file)
     finally:
         os.chdir(cwd)
 
-def _do_test_interpreter_on_file(input):
+def _do_test_interpreter_on_file(input, model_file):
     print 'interpreting %s' % input
 
     try:
@@ -67,7 +71,6 @@ created model:
 ---
 """ % as_text
 
-    model_file = os.path.splitext(input)[0] + '.model'
     expected = file(model_file, "rt").read().strip()
     print """
 expected model:
