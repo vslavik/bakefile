@@ -24,6 +24,10 @@
 
 import sys, os, os.path
 import imp
+import logging
+
+
+logger = logging.getLogger("bkl.plugins")
 
 
 def load_plugin(filename):
@@ -32,6 +36,7 @@ def load_plugin(filename):
     """
     basename = os.path.splitext(os.path.basename(filename))[0]
     modname = "bkl.plugins.%s" % basename
+    logger.debug("loading plugin %s from %s" % (modname, filename))
     imp.load_source(modname, filename)
 
 
@@ -50,6 +55,7 @@ def load_plugins_from_dir(dirname):
 # import all plugins:
 
 PLUGINS_PATH = [os.path.join(p, "plugins") for p in __path__]
+logger.debug("plugins search path: %s" % PLUGINS_PATH)
 
 sys.modules["bkl.plugins"] = imp.new_module("bkl.plugins")
 

@@ -25,5 +25,10 @@
 
 def pytest_configure(config):
     import sys, os.path
+
     bkl_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'src'))
     sys.path = [bkl_path] + sys.path
+
+    import logging
+    log_level = logging.DEBUG if config.getvalue("debug") else logging.WARNING
+    logging.basicConfig(level=log_level)
