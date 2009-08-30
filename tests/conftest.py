@@ -22,7 +22,8 @@
 #  IN THE SOFTWARE.
 #
 
-import sys, os.path
 
-bkl_path = os.path.normpath(os.path.join(__path__[0], '..', 'src'))
-sys.path = [bkl_path] + sys.path
+def pytest_configure(config):
+    import sys, os.path
+    bkl_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+    sys.path = [bkl_path] + sys.path
