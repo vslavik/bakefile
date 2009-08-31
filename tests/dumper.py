@@ -30,19 +30,19 @@ def dump_model(project):
     is an instance of bakefile.model.Project.
     """
     out = ""
-    for mk in project.modules:
-        out += "module {\n%s}\n" % _dump_makefile(mk)
+    for mod in project.modules:
+        out += "module {\n%s}\n" % _dump_module(mod)
     return out.strip()
 
 
-def _dump_makefile(makefile):
+def _dump_module(module):
     out = "  variables {\n"
 
-    out += _indent(_dump_vars(makefile))
+    out += _indent(_dump_vars(module))
 
     out += "  }\n  targets {\n"
-    for name in makefile.targets.iterkeys():
-        out += _indent(_indent(_dump_target(makefile.targets[name])))
+    for name in module.targets.iterkeys():
+        out += _indent(_indent(_dump_target(module.targets[name])))
     out +=  "  }\n"
 
     return out
