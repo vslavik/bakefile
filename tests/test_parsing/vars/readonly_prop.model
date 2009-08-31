@@ -1,2 +1,0 @@
-ERROR:
-vars/readonly_prop.bkl:2:4: variable "id" is read-only
