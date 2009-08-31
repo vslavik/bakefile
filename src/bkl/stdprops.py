@@ -22,46 +22,29 @@
 #  IN THE SOFTWARE.
 #
 
-import sys, os, os.path
-import imp
-import logging
+"""
+Standard properties for extensions or model parts with properties.
+"""
+
+import expr, api
+from vartypes import IdType
+from api import Property
 
 
-logger = logging.getLogger("bkl.plugins")
+#: Standard TargetType properties
+STD_TARGET_PROPS = [
+    Property("id",
+             type=IdType(),
+             default=lambda t: expr.ConstExpr(t.name),
+             readonly=True,
+             doc="Target's unique name (ID)."),
+    ]
 
 
-def load_plugin(filename):
+
+def _init():
     """
-    Loads Bakefile plugin from given file.
+    Initializes standard props, i.e. puts them everywhere they should be,
+    e.g. into api.TargetType.properties.
     """
-    basename = os.path.splitext(os.path.basename(filename))[0]
-    modname = "bkl.plugins.%s" % basename
-    logger.debug("loading plugin %s from %s" % (modname, filename))
-    imp.load_source(modname, filename)
-
-
-def load_plugins_from_dir(dirname):
-    """
-    Loads all Bakefile plugins from given directory, recursively.
-    """
-    for root, dirs, files in os.walk(dirname):
-        for f in files:
-            if not f.endswith(".py"):
-                continue
-            filename = os.path.join(root, f)
-            load_plugin(filename)
-
-
-# import all plugins:
-
-PLUGINS_PATH = [os.path.join(p, "plugins") for p in __path__]
-logger.debug("plugins search path: %s" % PLUGINS_PATH)
-
-sys.modules["bkl.plugins"] = imp.new_module("bkl.plugins")
-
-for p in PLUGINS_PATH:
-    load_plugins_from_dir(p)
-
-# initialize basics:
-import stdprops
-stdprops._init()
+    api.TargetType.properties = STD_TARGET_PROPS

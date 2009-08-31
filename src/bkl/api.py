@@ -23,7 +23,7 @@
 #
 
 import types
-import expr, vartypes
+import expr
 
 # Metaclass used for all extensions in order to implement automatic
 # extensions registration. For internal use only.
@@ -198,13 +198,7 @@ class TargetType(Extension):
     #: List of all properties supported on this target type,
     #: as :class:`Property` instances. Note that properties list is
     #: automagically inherited from base classes, if any.
-    properties = [
-            Property("id",
-                     type=vartypes.IdType(),
-                     default=lambda t: expr.ConstExpr(t.name),
-                     readonly=True,
-                     doc="Target's unique name (ID)."),
-    ]
+    properties = [] # will be initialized to stdprops.STD_TARGET_PROPS
 
 
 
