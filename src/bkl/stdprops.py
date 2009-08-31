@@ -30,8 +30,13 @@ import expr, api
 from vartypes import IdType
 from api import Property
 
+#: Standard :class:`bkl.api.Module` properties
+STD_MODULE_PROPS = [
+    ]
 
-#: Standard TargetType properties
+
+
+#: Standard :class:`bkl.api.TargetType` properties
 STD_TARGET_PROPS = [
     Property("id",
              type=IdType(),

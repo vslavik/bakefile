@@ -25,6 +25,7 @@
 import api
 import expr
 import model
+import stdprops
 from parser.ast import *
 from error import Error, ParserError
 
@@ -62,6 +63,7 @@ class Interpreter(object):
         """Returns constructed model, as :class:`bkl.model.Project` instance."""
         self.model = model.Project()
         self.context = model.Module()
+        self.context._init_from_properties_list(stdprops.STD_MODULE_PROPS)
         self.model.modules.append(self.context)
 
         self.handle_children(self.ast.children, self.context)

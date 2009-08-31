@@ -22,6 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
+import types
 import error, expr, vartypes, utils
 
 class Variable(object):
@@ -97,21 +98,35 @@ class ModelPart(object):
 
         :param type: Object with the properties definition.
 
-        .. seealso:: :class:`bkl.api.TargetType`
+        .. seealso:: :class:`bkl.api.TargetType`,
+                     :meth:`_init_from_properties_list`
         """
         t = type(props_source)
+        assert t is not types.ListType, \
+                "incorrect usage, did you mean _init_from_properties_list()?"
+
         prev_props = None
         while "properties" in dir(t):
             if t.properties is not prev_props:
+                self._init_from_properties_list(t.properties)
                 prev_props = t.properties
-                for p in t.properties:
-                    self.add_variable(Variable(p.name,
-                                               value=p.default_expr(self),
-                                               readonly=p.readonly))
             # else:
             #   derived class didn't define properties of its own and we don't
             #   want to add the same properties twice
             t = t.__base__
+
+
+    def _init_from_properties_list(self, props_list):
+        """
+        Like :meth:`_init_from_properties`, but takes the properties from
+        a list, not a type.
+        """
+        assert isinstance(props_list, types.ListType), \
+                "incorrect usage, did you mean _init_from_properties()?"
+        for p in props_list:
+            self.add_variable(Variable(p.name,
+                                       value=p.default_expr(self),
+                                       readonly=p.readonly))
 
 
     def get_variable(self, name):
