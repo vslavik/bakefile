@@ -85,7 +85,7 @@ class TypeError(Error):
         :param expr: :class:`bkl.expr.Expr` expression that caused the error.
         :param msg:  Optional error message detailing reasons for the error.
         """
-        text = "expression \"%s\" is not %s" % (expr, type.name)
+        text = "expression \"%s\" is not valid %s value" % (expr, type.name)
         if msg:
             text += ": %s" % msg
         super(TypeError, self).__init__(text, pos)

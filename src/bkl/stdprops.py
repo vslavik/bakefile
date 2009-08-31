@@ -27,23 +27,13 @@ Standard properties for extensions or model parts with properties.
 """
 
 import expr, api
-from vartypes import IdType
+from vartypes import IdType, EnumType, ListType
 from api import Property
 
 #: Standard :class:`bkl.api.Module` properties
-STD_MODULE_PROPS = [
-    ]
-
-
-
+STD_MODULE_PROPS = None
 #: Standard :class:`bkl.api.TargetType` properties
-STD_TARGET_PROPS = [
-    Property("id",
-             type=IdType(),
-             default=lambda t: expr.ConstExpr(t.name),
-             readonly=True,
-             doc="Target's unique name (ID)."),
-    ]
+STD_TARGET_PROPS = None
 
 
 
@@ -52,4 +42,34 @@ def _init():
     Initializes standard props, i.e. puts them everywhere they should be,
     e.g. into api.TargetType.properties.
     """
+
+    global STD_MODULE_PROPS
+    global STD_TARGET_PROPS
+
+    # ----------------------------------------------------------------
+    # standard module properties
+    # ----------------------------------------------------------------
+
+    toolsets_enum_type = EnumType(api.Toolset.implementations.keys())
+
+    STD_MODULE_PROPS = [
+        Property("toolsets",
+                 type=ListType(toolsets_enum_type),
+                 default=expr.ListExpr([]),
+                 doc="List of toolsets to generate makefiles/projects for."),
+        ]
+
+    # ----------------------------------------------------------------
+    # standard target properties
+    # ----------------------------------------------------------------
+
+    STD_TARGET_PROPS = [
+        Property("id",
+                 type=IdType(),
+                 default=lambda t: expr.ConstExpr(t.name),
+                 readonly=True,
+                 doc="Target's unique name (ID)."),
+        ]
+
+
     api.TargetType.properties = STD_TARGET_PROPS
