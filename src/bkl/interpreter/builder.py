@@ -24,7 +24,7 @@
 
 from ..api import TargetType
 from ..expr import ConstExpr, ListExpr, ReferenceExpr
-from ..model import Project, Module, Target, Variable
+from ..model import Module, Target, Variable
 from ..stdprops import STD_MODULE_PROPS
 from ..parser.ast import *
 from ..error import Error, ParserError
@@ -62,15 +62,15 @@ class Builder(object):
 
 
     def create_model(self):
-        """Returns constructed model, as :class:`bkl.model.Project` instance."""
-        self.model = Project()
-        self.context = Module()
+        """Returns constructed model, as :class:`bkl.model.Module` instance."""
+        mod = Module()
+        self.context = mod
         self.context._init_from_properties_list(STD_MODULE_PROPS)
-        self.model.modules.append(self.context)
 
         self.handle_children(self.ast.children, self.context)
+        assert self.context is mod
 
-        return self.model
+        return mod
 
 
     def handle_children(self, children, context):

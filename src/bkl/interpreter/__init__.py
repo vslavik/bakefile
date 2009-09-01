@@ -21,3 +21,71 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 #  IN THE SOFTWARE.
 #
+
+"""
+This module contains the very core of Bakefile -- the interpreter,
+:class:`bkl.interpreter.Interpreter`, and its supporting classes.
+"""
+
+import bkl.parser
+import bkl.model
+from builder import Builder
+
+
+class Interpreter(object):
+    """
+    The interpreter is responsible for doing everything necessary to
+    "translate" input ``.bkl`` files into generated native makefiles. This
+    includes building a project model from the input, checking it for
+    correctness, optimizing it and creating outputs for all enabled toolsets.
+
+    :class:`Interpreter` provides both high-level interface for single-call
+    usage (see :meth:`process`) and other methods with finer granularity that
+    allows you to inspect individual steps (most useful for the test suite).
+
+    .. attribute: model
+
+       Model of the project, as :class:`bkl.model.Project`. It's state always
+       reflects current state of processing.
+    """
+
+    def __init__(self):
+        self.model = bkl.model.Project()
+
+
+    def process(self, ast):
+        """
+        Interprets input file and generates the outputs.
+
+        :param ast: AST of the input file, as returned by
+               :func:`bkl.parser.parse_file`.
+
+        Processing is done in several phases:
+
+        1. Basic model is built (see :class:`bkl.interpreter.builder.Builder`).
+           No optimizations or checks are performed at this point.
+           (See :meth:`add_module`.)
+
+        2. Several generic optimization and checking passes are run on the
+           model.  Among other things, types correctness and other constraints
+           are checked, variables are substituted and evaluated.
+
+        3. The model is split into several copies, one per output toolset.
+
+        4. Further optimization passes are done.
+
+        5. Output files are generated.
+        """
+        self.add_module(ast)
+        # FIXME: other steps
+
+
+    def add_module(self, ast):
+        """
+        Adds parsed AST to the model, without doing any optimizations.
+
+        :param ast: AST of the input file, as returned by
+               :func:`bkl.parser.parse_file`.
+        """
+        b = Builder(ast)
+        self.model.modules.append(b.create_model())
