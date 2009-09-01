@@ -173,6 +173,21 @@ class Project(ModelPart):
         self.modules = []
 
 
+    def all_variables(self):
+        """
+        Returns iterator over all variables in the project. Works recursively,
+        i.e. scans all modules and targets under this object too.
+        """
+        for v in self.variables.itervalues():
+            yield v
+        for m in self.modules:
+            for v in m.variables.itervalues():
+                yield v
+            for t in m.targets.itervalues():
+                for v in t.variables.itervalues():
+                    yield v
+
+
 
 class Module(ModelPart):
     """

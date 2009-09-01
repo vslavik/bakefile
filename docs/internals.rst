@@ -33,3 +33,7 @@ Internals reference documentation
 .. automodule:: bkl.interpreter
         :members:
         :show-inheritance:
+
+.. automodule:: bkl.interpreter.builder
+        :members:
+        :show-inheritance:

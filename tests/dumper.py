@@ -24,26 +24,30 @@
 
 from bkl import model, expr
 
-def dump_model(project):
+def dump_project(project):
     """
     Returns string with dumped, human-readable description of 'project', which
     is an instance of bakefile.model.Project.
     """
     out = ""
     for mod in project.modules:
-        out += "module {\n%s}\n" % _dump_module(mod)
+        out += _dump_module(mod)
     return out.strip()
 
 
-def _dump_module(module):
-    out = "  variables {\n"
+def dump_module(module):
+    """
+    Returns string with dumped, human-readable description of 'module', which
+    is an instance of bakefile.model.Module.
+    """
+    out = "module {\n  variables {\n"
 
     out += _indent(_dump_vars(module))
 
     out += "  }\n  targets {\n"
     for name in module.targets.iterkeys():
         out += _indent(_indent(_dump_target(module.targets[name])))
-    out +=  "  }\n"
+    out +=  "  }\n}"
 
     return out
 

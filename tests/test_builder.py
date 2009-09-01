@@ -22,14 +22,14 @@
 #  IN THE SOFTWARE.
 #
 
-import bkl.parser, bkl.interpreter, bkl.error
+import bkl.parser, bkl.interpreter.builder, bkl.error
 import dumper
 
 import os, os.path
 from glob import glob
 
 
-def test_interpreter():
+def test_builder():
     """
     Tests Bakefile parser and compares resulting model with a copy saved
     in .model file. Does this for all .bkl files under tests/parser directory
@@ -38,10 +38,10 @@ def test_interpreter():
     import test_parsing
     d = os.path.dirname(test_parsing.__file__)
     for f in glob("%s/*/*.model" % d):
-        yield _test_interpreter_on_file, d, str(f)
+        yield _test_builder_on_file, d, str(f)
 
 
-def _test_interpreter_on_file(testdir, model_file):
+def _test_builder_on_file(testdir, model_file):
     assert model_file.startswith(testdir)
 
     input = os.path.splitext(model_file)[0] + '.bkl'
@@ -50,18 +50,18 @@ def _test_interpreter_on_file(testdir, model_file):
     cwd = os.getcwd()
     os.chdir(testdir)
     try:
-        _do_test_interpreter_on_file(f, model_file)
+        _do_test_builder_on_file(f, model_file)
     finally:
         os.chdir(cwd)
 
-def _do_test_interpreter_on_file(input, model_file):
+def _do_test_builder_on_file(input, model_file):
     print 'interpreting %s' % input
 
     try:
         t = bkl.parser.parse_file(input)
-        i = bkl.interpreter.Interpreter(t)
-        model = i.create_model()
-        as_text = dumper.dump_model(model)
+        i = bkl.interpreter.builder.Builder(t)
+        module = i.create_model()
+        as_text = dumper.dump_module(module)
     except bkl.error.Error, e:
         as_text = "ERROR:\n%s" % e
     print """

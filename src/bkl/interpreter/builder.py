@@ -22,23 +22,25 @@
 #  IN THE SOFTWARE.
 #
 
-import api
-import expr
-import model
-import stdprops
-from parser.ast import *
-from error import Error, ParserError
+from ..api import TargetType
+from ..expr import ConstExpr, ListExpr, ReferenceExpr
+from ..model import Module, Target, Variable
+from ..stdprops import STD_MODULE_PROPS
+from ..parser.ast import *
+from ..error import Error, ParserError
 
-class Interpreter(object):
+
+class Builder(object):
     """
-    Interpreter processes parsed AST and constructs a project model from it.
+    interpreter.Builder processes parsed AST and builds a project model
+    from it.
 
     It doesn't do anything smart like optimizing things, it does only the
     minimal processing needed to produce a valid, albeit suboptimal, model.
 
     This includes checking variables scopes etc., but does *not* involve
-    checks for type correctness. Passes further in the pipeline
-    (FIXME - reference the "compiler" pass that does it) handle that.
+    checks for type correctness. Passes further in the
+    :class:`bkl.interpreter.Interpreter` pipeline handle that.
 
     .. attribute:: context
 
@@ -60,15 +62,15 @@ class Interpreter(object):
 
 
     def create_model(self):
-        """Returns constructed model, as :class:`bkl.model.Project` instance."""
-        self.model = model.Project()
-        self.context = model.Module()
-        self.context._init_from_properties_list(stdprops.STD_MODULE_PROPS)
-        self.model.modules.append(self.context)
+        """Returns constructed model, as :class:`bkl.model.Module` instance."""
+        mod = Module()
+        self.context = mod
+        self.context._init_from_properties_list(STD_MODULE_PROPS)
 
         self.handle_children(self.ast.children, self.context)
+        assert self.context is mod
 
-        return self.model
+        return mod
 
 
     def handle_children(self, children, context):
@@ -109,7 +111,7 @@ class Interpreter(object):
         var = self.context.get_variable(varname)
         if var is None:
             # create new variable
-            var = model.Variable(varname, value)
+            var = Variable(varname, value)
             self.context.add_variable(var)
         else:
             # modify existing variable
@@ -123,8 +125,8 @@ class Interpreter(object):
 
         type_name = node.type.text
         try:
-            target_type = api.TargetType.get(type_name)
-            target = model.Target(name, target_type)
+            target_type = TargetType.get(type_name)
+            target = Target(name, target_type)
             self.context.add_target(target)
         except KeyError:
             raise ParserError("unknown target type \"%s\"" % type_name)
@@ -148,13 +150,13 @@ class Interpreter(object):
         else:
             assert result_type==None # FIXME: handle nested type correctly
             items = [self._build_expression(e, result_type) for e in values]
-            return expr.ListExpr(items)
+            return ListExpr(items)
 
 
     def _build_expression(self, ast, result_type=None):
         if isinstance(ast, ValueNode):
             # FIXME: type handling
-            return expr.ConstExpr(ast.text)
+            return ConstExpr(ast.text)
         elif isinstance(ast, VarReferenceNode):
-            return expr.ReferenceExpr(ast.var)
+            return ReferenceExpr(ast.var)
         assert False, "unrecognized AST node"
