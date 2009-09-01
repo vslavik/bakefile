@@ -29,6 +29,7 @@ This module contains the very core of Bakefile -- the interpreter,
 
 import bkl.parser
 import bkl.model
+import passes
 from builder import Builder
 
 
@@ -64,7 +65,6 @@ class Interpreter(object):
 
         1. Basic model is built (see :class:`bkl.interpreter.builder.Builder`).
            No optimizations or checks are performed at this point.
-           (See :meth:`add_module`.)
 
         2. Several generic optimization and checking passes are run on the
            model.  Among other things, types correctness and other constraints
@@ -75,17 +75,37 @@ class Interpreter(object):
         4. Further optimization passes are done.
 
         5. Output files are generated.
+
+        Step 1 is done by :meth:`add_module`. Steps 2-4 are done by
+        :meth:`finalize` and step 5 is implemented in :meth:`generate`.
         """
         self.add_module(ast)
-        # FIXME: other steps
+        self.finalize()
+        self.generate()
 
 
     def add_module(self, ast):
         """
-        Adds parsed AST to the model, without doing any optimizations.
+        Adds parsed AST to the model, without doing any optimizations. May be
+        called more than once, with different parsed files.
 
         :param ast: AST of the input file, as returned by
                :func:`bkl.parser.parse_file`.
         """
         b = Builder(ast)
         self.model.modules.append(b.create_model())
+
+
+    def finalize(self):
+        """
+        Finalizes the model, i.e. checks it for validity, optimizes, creates
+        per-toolset models etc.
+        """
+        passes.check_var_types(self.model)
+
+
+    def generate(self):
+        """
+        Generates output files.
+        """
+        raise NotImplementedError
