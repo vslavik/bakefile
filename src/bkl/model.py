@@ -126,6 +126,7 @@ class ModelPart(object):
         for p in props_list:
             self.add_variable(Variable(p.name,
                                        value=p.default_expr(self),
+                                       type=p.type,
                                        readonly=p.readonly))
 
 
