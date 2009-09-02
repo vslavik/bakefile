@@ -122,16 +122,18 @@ class EnumType(Type):
 
     def __init__(self, allowed_values):
         assert allowed_values, "list of values cannot be empty"
-        self.allowed_values = allowed_values
+        self.allowed_values = [unicode(x) for x in allowed_values]
 
 
     def validate(self, e):
         if isinstance(e, expr.ConstExpr):
+            assert isinstance(e.value, types.UnicodeType)
             if e.value not in self.allowed_values:
                 raise TypeError(self, e,
                                 msg="must be one of %s" % self.allowed_values)
-        # FIXME: allow references
-        raise TypeError(self, e)
+        else:
+            # FIXME: allow references
+            raise TypeError(self, e)
 
 
 
@@ -154,4 +156,6 @@ class ListType(Type):
             for i in e.items:
                 self.item_type.validate(i)
         else:
-            raise TypeError(self, e)
+            # FIXME: hack, add Type.normalize() instead
+            # other expressions are to be considered single-item lists
+            self.item_type.validate(e)
