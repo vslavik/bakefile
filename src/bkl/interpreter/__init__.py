@@ -108,4 +108,4 @@ class Interpreter(object):
         """
         Generates output files.
         """
-        raise NotImplementedError
+        pass # raise NotImplementedError
