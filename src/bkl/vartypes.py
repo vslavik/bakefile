@@ -146,6 +146,7 @@ class ListType(Type):
 
     def __init__(self, item_type):
         self.item_type = item_type
+        self.name = "list of %s" % item_type.name
 
 
     def validate(self, e):
