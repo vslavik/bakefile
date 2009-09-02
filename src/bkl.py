@@ -42,16 +42,15 @@ log_level = logging.DEBUG if options.debug else logging.WARNING
 logging.basicConfig(level=log_level)
 
 
-try:
-    # note: we intentionally import bakefile this late so that the logging
-    # module is already initialized
-    import bkl.error
-    from bkl.parser import parse_file
-    from bkl.interpreter import Interpreter
+# note: we intentionally import bakefile this late so that the logging
+# module is already initialized
+import bkl.error
+from bkl.parser import parse_file
+from bkl.interpreter import Interpreter
 
+try:
     intr = Interpreter()
     intr.process(parse_file(args[0]))
-
 except KeyboardInterrupt:
     sys.exit(2)
 except bkl.error.Error as e:
