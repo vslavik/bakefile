@@ -31,7 +31,7 @@ def dump_project(project):
     """
     out = ""
     for mod in project.modules:
-        out += _dump_module(mod)
+        out += dump_module(mod)
     return out.strip()
 
 

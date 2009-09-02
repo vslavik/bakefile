@@ -1,6 +1,6 @@
 module {
   variables {
-    toolsets = []
+    toolsets = "gnu"
   }
   targets {
   }

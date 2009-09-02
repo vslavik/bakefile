@@ -28,6 +28,7 @@ objects derived from :class:`bkl.vartypes.Type` -- are used to verify validity
 of variable values and other expressions.
 """
 
+import types
 import expr
 from error import TypeError
 
@@ -87,6 +88,7 @@ class BoolType(Type):
                 raise TypeError(self, e)
         else:
             # FIXME: boolean operations produce bools too
+            # FIXME: allow references
             raise TypeError(self, e)
 
 
@@ -103,3 +105,57 @@ class IdType(Type):
             raise TypeError(self, e)
         # FIXME: allow references
         # FIXME: needs to check that the value is a known ID
+
+
+
+class EnumType(Type):
+    """
+    Enum type. The value must be one of allowed values passed to the
+    constructor.
+
+    .. attribute:: allowed_values
+
+       List of allowed values (strings).
+    """
+
+    name = "enum"
+
+    def __init__(self, allowed_values):
+        assert allowed_values, "list of values cannot be empty"
+        self.allowed_values = [unicode(x) for x in allowed_values]
+
+
+    def validate(self, e):
+        if isinstance(e, expr.ConstExpr):
+            assert isinstance(e.value, types.UnicodeType)
+            if e.value not in self.allowed_values:
+                raise TypeError(self, e,
+                                msg="must be one of %s" % self.allowed_values)
+        else:
+            # FIXME: allow references
+            raise TypeError(self, e)
+
+
+
+class ListType(Type):
+    """
+    Type for a list of items of homogeneous type.
+
+    .. attribute:: item_type
+
+       Type of items stored in the list (:class:`bkl.vartypes.Type` instance).
+    """
+
+    def __init__(self, item_type):
+        self.item_type = item_type
+        self.name = "list of %s" % item_type.name
+
+
+    def validate(self, e):
+        if isinstance(e, expr.ListExpr):
+            for i in e.items:
+                self.item_type.validate(i)
+        else:
+            # FIXME: hack, add Type.normalize() instead
+            # other expressions are to be considered single-item lists
+            self.item_type.validate(e)
