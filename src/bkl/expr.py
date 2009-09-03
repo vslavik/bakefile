@@ -66,6 +66,9 @@ class ConstExpr(Expr):
     def is_const(self):
         return True
 
+    def __str__(self):
+        return str(self.value)
+
 
 
 class ListExpr(Expr):
@@ -81,6 +84,9 @@ class ListExpr(Expr):
                 return False
         return True
 
+    def __str__(self):
+        return "[%s]" % ", ".join(str(x) for x in self.items)
+
 
 
 class NullExpr(Expr):
@@ -89,6 +95,9 @@ class NullExpr(Expr):
     """
     def is_const(self):
         return True
+
+    def __str__(self):
+        return "null"
 
 
 
@@ -104,3 +113,6 @@ class ReferenceExpr(Expr):
     def __init__(self, var):
         # FIXME: use reference to variable object instead?
         self.var = var
+
+    def __str__(self, var):
+        return "$(%s)" % self.var

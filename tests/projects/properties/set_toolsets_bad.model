@@ -1,2 +1,2 @@
 ERROR:
-expression "<bkl.expr.ConstExpr object at 0x19c51d0>" is not valid enum value: must be one of [u'gnu']
+expression "nonexistent" is not valid enum value: must be one of ['gnu']
