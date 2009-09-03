@@ -130,7 +130,8 @@ class EnumType(Type):
             assert isinstance(e.value, types.UnicodeType)
             if e.value not in self.allowed_values:
                 raise TypeError(self, e,
-                                msg="must be one of %s" % self.allowed_values)
+                                msg="must be one of %s" %
+                                [str(x) for x in self.allowed_values])
         else:
             # FIXME: allow references
             raise TypeError(self, e)
