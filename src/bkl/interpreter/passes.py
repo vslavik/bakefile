@@ -30,6 +30,17 @@ import logging
 logger = logging.getLogger("bkl.pass")
 
 
+def normalize_vars(model):
+    """
+    Normalizes variables' values with respect to their types. For example,
+    changes non-list value expressions for lists into single-item lists.
+    """
+    logger.debug("normalizing variables")
+    for var in model.all_variables():
+        var.value = var.type.normalize(var.value)
+
+
+
 def check_var_types(model):
     """
     Validates that values assigned to variables correspond to their types.

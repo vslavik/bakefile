@@ -52,6 +52,18 @@ class Type(object):
 
     name = None
 
+    def normalize(self, e):
+        """
+        Normalizes the expression *e* to be of this type, if it can be done.
+        If it cannot be, does nothing.
+
+        Returns *e* if no normalization was done or a new expression with
+        normalized form of *e*.
+        """
+        # by default, no normalization is done:
+        return self
+
+
     def validate(self, e):
         """
         Validates if the expression *e* is of this type. If it isn't, throws
@@ -152,11 +164,18 @@ class ListType(Type):
         self.name = "list of %s" % item_type.name
 
 
+    def normalize(self, e):
+        # A non-list expression with single value is a special case of list
+        # for convenience, we translate it into single-item list automagically:
+        if isinstance(e, expr.ListExpr):
+            return e
+        return expr.ListExpr([e])
+
+
+
     def validate(self, e):
         if isinstance(e, expr.ListExpr):
             for i in e.items:
                 self.item_type.validate(i)
         else:
-            # FIXME: hack, add Type.normalize() instead
-            # other expressions are to be considered single-item lists
-            self.item_type.validate(e)
+            raise TypeError(self, e)

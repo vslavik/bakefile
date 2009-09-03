@@ -101,6 +101,7 @@ class Interpreter(object):
         Finalizes the model, i.e. checks it for validity, optimizes, creates
         per-toolset models etc.
         """
+        passes.normalize_vars(self.model)
         passes.check_var_types(self.model)
 
 
