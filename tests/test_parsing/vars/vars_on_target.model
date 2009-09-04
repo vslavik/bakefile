@@ -5,6 +5,7 @@ module {
   targets {
     exe foo {
         id = "foo"
+        deps = []
         my_var = "42"
         my_name = "a_name"
     }

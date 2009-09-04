@@ -69,6 +69,11 @@ def _init():
                  default=lambda t: expr.LiteralExpr(t.name),
                  readonly=True,
                  doc="Target's unique name (ID)."),
+
+        Property("deps",
+                 type=ListType(IdType()),
+                 default=expr.ListExpr([]),
+                 doc="Target's dependencies (list of IDs)."),
         ]
 
 

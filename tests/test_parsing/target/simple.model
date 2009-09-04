@@ -5,6 +5,7 @@ module {
   targets {
     exe hello {
         id = "hello"
+        deps = []
     }
   }
 }
