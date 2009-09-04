@@ -29,8 +29,12 @@ This module contains the very core of Bakefile -- the interpreter,
 
 import bkl.parser
 import bkl.model
+import bkl.api
 import passes
 from builder import Builder
+
+import logging
+logger = logging.getLogger("bkl.interpreter")
 
 
 class Interpreter(object):
@@ -109,4 +113,21 @@ class Interpreter(object):
         """
         Generates output files.
         """
-        pass # raise NotImplementedError
+        # collect all requested toolsets:
+        toolsets = set()
+        for module in self.model.modules:
+            module_toolsets = module.get_variable_value("toolsets").as_const()
+            toolsets.update(module_toolsets)
+        logger.debug("toolsets to generate for: %s" % list(toolsets))
+
+        # and generate the outputs:
+        for toolset in toolsets:
+            self._generate_for_toolset(toolset)
+
+
+    def _generate_for_toolset(self, toolset):
+        logger.debug("generating for toolset %s" % toolset)
+        # FIXME: make copy of the model, optimize it
+        model = self.model
+
+        bkl.api.Toolset.get(toolset).generate(model)
