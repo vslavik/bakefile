@@ -89,3 +89,20 @@ class TypeError(Error):
         if msg:
             text += ": %s" % msg
         super(TypeError, self).__init__(text, pos)
+
+
+
+class NonConstError(Error):
+    """
+    Exception thrown when attempting to convert an expression into bake-time
+    constant.
+    """
+    def __int__(self, expr):
+        """
+        Convenience constructor creates error message appropriate for given
+        expression *expr*.
+
+        :param expr: :class:`bkl.expr.Expr` expression that caused the error.
+        """
+        text = "expression \"%s\" must evaluate to a constant" % expr
+        super(NonConstError, self).__init__(text)

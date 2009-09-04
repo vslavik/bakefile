@@ -28,6 +28,8 @@ condition or variable value) is defined in this module, together with
 useful functions for evaluating and simplifying expressions.
 """
 
+from error import NonConstError
+
 class Expr(object):
     """
     Value expression.
@@ -41,12 +43,12 @@ class Expr(object):
     expression, replace it with a new object.
     """
 
-    def is_const(self):
+    def as_const(self):
         """
-        Returns True if the expression evaluates to a constant. If this method
-        returns False, it means that the expression can only be evaluated
-        at make-time. Such expressions cannot be used in some situations, e.g.
-        to specify output files.
+        Returns the expression as Python value (e.g. a list of strings) if it
+        evaluates to a constant literal. Throws an exception if the expression
+        cannot be evaluated at make-time (such expressions cannot be used in
+        some situations, e.g. to specify output files).
         """
         raise NotImplementedError
 
@@ -60,11 +62,14 @@ class LiteralExpr(Expr):
 
        Value of the literal.
     """
+
     def __init__(self, value):
         self.value = value
 
-    def is_const(self):
-        return True
+
+    def as_const(self):
+        return self.value
+
 
     def __str__(self):
         return str(self.value)
@@ -75,14 +80,14 @@ class ListExpr(Expr):
     """
     List expression -- list of several values of the same type.
     """
+
     def __init__(self, items):
         self.items = items
 
-    def is_const(self):
-        for i in self.items:
-            if not i.is_const():
-                return False
-        return True
+
+    def as_const(self):
+        return [ i.as_const() for i in self.items ]
+
 
     def __str__(self):
         return "[%s]" % ", ".join(str(x) for x in self.items)
@@ -93,8 +98,10 @@ class NullExpr(Expr):
     """
     Empty/unset value.
     """
-    def is_const(self):
-        return True
+
+    def as_const(self):
+        return None
+
 
     def __str__(self):
         return "null"
@@ -113,6 +120,11 @@ class ReferenceExpr(Expr):
     def __init__(self, var):
         # FIXME: use reference to variable object instead?
         self.var = var
+
+
+    def as_const(self):
+        raise NonConstError(self)
+
 
     def __str__(self, var):
         return "$(%s)" % self.var
