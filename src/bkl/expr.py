@@ -126,5 +126,5 @@ class ReferenceExpr(Expr):
         raise NonConstError(self)
 
 
-    def __str__(self, var):
+    def __str__(self):
         return "$(%s)" % self.var
