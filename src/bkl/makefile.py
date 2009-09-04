@@ -124,7 +124,6 @@ class MakefileToolset(Toolset):
     def generate(self, project):
         for m in project.modules:
             self._gen_makefile(m)
-        pass
 
 
     def _gen_makefile(self, module):
