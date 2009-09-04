@@ -114,9 +114,14 @@ class MakefileToolset(Toolset):
     #: :class:`MakefileFormatter` class for this toolset.
     Formatter = None
 
+    #: Default filename from output makefile.
+    default_makefile = None
+
     properties = [
             Property("makefile",
-                     type=AnyType(), # Make this a path!
+                     type=AnyType(), # FIXME: Make this a path!
+                     # FIXME: assign default value: if-expression evaluating
+                     #        to every possibility
                      doc="Name of output file for module's makefile."),
     ]
 
@@ -127,7 +132,15 @@ class MakefileToolset(Toolset):
 
 
     def _gen_makefile(self, module):
-        output = module.get_variable_value("makefile").as_const()
+        assert self.default_makefile is not None
+
+        # FIXME: require the value, use get_variable_value(), set the default
+        #        value instead
+        output_var = module.get_variable("makefile")
+        if output_var is None:
+            output = self.default_makefile
+        else:
+            output = output_var.value.as_const()
 
         f = io.OutputFile(output)
 

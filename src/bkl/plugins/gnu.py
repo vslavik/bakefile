@@ -47,3 +47,4 @@ class GnuToolset(MakefileToolset):
     name = "gnu"
 
     Formatter = GnuMakefileFormatter
+    default_makefile = "GNUmakefile"
