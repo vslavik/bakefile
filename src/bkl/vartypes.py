@@ -61,7 +61,7 @@ class Type(object):
         normalized form of *e*.
         """
         # by default, no normalization is done:
-        return self
+        return e
 
 
     def validate(self, e):

@@ -5,9 +5,11 @@ module {
   targets {
     exe one {
         id = "one"
+        deps = []
     }
     exe two {
         id = "two"
+        deps = []
     }
   }
 }
