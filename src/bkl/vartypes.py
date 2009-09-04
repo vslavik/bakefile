@@ -95,7 +95,7 @@ class BoolType(Type):
     allowed_values = [TRUE, FALSE]
 
     def validate(self, e):
-        if isinstance(e, expr.ConstExpr):
+        if isinstance(e, expr.LiteralExpr):
             if e.value not in self.allowed_values:
                 raise TypeError(self, e)
         else:
@@ -113,7 +113,7 @@ class IdType(Type):
     name = "id"
 
     def validate(self, e):
-        if not isinstance(e, expr.ConstExpr):
+        if not isinstance(e, expr.LiteralExpr):
             raise TypeError(self, e)
         # FIXME: allow references
         # FIXME: needs to check that the value is a known ID
@@ -138,7 +138,7 @@ class EnumType(Type):
 
 
     def validate(self, e):
-        if isinstance(e, expr.ConstExpr):
+        if isinstance(e, expr.LiteralExpr):
             assert isinstance(e.value, types.UnicodeType)
             if e.value not in self.allowed_values:
                 raise TypeError(self, e,

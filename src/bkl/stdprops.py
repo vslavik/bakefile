@@ -66,7 +66,7 @@ def _init():
     STD_TARGET_PROPS = [
         Property("id",
                  type=IdType(),
-                 default=lambda t: expr.ConstExpr(t.name),
+                 default=lambda t: expr.LiteralExpr(t.name),
                  readonly=True,
                  doc="Target's unique name (ID)."),
         ]

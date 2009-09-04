@@ -23,7 +23,7 @@
 #
 
 from ..api import TargetType
-from ..expr import ConstExpr, ListExpr, ReferenceExpr
+from ..expr import LiteralExpr, ListExpr, ReferenceExpr
 from ..model import Module, Target, Variable
 from ..stdprops import STD_MODULE_PROPS
 from ..parser.ast import *
@@ -156,7 +156,7 @@ class Builder(object):
     def _build_expression(self, ast, result_type=None):
         if isinstance(ast, ValueNode):
             # FIXME: type handling
-            return ConstExpr(ast.text)
+            return LiteralExpr(ast.text)
         elif isinstance(ast, VarReferenceNode):
             return ReferenceExpr(ast.var)
         assert False, "unrecognized AST node"

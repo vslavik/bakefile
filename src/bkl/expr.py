@@ -52,7 +52,7 @@ class Expr(object):
 
 
 
-class ConstExpr(Expr):
+class LiteralExpr(Expr):
     """
     Constant expression -- holds a literal.
 

@@ -81,7 +81,7 @@ def _dump_target(target):
 
 
 def _dump_expression(e):
-    if isinstance(e, expr.ConstExpr):
+    if isinstance(e, expr.LiteralExpr):
         # FIXME: handle types
         return '"%s"' % e.value
     elif isinstance(e, expr.ReferenceExpr):
