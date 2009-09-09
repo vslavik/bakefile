@@ -36,7 +36,8 @@ parser.add_option("", "--debug",
 options, args = parser.parse_args(sys.argv[1:])
 
 if len(args) != 1:
-    raise RuntimeError("incorrect number of arguments, exactly 1 .bkl required")
+    sys.stderr.write("incorrect number of arguments, exactly 1 .bkl required\n")
+    sys.exit(3)
 
 log_level = logging.DEBUG if options.debug else logging.WARNING
 logging.basicConfig(level=log_level)
