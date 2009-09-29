@@ -38,8 +38,8 @@
             <set var="__pc"/>
             <set var="__install_cmd" eval="0">
                 <if cond="TOOLSET=='unix'">
-                    $(INSTALL_DIR) $(LIBDIR)/pkgconfig
-                    $(INSTALL_DATA) $(__pc) $(LIBDIR)/pkgconfig
+                    $(INSTALL_DIR) $(DESTDIR)$(LIBDIR)/pkgconfig
+                    $(INSTALL_DATA) $(__pc) $(DESTDIR)$(LIBDIR)/pkgconfig
                 </if>
             </set>
 

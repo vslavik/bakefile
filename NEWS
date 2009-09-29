@@ -4,6 +4,7 @@
   number: use libfoo.so.1 for the file and the soname and libfoo.so for the
   only symlink
 - msvs2008prj: fixed MIDL compiler settings
+- autoconf, gnu: fixed pkgconfig module to respect DESTDIR (#248)
 
 
 Version 0.2.6
