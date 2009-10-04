@@ -403,7 +403,7 @@ def sources2objects(sources, target, ext, objSuffix=''):
         allObjectsBasenames[target] = {}
     basenames = allObjectsBasenames[target]
     dirsep = mk.vars['DIRSEP']
-    for s in getPossibleValues(sources):
+    for s in getPossibleValues(sources2):
         full = s[:s.rfind('.')]
         base = full[full.rfind(dirsep)+1:]
         if base not in basenames:
