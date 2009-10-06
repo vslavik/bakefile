@@ -1,0 +1,5 @@
+toolsets = gnu
+
+exe hello {
+    sources = hello.c
+}
