@@ -120,7 +120,7 @@ class IdType(Type):
 
 
 
-class FileType(Type):
+class FilenameType(Type):
     """
     A file name.
     """

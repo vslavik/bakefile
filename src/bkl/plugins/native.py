@@ -28,7 +28,7 @@ Targets for natively built binaries (executables, static and shared libraries).
 
 from bkl.api import TargetType, Property
 from bkl.expr import ListExpr
-from bkl.vartypes import ListType, FileType
+from bkl.vartypes import ListType, FilenameType
 
 
 class ExeType(TargetType):
@@ -39,7 +39,7 @@ class ExeType(TargetType):
 
     properties = [
             Property("sources",
-                 type=ListType(FileType()),
+                 type=ListType(FilenameType()),
                  default=ListExpr([]),
                  doc="Source files."),
         ]
