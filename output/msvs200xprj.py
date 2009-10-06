@@ -554,7 +554,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         tool.setAttribute("AdditionalIncludeDirectories", mk_list(cfg._include_paths))
         tool.setAttribute("PreprocessorDefinitions", mk_list(cfg._defines))
 
-        if cfg._optimize == "0" and cfg._debug == '1':
+        if cfg._optimize == "0" and cfg._rtl_dbg == 'on':
             # VC2008 projects use /MP switch, which is incompatible with
             # MinimalRebuild; /MP is more useful, so omit MinimalRebuild:
             if _MSVS_VCPROJ_VERSION in ["7.10", "8.00"]:
@@ -668,7 +668,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         tool.setAttribute("AdditionalDependencies", ldlibs)
         tool.setAttribute("OutputFile", "%s%s" % (cfg._targetdir, cfg._targetname))
 
-        if cfg._debug == '1':
+        if cfg._rtl_dbg == 'on':
             tool.setAttribute("LinkIncremental", linkIncrementalYes)
         else:
             tool.setAttribute("LinkIncremental", linkIncrementalNo)
@@ -696,11 +696,17 @@ Microsoft Visual Studio Solution File, Format Version 10.00
         if self.isEmbeddedConfig(c):
             tool.setAttribute("TargetMachine", "3")
             tool.setAttribute("DelayLoadDLLs", "$(NOINHERIT)")
-            if cfg._debug == '0':
+            if cfg._rtl_dbg == 'off':
                 tool.setAttribute("OptimizeReferences", optReferences)
                 tool.setAttribute("EnableCOMDATFolding", "2")
         else:
             tool.setAttribute("TargetMachine", "1")
+            # optimize linking unless we're using debug RTL (in which case we
+            # don't build production version anyhow) or we don't use /debug at
+            # all (in which case it's optimized by default)
+            if cfg._rtl_dbg == 'off' and cfg._debug == '1':
+                tool.setAttribute("OptimizeReferences", optReferences)
+                tool.setAttribute("EnableCOMDATFolding", "2")
 
 
     def buildLibrarianToolElement(self, tool, prjname, cfg, c, t):

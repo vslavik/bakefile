@@ -5,6 +5,8 @@
   only symlink
 - msvs2008prj: fixed MIDL compiler settings
 - autoconf, gnu: fixed pkgconfig module to respect DESTDIR (#248)
+- msvs*prj, msvc, msvc6prj: using debug info without debug runtime was fixed
+  to keep all optimizations enabled (#212)
 
 
 Version 0.2.6

@@ -54,8 +54,19 @@
             <set var="__rtl_dbg">
                 $(substituteFromDict(value, {'on':'d', 'off':''}))
             </set>
+
+            <!-- See bug #212:
+                 Specifying /debug to the linker not only enables PDB
+                 generation (which is what we want) but also automatically
+                 enables incremental linking and disables all linking
+                 optimizations. To correct this we need to add "/opt:ref
+                 /opt:icf" to cl command line (but only if debug runtime
+                 is not used). -->
+            <set var="__extra_debug_flags">
+                $(substituteFromDict(value, {'on':'', 'off':'/opt:ref /opt:icf'}))
+            </set>
         </define-tag>
-        
+
         <define-tag name="app-type" rules="exe">
             <define>
                 $(substituteFromDict(value,
@@ -69,6 +80,11 @@
         <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
         <cppflags>/Fd$(__pdbfile)</cppflags>
         <ldflags>/pdb:"$(__pdbfile)"</ldflags>
+        <cppflags>
+            $(substituteFromDict(value,
+                    {'on':ref('__extra_debug_flags', id),
+                     'off':''}))
+        </cppflags>
     </define-tag>
 
 
