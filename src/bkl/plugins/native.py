@@ -26,7 +26,9 @@
 Targets for natively built binaries (executables, static and shared libraries).
 """
 
-from bkl.api import TargetType
+from bkl.api import TargetType, Property
+from bkl.expr import ListExpr
+from bkl.vartypes import ListType, FileType
 
 
 class ExeType(TargetType):
@@ -34,3 +36,10 @@ class ExeType(TargetType):
     Executable program.
     """
     name = "exe"
+
+    properties = [
+            Property("sources",
+                 type=ListType(FileType()),
+                 default=ListExpr([]),
+                 doc="Source files."),
+        ]

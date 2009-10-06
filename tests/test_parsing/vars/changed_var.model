@@ -6,6 +6,7 @@ module {
   }
   targets {
     exe a_target {
+        sources = []
         id = "a_target"
         deps = []
         my_var = "my_take_2"

@@ -4,10 +4,12 @@ module {
   }
   targets {
     exe one {
+        sources = []
         id = "one"
         deps = []
     }
     exe two {
+        sources = []
         id = "two"
         deps = []
     }

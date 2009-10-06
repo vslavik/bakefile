@@ -4,6 +4,7 @@ module {
   }
   targets {
     exe hello {
+        sources = []
         id = "hello"
         deps = []
     }

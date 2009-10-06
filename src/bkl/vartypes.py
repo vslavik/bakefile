@@ -120,6 +120,21 @@ class IdType(Type):
 
 
 
+class FileType(Type):
+    """
+    A file name.
+    """
+
+    name = "file"
+
+    def validate(self, e):
+        if not isinstance(e, expr.LiteralExpr):
+            raise TypeError(self, e)
+        # FIXME: allow references
+        # FIXME: needs to check that the value is a known ID
+
+
+
 class EnumType(Type):
     """
     Enum type. The value must be one of allowed values passed to the
