@@ -55,5 +55,8 @@ try:
 except KeyboardInterrupt:
     sys.exit(2)
 except bkl.error.Error as e:
-    sys.stderr.write("%s\n" % e)
-    sys.exit(1)
+    if options.debug:
+        raise
+    else:
+        sys.stderr.write("%s\n" % e)
+        sys.exit(1)
