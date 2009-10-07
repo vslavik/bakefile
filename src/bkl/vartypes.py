@@ -183,8 +183,9 @@ class ListType(Type):
         # A non-list expression with single value is a special case of list
         # for convenience, we translate it into single-item list automagically:
         if isinstance(e, expr.ListExpr):
-            return e
-        return expr.ListExpr([e])
+            return expr.ListExpr([self.item_type.normalize(i) for i in e.items])
+        else:
+            return expr.ListExpr([self.item_type.normalize(e)])
 
 
 
