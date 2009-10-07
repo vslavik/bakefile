@@ -29,7 +29,9 @@ All makefile-based toolsets should derive from MakefileToolset defined
 in this module.
 """
 
+import types
 import io
+import expr
 from bkl.api import Extension, Toolset, Property
 from bkl.vartypes import AnyType
 
@@ -88,21 +90,47 @@ class MakefileFormatter(Extension):
         """
         Returns string with target definition.
 
-        :param name:     name of the target
-        :param deps:     list of its dependencies (as strings corresponding to
-                         some target's name); may be empty
-        :param commands: list of commands to execute to build the target; they
+        :param name:     Name of the target.
+        :param deps:     List of its dependencies. Items are strings
+                         corresponding to some target's name (may be expressions
+                         that reference a variable, in that case the string
+                         must already be processed with :meth:`var_reference`).
+                         May be empty.
+        :param commands: List of commands to execute to build the target; they
                          are already formatted to be in make's syntax and each
-                         command in the list is single-line shell command
+                         command in the list is single-line shell command.
         """
         out = "%s:" % name
         if deps:
             out += " "
             out += " ".join(deps)
         if commands:
-            for c in command:
+            for c in commands:
                 out += "\n\t%s" % c
+        out += "\n\n"
         return out
+
+
+    def format_expr(self, e):
+        """
+        Helper method to format a :class:`bkl.expr.Expr` expression into make's
+        syntax. The expression may only reference variables that will be part
+        of the output (no checks are done for this).
+        """
+        if isinstance(e, expr.ReferenceExpr):
+            return self.var_reference(e.var)
+        elif isinstance(e, expr.ListExpr):
+            return " ".join([self.format_expr(i) for i in e.items])
+        elif isinstance(e, types.ListType):
+            return " ".join([self.format_expr(i) for i in e])
+        elif isinstance(e, expr.LiteralExpr):
+            return e.value
+        elif isinstance(e, types.StringType):
+            return e
+        elif isinstance(e, types.UnicodeType):
+            return str(e)
+        else:
+            assert False, "unrecognized expression type (%s)" % type(e)
 
 
 
@@ -134,6 +162,8 @@ class MakefileToolset(Toolset):
     def _gen_makefile(self, module):
         assert self.default_makefile is not None
 
+        fmt = self.Formatter()
+
         # FIXME: require the value, use get_variable_value(), set the default
         #        value instead
         output_var = module.get_variable("makefile")
@@ -146,8 +176,20 @@ class MakefileToolset(Toolset):
 
         for v in module.variables:
             pass
-        for t in module.targets:
-            pass
-        raise NotImplementedError # not fully, anyway
+        for t in module.targets.itervalues():
+            graph = t.type.get_build_subgraph(t)
+
+            for node in graph:
+                if node.name:
+                    out = node.name
+                else:
+                    # FIXME: handle multi-output nodes too
+                    assert len(node.outputs) == 1
+                    out = node.outputs[0]
+                text = fmt.target(
+                        fmt.format_expr(out),
+                        [fmt.format_expr(i) for i in node.inputs],
+                        [fmt.format_expr(c) for c in node.commands])
+                f.write(text)
 
         f.commit()

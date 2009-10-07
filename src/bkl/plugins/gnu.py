@@ -26,7 +26,28 @@
 GNU tools (GCC, GNU Make, ...) toolset.
 """
 
+from bkl.api import FileCompiler
 from bkl.makefile import MakefileToolset, MakefileFormatter
+import bkl.compilers
+
+
+class GnuCCompiler(FileCompiler):
+    """
+    GNU C compiler.
+    """
+    name = "GNU C"
+    in_type = bkl.compilers.CFileType.get()
+    out_type = bkl.compilers.ObjectFileType.get()
+
+
+
+class GnuLinker(FileCompiler):
+    """
+    GNU linker.
+    """
+    name = "GNU LD"
+    in_type = bkl.compilers.ObjectFileType.get()
+    out_type = bkl.compilers.NativeExeFileType.get()
 
 
 

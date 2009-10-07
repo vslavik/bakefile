@@ -26,9 +26,10 @@
 Targets for natively built binaries (executables, static and shared libraries).
 """
 
-from bkl.api import TargetType, Property
+from bkl.api import TargetType, Property, FileType
 from bkl.expr import ListExpr
 from bkl.vartypes import ListType, FilenameType
+from bkl.compilers import get_compilation_subgraph, NativeExeFileType
 
 
 class ExeType(TargetType):
@@ -43,3 +44,9 @@ class ExeType(TargetType):
                  default=ListExpr([]),
                  doc="Source files."),
         ]
+
+    def get_build_subgraph(self, target):
+        return get_compilation_subgraph(
+                        ft_to=NativeExeFileType.get(),
+                        outfile=target.get_variable_value("id"), # FIXME
+                        sources=target.get_variable_value("sources"))

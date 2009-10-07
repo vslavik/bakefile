@@ -57,3 +57,11 @@ API reference documentation
 .. automodule:: bkl.makefile
         :members:
         :show-inheritance:
+
+
+:mod:`bkl.compilers` -- FileCompiler helpers
+--------------------------------------------
+
+.. automodule:: bkl.compilers
+        :members:
+        :show-inheritance:

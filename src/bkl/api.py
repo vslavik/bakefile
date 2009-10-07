@@ -94,14 +94,39 @@ class Extension(object):
     __metaclass__ = _ExtensionMetaclass
 
     @classmethod
-    def get(cls, name):
+    def get(cls, name=None):
         """
-        Returns instance of extension with given name and of the extension
-        type on which this classmethod was called.
+        This class method is used to get an instance of an extension. In can
+        be used in one of two ways:
 
-        :param name: name of the extension to read; this corresponds to
-            class' "name" attribute
+        1. When called on an extension type class with *name* argument, it
+           returns instance of extension with given name and of the extension
+           type on which this classmethod was called:
+
+           >>> bkl.api.Toolset.get("gnu")
+               <bkl.plugins.gnu.GnuToolset object at 0x2232950>
+
+        2. When called without the *name* argument, it must be called on
+           particular extension class and returns its (singleton) instance:
+
+           >>> GnuToolset.get()
+               <bkl.plugins.gnu.GnuToolset object at 0x2232950>
+
+        :param name: Name of the extension to read; this corresponds to
+            class' "name" attribute. If not specified, then get() must be
+            called on a extension, not extension base class.
         """
+        if name is None:
+            assert cls.name is not None, \
+                   "get() can only be called on fully implemented extension"
+            name = cls.name
+            # find the extension base class:
+            while not cls.__base__ is Extension:
+                cls = cls.__base__
+        else:
+            assert cls.name is None, \
+                   "get(name) can only be called on extension base class"
+
         global _extension_instances
         key = (cls, name)
         if key not in _extension_instances:
@@ -190,6 +215,110 @@ class Property(object):
 
 
 
+class BuildNode(object):
+    """
+    BuildNode represents a single node in traditional make-style build graph.
+    Bakefile's model is higher-level than that, its targets may represent
+    entities that will be mapped into several makefile targets. But BuildNode
+    is the simplest element of build process: a list of commands to run
+    together with dependencies that describe when to run it and a list of
+    outputs the commands create.
+
+    Node's commands are executed if either a) some of its outputs doesn't
+    exist or b) any of the inputs was modified since the last time the outputs
+    were modified.
+
+    .. seealso:: :meth:`bkl.api.TargetType.get_build_subgraph`
+
+    .. attribute:: name
+
+       Name of build node. May be empty. If not empty and the node has no
+       output files (i.e. is *phony*), then this name is used in the generated
+       makefiles. It is ignored in all other cases.
+
+    .. attribute:: inputs
+
+       List of all inputs for this node. Its items are filenames (as
+       :class:`bkl.expr.PathExpr` expressions) or (phony) target names.
+
+    .. attribute:: outputs
+
+       List of all outputs this node generates. Its items are filenames (as
+       :class:`bkl.expr.PathExpr` expressions).
+
+       A node with no outputs is called *phony*.
+
+    .. attribute:: commands:
+
+       List of commands to execute when the rebuild condition is met, as
+       :class:`bkl.expr.Expr`.
+    """
+    def __init__(self, commands, inputs=[], outputs=[], name=None):
+        self.commands = commands
+        self.inputs = inputs
+        self.outputs = outputs
+        self.name = name
+        assert name or outputs, \
+               "phony target must have a name, non-phony must have outputs"
+
+
+
+class FileType(Extension):
+    """
+    Description of a file type. File types are used by
+    :class:`bkl.api.FileCompiler` to define both input and output files.
+
+    .. attribute:: extensions
+
+       List of extensions for this file type, e.g. ``["cpp", "cxx", "C"]``.
+    """
+
+    def __init__(self, extensions=[]):
+        self.extensions = extensions
+
+
+    def detect(self, filename):
+        """
+        Returns True if the file is of this file type. This method is only
+        called if the file has one of the extensions listed in
+        :attr:`extensions`. By default, returns True.
+
+        :param filename: Name of the file to check. Note that this is native
+                         filename and points to existing file.
+        """
+        return True
+
+
+
+class FileCompiler(Extension):
+    """
+    In Bakefile API, FileCompiler is used to define all compilation steps.
+
+    Traditionally, the term *compiler* is used for a tool that compiles source
+    code into object files. In Bakefile, a *file compiler* is generalization of
+    this term: it's a tool that compiles file or files of one object type into
+    one or more files of another type. In this meaning, a C/C++ compiler is a
+    *file compiler*, but so is a linker (it "compiles" object files into
+    executables) or e.g. Lex/Yacc compiler or Qt's MOC preprocessor.
+    """
+
+    #: :class:`bkl.api.FileType` for compiler's input file.
+    in_type = None
+
+    #: :class:`bkl.api.FileType` for compiler's output file.
+    out_type = None
+
+    ONE_TO_ONE  = "1"
+    ONE_TO_MANY = "many"
+
+    #: Cardinality of the compiler. That is, whether it compiles one file into
+    #: one file (:const:`FileCompiler.ONE_TO_ONE`, e.g. C compilers) or whether
+    #: it compiles many files of the same type into one output file
+    #: (:const:`FileCompiler.ONE_TO_MANY`, e.g. the linker or Java compiler).
+    cardinality = ONE_TO_ONE
+
+
+
 class TargetType(Extension):
     """
     Base class for implementation of a new target type.
@@ -199,6 +328,18 @@ class TargetType(Extension):
     #: as :class:`Property` instances. Note that properties list is
     #: automagically inherited from base classes, if any.
     properties = [] # will be initialized to stdprops.STD_TARGET_PROPS
+
+    def get_build_subgraph(self, target):
+        """
+        Returns list of :class:`bkl.api.BuildNode` objects with description
+        of this target's local part of build graph -- that is, its part needed
+        to produce output files associated with this target.
+
+        Usually, exactly one BuildNode will be returned, but it's possible to
+        have TargetTypes that correspond to more than one makefile target
+        (e.g. libtool-style libraries or gettext catalogs).
+        """
+        raise NotImplementedError
 
 
 
