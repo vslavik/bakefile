@@ -122,7 +122,7 @@ RPAREN: ')' {self.implicitLineJoiningLevel -= 1};
 QUOTED_TEXT: '"' (options{greedy=false;}:.)* '"';
 
 // a chunk of simple text, used for identifiers, values etc.
-TEXT: ('a'..'z' | 'A'..'Z' | '0'..'9' | '_' | '.')+;
+TEXT: ('a'..'z' | 'A'..'Z' | '0'..'9' | '_' | '.' | '/' | '@')+;
 
 // ---------------------------------------------------------------------------
 // Comments:
