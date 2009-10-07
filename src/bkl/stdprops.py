@@ -50,7 +50,7 @@ def _init():
     # standard module properties
     # ----------------------------------------------------------------
 
-    toolsets_enum_type = EnumType(api.Toolset.implementations.keys())
+    toolsets_enum_type = EnumType(api.Toolset.all_names())
 
     STD_MODULE_PROPS = [
         Property("toolsets",

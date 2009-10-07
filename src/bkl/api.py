@@ -39,7 +39,7 @@ class _ExtensionMetaclass(type):
             return
         if cls.__base__ is Extension:
             # initialize list of implementations for direct extensions:
-            cls.implementations = {}
+            cls._implementations = {}
             return
 
         if cls.name is None:
@@ -54,14 +54,14 @@ class _ExtensionMetaclass(type):
         base = cls.__base__
         while not base.__base__ is Extension:
             base = base.__base__
-        if cls.name in base.implementations:
-            existing = base.implementations[cls.name]
+        if cls.name in base._implementations:
+            existing = base._implementations[cls.name]
             raise RuntimeError("conflicting implementations for %s \"%s\": %s.%s and %s.%s" %
                                (base.__name__,
                                 cls.name,
                                 cls.__module__, cls.__name__,
                                 existing.__module__, existing.__name__))
-        base.implementations[cls.name] = cls
+        base._implementations[cls.name] = cls
 
 
 
@@ -85,10 +85,6 @@ class Extension(object):
        Use-visible name of the extension. For example, the name for targets
        extensions is what is used in target declarations; likewise for
        property names.
-
-    .. attribute:: implementations
-
-       Dictionary of classes that implement this extension, keyed by their name.
     """
 
     __metaclass__ = _ExtensionMetaclass
@@ -130,11 +126,30 @@ class Extension(object):
         global _extension_instances
         key = (cls, name)
         if key not in _extension_instances:
-            _extension_instances[key] = cls.implementations[name]()
+            _extension_instances[key] = cls._implementations[name]()
         return _extension_instances[key]
 
+
+    @classmethod
+    def all(cls):
+        """
+        Returns iterator over instances of all implementations of this extension
+        type.
+        """
+        for name in cls.all_names():
+            yield cls.get(name)
+
+
+    @classmethod
+    def all_names(cls):
+        """
+        Returns names of all implementations of this extension type.
+        """
+        return cls._implementations.keys()
+
+
     name = None
-    implementations = {}
+    _implementations = {}
 
 
 

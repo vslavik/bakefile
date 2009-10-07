@@ -76,8 +76,7 @@ def get_file_type(extension):
     """
     global __cache_types
     if extension not in __cache_types:
-        for ftname in FileType.implementations:
-            ft = FileType.get(ftname)
+        for ft in FileType.all():
             if extension in ft.extensions:
                 __cache_types[extension] = ft
                 return __cache_types[extension]
@@ -99,8 +98,7 @@ def get_compiler(ft_from, ft_to):
     global __cache_compilers
     if key not in __cache_compilers:
         __cache_compilers[key] = None
-        for c_name in FileCompiler.implementations:
-            c = FileCompiler.get(c_name)
+        for c in FileCompiler.all():
             if c.in_type == ft_from and c.out_type == ft_to:
                 __cache_compilers[key] = c
                 break
