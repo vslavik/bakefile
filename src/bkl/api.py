@@ -324,12 +324,12 @@ class FileCompiler(Extension):
     out_type = None
 
     ONE_TO_ONE  = "1"
-    ONE_TO_MANY = "many"
+    MANY_TO_ONE = "many"
 
     #: Cardinality of the compiler. That is, whether it compiles one file into
     #: one file (:const:`FileCompiler.ONE_TO_ONE`, e.g. C compilers) or whether
     #: it compiles many files of the same type into one output file
-    #: (:const:`FileCompiler.ONE_TO_MANY`, e.g. the linker or Java compiler).
+    #: (:const:`FileCompiler.MANY_TO_ONE`, e.g. the linker or Java compiler).
     cardinality = ONE_TO_ONE
 
 
