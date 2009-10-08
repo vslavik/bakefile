@@ -32,6 +32,9 @@ parser = OptionParser()
 parser.add_option("", "--debug",
                   action="store_true", dest="debug", default=False,
                   help="show debug log")
+parser.add_option("", "--dump-model",
+                  action="store_true", dest="dump", default=False,
+                  help="dump project's model to stdout instead of generating output")
 
 options, args = parser.parse_args(sys.argv[1:])
 
@@ -48,9 +51,13 @@ logging.basicConfig(level=log_level)
 import bkl.error
 from bkl.parser import parse_file
 from bkl.interpreter import Interpreter
+import bkl.dumper
 
 try:
-    intr = Interpreter()
+    if options.dump:
+        intr = bkl.dumper.DumpingInterpreter()
+    else:
+        intr = Interpreter()
     intr.process(parse_file(args[0]))
 except KeyboardInterrupt:
     sys.exit(2)

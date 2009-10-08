@@ -22,7 +22,13 @@
 #  IN THE SOFTWARE.
 #
 
+"""
+Helpers for dumping Bakefile model into human-readable form.
+"""
+
 from bkl import model, expr
+from bkl.interpreter import Interpreter
+
 
 def dump_project(project):
     """
@@ -50,6 +56,12 @@ def dump_module(module):
     out +=  "  }\n}"
 
     return out
+
+
+class DumpingInterpreter(Interpreter):
+    def generate(self):
+        print dump_project(self.model)
+
 
 
 def _indent(text):

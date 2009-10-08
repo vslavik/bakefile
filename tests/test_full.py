@@ -23,7 +23,7 @@
 #
 
 import bkl.parser, bkl.interpreter.builder, bkl.error
-import dumper
+import bkl.dumper
 
 import os, os.path
 from glob import glob
@@ -62,7 +62,7 @@ def _do_test_on_file(input, model_file):
         t = bkl.parser.parse_file(input)
         i = bkl.interpreter.Interpreter()
         i.process(t)
-        as_text = dumper.dump_project(i.model)
+        as_text = bkl.dumper.dump_project(i.model)
     except bkl.error.Error, e:
         as_text = "ERROR:\n%s" % e
     print """
