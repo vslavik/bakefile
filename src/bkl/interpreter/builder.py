@@ -135,25 +135,21 @@ class Builder(object):
         self.handle_children(node.content, target)
 
 
-    def _build_assigned_value(self, ast, result_type=None):
+    def _build_assigned_value(self, ast):
         """
         Build :class:`bkl.expr.Expr` from given AST node of
         AssignedValueNode type.
-
-        If result_type is specified, then the expression will be of that
-        type, or the function will throw an exception.
         """
         assert isinstance(ast, AssignedValueNode)
         values = ast.values
         if len(values) == 1:
-            return self._build_expression(values[0], result_type)
+            return self._build_expression(values[0])
         else:
-            assert result_type==None # FIXME: handle nested type correctly
-            items = [self._build_expression(e, result_type) for e in values]
+            items = [self._build_expression(e) for e in values]
             return ListExpr(items)
 
 
-    def _build_expression(self, ast, result_type=None):
+    def _build_expression(self, ast):
         if isinstance(ast, ValueNode):
             # FIXME: type handling
             return LiteralExpr(ast.text)
