@@ -84,6 +84,12 @@ def _dump_expression(e):
     if isinstance(e, expr.LiteralExpr):
         # FIXME: handle types
         return '"%s"' % e.value
+    elif isinstance(e, expr.PathExpr):
+        components = [_dump_expression(x) for x in e.components]
+        if e.anchor == expr.ANCHOR_SRCDIR:
+            return "/".join(components)
+        else:
+            return "%s/%s" % (e.anchor, "/".join(components))
     elif isinstance(e, expr.ReferenceExpr):
         return "$(%s)" % e.var
     elif isinstance(e, expr.ListExpr):

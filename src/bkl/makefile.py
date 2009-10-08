@@ -33,7 +33,7 @@ import types
 import io
 import expr
 from bkl.api import Extension, Toolset, Property
-from bkl.vartypes import AnyType
+from bkl.vartypes import PathType
 
 
 class MakefileFormatter(Extension):
@@ -147,7 +147,7 @@ class MakefileToolset(Toolset):
 
     properties = [
             Property("makefile",
-                     type=AnyType(), # FIXME: Make this a path!
+                     type=PathType(),
                      # FIXME: assign default value: if-expression evaluating
                      #        to every possibility
                      doc="Name of output file for module's makefile."),

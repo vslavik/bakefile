@@ -120,18 +120,37 @@ class IdType(Type):
 
 
 
-class FilenameType(Type):
+class PathType(Type):
     """
-    A file name.
+    A file or directory name.
     """
 
-    name = "file"
+    name = "path"
+
+    def normalize(self, e):
+        if isinstance(e, expr.PathExpr):
+            return e
+
+        components = expr.split(e, "/")
+        if not components:
+            return e # empty path = invalid
+        first = components[0]
+        if (isinstance(first, expr.LiteralExpr) and
+                first.value and first.value[0] == "@"):
+            anchor = first.value
+            return expr.PathExpr(components[1:], anchor)
+        else:
+            return expr.PathExpr(components)
+
 
     def validate(self, e):
-        if not isinstance(e, expr.LiteralExpr):
+        if not isinstance(e, expr.PathExpr):
             raise TypeError(self, e)
+        else:
+            if e.anchor not in expr.ANCHORS:
+                raise TypeError(self, e,
+                                msg="\"%s\" is not a valid path anchor" % e.anchor)
         # FIXME: allow references
-        # FIXME: needs to check that the value is a known ID
 
 
 

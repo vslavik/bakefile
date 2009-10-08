@@ -28,7 +28,7 @@ condition or variable value) is defined in this module, together with
 useful functions for evaluating and simplifying expressions.
 """
 
-from error import NonConstError
+from error import NonConstError, Error
 
 class Expr(object):
     """
@@ -128,3 +128,62 @@ class ReferenceExpr(Expr):
 
     def __str__(self):
         return "$(%s)" % self.var
+
+
+
+# anchors -- special syntax first components of a path
+ANCHOR_SRCDIR     = "@srcdir"
+ANCHOR_TOP_SRCDIR = "@top_srcdir"
+
+# all possible anchors
+ANCHORS = [ANCHOR_SRCDIR, ANCHOR_TOP_SRCDIR]
+
+class PathExpr(Expr):
+    """
+    Expression that holds a file or directory name, or part of it.
+
+    .. attribute:: components
+
+       List of path's components (as expressions). For example, components of
+       path ``foo/bar/file.cpp`` are ``["foo", "bar", "file.cpp"]``.
+
+    .. attribute:: anchor
+
+       The point to which the path is relative to. This can be one of the
+       following:
+
+       * ``expr.ANCHOR_SRCDIR`` -- Path is relative to the source
+         directory (where the ``.bkl`` file is, unless overriden in it).
+       * ``expr.ANCHOR_TOP_SRCDIR`` -- Path is relative to the top
+         source directory (where the toplevel ``.bkl`` file is, unless
+         overriden in it).
+    """
+
+    def __init__(self, components, anchor=ANCHOR_SRCDIR):
+        self.components = components
+        self.anchor = anchor
+
+
+    def as_const(self):
+        # FIXME: this doesn't account for the anchor and platform
+        return "/".join(e.as_const() for e in self.components)
+
+
+    def __str__(self):
+        return "%s/%s" % (self.anchor, "/".join(str(e) for e in self.components))
+
+
+
+def split(e, sep):
+    """
+    Splits expression *e* into a list of expressions, using *sep* as the
+    delimiter character. Works with conditional expressions and variable
+    references too.
+    """
+    assert len(sep) == 1
+    if isinstance(e, LiteralExpr):
+        vals = e.value.split(sep)
+        return [LiteralExpr(v) for v in vals]
+    else:
+        # FIXME: set pos
+        raise Error("don't know how to split expression \"%s\"" % expr)
