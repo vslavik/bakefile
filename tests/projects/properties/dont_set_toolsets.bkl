@@ -1,0 +1,4 @@
+
+// toolsets variable intentionally not set
+
+exe foo {}

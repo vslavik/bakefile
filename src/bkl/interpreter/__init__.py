@@ -32,6 +32,7 @@ import bkl.model
 import bkl.api
 import passes
 from builder import Builder
+from bkl.error import Error
 
 import logging
 logger = logging.getLogger("bkl.interpreter")
@@ -119,6 +120,9 @@ class Interpreter(object):
             module_toolsets = module.get_variable_value("toolsets").as_const()
             toolsets.update(module_toolsets)
         logger.debug("toolsets to generate for: %s" % list(toolsets))
+
+        if not toolsets:
+            raise Error("nothing to generate, \"toolsets\" property is empty")
 
         # and generate the outputs:
         for toolset in toolsets:
