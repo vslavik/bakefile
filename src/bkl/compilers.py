@@ -137,7 +137,7 @@ def get_compilation_subgraph(ft_to, outfile, sources):
         if compiler is None:
             raise Error("cannot determine how to compile \"%s\" files into \"%s\"" % (ft_from.name, ObjectFileType.get().name))
 
-        node = BuildNode(commands=["echo FIXME: cmd"],
+        node = BuildNode(commands=compiler.commands(src, objname),
                          inputs=[src],
                          outputs=[objname])
         objects.append(node)
@@ -145,8 +145,9 @@ def get_compilation_subgraph(ft_to, outfile, sources):
     linker = get_compiler(ObjectFileType.get(), ft_to)
     assert linker
 
-    link_node = BuildNode(commands=["echo link"],
-                          inputs=[o.outputs[0] for o in objects],
+    object_files = [o.outputs[0] for o in objects]
+    link_node = BuildNode(commands=linker.commands(" ".join(object_files), outfile),
+                          inputs=object_files,
                           outputs=[outfile])
 
     return [link_node] + objects

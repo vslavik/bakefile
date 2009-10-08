@@ -333,6 +333,19 @@ class FileCompiler(Extension):
     cardinality = ONE_TO_ONE
 
 
+    def commands(self, input, output):
+        """
+        Returns list of commands (as :class:`bkl.expr.Expr`) to invoke
+        the compiler.
+
+        :param input:  Input file (:class:`bkl.expr.PathExpr`) or
+            files (:class:`bkl.expr.ListExpr`), depending on cardinality.
+        :param output: :class:`bkl.expr.Expr` expression with the name of
+            output file.
+        """
+        raise NotImplementedError
+
+
 
 class TargetType(Extension):
     """

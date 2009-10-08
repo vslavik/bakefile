@@ -39,6 +39,9 @@ class GnuCCompiler(FileCompiler):
     in_type = bkl.compilers.CFileType.get()
     out_type = bkl.compilers.ObjectFileType.get()
 
+    def commands(self, input, output):
+        return ["cc -c -o %s %s" % (output, input)]
+
 
 
 class GnuLinker(FileCompiler):
@@ -48,6 +51,9 @@ class GnuLinker(FileCompiler):
     name = "GNU LD"
     in_type = bkl.compilers.ObjectFileType.get()
     out_type = bkl.compilers.NativeExeFileType.get()
+
+    def commands(self, input, output):
+        return ["cc -o %s %s" % (output, input)]
 
 
 
