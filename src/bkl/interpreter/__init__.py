@@ -34,6 +34,8 @@ import passes
 from builder import Builder
 from bkl.error import Error
 
+from copy import deepcopy
+
 import logging
 logger = logging.getLogger("bkl.interpreter")
 
@@ -131,7 +133,8 @@ class Interpreter(object):
 
     def _generate_for_toolset(self, toolset):
         logger.debug("generating for toolset %s" % toolset)
-        # FIXME: make copy of the model, optimize it
-        model = self.model
+
+        model = deepcopy(self.model)
+        # FIXME: optimize the model
 
         bkl.api.Toolset.get(toolset).generate(model)
