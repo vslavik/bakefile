@@ -115,11 +115,17 @@ class ReferenceExpr(Expr):
     .. attribute:: var
 
        Name of referenced variable.
+
+    .. attribute:: context
+
+       Context of the reference, i.e. the scope in which it was used. This is
+       the appropriate :class:`bkl.model.ModelPart` instance (e.g. a target
+       or a module).
     """
 
-    def __init__(self, var):
-        # FIXME: use reference to variable object instead?
+    def __init__(self, var, context):
         self.var = var
+        self.context = context
 
 
     def as_const(self):

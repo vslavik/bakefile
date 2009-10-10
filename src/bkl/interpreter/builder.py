@@ -154,5 +154,5 @@ class Builder(object):
             # FIXME: type handling
             return LiteralExpr(ast.text)
         elif isinstance(ast, VarReferenceNode):
-            return ReferenceExpr(ast.var)
+            return ReferenceExpr(ast.var, self.context)
         assert False, "unrecognized AST node"
