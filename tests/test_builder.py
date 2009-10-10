@@ -60,7 +60,7 @@ def _do_test_builder_on_file(input, model_file):
     try:
         t = bkl.parser.parse_file(input)
         i = bkl.interpreter.builder.Builder(t)
-        module = i.create_model()
+        module = i.create_model(parent=None)
         as_text = bkl.dumper.dump_module(module)
     except bkl.error.Error, e:
         as_text = "ERROR:\n%s" % e

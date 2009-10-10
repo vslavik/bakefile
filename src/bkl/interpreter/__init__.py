@@ -100,7 +100,7 @@ class Interpreter(object):
                :func:`bkl.parser.parse_file`.
         """
         b = Builder(ast)
-        self.model.modules.append(b.create_model())
+        self.model.modules.append(b.create_model(parent=self.model))
 
 
     def finalize(self):

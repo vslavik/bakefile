@@ -22,6 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
+import copy
 import types
 import error, expr, vartypes, utils
 
@@ -82,10 +83,24 @@ class ModelPart(object):
     .. attribute:: variables
 
        Dictionary of all variables defined in global scope in this module
+
+    .. attribute:: parent
+
+       Parent model part of this one, i.e. the part one step higher in object
+       model hierarchy (e.g. module for a target). May only be ``None`` for
+       toplevel part (the project).
+       Dictionary of all variables defined in global scope in this module
     """
 
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent = parent
         self.variables = utils.OrderedDict()
+
+    # This is needed to make deepcopy work: it doesn't like neither cyclic
+    # references (self.parent) nor weakrefs. So we exclude self.parent from
+    # pickling and deepcopy.
+    def __getstate__(self):
+        return dict(x for x in self.__dict__.iteritems() if x[0] != "parent")
 
 
     def _init_from_properties(self, props_source):
@@ -170,8 +185,17 @@ class Project(ModelPart):
        List of all modules included in the project.
     """
     def __init__(self):
-        super(Project, self).__init__()
+        super(Project, self).__init__(parent=None)
         self.modules = []
+
+
+    def clone(self):
+        c = Project()
+        c.variables = copy.deepcopy(self.variables)
+        c.modules = copy.deepcopy(self.modules, memo)
+        for m in self.modules:
+            cm = copy.deepcopy(m, memo)
+            c.modules.append(cm)
 
 
     def all_variables(self):
@@ -202,8 +226,8 @@ class Module(ModelPart):
        Dictionary of all targets defined in this module
     """
 
-    def __init__(self):
-        super(Module, self).__init__()
+    def __init__(self, parent):
+        super(Module, self).__init__(parent)
         self.targets = utils.OrderedDict()
 
 
@@ -229,8 +253,8 @@ class Target(ModelPart):
        Type of the target, as :class:`bkl.api.TargetType` instance.
     """
 
-    def __init__(self, name, target_type):
-        super(Target, self).__init__()
+    def __init__(self, parent, name, target_type):
+        super(Target, self).__init__(parent)
         self.name = name
         self.type = target_type
         self._init_from_properties(target_type)

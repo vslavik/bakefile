@@ -61,9 +61,9 @@ class Builder(object):
         }
 
 
-    def create_model(self):
+    def create_model(self, parent):
         """Returns constructed model, as :class:`bkl.model.Module` instance."""
-        mod = Module()
+        mod = Module(parent)
         self.context = mod
         self.context._init_from_properties_list(STD_MODULE_PROPS)
 
@@ -126,7 +126,7 @@ class Builder(object):
         type_name = node.type.text
         try:
             target_type = TargetType.get(type_name)
-            target = Target(name, target_type)
+            target = Target(self.context, name, target_type)
             self.context.add_target(target)
         except KeyError:
             raise ParserError("unknown target type \"%s\"" % type_name)
