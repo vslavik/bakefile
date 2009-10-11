@@ -98,7 +98,7 @@ class ModelPart(object):
 
     # This is needed to make deepcopy work: it doesn't like neither cyclic
     # references (self.parent) nor weakrefs. So we exclude self.parent from
-    # pickling and deepcopy.
+    # pickling and deepcopy -- it is added back by Project.__deepcopy__.
     def __getstate__(self):
         return dict(x for x in self.__dict__.iteritems() if x[0] != "parent")
 
@@ -189,13 +189,15 @@ class Project(ModelPart):
         self.modules = []
 
 
-    def clone(self):
+    def __deepcopy__(self, memo):
         c = Project()
-        c.variables = copy.deepcopy(self.variables)
+        c.variables = copy.deepcopy(self.variables, memo)
         c.modules = copy.deepcopy(self.modules, memo)
-        for m in self.modules:
-            cm = copy.deepcopy(m, memo)
-            c.modules.append(cm)
+        for m in c.modules:
+            m.parent = c
+            for t in m.targets.itervalues():
+                t.parent = m
+        return c
 
 
     def all_variables(self):
