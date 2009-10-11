@@ -3,5 +3,5 @@ toolsets = gnu
 SOURCE_FILES = hello.c
 
 exe hello {
-    sources = $(SOURCE_FILES).c
+    sources = $(SOURCE_FILES)
 }
