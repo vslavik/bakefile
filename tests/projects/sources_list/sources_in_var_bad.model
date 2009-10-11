@@ -1,0 +1,2 @@
+ERROR:
+sources_list/sources_in_var_bad.bkl:6:16: unknown variable "SRC_FILES"

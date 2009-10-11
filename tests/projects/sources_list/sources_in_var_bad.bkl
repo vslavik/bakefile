@@ -1,0 +1,7 @@
+toolsets = gnu
+
+SOURCE_FILES = hello.c
+
+exe hello {
+    sources = $(SRC_FILES).c
+}
