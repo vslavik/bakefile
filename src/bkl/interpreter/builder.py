@@ -152,7 +152,10 @@ class Builder(object):
     def _build_expression(self, ast):
         if isinstance(ast, ValueNode):
             # FIXME: type handling
-            return LiteralExpr(ast.text)
+            e = LiteralExpr(ast.text)
         elif isinstance(ast, VarReferenceNode):
-            return ReferenceExpr(ast.var, self.context)
-        assert False, "unrecognized AST node"
+            e= ReferenceExpr(ast.var, self.context)
+        else:
+            assert False, "unrecognized AST node"
+        e.pos = ast.pos
+        return e

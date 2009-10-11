@@ -42,7 +42,15 @@ class Expr(object):
 
     Note that expression objects are immutable: if you need to modify an
     expression, replace it with a new object.
+
+    .. attribute:: pos
+
+       Location of the expression in source tree.
     """
+
+    def __init__(self):
+        self.pos = None
+
 
     def as_py(self, ctxt=None):
         """
@@ -72,6 +80,7 @@ class LiteralExpr(Expr):
     """
 
     def __init__(self, value):
+        super(LiteralExpr, self).__init__()
         self.value = value
 
 
@@ -90,6 +99,7 @@ class ListExpr(Expr):
     """
 
     def __init__(self, items):
+        super(ListExpr, self).__init__()
         self.items = items
 
 
@@ -132,6 +142,7 @@ class ReferenceExpr(Expr):
     """
 
     def __init__(self, var, context):
+        super(ReferenceExpr, self).__init__()
         self.var = var
         self.context = context
 
@@ -145,7 +156,12 @@ class ReferenceExpr(Expr):
         Returns value of the referenced variable. Throws an exception if
         the reference couldn't be resolved.
         """
-        return self.context.get_variable_value(self.var)
+        try:
+            return self.context.get_variable_value(self.var)
+        except Error as e:
+            if self.pos:
+                e.pos = self.pos
+            raise
 
 
     def __str__(self):
@@ -182,6 +198,7 @@ class PathExpr(Expr):
     """
 
     def __init__(self, components, anchor=ANCHOR_SRCDIR):
+        super(PathExpr, self).__init__()
         self.components = components
         self.anchor = anchor
 

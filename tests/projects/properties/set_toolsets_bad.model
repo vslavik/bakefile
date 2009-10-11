@@ -1,2 +1,2 @@
 ERROR:
-expression "nonexistent" is not valid enum value: must be one of ['gnu']
+properties/set_toolsets_bad.bkl:1:11: expression "nonexistent" is not valid enum value: must be one of ['gnu']
