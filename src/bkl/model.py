@@ -154,7 +154,10 @@ class ModelPart(object):
         if name in self.variables:
             return self.variables[name]
         else:
-            return None
+            if self.parent:
+                return self.parent.get_variable(name)
+            else:
+                return None
 
 
     def get_variable_value(self, name):
