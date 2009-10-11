@@ -140,6 +140,14 @@ class ReferenceExpr(Expr):
         raise NonConstError(self)
 
 
+    def get_value(self):
+        """
+        Returns value of the referenced variable. Throws an exception if
+        the reference couldn't be resolved.
+        """
+        return self.context.get_variable_value(self.var)
+
+
     def __str__(self):
         return "$(%s)" % self.var
 
@@ -230,6 +238,8 @@ def split(e, sep):
     if isinstance(e, LiteralExpr):
         vals = e.value.split(sep)
         return [LiteralExpr(v) for v in vals]
+    elif isinstance(e, ReferenceExpr):
+        return split(e.get_value(), sep)
     else:
         # FIXME: set pos
         raise Error("don't know how to split expression \"%s\"" % e)
