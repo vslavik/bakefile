@@ -232,4 +232,4 @@ def split(e, sep):
         return [LiteralExpr(v) for v in vals]
     else:
         # FIXME: set pos
-        raise Error("don't know how to split expression \"%s\"" % expr)
+        raise Error("don't know how to split expression \"%s\"" % e)
