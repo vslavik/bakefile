@@ -120,7 +120,7 @@ def get_compilation_subgraph(ft_to, outfile, sources):
     # FIXME: need to account for conditional compilation, i.e. use some
     #        expr.all_possible_elements(sources)
     assert isinstance(sources, expr.ListExpr)
-    source_files = sources.as_const()
+    source_files = sources.as_py() # FIXME: this is wrong, work on exprs!
 
     # FIXME: support direct many-files-into-one (e.g. java->jar, .cs->exe)
     # compilation too

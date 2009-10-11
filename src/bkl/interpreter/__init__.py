@@ -119,7 +119,7 @@ class Interpreter(object):
         # collect all requested toolsets:
         toolsets = set()
         for module in self.model.modules:
-            module_toolsets = module.get_variable_value("toolsets").as_const()
+            module_toolsets = module.get_variable_value("toolsets").as_py()
             toolsets.update(module_toolsets)
         logger.debug("toolsets to generate for: %s" % list(toolsets))
 

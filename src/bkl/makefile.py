@@ -170,7 +170,7 @@ class MakefileToolset(Toolset):
         if output_var is None:
             output = self.default_makefile
         else:
-            output = output_var.value.as_const()
+            output = output_var.value.as_py()
 
         f = io.OutputFile(output)
 
