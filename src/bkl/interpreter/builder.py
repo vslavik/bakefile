@@ -156,6 +156,6 @@ class Builder(object):
         elif isinstance(ast, VarReferenceNode):
             e= ReferenceExpr(ast.var, self.context)
         else:
-            assert False, "unrecognized AST node"
+            assert False, "unrecognized AST node (%s)" % ast
         e.pos = ast.pos
         return e
