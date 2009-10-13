@@ -41,14 +41,14 @@ tokens {
     VAR_REFERENCE;
 }
 
+// Bakefile grammar uses newlines to terminate statements, unlike C and like
+// e.g. Python. Like Python, it also treats newlines as any other whitespace
+// inside ( ... ) blocks such as this:
+//   sources += (foo.cpp
+//               bar.cpp)
+// This solution to the problem was strongly inspired by Terence Parr's and
+// Loring Craymer's ANTLR Python grammar.
 @lexer::init {
-    # Bakefile grammar uses newlines to terminate statements, unlike C and like
-    # e.g. Python. Like Python, it also treats newlines as any other whitespace
-    # inside ( ... ) blocks such as this:
-    #   sources += (foo.cpp
-    #               bar.cpp)
-    # This solution to the problem was strongly inspired by Terence Parr's and
-    # Loring Craymer's ANTLR Python grammar.
     self.implicitLineJoiningLevel = 0
 }
 
