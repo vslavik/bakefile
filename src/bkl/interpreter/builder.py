@@ -150,7 +150,7 @@ class Builder(object):
 
 
     def _build_expression(self, ast):
-        if isinstance(ast, ValueNode):
+        if isinstance(ast, LiteralNode):
             # FIXME: type handling
             e = LiteralExpr(ast.text)
         elif isinstance(ast, VarReferenceNode):

@@ -2,27 +2,27 @@ RootNode
     AssignmentNode
         IdNode foo
         AssignedValueNode
-            ValueNode "a_foo"
+            LiteralNode "a_foo"
     AssignmentNode
         IdNode bar
         AssignedValueNode
-            ValueNode "a_bar"
+            LiteralNode "a_bar"
     AssignmentNode
         IdNode foo
         AssignedValueNode
-            ValueNode "changed"
+            LiteralNode "changed"
     AssignmentNode
         IdNode bar
         AssignedValueNode
-            ValueNode "changed_too"
+            LiteralNode "changed_too"
     TargetNode
         IdNode exe
         IdNode a_target
         AssignmentNode
             IdNode my_var
             AssignedValueNode
-                ValueNode "my"
+                LiteralNode "my"
         AssignmentNode
             IdNode my_var
             AssignedValueNode
-                ValueNode "my_take_2"
+                LiteralNode "my_take_2"

@@ -2,15 +2,15 @@ RootNode
     AssignmentNode
         IdNode one
         AssignedValueNode
-            ValueNode "1"
+            LiteralNode "1"
     AssignmentNode
         IdNode two
         AssignedValueNode
-            ValueNode "2"
+            LiteralNode "2"
     AssignmentNode
         IdNode three
         AssignedValueNode
-            ValueNode "3"
+            LiteralNode "3"
     AssignmentNode
         IdNode all
         AssignedValueNode

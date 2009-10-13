@@ -115,7 +115,7 @@ class NilNode(Node):
 
 
 
-class ValueNode(Node):
+class LiteralNode(Node):
     """Single value, i.e. literal."""
 
     #: Text of the value, as string.
@@ -128,8 +128,9 @@ class ValueNode(Node):
 
 class AssignedValueNode(Node):
     """
-    Right side of variable assignment, contains list of values (ValueNode
-    objects)."""
+    Right side of variable assignment, contains list of values (LiteralNode,
+    VarReferenceNode etc.).
+    """
 
     #: List of values in the assignment. May be single value, maybe be
     #: multiple values, code using this must correctly interpret it and
@@ -189,7 +190,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
     # mapping of token types to AST node classes
     TOKENS_MAP = {
         BakefileParser.PROGRAM        : RootNode,
-        BakefileParser.VALUE          : ValueNode,
+        BakefileParser.LITERAL        : LiteralNode,
         BakefileParser.ID             : IdNode,
         BakefileParser.ASSIGNED_VALUE : AssignedValueNode,
         BakefileParser.ASSIGN         : AssignmentNode,

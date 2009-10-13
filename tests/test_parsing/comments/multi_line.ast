@@ -2,4 +2,4 @@ RootNode
     AssignmentNode
         IdNode x
         AssignedValueNode
-            ValueNode "1"
+            LiteralNode "1"

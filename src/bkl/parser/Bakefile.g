@@ -36,7 +36,7 @@ tokens {
     ID;
     ASSIGN;
     ASSIGNED_VALUE;
-    VALUE;
+    LITERAL;
     TARGET;
     VAR_REFERENCE;
 }
@@ -76,9 +76,9 @@ assignment_stmt
 
 identifier: t=TEXT             -> ID[$t];
 
-value
-    : t=TEXT                   -> VALUE[$t]
-    | t=QUOTED_TEXT            -> VALUE[$t, $t.text[1:-1\]]
+literal
+    : t=TEXT                   -> LITERAL[$t]
+    | t=QUOTED_TEXT            -> LITERAL[$t, $t.text[1:-1\]]
     ;
 
 // expression may span multiple lines, but only if enclosed in ( ... )
@@ -89,7 +89,7 @@ expression
 
 // single element of an expression
 element
-    : value                    -> value
+    : literal                  -> literal
     | '$(' identifier ')'      -> ^(VAR_REFERENCE identifier) 
     ;
 
