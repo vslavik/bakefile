@@ -29,18 +29,8 @@ from BakefileParser import BakefileParser
 from bkl.error import ParserError
 
 
-class Parser(BakefileParser):
-    """
-    The parser used to parse .bkl files.
-
-    Do not use directly, use parse() function instead.
-    """
-
-    def __init__(self, stream, filename):
-        BakefileParser.__init__(self, stream)
-        self.filename = filename
-
-
+# Helper to implement errors handling in a way we prefer
+class _BakefileErrorsMixin(object):
     def displayRecognitionError(self, tokenNames, e):
         pos = ast.Position()
         pos.filename = self.filename
@@ -62,6 +52,15 @@ class Parser(BakefileParser):
             return repr(str(s))
 
 
+# The lexer and parser used to parse .bkl files.
+# Do not use directly, use parse() function instead.
+class _Lexer(_BakefileErrorsMixin, BakefileLexer):
+    pass
+
+class _Parser(_BakefileErrorsMixin, BakefileParser):
+    pass
+
+
 
 def parse(code, filename=None):
     """
@@ -70,10 +69,14 @@ def parse(code, filename=None):
     of errors reporting.
     """
     cStream = antlr3.StringStream(code)
-    lexer = BakefileLexer(cStream)
+    lexer = _Lexer(cStream)
+    lexer.filename = filename
+
     tStream = antlr3.CommonTokenStream(lexer)
-    parser = Parser(tStream, filename)
+    parser = _Parser(tStream)
+    parser.filename = filename
     parser.adaptor = ast._TreeAdaptor(filename)
+
     return parser.program().tree
 
 
