@@ -81,8 +81,16 @@ def parse_file(filename):
     """
     Reads Bakefile code from given file returns parsed AST.
     """
-    f = file(filename, 'rt')
+    f = file(filename, "rt")
     try:
         return parse(f.read(), filename)
     finally:
         f.close()
+
+
+
+# for testing of AST construction, make this script runnable:
+if __name__ == "__main__":
+    import sys
+    t = parse_file(sys.argv[1])
+    print t.toStringTree()
