@@ -272,11 +272,29 @@ def split(e, sep):
     references too.
     """
     assert len(sep) == 1
+
     if isinstance(e, LiteralExpr):
         vals = e.value.split(sep)
         return [LiteralExpr(v) for v in vals]
+
     elif isinstance(e, ReferenceExpr):
         return split(e.get_value(), sep)
+
+    elif isinstance(e, ConcatExpr):
+        out = []
+        for i in e.items:
+            i_out = split(i, sep)
+            if out:
+                # Join the two lists on concatenation boundary. E.g. splitting
+                # two concatenated strings "foo/bar" and "x/y" along "/" should
+                # result in ["foo", "barx", "y"].
+                out = ( out[:-1] +
+                        [ConcatExpr([out[-1], i_out[0]])] +
+                        i_out[1:] )
+            else:
+                out = i_out
+        return out
+
     else:
         raise Error("don't know how to split expression \"%s\" with separator \"%s\""
                     % (e, sep),
