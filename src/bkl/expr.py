@@ -328,5 +328,14 @@ def simplify(e):
                 out.append(i)
         return ConcatExpr(out)
 
+    elif isinstance(e, ReferenceExpr):
+        # Simple reference can be replaced with the referenced value. Do this
+        # for (scalar) literals and other references only, though -- if the
+        # value is e.g. a list, we want to keep it as a variable to avoid
+        # duplication of large values.
+        ref = e.get_value()
+        if isinstance(e, LiteralExpr) or isinstance(e, ReferenceExpr):
+            return ref
+
     # otherwise, there's nothing much to simplify:
     return e
