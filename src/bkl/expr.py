@@ -120,6 +120,7 @@ class ConcatExpr(Expr):
 
     def __init__(self, items):
         super(ConcatExpr, self).__init__()
+        assert len(items) > 0
         self.items = items
 
 
@@ -299,3 +300,33 @@ def split(e, sep):
         raise Error("don't know how to split expression \"%s\" with separator \"%s\""
                     % (e, sep),
                     pos = e.pos)
+
+
+
+def simplify(e):
+    """
+    Simplify expression *e*. This does "cheap" simplifications such
+    as merging concatenated literals, recognizing always-false conditions,
+    eliminating unnecessary variable references (turn ``foo=$(x);bar=$(foo)``
+    into ``bar=$(x)``) etc.
+    """
+
+    if isinstance(e, ListExpr):
+        return ListExpr([simplify(i) for i in e.items])
+    elif isinstance(e, PathExpr):
+        return PathExpr([simplify(i) for i in e.components], e.anchor)
+
+    elif isinstance(e, ConcatExpr):
+        # merge concatenated literals:
+        items = [simplify(i) for i in e.items]
+        out = [items[0]]
+        for i in items[1:]:
+            last = out[-1]
+            if isinstance(i, LiteralExpr) and isinstance(last, LiteralExpr):
+                last.value += i.value
+            else:
+                out.append(i)
+        return ConcatExpr(out)
+
+    # otherwise, there's nothing much to simplify:
+    return e

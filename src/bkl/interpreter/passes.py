@@ -29,6 +29,8 @@ Implementation of misc interpreter passes -- optimization, checking etc.
 import logging
 logger = logging.getLogger("bkl.pass")
 
+import bkl.expr
+
 
 def normalize_vars(model):
     """
@@ -49,3 +51,16 @@ def check_var_types(model):
     logger.debug("checking types of variables")
     for var in model.all_variables():
         var.type.validate(var.value)
+
+
+
+def simplify_exprs(model):
+    """
+    Simplify expressions in the model. This does "cheap" simplifications such
+    as merging concatenated literals, recognizing always-false conditions,
+    eliminating unnecessary variable references (turn ``foo=$(x);bar=$(foo)``
+    into ``bar=$(x)``) etc.
+    """
+    logger.debug("simplifying expressions")
+    for var in model.all_variables():
+        var.value = bkl.expr.simplify(var.value)

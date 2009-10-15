@@ -110,6 +110,7 @@ class Interpreter(object):
         """
         passes.normalize_vars(self.model)
         passes.check_var_types(self.model)
+        passes.simplify_exprs(self.model)
 
 
     def generate(self):
