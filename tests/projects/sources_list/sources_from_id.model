@@ -1,0 +1,12 @@
+module {
+  variables {
+    toolsets = ["gnu"]
+  }
+  targets {
+    exe hello {
+        sources = ["hello.c"]
+        id = "hello"
+        deps = []
+    }
+  }
+}
