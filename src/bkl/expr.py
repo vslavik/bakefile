@@ -278,5 +278,6 @@ def split(e, sep):
     elif isinstance(e, ReferenceExpr):
         return split(e.get_value(), sep)
     else:
-        # FIXME: set pos
-        raise Error("don't know how to split expression \"%s\"" % e)
+        raise Error("don't know how to split expression \"%s\" with separator \"%s\""
+                    % (e, sep),
+                    pos = e.pos)
