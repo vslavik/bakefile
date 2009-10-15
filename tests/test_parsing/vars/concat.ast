@@ -1,0 +1,36 @@
+RootNode
+    AssignmentNode
+        IdNode FOO
+        ListNode
+            LiteralNode "bar"
+            ConcatNode
+                LiteralNode "yy"
+                VarReferenceNode
+                    IdNode foo
+                LiteralNode "xx"
+            LiteralNode "zar"
+    AssignmentNode
+        IdNode X
+        ConcatNode
+            LiteralNode "foo"
+            VarReferenceNode
+                IdNode bar
+    AssignmentNode
+        IdNode Y
+        ConcatNode
+            LiteralNode "foo"
+            VarReferenceNode
+                IdNode bar
+            LiteralNode "zar"
+    AssignmentNode
+        IdNode Z
+        ConcatNode
+            VarReferenceNode
+                IdNode foo
+            VarReferenceNode
+                IdNode bar
+    AssignmentNode
+        IdNode W
+        ConcatNode
+            LiteralNode "foo"
+            LiteralNode "bar"

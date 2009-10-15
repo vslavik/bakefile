@@ -112,6 +112,26 @@ class ListExpr(Expr):
 
 
 
+class ConcatExpr(Expr):
+    """
+    Concatenation of several expression. Typically, used with LiteralExpr
+    and ReferenceExpr to express values such as "$(foo).cpp".
+    """
+
+    def __init__(self, items):
+        super(ConcatExpr, self).__init__()
+        self.items = items
+
+
+    def as_py(self, ctxt=None):
+        return "".join(i.as_py(ctxt) for i in self.items)
+
+
+    def __str__(self):
+        return "".join(str(i) for i in self.items)
+
+
+
 class NullExpr(Expr):
     """
     Empty/unset value.

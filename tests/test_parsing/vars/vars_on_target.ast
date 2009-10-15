@@ -4,9 +4,7 @@ RootNode
         IdNode foo
         AssignmentNode
             IdNode my_var
-            AssignedValueNode
-                LiteralNode "42"
+            LiteralNode "42"
         AssignmentNode
             IdNode my_name
-            AssignedValueNode
-                LiteralNode "a_name"
+            LiteralNode "a_name"

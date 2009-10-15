@@ -1,7 +1,7 @@
 RootNode
     AssignmentNode
         IdNode foo
-        AssignedValueNode
+        ListNode
             LiteralNode "one"
             LiteralNode "two"
             LiteralNode "three"

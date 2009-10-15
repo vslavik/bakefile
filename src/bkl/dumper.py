@@ -107,6 +107,9 @@ def _dump_expression(e):
     elif isinstance(e, expr.ListExpr):
         items = [_dump_expression(x) for x in e.items]
         return "[%s]" % ", ".join(items)
+    elif isinstance(e, expr.ConcatExpr):
+        items = [_dump_expression(x) for x in e.items]
+        return "".join(items)
     elif isinstance(e, expr.NullExpr):
         return "null"
     else:

@@ -1,0 +1,12 @@
+module {
+  variables {
+    toolsets = []
+    FOO = ["bar", "yy"$(foo)"xx", "zar"]
+    X = "foo"$(bar)
+    Y = "foo"$(bar)"zar"
+    Z = $(foo)$(bar)
+    W = "foo""bar"
+  }
+  targets {
+  }
+}

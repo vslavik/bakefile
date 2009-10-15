@@ -23,7 +23,7 @@
 #
 
 from ..api import TargetType
-from ..expr import LiteralExpr, ListExpr, ReferenceExpr
+from ..expr import LiteralExpr, ListExpr, ConcatExpr, ReferenceExpr
 from ..model import Module, Target, Variable
 from ..stdprops import STD_MODULE_PROPS
 from ..parser.ast import *
@@ -106,7 +106,7 @@ class Builder(object):
 
     def on_assignment(self, node):
         varname = node.var
-        value = self._build_assigned_value(node.value)
+        value = self._build_expression(node.value)
 
         var = self.context.get_variable(varname)
         if var is None:
@@ -135,26 +135,18 @@ class Builder(object):
         self.handle_children(node.content, target)
 
 
-    def _build_assigned_value(self, ast):
-        """
-        Build :class:`bkl.expr.Expr` from given AST node of
-        AssignedValueNode type.
-        """
-        assert isinstance(ast, AssignedValueNode)
-        values = ast.values
-        if len(values) == 1:
-            return self._build_expression(values[0])
-        else:
-            items = [self._build_expression(e) for e in values]
-            return ListExpr(items)
-
-
     def _build_expression(self, ast):
         if isinstance(ast, LiteralNode):
             # FIXME: type handling
             e = LiteralExpr(ast.text)
         elif isinstance(ast, VarReferenceNode):
             e= ReferenceExpr(ast.var, self.context)
+        elif isinstance(ast, ListNode):
+            items = [self._build_expression(e) for e in ast.values]
+            e = ListExpr(items)
+        elif isinstance(ast, ConcatNode):
+            items = [self._build_expression(e) for e in ast.values]
+            e = ConcatExpr(items)
         else:
             assert False, "unrecognized AST node (%s)" % ast
         e.pos = ast.pos

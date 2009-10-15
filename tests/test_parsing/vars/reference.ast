@@ -1,19 +1,16 @@
 RootNode
     AssignmentNode
         IdNode one
-        AssignedValueNode
-            LiteralNode "1"
+        LiteralNode "1"
     AssignmentNode
         IdNode two
-        AssignedValueNode
-            LiteralNode "2"
+        LiteralNode "2"
     AssignmentNode
         IdNode three
-        AssignedValueNode
-            LiteralNode "3"
+        LiteralNode "3"
     AssignmentNode
         IdNode all
-        AssignedValueNode
+        ListNode
             VarReferenceNode
                 IdNode one
             VarReferenceNode

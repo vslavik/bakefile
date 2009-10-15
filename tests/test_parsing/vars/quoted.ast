@@ -1,10 +1,9 @@
 RootNode
     AssignmentNode
         IdNode foo
-        AssignedValueNode
+        ListNode
             LiteralNode "one two"
             LiteralNode "three"
     AssignmentNode
         IdNode bar
-        AssignedValueNode
-            LiteralNode "1 2 3"
+        LiteralNode "1 2 3"

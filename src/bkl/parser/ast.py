@@ -126,7 +126,7 @@ class LiteralNode(Node):
 
 
 
-class AssignedValueNode(Node):
+class ListNode(Node):
     """
     Right side of variable assignment, contains list of values (LiteralNode,
     VarReferenceNode etc.).
@@ -135,6 +135,16 @@ class AssignedValueNode(Node):
     #: List of values in the assignment. May be single value, maybe be
     #: multiple values, code using this must correctly interpret it and
     #: check values' types.
+    values = property(lambda self: self.children)
+
+
+
+class ConcatNode(Node):
+    """
+    Concatenation of several parts, to form single string.
+    """
+
+    #: List of fragments.
     values = property(lambda self: self.children)
 
 
@@ -156,7 +166,7 @@ class AssignmentNode(Node):
     var = property(lambda self: self.children[0].text,
                    doc="Variable assigning to")
     value = property(lambda self: self.children[1],
-                     doc="Value being assigned, AssignedValueNode")
+                     doc="Value being assigned.")
 
 
 
@@ -192,7 +202,8 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.PROGRAM        : RootNode,
         BakefileParser.LITERAL        : LiteralNode,
         BakefileParser.ID             : IdNode,
-        BakefileParser.ASSIGNED_VALUE : AssignedValueNode,
+        BakefileParser.LIST           : ListNode,
+        BakefileParser.CONCAT         : ConcatNode,
         BakefileParser.ASSIGN         : AssignmentNode,
         BakefileParser.VAR_REFERENCE  : VarReferenceNode,
         BakefileParser.TARGET         : TargetNode,

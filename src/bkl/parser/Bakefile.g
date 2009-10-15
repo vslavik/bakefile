@@ -35,10 +35,11 @@ tokens {
     PROGRAM;
     ID;
     ASSIGN;
-    ASSIGNED_VALUE;
     LITERAL;
     TARGET;
     VAR_REFERENCE;
+    CONCAT;
+    LIST;
 }
 
 // Bakefile grammar uses newlines to terminate statements, unlike C and like
@@ -66,7 +67,8 @@ stmt
 
 
 assignment_stmt
-    : identifier '=' expression NEWLINE -> ^(ASSIGN identifier expression)
+    : WS* identifier WS* '=' WS* expression NEWLINE
+                                    -> ^(ASSIGN identifier expression)
     ;
 
 
@@ -83,14 +85,29 @@ literal
 
 // expression may span multiple lines, but only if enclosed in ( ... )
 expression
-    : element+                               -> ^(ASSIGNED_VALUE element+)
-    | LPAREN expression RPAREN               -> expression
+    : element
+    | element_list
+    | LPAREN WS* expression WS* RPAREN     -> expression
     ;
 
-// single element of an expression
+element_list
+    : (element WS+)+ element               -> ^(LIST element+)
+    ;
+
+// Single element of an expression. This can be either a single literal,
+// a variable reference, or a concatenation of any combination of them.
+// Note that a combination of two literals is possible too (e.g. foo"bar").
+// Finally, notice that there's a difference between two concatenated elements
+// without whitespace ("foo$(bar)") and with whitespace between them ("foo
+// $(bar)") -- the former is a single element, the latter is a list.
 element
-    : literal                  -> literal
-    | '$(' identifier ')'      -> ^(VAR_REFERENCE identifier) 
+    : element_part
+    | element_part element_part+           -> ^(CONCAT element_part+)
+    ;
+
+element_part
+    : literal                              -> literal
+    | '$(' identifier ')'                  -> ^(VAR_REFERENCE identifier)
     ;
 
 
@@ -103,7 +120,8 @@ element
 //     exe hello {}
 
 target_stmt
-    : type=identifier id=identifier '{' target_content* '}' NEWLINE -> ^(TARGET $type $id target_content*)
+    : WS* type=identifier WS* id=identifier WS* '{' target_content* WS* '}' NEWLINE
+                            -> ^(TARGET $type $id target_content*)
     ;
 
 target_content
@@ -129,24 +147,27 @@ TEXT: ('a'..'z' | 'A'..'Z' | '0'..'9' | '_' | '.' | '/' | '@')+;
 // ---------------------------------------------------------------------------
 
 COMMENT
-    : '//' ~'\n'* { $channel = HIDDEN };
+    : WS* '//' ~'\n'* { $channel = HIDDEN };
 
 ML_COMMENT
-    : '/*' (options{greedy=false;}:.)* '*/' { $channel = HIDDEN };
+    : WS* '/*' (options{greedy=false;}:.)* '*/' { $channel = HIDDEN };
 
 
 // ---------------------------------------------------------------------------
 // Whitespace handling
 // ---------------------------------------------------------------------------
 
-WHITESPACE
-    : (' ' | '\t')+  { $channel = HIDDEN };
+// Note that whitespace is intentionally NOT put on the hidden channel. This
+// is because we need to distinguish between lists ("foo$(bar)zar") and
+// concatenation ("foo$(bar)zar").
+WS
+    : (' ' | '\t')+;
 
 NEWLINE
-    : ('\n' | '\r')  { if self.implicitLineJoiningLevel > 0:
-                           $channel = HIDDEN
-                     };
+    : WS* ('\n' | '\r')  { if self.implicitLineJoiningLevel > 0:
+                               $channel = HIDDEN
+                         };
 
 // C-style continuations for escaping of newlines:
 CONTINUATION
-    : '\\' WHITESPACE* NEWLINE { $channel = HIDDEN };
+    : '\\' NEWLINE { $channel = HIDDEN };
