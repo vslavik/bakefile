@@ -336,7 +336,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
         chmod +x shared-ld-sh
 
         SHARED_LD_MODULE_CC="`pwd`/shared-ld-sh -bundle -headerpad_max_install_names -o"
-        SHARED_LD_MODULE_CXX="CXX=\$(CXX) $SHARED_LD_MODULE_CC"
+        SHARED_LD_MODULE_CXX="CXX=\"\$(CXX)\" $SHARED_LD_MODULE_CC"
 
         dnl Most apps benefit from being fully binded (its faster and static
         dnl variables initialized at startup work).
