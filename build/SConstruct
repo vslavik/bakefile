@@ -115,21 +115,22 @@ libxml2_win32 = env.BuildComponent(
 
 
 
+OSX_10_6_FLAGS="-O2 -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk"
 OSX_10_5_FLAGS="-O2 -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk"
 OSX_10_4_FLAGS="-O2 -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
 
 libxml2_osx = env.BuildComponent(
         name="libxml2-osx",
-        agent="osx10.5",
+        agent="osx10.6",
         sources=src_libxml2,
         deps=None,
         commands=[
-            # Build 10.5 version first, then install 10.4 version on top of it.
-            # This way, libxml2.dylib will be usable on both systems (and py
-            # modules are installed in different places)
+            # Build 10.5 version first, then install 10.4 version on top of
+            # it.  This way, libxml2.dylib will be usable on all systems (and
+            # py modules are installed in different places)
             "mkdir B10.5",
             "cd B10.5",
-            "../configure --libdir=/usr/local/lib/bakefile/binmodules %s CFLAGS='%s' LDFLAGS='%s'" % (LIBXML2_CONFIGURE, OSX_10_5_FLAGS, OSX_10_5_FLAGS),
+            "../configure --libdir=/usr/local/lib/bakefile/binmodules %s CFLAGS='%s' LDFLAGS='%s' --with-python=/usr/bin/python2.5" % (LIBXML2_CONFIGURE, OSX_10_5_FLAGS, OSX_10_5_FLAGS),
             "make install-strip DESTDIR=`pwd`/../DESTDIR",
             "cd ..",
 
@@ -140,7 +141,7 @@ libxml2_osx = env.BuildComponent(
             "cd ..",
 
             "cd DESTDIR/usr/local/lib/bakefile/binmodules",
-            "mv python2.5/site-packages 2.5",
+            "mv ../../../../../Library/Python/2.5/site-packages 2.5",
             "mv python2.3/site-packages 2.3",
             "rm -rf python* pkgconfig *.la */*.la libxml2.dylib *.sh",
         ],

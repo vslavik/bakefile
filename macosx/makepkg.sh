@@ -1,5 +1,6 @@
 #!/bin/sh
 
+CC=${CC-gcc}
 OLDPWD=$PWD
 DELIVERDIR=deliver
 BAKEFILEDIR=$PWD/..
@@ -49,7 +50,7 @@ build_with_sdk()
         done
         flags="$flags -I$sdkdir/System/Library/Frameworks/Python.framework/Headers"
         mkdir -p $outdir
-        gcc -bundle -undefined dynamic_lookup \
+        $CC -bundle -undefined dynamic_lookup \
             -o $outdir/_bkl_c.so $flags \
             $BAKEFILEDIR/src/bottlenecks.c \
             $BAKEFILEDIR/src/bkl_c_wrap.c \
@@ -59,6 +60,7 @@ build_with_sdk()
 
 build_with_sdk "10.4u"  "10.4"  "2.3"  "ppc i386"
 build_with_sdk "10.5"   "10.5"  "2.5"  "ppc i386"
+build_with_sdk "10.6"   "10.6"  "2.6"  "i386 x86_64"
 
 if [ -n "$EXTRA_BINMODULES" ] ; then
     (cd $EXTRA_BINMODULES ; tar c .) | (cd $pydir/binmodules ; tar x)

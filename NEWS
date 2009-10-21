@@ -10,6 +10,7 @@ Version 0.2.7
 - autoconf, gnu: fixed pkgconfig module to respect DESTDIR (#248)
 - msvs*prj, msvc, msvc6prj: using debug info without debug runtime was fixed
   to keep all optimizations enabled (#212)
+- added support fo running on Mac OS X Snow Leopard
 
 
 Version 0.2.6

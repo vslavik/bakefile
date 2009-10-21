@@ -4,8 +4,13 @@
 #
 
 prefix="@prefix@"
-python="/usr/bin/python"
 program="`basename $0`"
+
+if test -f "/usr/bin/python2.5" ; then
+    python="/usr/bin/python2.5"
+else
+    python="/usr/bin/python"
+fi
 pyver=`"$python" -c "from distutils import sysconfig; print sysconfig.get_python_version()"`
 
 PYTHONPATH="$prefix/lib/bakefile/binmodules/$pyver:$PYTHONPATH"
