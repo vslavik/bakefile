@@ -1,4 +1,7 @@
 
+Version 0.2.7
+-------------
+
 - added getTagAttrib() helper (#97)
 - fixed shared library names and sonames on Solaris to use only one version
   number: use libfoo.so.1 for the file and the soname and libfoo.so for the
