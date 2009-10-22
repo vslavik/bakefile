@@ -1,3 +1,16 @@
+bakefile (0.2.7) unstable; urgency=low
+
+  * added getTagAttrib() helper (#97)
+  * fixed shared library names and sonames on Solaris to use only one version
+    number: use libfoo.so.1 for the file and the soname and libfoo.so for the
+    only symlink
+  * msvs2008prj: fixed MIDL compiler settings
+  * autoconf, gnu: fixed pkgconfig module to respect DESTDIR (#248)
+  * msvs*prj, msvc, msvc6prj: using debug info without debug runtime was fixed
+    to keep all optimizations enabled (#212)
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Oct, 22 Thu 2009 14:49:57 +0200
+
 bakefile (0.2.6) unstable; urgency=low
 
   * autoconf: fixed dependencies support for traditional Unix compilers
