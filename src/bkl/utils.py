@@ -56,7 +56,7 @@ class OrderedDict(dict):
     def __deepcopy__(self, memo):
         c = OrderedDict()
         for k in self.iterkeys():
-            c[k] = copy.deepcopy(self[k])
+            c[k] = copy.deepcopy(self[k], memo)
         return c
 
     # The rest is implemented using above methods:
