@@ -79,12 +79,11 @@
         <debug-runtime-libs>$(value)</debug-runtime-libs>
         <set var="__pdbfile" eval="0">$(__targetdir)$(__name).pdb</set>
         <cppflags>/Fd$(__pdbfile)</cppflags>
-        <ldflags>/pdb:"$(__pdbfile)"</ldflags>
-        <cppflags>
-            $(substituteFromDict(value,
-                    {'on':ref('__extra_debug_flags', id),
-                     'off':''}))
-        </cppflags>
+        <ldflags>
+            /pdb:"$(__pdbfile)" $(substituteFromDict(value,
+                                    {'on':ref('__extra_debug_flags', id),
+                                     'off':''}))
+        </ldflags>
     </define-tag>
 
 
