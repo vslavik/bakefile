@@ -27,6 +27,9 @@ Helper classes for Bakefile I/O. Manages atomic writing of output, detecting
 changes, line endings conversions etc.
 """
 
+import logging
+logger = logging.getLogger("bkl.io")
+
 
 class OutputFile(object):
     """
@@ -64,6 +67,7 @@ class OutputFile(object):
 
 
     def commit(self):
+        logger.info("creating file %s" % self.filename)
         # FIXME: not atomic, needs file-level locking!
         with open(self.filename, "wt") as f:
             f.write(self.text)

@@ -30,6 +30,8 @@ in this module.
 """
 
 import types
+import os.path
+
 import io
 import expr
 from bkl.api import Extension, Toolset, Property
@@ -164,13 +166,22 @@ class MakefileToolset(Toolset):
 
         fmt = self.Formatter()
 
+        ctxt = expr.EvalContext()
+        ctxt.dirsep = "/" # FIXME - format-configurable
+        # FIXME: topdir should be constant, this is akin to @srcdir
+        ctxt.topdir = os.path.dirname(module.source_file)
+
         # FIXME: require the value, use get_variable_value(), set the default
         #        value instead
         output_var = module.get_variable("makefile")
         if output_var is None:
-            output = self.default_makefile
+            # FIXME: instead of this, the default is supposed to be relative
+            #        to @srcdir
+            output = os.path.join(ctxt.topdir, self.default_makefile)
         else:
-            output = output_var.value.as_py()
+            output = output_var.value.as_py(ctxt)
+
+        ctxt.outdir = os.path.dirname(output)
 
         f = io.OutputFile(output)
 

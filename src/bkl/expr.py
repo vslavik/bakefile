@@ -258,11 +258,17 @@ class EvalContext(object):
        processing -- for example, it may be ``build/msvc2005`` when generating
        main library project for VC++ 2005, ``build/msvc2008`` when creating the
        same for VC++ 2008 and ``examples/build/msvc2008`` for a submodule).
+
+    .. attribute:: topdir
+
+       Top directory of the source tree. It is a native path pointing to the
+       top directory. It is most notably used by PathExpr.as_py().
     """
 
     def __init__(self):
         self.dirsep = None
         self.outdir = None
+        self.topdir = None
 
 
 

@@ -229,11 +229,16 @@ class Module(ModelPart):
     .. attribute:: targets
 
        Dictionary of all targets defined in this module
+
+    .. attribute:: source_file
+
+       Path to the input ``.bkl`` source file this module was created from.
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent, source_file):
         super(Module, self).__init__(parent)
         self.targets = utils.OrderedDict()
+        self.source_file = source_file
 
 
     def add_target(self, target):
