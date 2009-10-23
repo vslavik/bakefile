@@ -99,6 +99,7 @@ class Interpreter(object):
         :param ast: AST of the input file, as returned by
                :func:`bkl.parser.parse_file`.
         """
+        logger.info("processing %s" % ast.filename)
         b = Builder(ast)
         self.model.modules.append(b.create_model(parent=self.model))
 
@@ -108,6 +109,7 @@ class Interpreter(object):
         Finalizes the model, i.e. checks it for validity, optimizes, creates
         per-toolset models etc.
         """
+        logger.debug("finalizing the model")
         passes.normalize_vars(self.model)
         passes.check_var_types(self.model)
         passes.simplify_exprs(self.model)
