@@ -1,4 +1,10 @@
 
+Version 0.2.8
+-------------
+
+- msvc: fixed incorrect compiler flags for debug info without debug runtime
+
+
 Version 0.2.7
 -------------
 
