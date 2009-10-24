@@ -1,4 +1,6 @@
 
+foo = 1
+bar = 1
 FOO = bar yy$(foo)xx zar
 X = foo$(bar)
 Y = foo$(bar)zar

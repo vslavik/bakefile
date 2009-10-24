@@ -1,5 +1,11 @@
 RootNode
     AssignmentNode
+        IdNode foo
+        LiteralNode "1"
+    AssignmentNode
+        IdNode bar
+        LiteralNode "1"
+    AssignmentNode
         IdNode FOO
         ListNode
             LiteralNode "bar"

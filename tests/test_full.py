@@ -22,7 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
-import bkl.parser, bkl.interpreter.builder, bkl.error
+import bkl.parser, bkl.interpreter, bkl.error
 import bkl.dumper
 
 import os, os.path

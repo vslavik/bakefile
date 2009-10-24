@@ -22,7 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
-import bkl.parser, bkl.interpreter.builder, bkl.error
+import bkl.parser, bkl.interpreter, bkl.error
 import bkl.dumper
 
 import os, os.path
@@ -35,10 +35,12 @@ def test_builder():
     in .model file. Does this for all .bkl files under tests/parser directory
     that have a model dump present.
     """
-    import test_parsing
-    d = os.path.dirname(test_parsing.__file__)
-    for f in glob("%s/*/*.model" % d):
-        yield _test_builder_on_file, d, str(f)
+    import test_parsing, test_model
+    paths = [os.path.dirname(test_parsing.__file__),
+             os.path.dirname(test_model.__file__)]
+    for d in paths:
+        for f in glob("%s/*/*.model" % d):
+            yield _test_builder_on_file, d, str(f)
 
 
 def _test_builder_on_file(testdir, model_file):
@@ -59,9 +61,10 @@ def _do_test_builder_on_file(input, model_file):
 
     try:
         t = bkl.parser.parse_file(input)
-        i = bkl.interpreter.builder.Builder(t)
-        module = i.create_model(parent=None)
-        as_text = bkl.dumper.dump_module(module)
+        i = bkl.interpreter.Interpreter()
+        module = i.add_module(t)
+        i.finalize()
+        as_text = bkl.dumper.dump_project(i.model)
     except bkl.error.Error, e:
         as_text = "ERROR:\n%s" % e
     print """
