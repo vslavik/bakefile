@@ -327,9 +327,8 @@ def simplify(e):
         items = [simplify(i) for i in e.items]
         out = [items[0]]
         for i in items[1:]:
-            last = out[-1]
-            if isinstance(i, LiteralExpr) and isinstance(last, LiteralExpr):
-                last.value += i.value
+            if isinstance(i, LiteralExpr) and isinstance(out[-1], LiteralExpr):
+                out[-1] = LiteralExpr(out[-1].value + i.value)
             else:
                 out.append(i)
         return ConcatExpr(out)
