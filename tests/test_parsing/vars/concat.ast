@@ -4,7 +4,7 @@ RootNode
         LiteralNode "1"
     AssignmentNode
         IdNode bar
-        LiteralNode "1"
+        LiteralNode "2"
     AssignmentNode
         IdNode FOO
         ListNode

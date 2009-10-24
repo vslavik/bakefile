@@ -2,12 +2,12 @@ module {
   variables {
     toolsets = []
     foo = "1"
-    bar = "1"
-    FOO = ["bar", "yy"$(foo)"xx", "zar"]
-    X = "foo"$(bar)
-    Y = "foo"$(bar)"zar"
-    Z = $(foo)$(bar)
-    W = "foo""bar"
+    bar = "2"
+    FOO = ["bar", "yy1xx", "zar"]
+    X = "foo2"
+    Y = "foo2zar"
+    Z = "12"
+    W = "foobar"
   }
   targets {
   }
