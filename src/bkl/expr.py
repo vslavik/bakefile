@@ -235,6 +235,47 @@ class PathExpr(Expr):
         return "%s/%s" % (self.anchor, "/".join(str(e) for e in self.components))
 
 
+    def get_extension(self):
+        """
+        Returns extension of the filename path. Throws if it cannot be
+        determined.
+        """
+        if not self.components:
+            raise Error("cannot get extension of empty path", self.pos)
+
+        last = self.components[-1]
+        if isinstance(last, LiteralExpr):
+            dot = last.value.rfind(".")
+            if dot != -1:
+                return last.value[dot+1:]
+
+        raise Error("cannot determine extension of \"%s\"" % self, self.pos)
+
+
+
+    def change_extension(self, newext):
+        """
+        Changes extension of the filename to *newext* and returns
+        :class:`bkl.expr.PathExpr` with the new path.
+        """
+        if not self.components:
+            raise Error("cannot change extension of empty path", self.pos)
+
+        last = self.components[-1]
+        if not isinstance(last, LiteralExpr):
+            raise Error("cannot change extension of \"%s\" to .%s" % (self, newext),
+                        self.pos)
+
+        dot = last.value.rfind(".")
+        if dot != -1:
+            tail = "%s.%s" % (last.value[:dot], newext)
+        else:
+            tail = "%s.%s" (last.value, newext)
+
+        comps = self.components[:-1] + [LiteralExpr(tail)]
+        return PathExpr(comps, self.anchor)
+
+
 
 class EvalContext(object):
     """

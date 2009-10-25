@@ -126,10 +126,9 @@ def get_compilation_subgraph(ft_to, outfile, sources):
 
     for src in source_files:
         assert isinstance(src, expr.PathExpr)
-        # FIXME: use expr.PathExpr and get_extension(), change_extension()
-        src = str(src)
-        ext = str(src[src.rfind('.')+1:])
-        objname = str(src[:src.rfind('.')]) + '.o' # FIXME
+
+        ext = src.get_extension()
+        objname = src.change_extension("o") # FIXME
 
         ft_from = get_file_type(ext)
         compiler = get_compiler(ft_from, ObjectFileType.get())
@@ -145,7 +144,8 @@ def get_compilation_subgraph(ft_to, outfile, sources):
     assert linker
 
     object_files = [o.outputs[0] for o in objects]
-    link_node = BuildNode(commands=linker.commands(" ".join(object_files), outfile),
+    link_commands = linker.commands(expr.ListExpr(object_files), outfile)
+    link_node = BuildNode(commands=link_commands,
                           inputs=object_files,
                           outputs=[outfile])
 
