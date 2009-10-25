@@ -37,6 +37,12 @@ def load_plugin(filename):
     basename = os.path.splitext(os.path.basename(filename))[0]
     modname = "bkl.plugins.%s" % basename
     logger.debug("loading plugin %s from %s" % (modname, filename))
+
+    if modname in sys.modules:
+        from bkl.error import Error
+        raise Error("cannot load plugin %s from %s: already loaded from %s" %
+                    (modname, filename, sys.modules[modname].__file__))
+
     imp.load_source(modname, filename)
 
 
