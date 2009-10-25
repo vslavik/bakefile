@@ -54,6 +54,8 @@ def load_plugins_from_dir(dirname):
         for f in files:
             if not f.endswith(".py"):
                 continue
+            if f == "__init__.py":
+                continue
             filename = os.path.join(root, f)
             load_plugin(filename)
 
