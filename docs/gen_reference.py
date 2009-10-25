@@ -79,9 +79,9 @@ def write_docs(kind, extension):
 
 
 # write docs for all targets:
-for t in bkl.api.TargetType.implementations.values():
+for t in bkl.api.TargetType.all():
     write_docs("target", t)
 
 # write docs for all toolsets:
-for t in bkl.api.Toolset.implementations.values():
+for t in bkl.api.Toolset.all():
     write_docs("toolset", t)
