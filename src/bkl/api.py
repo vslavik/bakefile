@@ -172,7 +172,8 @@ class Property(object):
     .. attribute:: default
 
        Default value of the property (as :class:`bkl.expr.Expr`)
-       or :const:`None`.
+       or :const:`None`. If not specified (i.e. :const:`None`), then this
+       property is required and must always be set to a value in the bakefile.
 
     .. attribute:: readonly
 
@@ -218,6 +219,8 @@ class Property(object):
             is evaluated in the context of *for_obj*.
         """
         if self.default is None:
+            # FIXME: don't do this, make it a required property instead
+            # and check for this in one of the passes
             return expr.NullExpr()
         elif (type(self.default) is types.FunctionType or
               type(self.default) is types.MethodType):
