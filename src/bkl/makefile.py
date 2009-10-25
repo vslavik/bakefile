@@ -113,7 +113,7 @@ class MakefileFormatter(Extension):
         return out
 
 
-    def format_expr(self, e):
+    def format_expr(self, e, ctxt):
         """
         Helper method to format a :class:`bkl.expr.Expr` expression into make's
         syntax. The expression may only reference variables that will be part
@@ -127,6 +127,11 @@ class MakefileFormatter(Extension):
             return " ".join([self.format_expr(i) for i in e])
         elif isinstance(e, expr.LiteralExpr):
             return e.value
+        elif isinstance(e, expr.PathExpr):
+            # FIXME: doesn't handle relative directories, ignores
+            #        @anchors
+            return ctxt.dirsep.join(self.format_expr(i, ctxt)
+                                    for i in e.components)
         elif isinstance(e, types.StringType):
             return e
         elif isinstance(e, types.UnicodeType):
@@ -198,9 +203,9 @@ class MakefileToolset(Toolset):
                     assert len(node.outputs) == 1
                     out = node.outputs[0]
                 text = fmt.target(
-                        fmt.format_expr(out),
-                        [fmt.format_expr(i) for i in node.inputs],
-                        [fmt.format_expr(c) for c in node.commands])
+                        fmt.format_expr(out, ctxt),
+                        [fmt.format_expr(i, ctxt) for i in node.inputs],
+                        [fmt.format_expr(c, ctxt) for c in node.commands])
                 f.write(text)
 
         f.commit()
