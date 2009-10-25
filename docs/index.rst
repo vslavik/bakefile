@@ -8,6 +8,9 @@ Contents:
    :maxdepth: 3
    :numbered:
 
+   intro
+   tutorial
+   language
    ref
    devel
    glossary
