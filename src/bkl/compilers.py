@@ -117,10 +117,7 @@ def get_compilation_subgraph(ft_to, outfile, sources):
     """
     # FIXME: toolset-specific
 
-    # FIXME: need to account for conditional compilation, i.e. use some
-    #        expr.all_possible_elements(sources)
-    assert isinstance(sources, expr.ListExpr)
-    source_files = sources.as_py() # FIXME: this is wrong, work on exprs!
+    source_files = expr.all_possible_elements(sources)
 
     # FIXME: support direct many-files-into-one (e.g. java->jar, .cs->exe)
     # compilation too
@@ -128,7 +125,9 @@ def get_compilation_subgraph(ft_to, outfile, sources):
     objects = []
 
     for src in source_files:
+        assert isinstance(src, expr.PathExpr)
         # FIXME: use expr.PathExpr and get_extension(), change_extension()
+        src = str(src)
         ext = str(src[src.rfind('.')+1:])
         objname = str(src[:src.rfind('.')]) + '.o' # FIXME
 
