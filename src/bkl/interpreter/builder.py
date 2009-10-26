@@ -54,11 +54,6 @@ class Builder(object):
     def __init__(self, ast):
         """Constructor creates interpreter for given AST."""
         self.ast = ast
-        self._ast_dispatch = {
-            AssignmentNode : self.on_assignment,
-            TargetNode     : self.on_target,
-            NilNode        : lambda x: x, # do nothing
-        }
 
 
     def create_model(self, parent):
@@ -93,7 +88,7 @@ class Builder(object):
     def _handle_node(self, node):
         func = self._ast_dispatch[type(node)]
         try:
-            func(node)
+            func(self, node)
         except Error as e:
             # Assign position to the error if it wasn't done already; it's
             # often more convenient to do it here than to keep track of the
@@ -151,3 +146,9 @@ class Builder(object):
             assert False, "unrecognized AST node (%s)" % ast
         e.pos = ast.pos
         return e
+
+    _ast_dispatch = {
+        AssignmentNode : on_assignment,
+        TargetNode     : on_target,
+        NilNode        : lambda self,x: x, # do nothing
+    }
