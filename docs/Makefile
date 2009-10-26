@@ -2,8 +2,9 @@
 #
 
 # You can set these variables from the command line.
+PYTHONPATH   += pygments
 SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = PYTHONPATH=$(PYTHONPATH) sphinx-build
 
 # Internal variables.
 ALLSPHINXOPTS   = -d .doctrees $(SPHINXOPTS) .

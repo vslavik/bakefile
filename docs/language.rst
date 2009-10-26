@@ -11,14 +11,14 @@ Comments
 Bakefile uses C-style comments, in both the single-line and multi-line
 variants. Single-line comments look like this:
 
-.. code-block:: none
+.. code-block:: bkl
 
    // we only generate code for GNU format for now
    toolsets = gnu
 
 Multi-line comments can span several lines:
 
-.. code-block:: none
+.. code-block:: bkl
 
    /*
       We only generate code for GNU format for now.
@@ -28,7 +28,7 @@ Multi-line comments can span several lines:
 
 They can also be included in an expression:
 
-.. code-block:: none
+.. code-block:: bkl
 
    exe hello {
        sources = hello.c /*main() impl*/ lib.c
