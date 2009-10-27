@@ -30,6 +30,8 @@ from bkl.api import FileCompiler
 from bkl.makefile import MakefileToolset, MakefileFormatter
 import bkl.compilers
 
+# FIXME: shouldn't be needed later
+from bkl.expr import ListExpr, LiteralExpr
 
 class GnuCCompiler(FileCompiler):
     """
@@ -40,7 +42,13 @@ class GnuCCompiler(FileCompiler):
     out_type = bkl.compilers.ObjectFileType.get()
 
     def commands(self, input, output):
-        return ["cc -c -o %s %s" % (output, input)]
+        # FIXME: use a parser instead of constructing the expression manually
+        #        in here
+        return [ListExpr([
+                  LiteralExpr("cc -c -o"),
+                  output,
+                  input
+                ])]
 
 
 
@@ -53,7 +61,13 @@ class GnuLinker(FileCompiler):
     out_type = bkl.compilers.NativeExeFileType.get()
 
     def commands(self, input, output):
-        return ["cc -o %s %s" % (output, input)]
+        # FIXME: use a parser instead of constructing the expression manually
+        #        in here
+        return [ListExpr([
+                  LiteralExpr("cc -o"),
+                  output,
+                  input
+                ])]
 
 
 

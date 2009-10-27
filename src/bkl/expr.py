@@ -30,7 +30,10 @@ useful functions for evaluating and simplifying expressions.
 
 import os.path
 import itertools
+from abc import ABCMeta, abstractmethod
+
 from error import NonConstError, Error
+
 
 class Expr(object):
     """
@@ -311,6 +314,202 @@ class EvalContext(object):
         self.dirsep = None
         self.outdir = None
         self.topdir = None
+
+
+
+class Visitor(object):
+    """
+    Implements visitor pattern for :class:`Expr` expressions. This is abstract
+    base class, derived classes must implement all of its methods except
+    :meth:`visit()`. The way visitors are used is that the caller calls 
+    :meth:`visit()` on the expression.
+    """
+    __metaclass__ = ABCMeta
+
+    def visit(self, e):
+        """
+        Call this method to visit expression *e*. One of object's "callback"
+        methods will be called, depending on *e*'s type.
+
+        Return value is the value returned by the appropriate callback and
+        is typically :const:`None`.
+        """
+        t = type(e)
+        assert t in self._dispatch, "unknown expression type (%s)" % t
+        func = self._dispatch[t]
+        return func(self, e)
+
+
+    @abstractmethod
+    def literal(self, e):
+        """Called on :class:`LiteralExpr` expressions."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def list(self, e):
+        """Called on :class:`ListExpr` expressions."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def concat(self, e):
+        """Called on :class:`ConcatExpr` expressions."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def reference(self, e):
+        """Called on :class:`ReferenceExpr` expressions."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def path(self, e):
+        """Called on :class:`PathExpr` expressions."""
+        raise NotImplementedError
+
+    _dispatch = {
+        LiteralExpr   : lambda self,e: self.literal(e),
+        ListExpr      : lambda self,e: self.list(e),
+        ConcatExpr    : lambda self,e: self.concat(e),
+        ReferenceExpr : lambda self,e: self.reference(e),
+        PathExpr      : lambda self,e: self.path(e),
+    }
+
+
+
+class PathAnchors(object):
+    """
+    Struct with information about real values for symbolic *anchors* of
+    :class:`PathExpr` paths. These are needed in order to format path
+    expression (using :class:`bkl.expr.Formatter` or otherwise).
+
+    .. attribute:: dirsep
+
+       Separator to separate path components ("/" on Unix and "\\" on Windows).
+
+    .. attribute:: outdir
+
+       Current output directory, i.e. the directory into which Bakefile is
+       writing files at the moment the context is used, relative to
+       *top_srcdir* root, as a list of components. Will be empty list if the
+       paths are the same.
+
+       This value may (and typically does) change during processing -- for
+       example, it may be ``build/msvc2005`` when generating main library
+       project for VC++ 2005, ``build/msvc2008`` when creating the same for
+       VC++ 2008 and ``examples/build/msvc2008`` for a submodule).
+
+    .. attribute:: top_srcdir
+
+       Path to the top source directory, as a list of components, relative
+       to *outdir*. Will be empty list if the paths are the same.
+    """
+
+    def __init__(self, dirsep, outpath, top_srcpath):
+        """
+        The constructor creates anchors information from native paths passed
+        to it:
+
+        :param dirsep:
+                Path components separator, same as the :attr:`dirsep`
+                attribute.
+
+        :param outpath:
+                (Native) path to the output directory. Paths in the output
+                will be typically formatted relatively to this path.
+                The :attr:`outdir` attribute is computed from this parameter.
+
+        :param top_srcpath:
+                (Native) path to the top of source tree.  The
+                :attr:`top_srcdir` attribute is computed from this parameter.
+
+        For example:
+
+        >>> p = bkl.expr.PathAnchors(dirsep='/',
+        ...                          outpath='/tmp/myprj/build/gnu',
+        ...                          top_srcpath='/tmp/myprj/src')
+        >>> p.outdir
+        ['..', 'build', 'gnu']
+        >>> p.top_srcdir
+        ['..', '..', 'src']
+        """
+        out = os.path.split(os.path.abspath(outpath))
+        top = os.path.split(os.path.abspath(top_srcpath))
+
+        self.outdir = _pathcomp_make_relative(out, to=top)
+        self.top_srcdir = _pathcomp_make_relative(top, to=out)
+        self.dirsep = dirsep
+
+
+def _pathcomp_make_relative(what, to):
+    min_len = min(len(what), len(to))
+    first_not_common = -1
+    for i in xrange(0, min_len):
+        if what[i] != to[i]:
+            first_not_common = i
+            break
+    if first_not_common == -1:
+        if len(what) == len(to):
+            return [] # equivalent of "." path
+        else:
+            first_not_common = min_len
+    return [".."] * (len(to) - first_not_common) + what2[first_not_common:]
+
+
+
+class Formatter(Visitor):
+    """
+    Base class for expression formatters. A *formatter* is a class that
+    formats the expression into a string in the way that is needed on the
+    output. For example, it handles things such as path separators on
+    different platforms, variable references, quoting of literals with
+    whitespace in them and so on.
+
+    The base class implements commonly used formatting, such as using
+    whitespace for delimiting list items etc.
+
+    Use the :meth:`format()` method to format an expression.
+
+    .. attribute:: list_sep
+
+       Separator for list items (by default, single space).
+
+    .. attribute:: paths_info
+
+       :class:`PathAnchors` information object to use for formatting of paths.
+    """
+
+    list_sep = " "
+
+    def __init__(self, paths_info):
+        self.paths_info = paths_info
+
+    def format(self, e):
+        """
+        Formats expression *e* into a string.
+        """
+        return self.visit(e)
+
+    def literal(self, e):
+        # FIXME: quote strings with whitespace in them
+        return e.value
+
+    def concat(self, e):
+        # FIXME: quote strings with whitespace in them
+        return "".join(self.format(e) for e in e.items)
+
+    def list(self, e):
+        return self.list_sep.join(self.format(e) for e in e.items)
+
+    def path(self, e):
+        if e.anchor == ANCHOR_TOP_SRCDIR:
+            base = self.paths_info.top_srcdir
+        elif e.anchor == ANCHOR_SRCDIR:
+            # FIXME: this is obsolete
+            base = self.paths_info.top_srcdir
+        else:
+            assert False, "unknown path anchor (%s)" % e.anchor
+
+        comps = [self.format(i) for i in e.components]
+        return self.paths_info.dirsep.join(base + comps)
 
 
 

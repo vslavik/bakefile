@@ -113,31 +113,15 @@ class MakefileFormatter(Extension):
         return out
 
 
-    def format_expr(self, e, ctxt):
-        """
-        Helper method to format a :class:`bkl.expr.Expr` expression into make's
-        syntax. The expression may only reference variables that will be part
-        of the output (no checks are done for this).
-        """
-        if isinstance(e, expr.ReferenceExpr):
-            return self.var_reference(e.var)
-        elif isinstance(e, expr.ListExpr):
-            return " ".join([self.format_expr(i) for i in e.items])
-        elif isinstance(e, types.ListType):
-            return " ".join([self.format_expr(i) for i in e])
-        elif isinstance(e, expr.LiteralExpr):
-            return e.value
-        elif isinstance(e, expr.PathExpr):
-            # FIXME: doesn't handle relative directories, ignores
-            #        @anchors
-            return ctxt.dirsep.join(self.format_expr(i, ctxt)
-                                    for i in e.components)
-        elif isinstance(e, types.StringType):
-            return e
-        elif isinstance(e, types.UnicodeType):
-            return str(e)
-        else:
-            assert False, "unrecognized expression type (%s)" % type(e)
+
+class _MakefileExprFormatter(expr.Formatter):
+
+    def __init__(self, makefile_formatter, paths_info):
+        super(_MakefileExprFormatter, self).__init__(paths_info)
+        self.makefile_formatter = makefile_formatter
+
+    def reference(self, e):
+        return self.makefile_formatter.var_reference(e.var)
 
 
 
@@ -169,8 +153,6 @@ class MakefileToolset(Toolset):
     def _gen_makefile(self, module):
         assert self.default_makefile is not None
 
-        fmt = self.Formatter()
-
         ctxt = expr.EvalContext()
         ctxt.dirsep = "/" # FIXME - format-configurable
         # FIXME: topdir should be constant, this is akin to @srcdir
@@ -188,6 +170,16 @@ class MakefileToolset(Toolset):
 
         ctxt.outdir = os.path.dirname(output)
 
+        paths_info = expr.PathAnchors(
+                dirsep="/", # FIXME - format-configurable
+                outpath=os.path.dirname(output),
+                # FIXME: topdir should be constant, this is akin to @srcdir
+                top_srcpath=os.path.dirname(module.source_file)
+            )
+
+        mk_fmt = self.Formatter()
+        expr_fmt = _MakefileExprFormatter(mk_fmt, paths_info)
+
         f = io.OutputFile(output)
 
         for v in module.variables:
@@ -202,10 +194,10 @@ class MakefileToolset(Toolset):
                     # FIXME: handle multi-output nodes too
                     assert len(node.outputs) == 1
                     out = node.outputs[0]
-                text = fmt.target(
-                        fmt.format_expr(out, ctxt),
-                        [fmt.format_expr(i, ctxt) for i in node.inputs],
-                        [fmt.format_expr(c, ctxt) for c in node.commands])
+                text = mk_fmt.target(
+                        name=expr_fmt.format(out),
+                        deps=[expr_fmt.format(i) for i in node.inputs],
+                        commands=[expr_fmt.format(c) for c in node.commands])
                 f.write(text)
 
         f.commit()
