@@ -22,12 +22,14 @@
 #  IN THE SOFTWARE.
 #
 
+from abc import ABCMeta, abstractmethod
+
 import types
 import expr
 
 # Metaclass used for all extensions in order to implement automatic
 # extensions registration. For internal use only.
-class _ExtensionMetaclass(type):
+class _ExtensionMetaclass(ABCMeta):
 
     def __init__(cls, name, bases, dct):
         super(_ExtensionMetaclass, cls).__init__(name, bases, dct)
@@ -336,6 +338,7 @@ class FileCompiler(Extension):
     cardinality = ONE_TO_ONE
 
 
+    @abstractmethod
     def commands(self, input, output):
         """
         Returns list of commands (as :class:`bkl.expr.Expr`) to invoke
@@ -360,6 +363,7 @@ class TargetType(Extension):
     #: automagically inherited from base classes, if any.
     properties = [] # will be initialized to stdprops.STD_TARGET_PROPS
 
+    @abstractmethod
     def get_build_subgraph(self, target):
         """
         Returns list of :class:`bkl.api.BuildNode` objects with description
@@ -393,6 +397,7 @@ class Toolset(Extension):
     properties = []
 
 
+    @abstractmethod
     def generate(self, project):
         """
         Generates all output files for this toolset.
