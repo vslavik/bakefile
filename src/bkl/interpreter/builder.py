@@ -60,7 +60,7 @@ class Builder(object):
         """Returns constructed model, as :class:`bkl.model.Module` instance."""
         mod = Module(parent, source_file=self.ast.filename)
         self.context = mod
-        self.context._init_from_properties_list(STD_MODULE_PROPS)
+        self.context._init_from_properties(STD_MODULE_PROPS)
 
         self.handle_children(self.ast.children, self.context)
         assert self.context is mod

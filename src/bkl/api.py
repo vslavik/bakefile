@@ -150,6 +150,31 @@ class Extension(object):
         return cls._implementations.keys()
 
 
+    @classmethod
+    def all_properties(cls):
+        """
+        For derived extension types that have properties
+        e.g. :class:`TargetType`), returns iterator over all properties.
+
+        The class must have *class* member variable
+        var:`properties` with a list of :class:`bkl.api.Property` instances.
+        Base class' properties are automagically scanned too.
+
+        .. seealso:: :class:`bkl.api.Property`
+        """
+        t = cls
+        prev_props = None
+        while "properties" in dir(t):
+            if t.properties is not prev_props:
+                for p in t.properties:
+                    yield p
+                prev_props = t.properties
+            # else:
+            #   derived class didn't define properties of its own and we don't
+            #   want to add the same properties twice
+            t = t.__base__
+
+
     name = None
     _implementations = {}
 

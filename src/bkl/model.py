@@ -103,42 +103,18 @@ class ModelPart(object):
         return dict(x for x in self.__dict__.iteritems() if x[0] != "parent")
 
 
-    def _init_from_properties(self, props_source):
+    def _init_from_properties(self, props):
         """
         Creates variables for properties with default values. Properties are
-        taken from a "type" object (e.g. :class:`bkl.api.TargetType` or
-        :class:`bkl.api.Toolset`). This object must have *class* member variable
-        var:`properties` with a list of :class:`bkl.api.Property` instances
-        (base class' properties are automagically scanned too).
+        taken from a list or iterator (e.g. as returned by
+        :meth:`bkl.api.Extension.all_properties()` on
+        :class:`bkl.api.TargetType` or :class:`bkl.api.Toolset`).
 
-        :param type: Object with the properties definition.
+        :param props_list: Properties to process.
 
-        .. seealso:: :class:`bkl.api.TargetType`,
-                     :meth:`_init_from_properties_list`
+        .. seealso:: :class:`bkl.api.Extension`,
         """
-        t = type(props_source)
-        assert t is not types.ListType, \
-                "incorrect usage, did you mean _init_from_properties_list()?"
-
-        prev_props = None
-        while "properties" in dir(t):
-            if t.properties is not prev_props:
-                self._init_from_properties_list(t.properties)
-                prev_props = t.properties
-            # else:
-            #   derived class didn't define properties of its own and we don't
-            #   want to add the same properties twice
-            t = t.__base__
-
-
-    def _init_from_properties_list(self, props_list):
-        """
-        Like :meth:`_init_from_properties`, but takes the properties from
-        a list, not a type.
-        """
-        assert isinstance(props_list, types.ListType), \
-                "incorrect usage, did you mean _init_from_properties()?"
-        for p in props_list:
+        for p in props:
             self.add_variable(Variable(p.name,
                                        value=p.default_expr(self),
                                        type=p.type,
@@ -267,4 +243,4 @@ class Target(ModelPart):
         super(Target, self).__init__(parent)
         self.name = name
         self.type = target_type
-        self._init_from_properties(target_type)
+        self._init_from_properties(target_type.all_properties())
