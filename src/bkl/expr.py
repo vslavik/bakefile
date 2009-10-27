@@ -193,9 +193,10 @@ class ReferenceExpr(Expr):
 
 # anchors -- special syntax first components of a path
 ANCHOR_TOP_SRCDIR = "@top_srcdir"
+ANCHOR_BUILDDIR = "@builddir"
 
 # all possible anchors
-ANCHORS = [ANCHOR_TOP_SRCDIR]
+ANCHORS = [ANCHOR_TOP_SRCDIR, ANCHOR_BUILDDIR]
 
 class PathExpr(Expr):
     """
@@ -214,6 +215,10 @@ class PathExpr(Expr):
        * ``expr.ANCHOR_TOP_SRCDIR`` -- Path is relative to the top
          source directory (where the toplevel ``.bkl`` file is, unless
          overriden in it).
+
+       * ``expr.ANCHOR_BUILDDIR`` -- Path is relative to the build directory.
+         This anchor should be used for all transient files (object files
+         or other generated files).
     """
 
     def __init__(self, components, anchor=ANCHOR_TOP_SRCDIR):
@@ -361,6 +366,12 @@ class PathAnchors(object):
 
        Path to the top source directory, as a list of components, relative
        to *outdir*. Will be empty list if the paths are the same.
+
+    .. attribute:: builddir
+
+       Path to the build directory -- the directory where object files and
+       other generated files are put -- as a list of components, relative
+       to *outdir*. Will be empty list if the paths are the same.
     """
 
     def __init__(self, dirsep, outpath, top_srcpath):
@@ -394,9 +405,11 @@ class PathAnchors(object):
         out = os.path.split(os.path.abspath(outpath))
         top = os.path.split(os.path.abspath(top_srcpath))
 
+        self.dirsep = dirsep
         self.outdir = _pathcomp_make_relative(out, to=top)
         self.top_srcdir = _pathcomp_make_relative(top, to=out)
-        self.dirsep = dirsep
+        # FIXME: for now, make this settable
+        self.builddir = [] # i.e. equal to outdir
 
 
 def _pathcomp_make_relative(what, to):
@@ -462,6 +475,8 @@ class Formatter(Visitor):
     def path(self, e):
         if e.anchor == ANCHOR_TOP_SRCDIR:
             base = self.paths_info.top_srcdir
+        elif e.anchor == ANCHOR_BUILDDIR:
+            base = self.paths_info.builddir
         else:
             assert False, "unknown path anchor (%s)" % e.anchor
 

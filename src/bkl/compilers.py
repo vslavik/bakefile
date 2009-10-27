@@ -129,6 +129,8 @@ def get_compilation_subgraph(ft_to, outfile, sources):
 
         ext = src.get_extension()
         objname = src.change_extension("o") # FIXME
+        # FIXME: needs to flatten the path too
+        objname.anchor = expr.ANCHOR_BUILDDIR
 
         ft_from = get_file_type(ext)
         compiler = get_compiler(ft_from, ObjectFileType.get())
