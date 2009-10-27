@@ -98,7 +98,7 @@ def _dump_expression(e):
         return '"%s"' % e.value
     elif isinstance(e, expr.PathExpr):
         components = [_dump_expression(x) for x in e.components]
-        if e.anchor == expr.ANCHOR_SRCDIR:
+        if e.anchor == expr.ANCHOR_TOP_SRCDIR:
             return "/".join(components)
         else:
             return "%s/%s" % (e.anchor, "/".join(components))

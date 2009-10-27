@@ -1,4 +1,4 @@
 
 exe foo {
-    sources = @srcdir/foo.c @invalid/bar.c
+    sources = @top_srcdir/foo.c @invalid/bar.c
 }

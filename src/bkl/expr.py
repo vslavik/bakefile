@@ -192,11 +192,10 @@ class ReferenceExpr(Expr):
 
 
 # anchors -- special syntax first components of a path
-ANCHOR_SRCDIR     = "@srcdir"
 ANCHOR_TOP_SRCDIR = "@top_srcdir"
 
 # all possible anchors
-ANCHORS = [ANCHOR_SRCDIR, ANCHOR_TOP_SRCDIR]
+ANCHORS = [ANCHOR_TOP_SRCDIR]
 
 class PathExpr(Expr):
     """
@@ -212,14 +211,12 @@ class PathExpr(Expr):
        The point to which the path is relative to. This can be one of the
        following:
 
-       * ``expr.ANCHOR_SRCDIR`` -- Path is relative to the source
-         directory (where the ``.bkl`` file is, unless overriden in it).
        * ``expr.ANCHOR_TOP_SRCDIR`` -- Path is relative to the top
          source directory (where the toplevel ``.bkl`` file is, unless
          overriden in it).
     """
 
-    def __init__(self, components, anchor=ANCHOR_SRCDIR):
+    def __init__(self, components, anchor=ANCHOR_TOP_SRCDIR):
         super(PathExpr, self).__init__()
         self.components = components
         self.anchor = anchor
@@ -228,7 +225,7 @@ class PathExpr(Expr):
     def as_py(self, top_srcdir=None):
         assert top_srcdir, \
                "PathExpr.as_py() can only be called with top_scrdir argument"
-        assert self.anchor == ANCHOR_SRCDIR, \
+        assert self.anchor == ANCHOR_TOP_SRCDIR, \
                "PathExpr.as_py() can only be used with top_srcdir-relative paths"
         comp = (e.as_py() for e in self.components)
         return os.path.join(top_srcdir, os.path.sep.join(comp))
@@ -464,9 +461,6 @@ class Formatter(Visitor):
 
     def path(self, e):
         if e.anchor == ANCHOR_TOP_SRCDIR:
-            base = self.paths_info.top_srcdir
-        elif e.anchor == ANCHOR_SRCDIR:
-            # FIXME: this is obsolete
             base = self.paths_info.top_srcdir
         else:
             assert False, "unknown path anchor (%s)" % e.anchor
