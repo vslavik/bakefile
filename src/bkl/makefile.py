@@ -47,14 +47,15 @@ class MakefileFormatter(Extension):
     variables and so on.
 
     Note that formatters do *not* handle platform- or compiler-specific things,
-    e.g. path separators or compiler invocation. There are done by FIXME and
-    FIXME respectively.
+    e.g. path separators or compiler invocation. There are done by
+    :class:`bkl.expr.Formatter` and :class:`bkl.api.FileCompiler` classes.
 
     This base class implements methods that are common for most make variants;
     derived classes can override them and they must implement the rest.
     """
 
-    def comment(self, text):
+    @staticmethod
+    def comment(text):
         """
         Returns given (possibly multi-line) string formatted as a comment.
 
@@ -63,7 +64,8 @@ class MakefileFormatter(Extension):
         return "\n".join("# %s" % s for s in text.split("\n"))
 
 
-    def var_reference(self, var):
+    @staticmethod
+    def var_reference(var):
         """
         Returns string with code for referencing a variable.
 
@@ -75,7 +77,8 @@ class MakefileFormatter(Extension):
         return "$(%s)" % var
 
 
-    def var_definition(self, var, value):
+    @staticmethod
+    def var_definition(var, value):
         """
         Returns string with definition of a variable value, typically
         `var = value`.
@@ -88,7 +91,8 @@ class MakefileFormatter(Extension):
         return "%s = %s" % (var, " \\\n\t".join(value.split("\n")))
 
 
-    def target(self, name, deps, commands):
+    @staticmethod
+    def target(name, deps, commands):
         """
         Returns string with target definition.
 
@@ -130,7 +134,7 @@ class MakefileToolset(Toolset):
     Base class for makefile-based toolsets.
     """
 
-    #: :class:`MakefileFormatter` class for this toolset.
+    #: :class:`MakefileFormatter`-derived class for this toolset.
     Formatter = None
 
     #: Default filename from output makefile.
@@ -171,8 +175,7 @@ class MakefileToolset(Toolset):
                 top_srcpath=os.path.dirname(module.source_file)
             )
 
-        mk_fmt = self.Formatter()
-        expr_fmt = _MakefileExprFormatter(mk_fmt, paths_info)
+        expr_fmt = _MakefileExprFormatter(self.Formatter, paths_info)
 
         f = io.OutputFile(output)
 
@@ -188,7 +191,7 @@ class MakefileToolset(Toolset):
                     # FIXME: handle multi-output nodes too
                     assert len(node.outputs) == 1
                     out = node.outputs[0]
-                text = mk_fmt.target(
+                text = self.Formatter.target(
                         name=expr_fmt.format(out),
                         deps=[expr_fmt.format(i) for i in node.inputs],
                         commands=[expr_fmt.format(c) for c in node.commands])
