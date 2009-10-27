@@ -56,7 +56,7 @@ class Expr(object):
         self.pos = None
 
 
-    def as_py(self, ctxt=None):
+    def as_py(self):
         """
         Returns the expression as Python value (e.g. a list of strings) if it
         evaluates to a constant literal. Throws an exception if the expression
@@ -66,9 +66,6 @@ class Expr(object):
 
         Use :class:`bkl.expr.Formatter` if you need to format expressions
         into strings.
-
-        :param ctxt: The :class:`bkl.expr.EvalContext` to evaluate the
-            expression in.
         """
         raise NotImplementedError
 
@@ -88,7 +85,7 @@ class LiteralExpr(Expr):
         self.value = value
 
 
-    def as_py(self, ctxt=None):
+    def as_py(self):
         return self.value
 
 
@@ -107,8 +104,8 @@ class ListExpr(Expr):
         self.items = items
 
 
-    def as_py(self, ctxt=None):
-        return [ i.as_py(ctxt) for i in self.items ]
+    def as_py(self):
+        return [ i.as_py() for i in self.items ]
 
 
     def __str__(self):
@@ -128,8 +125,8 @@ class ConcatExpr(Expr):
         self.items = items
 
 
-    def as_py(self, ctxt=None):
-        return "".join(i.as_py(ctxt) for i in self.items)
+    def as_py(self):
+        return "".join(i.as_py() for i in self.items)
 
 
     def __str__(self):
@@ -142,7 +139,7 @@ class NullExpr(Expr):
     Empty/unset value.
     """
 
-    def as_py(self, ctxt=None):
+    def as_py(self):
         return None
 
 
@@ -172,7 +169,7 @@ class ReferenceExpr(Expr):
         self.context = context
 
 
-    def as_py(self, ctxt=None):
+    def as_py(self):
         raise NonConstError(self)
 
 
@@ -228,10 +225,13 @@ class PathExpr(Expr):
         self.anchor = anchor
 
 
-    def as_py(self, ctxt=None):
-        # FIXME: this code doesn't account for the anchor
+    def as_py(self, top_srcdir=None):
+        assert top_srcdir, \
+               "PathExpr.as_py() can only be called with top_scrdir argument"
+        assert self.anchor == ANCHOR_SRCDIR, \
+               "PathExpr.as_py() can only be used with top_srcdir-relative paths"
         comp = (e.as_py() for e in self.components)
-        return os.path.sep.join(comp)
+        return os.path.join(top_srcdir, os.path.sep.join(comp))
 
 
     def __str__(self):
@@ -277,43 +277,6 @@ class PathExpr(Expr):
 
         comps = self.components[:-1] + [LiteralExpr(tail)]
         return PathExpr(comps, self.anchor)
-
-
-
-class EvalContext(object):
-    """
-    Evaluation context information.
-
-    This structure is passed to some functions that work with :class:`Expr`
-    and that need to know additional information in order to process the
-    expression. For example, the :class:`bkl.expr.Formatter` class needs extra
-    information to be able to format file paths using the right separator.
-
-    All of the values may be ``None`` if they are not known yet.
-
-    .. attribute:: dirsep
-
-       Separator to separate path components ("/" on Unix and "\\" on Windows).
-
-    .. attribute:: outdir
-
-       Current output directory, i.e. the directory into which Bakefile is
-       writing files at the moment the context is used, relative to the project
-       root, in Unix syntax. This value may (and typically does) change during
-       processing -- for example, it may be ``build/msvc2005`` when generating
-       main library project for VC++ 2005, ``build/msvc2008`` when creating the
-       same for VC++ 2008 and ``examples/build/msvc2008`` for a submodule).
-
-    .. attribute:: topdir
-
-       Top directory of the source tree. It is a native path pointing to the
-       top directory. It is most notably used by PathExpr.as_py().
-    """
-
-    def __init__(self):
-        self.dirsep = None
-        self.outdir = None
-        self.topdir = None
 
 
 
