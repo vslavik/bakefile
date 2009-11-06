@@ -1,3 +1,8 @@
+bakefile (0.2.8) unstable; urgency=low
+  * msvc: fixed incorrect compiler flags for debug info without debug runtime
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Nov, 05 Thu 2009 19:46:10 +0100
+
 bakefile (0.2.7) unstable; urgency=low
 
   * added getTagAttrib() helper (#97)
