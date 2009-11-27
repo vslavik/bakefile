@@ -28,6 +28,9 @@
           <option>-D</option><replaceable
             class="parameter">VAR</replaceable>=<replaceable class="parameter">VALUE</replaceable>
         </arg>
+        <arg choice="opt" rep="repeat">
+          <option>-I</option><replaceable class="parameter">PATH</replaceable>
+        </arg>
         <arg choice="opt">
           <option>-c</option>
         </arg>
@@ -128,6 +131,18 @@
               <para>
                 Pass variable definition to Bakefile, overriding any
                 definition in description file or the input bakefile.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>
+              <option>-I</option><replaceable class="parameter">PATH</replaceable>
+            </term>
+            <listitem>
+              <para>
+                Add path to the list of directories where Bakefile looks for
+                rules and output templates.
               </para>
             </listitem>
           </varlistentry>

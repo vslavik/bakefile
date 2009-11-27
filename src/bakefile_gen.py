@@ -558,6 +558,9 @@ def run(args):
     parser.add_option('-D',
                       action="append", dest='defines', metavar='VAR=VALUE',
                       help="add variable or option definition in addition to -D options defined in Bakefiles.bkgen's <add-flags>")
+    parser.add_option('-I',
+                      action="append", dest='includes', metavar='PATH',
+                      help='search for bakefile rules in PATH')
     parser.add_option('-c', '--clean',
                       action="store_true", dest='clean',
                       default=0,
@@ -612,12 +615,14 @@ def run(args):
         options.bakefiles = options.bakefiles.replace('/',os.sep).split(',')
     options.jobs = int(options.jobs)
 
-    moreDefines=[]
+    moreFlags=[]
     if options.defines != None:
-        moreDefines = ['-D%s' % x for x in options.defines]
+        moreFlags += ['-D%s' % x for x in options.defines]
+    if options.includes != None:
+        moreFlags += ['-I%s' % x for x in options.includes]
  
     try:
-        loadTargets(os.path.abspath(options.descfile), moreDefines)
+        loadTargets(os.path.abspath(options.descfile), moreFlags)
         filterFiles(options.bakefiles, options.formats)
         if options.clean:
             cleanTargets(pretend=options.pretend, dryRun=options.dryRun)
