@@ -124,9 +124,12 @@ class ModelPart(object):
     def get_variable(self, name):
         """
         Returns variable object for given variable or None if it is not
-        defined.
+        defined. If the variable is not defined in this scope, looks in the
+        parent. In other words, None is returned only if the variable isn't
+        defined anywhere.
+
+        .. seealso:: :meth:`get_variable_value()`
         """
-        # FIXME: implement recursive lookup
         if name in self.variables:
             return self.variables[name]
         else:
@@ -139,7 +142,10 @@ class ModelPart(object):
     def get_variable_value(self, name):
         """
         Similar to get_variable(), but returns the expression with variable's
-        value. Throws and exception if the variable isn't defined.
+        value. Throws and exception if the variable isn't defined, neither in
+        this scope or in any of its parent scopes.
+
+        .. seealso:: :meth:`get_variable()`
         """
         var = self.get_variable(name)
         if not var:
