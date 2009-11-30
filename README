@@ -3,10 +3,10 @@
  Requirements
 --------------
 
-Python >= 2.3.0, including builtin XML modules. It is highly recommended to
-install libxml2-python as well, but it is not required.  (In Debian 3.0, these
-are in python2.3, python2.3-dev, python2.3-xmlbase and
-libxml2-python2.3 packages.)
+Python >= 2.3.0 (last version tested is 2.6.4), including builtin XML modules.
+It is highly recommended to install libxml2-python as well, but it is not
+required.  (In Debian/Ubuntu, these are in python2.x, python2.x-dev,
+python2.x-xmlbase and libxml2-python2.x packages.)
 
 
  Building Bakefile
@@ -18,9 +18,9 @@ Requirements: installed Python (including headers).
 On Windows, either download installer package or compile it by running
 nmake -f makefile.vc. You will need Python installed in directory
 specified at the beginning of makefile.vc and the same Visual C++ version that
-was used to build Python (VC7 for 2.4+, VC6 for 2.3).  Note that makefile.vc
-builds bakefile.exe and bakefile_gen.exe binaries that work only if you have
-Python installed in the same directory where they are!
+was used to build Python (VC9 for 2.6, VC7 for 2.4 and 2.5, VC6 for 2.3).
+Note that makefile.vc builds bakefile.exe and bakefile_gen.exe binaries that
+work only if you have Python installed in the same directory where they are!
 
 
  Building from Subversion repository
