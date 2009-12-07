@@ -25,6 +25,7 @@
 import copy
 import types
 import error, expr, vartypes, utils
+import props
 
 class Variable(object):
     """
@@ -59,6 +60,23 @@ class Variable(object):
         self.type = type
         self.value = value
         self.readonly = readonly
+
+
+    @staticmethod
+    def from_property(prop, value):
+        """
+        Creates a variable from property *prop*. In particular, takes the type
+        and :attr:`readonly` attribute from the property. Properties' default
+        value is *not* assigned; *value* is used instead.
+        """
+        v = Variable(name=prop.name,
+                     value=None,
+                     type=prop.type,
+                     readonly=prop.readonly)
+        # this is intentional; if the property is read-only,
+        # set_value() will fail:
+        v.set_value(value)
+        return v
 
 
     def set_value(self, value):
@@ -103,24 +121,6 @@ class ModelPart(object):
         return dict(x for x in self.__dict__.iteritems() if x[0] != "parent")
 
 
-    def _init_from_properties(self, props):
-        """
-        Creates variables for properties with default values. Properties are
-        taken from a list or iterator (e.g. as returned by
-        :meth:`bkl.api.Extension.all_properties()` on
-        :class:`bkl.api.TargetType` or :class:`bkl.api.Toolset`).
-
-        :param props_list: Properties to process.
-
-        .. seealso:: :class:`bkl.api.Extension`,
-        """
-        for p in props:
-            self.add_variable(Variable(p.name,
-                                       value=p.default_expr(self),
-                                       type=p.type,
-                                       readonly=p.readonly))
-
-
     def get_variable(self, name):
         """
         Returns variable object for given variable or None if it is not
@@ -129,6 +129,9 @@ class ModelPart(object):
         defined anywhere.
 
         .. seealso:: :meth:`get_variable_value()`
+
+        .. note:: Unlike :meth:`get_variable_value()`, this method doesn't
+                  look for properties' default values.
         """
         if name in self.variables:
             return self.variables[name]
@@ -145,18 +148,43 @@ class ModelPart(object):
         value. Throws and exception if the variable isn't defined, neither in
         this scope or in any of its parent scopes.
 
+        If variable *name* is not explicitly defined in the model, but a
+        property with the same name exists in this scope, then its default
+        value is used.
+
         .. seealso:: :meth:`get_variable()`
         """
         var = self.get_variable(name)
-        if not var:
-            raise error.Error("unknown variable \"%s\"" % name)
-        return var.value
+
+        if var is not None:
+            return var.value
+
+        # else, as last bet, try to find a property with this name
+        scope = self
+        while scope:
+            p = scope.get_prop(name)
+            if p is not None:
+                return p.default_expr(scope)
+            scope = scope.parent
+        raise error.Error("unknown variable \"%s\"" % name)
 
 
     def add_variable(self, var):
         """Adds a new variable object."""
         assert var.name not in self.variables
         self.variables[var.name] = var
+
+
+    def get_prop(self, name):
+        """
+        Try to get a property *name*. Called by get_variable_value() if no
+        variable with such name could be found.
+
+        Note that unlike :meth:`get_variable()`, this one doesn't work
+        recursively upwards, but finds only properties that are defined for
+        this scope.
+        """
+        raise NotImplementedError
 
 
 
@@ -200,6 +228,11 @@ class Project(ModelPart):
                     yield v
 
 
+    def get_prop(self, name):
+        # there are no project-global properties (yet)
+        return None
+
+
 
 class Module(ModelPart):
     """
@@ -229,6 +262,9 @@ class Module(ModelPart):
         self.targets[target.name] = target
 
 
+    def get_prop(self, name):
+        return props.get_module_prop(name)
+
 
 class Target(ModelPart):
     """
@@ -249,4 +285,7 @@ class Target(ModelPart):
         super(Target, self).__init__(parent)
         self.name = name
         self.type = target_type
-        self._init_from_properties(target_type.all_properties())
+
+
+    def get_prop(self, name):
+        return props.get_target_prop(self.type, name)

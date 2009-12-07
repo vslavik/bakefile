@@ -25,7 +25,6 @@
 from ..api import TargetType
 from ..expr import LiteralExpr, ListExpr, ConcatExpr, ReferenceExpr
 from ..model import Module, Target, Variable
-from ..stdprops import STD_MODULE_PROPS
 from ..parser.ast import *
 from ..error import Error, ParserError
 
@@ -60,7 +59,6 @@ class Builder(object):
         """Returns constructed model, as :class:`bkl.model.Module` instance."""
         mod = Module(parent, source_file=self.ast.filename)
         self.context = mod
-        self.context._init_from_properties(STD_MODULE_PROPS)
 
         self.handle_children(self.ast.children, self.context)
         assert self.context is mod
@@ -102,12 +100,24 @@ class Builder(object):
     def on_assignment(self, node):
         varname = node.var
         value = self._build_expression(node.value)
-
         var = self.context.get_variable(varname)
+
         if var is None:
-            # create new variable
-            var = Variable(varname, value)
+            # Create new variable.
+            #
+            # If there's an appropriate property with the same name, then
+            # this assignment expression needs to be interpreted as assignment
+            # to said property. In other words, the new variable's type
+            # must much that of the property.
+            prop = self.context.get_prop(varname)
+
+            if prop:
+                var = Variable.from_property(prop, value)
+            else:
+                var = Variable(varname, value)
+
             self.context.add_variable(var)
+
         else:
             # modify existing variable
             var.set_value(value)

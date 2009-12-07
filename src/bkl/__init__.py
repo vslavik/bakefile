@@ -69,7 +69,3 @@ sys.modules["bkl.plugins"] = imp.new_module("bkl.plugins")
 
 for p in PLUGINS_PATH:
     load_plugins_from_dir(p)
-
-# initialize basics:
-import stdprops
-stdprops._init()

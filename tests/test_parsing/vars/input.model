@@ -1,6 +1,5 @@
 module {
   variables {
-    toolsets = []
     FOO = ["value1", "value2"]
     SINGLE = "one"
     BAR = ["bar", "zar    foo", "let", "x"]

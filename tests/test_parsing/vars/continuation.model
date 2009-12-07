@@ -1,6 +1,5 @@
 module {
   variables {
-    toolsets = []
     foo = ["one", "two", "three", "four"]
   }
   targets {

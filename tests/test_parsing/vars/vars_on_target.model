@@ -1,12 +1,8 @@
 module {
   variables {
-    toolsets = []
   }
   targets {
     exe foo {
-        sources = []
-        id = "foo"
-        deps = []
         my_var = "42"
         my_name = "a_name"
     }

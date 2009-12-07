@@ -1,6 +1,5 @@
 module {
   variables {
-    toolsets = []
     x = "1"
   }
   targets {

@@ -4,11 +4,9 @@ module {
   }
   targets {
     exe hello {
-        sources = ["hello.c"]
-        id = "hello"
-        deps = []
         name = "hello"
         src = "hello"
+        sources = ["hello.c"]
     }
   }
 }

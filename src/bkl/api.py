@@ -386,7 +386,7 @@ class TargetType(Extension):
     #: List of all properties supported on this target type,
     #: as :class:`Property` instances. Note that properties list is
     #: automagically inherited from base classes, if any.
-    properties = [] # will be initialized to stdprops.STD_TARGET_PROPS
+    properties = []
 
     @abstractmethod
     def get_build_subgraph(self, target):
