@@ -1,5 +1,6 @@
 
 - added -I flag to bakefile_gen too
+- msevc4prj: fixed breakage of <debug-info> introduced in 0.2.7
 
 
 Version 0.2.8
