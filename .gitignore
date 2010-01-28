@@ -5,3 +5,4 @@ docs/ref
 docs/.doctrees
 docs/.build
 docs/html
+*.py[oc]
