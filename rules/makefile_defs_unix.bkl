@@ -119,7 +119,7 @@
      https://sourceforge.net/tracker/?func=detail&aid=949940&group_id=83016&atid=568029
      (See makefile_defs_gnu.bkl for GNU-specific code)
      -->
-    <if cond="FORMAT!='gnu'">
+    <if cond="FORMAT not in ['gnu','suncc']">
         <template id="__commands_templ_C">
             <set var="__COMPILE_C_CMD" eval="0">
                 $(CCC) -c -o $@ $(__cflags) $(src)

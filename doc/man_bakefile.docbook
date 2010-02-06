@@ -194,6 +194,11 @@
                       </row>
 
                       <row>
+                        <entry>suncc</entry>
+                        <entry>GNU makefile for SunCC compiler</entry>
+                      </row>
+
+                      <row>
                         <entry>symbian</entry>
                         <entry>Symbian development files</entry>
                       </row>

@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!--
+
+  This file is part of Bakefile (http://www.bakefile.org)
+
+  Copyright (C) 2010 Vaclav Slavik
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to
+  deal in the Software without restriction, including without limitation the
+  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+  sell copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  IN THE SOFTWARE.
+
+  $Id$
+
+-->
+<makefile>
+
+    <set var="COMPILER">suncc</set>
+    <set var="MAKEFILE_SYNTAX">suncc</set>
+
+    <set var="PLATFORM_UNIX">1</set>
+    <set var="TOOLSET">unix</set>
+    <set var="EOL_STYLE">unix</set>
+
+    <option name="INSTALL">
+        <default-value>install</default-value>
+        <description>'install' program location</description>
+    </option>
+
+    <option name="prefix">
+        <default-value>/usr/local</default-value>
+        <description>
+            Location where the package is installed by 'make install'
+        </description>
+    </option>
+
+    <set var="PREFIX">$(prefix)</set>
+
+    <option name="DESTDIR">
+        <description>
+            Destination root (/ is used if empty)
+        </description>
+    </option>
+
+    <include file="makefile.bkl"/>
+
+    <!-- We don't support sonames here, so libname==dllname: -->
+    <tag-info name="libname" position="after:dllname"/>
+    <define-tag name="libname" rules="dll">
+        <set var="__dllname">$(value)</set>
+    </define-tag>
+
+
+    <!-- =============================================================== -->
+    <!--                         "make clean":                           -->
+    <!-- =============================================================== -->
+
+    <action id="clean" template="__phony">
+        <set var="__builddir" eval="0">$(BUILDDIR)</set>
+        <command>
+            $(RM) $(__builddir)/*$(OBJEXT)
+            $(RM) $(__builddir)/*.d
+        </command>
+    </action>
+
+    <!-- =============================================================== -->
+    <!--                            output:                              -->
+    <!-- =============================================================== -->
+
+    <!-- see format_features.bkl for explanation: -->
+    <set var="FORMAT_OUTPUT_VARIABLES">
+        __targetdir __targetname __deps __command __is_phony
+    </set>
+
+    <output file="$(OUTPUT_FILE)" writer="gnumake.empy"/>
+
+    <if cond="OPTIONS_FILE!='' and WRITE_OPTIONS_FILE=='1'">
+    <output file="$(os.path.join(os.path.dirname(OUTPUT_FILE), OPTIONS_FILE))"
+            writer="gnumake-opts.empy"/>
+    </if>
+
+</makefile>

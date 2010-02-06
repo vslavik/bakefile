@@ -114,5 +114,10 @@
         <description>Symbian development files</description>
         <default-filename>bld.inf</default-filename>
     </format>
-    
+
+    <format id="suncc">
+        <description>GNU makefiles for Sun CC compiler</description>
+        <default-filename>Makefile.suncc</default-filename>
+    </format>
+
 </bakefile-manifest>

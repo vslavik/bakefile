@@ -58,6 +58,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/makefile_defs_dmars_smake.bkl \
               rules/makefile_defs_msvc.bkl \
               rules/makefile_defs_gnu.bkl \
+              rules/makefile_defs_suncc.bkl \
               rules/makefile_defs_mingw.bkl \
               rules/makefile_defs_watcom.bkl \
               rules/makefile_defs_unix.bkl \
@@ -77,6 +78,7 @@ rules_DATA =  rules/FORMATS.bkmanifest \
               rules/msvs2008prj.bkl \
               rules/mingw.bkl \
               rules/gnu.bkl \
+              rules/suncc.bkl \
               rules/watcom.bkl \
               rules/xcode2.bkl \
               rules/symbian.bkl \
