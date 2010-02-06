@@ -32,6 +32,8 @@
 
     <set var="PIC_CFLAGS">-pic -DPIC</set>
 
+    <set var="SUNCXX_LINK_FLAGS">-lCrun -lCstd</set>
+
     <!--
       We define compilation differently for GNU than for generic Unix:
         * dependencies tracking is used
@@ -64,10 +66,11 @@
     <set var="LINK_DLL_FLAGS">-G</set>
     <set var="LINK_MODULE_FLAGS">-G</set>
 
+    <set var="__LINKER_CXX" eval="0">$(CXX) $(SUNCXX_LINK_FLAGS)</set>
     <set var="__DLL_LINKER_CC" eval="0">$(CC) $(LINK_DLL_FLAGS) -pic -o</set>
-    <set var="__DLL_LINKER_CXX" eval="0">$(CXX) $(LINK_DLL_FLAGS) -pic -o</set>
+    <set var="__DLL_LINKER_CXX" eval="0">$(CXX) $(LINK_DLL_FLAGS) $(SUNCXX_LINK_FLAGS) -pic -o</set>
     <set var="__MODULE_LINKER_CC" eval="0">$(CC) $(LINK_MODULE_FLAGS) -pic -o</set>
-    <set var="__MODULE_LINKER_CXX" eval="0">$(CXX) $(LINK_MODULE_FLAGS) -pic -o</set>
+    <set var="__MODULE_LINKER_CXX" eval="0">$(CXX) $(LINK_MODULE_FLAGS) $(SUNCXX_LINK_FLAGS) -pic -o</set>
 
     <set var="__FLAG_DEBUG_ON">-g</set>
     <set var="__FLAG_DEBUG_ON_LINKER">-g</set>
