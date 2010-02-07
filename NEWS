@@ -2,6 +2,7 @@
 - added -I flag to bakefile_gen too
 - msevc4prj: fixed breakage of <debug-info> introduced in 0.2.7
 - added suncc backend
+- msvs2005prj, msvs2008prj: preliminary support for x64 builds
 
 
 Version 0.2.8

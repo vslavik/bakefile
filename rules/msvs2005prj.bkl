@@ -37,6 +37,7 @@
          by default, only PC Win32 targets are generated. Allowed values are:
 
          "win32"                    - Win32
+         "win64"                    - x64
          "pocketpc2003"             - Pocket PC 2003 (ARMV4)
       -->
     <set var="MSVS_PLATFORMS" overwrite="0">win32</set>
@@ -45,6 +46,7 @@
         $(','.join([substituteFromDict(x,
                     {
                        'win32'        : 'Win32',
+                       'win64'        : 'x64',
                        'pocketpc2003' : 'Pocket PC 2003 (ARMV4)',
                      })
                    for x in MSVS_PLATFORMS.split(',')]))

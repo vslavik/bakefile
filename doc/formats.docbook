@@ -40,6 +40,10 @@
               <entry>Win32</entry>
             </row>
             <row>
+              <entry><literal>win64</literal></entry>
+              <entry>x64</entry>
+            </row>
+            <row>
               <entry><literal>pocketpc2003</literal></entry>
               <entry>Pocket PC 2003 (ARMV4)</entry>
             </row>
