@@ -78,6 +78,11 @@ optReferencesDefault    = '0'
 optNoReferences         = '1'
 optReferences           = '2'
 
+machineX86              = '1'
+machineARM              = '3'
+machineAMD64            = '17'
+
+
 # ------------------------------------------------------------------------
 #   extended minidom classes to create XML file with specified attributes
 #   order (VC2003 projet file must have attribute "Name" as first)
@@ -320,6 +325,11 @@ class ProjectGeneratorMsvc9:
         """Returns true if given config targets embedded device."""
         cfg = configs[config][0]['MSVS_PLATFORM']
         return cfg == 'pocketpc2003'
+
+    def isX64Config(self, config):
+        """Returns true if given config targets a 64bit system."""
+        cfg = configs[config][0]['MSVS_PLATFORM']
+        return cfg == 'win64'
 
 
     def assignGUIDs(self, sln_targets):
@@ -694,13 +704,16 @@ Microsoft Visual Studio Solution File, Format Version 10.00
                              "%s" % self.app_type_code[cfg._type_nick])
 
         if self.isEmbeddedConfig(c):
-            tool.setAttribute("TargetMachine", "3")
+            tool.setAttribute("TargetMachine", machineARM)
             tool.setAttribute("DelayLoadDLLs", "$(NOINHERIT)")
             if cfg._rtl_dbg == 'off':
                 tool.setAttribute("OptimizeReferences", optReferences)
                 tool.setAttribute("EnableCOMDATFolding", "2")
         else:
-            tool.setAttribute("TargetMachine", "1")
+            if self.isX64Config(c):
+                tool.setAttribute("TargetMachine", machineAMD64)
+            else:
+                tool.setAttribute("TargetMachine", machineX86)
             # optimize linking unless we're using debug RTL (in which case we
             # don't build production version anyhow) or we don't use /debug at
             # all (in which case it's optimized by default)
