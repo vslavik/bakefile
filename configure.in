@@ -1,6 +1,6 @@
 AC_PREREQ(2.53)
 
-AC_INIT([bakefile], [0.2.8], [vslavik@fastmail.fm])
+AC_INIT([bakefile], [0.2.8], [bakefile-devel@lists.sourceforge.net])
 
 AC_CONFIG_SRCDIR([bakefile.vim])
 AC_CONFIG_AUX_DIR([admin])
@@ -30,7 +30,8 @@ fi
 AM_CONDITIONAL(BUILD_DOCS, test $build_docs = yes)
 
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
         Makefile
         doc/Makefile
     ])
+AC_OUTPUT

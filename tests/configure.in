@@ -1,7 +1,8 @@
 AC_PREREQ(2.53)
-AC_INIT(aclocal.m4)
+AC_INIT([bakefile-tests], [0.1], [bakefile-devel@lists.sourceforge.net])
+AC_CONFIG_SRCDIR([Bakefiles.bkgen])
 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_HOST
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -41,35 +42,35 @@ AC_BAKEFILE([m4_include(autoconf_inc.m4)])
 # NOTE: when updating the following list remember to update also
 #       the list in the root.bkl and Bakefile.bkgen files.
 #
-AC_OUTPUT([
-           Makefile
-           cond/Makefile
-           cond_install/Makefile
-           condlinking/Makefile
-           condvar_transitivity/Makefile
-           datafiles/Makefile
-           debug/Makefile
-           definetag/Makefile
-           defineglobaltag/Makefile
-           dll/Makefile
-           echo/Makefile
-           envvar/Makefile
-           features/Makefile
-           filelist/Makefile
-           gettext/Makefile
-           headers/Makefile
-           hello/Makefile
-           includeonce/Makefile
-           isdefined/Makefile
-           library/Makefile
-           module/Makefile
-           paths/Makefile
-           pkgconfig/Makefile
-           pkgconfig/test.pc
-           pch/Makefile
-           regressions/Makefile
-           subproject/Makefile
-           subproject/subdir/Makefile
-           variants/Makefile
-         ])
-
+AC_CONFIG_FILES([
+       Makefile
+       cond/Makefile
+       cond_install/Makefile
+       condlinking/Makefile
+       condvar_transitivity/Makefile
+       datafiles/Makefile
+       debug/Makefile
+       definetag/Makefile
+       defineglobaltag/Makefile
+       dll/Makefile
+       echo/Makefile
+       envvar/Makefile
+       features/Makefile
+       filelist/Makefile
+       gettext/Makefile
+       headers/Makefile
+       hello/Makefile
+       includeonce/Makefile
+       isdefined/Makefile
+       library/Makefile
+       module/Makefile
+       paths/Makefile
+       pkgconfig/Makefile
+       pkgconfig/test.pc
+       pch/Makefile
+       regressions/Makefile
+       subproject/Makefile
+       subproject/subdir/Makefile
+       variants/Makefile
+     ])
+AC_OUTPUT
