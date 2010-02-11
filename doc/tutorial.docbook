@@ -103,11 +103,14 @@ int main()
   	  example program would look like this:
       <programlisting><![CDATA[
 AC_PREREQ(2.53)
-AC_INIT(aclocal.m4)
-AC_CANONICAL_SYSTEM
+AC_INIT([hello], [1.0], [author@example.com])
+dnl pass some unique file file to AC_CONFIG_SRCDIR
+AC_CONFIG_SRCDIR([autoconf_inc.m4])
+AC_CANONICAL_HOST
 DEBUG=0
 AC_BAKEFILE([m4_include(autoconf_inc.m4)])
-AC_OUTPUT([Makefile])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
 ]]></programlisting>
     </para>
     <para>
@@ -123,8 +126,10 @@ AC_OUTPUT([Makefile])
   	  debug option:
       <programlisting><![CDATA[
 AC_PREREQ(2.53)
-AC_INIT(aclocal.m4)
-AC_CANONICAL_SYSTEM
+AC_INIT([hello], [1.0], [author@example.com])
+dnl pass some unique file file to AC_CONFIG_SRCDIR
+AC_CONFIG_SRCDIR([autoconf_inc.m4])
+AC_CANONICAL_HOST
 
 AC_ARG_ENABLE(debug,
               [  --enable-debug          Enable debugging information],
@@ -142,7 +147,8 @@ else
 fi
 
 AC_BAKEFILE([m4_include(autoconf_inc.m4)])
-AC_OUTPUT([Makefile])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
 ]]></programlisting>
     </para>
 
