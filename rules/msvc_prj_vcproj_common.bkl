@@ -158,19 +158,6 @@
     <define-tag name="msvc-guid" rules="_compiled">
         <set var="_msvc_guid">$(value)</set>
     </define-tag>
-    
-    <define-tag name="cppflags-msvc" rules="exe,lib,dll,module">
-        <cppflags>$(value)</cppflags>
-    </define-tag>
-    <define-tag name="cflags-msvc" rules="exe,lib,dll,module">
-        <cflags>$(value)</cflags>
-    </define-tag>
-    <define-tag name="cxxflags-msvc" rules="exe,lib,dll,module">
-        <cxxflags>$(value)</cxxflags>
-    </define-tag>
-    <define-tag name="ldflags-msvc" rules="exe,dll,module">
-        <ldflags>$(value)</ldflags>
-    </define-tag>
 
     <!-- ================ end of included msvc_common.bkl copy ========= -->
 
