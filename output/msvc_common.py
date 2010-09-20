@@ -49,15 +49,20 @@ def fixFlagsQuoting(text):
     """Replaces e.g. /DFOO with /D "FOO" and /DFOO=X with /D FOO=X."""
     return re.sub(r'\/([DIid]) ([^ \"=]+)([ $])', r'/\1 "\2"\3',
            re.sub(r'\/([DIid]) ([^ \"=]+)=([^ \"]*)([ $])', r'/\1 \2=\3\4', text))
-    
+
 
 def sortByBasename(files):
     def __sort(x1, x2):
         f1 = x1.split('\\')[-1]
         f2 = x2.split('\\')[-1]
-        if f1 == f2: return 0
-        elif f1 < f2: return -1
-        else: return 1
+        if f1 < f2:
+            return -1
+        elif f1 > f2:
+            return 1
+        else: # f1 == f2
+            # if basenames don't differ, sort by full name
+            return cmp(x1, x2)
+
     files.sort(__sort)
 
 
