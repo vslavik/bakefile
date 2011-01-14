@@ -54,6 +54,7 @@
         <define-tag name="headers"/>
         <define-tag name="libname"/>
         <define-tag name="dllname"/>
+        <define-tag name="exename"/>
         <define-tag name="dirname"/>
         <define-tag name="dependency-of"/>
         <define-tag name="debug-info"/>
