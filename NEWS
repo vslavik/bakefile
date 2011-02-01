@@ -3,6 +3,7 @@
 - msevc4prj: fixed breakage of <debug-info> introduced in 0.2.7
 - added suncc backend
 - msvs2005prj, msvs2008prj: added support for x64 builds
+- msvs2008prj: fixed compatibility with VS 2010 (Stefan Csomor)
 
 
 Version 0.2.8

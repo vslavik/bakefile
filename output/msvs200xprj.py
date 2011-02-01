@@ -215,6 +215,10 @@ def mk_list(list):
     # remove empty items from the list:
     return ";".join([x for x in list.split(";") if len(x) > 0])
 
+def mk_listsp(list):
+    # remove empty items from the list:
+    return ";".join([x for x in list.split(" ") if len(x) > 0])
+
 def bool2vcstr(value):
     """Returns "true"/"false" or "TRUE"/"FALSE" string depending on format
        version."""
@@ -893,7 +897,11 @@ Microsoft Visual Studio Solution File, Format Version 10.00
             elif deps.startswith('$(SOURCE) '):
                 deps = deps[len('$(SOURCE) '):]
 
-            el.setAttribute('AdditionalDependencies', deps)
+            if _MSVS_SLN_VERSION == "10.00":
+                el.setAttribute('AdditionalDependencies', mk_listsp(deps))
+            else:
+                el.setAttribute('AdditionalDependencies', deps)
+
         return el
 
 
