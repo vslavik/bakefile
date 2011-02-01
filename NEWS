@@ -1,4 +1,7 @@
 
+Version 0.2.9
+-------------
+
 - added -I flag to bakefile_gen too
 - msevc4prj: fixed breakage of <debug-info> introduced in 0.2.7
 - added suncc backend

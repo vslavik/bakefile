@@ -1,6 +1,6 @@
 AC_PREREQ(2.53)
 
-AC_INIT([bakefile], [0.2.8], [bakefile-devel@lists.sourceforge.net])
+AC_INIT([bakefile], [0.2.9], [bakefile-devel@lists.sourceforge.net])
 
 AC_CONFIG_SRCDIR([bakefile.vim])
 AC_CONFIG_AUX_DIR([admin])
