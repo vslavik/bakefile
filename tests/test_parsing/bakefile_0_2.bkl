@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<makefile>
+
+    <requires version="0.1.1"/>
+
+    <if cond="FORMAT not in ['msvs2003prj','msvs2005prj','msvs2008prj']">
+        <set var="BUILDDIR">
+            <if cond="TOOLSET=='win32'">build-$(COMPILER)</if>
+            <if cond="TOOLSET!='win32'">.</if>
+        </set>
+    </if>
+
+    <if cond="FORMAT not in ['msevc4prj','msvs2003prj','msvs2005prj','msvs2008prj']">
+        <exe id="hello">
+            <define>SOMEMACRO</define>
+            <sources>hello.c</sources>
+            <headers>hello.h</headers>
+        </exe>
+        <exe id="hello_cxx">
+            <define>SOMEMACRO</define>
+            <sources>hello.cpp</sources>
+            <headers>hello.h</headers>
+        </exe>
+    </if>
+
+    <exe id="hello_gui">
+        <app-type>gui</app-type>
+        <uid type="symbian2">0x100039CE</uid>
+        <uid type="symbian3">0x10005B91</uid>
+        <define>SOMEMACRO</define>
+        <define>BUILD_AS_GUI</define>
+        <sources>hello.cpp</sources>
+        <headers>hello.h</headers>
+        <win32-res>hello.rc</win32-res>
+        <symbian-res>hello.rss</symbian-res>
+    </exe>
+</makefile>
+

@@ -23,6 +23,7 @@
 #
 
 import os, os.path
+import pytest
 import bkl.parser, bkl.error
 from glob import glob
 
@@ -77,3 +78,10 @@ expected tree:
 """ % expected
 
     assert as_text == expected
+
+
+def test_parsing_bakefile_0_2_xml():
+    import test_parsing
+    d = os.path.dirname(test_parsing.__file__)
+    with pytest.raises(bkl.error.ParserError):
+        bkl.parser.parse_file(os.path.join(d, "bakefile_0_2.bkl"))

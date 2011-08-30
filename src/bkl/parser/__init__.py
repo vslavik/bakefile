@@ -77,7 +77,15 @@ def parse(code, filename=None):
     parser.filename = filename
     parser.adaptor = ast._TreeAdaptor(filename)
 
-    return parser.program().tree
+    try:
+        return parser.program().tree
+    except ParserError:
+        # Report usage of bkl-ng with old bkl files in user-friendly way:
+        if code.startswith("<?xml"):
+            raise ParserError("this file is incompatible with new Bakefile versions; please use Bakefile 0.2.x to process it",
+                              pos=ast.Position(filename))
+        else:
+            raise
 
 
 def parse_file(filename):
