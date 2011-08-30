@@ -29,6 +29,9 @@ from optparse import OptionParser
 
 
 parser = OptionParser()
+parser.add_option("-v", "--verbose",
+                  action="store_true", dest="verbose", default=False,
+                  help="show verbose output")
 parser.add_option("", "--debug",
                   action="store_true", dest="debug", default=False,
                   help="show debug log")
@@ -42,7 +45,12 @@ if len(args) != 1:
     sys.stderr.write("incorrect number of arguments, exactly 1 .bkl required\n")
     sys.exit(3)
 
-log_level = logging.DEBUG if options.debug else logging.WARNING
+if options.debug:
+    log_level = logging.DEBUG
+elif options.verbose:
+    log_level = logging.INFO
+else:
+    log_level = logging.WARNING
 logging.basicConfig(level=log_level)
 
 
