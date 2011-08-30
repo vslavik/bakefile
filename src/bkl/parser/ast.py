@@ -45,10 +45,10 @@ class Position(object):
 
        Column on the line.
     """
-    def __init__(self):
-        self.filename = None
-        self.line = None
-        self.column = None
+    def __init__(self, filename=None, line=None, column=None):
+        self.filename = filename
+        self.line = line
+        self.column = column
 
 
     def __str__(self):
