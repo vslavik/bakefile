@@ -52,6 +52,25 @@ class GnuCCompiler(FileCompiler):
 
 
 
+class GnuCXXompiler(FileCompiler):
+    """
+    GNU C++ compiler.
+    """
+    name = "GNU C++"
+    in_type = bkl.compilers.CxxFileType.get()
+    out_type = bkl.compilers.ObjectFileType.get()
+
+    def commands(self, input, output):
+        # FIXME: use a parser instead of constructing the expression manually
+        #        in here
+        return [ListExpr([
+                  LiteralExpr("c++ -c -o"),
+                  output,
+                  input
+                ])]
+
+
+
 class GnuLinker(FileCompiler):
     """
     GNU linker.
