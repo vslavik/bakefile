@@ -363,6 +363,15 @@ class FileCompiler(Extension):
     cardinality = ONE_TO_ONE
 
 
+    def is_supported(self, toolset):
+        """
+        Returns whether given toolset is supported by this compiler.
+
+        Default implementation returns True for all toolsets.
+        """
+        return True
+
+
     @abstractmethod
     def commands(self, input, output):
         """
@@ -389,7 +398,7 @@ class TargetType(Extension):
     properties = []
 
     @abstractmethod
-    def get_build_subgraph(self, target):
+    def get_build_subgraph(self, toolset, target):
         """
         Returns list of :class:`bkl.api.BuildNode` objects with description
         of this target's local part of build graph -- that is, its part needed
@@ -398,6 +407,9 @@ class TargetType(Extension):
         Usually, exactly one BuildNode will be returned, but it's possible to
         have TargetTypes that correspond to more than one makefile target
         (e.g. libtool-style libraries or gettext catalogs).
+
+        :param toolset: The toolset used (:class:`bkl.api.Toolset`).
+        :param target:  Target instance (:class:`bkl.model.Target`).
         """
         raise NotImplementedError
 
@@ -415,6 +427,10 @@ class Toolset(Extension):
     puts all the components (platform-specific commands, make syntax, compiler
     invocation, ...) together and writes out the makefiles or projects.
     """
+
+    #: This toolset's compiler's object files type, as :class:`bkl.api.FileType`.
+    # TODO: shouldn't be needed, get_compilation_subgraph() should figure it out.
+    object_type = None
 
     #: List of all properties supported on this target type,
     #: as :class:`Property` instances. Note that properties list is

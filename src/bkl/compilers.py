@@ -31,12 +31,6 @@ from api import FileType, FileCompiler, BuildNode
 from error import Error
 import expr
 
-#: Native compiler's object files
-class ObjectFileType(FileType):
-    name = "object"
-    def __init__(self):
-        FileType.__init__(self, extensions=["o"]) # FIXME: platform
-
 
 #: Native executable file type
 class NativeExeFileType(FileType):
@@ -84,7 +78,7 @@ def get_file_type(extension):
     return __cache_types[extension]
 
 
-def get_compiler(ft_from, ft_to):
+def get_compiler(toolset, ft_from, ft_to):
     """
     Finds the compiler that compiles files of type *ft_from* into *ft_to*.
     Both arguments are :class:`bkl.api.FileType` instances.
@@ -92,31 +86,30 @@ def get_compiler(ft_from, ft_to):
     The returned object is a singleton. If such compiler cannot be found,
     returns None.
     """
-    # FIXME: this is toolset-specific, add toolset to the key
-    key = (ft_from, ft_to)
+    key = (toolset, ft_from, ft_to)
 
     global __cache_compilers
     if key not in __cache_compilers:
         __cache_compilers[key] = None
         for c in FileCompiler.all():
-            if c.in_type == ft_from and c.out_type == ft_to:
+            if c.in_type == ft_from and c.out_type == ft_to and c.is_supported(toolset):
                 __cache_compilers[key] = c
                 break
 
     return __cache_compilers[key]
 
 
-def get_compilation_subgraph(ft_to, outfile, sources):
+def get_compilation_subgraph(toolset, ft_to, outfile, sources):
     """
     Given list of source files (as :class:`bkl.expr.ListExpr`), produces build
     graph with appropriate :class:`bkl.api.BuildNode` nodes.
 
+    :param toolset: The toolset used (as :class:`bkl.api.Toolset`).
     :param ft_to:   Type of the output file to compile to.
     :param outfile: Name of the output file (as :class:`bkl.expr.PathExpr`).
     :param sources: List of source files (as :class:`bkl.expr.PathExpr`).
     """
-    # FIXME: toolset-specific
-
+    
     source_files = expr.all_possible_elements(sources)
 
     # FIXME: support direct many-files-into-one (e.g. java->jar, .cs->exe)
@@ -128,21 +121,23 @@ def get_compilation_subgraph(ft_to, outfile, sources):
         assert isinstance(src, expr.PathExpr)
 
         ext = src.get_extension()
-        objname = src.change_extension("o") # FIXME
+        objname = src.change_extension(toolset.object_type.extensions[0]) # FIXME
         # FIXME: needs to flatten the path too
         objname.anchor = expr.ANCHOR_BUILDDIR
 
         ft_from = get_file_type(ext)
-        compiler = get_compiler(ft_from, ObjectFileType.get())
+        # FIXME: toolset.object_type shouldn't be needed
+        compiler = get_compiler(toolset, ft_from, toolset.object_type)
         if compiler is None:
-            raise Error("cannot determine how to compile \"%s\" files into \"%s\"" % (ft_from.name, ObjectFileType.get().name))
+            raise Error("cannot determine how to compile \"%s\" files into \"%s\"" % (ft_from.name, toolset.object_type.name),
+                        pos=sources.pos)
 
         node = BuildNode(commands=compiler.commands(src, objname),
                          inputs=[src],
                          outputs=[objname])
         objects.append(node)
 
-    linker = get_compiler(ObjectFileType.get(), ft_to)
+    linker = get_compiler(toolset, toolset.object_type, ft_to)
     assert linker
 
     object_files = [o.outputs[0] for o in objects]

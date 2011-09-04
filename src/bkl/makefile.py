@@ -182,7 +182,7 @@ class MakefileToolset(Toolset):
         for v in module.variables:
             pass
         for t in module.targets.itervalues():
-            graph = t.type.get_build_subgraph(t)
+            graph = t.type.get_build_subgraph(self, t)
 
             for node in graph:
                 if node.name:

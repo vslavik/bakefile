@@ -45,8 +45,9 @@ class ExeType(TargetType):
                  doc="Source files."),
         ]
 
-    def get_build_subgraph(self, target):
+    def get_build_subgraph(self, toolset, target):
         return get_compilation_subgraph(
+                        toolset,
                         ft_to=NativeExeFileType.get(),
                         outfile=target.get_variable_value("id"), # FIXME
                         sources=target.get_variable_value("sources"))

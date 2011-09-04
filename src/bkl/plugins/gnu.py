@@ -26,20 +26,33 @@
 GNU tools (GCC, GNU Make, ...) toolset.
 """
 
-from bkl.api import FileCompiler
+from bkl.api import FileCompiler, FileType
 from bkl.makefile import MakefileToolset, MakefileFormatter
 import bkl.compilers
 
 # FIXME: shouldn't be needed later
 from bkl.expr import ListExpr, LiteralExpr
 
-class GnuCCompiler(FileCompiler):
+class GnuObjectFileType(FileType):
+    name = "gnu-object"
+    def __init__(self):
+        FileType.__init__(self, extensions=["o"])
+
+
+
+class GnuFileCompiler(FileCompiler):
+    def is_supported(self, toolset):
+        return toolset == GnuToolset.get()
+
+
+
+class GnuCCompiler(GnuFileCompiler):
     """
     GNU C compiler.
     """
     name = "GNU C"
     in_type = bkl.compilers.CFileType.get()
-    out_type = bkl.compilers.ObjectFileType.get()
+    out_type = GnuObjectFileType.get()
 
     def commands(self, input, output):
         # FIXME: use a parser instead of constructing the expression manually
@@ -52,13 +65,13 @@ class GnuCCompiler(FileCompiler):
 
 
 
-class GnuCXXompiler(FileCompiler):
+class GnuCXXompiler(GnuFileCompiler):
     """
     GNU C++ compiler.
     """
     name = "GNU C++"
     in_type = bkl.compilers.CxxFileType.get()
-    out_type = bkl.compilers.ObjectFileType.get()
+    out_type = GnuObjectFileType.get()
 
     def commands(self, input, output):
         # FIXME: use a parser instead of constructing the expression manually
@@ -71,12 +84,12 @@ class GnuCXXompiler(FileCompiler):
 
 
 
-class GnuLinker(FileCompiler):
+class GnuLinker(GnuFileCompiler):
     """
     GNU linker.
     """
     name = "GNU LD"
-    in_type = bkl.compilers.ObjectFileType.get()
+    in_type = GnuObjectFileType.get()
     out_type = bkl.compilers.NativeExeFileType.get()
 
     def commands(self, input, output):
@@ -108,3 +121,5 @@ class GnuToolset(MakefileToolset):
 
     Formatter = GnuMakefileFormatter
     default_makefile = "GNUmakefile"
+
+    object_type = GnuObjectFileType.get()
