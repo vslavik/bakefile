@@ -138,9 +138,9 @@ class PathType(Type):
         if (isinstance(first, expr.LiteralExpr) and
                 first.value and first.value[0] == "@"):
             anchor = first.value
-            return expr.PathExpr(components[1:], anchor)
+            return expr.PathExpr(components[1:], anchor, pos=e.pos)
         else:
-            return expr.PathExpr(components)
+            return expr.PathExpr(components, pos=e.pos)
 
 
     def validate(self, e):
@@ -202,9 +202,9 @@ class ListType(Type):
         # A non-list expression with single value is a special case of list
         # for convenience, we translate it into single-item list automagically:
         if isinstance(e, expr.ListExpr):
-            return expr.ListExpr([self.item_type.normalize(i) for i in e.items])
+            return expr.ListExpr([self.item_type.normalize(i) for i in e.items], pos=e.pos)
         else:
-            return expr.ListExpr([self.item_type.normalize(e)])
+            return expr.ListExpr([self.item_type.normalize(e)], pos=e.pos)
 
 
 

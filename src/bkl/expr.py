@@ -52,8 +52,8 @@ class Expr(object):
        Location of the expression in source tree.
     """
 
-    def __init__(self):
-        self.pos = None
+    def __init__(self, pos=None):
+        self.pos = pos
 
 
     def as_py(self):
@@ -78,10 +78,14 @@ class LiteralExpr(Expr):
     .. attribute:: value
 
        Value of the literal.
+
+    .. attribute:: pos
+
+       Location of the expression in source tree.
     """
 
-    def __init__(self, value):
-        super(LiteralExpr, self).__init__()
+    def __init__(self, value, pos=None):
+        super(LiteralExpr, self).__init__(pos)
         self.value = value
 
 
@@ -99,8 +103,8 @@ class ListExpr(Expr):
     List expression -- list of several values of the same type.
     """
 
-    def __init__(self, items):
-        super(ListExpr, self).__init__()
+    def __init__(self, items, pos=None):
+        super(ListExpr, self).__init__(pos)
         self.items = items
 
 
@@ -119,8 +123,8 @@ class ConcatExpr(Expr):
     and ReferenceExpr to express values such as "$(foo).cpp".
     """
 
-    def __init__(self, items):
-        super(ConcatExpr, self).__init__()
+    def __init__(self, items, pos=None):
+        super(ConcatExpr, self).__init__(pos)
         assert len(items) > 0
         self.items = items
 
@@ -163,8 +167,8 @@ class ReferenceExpr(Expr):
        or a module).
     """
 
-    def __init__(self, var, context):
-        super(ReferenceExpr, self).__init__()
+    def __init__(self, var, context, pos=None):
+        super(ReferenceExpr, self).__init__(pos)
         self.var = var
         self.context = context
 
@@ -219,10 +223,14 @@ class PathExpr(Expr):
        * ``expr.ANCHOR_BUILDDIR`` -- Path is relative to the build directory.
          This anchor should be used for all transient files (object files
          or other generated files).
+
+    .. attribute:: pos
+
+       Location of the expression in source tree.
     """
 
-    def __init__(self, components, anchor=ANCHOR_TOP_SRCDIR):
-        super(PathExpr, self).__init__()
+    def __init__(self, components, anchor=ANCHOR_TOP_SRCDIR, pos=None):
+        super(PathExpr, self).__init__(pos)
         self.components = components
         self.anchor = anchor
 
@@ -495,7 +503,7 @@ def split(e, sep):
 
     if isinstance(e, LiteralExpr):
         vals = e.value.split(sep)
-        return [LiteralExpr(v) for v in vals]
+        return [LiteralExpr(v, pos=e.pos) for v in vals]
 
     elif isinstance(e, ReferenceExpr):
         return split(e.get_value(), sep)
@@ -531,9 +539,9 @@ def simplify(e):
     """
 
     if isinstance(e, ListExpr):
-        return ListExpr([simplify(i) for i in e.items])
+        return ListExpr([simplify(i) for i in e.items], pos=e.pos)
     elif isinstance(e, PathExpr):
-        return PathExpr([simplify(i) for i in e.components], e.anchor)
+        return PathExpr([simplify(i) for i in e.components], e.anchor, pos=e.pos)
 
     elif isinstance(e, ConcatExpr):
         # merge concatenated literals:
@@ -544,7 +552,7 @@ def simplify(e):
                 out[-1] = LiteralExpr(out[-1].value + i.value)
             else:
                 out.append(i)
-        return ConcatExpr(out)
+        return ConcatExpr(out, pos=e.pos)
 
     elif isinstance(e, ReferenceExpr):
         # Simple reference can be replaced with the referenced value. Do this
@@ -591,7 +599,7 @@ def all_possible_values(e):
 
     else:
         raise Error("cannot determine all possible values of expression \"%s\"" % e,
-                    pos = e.pos)
+                    pos=e.pos)
 
 
 
