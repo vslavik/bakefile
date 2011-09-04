@@ -36,7 +36,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'Bakefile'
-copyright = '2009, Vaclav Slavik'
+copyright = '2009-2011 Vaclav Slavik'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
