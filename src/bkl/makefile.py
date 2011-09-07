@@ -191,9 +191,11 @@ class MakefileToolset(Toolset):
                     # FIXME: handle multi-output nodes too
                     assert len(node.outputs) == 1
                     out = node.outputs[0]
+                deps = [expr_fmt.format(i) for i in node.inputs]
+                deps += [expr_fmt.format(module.get_target(id).get_variable_value("id")) for id in t.get_variable_value("deps").as_py()]
                 text = self.Formatter.target(
                         name=expr_fmt.format(out),
-                        deps=[expr_fmt.format(i) for i in node.inputs],
+                        deps=deps,
                         commands=[expr_fmt.format(c) for c in node.commands])
                 f.write(text)
 

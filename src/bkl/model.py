@@ -262,6 +262,11 @@ class Module(ModelPart):
         self.targets[target.name] = target
 
 
+    def get_target(self, id):
+        """Returns Target object identified by its string ID."""
+        return self.targets[id]
+
+
     def get_prop(self, name):
         return props.get_module_prop(name)
 
