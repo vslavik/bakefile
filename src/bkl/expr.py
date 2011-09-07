@@ -552,7 +552,10 @@ def simplify(e):
                 out[-1] = LiteralExpr(out[-1].value + i.value)
             else:
                 out.append(i)
-        return ConcatExpr(out, pos=e.pos)
+        if len(out) == 1:
+            return out[0]
+        else:
+            return ConcatExpr(out, pos=e.pos)
 
     elif isinstance(e, ReferenceExpr):
         # Simple reference can be replaced with the referenced value. Do this
