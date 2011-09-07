@@ -110,3 +110,12 @@ class NonConstError(Error):
         if not pos:
             pos = expr.pos
         super(NonConstError, self).__init__(text, pos)
+
+
+
+class UndefinedError(Error):
+    """
+    Exception thrown when a property or variable is undefined, i.e. doesn't
+    have a value.
+    """
+    pass

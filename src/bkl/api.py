@@ -26,6 +26,7 @@ from abc import ABCMeta, abstractmethod
 
 import types
 import expr
+import error
 
 # Metaclass used for all extensions in order to implement automatic
 # extensions registration. For internal use only.
@@ -246,9 +247,7 @@ class Property(object):
             is evaluated in the context of *for_obj*.
         """
         if self.default is None:
-            # FIXME: don't do this, make it a required property instead
-            # and check for this in one of the passes
-            return expr.NullExpr()
+            raise error.UndefinedError("required property \"%s\" on %s not set" % (self.name, for_obj))
         elif (type(self.default) is types.FunctionType or
               type(self.default) is types.MethodType):
             # default is defined as a callback function

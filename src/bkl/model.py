@@ -213,6 +213,10 @@ class Project(ModelPart):
         return c
 
 
+    def __str__(self):
+        return "the project"
+
+
     def all_variables(self):
         """
         Returns iterator over all variables in the project. Works recursively,
@@ -255,6 +259,10 @@ class Module(ModelPart):
         self.source_file = source_file
 
 
+    def __str__(self):
+        return "module %s" % self.source_file
+
+
     def add_target(self, target):
         """Adds a new target object."""
         assert target.name not in self.targets
@@ -289,6 +297,10 @@ class Target(ModelPart):
         super(Target, self).__init__(parent)
         self.name = name
         self.type = target_type
+
+
+    def __str__(self):
+        return "target %s" % self.name
 
 
     def get_prop(self, name):
