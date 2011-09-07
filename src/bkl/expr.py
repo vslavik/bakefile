@@ -503,15 +503,24 @@ def split(e, sep):
 
     if isinstance(e, LiteralExpr):
         vals = e.value.split(sep)
+        if len(vals) == 1:
+            return [e]
         return [LiteralExpr(v, pos=e.pos) for v in vals]
 
     elif isinstance(e, ReferenceExpr):
-        return split(e.get_value(), sep)
+        value_split = split(e.get_value(), sep)
+        if len(value_split) == 1:
+            return [e]
+        else:
+            return value_split
 
     elif isinstance(e, ConcatExpr):
+        any_change = False
         out = []
         for i in e.items:
             i_out = split(i, sep)
+            if i is not i_out:
+                any_change = True
             if out:
                 # Join the two lists on concatenation boundary. E.g. splitting
                 # two concatenated strings "foo/bar" and "x/y" along "/" should
@@ -521,7 +530,13 @@ def split(e, sep):
                         i_out[1:] )
             else:
                 out = i_out
-        return out
+        if any_change:
+            return out
+        else:
+            return [e]
+
+    elif isinstance(e, NullExpr):
+        return [e]
 
     else:
         raise Error("don't know how to split expression \"%s\" with separator \"%s\""
