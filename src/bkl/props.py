@@ -62,6 +62,16 @@ def _std_module_props():
         ]
 
 
+def _std_project_props():
+    """Creates list of all standard project properties."""
+    toolsets_enum_type = EnumType(api.Toolset.all_names())
+
+    return [
+        Property("toolset",
+                 type=toolsets_enum_type,
+                 doc="Toolset to generate for."),
+        ]
+
 
 
 def _fill_prop_dict(props):
@@ -79,6 +89,7 @@ class PropertiesCache(object):
     def __init__(self):
         self.all_targets = None
         self.modules = None
+        self.project = None
         self.target_types = {}
 
 
@@ -101,6 +112,12 @@ class PropertiesCache(object):
         return self.modules.get(name, None)
 
 
+    def get_project_prop(self, name):
+        if self.project is None:
+            self.project = _fill_prop_dict(_std_project_props())
+        return self.project.get(name, None)
+
+
 
 
 cache = PropertiesCache()
@@ -119,3 +136,11 @@ def get_module_prop(name):
     :const:`None` otherwise.
     """
     return cache.get_module_prop(name)
+
+
+def get_project_prop(name):
+    """
+    Returns property *name* on module level if such property exists, or
+    :const:`None` otherwise.
+    """
+    return cache.get_project_prop(name)

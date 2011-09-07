@@ -229,8 +229,7 @@ class Project(ModelPart):
 
 
     def get_prop(self, name):
-        # there are no project-global properties (yet)
-        return None
+        return props.get_project_prop(name)
 
 
 
