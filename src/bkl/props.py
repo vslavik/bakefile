@@ -69,6 +69,7 @@ def _std_project_props():
     return [
         Property("toolset",
                  type=toolsets_enum_type,
+                 default=expr.UndeterminedExpr(),
                  doc="Toolset to generate for."),
         ]
 

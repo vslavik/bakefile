@@ -152,6 +152,16 @@ class NullExpr(Expr):
 
 
 
+class UndeterminedExpr(Expr):
+    """
+    This is a hack. It is used as placeholder for expressions with not yet known value.
+    In particular, it is used for the "toolset" property before the model is split into
+    toolset-specific copies, to allow partial evaluation common to all of them.
+    """
+    pass
+
+
+
 class ReferenceExpr(Expr):
     """
     Reference to a variable.
@@ -294,7 +304,7 @@ class Visitor(object):
     """
     Implements visitor pattern for :class:`Expr` expressions. This is abstract
     base class, derived classes must implement all of its methods except
-    :meth:`visit()`. The way visitors are used is that the caller calls 
+    :meth:`visit()`. The way visitors are used is that the caller calls
     :meth:`visit()` on the expression.
     """
     __metaclass__ = ABCMeta
@@ -535,7 +545,7 @@ def split(e, sep):
         else:
             return [e]
 
-    elif isinstance(e, NullExpr):
+    elif isinstance(e, NullExpr) or isinstance(e, UndeterminedExpr):
         return [e]
 
     else:
