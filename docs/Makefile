@@ -2,16 +2,16 @@
 #
 
 # You can set these variables from the command line.
-PYTHONPATH   += pygments
-SPHINXOPTS    =
-SPHINXBUILD   = PYTHONPATH=$(PYTHONPATH) sphinx-build
+PYTHONPATH   := $(PYTHONPATH):pygments
+SPHINXOPTS   :=
+SPHINXBUILD  := PYTHONPATH=$(PYTHONPATH) sphinx-build
 
 # Internal variables.
 ALLSPHINXOPTS   = -d .doctrees $(SPHINXOPTS) .
 
 GENERATED_TS = ref/timestamp
-GENERATED_DOCS_SOURCES = $(wildcard ../src/bakefile/*.py) \
-                         $(wildcard ../src/bakefile/plugins/*.py)
+GENERATED_DOCS_SOURCES := $(wildcard ../src/bakefile/*.py) \
+                          $(wildcard ../src/bakefile/plugins/*.py)
 
 .PHONY: all help clean html htmlhelp changes linkcheck
 
