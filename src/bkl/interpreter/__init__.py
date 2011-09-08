@@ -143,11 +143,11 @@ class Interpreter(object):
 
 
     def generate_for_toolset(self, toolset):
-        logger.debug("generating for toolset %s" % toolset)
-
+        logger.debug("preparing model for toolset %s" % toolset)
         model = deepcopy(self.model)
         model.add_variable(bkl.model.Variable.from_property(model.get_prop("toolset"),
                                                             bkl.expr.LiteralExpr(toolset)))
         self.finalize_for_toolset(model)
 
+        logger.debug("generating for toolset %s" % toolset)
         bkl.api.Toolset.get(toolset).generate(model)
