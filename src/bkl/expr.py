@@ -578,7 +578,7 @@ def simplify(e):
         # value is e.g. a list, we want to keep it as a variable to avoid
         # duplication of large values.
         ref = e.get_value()
-        if isinstance(e, LiteralExpr) or isinstance(e, ReferenceExpr):
+        if isinstance(ref, LiteralExpr) or isinstance(ref, ReferenceExpr):
             return ref
 
     # otherwise, there's nothing much to simplify:
