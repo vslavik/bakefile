@@ -34,7 +34,7 @@ from api import Property
 
 
 
-def _std_target_props():
+def std_target_props():
     """Creates list of all standard target properties."""
     return [
         Property("id",
@@ -50,7 +50,7 @@ def _std_target_props():
         ]
 
 
-def _std_module_props():
+def std_module_props():
     """Creates list of all standard module properties."""
     toolsets_enum_type = EnumType(api.Toolset.all_names())
 
@@ -62,7 +62,7 @@ def _std_module_props():
         ]
 
 
-def _std_project_props():
+def std_project_props():
     """Creates list of all standard project properties."""
     toolsets_enum_type = EnumType(api.Toolset.all_names())
 
@@ -96,7 +96,7 @@ class PropertiesCache(object):
 
     def get_target_prop(self, target_type, name):
         if self.all_targets is None:
-            self.all_targets = _fill_prop_dict(_std_target_props())
+            self.all_targets = _fill_prop_dict(std_target_props())
         if name in self.all_targets:
             return self.all_targets[name]
         if target_type not in self.target_types:
@@ -109,13 +109,13 @@ class PropertiesCache(object):
 
     def get_module_prop(self, name):
         if self.modules is None:
-            self.modules = _fill_prop_dict(_std_module_props())
+            self.modules = _fill_prop_dict(std_module_props())
         return self.modules.get(name, None)
 
 
     def get_project_prop(self, name):
         if self.project is None:
-            self.project = _fill_prop_dict(_std_project_props())
+            self.project = _fill_prop_dict(std_project_props())
         return self.project.get(name, None)
 
 
