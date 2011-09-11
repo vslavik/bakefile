@@ -52,10 +52,13 @@ def write_property(prop):
         desc += prop.__doc__
         desc += "\n"
 
-    if prop.default:
-        desc += "\n*Default:* ``%s``\n" % prop.default
+    if prop.readonly:
+        desc += "\n*Read-only property*\n"
     else:
-        desc += "\n*Required property*\n"
+        if prop.default:
+            desc += "\n*Default:* ``%s``\n" % prop.default
+        else:
+            desc += "\n*Required property*\n"
 
     txt = "**%s** (type: %s)\n\n" % (prop.name, prop.type.name)
     txt += "    " + "\n    ".join(desc.split("\n"))
