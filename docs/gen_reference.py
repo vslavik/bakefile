@@ -63,8 +63,7 @@ def write_property(prop):
     return txt
 
 
-def write_properties(extension, extra_props):
-    props = list(extension.all_properties()) + extra_props
+def write_properties(props):
     if not props:
         return ""
 
@@ -83,8 +82,19 @@ DOC_TEMPLATE = """
 %(title)s
 %(underline)s
 
-%(docstring_text)s
+%(docstring)s
 """
+
+def write_docs(filename, title, docstring):
+    """
+    Writes out documentation to a file.
+    """
+
+    underline = "".join("=" for i in xrange(0, len(title)))
+
+    f = open("%s/%s.rst" % (OUT_DIR, filename), "wt")
+    f.write(DOC_TEMPLATE % locals())
+
 
 def write_extension_docs(kind, extension, extra_props=[]):
     """
@@ -100,13 +110,10 @@ def write_extension_docs(kind, extension, extra_props=[]):
         if summary[-1] == ".":
             title = "%s -- `%s`" % (summary[:-1], name)
 
-    underline = "".join("=" for i in xrange(0, len(title)))
-
     docstring_text = "\n".join(docstring)
-    docstring_text += write_properties(extension, extra_props)
+    docstring_text += write_properties(list(extension.all_properties()) + extra_props)
 
-    f = open("%s/%s_%s.rst" % (OUT_DIR, kind, name), "wt")
-    f.write(DOC_TEMPLATE % locals())
+    write_docs("%s_%s" % (kind, name), title, docstring_text)
 
 
 
@@ -118,3 +125,7 @@ for t in bkl.api.TargetType.all():
 # write docs for all toolsets:
 for t in bkl.api.Toolset.all():
     write_extension_docs("toolset", t)
+
+# write docs for projects/modules:
+write_docs("project", "Global project properties", write_properties(bkl.props.std_project_props()))
+write_docs("module", "Module properties", write_properties(bkl.props.std_module_props()))
