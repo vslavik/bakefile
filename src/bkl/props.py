@@ -70,7 +70,10 @@ def std_project_props():
         Property("toolset",
                  type=toolsets_enum_type,
                  default=expr.UndeterminedExpr(),
-                 doc="Toolset to generate for."),
+                 doc="The toolset makefiles or projects are being generated for. "
+                     "This property is set by Bakefile and can be used for performing "
+                     "toolset-specific tasks or modifications."
+                 ),
         ]
 
 
