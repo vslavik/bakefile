@@ -114,7 +114,14 @@ class GnuMakefileFormatter(MakefileFormatter):
 
 class GnuToolset(MakefileToolset):
     """
-    GNU toolset.
+    GNU toolchain.
+
+    This toolset generates makefiles for the GNU toolchain -- GNU Make, GCC compiler,
+    GNU LD linker etc. -- running on Unix system.
+
+    Currently, only Linux systems (or something sufficiently compatible) are supported.
+    In particular, file extensions and linker behavior (symlinks, sonames) are assumed
+    to be Linux ones.
     """
 
     name = "gnu"
