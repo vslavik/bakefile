@@ -10,8 +10,12 @@ SPHINXBUILD  := PYTHONPATH=$(PYTHONPATH) sphinx-build
 ALLSPHINXOPTS   = -d .doctrees $(SPHINXOPTS) .
 
 GENERATED_TS = ref/timestamp
-GENERATED_DOCS_SOURCES := $(wildcard ../src/bakefile/*.py) \
-                          $(wildcard ../src/bakefile/plugins/*.py)
+GENERATED_DOCS_SOURCES := $(wildcard ../src/bkl/*.py) \
+                          $(wildcard ../src/bkl/plugins/*.py)
+
+SPHINX_DOC_FILES := conf.py pygments/bkl_lexer.py $(wildcard *.rst)
+
+ALL_DOCS_INPUTS = $(GENERATED_TS) $(SPHINX_DOC_FILES)
 
 .PHONY: all help clean html htmlhelp changes linkcheck
 
@@ -33,28 +37,32 @@ $(GENERATED_TS): $(GENERATED_DOCS_SOURCES) gen_reference.py
 	./gen_reference.py
 	@touch $(GENERATED_TS)
 
-html: $(GENERATED_TS)
+html: html/.buildinfo
+html/.buildinfo: $(ALL_DOCS_INPUTS)
 	mkdir -p html .doctrees
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) html
 	@echo
 	@echo "Build finished. The HTML pages are in ./html."
 
-htmlhelp: $(GENERATED_TS)
+htmlhelp: $(ALL_DOCS_INPUTS)
 	mkdir -p .build/htmlhelp .doctrees
 	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) .build/htmlhelp
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
 	      ".hhp project file in .build/htmlhelp."
 
-changes: $(GENERATED_TS)
+changes: $(ALL_DOCS_INPUTS)
 	mkdir -p .build/changes .doctrees
 	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) .build/changes
 	@echo
 	@echo "The overview file is in .build/changes."
 
-linkcheck: $(GENERATED_TS)
+linkcheck: $(ALL_DOCS_INPUTS)
 	mkdir -p .build/linkcheck .doctrees
 	$(SPHINXBUILD) -b linkcheck $(ALLSPHINXOPTS) .build/linkcheck
 	@echo
 	@echo "Link check complete; look for any errors in the above output " \
 	      "or in .build/linkcheck/output.txt."
+
+
+.PHONY: all help clean html htmlhelp changes linkcheck
