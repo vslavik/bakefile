@@ -105,6 +105,7 @@ class MakefileFormatter(Extension):
         :param commands: List of commands to execute to build the target; they
                          are already formatted to be in make's syntax and each
                          command in the list is single-line shell command.
+                         May be :const:`None`.
         """
         out = "%s:" % name
         if deps:
@@ -181,6 +182,11 @@ class MakefileToolset(Toolset):
 
         for v in module.variables:
             pass
+
+        # Write the "all" target:
+        all_targets = [expr_fmt.format(t.get_variable_value("id")) for t in module.targets.itervalues()]
+        f.write(self.Formatter.target(name="all", deps=all_targets, commands=None))
+
         for t in module.targets.itervalues():
             graph = t.type.get_build_subgraph(self, t)
 
@@ -198,5 +204,6 @@ class MakefileToolset(Toolset):
                         deps=deps,
                         commands=[expr_fmt.format(c) for c in node.commands])
                 f.write(text)
+                all_targets.append(expr_fmt.format(out))
 
         f.commit()
