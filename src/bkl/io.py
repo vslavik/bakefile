@@ -31,6 +31,10 @@ import logging
 logger = logging.getLogger("bkl.io")
 
 
+EOL_WINDOWS = "win"
+EOL_UNIX    = "unix"
+
+
 class OutputFile(object):
     """
     File to be written by Bakefile.
@@ -46,14 +50,16 @@ class OutputFile(object):
     Notice the need to explicitly call commit().
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename, eol):
         """
         Creates output file.
 
         :param filename: Name of the output file. Should be either relative
                          to CWD or absolute; the latter is recommended.
+        :param eol:      Line endings to use. One of EOL_WINDOWS and EOL_UNIX.
         """
         self.filename = filename
+        self.eol = eol
         self.text = ""
 
 
@@ -67,6 +73,8 @@ class OutputFile(object):
 
 
     def commit(self):
+        if self.eol == EOL_WINDOWS:
+            self.text = self.text.replace("\n", "\r\n")
         logger.info("creating file %s" % self.filename)
         # FIXME: not atomic, needs file-level locking!
         with open(self.filename, "wt") as f:

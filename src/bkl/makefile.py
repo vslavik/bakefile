@@ -178,7 +178,7 @@ class MakefileToolset(Toolset):
 
         expr_fmt = _MakefileExprFormatter(self.Formatter, paths_info)
 
-        f = io.OutputFile(output)
+        f = io.OutputFile(output, io.EOL_UNIX)
 
         for v in module.variables:
             pass
