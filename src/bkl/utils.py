@@ -62,7 +62,9 @@ class OrderedDict(dict):
     # The rest is implemented using above methods:
 
     def update(self, dict):
-        assert 0 # not permitted!
+        for k, v in dict.iteritems():
+            self[k] = v
+
     def __copy__(self):
         assert 0 # not permitted!
 

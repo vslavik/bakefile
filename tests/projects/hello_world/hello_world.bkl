@@ -1,4 +1,4 @@
-toolsets = gnu
+toolsets = gnu vs2010
 
 exe hello {
     sources = hello.c
