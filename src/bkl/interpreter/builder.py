@@ -50,20 +50,21 @@ class Builder(object):
        then restored and so on.
     """
 
-    def __init__(self, ast):
-        """Constructor creates interpreter for given AST."""
-        self.ast = ast
-
-
-    def create_model(self, parent):
+    def create_model(self, ast, parent):
         """Returns constructed model, as :class:`bkl.model.Module` instance."""
-        mod = Module(parent, source_file=self.ast.filename)
+        mod = Module(parent, source_file=ast.filename)
         self.context = mod
 
-        self.handle_children(self.ast.children, self.context)
+        self.handle_children(ast.children, self.context)
         assert self.context is mod
 
         return mod
+
+
+    def create_expression(self, ast, parent):
+        """Creates :class:`bkl.epxr.Expr` expression in given parent's context."""
+        self.context = parent
+        return self._build_expression(ast)
 
 
     def handle_children(self, children, context):

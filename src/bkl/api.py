@@ -199,8 +199,8 @@ class Property(object):
 
     .. attribute:: default
 
-       Default value of the property (as :class:`bkl.expr.Expr`)
-       or :const:`None`. If not specified (i.e. :const:`None`), then this
+       Default value of the property (as :class:`bkl.expr.Expr` or a function that returns
+       an expression) or :const:`None`. If not specified (i.e. :const:`None`), then this
        property is required and must always be set to a value in the bakefile.
 
     .. attribute:: readonly
@@ -221,8 +221,10 @@ class Property(object):
        class FooTarget(bkl.api.TargetType):
            name = "foo"
            properties = [
-               Property("defines", default="",
-                        doc="compiler predefined symbols for the foo compiler")
+               Property("deps",
+                     type=ListType(IdType()),
+                     default=[],
+                     doc="Target's dependencies (list of IDs).")
            ]
            ...
 
@@ -240,7 +242,7 @@ class Property(object):
         """
         Returns the value of :attr:`default` expression. Always returns
         an :class:`bkl.expr.Expr` instance, even if the default is
-        :const:`None`.
+        of a different type.
 
         :param for_obj: The class:`bkl.model.ModelPart` object to return
             the default for. If the default value is defined, its expression
@@ -248,14 +250,31 @@ class Property(object):
         """
         if self.default is None:
             raise error.UndefinedError("required property \"%s\" on %s not set" % (self.name, for_obj))
-        elif (type(self.default) is types.FunctionType or
-              type(self.default) is types.MethodType):
+        return self._make_expr(self.default, for_obj)
+
+    def _make_expr(self, val, for_obj):
+        if (type(val) is types.FunctionType or type(val) is types.MethodType):
             # default is defined as a callback function
-            return self.default(for_obj)
+            val = val(for_obj)
+        if isinstance(val, expr.Expr):
+            return val
+        elif isinstance(val, types.StringType):
+            # parse strings as bkl language expressions, it's too useful to
+            return self._parse_expr(val, for_obj)
+        elif isinstance(val, list):
+            return expr.ListExpr([self._make_expr(x, for_obj) for x in val])
         else:
-            # FIXME: if 'default' is a string, parse it into an expression
-            #        (in context of `for_obj`!)
-            return self.default
+            assert False, "unexpected default value type: %s" % type(val)
+
+    def _parse_expr(self, e, for_obj):
+        from interpreter.builder import Builder
+        from parser import get_parser
+        location = '("%s" property default: "%s")' % (self.name, e)
+        pars = get_parser(e, filename=location)
+        e = Builder().create_expression(pars.expression().tree, for_obj)
+        e = self.type.normalize(e)
+        self.type.validate(e)
+        return e
 
 
 

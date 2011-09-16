@@ -101,8 +101,8 @@ class Interpreter(object):
                :func:`bkl.parser.parse_file`.
         """
         logger.info("processing %s" % ast.filename)
-        b = Builder(ast)
-        self.model.modules.append(b.create_model(parent=self.model))
+        b = Builder()
+        self.model.modules.append(b.create_model(ast, parent=self.model))
 
 
     def finalize(self):

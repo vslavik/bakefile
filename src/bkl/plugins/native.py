@@ -41,7 +41,7 @@ class ExeType(TargetType):
     properties = [
             Property("sources",
                  type=ListType(PathType()),
-                 default=ListExpr([]),
+                 default=[],
                  doc="Source files."),
         ]
 

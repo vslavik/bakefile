@@ -61,13 +61,15 @@ class _Parser(_BakefileErrorsMixin, BakefileParser):
     pass
 
 
+def get_parser(code, filename=None):
+    """
+    Prepares Bakefile parser for parsing given Bakefile code from string
+    argument passed in. The optional filename argument allows specifying input
+    file name for the purpose of errors reporting.
+    """
+    if code and code[-1] != "\n":
+        code += "\n"
 
-def parse(code, filename=None):
-    """
-    Reads Bakefile code from string argument passed in and returns parsed AST.
-    The optional filename argument allows specifying input file name for the purpose
-    of errors reporting.
-    """
     cStream = antlr3.StringStream(code)
     lexer = _Lexer(cStream)
     lexer.filename = filename
@@ -77,6 +79,16 @@ def parse(code, filename=None):
     parser.filename = filename
     parser.adaptor = ast._TreeAdaptor(filename)
 
+    return parser
+
+
+def parse(code, filename=None):
+    """
+    Reads Bakefile code from string argument passed in and returns parsed AST.
+    The optional filename argument allows specifying input file name for the purpose
+    of errors reporting.
+    """
+    parser = get_parser(code, filename)
     try:
         return parser.program().tree
     except ParserError:

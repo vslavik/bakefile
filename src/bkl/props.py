@@ -45,7 +45,7 @@ def std_target_props():
 
         Property("deps",
                  type=ListType(IdType()),
-                 default=expr.ListExpr([]),
+                 default=[],
                  doc="Target's dependencies (list of IDs)."),
         ]
 
@@ -57,7 +57,7 @@ def std_module_props():
     return [
         Property("toolsets",
                  type=ListType(toolsets_enum_type),
-                 default=expr.ListExpr([]),
+                 default=[],
                  doc="List of toolsets to generate makefiles/projects for."),
         ]
 
