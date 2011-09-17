@@ -300,7 +300,7 @@ class Target(ModelPart):
 
 
     def __str__(self):
-        return "target %s" % self.name
+        return 'target "%s"' % self.name
 
 
     def get_prop(self, name):
