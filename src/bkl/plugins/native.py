@@ -41,8 +41,12 @@ class ExeType(TargetType):
     properties = [
             Property("sources",
                  type=ListType(PathType()),
-                 default=[],
+                 default=None,
                  doc="Source files."),
+            Property("headers",
+                 type=ListType(PathType()),
+                 default=[],
+                 doc="Header files."),
         ]
 
     def get_build_subgraph(self, toolset, target):

@@ -284,6 +284,13 @@ class VS2010Toolset(Toolset):
         for sfile in target.get_variable_value("sources").items:
             items.add("ClCompile", Include=sfile)
         root.add(items)
+        # Headers files:
+        headers = target.get_variable_value("headers").items
+        if headers:
+            items = Node("ItemGroup")
+            for sfile in headers:
+                items.add("ClInclude", Include=sfile)
+            root.add(items)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.targets")
         root.add("ImportGroup", Label="ExtensionTargets")
