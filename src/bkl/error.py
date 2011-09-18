@@ -82,7 +82,7 @@ class TypeError(Error):
         :param expr: :class:`bkl.expr.Expr` expression that caused the error.
         :param msg:  Optional error message detailing reasons for the error.
         """
-        text = "expression \"%s\" is not valid %s value" % (expr, type.name)
+        text = "expression \"%s\" is not valid %s value" % (expr, type)
         if msg:
             text += ": %s" % msg
         if not pos:

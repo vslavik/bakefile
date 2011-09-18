@@ -70,6 +70,8 @@ class Type(object):
         """
         raise NotImplementedError
 
+    def __str__(self):
+        return self.name
 
 
 class AnyType(Type):
