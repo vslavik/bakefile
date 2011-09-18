@@ -1,0 +1,2 @@
+ERROR:
+vars/append_nonexist.bkl:1:0: unknown variable "made_up"

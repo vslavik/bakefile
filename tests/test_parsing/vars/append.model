@@ -1,0 +1,11 @@
+module {
+  variables {
+    toolsets = ["gnu"]
+  }
+  targets {
+    exe dummy {
+        sources = ["one.c", "two.c"]
+    }
+  }
+}
+

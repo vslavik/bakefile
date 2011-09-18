@@ -156,6 +156,9 @@ class AssignmentNode(Node):
                      doc="Value being assigned.")
 
 
+class AppendNode(AssignmentNode):
+    pass
+
 
 class VarReferenceNode(Node):
     """Reference to a variable."""
@@ -186,6 +189,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.LIST           : ListNode,
         BakefileParser.CONCAT         : ConcatNode,
         BakefileParser.ASSIGN         : AssignmentNode,
+        BakefileParser.APPEND         : AppendNode,
         BakefileParser.VAR_REFERENCE  : VarReferenceNode,
         BakefileParser.TARGET         : TargetNode,
     }

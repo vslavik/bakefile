@@ -35,6 +35,7 @@ tokens {
     PROGRAM;
     ID;
     ASSIGN;
+    APPEND;
     LITERAL;
     TARGET;
     VAR_REFERENCE;
@@ -69,6 +70,8 @@ stmt
 assignment_stmt
     : WS* identifier WS* '=' WS* expression NEWLINE
                                     -> ^(ASSIGN identifier expression)
+    | WS* identifier WS* '+=' WS* expression NEWLINE
+                                    -> ^(APPEND identifier expression)
     ;
 
 

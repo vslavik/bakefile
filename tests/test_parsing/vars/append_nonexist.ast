@@ -1,0 +1,5 @@
+RootNode
+    AppendNode
+        IdNode made_up
+        LiteralNode "foo"
+

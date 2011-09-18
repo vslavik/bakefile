@@ -1,0 +1,2 @@
+ERROR:
+vars/append_nonlist.bkl:2:0: cannot append to non-list variable "foo" (type: any)

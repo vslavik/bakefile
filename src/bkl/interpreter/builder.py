@@ -23,10 +23,11 @@
 #
 
 from ..api import TargetType
-from ..expr import LiteralExpr, ListExpr, ConcatExpr, ReferenceExpr
+from ..expr import LiteralExpr, ListExpr, ConcatExpr, ReferenceExpr, NullExpr
 from ..model import Module, Target, Variable
 from ..parser.ast import *
 from ..error import Error, ParserError
+from ..vartypes import ListType
 
 
 class Builder(object):
@@ -96,9 +97,11 @@ class Builder(object):
             raise e
 
 
-    def on_assignment(self, node):
-        varname = node.var
-        value = self._build_expression(node.value)
+    def _get_or_init_variable(self, varname):
+        """
+        Gets the variable in model. If it doesn't exist, tries to create it
+        from a property if there's any.
+        """
         var = self.context.get_variable(varname)
 
         if var is None:
@@ -109,17 +112,41 @@ class Builder(object):
             # to said property. In other words, the new variable's type
             # must much that of the property.
             prop = self.context.get_prop(varname)
-
             if prop:
-                var = Variable.from_property(prop, value)
-            else:
-                var = Variable(varname, value)
+                var = Variable.from_property(prop, NullExpr())
+                self.context.add_variable(var)
 
-            self.context.add_variable(var)
+        return var
 
+
+    def on_assignment(self, node):
+        varname = node.var
+        value = self._build_expression(node.value)
+        var = self._get_or_init_variable(varname)
+
+        if var is None:
+            # Create new variable.
+            self.context.add_variable(Variable(varname, value))
         else:
             # modify existing variable
             var.set_value(value)
+
+
+    def on_append(self, node):
+        varname = node.var
+        value = self._build_expression(node.value)
+        var = self._get_or_init_variable(varname)
+        if var is None:
+            raise ParserError('unknown variable "%s"' % varname)
+        if not isinstance(var.type, ListType):
+            raise ParserError('cannot append to non-list variable "%s" (type: %s)' %
+                              (varname, var.type))
+        if isinstance(var.value, ListExpr):
+            listval = ListExpr(var.value.items + [value])
+        else:
+            listval = ListExpr([var.value, value])
+        listval.pos = node.pos
+        var.set_value(listval)
 
 
     def on_target(self, node):
@@ -157,6 +184,7 @@ class Builder(object):
         return e
 
     _ast_dispatch = {
+        AppendNode     : on_append,
         AssignmentNode : on_assignment,
         TargetNode     : on_target,
         NilNode        : lambda self,x: x, # do nothing

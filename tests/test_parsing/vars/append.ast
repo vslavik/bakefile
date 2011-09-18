@@ -1,0 +1,14 @@
+RootNode
+    AssignmentNode
+        IdNode toolsets
+        LiteralNode "gnu"
+    TargetNode
+        IdNode exe
+        IdNode dummy
+        AssignmentNode
+            IdNode sources
+            LiteralNode "one.c"
+        AppendNode
+            IdNode sources
+            LiteralNode "two.c"
+
