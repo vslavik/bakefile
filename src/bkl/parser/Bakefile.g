@@ -120,7 +120,7 @@ element_part
 //     exe hello {}
 
 target_stmt
-    : WS* type=identifier WS* id=identifier WS* '{' target_content* WS* '}' NEWLINE
+    : WS* type=identifier WS* id=identifier any_ws '{' target_content* WS* '}' NEWLINE
                             -> ^(TARGET $type $id target_content*)
     ;
 
@@ -129,6 +129,17 @@ target_content
     | NEWLINE -> // empty statement
     ;
 
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+// Any whitespace sequence, including newlines
+any_ws : WS               ->
+       | NEWLINE          ->
+       | WS any_ws        ->
+       | NEWLINE any_ws   ->
+       ;
 
 // ---------------------------------------------------------------------------
 // Basic tokens
@@ -158,7 +169,7 @@ ML_COMMENT
 // ---------------------------------------------------------------------------
 
 // Note that whitespace is intentionally NOT put on the hidden channel. This
-// is because we need to distinguish between lists ("foo$(bar)zar") and
+// is because we need to distinguish between lists ("foo $(bar) zar") and
 // concatenation ("foo$(bar)zar").
 WS
     : (' ' | '\t')+;

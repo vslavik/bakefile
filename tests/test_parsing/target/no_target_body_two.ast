@@ -1,2 +1,2 @@
 ERROR:
-target/no_target_body_two.bkl:1:7: missing '{' at '\n'
+target/no_target_body_two.bkl:2:0: no viable alternative at input '\n'
