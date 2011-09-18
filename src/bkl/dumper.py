@@ -63,7 +63,6 @@ class DumpingInterpreter(Interpreter):
         print dump_project(self.model)
 
 
-
 def _indent(text):
     lines = text.split("\n")
     out = ""

@@ -24,6 +24,7 @@
 
 import copy
 import types
+
 import error, expr, vartypes, utils
 import props
 
@@ -54,13 +55,11 @@ class Variable(object):
        Indicates if the variable is read-only. Read-only variables can only
        be assigned once and cannot be modified afterwards.
     """
-
     def __init__(self, name, value, type=vartypes.AnyType(), readonly=False):
         self.name = name
         self.type = type
         self.value = value
         self.readonly = readonly
-
 
     @staticmethod
     def from_property(prop, value):
@@ -78,7 +77,6 @@ class Variable(object):
         v.set_value(value)
         return v
 
-
     def set_value(self, value):
         """
         Sets new value on the variable. The new value must have same type
@@ -90,7 +88,6 @@ class Variable(object):
             raise error.Error("variable \"%s\" is read-only" % self.name)
         # FIXME: type checks
         self.value = value
-
 
 
 class ModelPart(object):
@@ -109,7 +106,6 @@ class ModelPart(object):
        toplevel part (the project).
        Dictionary of all variables defined in global scope in this module
     """
-
     def __init__(self, parent):
         self.parent = parent
         self.variables = utils.OrderedDict()
@@ -187,7 +183,6 @@ class ModelPart(object):
         raise NotImplementedError
 
 
-
 class Project(ModelPart):
     """
     Abstract model that completely describes state of loaded and processed
@@ -201,7 +196,6 @@ class Project(ModelPart):
         super(Project, self).__init__(parent=None)
         self.modules = []
 
-
     def __deepcopy__(self, memo):
         c = Project()
         c.variables = copy.deepcopy(self.variables, memo)
@@ -212,10 +206,8 @@ class Project(ModelPart):
                 t.parent = m
         return c
 
-
     def __str__(self):
         return "the project"
-
 
     def all_variables(self):
         """
@@ -231,10 +223,8 @@ class Project(ModelPart):
                 for v in t.variables.itervalues():
                     yield v
 
-
     def get_prop(self, name):
         return props.get_project_prop(name)
-
 
 
 class Module(ModelPart):
@@ -252,27 +242,22 @@ class Module(ModelPart):
 
        Path to the input ``.bkl`` source file this module was created from.
     """
-
     def __init__(self, parent, source_file):
         super(Module, self).__init__(parent)
         self.targets = utils.OrderedDict()
         self.source_file = source_file
 
-
     def __str__(self):
         return "module %s" % self.source_file
-
 
     def add_target(self, target):
         """Adds a new target object."""
         assert target.name not in self.targets
         self.targets[target.name] = target
 
-
     def get_target(self, id):
         """Returns Target object identified by its string ID."""
         return self.targets[id]
-
 
     def get_prop(self, name):
         return props.get_module_prop(name)
@@ -292,16 +277,13 @@ class Target(ModelPart):
 
        Type of the target, as :class:`bkl.api.TargetType` instance.
     """
-
     def __init__(self, parent, name, target_type):
         super(Target, self).__init__(parent)
         self.name = name
         self.type = target_type
 
-
     def __str__(self):
         return 'target "%s"' % self.name
-
 
     def get_prop(self, name):
         return props.get_target_prop(self.type, name)

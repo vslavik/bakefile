@@ -24,8 +24,9 @@
 
 import os, os.path
 import pytest
-import bkl.parser, bkl.error
 from glob import glob
+
+import bkl.parser, bkl.error
 
 
 def test_parser():

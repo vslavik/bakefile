@@ -23,6 +23,7 @@
 #
 
 from antlr3.tree import CommonTree, CommonTreeAdaptor
+
 import BakefileParser
 
 
@@ -62,7 +63,6 @@ class Position(object):
         return ":".join(hdr)
 
 
-
 class Node(CommonTree):
     """
     Base class for Bakefile AST tree node.
@@ -84,12 +84,10 @@ class Node(CommonTree):
     def __str__(self):
         return self.__class__.__name__
 
-
     # CommonTree methods:
 
     def toString(self):
         return str(self)
-
 
     def toStringTree(self, indent=''):
         s = self.toString()
@@ -101,18 +99,15 @@ class Node(CommonTree):
         return '%s\n%s' % (s, '\n'.join(_formatNode(c) for c in self.children))
 
 
-
 class RootNode(Node):
     """Root node of loaded .bkl file."""
     pass
-
 
 
 class NilNode(Node):
     """Empty node."""
     def __init__(self, payload=None):
         Node.__init__(self, payload)
-
 
 
 class LiteralNode(Node):
@@ -125,33 +120,27 @@ class LiteralNode(Node):
         return '%s "%s"' % (self.__class__.__name__, self.text)
 
 
-
 class ListNode(Node):
     """
     Right side of variable assignment, contains list of values (LiteralNode,
     VarReferenceNode etc.).
     """
-
     #: List of values in the assignment. May be single value, maybe be
     #: multiple values, code using this must correctly interpret it and
     #: check values' types.
     values = property(lambda self: self.children)
 
 
-
 class ConcatNode(Node):
     """
     Concatenation of several parts, to form single string.
     """
-
     #: List of fragments.
     values = property(lambda self: self.children)
 
 
-
 class IdNode(Node):
     """Identifier (variable, target, template, ...)."""
-
     # Text of the identifier, as string.
     text = property(lambda self: self.token.text)
 
@@ -159,10 +148,8 @@ class IdNode(Node):
         return '%s %s' % (self.__class__.__name__, self.text)
 
 
-
 class AssignmentNode(Node):
     """Assignment of value to a variable."""
-
     var = property(lambda self: self.children[0].text,
                    doc="Variable assigning to")
     value = property(lambda self: self.children[1],
@@ -172,15 +159,12 @@ class AssignmentNode(Node):
 
 class VarReferenceNode(Node):
     """Reference to a variable."""
-
     var = property(lambda self: self.children[0].text,
                    doc="Referenced variable")
 
 
-
 class TargetNode(Node):
     """Creation of a makefile target."""
-
     type = property(lambda self: self.children[0],
                     doc="Type of the target")
     name = property(lambda self: self.children[1],
@@ -189,13 +173,10 @@ class TargetNode(Node):
                        doc="Other content: variables assignments and such")
 
 
-
 class _TreeAdaptor(CommonTreeAdaptor):
     """Adaptor for ANTLR3 AST tree creation."""
-
     def __init__(self, filename):
         self.filename = filename
-
 
     # mapping of token types to AST node classes
     TOKENS_MAP = {
@@ -208,7 +189,6 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.VAR_REFERENCE  : VarReferenceNode,
         BakefileParser.TARGET         : TargetNode,
     }
-
 
     def createWithPayload(self, payload):
         if payload is None:

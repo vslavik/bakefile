@@ -48,7 +48,6 @@ class Error(Exception):
         self.msg = msg
         self.pos = pos
 
-
     def __unicode__(self):
         return str(self)
 
@@ -59,13 +58,11 @@ class Error(Exception):
             return self.msg
 
 
-
 class ParserError(Error):
     """
     Exception class for errors encountered by the Bakefile parser.
     """
     pass
-
 
 
 class TypeError(Error):
@@ -93,7 +90,6 @@ class TypeError(Error):
         super(TypeError, self).__init__(text, pos)
 
 
-
 class NonConstError(Error):
     """
     Exception thrown when attempting to convert an expression into bake-time
@@ -110,7 +106,6 @@ class NonConstError(Error):
         if not pos:
             pos = expr.pos
         super(NonConstError, self).__init__(text, pos)
-
 
 
 class UndefinedError(Error):

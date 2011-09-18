@@ -27,6 +27,9 @@ This module contains the very core of Bakefile -- the interpreter,
 :class:`bkl.interpreter.Interpreter`, and its supporting classes.
 """
 
+from copy import deepcopy
+import logging
+
 import bkl.parser
 import bkl.model
 import bkl.api
@@ -35,9 +38,6 @@ import passes
 from builder import Builder
 from bkl.error import Error
 
-from copy import deepcopy
-
-import logging
 logger = logging.getLogger("bkl.interpreter")
 
 

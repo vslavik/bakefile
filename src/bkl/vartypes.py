@@ -29,6 +29,7 @@ of variable values and other expressions.
 """
 
 import types
+
 import expr
 from error import TypeError
 
@@ -40,7 +41,7 @@ FALSE = "false"
 
 
 class Type(object):
-    # FIXME: we ma want to derive this from api.Extension, but it only makes
+    # FIXME: we may want to derive this from api.Extension, but it only makes
     # sense if specifying types in the code ("e.g. foo as string = ... ")
     """
     Base class for all Bakefile types.
@@ -49,7 +50,6 @@ class Type(object):
 
        Human-readable name of the type, e.g. "path" or "bool".
     """
-
     name = None
 
     def normalize(self, e):
@@ -62,7 +62,6 @@ class Type(object):
         """
         # by default, no normalization is done:
         return e
-
 
     def validate(self, e):
         """
@@ -77,12 +76,10 @@ class AnyType(Type):
     """
     A fallback type that allows any value at all.
     """
-
     name = "any"
 
     def validate(self, e):
         pass # anything is valid
-
 
 
 class BoolType(Type):
@@ -90,7 +87,6 @@ class BoolType(Type):
     Boolean value type. May be product of a boolean expression or one of the
     following literals with obvious meanings: "true" or "false".
     """
-
     name = "bool"
     allowed_values = [TRUE, FALSE]
 
@@ -104,12 +100,10 @@ class BoolType(Type):
             raise TypeError(self, e)
 
 
-
 class IdType(Type):
     """
     Type for target IDs.
     """
-
     name = "id"
 
     def validate(self, e):
@@ -119,12 +113,10 @@ class IdType(Type):
         # FIXME: needs to check that the value is a known ID
 
 
-
 class PathType(Type):
     """
     A file or directory name.
     """
-
     name = "path"
 
     def normalize(self, e):
@@ -142,7 +134,6 @@ class PathType(Type):
         else:
             return expr.PathExpr(components, pos=e.pos)
 
-
     def validate(self, e):
         if not isinstance(e, expr.PathExpr):
             raise TypeError(self, e)
@@ -151,7 +142,6 @@ class PathType(Type):
                 raise TypeError(self, e,
                                 msg="\"%s\" is not a valid path anchor" % e.anchor)
         # FIXME: allow references
-
 
 
 class EnumType(Type):
@@ -163,13 +153,11 @@ class EnumType(Type):
 
        List of allowed values (strings).
     """
-
     name = "enum"
 
     def __init__(self, allowed_values):
         assert allowed_values, "list of values cannot be empty"
         self.allowed_values = [unicode(x) for x in allowed_values]
-
 
     def validate(self, e):
         if isinstance(e, expr.LiteralExpr):
@@ -183,7 +171,6 @@ class EnumType(Type):
             raise TypeError(self, e)
 
 
-
 class ListType(Type):
     """
     Type for a list of items of homogeneous type.
@@ -192,11 +179,9 @@ class ListType(Type):
 
        Type of items stored in the list (:class:`bkl.vartypes.Type` instance).
     """
-
     def __init__(self, item_type):
         self.item_type = item_type
         self.name = "list of %s" % item_type.name
-
 
     def normalize(self, e):
         # A non-list expression with single value is a special case of list
@@ -205,8 +190,6 @@ class ListType(Type):
             return expr.ListExpr([self.item_type.normalize(i) for i in e.items], pos=e.pos)
         else:
             return expr.ListExpr([self.item_type.normalize(e)], pos=e.pos)
-
-
 
     def validate(self, e):
         if isinstance(e, expr.ListExpr):

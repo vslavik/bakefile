@@ -26,6 +26,7 @@ import antlr3
 import ast
 from BakefileLexer import BakefileLexer
 from BakefileParser import BakefileParser
+
 from bkl.error import ParserError
 
 
@@ -40,7 +41,6 @@ class _BakefileErrorsMixin(object):
 
         msg = self.getErrorMessage(e, tokenNames)
         raise ParserError(msg, pos=pos)
-
 
     def getTokenErrorDisplay(self, t):
         # workaround for an ugly behavior in ANTLRv3's Python bindings: it

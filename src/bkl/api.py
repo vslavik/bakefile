@@ -31,7 +31,6 @@ import error
 # Metaclass used for all extensions in order to implement automatic
 # extensions registration. For internal use only.
 class _ExtensionMetaclass(ABCMeta):
-
     def __init__(cls, name, bases, dct):
         super(_ExtensionMetaclass, cls).__init__(name, bases, dct)
 
@@ -89,7 +88,6 @@ class Extension(object):
        extensions is what is used in target declarations; likewise for
        property names.
     """
-
     __metaclass__ = _ExtensionMetaclass
 
     @classmethod
@@ -132,7 +130,6 @@ class Extension(object):
             _extension_instances[key] = cls._implementations[name]()
         return _extension_instances[key]
 
-
     @classmethod
     def all(cls):
         """
@@ -142,14 +139,12 @@ class Extension(object):
         for name in cls.all_names():
             yield cls.get(name)
 
-
     @classmethod
     def all_names(cls):
         """
         Returns names of all implementations of this extension type.
         """
         return cls._implementations.keys()
-
 
     @classmethod
     def all_properties(cls):
@@ -175,10 +170,8 @@ class Extension(object):
             #   want to add the same properties twice
             t = t.__base__
 
-
     name = None
     _implementations = {}
-
 
 
 class Property(object):
@@ -229,14 +222,12 @@ class Property(object):
            ...
 
     """
-
     def __init__(self, name, type, default=None, readonly=False, doc=None):
         self.name = name
         self.type = type
         self.default = default
         self.readonly = readonly
         self.__doc__ = doc
-
 
     def default_expr(self, for_obj):
         """
@@ -275,7 +266,6 @@ class Property(object):
         e = self.type.normalize(e)
         self.type.validate(e)
         return e
-
 
 
 class BuildNode(object):
@@ -325,7 +315,6 @@ class BuildNode(object):
                "phony target must have a name, non-phony must have outputs"
 
 
-
 class FileType(Extension):
     """
     Description of a file type. File types are used by
@@ -335,10 +324,8 @@ class FileType(Extension):
 
        List of extensions for this file type, e.g. ``["cpp", "cxx", "C"]``.
     """
-
     def __init__(self, extensions=[]):
         self.extensions = extensions
-
 
     def detect(self, filename):
         """
@@ -352,7 +339,6 @@ class FileType(Extension):
         return True
 
 
-
 class FileCompiler(Extension):
     """
     In Bakefile API, FileCompiler is used to define all compilation steps.
@@ -364,7 +350,6 @@ class FileCompiler(Extension):
     *file compiler*, but so is a linker (it "compiles" object files into
     executables) or e.g. Lex/Yacc compiler or Qt's MOC preprocessor.
     """
-
     #: :class:`bkl.api.FileType` for compiler's input file.
     in_type = None
 
@@ -380,7 +365,6 @@ class FileCompiler(Extension):
     #: (:const:`FileCompiler.MANY_TO_ONE`, e.g. the linker or Java compiler).
     cardinality = ONE_TO_ONE
 
-
     def is_supported(self, toolset):
         """
         Returns whether given toolset is supported by this compiler.
@@ -388,7 +372,6 @@ class FileCompiler(Extension):
         Default implementation returns True for all toolsets.
         """
         return True
-
 
     @abstractmethod
     def commands(self, input, output):
@@ -402,7 +385,6 @@ class FileCompiler(Extension):
             output file.
         """
         raise NotImplementedError
-
 
 
 class TargetType(Extension):
@@ -432,7 +414,6 @@ class TargetType(Extension):
         raise NotImplementedError
 
 
-
 class Toolset(Extension):
     """
     This class encapsulates generating of the project files or makefiles.
@@ -445,7 +426,6 @@ class Toolset(Extension):
     puts all the components (platform-specific commands, make syntax, compiler
     invocation, ...) together and writes out the makefiles or projects.
     """
-
     #: This toolset's compiler's object files type, as :class:`bkl.api.FileType`.
     # TODO: shouldn't be needed, get_compilation_subgraph() should figure it out.
     object_type = None
@@ -454,7 +434,6 @@ class Toolset(Extension):
     #: as :class:`Property` instances. Note that properties list is
     #: automagically inherited from base classes, if any.
     properties = []
-
 
     @abstractmethod
     def generate(self, project):

@@ -51,10 +51,8 @@ class Expr(object):
 
        Location of the expression in source tree.
     """
-
     def __init__(self, pos=None):
         self.pos = pos
-
 
     def as_py(self):
         """
@@ -70,7 +68,6 @@ class Expr(object):
         raise NotImplementedError
 
 
-
 class LiteralExpr(Expr):
     """
     Constant expression -- holds a literal.
@@ -83,38 +80,30 @@ class LiteralExpr(Expr):
 
        Location of the expression in source tree.
     """
-
     def __init__(self, value, pos=None):
         super(LiteralExpr, self).__init__(pos)
         self.value = value
 
-
     def as_py(self):
         return self.value
 
-
     def __str__(self):
         return str(self.value)
-
 
 
 class ListExpr(Expr):
     """
     List expression -- list of several values of the same type.
     """
-
     def __init__(self, items, pos=None):
         super(ListExpr, self).__init__(pos)
         self.items = items
 
-
     def as_py(self):
         return [ i.as_py() for i in self.items ]
 
-
     def __str__(self):
         return "[%s]" % ", ".join(str(x) for x in self.items)
-
 
 
 class ConcatExpr(Expr):
@@ -122,34 +111,27 @@ class ConcatExpr(Expr):
     Concatenation of several expression. Typically, used with LiteralExpr
     and ReferenceExpr to express values such as "$(foo).cpp".
     """
-
     def __init__(self, items, pos=None):
         super(ConcatExpr, self).__init__(pos)
         assert len(items) > 0
         self.items = items
 
-
     def as_py(self):
         return "".join(i.as_py() for i in self.items)
 
-
     def __str__(self):
         return "".join(str(i) for i in self.items)
-
 
 
 class NullExpr(Expr):
     """
     Empty/unset value.
     """
-
     def as_py(self):
         return None
 
-
     def __str__(self):
         return "null"
-
 
 
 class UndeterminedExpr(Expr):
@@ -159,7 +141,6 @@ class UndeterminedExpr(Expr):
     toolset-specific copies, to allow partial evaluation common to all of them.
     """
     pass
-
 
 
 class ReferenceExpr(Expr):
@@ -176,16 +157,13 @@ class ReferenceExpr(Expr):
        the appropriate :class:`bkl.model.ModelPart` instance (e.g. a target
        or a module).
     """
-
     def __init__(self, var, context, pos=None):
         super(ReferenceExpr, self).__init__(pos)
         self.var = var
         self.context = context
 
-
     def as_py(self):
         raise NonConstError(self)
-
 
     def get_value(self):
         """
@@ -199,10 +177,8 @@ class ReferenceExpr(Expr):
                 e.pos = self.pos
             raise
 
-
     def __str__(self):
         return "$(%s)" % self.var
-
 
 
 # anchors -- special syntax first components of a path
@@ -238,12 +214,10 @@ class PathExpr(Expr):
 
        Location of the expression in source tree.
     """
-
     def __init__(self, components, anchor=ANCHOR_TOP_SRCDIR, pos=None):
         super(PathExpr, self).__init__(pos)
         self.components = components
         self.anchor = anchor
-
 
     def as_py(self, top_srcdir=None):
         assert top_srcdir, \
@@ -253,10 +227,8 @@ class PathExpr(Expr):
         comp = (e.as_py() for e in self.components)
         return os.path.join(top_srcdir, os.path.sep.join(comp))
 
-
     def __str__(self):
         return "%s/%s" % (self.anchor, "/".join(str(e) for e in self.components))
-
 
     def get_extension(self):
         """
@@ -273,8 +245,6 @@ class PathExpr(Expr):
                 return last.value[dot+1:]
 
         raise Error("cannot determine extension of \"%s\"" % self, self.pos)
-
-
 
     def change_extension(self, newext):
         """
@@ -299,7 +269,6 @@ class PathExpr(Expr):
         return PathExpr(comps, self.anchor)
 
 
-
 class Visitor(object):
     """
     Implements visitor pattern for :class:`Expr` expressions. This is abstract
@@ -321,7 +290,6 @@ class Visitor(object):
         assert t in self._dispatch, "unknown expression type (%s)" % t
         func = self._dispatch[t]
         return func(self, e)
-
 
     @abstractmethod
     def literal(self, e):
@@ -357,7 +325,6 @@ class Visitor(object):
     }
 
 
-
 class PathAnchors(object):
     """
     Struct with information about real values for symbolic *anchors* of
@@ -391,7 +358,6 @@ class PathAnchors(object):
        other generated files are put -- as a list of components, relative
        to *outdir*. Will be empty list if the paths are the same.
     """
-
     def __init__(self, dirsep, outpath, top_srcpath):
         """
         The constructor creates anchors information from native paths passed
@@ -445,7 +411,6 @@ def _pathcomp_make_relative(what, to):
     return [".."] * (len(to) - first_not_common) + what2[first_not_common:]
 
 
-
 class Formatter(Visitor):
     """
     Base class for expression formatters. A *formatter* is a class that
@@ -467,7 +432,6 @@ class Formatter(Visitor):
 
        :class:`PathAnchors` information object to use for formatting of paths.
     """
-
     list_sep = " "
 
     def __init__(self, paths_info):
@@ -500,7 +464,6 @@ class Formatter(Visitor):
 
         comps = [self.format(i) for i in e.components]
         return self.paths_info.dirsep.join(base + comps)
-
 
 
 def split(e, sep):
@@ -554,7 +517,6 @@ def split(e, sep):
                     pos = e.pos)
 
 
-
 def simplify(e):
     """
     Simplify expression *e*. This does "cheap" simplifications such
@@ -562,7 +524,6 @@ def simplify(e):
     eliminating unnecessary variable references (turn ``foo=$(x);bar=$(foo)``
     into ``bar=$(x)``) etc.
     """
-
     if isinstance(e, ListExpr):
         return ListExpr([simplify(i) for i in e.items], pos=e.pos)
     elif isinstance(e, PathExpr):
@@ -595,7 +556,6 @@ def simplify(e):
     return e
 
 
-
 def all_possible_values(e):
     """
     Given an expression *e*, returns a Python iterator over all its possible
@@ -605,7 +565,6 @@ def all_possible_values(e):
     which is probably not something you want and
     :func:`bkl.expr.all_possible_elements()` is a better choice.
     """
-
     assert not isinstance(e, ListExpr), \
            "use all_possible_elements() with lists (%s)" % e
 
@@ -628,7 +587,6 @@ def all_possible_values(e):
     else:
         raise Error("cannot determine all possible values of expression \"%s\"" % e,
                     pos=e.pos)
-
 
 
 def all_possible_elements(e):

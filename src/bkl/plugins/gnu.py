@@ -39,11 +39,9 @@ class GnuObjectFileType(FileType):
         FileType.__init__(self, extensions=["o"])
 
 
-
 class GnuFileCompiler(FileCompiler):
     def is_supported(self, toolset):
         return toolset == GnuToolset.get()
-
 
 
 class GnuCCompiler(GnuFileCompiler):
@@ -64,7 +62,6 @@ class GnuCCompiler(GnuFileCompiler):
                 ])]
 
 
-
 class GnuCXXompiler(GnuFileCompiler):
     """
     GNU C++ compiler.
@@ -81,7 +78,6 @@ class GnuCXXompiler(GnuFileCompiler):
                   output,
                   input
                 ])]
-
 
 
 class GnuLinker(GnuFileCompiler):
@@ -102,14 +98,12 @@ class GnuLinker(GnuFileCompiler):
                 ])]
 
 
-
 class GnuMakefileFormatter(MakefileFormatter):
     """
     Formatter for the GNU Make syntax.
     """
     # The basics are common to all makes, nothing to add (yet)
     pass
-
 
 
 class GnuToolset(MakefileToolset):
@@ -123,7 +117,6 @@ class GnuToolset(MakefileToolset):
     In particular, file extensions and linker behavior (symlinks, sonames) are assumed
     to be Linux ones.
     """
-
     name = "gnu"
 
     Formatter = GnuMakefileFormatter

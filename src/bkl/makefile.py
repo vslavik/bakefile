@@ -53,7 +53,6 @@ class MakefileFormatter(Extension):
     This base class implements methods that are common for most make variants;
     derived classes can override them and they must implement the rest.
     """
-
     @staticmethod
     def comment(text):
         """
@@ -62,7 +61,6 @@ class MakefileFormatter(Extension):
         :param text: text of the comment
         """
         return "\n".join("# %s" % s for s in text.split("\n"))
-
 
     @staticmethod
     def var_reference(var):
@@ -76,7 +74,6 @@ class MakefileFormatter(Extension):
         """
         return "$(%s)" % var
 
-
     @staticmethod
     def var_definition(var, value):
         """
@@ -89,7 +86,6 @@ class MakefileFormatter(Extension):
                       may be multi-line
         """
         return "%s = %s" % (var, " \\\n\t".join(value.split("\n")))
-
 
     @staticmethod
     def target(name, deps, commands):
@@ -118,9 +114,7 @@ class MakefileFormatter(Extension):
         return out
 
 
-
 class _MakefileExprFormatter(expr.Formatter):
-
     def __init__(self, makefile_formatter, paths_info):
         super(_MakefileExprFormatter, self).__init__(paths_info)
         self.makefile_formatter = makefile_formatter
@@ -129,12 +123,10 @@ class _MakefileExprFormatter(expr.Formatter):
         return self.makefile_formatter.var_reference(e.var)
 
 
-
 class MakefileToolset(Toolset):
     """
     Base class for makefile-based toolsets.
     """
-
     #: :class:`MakefileFormatter`-derived class for this toolset.
     Formatter = None
 
@@ -149,11 +141,9 @@ class MakefileToolset(Toolset):
                      doc="Name of output file for module's makefile."),
     ]
 
-
     def generate(self, project):
         for m in project.modules:
             self._gen_makefile(m)
-
 
     def _gen_makefile(self, module):
         assert self.default_makefile is not None

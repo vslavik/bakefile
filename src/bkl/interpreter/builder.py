@@ -49,7 +49,6 @@ class Builder(object):
        descending into a target, it is temporarily set to said target and
        then restored and so on.
     """
-
     def create_model(self, ast, parent):
         """Returns constructed model, as :class:`bkl.model.Module` instance."""
         mod = Module(parent, source_file=ast.filename)
@@ -95,7 +94,6 @@ class Builder(object):
             if e.pos is None and node.pos is not None:
                 e.pos = node.pos
             raise e
-
 
 
     def on_assignment(self, node):

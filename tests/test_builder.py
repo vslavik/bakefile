@@ -22,11 +22,11 @@
 #  IN THE SOFTWARE.
 #
 
-import bkl.parser, bkl.interpreter, bkl.error
-import bkl.dumper
-
 import os, os.path
 from glob import glob
+
+import bkl.parser, bkl.interpreter, bkl.error
+import bkl.dumper
 
 
 def test_builder():

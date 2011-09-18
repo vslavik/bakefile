@@ -37,7 +37,6 @@ class OrderedDict(dict):
     #        Python 2.7/3.1
 
     # These must be overriden in derived class:
-
     def __init__(self):
         dict.__init__(self)
         self.order = []
@@ -60,7 +59,6 @@ class OrderedDict(dict):
         return c
 
     # The rest is implemented using above methods:
-
     def update(self, dict):
         for k, v in dict.iteritems():
             self[k] = v

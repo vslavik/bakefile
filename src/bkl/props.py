@@ -33,7 +33,6 @@ from vartypes import IdType, EnumType, ListType
 from api import Property
 
 
-
 def std_target_props():
     """Creates list of all standard target properties."""
     return [
@@ -78,7 +77,6 @@ def std_project_props():
         ]
 
 
-
 def _fill_prop_dict(props):
     d = {}
     for p in props:
@@ -90,13 +88,11 @@ class PropertiesCache(object):
     """
     Cache of existing properties.
     """
-
     def __init__(self):
         self.all_targets = None
         self.modules = None
         self.project = None
         self.target_types = {}
-
 
     def get_target_prop(self, target_type, name):
         if self.all_targets is None:
@@ -110,19 +106,15 @@ class PropertiesCache(object):
             props = self.target_types[target_type]
         return props.get(name, None)
 
-
     def get_module_prop(self, name):
         if self.modules is None:
             self.modules = _fill_prop_dict(std_module_props())
         return self.modules.get(name, None)
 
-
     def get_project_prop(self, name):
         if self.project is None:
             self.project = _fill_prop_dict(std_project_props())
         return self.project.get(name, None)
-
-
 
 
 cache = PropertiesCache()

@@ -42,7 +42,6 @@ def normalize_vars(model):
         var.value = var.type.normalize(var.value)
 
 
-
 def check_var_types(model):
     """
     Validates that values assigned to variables correspond to their types.
@@ -51,7 +50,6 @@ def check_var_types(model):
     logger.debug("checking types of variables")
     for var in model.all_variables():
         var.type.validate(var.value)
-
 
 
 def simplify_exprs(model):

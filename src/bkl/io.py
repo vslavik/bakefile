@@ -49,7 +49,6 @@ class OutputFile(object):
 
     Notice the need to explicitly call commit().
     """
-
     def __init__(self, filename, eol):
         """
         Creates output file.
@@ -62,7 +61,6 @@ class OutputFile(object):
         self.eol = eol
         self.text = ""
 
-
     def write(self, text):
         """
         Writes text to the output, performing line endings conversion as
@@ -70,7 +68,6 @@ class OutputFile(object):
         commit().
         """
         self.text += text
-
 
     def commit(self):
         if self.eol == EOL_WINDOWS:
