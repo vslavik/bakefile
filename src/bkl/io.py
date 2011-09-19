@@ -72,7 +72,19 @@ class OutputFile(object):
     def commit(self):
         if self.eol == EOL_WINDOWS:
             self.text = self.text.replace("\n", "\r\n")
-        logger.info("creating file %s" % self.filename)
-        # FIXME: not atomic, needs file-level locking!
-        with open(self.filename, "wt") as f:
-            f.write(self.text)
+
+        try:
+            with open(self.filename, "rt") as f:
+                old = f.read()
+        except IOError:
+            old = None
+        
+        if old == self.text:
+            logger.info("no changes in file %s" % self.filename)
+        else:
+            if old is None:
+                logger.info("creating file %s" % self.filename)
+            else:
+                logger.info("updating file %s" % self.filename)
+            with open(self.filename, "wt") as f:
+                f.write(self.text)
