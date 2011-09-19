@@ -1,2 +1,3 @@
 ERROR:
-vars/multiline_bad.bkl:2:9: no viable alternative at input '\n'
+vars/multiline_bad.bkl:2:6: no viable alternative at input 'two'
+

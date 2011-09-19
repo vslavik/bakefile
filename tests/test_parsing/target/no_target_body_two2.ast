@@ -1,2 +1,2 @@
 ERROR:
-target/no_target_body_two2.bkl:1:7: no viable alternative at input '\n'
+target/no_target_body_two2.bkl:2:0: missing '{' at 'exe'

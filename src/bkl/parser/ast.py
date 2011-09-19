@@ -188,6 +188,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.ID             : IdNode,
         BakefileParser.LIST           : ListNode,
         BakefileParser.CONCAT         : ConcatNode,
+        BakefileParser.LIST_OR_CONCAT : Node, # post-processed below
         BakefileParser.ASSIGN         : AssignmentNode,
         BakefileParser.APPEND         : AppendNode,
         BakefileParser.VAR_REFERENCE  : VarReferenceNode,
@@ -200,4 +201,49 @@ class _TreeAdaptor(CommonTreeAdaptor):
         else:
             n = self.TOKENS_MAP[payload.type](payload)
             n.filename = self.filename
+            return n
+
+    def rulePostProcessing(self, root):
+        root = CommonTreeAdaptor.rulePostProcessing(self, root)
+        if root is not None:
+            if root.token and root.token.type == BakefileParser.LIST_OR_CONCAT:
+                root = self.filter_list_or_concat(root)
+        return root
+
+    def filter_list_or_concat(self, node):
+        """
+        Given LIST_OR_CONCAT node, determine which parts are concatenations
+        (e.g. "foo$(bar)zar") and which are list elements ("foo bar"). Note
+        that a typical list expression may contain both ("foo bar$(zar)").
+
+        FIXME: It would be better to do it here, with backtrack=true and
+               validating predicates to build it directly, but bugs in
+               ANTLR 3.4's Python binding prevent it from working at the moment. 
+        """
+        concats = []
+        children = node.children
+        while children:
+            adjacent = [children.pop(0)]
+            while children:
+                if adjacent[-1].tokenStopIndex + 1 == children[0].tokenStartIndex:
+                    # adjacent tokens mean concatenation
+                    c = children.pop(0)
+                    adjacent.append(c)
+                else:
+                    # whitespace in between, is a list
+                    break
+            if len(adjacent) == 1:
+                concats.append(adjacent[0])
+            else:
+                n = self.createFromType(BakefileParser.CONCAT, text=None)
+                for c in adjacent:
+                    n.addChild(c)
+                concats.append(n)
+
+        if len(concats) == 1:
+            return concats[0]
+        else:
+            n = self.createFromType(BakefileParser.LIST, text=None)
+            for c in concats:
+                n.addChild(c)
             return n
