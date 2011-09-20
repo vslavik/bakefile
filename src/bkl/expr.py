@@ -140,7 +140,8 @@ class UndeterminedExpr(Expr):
     In particular, it is used for the "toolset" property before the model is split into
     toolset-specific copies, to allow partial evaluation common to all of them.
     """
-    pass
+    def as_py(self):
+        raise NonConstError(self)
 
 
 class ReferenceExpr(Expr):
