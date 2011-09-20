@@ -1,12 +1,12 @@
 module {
   variables {
-    foo = "1"
-    bar = "2"
-    FOO = ["bar", "yy1xx", "zar"]
-    X = "foo2"
-    Y = "foo2zar"
-    Z = "12"
-    W = "foobar"
+    foo = 1
+    bar = 2
+    FOO = [bar, yy1xx, zar]
+    X = foo2
+    Y = foo2zar
+    Z = 12
+    W = foobar
   }
   targets {
   }

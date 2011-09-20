@@ -81,7 +81,7 @@ def _dump_vars(part):
 
 
 def _dump_variable(var):
-    return "%s = %s" % (var.name, _dump_expression(var.value))
+    return "%s = %s" % (var.name, var.value)
 
 
 def _dump_target(target):
@@ -89,27 +89,3 @@ def _dump_target(target):
     out += _indent(_dump_vars(target))
     out += "\n}"
     return out
-
-
-def _dump_expression(e):
-    if isinstance(e, expr.LiteralExpr):
-        # FIXME: handle types
-        return '"%s"' % e.value
-    elif isinstance(e, expr.PathExpr):
-        components = [_dump_expression(x) for x in e.components]
-        if e.anchor == expr.ANCHOR_TOP_SRCDIR:
-            return "/".join(components)
-        else:
-            return "%s/%s" % (e.anchor, "/".join(components))
-    elif isinstance(e, expr.ReferenceExpr):
-        return "$(%s)" % e.var
-    elif isinstance(e, expr.ListExpr):
-        items = [_dump_expression(x) for x in e.items]
-        return "[%s]" % ", ".join(items)
-    elif isinstance(e, expr.ConcatExpr):
-        items = [_dump_expression(x) for x in e.items]
-        return "".join(items)
-    elif isinstance(e, expr.NullExpr):
-        return "null"
-    else:
-        assert False, "unknown expression type"

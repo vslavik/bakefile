@@ -1,11 +1,10 @@
 module {
   variables {
-    toolsets = ["gnu"]
+    toolsets = [gnu]
   }
   targets {
     exe dummy {
-        sources = ["one.c", "two.c"]
+        sources = [@top_srcdir/one.c, @top_srcdir/two.c]
     }
   }
 }
-

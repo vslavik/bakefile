@@ -1,7 +1,7 @@
 module {
   variables {
-    foo = ["one", "two", "three"]
-    bar = ["one", "two", "three"]
+    foo = [one, two, three]
+    bar = [one, two, three]
   }
   targets {
   }

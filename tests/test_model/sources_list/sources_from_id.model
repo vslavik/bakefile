@@ -1,10 +1,10 @@
 module {
   variables {
-    toolsets = ["gnu"]
+    toolsets = [gnu]
   }
   targets {
     exe hello {
-        sources = ["hello.c"]
+        sources = [@top_srcdir/hello.c]
     }
   }
 }
