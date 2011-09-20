@@ -164,7 +164,7 @@ class ReferenceExpr(Expr):
         self.context = context
 
     def as_py(self):
-        raise NonConstError(self)
+        return self.get_value().as_py()
 
     def get_value(self):
         """
