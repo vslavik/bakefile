@@ -114,3 +114,13 @@ class UndefinedError(Error):
     have a value.
     """
     pass
+
+
+class CannotDetermineError(Error):
+    """
+    Exception thrown when something (e.g. equality) cannot be determined.
+    This usually signifies a weakness in Bakefile implementation that should
+    be improved.
+    """
+    def __init__(self, msg=None, pos=None):
+        super(CannotDetermineError, self).__init__(msg, pos)

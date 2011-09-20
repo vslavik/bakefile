@@ -62,19 +62,16 @@ class Variable(object):
         self.readonly = readonly
 
     @staticmethod
-    def from_property(prop, value):
+    def from_property(prop, value=None):
         """
         Creates a variable from property *prop*. In particular, takes the type
         and :attr:`readonly` attribute from the property. Properties' default
         value is *not* assigned; *value* is used instead.
         """
         v = Variable(name=prop.name,
-                     value=None,
+                     value=value,
                      type=prop.type,
                      readonly=prop.readonly)
-        # this is intentional; if the property is read-only,
-        # set_value() will fail:
-        v.set_value(value)
         return v
 
     def set_value(self, value):

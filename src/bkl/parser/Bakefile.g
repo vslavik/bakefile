@@ -42,6 +42,11 @@ tokens {
     LIST_OR_CONCAT;
     LIST;
     CONCAT;
+    IF;
+}
+
+scope StmtScope {
+    insideTarget;
 }
 
 // Bakefile grammar uses newlines to terminate statements, unlike C and like
@@ -59,11 +64,16 @@ tokens {
 // Overall program structure
 // ---------------------------------------------------------------------------
 
-program: stmt* EOF -> ^(PROGRAM stmt*);
+
+program
+scope StmtScope;
+@init { $StmtScope::insideTarget = False }
+    : stmt* EOF -> ^(PROGRAM stmt*);
 
 stmt
     : assignment_stmt
-    | target_stmt
+    | {not $StmtScope::insideTarget}?=> target_stmt
+    | if_stmt
     | NEWLINE -> // empty statement
     ;
 
@@ -74,22 +84,40 @@ assignment_stmt
     ;
 
 
+if_stmt
+    : 'if' LPAREN expression RPAREN if_body      -> ^(IF expression if_body)
+    ;
+
+if_body
+    : stmt
+    | NEWLINE* '{' (stmt)* '}'  -> stmt*
+    ;
+
 // ---------------------------------------------------------------------------
 // Expressions
 // ---------------------------------------------------------------------------
 
-identifier: t=TEXT             -> ID[$t];
-
-literal
-    : t=TEXT                   -> LITERAL[$t]
-    | t=QUOTED_TEXT            -> LITERAL[$t, $t.text[1:-1\]]
-    ;
-
 // expression may span multiple lines, but only if enclosed in ( ... )
-expression
-    : element
-    | LPAREN expression RPAREN             -> expression
+expression : expr_and;
+
+expr_and
+    : expr_or (AND^ expr_or)*
     ;
+
+expr_or
+    : expr_eq (OR^ expr_eq)*
+    ;
+
+expr_eq
+    : expr_atom ((EQUAL | NOT_EQUAL)^ expr_atom)?
+    ;
+
+expr_atom
+    : element
+    | NOT expr_atom                                 -> ^(NOT expr_atom)
+    | LPAREN expression RPAREN                      -> expression
+    ;
+
 
 // Single element of an expression. This can be either a single literal,
 // a variable reference, or a concatenation of any combination of them.
@@ -114,6 +142,12 @@ element_part
     | '$(' identifier ')'                  -> ^(VAR_REFERENCE identifier)
     ;
 
+identifier: t=TEXT             -> ID[$t];
+
+literal
+    : t=TEXT                   -> LITERAL[$t]
+    | t=QUOTED_TEXT            -> LITERAL[$t, $t.text[1:-1\]]
+    ;
 
 // ---------------------------------------------------------------------------
 // Targets
@@ -124,19 +158,24 @@ element_part
 //     exe hello {}
 
 target_stmt
+scope StmtScope;
+@init { $StmtScope::insideTarget = True }
     : type=identifier id=identifier NEWLINE* '{' target_content* '}' NEWLINE
                             -> ^(TARGET $type $id target_content*)
     ;
 
-target_content
-    : assignment_stmt
-    | NEWLINE -> // empty statement
-    ;
+target_content : stmt;
 
 
 // ---------------------------------------------------------------------------
 // Basic tokens
 // ---------------------------------------------------------------------------
+
+AND:       '&&';
+OR:        '||';
+NOT:       '!';
+EQUAL:     '==';
+NOT_EQUAL: '!=';
 
 LPAREN: '(' {self.implicitLineJoiningLevel += 1};
 RPAREN: ')' {self.implicitLineJoiningLevel -= 1};

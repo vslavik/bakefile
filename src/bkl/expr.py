@@ -182,6 +182,114 @@ class ReferenceExpr(Expr):
         return "$(%s)" % self.var
 
 
+class BoolExpr(Expr):
+    """
+    Boolean expression.
+
+    .. attribute:: operator
+
+       Boolean operator of the node. The value is one of `BoolExpr` constants,
+       e.g. `BoolExpr.AND`.
+
+    .. attribute:: left
+
+       Left (or in the case of NOT operator, only) operand.
+
+    .. attribute:: right
+
+       Right operand. Not set for the NOT operator.
+    """
+
+    #: And operator
+    AND       = "&&"
+    #: Or operator
+    OR        = "||"
+    #: Equality operator
+    EQUAL     = "=="
+    #: Inequality operator
+    NOT_EQUAL = "!="
+    #: Not operator; unlike others, this one is unary and has no right operand.
+    NOT       = "!"
+
+    def __init__(self, operator, left, right=None, pos=None):
+        super(BoolExpr, self).__init__(pos)
+        self.operator = operator
+        self.left = left
+        self.right = right
+
+    def as_py(self):
+        op = self.operator
+        if op == BoolExpr.AND:
+            return self.left.as_py() and self.right.as_py()
+        elif op == BoolExpr.OR:
+            return self.left.as_py() or self.right.as_py()
+        elif op == BoolExpr.EQUAL:
+            try:
+                return are_equal(self.left, self.right)
+            except CannotDetermineError:
+                raise CannotDetermineError('cannot evaluate bool expression "%s"' % self, self.pos)
+        elif op == BoolExpr.NOT_EQUAL:
+            try:
+                return not are_equal(self.left, self.right)
+            except CannotDetermineError:
+                raise CannotDetermineError('cannot evaluate bool expression "%s"' % self, self.pos)
+        elif op == BoolExpr.NOT:
+            return not self.left.as_py()
+        else:
+            assert False, "invalid BoolExpr operator"
+
+    def __str__(self):
+        if self.operator == BoolExpr.NOT:
+            return "!%s" % self.left
+        else:
+            return "(%s %s %s)" % (self.left, self.operator, self.right)
+
+
+class IfExpr(Expr):
+    """
+    Conditional expression.
+
+    .. attribute:: cond
+
+       The condition expression.
+
+    .. attribute:: value_yes
+
+       Value of the expression if the condition evaluates to True.
+
+    .. attribute:: value_no
+
+       Value of the expression if the condition evaluates to False.
+    """
+    def __init__(self, cond, yes, no, pos=None):
+        super(IfExpr, self).__init__(pos)
+        self.cond = cond
+        self.value_yes = yes
+        self.value_no = no
+
+    def as_py(self):
+        if self.cond.as_py():
+            return self.value_yes.as_py()
+        else:
+            return self.value_no.as_py()
+
+    def get_value(self):
+        """
+        Returns value of the conditional expression, i.e. either
+        :attr:`value_yes` or :attr:`value_no`, depending on what the condition
+        evaluates to. Throws if the condition cannot be evaluated.
+        """
+        try:
+            return self.value_yes if self.cond.as_py() else self.value_no
+        except Error as e:
+            if self.pos:
+                e.pos = self.pos
+            raise
+
+    def __str__(self):
+        return "(%s ? %s : %s)" % (self.cond, self.value_yes, self.value_no)
+
+
 # anchors -- special syntax first components of a path
 ANCHOR_TOP_SRCDIR = "@top_srcdir"
 ANCHOR_BUILDDIR = "@builddir"
@@ -317,12 +425,24 @@ class Visitor(object):
         """Called on :class:`PathExpr` expressions."""
         raise NotImplementedError
 
+    @abstractmethod
+    def bool(self, e):
+        """Called on :class:`BoolExpr` expressions."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def if_(self, e):
+        """Called on :class:`IfExpr` expressions."""
+        raise NotImplementedError
+
     _dispatch = {
         LiteralExpr   : lambda self,e: self.literal(e),
         ListExpr      : lambda self,e: self.list(e),
         ConcatExpr    : lambda self,e: self.concat(e),
         ReferenceExpr : lambda self,e: self.reference(e),
         PathExpr      : lambda self,e: self.path(e),
+        BoolExpr      : lambda self,e: self.bool(e),
+        IfExpr        : lambda self,e: self.if_(e),
     }
 
 
@@ -465,6 +585,15 @@ class Formatter(Visitor):
 
         comps = [self.format(i) for i in e.components]
         return self.paths_info.dirsep.join(base + comps)
+
+    def bool(self, e):
+        raise NotImplementedError
+
+    def if_(self, e):
+        # Default implementation evaluates the condition and prints
+        # the value that the expression evals to, throwing if the condition
+        # cannot be determined.
+        return self.format(e.get_value())
 
 
 def split(e, sep):
@@ -619,3 +748,18 @@ def all_possible_elements(e):
             if key not in already_added:
                 already_added.add(key)
                 yield v
+
+
+def are_equal(a, b):
+    """
+    Compares two expressions for equality.
+
+    Throws the CannotDetermineError() exception if it cannot reliably
+    determine equality.
+    """
+    try:
+        # FIXME: This is not good enough, the comparison should be done
+        #        symbolically as much as possible.
+        return a.as_py() == b.as_py()
+    except NonConstError:
+        raise CannotDetermineError()

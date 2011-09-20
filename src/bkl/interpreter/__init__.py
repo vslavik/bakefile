@@ -147,10 +147,9 @@ class Interpreter(object):
         model = deepcopy(self.model)
 
         # don't use Variable.from_property(), because it's read-only
-        model.add_variable(bkl.model.Variable(name="toolset",
-                                              value=bkl.expr.LiteralExpr(toolset),
-                                              type=model.get_prop("toolset").type,
-                                              readonly=True))
+        model.add_variable(bkl.model.Variable.from_property(
+                                              model.get_prop("toolset"),
+                                              bkl.expr.LiteralExpr(toolset)))
 
         self.finalize_for_toolset(model)
 

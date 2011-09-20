@@ -176,6 +176,27 @@ class TargetNode(Node):
                        doc="Other content: variables assignments and such")
 
 
+class IfNode(Node):
+    """Conditional content node -- "if" statement."""
+    cond = property(lambda self: self.children[0],
+                   doc="Condition expression")
+    content = property(lambda self: self.children[1:],
+                       doc="Conditional statements")
+
+
+class BoolNode(Node):
+    operator = property(lambda self: self.token.type,
+                        doc="Boolean operator (token type, e.g. AND)")
+    left = property(lambda self: self.children[0], doc="Left operand")
+    right = property(lambda self: self.children[1], doc="Right operand")
+
+class OrNode(BoolNode): pass
+class AndNode(BoolNode): pass
+class NotNode(BoolNode): pass
+class EqualNode(BoolNode): pass
+class NotEqualNode(BoolNode): pass
+
+
 class _TreeAdaptor(CommonTreeAdaptor):
     """Adaptor for ANTLR3 AST tree creation."""
     def __init__(self, filename):
@@ -193,6 +214,12 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.APPEND         : AppendNode,
         BakefileParser.VAR_REFERENCE  : VarReferenceNode,
         BakefileParser.TARGET         : TargetNode,
+        BakefileParser.IF             : IfNode,
+        BakefileParser.OR             : OrNode,
+        BakefileParser.AND            : AndNode,
+        BakefileParser.NOT            : NotNode,
+        BakefileParser.EQUAL          : EqualNode,
+        BakefileParser.NOT_EQUAL      : NotEqualNode,
     }
 
     def createWithPayload(self, payload):

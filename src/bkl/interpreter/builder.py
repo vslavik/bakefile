@@ -23,11 +23,12 @@
 #
 
 from ..api import TargetType
-from ..expr import LiteralExpr, ListExpr, ConcatExpr, ReferenceExpr, NullExpr
+from ..expr import *
 from ..model import Module, Target, Variable
 from ..parser.ast import *
 from ..error import Error, ParserError
 from ..vartypes import ListType
+import bkl.parser.BakefileParser as BakefileParser
 
 
 class Builder(object):
@@ -50,6 +51,15 @@ class Builder(object):
        descending into a target, it is temporarily set to said target and
        then restored and so on.
     """
+
+    active_if_cond = property(lambda self: self.if_stack[-1] if self.if_stack else None,
+                              doc="Currently active 'if' statement condition, if any.")
+
+    def __init__(self):
+        self.context = None
+        self.if_stack = []
+
+
     def create_model(self, ast, parent):
         """Returns constructed model, as :class:`bkl.model.Module` instance."""
         mod = Module(parent, source_file=ast.filename)
@@ -97,62 +107,73 @@ class Builder(object):
             raise e
 
 
-    def _get_or_init_variable(self, varname):
-        """
-        Gets the variable in model. If it doesn't exist, tries to create it
-        from a property if there's any.
-        """
+    def _assign_to_var(self, node, append):
+        varname = node.var
+        value = self._build_expression(node.value)
         var = self.context.get_variable(varname)
 
+        has_cond = self.active_if_cond is not None
+        if has_cond:
+            value = IfExpr(self.active_if_cond,
+                           yes=value,
+                           no=NullExpr(),
+                           pos=node.pos)
+
         if var is None:
-            # Create new variable.
-            #
             # If there's an appropriate property with the same name, then
             # this assignment expression needs to be interpreted as assignment
             # to said property. In other words, the new variable's type
             # must much that of the property.
             prop = self.context.get_prop(varname)
             if prop:
-                var = Variable.from_property(prop, NullExpr())
+                if append:
+                    propval = prop.default_expr(self.context)
+                else:
+                    propval = NullExpr() # we'll set it below
+                var = Variable.from_property(prop, propval)
                 self.context.add_variable(var)
 
-        return var
-
-
-    def on_assignment(self, node):
-        varname = node.var
-        value = self._build_expression(node.value)
-        var = self._get_or_init_variable(varname)
-
         if var is None:
+            if append:
+                raise ParserError('unknown variable "%s"' % varname)
             # Create new variable.
             self.context.add_variable(Variable(varname, value))
         else:
             # modify existing variable
-            var.set_value(value)
+            if append:
+                if not isinstance(var.type, ListType):
+                    raise ParserError('cannot append to non-list variable "%s" (type: %s)' %
+                                      (varname, var.type))
+                if isinstance(var.value, ListExpr):
+                    value = ListExpr(var.value.items + [value])
+                else:
+                    value = ListExpr([var.value, value])
+                value.pos = node.pos
+                var.set_value(value)
+            else:
+                if not isinstance(var.value, NullExpr):
+                    # Preserve previous value. Consider this code:
+                    #   foo = one
+                    #   if ( someCond ) foo = two
+                    value.value_no = var.value
+                var.set_value(value)
 
+    def on_assignment(self, node):
+        self._assign_to_var(node, append=False)
 
     def on_append(self, node):
-        varname = node.var
-        value = self._build_expression(node.value)
-        var = self._get_or_init_variable(varname)
-        if var is None:
-            raise ParserError('unknown variable "%s"' % varname)
-        if not isinstance(var.type, ListType):
-            raise ParserError('cannot append to non-list variable "%s" (type: %s)' %
-                              (varname, var.type))
-        if isinstance(var.value, ListExpr):
-            listval = ListExpr(var.value.items + [value])
-        else:
-            listval = ListExpr([var.value, value])
-        listval.pos = node.pos
-        var.set_value(listval)
+        self._assign_to_var(node, append=True)
 
 
     def on_target(self, node):
         name = node.name.text
         if name in self.context.targets:
             raise ParserError("target ID \"%s\" not unique" % name)
+
+        if self.active_if_cond:
+            raise ParserError("conditionally built targets not supported yet"
+                              ' (condition "%s" set at %s)' % (
+                                  self.active_if_cond, self.active_if_cond.pos))
 
         type_name = node.type.text
         try:
@@ -166,26 +187,62 @@ class Builder(object):
         self.handle_children(node.content, target)
 
 
-    def _build_expression(self, ast):
-        if isinstance(ast, LiteralNode):
-            # FIXME: type handling
-            e = LiteralExpr(ast.text)
-        elif isinstance(ast, VarReferenceNode):
-            e= ReferenceExpr(ast.var, self.context)
-        elif isinstance(ast, ListNode):
-            items = [self._build_expression(e) for e in ast.values]
-            e = ListExpr(items)
-        elif isinstance(ast, ConcatNode):
-            items = [self._build_expression(e) for e in ast.values]
-            e = ConcatExpr(items)
-        else:
-            assert False, "unrecognized AST node (%s)" % ast
-        e.pos = ast.pos
-        return e
+    def on_if(self, node):
+        cond = self._build_expression(node.cond)
+        if self.active_if_cond:
+            # combine this condition with the outer 'if':
+            cond = BoolExpr(BoolExpr.AND,
+                            self.active_if_cond,
+                            cond,
+                            pos=node.pos)
+        self.if_stack.append(cond)
+        self.handle_children(node.content, self.context)
+        self.if_stack.pop()
+
 
     _ast_dispatch = {
         AppendNode     : on_append,
         AssignmentNode : on_assignment,
         TargetNode     : on_target,
+        IfNode         : on_if,
         NilNode        : lambda self,x: x, # do nothing
     }
+
+
+    def _build_expression(self, ast):
+        t = type(ast)
+        if t is LiteralNode:
+            # FIXME: type handling
+            e = LiteralExpr(ast.text)
+        elif t is VarReferenceNode:
+            e= ReferenceExpr(ast.var, self.context)
+        elif t is ListNode:
+            items = [self._build_expression(e) for e in ast.values]
+            e = ListExpr(items)
+        elif t is ConcatNode:
+            items = [self._build_expression(e) for e in ast.values]
+            e = ConcatExpr(items)
+        elif isinstance(ast, BoolNode):
+            e = self._build_bool_expression(ast)
+        else:
+            assert False, "unrecognized AST node (%s)" % ast
+        e.pos = ast.pos
+        return e
+
+
+    def _build_bool_expression(self, ast):
+        t = type(ast)
+        if t is NotNode:
+            return BoolExpr(BoolExpr.NOT, self._build_expression(ast.left))
+        else:
+            if t is AndNode:
+                op = BoolExpr.AND
+            elif t is OrNode:
+                op = BoolExpr.OR
+            elif t is EqualNode:
+                op = BoolExpr.EQUAL
+            elif t is NotEqualNode:
+                op = BoolExpr.NOT_EQUAL
+            left = self._build_expression(ast.left)
+            right = self._build_expression(ast.right)
+            return BoolExpr(op, left, right)
