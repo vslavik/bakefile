@@ -137,6 +137,20 @@ class BoolType(Type):
         else:
             # FIXME: boolean operations produce bools too
             raise TypeError(self, e)
+
+
+class StringType(Type):
+    """
+    Any string value.
+    """
+    name = "string"
+
+    def _validate_impl(self, e):
+        if isinstance(e, expr.ConcatExpr):
+            # concatenation of strings is a string
+            for x in e.items:
+                self.validate(x)
+        elif not isinstance(e, expr.LiteralExpr):
             raise TypeError(self, e)
 
 
