@@ -69,6 +69,10 @@ class TypeError(Error):
     """
     Exception class for variable type errors.
 
+    .. attribute:: detail
+
+        Any extra details about the error or (usually) :const:`None`.
+
     .. seealso:: :class:`bkl.vartypes.Type`
     """
     def __init__(self, type, expr, msg=None, pos=None):
@@ -81,13 +85,15 @@ class TypeError(Error):
         :param type: :class:`bkl.vartypes.Type` instance the error is related to.
         :param expr: :class:`bkl.expr.Expr` expression that caused the error.
         :param msg:  Optional error message detailing reasons for the error.
+                     This will be stored as :attr:`detail` if provided.
         """
-        text = "expression \"%s\" is not valid %s value" % (expr, type)
+        text = 'expression "%s" is not a valid %s value' % (expr, type)
         if msg:
             text += ": %s" % msg
         if not pos:
             pos = expr.pos
         super(TypeError, self).__init__(text, pos)
+        self.detail = msg
 
 
 class NonConstError(Error):

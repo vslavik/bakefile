@@ -67,7 +67,45 @@ class Type(object):
         """
         Validates if the expression *e* is of this type. If it isn't, throws
         :exc:`bkl.error.TypeError` with description of the error.
+
+        Note that this method transparently handles references and conditional
+        expressions.
         """
+        try:
+            if isinstance(e, expr.NullExpr):
+                # Null expression is rarely a valid value, but it can happen all
+                # over the place due to conditional processing
+                pass
+            elif isinstance(e, expr.ReferenceExpr):
+                try:
+                    # FIXME: Compare referenced var's type with self, do this only if
+                    #        it is AnyType. Need to handle type promotion then as well.
+                    self.validate(e.get_value())
+                except TypeError as err:
+                    # If the error happened in a referenced variable, then
+                    # it's location is not interesting -- we want to report
+                    # the error at the place where validation was requested.
+                    # FIXME: push the old location on a stack instead?
+                    err.pos = None
+                    raise
+            elif isinstance(e, expr.IfExpr):
+                self.validate(e.value_yes)
+                self.validate(e.value_no)
+            elif isinstance(e, expr.UndeterminedExpr):
+                raise TypeError(self, e, "value not determinable")
+            else:
+                # finally, perform actual type-specific validation:
+                self._validate_impl(e)
+        except TypeError as err:
+            if e.pos and not err.pos:
+                err.pos = e.pos
+            raise
+
+    def _validate_impl(self, e):
+        # Implementation of validate(), to be overriden in derived classes.
+        # Conditonal expressions and references are handled transparently by
+        # Type.validate(), so you don't have to worry about that when
+        # implementing _validate_impl().
         raise NotImplementedError
 
     def __str__(self):
@@ -92,13 +130,13 @@ class BoolType(Type):
     name = "bool"
     allowed_values = [TRUE, FALSE]
 
-    def validate(self, e):
+    def _validate_impl(self, e):
         if isinstance(e, expr.LiteralExpr):
             if e.value not in self.allowed_values:
                 raise TypeError(self, e)
         else:
             # FIXME: boolean operations produce bools too
-            # FIXME: allow references
+            raise TypeError(self, e)
             raise TypeError(self, e)
 
 
@@ -108,10 +146,9 @@ class IdType(Type):
     """
     name = "id"
 
-    def validate(self, e):
+    def _validate_impl(self, e):
         if not isinstance(e, expr.LiteralExpr):
             raise TypeError(self, e)
-        # FIXME: allow references
         # FIXME: needs to check that the value is a known ID
 
 
@@ -136,14 +173,16 @@ class PathType(Type):
         else:
             return expr.PathExpr(components, pos=e.pos)
 
-    def validate(self, e):
+    def _validate_impl(self, e):
         if not isinstance(e, expr.PathExpr):
             raise TypeError(self, e)
         else:
             if e.anchor not in expr.ANCHORS:
                 raise TypeError(self, e,
-                                msg="\"%s\" is not a valid path anchor" % e.anchor)
-        # FIXME: allow references
+                                msg='invalid anchor "%s"' % e.anchor)
+            component_type = StringType()
+            for c in e.components:
+                component_type.validate(c)
 
 
 class EnumType(Type):
@@ -161,7 +200,7 @@ class EnumType(Type):
         assert allowed_values, "list of values cannot be empty"
         self.allowed_values = [unicode(x) for x in allowed_values]
 
-    def validate(self, e):
+    def _validate_impl(self, e):
         if isinstance(e, expr.LiteralExpr):
             assert isinstance(e.value, types.UnicodeType)
             if e.value not in self.allowed_values:
@@ -169,7 +208,6 @@ class EnumType(Type):
                                 msg="must be one of %s" %
                                 [str(x) for x in self.allowed_values])
         else:
-            # FIXME: allow references
             raise TypeError(self, e)
 
 
@@ -193,7 +231,7 @@ class ListType(Type):
         else:
             return expr.ListExpr([self.item_type.normalize(e)], pos=e.pos)
 
-    def validate(self, e):
+    def _validate_impl(self, e):
         if isinstance(e, expr.ListExpr):
             for i in e.items:
                 self.item_type.validate(i)
