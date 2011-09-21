@@ -29,7 +29,7 @@ Implementation of misc interpreter passes -- optimization, checking etc.
 import logging
 logger = logging.getLogger("bkl.pass")
 
-import bkl.expr
+import simplify
 
 
 def normalize_vars(model):
@@ -60,5 +60,6 @@ def simplify_exprs(model):
     into ``bar=$(x)``) etc.
     """
     logger.debug("simplifying expressions")
+    simplifier = simplify.BasicSimplifier()
     for var in model.all_variables():
-        var.value = bkl.expr.simplify(var.value)
+        var.value = simplifier.visit(var.value)

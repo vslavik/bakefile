@@ -25,7 +25,7 @@
 """
 The :class:`Expr` class that represents a Bakefile expression (be it a
 condition or variable value) is defined in this module, together with
-useful functions for evaluating and simplifying expressions.
+useful functions for evaluating and manipulating expressions.
 """
 
 import os.path
@@ -654,45 +654,6 @@ def split(e, sep):
         raise Error("don't know how to split expression \"%s\" with separator \"%s\""
                     % (e, sep),
                     pos = e.pos)
-
-
-def simplify(e):
-    """
-    Simplify expression *e*. This does "cheap" simplifications such
-    as merging concatenated literals, recognizing always-false conditions,
-    eliminating unnecessary variable references (turn ``foo=$(x);bar=$(foo)``
-    into ``bar=$(x)``) etc.
-    """
-    if isinstance(e, ListExpr):
-        return ListExpr([simplify(i) for i in e.items], pos=e.pos)
-    elif isinstance(e, PathExpr):
-        return PathExpr([simplify(i) for i in e.components], e.anchor, pos=e.pos)
-
-    elif isinstance(e, ConcatExpr):
-        # merge concatenated literals:
-        items = [simplify(i) for i in e.items]
-        out = [items[0]]
-        for i in items[1:]:
-            if isinstance(i, LiteralExpr) and isinstance(out[-1], LiteralExpr):
-                out[-1] = LiteralExpr(out[-1].value + i.value)
-            else:
-                out.append(i)
-        if len(out) == 1:
-            return out[0]
-        else:
-            return ConcatExpr(out, pos=e.pos)
-
-    elif isinstance(e, ReferenceExpr):
-        # Simple reference can be replaced with the referenced value. Do this
-        # for (scalar) literals and other references only, though -- if the
-        # value is e.g. a list, we want to keep it as a variable to avoid
-        # duplication of large values.
-        ref = e.get_value()
-        if isinstance(ref, LiteralExpr) or isinstance(ref, ReferenceExpr):
-            return ref
-
-    # otherwise, there's nothing much to simplify:
-    return e
 
 
 def all_possible_values(e):

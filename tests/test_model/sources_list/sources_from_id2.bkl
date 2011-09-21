@@ -2,7 +2,7 @@ toolsets = gnu
 
 exe hello {
     name = $(id)
-    // this tests expr.simplify() pass - should be simplified to "hello"
+    // this tests expression simplifier pass - should be simplified to "hello"
     src = $(name)
     sources = $(src).c
 }
