@@ -401,6 +401,11 @@ class Visitor(object):
         return func(self, e)
 
     @abstractmethod
+    def null(self, e):
+        """Called on :class:`NullExpr` expressions."""
+        raise NotImplementedError
+
+    @abstractmethod
     def literal(self, e):
         """Called on :class:`LiteralExpr` expressions."""
         raise NotImplementedError
@@ -436,6 +441,7 @@ class Visitor(object):
         raise NotImplementedError
 
     _dispatch = {
+        NullExpr      : lambda self,e: self.null(e),
         LiteralExpr   : lambda self,e: self.literal(e),
         ListExpr      : lambda self,e: self.list(e),
         ConcatExpr    : lambda self,e: self.concat(e),
@@ -563,6 +569,9 @@ class Formatter(Visitor):
         Formats expression *e* into a string.
         """
         return self.visit(e)
+
+    def null(self, e):
+        return ""
 
     def literal(self, e):
         # FIXME: quote strings with whitespace in them
