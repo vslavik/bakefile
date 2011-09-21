@@ -92,7 +92,7 @@ class GnuLinker(GnuFileCompiler):
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         return [ListExpr([
-                  LiteralExpr("cc -o"),
+                  LiteralExpr("c++ -o"),
                   output,
                   input
                 ])]
