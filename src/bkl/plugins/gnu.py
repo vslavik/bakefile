@@ -29,6 +29,7 @@ GNU tools (GCC, GNU Make, ...) toolset.
 from bkl.api import FileCompiler, FileType
 from bkl.makefile import MakefileToolset, MakefileFormatter
 import bkl.compilers
+import bkl.expr
 
 # FIXME: shouldn't be needed later
 from bkl.expr import ListExpr, LiteralExpr
@@ -52,17 +53,23 @@ class GnuCCompiler(GnuFileCompiler):
     in_type = bkl.compilers.CFileType.get()
     out_type = GnuObjectFileType.get()
 
-    def commands(self, input, output):
+    _compiler = "cc"
+
+    def commands(self, target, input, output):
+        # FIXME: evaluating the flags here every time is inefficient
+        defines = bkl.expr.add_prefix("-D", target.get_variable_value("defines"))
+        flags = defines
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         return [ListExpr([
-                  LiteralExpr("cc -c -o"),
+                  LiteralExpr("%s -c -o" % self._compiler),
                   output,
+                  flags,
                   input
                 ])]
 
 
-class GnuCXXompiler(GnuFileCompiler):
+class GnuCXXompiler(GnuCCompiler):
     """
     GNU C++ compiler.
     """
@@ -70,14 +77,7 @@ class GnuCXXompiler(GnuFileCompiler):
     in_type = bkl.compilers.CxxFileType.get()
     out_type = GnuObjectFileType.get()
 
-    def commands(self, input, output):
-        # FIXME: use a parser instead of constructing the expression manually
-        #        in here
-        return [ListExpr([
-                  LiteralExpr("c++ -c -o"),
-                  output,
-                  input
-                ])]
+    _compiler = "c++"
 
 
 class GnuLinker(GnuFileCompiler):
@@ -88,7 +88,7 @@ class GnuLinker(GnuFileCompiler):
     in_type = GnuObjectFileType.get()
     out_type = bkl.compilers.NativeExeFileType.get()
 
-    def commands(self, input, output):
+    def commands(self, target, input, output):
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         return [ListExpr([

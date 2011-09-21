@@ -99,12 +99,13 @@ def get_compiler(toolset, ft_from, ft_to):
     return __cache_compilers[key]
 
 
-def get_compilation_subgraph(toolset, ft_to, outfile, sources):
+def get_compilation_subgraph(toolset, target, ft_to, outfile, sources):
     """
     Given list of source files (as :class:`bkl.expr.ListExpr`), produces build
     graph with appropriate :class:`bkl.api.BuildNode` nodes.
 
     :param toolset: The toolset used (as :class:`bkl.api.Toolset`).
+    :param target: The target object for which the invocation is done.
     :param ft_to:   Type of the output file to compile to.
     :param outfile: Name of the output file (as :class:`bkl.expr.PathExpr`).
     :param sources: List of source files (as :class:`bkl.expr.PathExpr`).
@@ -132,7 +133,7 @@ def get_compilation_subgraph(toolset, ft_to, outfile, sources):
             raise Error("cannot determine how to compile \"%s\" files into \"%s\"" % (ft_from.name, toolset.object_type.name),
                         pos=sources.pos)
 
-        node = BuildNode(commands=compiler.commands(src, objname),
+        node = BuildNode(commands=compiler.commands(target, src, objname),
                          inputs=[src],
                          outputs=[objname])
         objects.append(node)
@@ -141,7 +142,7 @@ def get_compilation_subgraph(toolset, ft_to, outfile, sources):
     assert linker
 
     object_files = [o.outputs[0] for o in objects]
-    link_commands = linker.commands(expr.ListExpr(object_files), outfile)
+    link_commands = linker.commands(target, expr.ListExpr(object_files), outfile)
     link_node = BuildNode(commands=link_commands,
                           inputs=object_files,
                           outputs=[outfile])

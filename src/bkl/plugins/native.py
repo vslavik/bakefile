@@ -28,7 +28,7 @@ Targets for natively built binaries (executables, static and shared libraries).
 
 from bkl.api import TargetType, Property, FileType
 from bkl.expr import ListExpr
-from bkl.vartypes import ListType, PathType
+from bkl.vartypes import *
 from bkl.compilers import get_compilation_subgraph, NativeExeFileType
 
 
@@ -47,11 +47,16 @@ class ExeType(TargetType):
                  type=ListType(PathType()),
                  default=[],
                  doc="Header files."),
+            Property("defines",
+                 type=ListType(StringType()),
+                 default=[],
+                 doc="List of preprocessor macros to define."),
         ]
 
     def get_build_subgraph(self, toolset, target):
         return get_compilation_subgraph(
                         toolset,
+                        target,
                         ft_to=NativeExeFileType.get(),
                         outfile=target.get_variable_value("id"), # FIXME
                         sources=target.get_variable_value("sources"))

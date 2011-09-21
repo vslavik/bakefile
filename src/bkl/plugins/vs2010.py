@@ -88,6 +88,7 @@ class Node(object):
 
 
 class VS2010ExprFormatter(bkl.expr.Formatter):
+    list_sep = ";"
     def reference(self, e):
         assert False, "All references should be expanded in VS output"
 
@@ -262,12 +263,15 @@ class VS2010Toolset(Toolset):
             n_cl.add("WarningLevel", "Level3")
             if c == "Debug":
                 n_cl.add("Optimization", "Disabled")
-                defs = "WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)"
+                std_defs = "WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)"
             else:
                 n_cl.add("Optimization", "MaxSpeed")
                 n_cl.add("FunctionLevelLinking", True)
                 n_cl.add("IntrinsicFunctions", True)
-                defs = "WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)"
+                std_defs = "WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)"
+            defs = bkl.expr.ListExpr(
+                            target.get_variable_value("defines").items +
+                            [bkl.expr.LiteralExpr(std_defs)])
             n_cl.add("PreprocessorDefinitions", defs)
             n.add(n_cl)
             n_link = Node("Link")

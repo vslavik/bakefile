@@ -777,3 +777,24 @@ def are_equal(a, b):
         return a.as_py() == b.as_py()
     except NonConstError:
         raise CannotDetermineError
+
+
+def add_prefix(prefix, e):
+    """
+    Adds a *prefix* in front of the expression *e* or, if *e* is a list,
+    in front of each of its elements.
+
+    :param prefix:
+            The prefix to add; either an :class:`bkl.expr.Expr` object or
+            a string.
+
+    :param e:
+            The expression to add the prefix in front of.
+    """
+    if not isinstance(prefix, Expr):
+        prefix = LiteralExpr(prefix)
+
+    if isinstance(e, ListExpr):
+        return ListExpr([add_prefix(prefix, i) for i in e.items], pos=e.pos)
+    else:
+        return ConcatExpr([prefix, e], pos=e.pos)
