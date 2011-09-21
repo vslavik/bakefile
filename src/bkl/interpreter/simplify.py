@@ -93,7 +93,7 @@ class BasicSimplifier(NoopSimplifier):
         # duplication of large values.
         ref = e.get_value()
         if isinstance(ref, LiteralExpr) or isinstance(ref, ReferenceExpr):
-            return ref
+            return self.visit(ref)
         else:
             return e
 
