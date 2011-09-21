@@ -55,8 +55,10 @@ class Variable(object):
        Indicates if the variable is read-only. Read-only variables can only
        be assigned once and cannot be modified afterwards.
     """
-    def __init__(self, name, value, type=vartypes.AnyType(), readonly=False):
+    def __init__(self, name, value, type=None, readonly=False):
         self.name = name
+        if type is None:
+            type = vartypes.guess_expr_type(value)
         self.type = type
         self.value = value
         self.readonly = readonly

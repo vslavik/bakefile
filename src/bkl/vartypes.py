@@ -199,3 +199,15 @@ class ListType(Type):
                 self.item_type.validate(i)
         else:
             raise TypeError(self, e)
+
+
+def guess_expr_type(e):
+    """
+    Attempts to guess type of the expression if it's possible.
+    Returns AnyType type if unsure.
+    """
+    if isinstance(e, expr.PathExpr):
+        return PathType()
+    if isinstance(e, expr.ListExpr):
+        return ListType(AnyType())
+    return AnyType()
