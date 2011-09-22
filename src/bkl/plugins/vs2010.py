@@ -122,7 +122,9 @@ class XmlFormatter(object):
                     s += self._format_node(value, subindent)
                 else:
                     v = escape(self._format_value(value))
-                    s += "%s<%s>%s</%s>\n" % (subindent, key, v, key)
+                    if v:
+                        s += "%s<%s>%s</%s>\n" % (subindent, key, v, key)
+                    # else: empty value, don't write that
 
             s += "%s</%s>\n" % (indent, n.name)
         else:
