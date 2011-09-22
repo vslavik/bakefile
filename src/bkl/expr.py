@@ -53,17 +53,33 @@ class Expr(object):
     """
     def __init__(self, pos=None):
         self.pos = pos
+    
+    def is_const(self):
+        """
+        Returns true if the expression is constant, i.e. can be evaluated
+        at this time (bake-time), as opposed to expressions that depend on
+        a setting that can only be determined at make-time.
+
+        .. seealso:: :meth:`as_py()`
+        """
+        try:
+            self.as_py()
+            return True
+        except NonConstError:
+            return False
 
     def as_py(self):
         """
         Returns the expression as Python value (e.g. a list of strings) if it
         evaluates to a constant literal. Throws an exception if the expression
-        cannot be evaluated at make-time (such expressions cannot be used in
+        cannot be evaluated at bake-time (such expressions cannot be used in
         some situations, e.g. to specify output files). Paths are returned as
         native paths.
 
         Use :class:`bkl.expr.Formatter` if you need to format expressions
         into strings.
+
+        .. seealso:: :meth:`is_const()`
         """
         raise NotImplementedError
 
