@@ -34,39 +34,7 @@ from bkl.expr import *
 from bkl.error import NonConstError
 
 
-class NoopSimplifier(Visitor):
-    """
-    This simplifier doesn't simplify anything.
-    """
-    def null(self, e):
-        return e
-
-    def literal(self, e):
-        return e
-
-    def list(self, e):
-        return e
-
-    def concat(self, e):
-        return e
-
-    def reference(self, e):
-        return e
-
-    def path(self, e):
-        return e
-
-    def bool_value(self, e):
-        return e
-
-    def bool(self, e):
-        return e
-
-    def if_(self, e):
-        return e
-
-
-class BasicSimplifier(NoopSimplifier):
+class BasicSimplifier(Visitor):
     """
     Simplify expression *e*. This does "cheap" simplifications such
     as merging concatenated literals, recognizing always-false conditions,
@@ -87,6 +55,10 @@ class BasicSimplifier(NoopSimplifier):
         if not changed:
             new = children
         return (new, changed)
+    
+    bool_value = Visitor.noop
+    literal = Visitor.noop
+    null = Visitor.noop
     
     def list(self, e):
         new, changed = self._visit_children(e.items)

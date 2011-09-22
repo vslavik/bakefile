@@ -435,6 +435,9 @@ class Visitor(object):
         func = self._dispatch[t]
         return func(self, e)
 
+    # helper to quickly implement handler functions that do nothing
+    noop = lambda self, e: e
+        
     @abstractmethod
     def null(self, e):
         """Called on :class:`NullExpr` expressions."""
