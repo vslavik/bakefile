@@ -56,17 +56,14 @@ class GnuCCompiler(GnuFileCompiler):
     _compiler = "cc"
 
     def commands(self, target, input, output):
+        cmd = [LiteralExpr("%s -c -o" % self._compiler), output]
         # FIXME: evaluating the flags here every time is inefficient
-        defines = bkl.expr.add_prefix("-D", target.get_variable_value("defines"))
-        flags = defines
+        cmd += bkl.expr.add_prefix("-D", target.get_variable_value("defines")).items
+        cmd += bkl.expr.add_prefix("-I", target.get_variable_value("includedirs")).items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
-        return [ListExpr([
-                  LiteralExpr("%s -c -o" % self._compiler),
-                  output,
-                  flags,
-                  input
-                ])]
+        cmd.append(input)
+        return [ListExpr(cmd)]
 
 
 class GnuCXXompiler(GnuCCompiler):

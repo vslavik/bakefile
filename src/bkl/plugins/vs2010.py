@@ -275,6 +275,7 @@ class VS2010Toolset(Toolset):
                             target.get_variable_value("defines").items +
                             [bkl.expr.LiteralExpr(std_defs)])
             n_cl.add("PreprocessorDefinitions", defs)
+            n_cl.add("AdditionalIncludeDirectories", target.get_variable_value("includedirs"))
             n.add(n_cl)
             n_link = Node("Link")
             n_link.add("SubSystem", "Console")

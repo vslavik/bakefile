@@ -51,6 +51,10 @@ class ExeType(TargetType):
                  type=ListType(StringType()),
                  default=[],
                  doc="List of preprocessor macros to define."),
+            Property("includedirs",
+                 type=ListType(PathType()),
+                 default=[],
+                 doc="Directories where to look for header files."),
         ]
 
     def get_build_subgraph(self, toolset, target):
