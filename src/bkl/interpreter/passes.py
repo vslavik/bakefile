@@ -63,3 +63,25 @@ def simplify_exprs(model):
     simplifier = simplify.BasicSimplifier()
     for var in model.all_variables():
         var.value = simplifier.visit(var.value)
+
+
+def eliminate_superfluous_conditionals(model):
+    """
+    Removes as much of conditional content as possible. This involves doing
+    as many optimizations as possible, even if the calculation is relatively
+    expensive (compared to simplify_exprs()).
+    """
+    iteration = 1
+    simplifier = simplify.ConditionalsSimplifier()
+    while True:
+        logger.debug("removing superfluous conditional expressions: pass %i" % iteration)
+        modified = False
+        for var in model.all_variables():
+            old = var.value
+            var.value = simplifier.visit(var.value)
+            if old is not var.value:
+                modified = True
+        if modified:
+            iteration += 1
+        else:
+            break

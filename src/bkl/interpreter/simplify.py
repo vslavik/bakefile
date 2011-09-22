@@ -31,6 +31,7 @@ useful functions for evaluating and simplifying expressions.
 """
 
 from bkl.expr import *
+from bkl.error import NonConstError
 
 
 class NoopSimplifier(Visitor):
@@ -55,6 +56,9 @@ class NoopSimplifier(Visitor):
     def path(self, e):
         return e
 
+    def bool_value(self, e):
+        return e
+
     def bool(self, e):
         return e
 
@@ -69,14 +73,17 @@ class BasicSimplifier(NoopSimplifier):
     eliminating unnecessary variable references (turn ``foo=$(x);bar=$(foo)``
     into ``bar=$(x)``) etc.
     """
-    def _visit_children(self, children):
+    def _visit_children(self, children, removeNulls=True):
         new = []
         changed = False
         for i in children:
             j = self.visit(i)
             if i is not j:
                 changed = True
-            new.append(j)
+            if removeNulls and isinstance(j, NullExpr):
+                changed = True
+            else:
+                new.append(j)
         if not changed:
             new = children
         return (new, changed)
@@ -114,7 +121,7 @@ class BasicSimplifier(NoopSimplifier):
             return e
 
     def path(self, e):
-        components, changed = self._visit_children(e.components)
+        components, changed = self._visit_children(e.components, removeNulls=False)
         if changed:
             return PathExpr(components, e.anchor, pos=e.pos)
         else:
@@ -136,3 +143,57 @@ class BasicSimplifier(NoopSimplifier):
             return e
         else:
             return IfExpr(cond, yes, no, pos=e.pos)
+
+
+class ConditionalsSimplifier(BasicSimplifier):
+    """
+    More advanced simplifier class, eliminates const boolean expressions
+    and their consequences (such as null items in lists).
+    """
+    def bool(self, e):
+        e = super(ConditionalsSimplifier, self).bool(e)
+        op = e.operator
+        try:
+            # Note: any of the as_py() calls below may throw, because the
+            # subexpression may be non-const. That's OK, it just means we
+            # cannot simplify the expression yet, so we just catch that
+            # particular exception, NonConstError, later.
+            if op == BoolExpr.NOT:
+                return BoolValueExpr(not e.left.as_py(), pos=e.pos)
+            elif op == BoolExpr.AND:
+                return BoolValueExpr(e.left.as_py() and e.right.as_py(), pos=e.pos)
+            elif op == BoolExpr.OR:
+                # We can simplify or expressions even if one part is undeterminable
+                left = right = None
+                try:
+                    left = e.left.as_py()
+                    if left:
+                        return BoolValueExpr(True, pos=e.pos)
+                except NonConstError:
+                    pass
+                try:
+                    right = e.right.as_py()
+                    if right:
+                        return BoolValueExpr(True, pos=e.pos)
+                except NonConstError:
+                    pass
+                if left is not None and right is not None:
+                    assert (left or right) == False
+                    return BoolValueExpr(False, pos=e.pos)
+            elif op == BoolExpr.EQUAL: 
+                return BoolValueExpr(e.left.as_py() == e.right.as_py())
+            elif op == BoolExpr.NOT_EQUAL: 
+                return BoolValueExpr(e.left.as_py() != e.right.as_py())
+        except NonConstError:
+            pass
+        return e
+
+    def if_(self, e):
+        e = super(ConditionalsSimplifier, self).if_(e)
+        try:
+            if e.cond.as_py():
+                return e.value_yes
+            else:
+                return e.value_no
+        except NonConstError:
+            return e

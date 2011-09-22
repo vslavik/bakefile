@@ -198,6 +198,25 @@ class ReferenceExpr(Expr):
         return "$(%s)" % self.var
 
 
+class BoolValueExpr(Expr):
+    """
+    Constant boolean value, i.e. true or false.
+
+    .. attribute:: value
+
+       Value of the literal, as (Python) boolean.
+    """
+    def __init__(self, value, pos=None):
+        super(BoolValueExpr, self).__init__(pos)
+        self.value = value
+
+    def as_py(self):
+        return self.value
+
+    def __str__(self):
+        return "true" if self.value else "false"
+
+
 class BoolExpr(Expr):
     """
     Boolean expression.
@@ -447,6 +466,11 @@ class Visitor(object):
         raise NotImplementedError
 
     @abstractmethod
+    def bool_value(self, e):
+        """Called on :class:`BoolValueExpr` expressions."""
+        raise NotImplementedError
+
+    @abstractmethod
     def bool(self, e):
         """Called on :class:`BoolExpr` expressions."""
         raise NotImplementedError
@@ -463,6 +487,7 @@ class Visitor(object):
         ConcatExpr    : lambda self,e: self.concat(e),
         ReferenceExpr : lambda self,e: self.reference(e),
         PathExpr      : lambda self,e: self.path(e),
+        BoolValueExpr : lambda self,e: self.bool_value(e),
         BoolExpr      : lambda self,e: self.bool(e),
         IfExpr        : lambda self,e: self.if_(e),
     }
@@ -610,6 +635,9 @@ class Formatter(Visitor):
 
         comps = [self.format(i) for i in e.components]
         return self.paths_info.dirsep.join(base + comps)
+
+    def bool_value(self, e):
+        raise NotImplementedError
 
     def bool(self, e):
         raise NotImplementedError

@@ -120,7 +120,7 @@ class Interpreter(object):
         """
         Finalizes after "toolset" variable was set.
         """
-        passes.simplify_exprs(toolset_model)
+        passes.eliminate_superfluous_conditionals(toolset_model)
 
 
     def generate(self):

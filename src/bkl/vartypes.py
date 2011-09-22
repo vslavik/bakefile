@@ -34,12 +34,6 @@ import expr
 from error import TypeError
 
 
-#: Boolean value of "true".
-TRUE = "true"
-#: Boolean value of "false".
-FALSE = "false"
-
-
 class Type(object):
     # FIXME: we may want to derive this from api.Extension, but it only makes
     # sense if specifying types in the code ("e.g. foo as string = ... ")
@@ -128,14 +122,26 @@ class BoolType(Type):
     following literals with obvious meanings: "true" or "false".
     """
     name = "bool"
+
+    TRUE  = "true"
+    FALSE = "false"
     allowed_values = [TRUE, FALSE]
+
+    def normalize(self, e):
+        if isinstance(e, expr.LiteralExpr):
+            return expr.BoolValueExpr(e.value == self.TRUE)
+        else:
+            return e
 
     def _validate_impl(self, e):
         if isinstance(e, expr.LiteralExpr):
             if e.value not in self.allowed_values:
                 raise TypeError(self, e)
+        elif isinstance(e, expr.BoolExpr):
+            return
+        elif isinstance(e, expr.BoolValueExpr):
+            return
         else:
-            # FIXME: boolean operations produce bools too
             raise TypeError(self, e)
 
 
