@@ -269,3 +269,38 @@ def guess_expr_type(e):
     if isinstance(e, expr.ListExpr):
         return ListType(AnyType())
     return AnyType()
+
+
+class _BoolNormalizer(expr.Visitor):
+    literal = expr.Visitor.noop
+    bool_value = expr.Visitor.noop
+    null = expr.Visitor.noop
+    reference = expr.Visitor.noop
+
+    concat = expr.Visitor.visit_children
+    list = expr.Visitor.visit_children
+    path = expr.Visitor.visit_children
+
+    _bool_type = BoolType()
+    
+    def bool(self, e):
+        self.visit_children(e)
+        if e.has_bool_operands():
+            e.left = self._bool_type.normalize(e.left)
+            self._bool_type.validate(e.left)
+            if e.right is not None:
+                e.right = self._bool_type.normalize(e.right)
+                self._bool_type.validate(e.right)
+
+    def if_(self, e):
+        self.visit_children(e)
+        e.cond = self._bool_type.normalize(e.cond)
+        self._bool_type.validate(e.cond)
+
+
+def normalize_and_validate_bool_subexpressions(e):
+    """
+    Performs type normalization and validation steps for typed subexpressions,
+    namely for IfExpr conditions and boolean expressions.
+    """
+    _BoolNormalizer().visit(e)

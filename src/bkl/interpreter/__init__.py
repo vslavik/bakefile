@@ -111,8 +111,7 @@ class Interpreter(object):
         per-toolset models etc.
         """
         logger.debug("finalizing the model")
-        passes.normalize_vars(self.model)
-        passes.check_var_types(self.model)
+        passes.normalize_and_validate_vars(self.model)
         passes.simplify_exprs(self.model)
 
 

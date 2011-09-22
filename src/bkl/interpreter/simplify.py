@@ -41,7 +41,7 @@ class BasicSimplifier(Visitor):
     eliminating unnecessary variable references (turn ``foo=$(x);bar=$(foo)``
     into ``bar=$(x)``) etc.
     """
-    def _visit_children(self, children, removeNulls=True):
+    def _process_children(self, children, removeNulls=True):
         new = []
         changed = False
         for i in children:
@@ -61,7 +61,7 @@ class BasicSimplifier(Visitor):
     null = Visitor.noop
     
     def list(self, e):
-        new, changed = self._visit_children(e.items)
+        new, changed = self._process_children(e.items)
         if changed:
             return ListExpr(new, pos=e.pos)
         else:
@@ -69,7 +69,7 @@ class BasicSimplifier(Visitor):
 
     def concat(self, e):
         # merge concatenated literals:
-        items, changed = self._visit_children(e.items)
+        items, changed = self._process_children(e.items)
         out = [items[0]]
         for i in items[1:]:
             if isinstance(i, LiteralExpr) and isinstance(out[-1], LiteralExpr):
@@ -93,7 +93,7 @@ class BasicSimplifier(Visitor):
             return e
 
     def path(self, e):
-        components, changed = self._visit_children(e.components, removeNulls=False)
+        components, changed = self._process_children(e.components, removeNulls=False)
         if changed:
             return PathExpr(components, e.anchor, pos=e.pos)
         else:

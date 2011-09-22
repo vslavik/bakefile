@@ -30,23 +30,22 @@ import logging
 logger = logging.getLogger("bkl.pass")
 
 import simplify
+import bkl.vartypes
 
 
-def normalize_vars(model):
+def normalize_and_validate_vars(model):
     """
     Normalizes variables' values with respect to their types. For example,
     changes non-list value expressions for lists into single-item lists.
     """
+    logger.debug("checking boolean expressions")
+    for var in model.all_variables():
+        bkl.vartypes.normalize_and_validate_bool_subexpressions(var.value)
+
     logger.debug("normalizing variables")
     for var in model.all_variables():
         var.value = var.type.normalize(var.value)
 
-
-def check_var_types(model):
-    """
-    Validates that values assigned to variables correspond to their types.
-    Inspects all variables in the model, including all modules and targets.
-    """
     logger.debug("checking types of variables")
     for var in model.all_variables():
         var.type.validate(var.value)

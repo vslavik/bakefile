@@ -251,6 +251,15 @@ class BoolExpr(Expr):
         self.operator = operator
         self.left = left
         self.right = right
+    
+    def has_bool_operands(self):
+        """
+        Returns true if the operator is such that it requires boolean operands
+        (i.e. NOT, AND, OR).
+        """
+        return (self.operator is BoolExpr.AND or
+                self.operator is BoolExpr.OR or
+                self.operator is BoolExpr.NOT)
 
     def as_py(self):
         op = self.operator
@@ -435,9 +444,6 @@ class Visitor(object):
         func = self._dispatch[t]
         return func(self, e)
 
-    # helper to quickly implement handler functions that do nothing
-    noop = lambda self, e: e
-        
     @abstractmethod
     def null(self, e):
         """Called on :class:`NullExpr` expressions."""
@@ -494,6 +500,30 @@ class Visitor(object):
         BoolExpr      : lambda self,e: self.bool(e),
         IfExpr        : lambda self,e: self.if_(e),
     }
+
+    #: Helper to quickly implement handler functions that do nothing.
+    noop = lambda self, e: e
+
+    def visit_children(self, e):
+        """
+        Helper to implement visitor methods that just need to recursively
+        work on all children. Ignores return value for the children.
+        """
+        t = type(e)
+        if t is ListExpr:
+            for i in e.items: self.visit(i)
+        elif t is ConcatExpr:
+            for i in e.items: self.visit(i)
+        elif t is PathExpr:
+            for i in e.components: self.visit(i)
+        elif t is BoolExpr:
+            self.visit(e.left)
+            if e.right is not None:
+                self.visit(e.right)
+        elif t is IfExpr:
+            self.visit(e.cond)
+            self.visit(e.value_yes)
+            self.visit(e.value_no)
 
 
 class PathAnchors(object):
