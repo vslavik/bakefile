@@ -119,3 +119,20 @@ class BasicSimplifier(NoopSimplifier):
             return PathExpr(components, e.anchor, pos=e.pos)
         else:
             return e
+
+    def bool(self, e):
+        left = self.visit(e.left)
+        right = None if e.right is None else self.visit(e.right)
+        if left is e.left and right is e.right:
+            return e
+        else:
+            return BoolExpr(e.operator, left, right, pos=e.pos)
+
+    def if_(self, e):
+        cond = self.visit(e.cond)
+        yes = self.visit(e.value_yes)
+        no = self.visit(e.value_no)
+        if cond is e.cond and yes is e.value_yes and no is e.value_no:
+            return e
+        else:
+            return IfExpr(cond, yes, no, pos=e.pos)
