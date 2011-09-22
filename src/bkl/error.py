@@ -114,19 +114,19 @@ class NonConstError(Error):
         super(NonConstError, self).__init__(text, pos)
 
 
-class UndefinedError(Error):
-    """
-    Exception thrown when a property or variable is undefined, i.e. doesn't
-    have a value.
-    """
-    pass
-
-
-class CannotDetermineError(Error):
+class CannotDetermineError(NonConstError):
     """
     Exception thrown when something (e.g. equality) cannot be determined.
     This usually signifies a weakness in Bakefile implementation that should
     be improved.
     """
     def __init__(self, msg=None, pos=None):
-        super(CannotDetermineError, self).__init__(msg, pos)
+        Error.__init__(msg, pos)
+
+
+class UndefinedError(Error):
+    """
+    Exception thrown when a property or variable is undefined, i.e. doesn't
+    have a value.
+    """
+    pass

@@ -724,7 +724,7 @@ def are_equal(a, b):
     """
     Compares two expressions for equality.
 
-    Throws the CannotDetermineError() exception if it cannot reliably
+    Throws the CannotDetermineError exception if it cannot reliably
     determine equality.
     """
     try:
@@ -732,4 +732,4 @@ def are_equal(a, b):
         #        symbolically as much as possible.
         return a.as_py() == b.as_py()
     except NonConstError:
-        raise CannotDetermineError()
+        raise CannotDetermineError
