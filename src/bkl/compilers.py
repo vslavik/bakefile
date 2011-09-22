@@ -37,6 +37,11 @@ class NativeExeFileType(FileType):
     name = "exe"
     # FIXME: extensions
 
+#: Native static library file type
+class NativeLibFileType(FileType):
+    name = "library"
+    # FIXME: extensions
+
 
 #: C files
 class CFileType(FileType):

@@ -206,6 +206,9 @@ class VS2010Toolset(Toolset):
 
 
     def gen_for_target(self, target, filename, paths_info, sln):
+        is_library = (target.type.name == "library")
+        is_exe = (target.type.name == "exe")
+
         root = Node("Project")
         root["DefaultTargets"] = "Build"
         root["ToolsVersion"] = "4.0"
@@ -233,7 +236,12 @@ class VS2010Toolset(Toolset):
         for c in configs:
             n = Node("PropertyGroup", Label="Configuration")
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % c
-            n.add("ConfigurationType", "Application")
+            if is_exe:
+                n.add("ConfigurationType", "Application")
+            elif is_library:
+                n.add("ConfigurationType", "StaticLibrary")
+            else:
+                assert False, "unknown target type %s" % target.type.name
             n.add("UseDebugLibraries", c == "Debug")
             n.add("CharacterSet", "Unicode")
             root.add(n)
@@ -254,8 +262,9 @@ class VS2010Toolset(Toolset):
 
         for c in configs:
             n = Node("PropertyGroup")
-            n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % c
-            n.add("LinkIncremental", c == "Debug")
+            if not is_library:
+                n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % c
+                n.add("LinkIncremental", c == "Debug")
             root.add(n)
 
         for c in configs:
@@ -265,12 +274,17 @@ class VS2010Toolset(Toolset):
             n_cl.add("WarningLevel", "Level3")
             if c == "Debug":
                 n_cl.add("Optimization", "Disabled")
-                std_defs = "WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)"
+                std_defs = "WIN32;_DEBUG"
             else:
                 n_cl.add("Optimization", "MaxSpeed")
                 n_cl.add("FunctionLevelLinking", True)
                 n_cl.add("IntrinsicFunctions", True)
-                std_defs = "WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)"
+                std_defs = "WIN32;NDEBUG"
+            if is_exe:
+                std_defs += ";_CONSOLE"
+            if is_library:
+                std_defs += ";_LIB"
+            std_defs += ";%(PreprocessorDefinitions)"
             defs = bkl.expr.ListExpr(
                             target.get_variable_value("defines").items +
                             [bkl.expr.LiteralExpr(std_defs)])
@@ -278,7 +292,7 @@ class VS2010Toolset(Toolset):
             n_cl.add("AdditionalIncludeDirectories", target.get_variable_value("includedirs"))
             n.add(n_cl)
             n_link = Node("Link")
-            n_link.add("SubSystem", "Console")
+            n_link.add("SubSystem", "Console" if is_exe else "Windows")
             n_link.add("GenerateDebugInformation", True)
             if c == "Release":
                 n_link.add("EnableCOMDATFolding", True)

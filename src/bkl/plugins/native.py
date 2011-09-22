@@ -29,15 +29,11 @@ Targets for natively built binaries (executables, static and shared libraries).
 from bkl.api import TargetType, Property, FileType
 from bkl.expr import ListExpr
 from bkl.vartypes import *
-from bkl.compilers import get_compilation_subgraph, NativeExeFileType
+from bkl.compilers import *
 
 
-class ExeType(TargetType):
-    """
-    Executable program.
-    """
-    name = "exe"
-
+class NativeCompiledType(TargetType):
+    """Base class for natively-compiled targets."""
     properties = [
             Property("sources",
                  type=ListType(PathType()),
@@ -57,10 +53,40 @@ class ExeType(TargetType):
                  doc="Directories where to look for header files."),
         ]
 
+
+class ExeType(NativeCompiledType):
+    """
+    Executable program.
+    """
+    name = "exe"
+
     def get_build_subgraph(self, toolset, target):
         return get_compilation_subgraph(
                         toolset,
                         target,
                         ft_to=NativeExeFileType.get(),
                         outfile=target.get_variable_value("id"), # FIXME
+                        sources=target.get_variable_value("sources"))
+
+
+class LibraryType(NativeCompiledType):
+    """
+    Static library.
+    """
+    name = "library"
+
+    properties = [
+            # FIXME: temporary
+            Property("libname",
+                 type=StringType(),
+                 default="lib$(id).a",
+                 doc="Library file name. (TEMPORARY, DO NOT USE.)"), # FIXME
+        ]
+
+    def get_build_subgraph(self, toolset, target):
+        return get_compilation_subgraph(
+                        toolset,
+                        target,
+                        ft_to=NativeLibFileType.get(),
+                        outfile=target.get_variable_value("libname"), # FIXME
                         sources=target.get_variable_value("sources"))

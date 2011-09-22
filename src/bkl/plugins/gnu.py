@@ -94,6 +94,21 @@ class GnuLinker(GnuFileCompiler):
                 ])]
 
 
+class GnuLibLinker(GnuFileCompiler):
+    """
+    GNU library linker.
+    """
+    name = "AR"
+    in_type = GnuObjectFileType.get()
+    out_type = bkl.compilers.NativeLibFileType.get()
+
+    def commands(self, target, input, output):
+        # FIXME: use a parser instead of constructing the expression manually
+        #        in here
+        return [ListExpr([LiteralExpr("ar rcu $@"), input]),
+                ListExpr([LiteralExpr("ranlib $@")])]
+
+
 class GnuMakefileFormatter(MakefileFormatter):
     """
     Formatter for the GNU Make syntax.

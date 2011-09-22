@@ -1,0 +1,11 @@
+module {
+  variables {
+    toolsets = [gnu, vs2010]
+  }
+  targets {
+    library helpers {
+        sources = [@top_srcdir/common.cpp, @top_srcdir/helpers.cpp]
+    }
+  }
+}
+
