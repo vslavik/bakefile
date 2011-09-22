@@ -34,6 +34,7 @@ import os.path
 
 import io
 import expr
+import utils
 from bkl.api import Extension, Toolset, Property
 from bkl.vartypes import PathType
 
@@ -173,13 +174,31 @@ class MakefileToolset(Toolset):
         for v in module.variables:
             pass
 
+        # We need to know build graphs of all targets so that we can generate
+        # dependencies on produced files:
+        build_graphs = utils.OrderedDict()
+        for t in module.targets.itervalues():
+            build_graphs[t] = t.type.get_build_subgraph(self, t)
+
+        #FIXME: make this part of the formatter for (future) IdRefExpr
+        def _format_dep(target_name):
+            t = module.get_target(target_name)
+            # FIXME: instead of using the first node, use some main_node
+            g = build_graphs[t][0]
+            if g.name:
+                out = g.name
+            else:
+                # FIXME: handle multi-output nodes too
+                assert len(g.outputs) == 1
+                out = g.outputs[0]
+            return expr_fmt.format(out)
+
         # Write the "all" target:
-        all_targets = [expr_fmt.format(t.get_variable_value("id")) for t in module.targets.itervalues()]
+        all_targets = [_format_dep(t) for t in module.targets]
         f.write(self.Formatter.target(name="all", deps=all_targets, commands=None))
 
         for t in module.targets.itervalues():
-            graph = t.type.get_build_subgraph(self, t)
-
+            graph = build_graphs[t]
             for node in graph:
                 if node.name:
                     out = node.name
@@ -188,7 +207,7 @@ class MakefileToolset(Toolset):
                     assert len(node.outputs) == 1
                     out = node.outputs[0]
                 deps = [expr_fmt.format(i) for i in node.inputs]
-                deps += [expr_fmt.format(module.get_target(id).get_variable_value("id")) for id in t.get_variable_value("deps").as_py()]
+                deps += [_format_dep(t) for t in t.get_variable_value("deps").as_py()]
                 text = self.Formatter.target(
                         name=expr_fmt.format(out),
                         deps=deps,
