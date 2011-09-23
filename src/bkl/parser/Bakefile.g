@@ -139,7 +139,7 @@ element
 
 element_part
     : literal                              -> literal
-    | '$(' identifier ')'                  -> ^(VAR_REFERENCE identifier)
+    | '$' LPAREN identifier RPAREN         -> ^(VAR_REFERENCE identifier)
     ;
 
 identifier: t=TEXT             -> ID[$t];
