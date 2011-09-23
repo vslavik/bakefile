@@ -254,6 +254,8 @@ class Property(object):
             return self._parse_expr(val, for_obj)
         elif isinstance(val, list):
             return expr.ListExpr([self._make_expr(x, for_obj) for x in val])
+        elif isinstance(val, types.BooleanType):
+            return expr.BoolValueExpr(val)
         else:
             assert False, "unexpected default value type: %s" % type(val)
 

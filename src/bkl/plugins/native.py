@@ -27,7 +27,6 @@ Targets for natively built binaries (executables, static and shared libraries).
 """
 
 from bkl.api import TargetType, Property, FileType
-from bkl.expr import ListExpr
 from bkl.vartypes import *
 from bkl.compilers import *
 
@@ -51,6 +50,12 @@ class NativeCompiledType(TargetType):
                  type=ListType(PathType()),
                  default=[],
                  doc="Directories where to look for header files."),
+            Property("win32-unicode",
+                 type=BoolType(),
+                 default=True,
+                 doc="Compile win32 code in Unicode mode? If enabled, "
+                     "``_UNICODE`` symbol is defined and the wide character "
+                     "entry point (``WinMain``, ...) is used."),
         ]
 
 

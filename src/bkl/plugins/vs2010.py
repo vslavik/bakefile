@@ -243,7 +243,10 @@ class VS2010Toolset(Toolset):
             else:
                 assert False, "unknown target type %s" % target.type.name
             n.add("UseDebugLibraries", c == "Debug")
-            n.add("CharacterSet", "Unicode")
+            if target.get_variable_value("win32-unicode").as_py():
+                n.add("CharacterSet", "Unicode")
+            else:
+                n.add("CharacterSet", "MultiByte")
             root.add(n)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.props")
