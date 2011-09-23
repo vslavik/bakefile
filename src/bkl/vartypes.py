@@ -54,6 +54,19 @@ class Type(object):
         Returns *e* if no normalization was done or a new expression with
         normalized form of *e*.
         """
+        if isinstance(e, expr.IfExpr):
+            yes = self.normalize(e.value_yes)
+            no = self.normalize(e.value_no)
+            if yes is e.value_yes and no is e.value_no:
+                return e
+            else:
+                return expr.IfExpr(e.cond, yes, no, pos=e.pos)
+        else:
+            return self._normalize_impl(e)
+
+    def _normalize_impl(self, e):
+        # Implementation of normalize(), to be overriden in derived classes.
+        # Conditional expressions are handled transparently by normalize().
         # by default, no normalization is done:
         return e
 
@@ -127,7 +140,7 @@ class BoolType(Type):
     FALSE = "false"
     allowed_values = [TRUE, FALSE]
 
-    def normalize(self, e):
+    def _normalize_impl(self, e):
         if isinstance(e, expr.LiteralExpr):
             return expr.BoolValueExpr(e.value == self.TRUE)
         else:
@@ -178,7 +191,7 @@ class PathType(Type):
     """
     name = "path"
 
-    def normalize(self, e):
+    def _normalize_impl(self, e):
         if isinstance(e, expr.PathExpr):
             return e
 
@@ -243,7 +256,7 @@ class ListType(Type):
         self.item_type = item_type
         self.name = "list of %s" % item_type.name
 
-    def normalize(self, e):
+    def _normalize_impl(self, e):
         # A non-list expression with single value is a special case of list
         # for convenience, we translate it into single-item list automagically:
         if isinstance(e, expr.ListExpr):
