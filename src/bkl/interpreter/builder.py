@@ -126,7 +126,7 @@ class Builder(object):
             # must much that of the property.
             prop = self.context.get_prop(varname)
             if prop:
-                if append:
+                if append or has_cond:
                     propval = prop.default_expr(self.context)
                 else:
                     propval = NullExpr() # we'll set it below
