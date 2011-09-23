@@ -41,14 +41,14 @@ class BasicSimplifier(Visitor):
     eliminating unnecessary variable references (turn ``foo=$(x);bar=$(foo)``
     into ``bar=$(x)``) etc.
     """
-    def _process_children(self, children, removeNulls=True):
+    def _process_children(self, children):
         new = []
         changed = False
         for i in children:
             j = self.visit(i)
             if i is not j:
                 changed = True
-            if removeNulls and isinstance(j, NullExpr):
+            if isinstance(j, NullExpr):
                 changed = True
             else:
                 new.append(j)
@@ -63,13 +63,18 @@ class BasicSimplifier(Visitor):
     def list(self, e):
         new, changed = self._process_children(e.items)
         if changed:
-            return ListExpr(new, pos=e.pos)
+            if len(new):
+                return ListExpr(new, pos=e.pos)
+            else:
+                return NullExpr(pos=e.pos)
         else:
             return e
 
     def concat(self, e):
         # merge concatenated literals:
         items, changed = self._process_children(e.items)
+        if len(items) == 0:
+            return NullExpr(pos=e.pos)
         out = [items[0]]
         for i in items[1:]:
             if isinstance(i, LiteralExpr) and isinstance(out[-1], LiteralExpr):
@@ -93,9 +98,12 @@ class BasicSimplifier(Visitor):
             return e
 
     def path(self, e):
-        components, changed = self._process_children(e.components, removeNulls=False)
+        components, changed = self._process_children(e.components)
         if changed:
-            return PathExpr(components, e.anchor, pos=e.pos)
+            if not components:
+                return NullExpr(pos=e.pos)
+            else:
+                return PathExpr(components, e.anchor, pos=e.pos)
         else:
             return e
 
@@ -105,7 +113,11 @@ class BasicSimplifier(Visitor):
         if left is e.left and right is e.right:
             return e
         else:
-            return BoolExpr(e.operator, left, right, pos=e.pos)
+            if (isinstance(left, NullExpr) and 
+                (right is None or isinstance(right, NullExpr))):
+                return NullExpr(pos=e.pos)
+            else:
+                return BoolExpr(e.operator, left, right, pos=e.pos)
 
     def if_(self, e):
         cond = self.visit(e.cond)
@@ -114,7 +126,10 @@ class BasicSimplifier(Visitor):
         if cond is e.cond and yes is e.value_yes and no is e.value_no:
             return e
         else:
-            return IfExpr(cond, yes, no, pos=e.pos)
+            if isinstance(yes, NullExpr) and isinstance(no, NullExpr):
+                return NullExpr(pos=e.pos)
+            else:
+                return IfExpr(cond, yes, no, pos=e.pos)
 
 
 class ConditionalsSimplifier(BasicSimplifier):
@@ -124,6 +139,8 @@ class ConditionalsSimplifier(BasicSimplifier):
     """
     def bool(self, e):
         e = super(ConditionalsSimplifier, self).bool(e)
+        if not isinstance(e, BoolExpr):
+            return e
         op = e.operator
         try:
             # Note: any of the as_py() calls below may throw, because the
@@ -162,6 +179,8 @@ class ConditionalsSimplifier(BasicSimplifier):
 
     def if_(self, e):
         e = super(ConditionalsSimplifier, self).if_(e)
+        if not isinstance(e, IfExpr):
+            return e
         try:
             if e.cond.as_py():
                 return e.value_yes
