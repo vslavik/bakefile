@@ -293,6 +293,9 @@ class VS2010Toolset(Toolset):
                             [bkl.expr.LiteralExpr(std_defs)])
             n_cl.add("PreprocessorDefinitions", defs)
             n_cl.add("AdditionalIncludeDirectories", target.get_variable_value("includedirs"))
+            cppflags = target.get_variable_value("cppflags").as_py()
+            if cppflags:
+                n_cl.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(cppflags))
             n.add(n_cl)
             n_link = Node("Link")
             n_link.add("SubSystem", "Console" if is_exe else "Windows")

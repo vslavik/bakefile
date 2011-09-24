@@ -50,6 +50,19 @@ class NativeCompiledType(TargetType):
                  type=ListType(PathType()),
                  default=[],
                  doc="Directories where to look for header files."),
+            Property("cppflags",
+                 type=ListType(StringType()),
+                 default=[],
+                 doc="""
+                     Additional compiler flags common to C and C++.
+                     These should be limited to flags related to preprocessor,
+                     i.e. include options etc. *Compiler* flags should be put
+                     in ``cflags`` or ``cxxflags`` properties.
+
+                     Note that the flags are compiler-specific and so this
+                     property should only be set conditionally for particular
+                     compilers that recognize the flags.
+                     """),
             Property("win32-unicode",
                  type=BoolType(),
                  default=True,

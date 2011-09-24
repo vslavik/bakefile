@@ -60,6 +60,7 @@ class GnuCCompiler(GnuFileCompiler):
         # FIXME: evaluating the flags here every time is inefficient
         cmd += bkl.expr.add_prefix("-D", target.get_variable_value("defines")).items
         cmd += bkl.expr.add_prefix("-I", target.get_variable_value("includedirs")).items
+        cmd += target.get_variable_value("cppflags").items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         cmd.append(input)
