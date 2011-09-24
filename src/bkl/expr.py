@@ -526,7 +526,7 @@ class Visitor(object):
             self.visit(e.value_no)
 
 
-class PathAnchors(object):
+class PathAnchorsInfo(object):
     """
     Struct with information about real values for symbolic *anchors* of
     :class:`PathExpr` paths. These are needed in order to format path
@@ -579,7 +579,7 @@ class PathAnchors(object):
 
         For example:
 
-        >>> p = bkl.expr.PathAnchors(dirsep='/',
+        >>> p = bkl.expr.PathAnchorsInfo(dirsep='/',
         ...                          outpath='/tmp/myprj/build/gnu',
         ...                          top_srcpath='/tmp/myprj/src')
         >>> p.outdir
@@ -631,7 +631,7 @@ class Formatter(Visitor):
 
     .. attribute:: paths_info
 
-       :class:`PathAnchors` information object to use for formatting of paths.
+       :class:`PathAnchorsInfo` information object to use for formatting of paths.
     """
     list_sep = " "
 

@@ -163,7 +163,7 @@ class MakefileToolset(Toolset):
         else:
             output = output_var.value.as_py()
 
-        paths_info = expr.PathAnchors(
+        paths_info = expr.PathAnchorsInfo(
                 dirsep="/", # FIXME - format-configurable
                 outpath=os.path.dirname(output),
                 # FIXME: topdir should be constant, this is akin to @srcdir

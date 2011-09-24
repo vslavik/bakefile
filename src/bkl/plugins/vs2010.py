@@ -192,7 +192,7 @@ class VS2010Toolset(Toolset):
         output_dir = os.path.dirname(module.source_file)
         output_name = os.path.splitext(os.path.basename(module.source_file))[0]
 
-        paths_info = bkl.expr.PathAnchors(dirsep="\\",
+        paths_info = bkl.expr.PathAnchorsInfo(dirsep="\\",
                                           outpath=output_dir,
                                           # FIXME: topdir should be constant, this is akin to @srcdir
                                           top_srcpath=output_dir)
