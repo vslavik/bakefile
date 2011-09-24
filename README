@@ -1,0 +1,31 @@
+
+
+Building from sources
+---------------------
+
+You'll need the following to get Bakefile running:
+
+1. Python >= 2.6+
+
+2. ANTLR 3.4 generator. Because of bugs in the official release, a patched
+   version is needed for now. You can download prebuilt binary from
+   https://github.com/downloads/vslavik/antlr/antlr-3.4-complete.jar
+   (the sources are available at https://github.com/vslavik/antlr). It has
+   to be available at the `PATH` under the `antlr-3.4` name, e.g. using the
+   following shell script:
+
+       #!/bin/sh
+       java -jar /path/to/antlr-3.4-complete.jar "$@"
+
+3. ANTLR 3.4 Python runtime (no patches needed). It can be installed with
+   `easy_install`:
+
+       easy_install https://github.com/downloads/vslavik/antlr/antlr_python_runtime-3.4.tar.gz
+
+4. Sphinx documentation tool. Install it with
+
+       easy_install Sphinx
+
+Once all tools are installed, you can build Bakefile by running `make`. This
+generates the parser from ANTLR grammar and build the HTML documentation. Use
+the `./bkl` script to run Bakefile.
