@@ -31,6 +31,57 @@ logger = logging.getLogger("bkl.pass")
 
 import simplify
 import bkl.vartypes
+import bkl.error
+
+
+def detect_self_references(model):
+    """
+    Verifies that recursive self-referencing loops (e.g. "foo = $(foo)")
+    don't exist.
+    """
+    logger.debug("checking for self-references")
+
+    from bkl.expr import Visitor
+    class SelfRefChecker(Visitor):
+        def __init__(self):
+            self.stack = []
+            self.checked = set()
+
+        literal = Visitor.noop
+        bool_value = Visitor.noop
+        null = Visitor.noop
+        concat = Visitor.visit_children
+        list = Visitor.visit_children
+        path = Visitor.visit_children
+        bool = Visitor.visit_children
+        if_ = Visitor.visit_children
+
+        def reference(self, e):
+            var = e.context.get_variable(e.var)
+            if var is None:
+                # reference to default value of a property
+                return
+            if var in self.stack:
+                # TODO: include complete stack of messages+positions
+                raise bkl.error.Error('variable "%s" is defined recursively, references itself' % var.name,
+                                      pos=e.pos)
+            else:
+                self.check(var)
+
+        def check(self, var):
+            if var in self.checked:
+                return
+            self.stack.append(var)
+            try:
+                self.visit(var.value)
+            finally:
+                self.stack.pop()
+            self.checked.add(var)
+
+    visitor = SelfRefChecker()
+
+    for var in model.all_variables():
+        visitor.check(var)
 
 
 def normalize_and_validate_vars(model):

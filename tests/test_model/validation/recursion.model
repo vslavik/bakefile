@@ -1,0 +1,2 @@
+ERROR:
+validation/recursion.bkl:3:6: variable "a" is defined recursively, references itself
