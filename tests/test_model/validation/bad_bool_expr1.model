@@ -1,0 +1,2 @@
+ERROR:
+validation/bad_bool_expr1.bkl:2:7: expression "1" is not a valid bool value
