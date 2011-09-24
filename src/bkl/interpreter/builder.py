@@ -114,10 +114,22 @@ class Builder(object):
 
         has_cond = self.active_if_cond is not None
         if has_cond:
-            value = IfExpr(self.active_if_cond,
-                           yes=value,
-                           no=NullExpr(),
-                           pos=node.pos)
+            if append and isinstance(value, ListExpr):
+                # If conditionally appending more items to an existing list,
+                # it's better to associate the condition with individual items.
+                ifs = [IfExpr(self.active_if_cond,
+                              yes=i,
+                              no=NullExpr(),
+                              pos=i.pos)
+                       for i in value.items]
+                value = ListExpr(ifs, pos=value.pos)
+            else:
+                # But when just setting the value, keep it all together as
+                # a single value inside single IfExpr.
+                value = IfExpr(self.active_if_cond,
+                               yes=value,
+                               no=NullExpr(),
+                               pos=node.pos)
 
         if var is None:
             # If there's an appropriate property with the same name, then
@@ -144,10 +156,14 @@ class Builder(object):
                 if not isinstance(var.type, ListType):
                     raise ParserError('cannot append to non-list variable "%s" (type: %s)' %
                                       (varname, var.type))
-                if isinstance(var.value, ListExpr):
-                    value = ListExpr(var.value.items + [value])
+                if isinstance(value, ListExpr):
+                    new_values = value.items
                 else:
-                    value = ListExpr([var.value, value])
+                    new_values = [value]
+                if isinstance(var.value, ListExpr):
+                    value = ListExpr(var.value.items + new_values)
+                else:
+                    value = ListExpr([var.value] + new_values)
                 value.pos = node.pos
                 var.set_value(value)
             else:
