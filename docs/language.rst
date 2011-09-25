@@ -118,6 +118,10 @@ semantical difference in that the properties are usually typed and only values
 compatible with their type can be assigned to them. For example, you cannot
 assign arbitrary string to a *path* property or overwrite a read-only property.
 
+
+Setting variables
+^^^^^^^^^^^^^^^^^
+
 Variables don't need to be declared; they are defined on first assignment.
 Assignment to variables is done in the usual way:
 
@@ -128,14 +132,40 @@ Assignment to variables is done in the usual way:
    main_sources = foo.cpp;
    main_sources += bar.cpp third.cpp;
 
-Because literals aren't quoted, variable references use the ``$()`` make-like
-syntax:
+
+Referencing variables
+^^^^^^^^^^^^^^^^^^^^^
+
+Because literals aren't quoted, variables are referenced using the make-like
+``$(<varname>)`` syntax:
 
 .. code-block:: bkl
 
    platform = windows;
    sources { os/$(platform).cpp }
 
+Note that the substitution isn't done immediately. Instead, the reference is
+included in the object model of the bakefiles and is dereferenced at a later
+stage, when generating makefile and project files. Sometimes, they are kept in
+the generated files too.
+
+This has two practical consequences:
+
+ 1. It is possible to reference variables that are defined later in the
+    bakefile without getting errors.
+
+ 2. Definitions cannot be recursive, a variable must not reference itself. You
+    cannot write this:
+
+    .. code-block:: bkl
+
+       defines = $(defines) SOME_MORE
+
+    Use operator ``+=`` instead:
+
+    .. code-block:: bkl
+
+       defines += SOME_MORE
 
 
 Targets
