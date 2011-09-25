@@ -1,12 +1,12 @@
 
-foo = a_foo
-bar = a_bar
+foo = a_foo;
+bar = a_bar;
 
-foo = changed
-bar = changed_too
+foo = changed;
+bar = changed_too;
 
 
 exe a_target {
-    my_var = my
-    my_var = my_take_2
+    my_var = my;
+    my_var = my_take_2;
     }

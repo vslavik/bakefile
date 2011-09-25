@@ -6,33 +6,24 @@ Language reference
 Statements, blocks, literals etc.
 ---------------------------------
 
-Statements in Bakefile are separated by newlines, with one statement per line,
-similarly to Python.  Unlike in Python, code blocks are marked up in C style,
-with ``{`` and ``}``. See an example:
+Statements in Bakefile are separated by semicolon (``;``) and code blocks are
+marked up in with ``{`` and ``}``, as in C. See an example:
 
 .. code-block:: bkl
 
-   toolsets = gnu vs2010
+   toolsets = gnu vs2010;
    exe hello {
-       sources = hello.cpp
+       sources = hello.cpp;
    }
 
-The problem of expressions that are too long to fit on a single line is handled
-in the same way as in Python, with two options:
+In particular, expressions may span multiple lines without the need to escape newlines or enclose the
+expression in parenthesis:
 
- 1. Escape the newline with ``\``:
+.. code-block:: bkl
 
-    .. code-block:: bkl
-
-       sources = foo.cpp \
-                 bar.cpp
-
- 2. Enclose the expression in parenthesis:
-
-    .. code-block:: bkl
-
-       sources = (foo.cpp
-                 bar.cpp)
+   sources = foo.cpp
+             bar.cpp
+             ;
 
 
 
@@ -109,9 +100,9 @@ Here are some examples showing common uses for the anchors:
 
 .. code-block:: bkl
 
-   sources = hello.cpp  // relative to srcdir
-   sources += @builddir/generated_file.c
-   includedirs += @top_srcdir/include
+   sources = hello.cpp;  // relative to srcdir
+   sources += @builddir/generated_file.c;
+   includedirs += @top_srcdir/include;
 
 
 
@@ -130,18 +121,18 @@ Assignment to variables is done in the usual way:
 
 .. code-block:: bkl
 
-   variable = value
+   variable = value;
    // Lists can be appended to, too:
-   sources = foo.cpp
-   sources += bar.cpp third.cpp
+   sources = foo.cpp;
+   sources += bar.cpp third.cpp;
 
 Because literals aren't quoted, variable references use the ``$()`` make-like
 syntax:
 
 .. code-block:: bkl
 
-   platform = windows
-   sources += os/$(platform).cpp
+   platform = windows;
+   sources += os/$(platform).cpp;
 
 
 
@@ -156,8 +147,8 @@ properties:
 .. code-block:: bkl
 
    type id {
-       property = value
-       property = value
+       property = value;
+       property = value;
        ...more content...
    }
 
@@ -174,8 +165,9 @@ The syntax is similar to C/C++'s one:
 
 .. code-block:: bkl
 
-   defines = BUILD
-   if ( $(toolset) == gnu ) defines += LINUX
+   defines = BUILD;
+   if ( $(toolset) == gnu )
+       defines += LINUX;
 
 In this example, the ``defines`` list will contain two items, ``[BUILD,
 LINUX]`` when generating makefiles for the ``gnu`` toolset and only one item,
@@ -190,8 +182,8 @@ this one can contain more than one statement:
 .. code-block:: bkl
 
    if ( $(toolset) == gnu ) {
-       defines += LINUX
-       sources += os/linux.cpp
+       defines += LINUX;
+       sources += os/linux.cpp;
    }
 
 Conditional statements may be nested, too:
@@ -200,10 +192,10 @@ Conditional statements may be nested, too:
 
    if ( $(build_tests) ) {
        exe test {
-           sources = main.cpp
+           sources = main.cpp;
            if ( $(toolset) == gnu ) {
-               defines += LINUX
-               sources += os/linux.cpp
+               defines += LINUX;
+               sources += os/linux.cpp;
            }
        }
    }
@@ -223,7 +215,7 @@ variants. Single-line comments look like this:
 .. code-block:: bkl
 
    // we only generate code for GNU format for now
-   toolsets = gnu
+   toolsets = gnu;
 
 Multi-line comments can span several lines:
 
@@ -233,14 +225,14 @@ Multi-line comments can span several lines:
       We only generate code for GNU format for now.
       This will change later, when we add Visual C++ support.
     */
-   toolsets = gnu
+   toolsets = gnu;
 
 They can also be included in an expression:
 
 .. code-block:: bkl
 
    exe hello {
-       sources = hello.c /*main() impl*/ lib.c
+       sources = hello.c /*main() impl*/ lib.c;
    }
 
 

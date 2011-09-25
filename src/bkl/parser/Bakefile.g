@@ -49,16 +49,6 @@ scope StmtScope {
     insideTarget;
 }
 
-// Bakefile grammar uses newlines to terminate statements, unlike C and like
-// e.g. Python. Like Python, it also treats newlines as any other whitespace
-// inside ( ... ) blocks such as this:
-//   sources += (foo.cpp
-//               bar.cpp)
-// This solution to the problem was strongly inspired by Terence Parr's and
-// Loring Craymer's ANTLR Python grammar.
-@lexer::init {
-    self.implicitLineJoiningLevel = 0
-}
 
 // ---------------------------------------------------------------------------
 // Overall program structure
@@ -74,13 +64,13 @@ stmt
     : assignment_stmt
     | {not $StmtScope::insideTarget}?=> target_stmt
     | if_stmt
-    | NEWLINE -> // empty statement
+    | ';' -> // empty statement
     ;
 
 
 assignment_stmt
-    : identifier '=' expression NEWLINE    -> ^(ASSIGN identifier expression)
-    | identifier '+=' expression NEWLINE   -> ^(APPEND identifier expression)
+    : identifier '=' expression ';'    -> ^(ASSIGN identifier expression)
+    | identifier '+=' expression ';'   -> ^(APPEND identifier expression)
     ;
 
 
@@ -90,7 +80,7 @@ if_stmt
 
 if_body
     : stmt
-    | NEWLINE* '{' (stmt)* '}'  -> stmt*
+    | '{' (stmt)* '}'  -> stmt*
     ;
 
 // ---------------------------------------------------------------------------
@@ -160,7 +150,7 @@ literal
 target_stmt
 scope StmtScope;
 @init { $StmtScope::insideTarget = True }
-    : type=identifier id=identifier NEWLINE* '{' target_content* '}' NEWLINE
+    : type=identifier id=identifier '{' target_content* '}'
                             -> ^(TARGET $type $id target_content*)
     ;
 
@@ -177,8 +167,8 @@ NOT:       '!';
 EQUAL:     '==';
 NOT_EQUAL: '!=';
 
-LPAREN: '(' {self.implicitLineJoiningLevel += 1};
-RPAREN: ')' {self.implicitLineJoiningLevel -= 1};
+LPAREN:    '(';
+RPAREN:    ')';
 
 QUOTED_TEXT: '"' (options{greedy=false;}:.)* '"';
 
@@ -207,10 +197,4 @@ WS
     : (' ' | '\t')+ { $channel = HIDDEN };
 
 NEWLINE
-    : ('\n' | '\r')  { if self.implicitLineJoiningLevel > 0:
-                               $channel = HIDDEN
-                      };
-
-// C-style continuations for escaping of newlines:
-CONTINUATION
-    : '\\' WS* NEWLINE { $channel = HIDDEN };
+    : ('\n' | '\r')  { $channel = HIDDEN };

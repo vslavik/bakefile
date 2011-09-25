@@ -1,8 +1,0 @@
-RootNode
-    AssignmentNode
-        IdNode foo
-        ListNode
-            LiteralNode "one"
-            LiteralNode "two"
-            LiteralNode "three"
-            LiteralNode "four"

@@ -1,7 +1,0 @@
-module {
-  variables {
-    foo = [one, two, three, four]
-  }
-  targets {
-  }
-}

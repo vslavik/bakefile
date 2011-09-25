@@ -1,7 +1,7 @@
-toolsets = gnu
+toolsets = gnu;
 
 exe dummy
     {
-        sources = one.c
-        sources += two.c
+        sources = one.c;
+        sources += two.c;
     }

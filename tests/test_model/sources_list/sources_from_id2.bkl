@@ -1,8 +1,8 @@
-toolsets = gnu
+toolsets = gnu;
 
 exe hello {
-    name = $(id)
+    name = $(id);
     // this tests expression simplifier pass - should be simplified to "hello"
-    src = $(name)
-    sources = $(src).c
+    src = $(name);
+    sources = $(src).c;
 }

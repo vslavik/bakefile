@@ -1,5 +1,5 @@
 // This test has two quoted variables, to verify that the lexer
 // isn't greedy when parsing quoted blocks.
 
-foo = "one two" "three"
-bar = "1 2 3"
+foo = "one two" "three";
+bar = "1 2 3";

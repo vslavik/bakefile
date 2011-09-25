@@ -1,7 +1,7 @@
-toolsets = gnu
+toolsets = gnu;
 
-SOURCE_FILES = hello.c
+SOURCE_FILES = hello.c;
 
 exe hello {
-    sources = $(SRC_FILES).c
+    sources = $(SRC_FILES).c;
 }

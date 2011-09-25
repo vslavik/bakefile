@@ -1,8 +1,8 @@
 
-foo = 1
-bar = 2
-FOO = bar yy$(foo)xx zar
-X = foo$(bar)
-Y = foo$(bar)zar
-Z = $(foo)$(bar)
-W = "foo"bar
+foo = 1;
+bar = 2;
+FOO = bar yy$(foo)xx zar;
+X = foo$(bar);
+Y = foo$(bar)zar;
+Z = $(foo)$(bar);
+W = "foo"bar;

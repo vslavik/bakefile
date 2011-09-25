@@ -1,5 +1,5 @@
-toolsets = gnu vs2010
+toolsets = gnu vs2010;
 
 library helpers {
-    sources = common.cpp helpers.cpp
+    sources = common.cpp helpers.cpp;
 }

@@ -1,5 +1,5 @@
-toolsets = gnu
+toolsets = gnu;
 
 exe hello {
-    sources = $(id).c
+    sources = $(id).c;
 }

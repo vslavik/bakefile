@@ -1,2 +1,2 @@
-one = 1
-if ( $(toolset) == gnu && $(one) ) onetwo = $(one)two
+one = 1;
+if ( $(toolset) == gnu && $(one) ) onetwo = $(one)two;

@@ -1,2 +1,2 @@
-foo = true
-foo += FOO
+foo = true;
+foo += FOO;

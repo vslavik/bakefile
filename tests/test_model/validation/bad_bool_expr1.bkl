@@ -1,2 +1,2 @@
-one = 1
-if ( $(one) ) onetwo = $(one) two
+one = 1;
+if ( $(one) ) onetwo = $(one) two;
