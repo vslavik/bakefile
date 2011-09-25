@@ -107,8 +107,9 @@ class Builder(object):
             raise e
 
 
-    def _assign_to_var(self, node, append):
+    def on_assignment(self, node):
         varname = node.var
+        append = node.append
         value = self._build_expression(node.value)
         var = self.context.get_variable(varname)
 
@@ -174,12 +175,6 @@ class Builder(object):
                     value.value_no = var.value
                 var.set_value(value)
 
-    def on_assignment(self, node):
-        self._assign_to_var(node, append=False)
-
-    def on_append(self, node):
-        self._assign_to_var(node, append=True)
-
 
     def on_target(self, node):
         name = node.name.text
@@ -217,8 +212,8 @@ class Builder(object):
 
 
     _ast_dispatch = {
-        AppendNode     : on_append,
         AssignmentNode : on_assignment,
+        AppendNode     : on_assignment,
         TargetNode     : on_target,
         IfNode         : on_if,
         NilNode        : lambda self,x: x, # do nothing

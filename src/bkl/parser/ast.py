@@ -154,10 +154,12 @@ class AssignmentNode(Node):
                    doc="Variable assigning to")
     value = property(lambda self: self.children[1],
                      doc="Value being assigned.")
-
+    append = False
+                     
 
 class AppendNode(AssignmentNode):
-    pass
+    """Assignment of value to a variable by appending (operator +=)."""
+    append = True
 
 
 class VarReferenceNode(Node):
