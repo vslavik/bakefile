@@ -85,7 +85,7 @@ For such situations, Bakefile has the ability to *anchor* paths under a
 different root. This is done by adding a prefix of the form of ``@<anchor>/``
 in front of the path. The following anchors are recognized:
 
- 1. ``@top_srcdir`` is the toplevel source directory, i.e. *srcdir* of the
+ 1. ``@top_srcdir`` is the top level source directory, i.e. *srcdir* of the
     top-most bakefile of the project.
 
  2. ``@builddir`` is the directory where build files of the current bakefile
@@ -172,7 +172,7 @@ Targets
 -------
 
 Target definition consists of three things: the *type* of the target (an
-executable, a library etc.), it's *ID* (the name, which usually corresponds to
+executable, a library etc.), its *ID* (the name, which usually corresponds to
 built file's name, but doesn't have to) and detailed specification of its
 properties:
 
@@ -198,7 +198,7 @@ contain any valid expression; in particular, references to variables are
 permitted.
 
 It's possible to have multiple ``sources`` statements in the same target.
-Another use of ``sources`` appends thefiles to the list of sources, it doesn't
+Another use of ``sources`` appends the files to the list of sources, it doesn't
 overwrite it; the effect is the same as that of operator ``+=``.
 
 See an example:
