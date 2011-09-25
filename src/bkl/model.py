@@ -120,6 +120,16 @@ class ModelPart(object):
     def __getstate__(self):
         return dict(x for x in self.__dict__.iteritems() if x[0] != "parent")
 
+    @property
+    def project(self):
+        """
+        The :class:`bkl.mode.Project` project this part belongs to.
+        """
+        prj = self
+        while prj.parent is not None:
+            prj = prj.parent
+        return prj
+
 
     def get_variable(self, name):
         """
@@ -212,6 +222,13 @@ class Project(ModelPart):
 
     def __str__(self):
         return "the project"
+
+    @property
+    def top_module(self):
+        """
+        The toplevel module of this project.
+        """
+        return self.modules[0]
 
     def all_variables(self):
         """

@@ -192,20 +192,22 @@ class VS2010Toolset(Toolset):
         output_dir = os.path.dirname(module.source_file)
         output_name = os.path.splitext(os.path.basename(module.source_file))[0]
 
-        paths_info = bkl.expr.PathAnchorsInfo(dirsep="\\",
-                                          outpath=output_dir,
-                                          # FIXME: topdir should be constant, this is akin to @srcdir
-                                          top_srcpath=output_dir)
-
         sln = VS2010Solution(output_name, os.path.join(output_dir, "%s.sln" % output_name))
         for t in module.targets.itervalues():
             self.gen_for_target(t,
                                 os.path.join(output_dir, "%s.vcxproj" % t.name),
-                                paths_info, sln)
+                                sln)
         sln.commit()
 
 
-    def gen_for_target(self, target, filename, paths_info, sln):
+    def gen_for_target(self, target, filename, sln):
+        paths_info = bkl.expr.PathAnchorsInfo(
+                                    dirsep="\\",
+                                    outfile=filename,
+                                    # FIXME: this needs to be config-specific
+                                    builddir=os.path.dirname(filename),
+                                    model=target)
+
         is_library = (target.type.name == "library")
         is_exe = (target.type.name == "exe")
 

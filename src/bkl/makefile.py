@@ -165,10 +165,9 @@ class MakefileToolset(Toolset):
 
         paths_info = expr.PathAnchorsInfo(
                 dirsep="/", # FIXME - format-configurable
-                outpath=os.path.dirname(output),
-                # FIXME: topdir should be constant, this is akin to @srcdir
-                top_srcpath=os.path.dirname(module.source_file)
-            )
+                outfile=output,
+                builddir=os.path.dirname(output), # FIXME
+                model=module)
 
         expr_fmt = _MakefileExprFormatter(self.Formatter, paths_info)
 

@@ -372,13 +372,17 @@ class PathExpr(Expr):
         self.components = components
         self.anchor = anchor
 
-    def as_py(self, top_srcdir=None):
-        assert top_srcdir, \
-               "PathExpr.as_py() can only be called with top_scrdir argument"
-        assert self.anchor == ANCHOR_TOP_SRCDIR, \
-               "PathExpr.as_py() can only be used with top_srcdir-relative paths"
+    def as_py(self, paths_info=None):
+        assert paths_info is not None, \
+               "PathExpr.as_py() can only be called with paths_info argument"
+        if self.anchor == ANCHOR_TOP_SRCDIR:
+            base = paths_info.top_srcdir_abs
+        elif self.anchor == ANCHOR_BUILDDIR:
+            base = paths_info.builddir_abs
+        else:
+            assert False, "unsupported anchor in PathExpr.as_py()"
         comp = (e.as_py() for e in self.components)
-        return os.path.join(top_srcdir, os.path.sep.join(comp))
+        return os.path.join(base, os.path.sep.join(comp))
 
     def __str__(self):
         return "%s/%s" % (self.anchor, "/".join(str(e) for e in self.components))
@@ -536,30 +540,30 @@ class PathAnchorsInfo(object):
 
        Separator to separate path components ("/" on Unix and "\\" on Windows).
 
-    .. attribute:: outdir
-
-       Current output directory, i.e. the directory into which Bakefile is
-       writing files at the moment the context is used, relative to
-       *top_srcdir* root, as a list of components. Will be empty list if the
-       paths are the same.
-
-       This value may (and typically does) change during processing -- for
-       example, it may be ``build/msvc2005`` when generating main library
-       project for VC++ 2005, ``build/msvc2008`` when creating the same for
-       VC++ 2008 and ``examples/build/msvc2008`` for a submodule).
-
     .. attribute:: top_srcdir
 
        Path to the top source directory, as a list of components, relative
-       to *outdir*. Will be empty list if the paths are the same.
+       to the output directory. Will be empty list if the paths are the same.
 
     .. attribute:: builddir
 
        Path to the build directory -- the directory where object files and
        other generated files are put -- as a list of components, relative
-       to *outdir*. Will be empty list if the paths are the same.
+       to the output directory. Will be empty list if the paths are the same.
+
+    .. attribute:: top_srcdir_abs
+
+       Absolute native path to the top source directory.
+
+    .. attribute:: outdir_abs
+
+       Absolute native path to the output directory.
+
+    .. attribute:: builddir_abs
+
+       Absolute native path to the build directory.
     """
-    def __init__(self, dirsep, outpath, top_srcpath):
+    def __init__(self, dirsep, outfile, builddir, model):
         """
         The constructor creates anchors information from native paths passed
         to it:
@@ -568,48 +572,38 @@ class PathAnchorsInfo(object):
                 Path components separator, same as the :attr:`dirsep`
                 attribute.
 
-        :param outpath:
-                (Native) path to the output directory. Paths in the output
+        :param outfile:
+                (Native) path to the output file. Paths in the output
                 will be typically formatted relatively to this path.
                 The :attr:`outdir` attribute is computed from this parameter.
 
-        :param top_srcpath:
-                (Native) path to the top of source tree.  The
-                :attr:`top_srcdir` attribute is computed from this parameter.
+        :param builddir:
+                (Native) path to the build directory.
 
-        For example:
-
-        >>> p = bkl.expr.PathAnchorsInfo(dirsep='/',
-        ...                          outpath='/tmp/myprj/build/gnu',
-        ...                          top_srcpath='/tmp/myprj/src')
-        >>> p.outdir
-        ['..', 'build', 'gnu']
-        >>> p.top_srcdir
-        ['..', '..', 'src']
+        :param model:
+                Part of the model (:class:`bkl.model.Module` or
+                :class:`bkl.model.Target`) that *outfile* corresponds to.
         """
-        out = os.path.split(os.path.abspath(outpath))
-        top = os.path.split(os.path.abspath(top_srcpath))
 
-        self.dirsep = dirsep
-        self.outdir = _pathcomp_make_relative(out, to=top)
-        self.top_srcdir = _pathcomp_make_relative(top, to=out)
-        # FIXME: for now, make this settable
-        self.builddir = [] # i.e. equal to outdir
+        outdir = os.path.dirname(os.path.abspath(outfile))
+        builddir = os.path.abspath(builddir)
+        top_srcdir = os.path.dirname(os.path.abspath(model.project.top_module.source_file))
 
+        to_top_srcdir = os.path.relpath(top_srcdir, start=outdir)
+        to_builddir = os.path.relpath(builddir, start=outdir)
 
-def _pathcomp_make_relative(what, to):
-    min_len = min(len(what), len(to))
-    first_not_common = -1
-    for i in xrange(0, min_len):
-        if what[i] != to[i]:
-            first_not_common = i
-            break
-    if first_not_common == -1:
-        if len(what) == len(to):
-            return [] # equivalent of "." path
+        if to_top_srcdir == ".":
+            self.top_srcdir = []
         else:
-            first_not_common = min_len
-    return [".."] * (len(to) - first_not_common) + what2[first_not_common:]
+            self.top_srcdir = to_top_srcdir.split(os.path.sep)
+        if to_builddir == ".":
+            self.builddir = []
+        else:
+            self.builddir = to_builddir.split(os.path.sep)
+        self.dirsep = dirsep
+        self.top_srcdir_abs = top_srcdir
+        self.outdir_abs = outdir
+        self.builddir_abs = builddir
 
 
 class Formatter(Visitor):
@@ -659,15 +653,25 @@ class Formatter(Visitor):
         return self.list_sep.join(self.format(e) for e in e.items)
 
     def path(self, e):
+        pi = self.paths_info
         if e.anchor == ANCHOR_TOP_SRCDIR:
-            base = self.paths_info.top_srcdir
+            base = pi.top_srcdir
+            base_abs = pi.top_srcdir_abs
         elif e.anchor == ANCHOR_BUILDDIR:
-            base = self.paths_info.builddir
+            base = pi.builddir
+            base_abs = pi.builddir_abs
         else:
             assert False, "unknown path anchor (%s)" % e.anchor
-
-        comps = [self.format(i) for i in e.components]
-        return self.paths_info.dirsep.join(base + comps)
+        try:
+            # Try to format the path without superfluous "..".
+            abs_path = os.path.abspath(e.as_py(pi))
+            rel_path = os.path.relpath(abs_path, start=pi.outdir_abs)
+            return pi.dirsep.join(rel_path.split(os.path.sep))
+        except NonConstError:
+            # The path has some conditional elements, give up on formatting
+            # it nicely.
+            comps = [self.format(i) for i in e.components]
+            return pi.dirsep.join(base + comps)
 
     def bool_value(self, e):
         raise NotImplementedError
