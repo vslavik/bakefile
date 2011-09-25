@@ -335,11 +335,12 @@ class IfExpr(Expr):
 
 
 # anchors -- special syntax first components of a path
+ANCHOR_SRCDIR = "@srcdir"
 ANCHOR_TOP_SRCDIR = "@top_srcdir"
 ANCHOR_BUILDDIR = "@builddir"
 
 # all possible anchors
-ANCHORS = [ANCHOR_TOP_SRCDIR, ANCHOR_BUILDDIR]
+ANCHORS = [ANCHOR_SRCDIR, ANCHOR_TOP_SRCDIR, ANCHOR_BUILDDIR]
 
 class PathExpr(Expr):
     """
@@ -355,6 +356,9 @@ class PathExpr(Expr):
        The point to which the path is relative to. This can be one of the
        following:
 
+       * ``expr.ANCHOR_SRCDIR`` -- Path is relative to the directory where
+         the input bakefile is (unless overriden in it).
+
        * ``expr.ANCHOR_TOP_SRCDIR`` -- Path is relative to the top
          source directory (where the toplevel ``.bkl`` file is, unless
          overriden in it).
@@ -367,7 +371,7 @@ class PathExpr(Expr):
 
        Location of the expression in source tree.
     """
-    def __init__(self, components, anchor=ANCHOR_TOP_SRCDIR, pos=None):
+    def __init__(self, components, anchor=ANCHOR_SRCDIR, pos=None):
         super(PathExpr, self).__init__(pos)
         self.components = components
         self.anchor = anchor

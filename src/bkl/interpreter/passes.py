@@ -26,12 +26,16 @@
 Implementation of misc interpreter passes -- optimization, checking etc.
 """
 
+import os.path
+
 import logging
 logger = logging.getLogger("bkl.pass")
 
 import simplify
 import bkl.vartypes
 import bkl.error
+import bkl.expr
+from bkl.expr import Visitor
 
 
 def detect_self_references(model):
@@ -41,7 +45,6 @@ def detect_self_references(model):
     """
     logger.debug("checking for self-references")
 
-    from bkl.expr import Visitor
     class SelfRefChecker(Visitor):
         def __init__(self):
             self.stack = []
@@ -100,6 +103,49 @@ def normalize_and_validate_vars(model):
     logger.debug("checking types of variables")
     for var in model.all_variables():
         var.type.validate(var.value)
+
+
+def normalize_srcdir_paths(model):
+    """
+    Normalizes paths so that they are not relative to @srcdir: all such paths
+    are rewritten in terms of @top_srcdir. This is needed so that cross-module
+    variables and paths uses produce correct results.
+
+    Performs the normalization in-place for the whole model.
+    """
+    logger.debug("translating @srcdir paths to @top_srcdir ones")
+
+    class PathsNormalizer(Visitor):
+        def __init__(self, prefix):
+            if prefix == ".":
+                self.prefix = None
+            else:
+                lst = prefix.split(os.path.sep)
+                self.prefix = [bkl.expr.LiteralExpr(i) for i in lst]
+
+        literal = Visitor.noop
+        bool_value = Visitor.noop
+        null = Visitor.noop
+        reference = Visitor.noop
+        concat = Visitor.visit_children
+        list = Visitor.visit_children
+        bool = Visitor.visit_children
+        if_ = Visitor.visit_children
+
+        def path(self, e):
+            self.visit_children(e)
+            if e.anchor == bkl.expr.ANCHOR_SRCDIR:
+                if self.prefix is not None:
+                    e.components = self.prefix + e.components
+                e.anchor = bkl.expr.ANCHOR_TOP_SRCDIR
+
+    top_srcdir = os.path.abspath(model.top_module.source_file)
+    for module in model.modules:
+        srcdir = os.path.abspath(module.source_file)
+        prefix = os.path.relpath(srcdir, start=top_srcdir)
+        norm = PathsNormalizer(prefix)
+        for var in module.all_variables():
+            norm.visit(var.value)
 
 
 def simplify_exprs(model):

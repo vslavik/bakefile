@@ -230,6 +230,9 @@ class Project(ModelPart):
         """
         return self.modules[0]
 
+    def get_prop(self, name):
+        return props.get_project_prop(name)
+
     def all_variables(self):
         """
         Returns iterator over all variables in the project. Works recursively,
@@ -238,14 +241,8 @@ class Project(ModelPart):
         for v in self.variables.itervalues():
             yield v
         for m in self.modules:
-            for v in m.variables.itervalues():
+            for v in m.all_variables():
                 yield v
-            for t in m.targets.itervalues():
-                for v in t.variables.itervalues():
-                    yield v
-
-    def get_prop(self, name):
-        return props.get_project_prop(name)
 
 
 class Module(ModelPart):
@@ -285,6 +282,17 @@ class Module(ModelPart):
 
     def get_prop(self, name):
         return props.get_module_prop(name)
+
+    def all_variables(self):
+        """
+        Returns iterator over all variables in the project. Works recursively,
+        i.e. scans all modules and targets under this object too.
+        """
+        for v in self.variables.itervalues():
+            yield v
+        for t in self.targets.itervalues():
+            for v in t.variables.itervalues():
+                yield v
 
 
 class Target(ModelPart):
