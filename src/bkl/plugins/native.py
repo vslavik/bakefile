@@ -36,7 +36,7 @@ class NativeCompiledType(TargetType):
     properties = [
             Property("sources",
                  type=ListType(PathType()),
-                 default=None,
+                 default=[],
                  doc="Source files."),
             Property("headers",
                  type=ListType(PathType()),

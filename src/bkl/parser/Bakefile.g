@@ -37,12 +37,13 @@ tokens {
     ASSIGN;
     APPEND;
     LITERAL;
-    TARGET;
     VAR_REFERENCE;
     LIST_OR_CONCAT;
     LIST;
     CONCAT;
     IF;
+    TARGET;
+    FILES_LIST;
 }
 
 scope StmtScope {
@@ -62,11 +63,21 @@ scope StmtScope;
 
 stmt
     : assignment_stmt
-    | {not $StmtScope::insideTarget}?=> target_stmt
+    | {$StmtScope::insideTarget}?=> stmt_inside_target
+    | {not $StmtScope::insideTarget}?=> stmt_outside_target
     | if_stmt
     | ';' -> // empty statement
     ;
 
+// statements only allowed outside target definition:
+stmt_outside_target
+    : target_stmt
+    ;
+
+// and those only allowed inside target:
+stmt_inside_target
+    : sources_stmt
+    ;
 
 assignment_stmt
     : identifier '=' expression ';'    -> ^(ASSIGN identifier expression)
@@ -150,12 +161,18 @@ literal
 target_stmt
 scope StmtScope;
 @init { $StmtScope::insideTarget = True }
-    : type=identifier id=identifier '{' target_content* '}'
-                            -> ^(TARGET $type $id target_content*)
+    : type=identifier id=identifier '{' stmt* '}'
+                            -> ^(TARGET $type $id stmt*)
     ;
 
-target_content : stmt;
 
+sources_stmt
+    : sources_keyword '{' element '}'
+                            -> ^(FILES_LIST sources_keyword element)
+    ;
+
+sources_keyword
+    : (t='sources' | t='headers') -> ID[$t];
 
 // ---------------------------------------------------------------------------
 // Basic tokens

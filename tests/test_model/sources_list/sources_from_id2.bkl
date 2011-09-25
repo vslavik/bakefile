@@ -4,5 +4,5 @@ exe hello {
     name = $(id);
     // this tests expression simplifier pass - should be simplified to "hello"
     src = $(name);
-    sources = $(src).c;
+    sources { $(src).c }
 }

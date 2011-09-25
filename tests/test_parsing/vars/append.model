@@ -4,7 +4,8 @@ module {
   }
   targets {
     exe dummy {
-        sources = [@top_srcdir/one.c, @top_srcdir/two.c]
+        xxx = [one.c, two.c, three.c]
     }
   }
 }
+

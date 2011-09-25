@@ -2,6 +2,6 @@ toolsets = gnu;
 
 exe dummy
     {
-        sources = one.c;
-        sources += two.c;
+        xxx = one.c two.c;
+        xxx += three.c;
     }

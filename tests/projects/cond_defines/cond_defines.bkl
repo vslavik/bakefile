@@ -1,7 +1,7 @@
 toolsets = gnu vs2010;
 
 exe hello {
-    sources = hello.c;
+    sources { hello.c }
     defines = PRINT_DETAILS;
     if ($(toolset) == gnu)
         defines += PLATFORM_UNIX;

@@ -13,7 +13,7 @@ marked up in with ``{`` and ``}``, as in C. See an example:
 
    toolsets = gnu vs2010;
    exe hello {
-       sources = hello.cpp;
+       sources { hello.cpp }
    }
 
 In particular, expressions may span multiple lines without the need to escape newlines or enclose the
@@ -21,9 +21,9 @@ expression in parenthesis:
 
 .. code-block:: bkl
 
-   sources = foo.cpp
-             bar.cpp
-             ;
+   os_files = foo.cpp
+              bar.cpp
+              ;
 
 
 
@@ -100,8 +100,10 @@ Here are some examples showing common uses for the anchors:
 
 .. code-block:: bkl
 
-   sources = hello.cpp;  // relative to srcdir
-   sources += @builddir/generated_file.c;
+   sources {
+       hello.cpp;  // relative to srcdir
+       @builddir/generated_file.c;
+   }
    includedirs += @top_srcdir/include;
 
 
@@ -123,8 +125,8 @@ Assignment to variables is done in the usual way:
 
    variable = value;
    // Lists can be appended to, too:
-   sources = foo.cpp;
-   sources += bar.cpp third.cpp;
+   main_sources = foo.cpp;
+   main_sources += bar.cpp third.cpp;
 
 Because literals aren't quoted, variable references use the ``$()`` make-like
 syntax:
@@ -132,7 +134,7 @@ syntax:
 .. code-block:: bkl
 
    platform = windows;
-   sources += os/$(platform).cpp;
+   sources { os/$(platform).cpp }
 
 
 
@@ -149,11 +151,48 @@ properties:
    type id {
        property = value;
        property = value;
+       ...sources specification...
        ...more content...
    }
 
 (It's a bit more complicated than that, the content may contain conditional
 statements too, but that's the overall structure.)
+
+
+Sources files
+^^^^^^^^^^^^^
+
+Source files are added to the target using the ``sources`` keyword, followed by
+the list of source files inside curly brackets. Note the sources list may
+contain any valid expression; in particular, references to variables are
+permitted.
+
+It's possible to have multiple ``sources`` statements in the same target.
+Another use of ``sources`` appends thefiles to the list of sources, it doesn't
+overwrite it; the effect is the same as that of operator ``+=``.
+
+See an example:
+
+.. code-block:: bkl
+
+   exe hello {
+       sources {
+           hello.cpp
+           utils.cpp
+       }
+
+       // add some more sources later:
+       sources { $(EXTRA_SOURCES) }
+   }
+
+
+Headers
+^^^^^^^
+
+Syntax for headers specification is identical to the one used for source files,
+except that the ``headers`` keyword is used instead. The difference between
+sources and headers is that the latter may be used outside of the target (e.g.
+a library installs headers that are then used by users of the library).
 
 
 
@@ -183,7 +222,7 @@ this one can contain more than one statement:
 
    if ( $(toolset) == gnu ) {
        defines += LINUX;
-       sources += os/linux.cpp;
+       sources { os/linux.cpp }
    }
 
 Conditional statements may be nested, too:
@@ -192,10 +231,10 @@ Conditional statements may be nested, too:
 
    if ( $(build_tests) ) {
        exe test {
-           sources = main.cpp;
+           sources { main.cpp }
            if ( $(toolset) == gnu ) {
                defines += LINUX;
-               sources += os/linux.cpp;
+               sources { os/linux.cpp }
            }
        }
    }
@@ -232,7 +271,7 @@ They can also be included in an expression:
 .. code-block:: bkl
 
    exe hello {
-       sources = hello.c /*main() impl*/ lib.c;
+       sources { hello.c /*main() impl*/ lib.c }
    }
 
 

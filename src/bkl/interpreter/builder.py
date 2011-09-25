@@ -176,6 +176,12 @@ class Builder(object):
                 var.set_value(value)
 
 
+    def on_sources_or_headers(self, node):
+        # TODO: handling this as AppendNode is temporary hack until the
+        # source/header statement grows more syntactically complicated
+        self.on_assignment(node)
+
+
     def on_target(self, node):
         name = node.name.text
         if name in self.context.targets:
@@ -214,6 +220,7 @@ class Builder(object):
     _ast_dispatch = {
         AssignmentNode : on_assignment,
         AppendNode     : on_assignment,
+        FilesListNode  : on_sources_or_headers,
         TargetNode     : on_target,
         IfNode         : on_if,
         NilNode        : lambda self,x: x, # do nothing

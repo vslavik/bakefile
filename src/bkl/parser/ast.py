@@ -148,6 +148,12 @@ class IdNode(Node):
         return '%s %s' % (self.__class__.__name__, self.text)
 
 
+class VarReferenceNode(Node):
+    """Reference to a variable."""
+    var = property(lambda self: self.children[0].text,
+                   doc="Referenced variable")
+
+
 class AssignmentNode(Node):
     """Assignment of value to a variable."""
     var = property(lambda self: self.children[0].text,
@@ -162,10 +168,11 @@ class AppendNode(AssignmentNode):
     append = True
 
 
-class VarReferenceNode(Node):
-    """Reference to a variable."""
-    var = property(lambda self: self.children[0].text,
-                   doc="Referenced variable")
+class FilesListNode(AppendNode):
+    """Setting of sources/headers."""
+    # TODO: handling this as AppendNode is temporary hack until the
+    # source/header statement grows more syntactically complicated
+    pass
 
 
 class TargetNode(Node):
@@ -212,9 +219,10 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.LIST           : ListNode,
         BakefileParser.CONCAT         : ConcatNode,
         BakefileParser.LIST_OR_CONCAT : Node, # post-processed below
+        BakefileParser.VAR_REFERENCE  : VarReferenceNode,
         BakefileParser.ASSIGN         : AssignmentNode,
         BakefileParser.APPEND         : AppendNode,
-        BakefileParser.VAR_REFERENCE  : VarReferenceNode,
+        BakefileParser.FILES_LIST     : FilesListNode,
         BakefileParser.TARGET         : TargetNode,
         BakefileParser.IF             : IfNode,
         BakefileParser.OR             : OrNode,

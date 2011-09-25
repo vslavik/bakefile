@@ -6,9 +6,10 @@ RootNode
         IdNode exe
         IdNode dummy
         AssignmentNode
-            IdNode sources
-            LiteralNode "one.c"
+            IdNode xxx
+            ListNode
+                LiteralNode "one.c"
+                LiteralNode "two.c"
         AppendNode
-            IdNode sources
-            LiteralNode "two.c"
-
+            IdNode xxx
+            LiteralNode "three.c"
