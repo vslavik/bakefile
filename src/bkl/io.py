@@ -27,6 +27,9 @@ Helper classes for Bakefile I/O. Manages atomic writing of output, detecting
 changes, line endings conversions etc.
 """
 
+import os
+import os.path
+
 import logging
 logger = logging.getLogger("bkl.io")
 
@@ -86,5 +89,9 @@ class OutputFile(object):
                 logger.info("creating file %s" % self.filename)
             else:
                 logger.info("updating file %s" % self.filename)
+
+            dirname = os.path.dirname(self.filename)
+            if dirname and not os.path.isdir(dirname):
+                os.makedirs(dirname)
             with open(self.filename, "wt") as f:
                 f.write(self.text)
