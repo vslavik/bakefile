@@ -58,7 +58,10 @@ def write_property(prop):
         if prop.default is None:
             desc += "\n*Required property*\n"
         else:
-            desc += "\n*Default:* ``%s``\n" % prop.default
+            default = prop.default
+            if default == []:
+                default = "empty"
+            desc += "\n*Default:* %s\n" % default
 
     txt = "**%s** (type: %s)\n\n" % (prop.name, prop.type.name)
     txt += "    " + "\n    ".join(desc.split("\n"))
