@@ -28,10 +28,9 @@ Keep track of properties for extensions or model parts.
 Also define standard, always available, properties.
 """
 
-import expr, api
+import expr, api, utils
 from vartypes import IdType, EnumType, ListType
 from api import Property
-
 
 def std_target_props():
     """Creates list of all standard target properties."""
@@ -77,10 +76,15 @@ def std_project_props():
         ]
 
 
+class PropertiesDict(utils.OrderedDict):
+    """Dictionary of properties, keyed by their names."""
+    def add(self, prop):
+        self[prop.name] = prop
+
 def _fill_prop_dict(props):
-    d = {}
+    d = PropertiesDict()
     for p in props:
-        d[p.name] = p
+        d.add(p)
     return d
 
 
@@ -94,27 +98,80 @@ class PropertiesRegistry(object):
         self.project = None
         self.target_types = {}
 
-    def get_target_prop(self, target_type, name):
-        if self.all_targets is None:
-            self.all_targets = _fill_prop_dict(std_target_props())
-        if name in self.all_targets:
-            return self.all_targets[name]
-        if target_type not in self.target_types:
-            props = _fill_prop_dict(target_type.all_properties())
-            self.target_types[target_type] = props
-        else:
-            props = self.target_types[target_type]
-        return props.get(name, None)
+    def get_project_prop(self, name):
+        if self.project is None:
+            self._init_project_props()
+        return self.project.get(name, None)
 
     def get_module_prop(self, name):
         if self.modules is None:
-            self.modules = _fill_prop_dict(std_module_props())
+            self._init_module_props()
         return self.modules.get(name, None)
 
-    def get_project_prop(self, name):
+    def get_target_prop(self, target_type, name):
+        if self.all_targets is None or target_type not in self.target_types:
+            self._init_target_props(target_type)
+        if name in self.all_targets:
+            return self.all_targets[name]
+        else:
+            return self.target_types[target_type].get(name, None)
+    
+    def enum_project_props(self):
         if self.project is None:
-            self.project = _fill_prop_dict(std_project_props())
-        return self.project.get(name, None)
+            self._init_project_props()
+        for p in self.project.itervalues():
+            yield p
+
+    def enum_module_props(self):
+        if self.modules is None:
+            self._init_module_props()
+        for p in self.modules.itervalues():
+            yield p
+
+    def enum_target_props(self, target_type):
+        if self.all_targets is None or target_type not in self.target_types:
+            self._init_target_props(target_type)
+        for p in self.target_types[target_type].itervalues():
+            yield p
+        for p in self.all_targets.itervalues():
+            yield p
+
+    def _init_project_props(self):
+        if self.project is not None:
+            return
+        self.project = _fill_prop_dict(std_project_props())
+        for toolset in api.Toolset.all():
+            for p in toolset.all_properties("properties_project"):
+                p.toolsets = [toolset.name]
+                p.scope = api.Property.SCOPE_PROJECT
+                self.project.add(p)
+
+    def _init_module_props(self):
+        if self.modules is not None:
+            return
+        self.modules = _fill_prop_dict(std_module_props())
+        for toolset in api.Toolset.all():
+            for p in toolset.all_properties("properties_module"):
+                p.toolsets = [toolset.name]
+                p.scope = api.Property.SCOPE_MODULE
+                self.modules.add(p)
+
+    def _init_target_props(self, target_type):
+        if self.all_targets is None:
+            self.all_targets = _fill_prop_dict(std_target_props())
+            for toolset in api.Toolset.all():
+                for p in toolset.all_properties("properties_target"):
+                    p.toolsets = [toolset.name]
+                    p.scope = api.Property.SCOPE_TARGET
+                    self.all_targets.add(p)
+        if target_type not in self.target_types:
+            props = _fill_prop_dict(target_type.all_properties())
+            for toolset in api.Toolset.all():
+                for p in toolset.all_properties("properties_%s" % target_type):
+                    p.toolsets = [toolset.name]
+                    p.scope = target_type
+                    props.add(p)
+            self.target_types[target_type] = props
 
 
 registry = PropertiesRegistry()

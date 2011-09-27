@@ -147,7 +147,21 @@ class Extension(object):
         return cls._implementations.keys()
 
     @classmethod
-    def all_properties(cls):
+    def all_properties_kinds(cls):
+        """
+        Returns a set of names of all properties attributes in this class.
+        These are attributes named "properties" or "properties_<something>",
+        e.g. "properties_module" for properties with module scope.
+        """
+        props = set()
+        t = cls
+        while t is not types.ObjectType and t is not None:
+            props.update(p for p in dir(cls) if p.startswith("properties"))
+            t = t.__base__
+        return props
+
+    @classmethod
+    def all_properties(cls, kind="properties"):
         """
         For derived extension types that have properties
         e.g. :class:`TargetType`), returns iterator over all properties.
@@ -156,15 +170,22 @@ class Extension(object):
         var:`properties` with a list of :class:`bkl.api.Property` instances.
         Base class' properties are automagically scanned too.
 
+        :param kind: Kind (i.e. attribute name) of the properties to list. By
+                default, "properties", but may be more specific, e.g.
+                "properties_module" or "properties_vs2010".
+
         .. seealso:: :class:`bkl.api.Property`
         """
         t = cls
         prev_props = None
-        while "properties" in dir(t):
-            if t.properties is not prev_props:
-                for p in t.properties:
+        while True:
+            t_props = getattr(t, kind, None)
+            if t_props is None:
+                break # we're done, no more properties
+            if t_props is not prev_props:
+                for p in t_props:
                     yield p
-                prev_props = t.properties
+                prev_props = t_props
             # else:
             #   derived class didn't define properties of its own and we don't
             #   want to add the same properties twice
@@ -203,6 +224,21 @@ class Property(object):
        derived from some other value and exist as a convenience. An example
        of read-only property is the ``id`` property on targets.
 
+    .. attribute:: scope
+
+       Optional scope of the property. May be one of
+       :const:`Property.SCOPE_PROJECT`, :const:`Property.SCOPE_MODULE`,
+       :const:`Property.SCOPE_TARGET` for any target or target type name
+       (e.g. ``exe``) for scoping on specific target name. May be list of
+       such items for multiscope properties. Finally, may be :const:`None`
+       for default (depending from where the property was obtained from).
+
+    .. attribute:: toolsets
+
+       List of toolset names for toolsets this property applies to.
+       This is mostly for documentation purposes, it doesn't affect
+       their processing. Is :const:`None` for toolset-agnostic properties.
+
     .. attribute:: doc
 
        Optional documentation for the property.
@@ -222,11 +258,19 @@ class Property(object):
            ...
 
     """
+
+    # Scopes for properties
+    SCOPE_PROJECT = "project"
+    SCOPE_MODULE = "module"
+    SCOPE_TARGET = "target"
+
     def __init__(self, name, type, default=None, readonly=False, doc=None):
         self.name = name
         self.type = type
         self.default = default
         self.readonly = readonly
+        self.scope = None
+        self.toolsets = None
         self.__doc__ = doc
 
     def default_expr(self, for_obj):

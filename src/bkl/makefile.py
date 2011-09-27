@@ -137,7 +137,7 @@ class MakefileToolset(Toolset):
     #: Default filename from output makefile.
     default_makefile = None
 
-    properties = [
+    properties_module = [
             Property("makefile",
                      type=PathType(),
                      # FIXME: assign default value: if-expression evaluating
