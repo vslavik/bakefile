@@ -84,9 +84,9 @@ def _fill_prop_dict(props):
     return d
 
 
-class PropertiesCache(object):
+class PropertiesRegistry(object):
     """
-    Cache of existing properties.
+    Registry of existing properties.
     """
     def __init__(self):
         self.all_targets = None
@@ -117,14 +117,14 @@ class PropertiesCache(object):
         return self.project.get(name, None)
 
 
-cache = PropertiesCache()
+registry = PropertiesRegistry()
 
 def get_target_prop(target_type, name):
     """
     Returns property *name* on target level for targets of type *target_type*
     if such property exists, or :const:`None` otherwise.
     """
-    return cache.get_target_prop(target_type, name)
+    return registry.get_target_prop(target_type, name)
 
 
 def get_module_prop(name):
@@ -132,7 +132,7 @@ def get_module_prop(name):
     Returns property *name* on module level if such property exists, or
     :const:`None` otherwise.
     """
-    return cache.get_module_prop(name)
+    return registry.get_module_prop(name)
 
 
 def get_project_prop(name):
@@ -140,4 +140,4 @@ def get_project_prop(name):
     Returns property *name* on module level if such property exists, or
     :const:`None` otherwise.
     """
-    return cache.get_project_prop(name)
+    return registry.get_project_prop(name)
