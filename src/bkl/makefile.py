@@ -161,7 +161,7 @@ class MakefileToolset(Toolset):
             output = os.path.join(os.path.dirname(module.source_file),
                                   self.default_makefile)
         else:
-            output = output_var.value.as_py()
+            output = output_var.value.as_native_path_for_output(module)
 
         paths_info = expr.PathAnchorsInfo(
                 dirsep="/", # FIXME - format-configurable

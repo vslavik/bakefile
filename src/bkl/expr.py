@@ -376,20 +376,45 @@ class PathExpr(Expr):
         self.components = components
         self.anchor = anchor
 
-    def as_py(self, paths_info=None):
-        assert paths_info is not None, \
-               "PathExpr.as_py() can only be called with paths_info argument"
+    def as_py(self):
+        raise NotImplementedError
+
+    def __str__(self):
+        return "%s/%s" % (self.anchor, "/".join(str(e) for e in self.components))
+
+    def as_native_path(self, paths_info):
+        """
+        Returns the path expressed as *absolute* native path. Requires complete
+        :class:`bkl.expr.PathAnchorsInfo` information as its argument.
+
+        Throws NonConstError if it cannot be done because of conditional
+        subexpression.
+
+        .. seealso:: :meth:`as_native_path_for_output()`
+        """
         if self.anchor == ANCHOR_TOP_SRCDIR:
             base = paths_info.top_srcdir_abs
         elif self.anchor == ANCHOR_BUILDDIR:
             base = paths_info.builddir_abs
         else:
-            assert False, "unsupported anchor in PathExpr.as_py()"
+            assert False, "unsupported anchor in PathExpr.as_native_path()"
         comp = (e.as_py() for e in self.components)
-        return os.path.join(base, os.path.sep.join(comp))
+        return os.path.abspath(os.path.join(base, os.path.sep.join(comp)))
 
-    def __str__(self):
-        return "%s/%s" % (self.anchor, "/".join(str(e) for e in self.components))
+    def as_native_path_for_output(self, model):
+        """
+        Specialized version of :meth:`as_native_path()` that only works with
+        srcdir-based paths. It's useful for code that needs to obtain output
+        file name (which happens *before* PathAnchorsInfo can be constructed).
+
+        :param model:
+                Any part of the model.
+        """
+        if self.anchor != ANCHOR_TOP_SRCDIR:
+            raise Error('path "%s" is not srcdir-relative' % self, pos=self.pos)
+        top_srcdir = os.path.dirname(model.project.top_module.source_file)
+        comp = (e.as_py() for e in self.components)
+        return os.path.join(top_srcdir, os.path.sep.join(comp))
 
     def get_extension(self):
         """
@@ -668,7 +693,7 @@ class Formatter(Visitor):
             assert False, "unknown path anchor (%s)" % e.anchor
         try:
             # Try to format the path without superfluous "..".
-            abs_path = os.path.abspath(e.as_py(pi))
+            abs_path = e.as_native_path(pi)
             rel_path = os.path.relpath(abs_path, start=pi.outdir_abs)
             return pi.dirsep.join(rel_path.split(os.path.sep))
         except NonConstError:
