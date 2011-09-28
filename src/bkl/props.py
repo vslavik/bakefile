@@ -99,16 +99,28 @@ class PropertiesRegistry(object):
         self.target_types = {}
 
     def get_project_prop(self, name):
+        """
+        Returns property *name* on module level if such property exists, or
+        :const:`None` otherwise.
+        """
         if self.project is None:
             self._init_project_props()
         return self.project.get(name, None)
 
     def get_module_prop(self, name):
+        """
+        Returns property *name* on module level if such property exists, or
+        :const:`None` otherwise.
+        """
         if self.modules is None:
             self._init_module_props()
         return self.modules.get(name, None)
 
     def get_target_prop(self, target_type, name):
+        """
+        Returns property *name* on target level for targets of type *target_type*
+        if such property exists, or :const:`None` otherwise.
+        """
         if self.all_targets is None or target_type not in self.target_types:
             self._init_target_props(target_type)
         if name in self.all_targets:
@@ -176,25 +188,10 @@ class PropertiesRegistry(object):
 
 registry = PropertiesRegistry()
 
-def get_target_prop(target_type, name):
-    """
-    Returns property *name* on target level for targets of type *target_type*
-    if such property exists, or :const:`None` otherwise.
-    """
-    return registry.get_target_prop(target_type, name)
+get_project_prop = registry.get_project_prop
+get_module_prop = registry.get_module_prop
+get_target_prop = registry.get_target_prop
 
-
-def get_module_prop(name):
-    """
-    Returns property *name* on module level if such property exists, or
-    :const:`None` otherwise.
-    """
-    return registry.get_module_prop(name)
-
-
-def get_project_prop(name):
-    """
-    Returns property *name* on module level if such property exists, or
-    :const:`None` otherwise.
-    """
-    return registry.get_project_prop(name)
+enum_project_props = registry.enum_project_props
+enum_module_props = registry.enum_module_props
+enum_target_props = registry.enum_target_props

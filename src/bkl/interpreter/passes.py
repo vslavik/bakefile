@@ -148,6 +148,18 @@ def normalize_srcdir_paths(model):
             norm.visit(var.value)
 
 
+def make_variables_for_missing_props(model, toolset):
+    """
+    Creates variables for properties that don't have variables set yet.
+    """
+    logger.debug("adding properties' default values")
+    model.make_variables_for_missing_props(toolset)
+    for m in model.modules:
+        m.make_variables_for_missing_props(toolset)
+        for t in m.targets.itervalues():
+            t.make_variables_for_missing_props(toolset)
+
+
 def simplify_exprs(model):
     """
     Simplify expressions in the model. This does "cheap" simplifications such

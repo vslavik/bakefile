@@ -117,11 +117,18 @@ class Interpreter(object):
         passes.simplify_exprs(self.model)
 
 
-    def finalize_for_toolset(self, toolset_model):
+    def finalize_for_toolset(self, toolset_model, toolset):
         """
         Finalizes after "toolset" variable was set.
         """
+        passes.make_variables_for_missing_props(toolset_model, toolset)
         passes.eliminate_superfluous_conditionals(toolset_model)
+
+        # This is done second time here (in addition to finalize()) to deal
+        # with paths added by make_variables_for_missing_props(); ideally we
+        # wouldn't do it, but hopefully it's not all that inefficient, as no
+        # real work is done for paths that are already normalized:
+        passes.normalize_srcdir_paths(toolset_model)
 
 
     def generate(self):
@@ -152,7 +159,7 @@ class Interpreter(object):
                                               model.get_prop("toolset"),
                                               bkl.expr.LiteralExpr(toolset)))
 
-        self.finalize_for_toolset(model)
+        self.finalize_for_toolset(model, toolset)
 
         logger.debug("generating for toolset %s" % toolset)
         bkl.api.Toolset.get(toolset).generate(model)

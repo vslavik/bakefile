@@ -25,6 +25,9 @@
 import copy
 import types
 
+import logging
+logger = logging.getLogger("bkl.model")
+
 import error, expr, vartypes, utils
 import props
 
@@ -193,8 +196,37 @@ class ModelPart(object):
         Note that unlike :meth:`get_variable()`, this one doesn't work
         recursively upwards, but finds only properties that are defined for
         this scope.
+
+        .. seealso:: :meth:`enum_props()`
         """
         raise NotImplementedError
+
+    def enum_props(self):
+        """
+        Enumerates properties defined on this object.
+
+        Like :meth:`get_prop()`, this method doesn't work recursively upwards,
+        but lists only properties that are defined for this scope.
+        
+        .. seealso:: :meth:`get_prop()`
+        """
+        raise NotImplementedError
+
+
+    def make_variables_for_missing_props(self, toolset):
+        """
+        Creates variables for properties that don't have variables set yet.
+
+        :param toolset: Name of the toolset to generate for. Properties
+                specific to other toolsets are ignored for efficiency.
+        """
+        for p in self.enum_props():
+            if p.toolsets and toolset not in p.toolsets:
+                continue
+            if self.get_variable(p.name) is None:
+                var = Variable.from_property(p, p.default_expr(self))
+                self.add_variable(var)
+                logger.debug("%s: setting default of %s: %s" % (self, var.name, var.value))
 
 
 class Project(ModelPart):
@@ -232,6 +264,9 @@ class Project(ModelPart):
 
     def get_prop(self, name):
         return props.get_project_prop(name)
+
+    def enum_props(self):
+        return props.enum_project_props()
 
     def all_variables(self):
         """
@@ -283,6 +318,9 @@ class Module(ModelPart):
     def get_prop(self, name):
         return props.get_module_prop(name)
 
+    def enum_props(self):
+        return props.enum_module_props()
+
     def all_variables(self):
         """
         Returns iterator over all variables in the project. Works recursively,
@@ -319,3 +357,6 @@ class Target(ModelPart):
 
     def get_prop(self, name):
         return props.get_target_prop(self.type, name)
+
+    def enum_props(self):
+        return props.enum_target_props(self.type)
