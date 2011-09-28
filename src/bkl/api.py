@@ -263,7 +263,7 @@ class Property(object):
         from interpreter.builder import Builder
         from parser import get_parser
         location = '("%s" property default: "%s")' % (self.name, e)
-        pars = get_parser(e, filename=location)
+        pars = get_parser("%s;" % e, filename=location)
         e = Builder().create_expression(pars.expression().tree, for_obj)
         e = self.type.normalize(e)
         self.type.validate(e)
