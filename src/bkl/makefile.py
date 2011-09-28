@@ -137,31 +137,20 @@ class MakefileToolset(Toolset):
     #: Default filename from output makefile.
     default_makefile = None
 
-    properties_module = [
-            Property("makefile",
-                     type=PathType(),
-                     # FIXME: assign default value: if-expression evaluating
-                     #        to every possibility
-                     doc="Name of output file for module's makefile."),
-    ]
+    @classmethod
+    def properties_module(cls):
+        yield Property("%s.makefile" % cls.name,
+                       type=PathType(),
+                       default=cls.default_makefile,
+                       doc="Name of output file for module's makefile.")
 
     def generate(self, project):
         for m in project.modules:
             self._gen_makefile(m)
 
     def _gen_makefile(self, module):
-        assert self.default_makefile is not None
-
-        # FIXME: require the value, use get_variable_value(), set the default
-        #        value instead
-        output_var = module.get_variable("makefile")
-        if output_var is None:
-            # FIXME: instead of this, the default is supposed to be relative
-            #        to @srcdir
-            output = os.path.join(os.path.dirname(module.source_file),
-                                  self.default_makefile)
-        else:
-            output = output_var.value.as_native_path_for_output(module)
+        output_value = module.get_variable_value("%s.makefile" % self.name)
+        output = output_value.as_native_path_for_output(module)
 
         paths_info = expr.PathAnchorsInfo(
                 dirsep="/", # FIXME - format-configurable
