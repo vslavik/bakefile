@@ -240,7 +240,8 @@ class Property(object):
             is evaluated in the context of *for_obj*.
         """
         if self.default is None:
-            raise error.UndefinedError("required property \"%s\" on %s not set" % (self.name, for_obj))
+            raise error.UndefinedError("required property \"%s\" on %s not set" % (self.name, for_obj),
+                                       pos=for_obj.source_pos)
         return self._make_expr(self.default, for_obj)
 
     def _make_expr(self, val, for_obj):

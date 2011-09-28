@@ -104,10 +104,15 @@ class ModelPart(object):
        model hierarchy (e.g. module for a target). May only be ``None`` for
        toplevel part (the project).
        Dictionary of all variables defined in global scope in this module
+
+    .. attribute:: source_pos
+
+       Source code position of object's definition, or :const:`None`.
     """
-    def __init__(self, parent):
+    def __init__(self, parent, source_pos=None):
         self.parent = parent
         self.variables = utils.OrderedDict()
+        self.source_pos = source_pos
 
     # This is needed to make deepcopy work: it doesn't like neither cyclic
     # references (self.parent) nor weakrefs. So we exclude self.parent from
@@ -241,13 +246,16 @@ class Module(ModelPart):
 
        Path to the input ``.bkl`` source file this module was created from.
     """
-    def __init__(self, parent, source_file):
-        super(Module, self).__init__(parent)
+    def __init__(self, parent, source_pos):
+        super(Module, self).__init__(parent, source_pos)
         self.targets = utils.OrderedDict()
-        self.source_file = source_file
 
     def __str__(self):
         return "module %s" % self.source_file
+
+    @property
+    def source_file(self):
+        return self.source_pos.filename
 
     def add_target(self, target):
         """Adds a new target object."""
@@ -276,8 +284,8 @@ class Target(ModelPart):
 
        Type of the target, as :class:`bkl.api.TargetType` instance.
     """
-    def __init__(self, parent, name, target_type):
-        super(Target, self).__init__(parent)
+    def __init__(self, parent, name, target_type, source_pos):
+        super(Target, self).__init__(parent, source_pos)
         self.name = name
         self.type = target_type
 
