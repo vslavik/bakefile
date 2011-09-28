@@ -182,9 +182,15 @@ class Extension(object):
             t_props = getattr(t, kind, None)
             if t_props is None:
                 break # we're done, no more properties
-            if t_props is not prev_props:
-                for p in t_props:
-                    yield p
+            if isinstance(t_props, types.MethodType):
+                if t_props.im_func is not prev_props:
+                    for p in t_props():
+                        yield p
+                prev_props = t_props.im_func
+            else:
+                if t_props is not prev_props:
+                    for p in t_props:
+                        yield p
                 prev_props = t_props
             # else:
             #   derived class didn't define properties of its own and we don't
