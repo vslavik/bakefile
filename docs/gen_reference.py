@@ -91,6 +91,10 @@ def write_property(prop):
             default = prop.default
             if default == []:
                 default = "empty"
+            elif ((isinstance(default, types.FunctionType) or
+                 isinstance(default, types.MethodType)) and
+                "__doc__" in dir(default)):
+                default = default.__doc__
             desc += "\n*Default:* %s\n" % default
 
     txt = "**%s** (type: %s)\n\n" % (prop.name, prop.type.name)
