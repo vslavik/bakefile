@@ -29,7 +29,9 @@ import codecs
 from xml.sax.saxutils import escape, quoteattr
 
 import bkl.expr
-from bkl.api import Toolset
+import bkl.error
+from bkl.api import Toolset, Property
+from bkl.vartypes import PathType
 from bkl.utils import OrderedDict
 from bkl.io import OutputFile, EOL_WINDOWS
 
@@ -175,6 +177,19 @@ class VS2010Solution(OutputFile):
         self.write("EndGlobal\n")
         super(VS2010Solution, self).commit()
 
+    
+# TODO: Both of these should be done as an expression once proper functions
+#       are implemented, as $(dirname(vs2010.solutionfile)/$(id).vcxproj)
+def _default_solution_name(module):
+    """same directory and name as the module's bakefile, with ``.sln`` extension"""
+    basename = os.path.splitext(os.path.basename(module.source_file))[0]
+    return bkl.expr.PathExpr([bkl.expr.LiteralExpr(basename + ".sln")])
+
+def _project_name_from_solution(target):
+    """``$(id).vcxproj`` in the same directory as the ``.sln`` file"""
+    sln = target.get_variable_value("vs2010.solutionfile")
+    return bkl.expr.PathExpr(sln.components[:-1] + [bkl.expr.LiteralExpr("%s.vcxproj" % target.name)], sln.anchor)
+
 
 class VS2010Toolset(Toolset):
     """
@@ -182,6 +197,20 @@ class VS2010Toolset(Toolset):
     """
 
     name = "vs2010"
+
+    properties_target = [
+        Property("vs2010.projectfile",
+                 type=PathType(),
+                 default=_project_name_from_solution,
+                 doc="File name of the project for the target."),
+        ]
+
+    properties_module = [
+        Property("vs2010.solutionfile",
+                 type=PathType(),
+                 default=_default_solution_name,
+                 doc="File name of the solution file for the module."),
+        ]
 
     def generate(self, project):
         for m in project.modules:
@@ -192,11 +221,16 @@ class VS2010Toolset(Toolset):
         output_dir = os.path.dirname(module.source_file)
         output_name = os.path.splitext(os.path.basename(module.source_file))[0]
 
-        sln = VS2010Solution(output_name, os.path.join(output_dir, "%s.sln" % output_name))
+        slnfile = module.get_variable_value("vs2010.solutionfile").as_native_path_for_output(module)
+        sln = VS2010Solution(output_name, slnfile)
         for t in module.targets.itervalues():
-            self.gen_for_target(t,
-                                os.path.join(output_dir, "%s.vcxproj" % t.name),
-                                sln)
+            try:
+                projfile = t.get_variable_value("vs2010.projectfile").as_native_path_for_output(t)
+                self.gen_for_target(t, projfile, sln)
+            except bkl.error.Error as e:
+                if e.pos is None:
+                    e.pos = t.source_pos
+                raise
         sln.commit()
 
 
