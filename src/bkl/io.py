@@ -34,6 +34,10 @@ import logging
 logger = logging.getLogger("bkl.io")
 
 
+# Set to true to prevent any output from being written
+dry_run = False
+
+
 EOL_WINDOWS = "win"
 EOL_UNIX    = "unix"
 
@@ -81,14 +85,19 @@ class OutputFile(object):
                 old = f.read()
         except IOError:
             old = None
-        
+
+        note = " (dry run)" if dry_run else ""
+
         if old == self.text:
             logger.info("no changes in file %s" % self.filename)
         else:
             if old is None:
-                logger.info("creating file %s" % self.filename)
+                logger.info("creating file %s%s" % (self.filename, note))
             else:
-                logger.info("updating file %s" % self.filename)
+                logger.info("updating file %s%s" % (self.filename, note))
+
+            if dry_run:
+                return # nothing to do, just pretending to write output
 
             dirname = os.path.dirname(self.filename)
             if dirname and not os.path.isdir(dirname):

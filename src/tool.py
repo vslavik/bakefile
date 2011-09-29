@@ -32,6 +32,9 @@ parser = OptionParser()
 parser.add_option("-v", "--verbose",
                   action="store_true", dest="verbose", default=False,
                   help="show verbose output")
+parser.add_option("", "--dry-run",
+                  action="store_true", dest="dry_run", default=False,
+                  help="don't write any files, just pretend to do it")
 parser.add_option("", "--debug",
                   action="store_true", dest="debug", default=False,
                   help="show debug log")
@@ -60,8 +63,10 @@ import bkl.error
 from bkl.parser import parse_file
 from bkl.interpreter import Interpreter
 import bkl.dumper
+import bkl.io
 
 try:
+    bkl.io.dry_run = options.dry_run
     if options.dump:
         intr = bkl.dumper.DumpingInterpreter()
     else:
