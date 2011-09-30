@@ -36,7 +36,7 @@ def load_plugin(filename):
     """
     basename = os.path.splitext(os.path.basename(filename))[0]
     modname = "bkl.plugins.%s" % basename
-    logger.debug("loading plugin %s from %s" % (modname, filename))
+    logger.debug("loading plugin %s from %s", modname, filename)
 
     if modname in sys.modules:
         from bkl.error import Error
@@ -63,7 +63,7 @@ def load_plugins_from_dir(dirname):
 # import all plugins:
 
 PLUGINS_PATH = [os.path.join(p, "plugins") for p in __path__]
-logger.debug("plugins search path: %s" % PLUGINS_PATH)
+logger.debug("plugins search path: %s", PLUGINS_PATH)
 
 sys.modules["bkl.plugins"] = imp.new_module("bkl.plugins")
 

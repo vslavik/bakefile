@@ -140,7 +140,7 @@ class Interpreter(object):
         for module in self.model.modules:
             module_toolsets = module.get_variable_value("toolsets").as_py()
             toolsets.update(module_toolsets)
-        logger.debug("toolsets to generate for: %s" % list(toolsets))
+        logger.debug("toolsets to generate for: %s", list(toolsets))
 
         if not toolsets:
             raise Error("nothing to generate, \"toolsets\" property is empty")
@@ -151,7 +151,7 @@ class Interpreter(object):
 
 
     def generate_for_toolset(self, toolset):
-        logger.debug("preparing model for toolset %s" % toolset)
+        logger.debug("preparing model for toolset %s", toolset)
         model = deepcopy(self.model)
 
         # don't use Variable.from_property(), because it's read-only
@@ -161,5 +161,5 @@ class Interpreter(object):
 
         self.finalize_for_toolset(model, toolset)
 
-        logger.debug("generating for toolset %s" % toolset)
+        logger.debug("generating for toolset %s", toolset)
         bkl.api.Toolset.get(toolset).generate(model)

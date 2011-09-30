@@ -89,12 +89,12 @@ class OutputFile(object):
         note = " (dry run)" if dry_run else ""
 
         if old == self.text:
-            logger.info("no changes in file %s" % self.filename)
+            logger.info("no changes in file %s", self.filename)
         else:
             if old is None:
-                logger.info("creating file %s%s" % (self.filename, note))
+                logger.info("creating file %s%s", self.filename, note)
             else:
-                logger.info("updating file %s%s" % (self.filename, note))
+                logger.info("updating file %s%s", self.filename, note)
 
             if dry_run:
                 return # nothing to do, just pretending to write output

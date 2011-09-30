@@ -220,7 +220,7 @@ class ModelPart(object):
             if self.get_variable(p.name) is None:
                 var = Variable.from_property(p, p.default_expr(self))
                 self.add_variable(var)
-                logger.debug("%s: setting default of %s: %s" % (self, var.name, var.value))
+                logger.debug("%s: setting default of %s: %s", self, var.name, var.value)
 
 
 class Project(ModelPart):

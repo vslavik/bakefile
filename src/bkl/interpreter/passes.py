@@ -184,7 +184,7 @@ def eliminate_superfluous_conditionals(model):
     iteration = 1
     simplifier = simplify.ConditionalsSimplifier()
     while True:
-        logger.debug("removing superfluous conditional expressions: pass %i" % iteration)
+        logger.debug("removing superfluous conditional expressions: pass %i", iteration)
         modified = False
         for var in model.all_variables():
             old = var.value
