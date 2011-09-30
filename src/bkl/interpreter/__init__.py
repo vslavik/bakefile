@@ -37,6 +37,7 @@ import bkl.expr
 import passes
 from builder import Builder
 from bkl.error import Error
+from bkl.parser import parse_file
 
 logger = logging.getLogger("bkl.interpreter")
 
@@ -87,12 +88,17 @@ class Interpreter(object):
         Step 1 is done by :meth:`add_module`. Steps 2-4 are done by
         :meth:`finalize` and step 5 is implemented in :meth:`generate`.
         """
-        self.add_module(ast)
+        self.add_module(ast, self.model)
         self.finalize()
         self.generate()
 
 
-    def add_module(self, ast):
+    def process_file(self, filename):
+        """Like :meth:`process()`, but takes filename as its argument."""
+        self.process(parse_file(filename))
+
+
+    def add_module(self, ast, parent):
         """
         Adds parsed AST to the model, without doing any optimizations. May be
         called more than once, with different parsed files.
@@ -100,9 +106,26 @@ class Interpreter(object):
         :param ast: AST of the input file, as returned by
                :func:`bkl.parser.parse_file`.
         """
-        logger.info("processing %s" % ast.filename)
-        b = Builder()
-        self.model.modules.append(b.create_model(ast, parent=self.model))
+        logger.info("processing %s", ast.filename)
+
+        submodules = []
+        b = Builder(on_submodule=lambda fn, pos: submodules.append((fn,pos)))
+
+        module = b.create_model(ast, parent)
+        self.model.modules.append(module)
+
+        while submodules:
+            sub_filename, sub_pos = submodules[0]
+            submodules.pop(0)
+            try:
+                sub_ast = parse_file(sub_filename)
+            except IOError as e:
+                if e.filename:
+                    msg = "%s: %s" % (e.strerror, e.filename)
+                else:
+                    msg = e.strerror
+                raise Error(msg, pos=sub_pos)
+            self.add_module(sub_ast, module)
 
 
     def finalize(self):

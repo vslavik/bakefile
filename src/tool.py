@@ -60,7 +60,6 @@ logging.basicConfig(level=log_level)
 # note: we intentionally import bakefile this late so that the logging
 # module is already initialized
 import bkl.error
-from bkl.parser import parse_file
 from bkl.interpreter import Interpreter
 import bkl.dumper
 import bkl.io
@@ -71,7 +70,7 @@ try:
         intr = bkl.dumper.DumpingInterpreter()
     else:
         intr = Interpreter()
-    intr.process(parse_file(args[0]))
+    intr.process_file(args[0])
 except KeyboardInterrupt:
     sys.exit(2)
 except bkl.error.Error as e:

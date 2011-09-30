@@ -44,7 +44,7 @@ def GUID(namespace, solution, data):
     Generates GUID in given namespace, for given solution (bkl project), with
     given data (typically, target ID).
     """
-    g = uuid.uuid5(namespace, '%s/%s' % (solution, str(data)))
+    g = uuid.uuid5(namespace, '%s/%s' % (str(solution), str(data)))
     return "{%s}" % str(g).upper()
 
 

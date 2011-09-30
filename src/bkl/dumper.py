@@ -46,11 +46,23 @@ def dump_module(module):
     Returns string with dumped, human-readable description of 'module', which
     is an instance of bakefile.model.Module.
     """
-    out = "module {\n  variables {\n"
+    if len(module.project.modules) > 1:
+        out = "module %s {\n" % module.source_file
+    else:
+        out = "module {\n"
 
+    submodules = list(module.submodules)
+    if submodules:
+        out += "  submodules {\n"
+        for s in submodules:
+            out += "    %s\n" % s.source_file
+        out += "  }\n"
+    
+    out += "  variables {\n"
     out += _indent(_dump_vars(module))
+    out += "  }\n"
 
-    out += "  }\n  targets {\n"
+    out += "  targets {\n"
     for name in module.targets.iterkeys():
         out += _indent(_indent(_dump_target(module.targets[name])))
     out +=  "  }\n}\n\n"

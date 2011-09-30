@@ -206,6 +206,12 @@ class EqualNode(BoolNode): pass
 class NotEqualNode(BoolNode): pass
 
 
+class SubmoduleNode(Node):
+    """Inclusion of a submodule."""
+    file = property(lambda self: self.children[0].text,
+                    doc="File with submodule definition")
+
+
 class _TreeAdaptor(CommonTreeAdaptor):
     """Adaptor for ANTLR3 AST tree creation."""
     def __init__(self, filename):
@@ -230,6 +236,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.NOT            : NotNode,
         BakefileParser.EQUAL          : EqualNode,
         BakefileParser.NOT_EQUAL      : NotEqualNode,
+        BakefileParser.SUBMODULE      : SubmoduleNode,
     }
 
     def createWithPayload(self, payload):

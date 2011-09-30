@@ -306,6 +306,11 @@ class Module(ModelPart):
     @property
     def source_file(self):
         return self.source_pos.filename
+    
+    @property
+    def submodules(self):
+        """Submodules of this module."""
+        return (x for x in self.project.modules if x.parent is self)
 
     def add_target(self, target):
         """Adds a new target object."""

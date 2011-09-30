@@ -55,9 +55,16 @@ class Builder(object):
     active_if_cond = property(lambda self: self.if_stack[-1] if self.if_stack else None,
                               doc="Currently active 'if' statement condition, if any.")
 
-    def __init__(self):
+    def __init__(self, on_submodule=None):
+        """
+        Constructor.
+
+        :param on_module: Callback to call (with filename as argument) on
+                ``submodule`` statement.
+        """
         self.context = None
         self.if_stack = []
+        self.on_submodule_callback = on_submodule
 
 
     def create_model(self, ast, parent):
@@ -217,12 +224,22 @@ class Builder(object):
         self.if_stack.pop()
 
 
+    def on_submodule(self, node):
+        if self.active_if_cond:
+            raise ParserError("conditionally included submodules not supported yet"
+                              ' (condition "%s" set at %s)' % (
+                                  self.active_if_cond, self.active_if_cond.pos))
+        fn = os.path.relpath(os.path.join(os.path.dirname(node.pos.filename), node.file))
+        self.on_submodule_callback(fn, node.pos)
+
+
     _ast_dispatch = {
         AssignmentNode : on_assignment,
         AppendNode     : on_assignment,
         FilesListNode  : on_sources_or_headers,
         TargetNode     : on_target,
         IfNode         : on_if,
+        SubmoduleNode  : on_submodule,
         NilNode        : lambda self,x: x, # do nothing
     }
 

@@ -275,6 +275,23 @@ and inequality tests respectively.
 
 
 
+Submodules
+----------
+
+A bakefile file -- a *module* can include other modules as its children. This
+maps to invoking makefiles in subdirectories when generating makefile-based
+output. The ``submodule`` keyword is used for that:
+
+.. code-block:: bkl
+
+   submodule samples/hello/hello.bkl;
+   submodule samples/advanced/adv.bkl;
+
+Submodules may only be included at the top level and cannot be included
+conditionally (i.e. inside an ``if`` statement).
+
+
+
 Comments
 --------
 

@@ -44,6 +44,7 @@ tokens {
     IF;
     TARGET;
     FILES_LIST;
+    SUBMODULE;
 }
 
 scope StmtScope {
@@ -72,6 +73,7 @@ stmt
 // statements only allowed outside target definition:
 stmt_outside_target
     : target_stmt
+    | submodule_stmt
     ;
 
 // and those only allowed inside target:
@@ -92,6 +94,11 @@ if_stmt
 if_body
     : stmt
     | '{' (stmt)* '}'  -> stmt*
+    ;
+
+
+submodule_stmt
+    : 'submodule' literal ';'          -> ^(SUBMODULE literal)
     ;
 
 // ---------------------------------------------------------------------------
