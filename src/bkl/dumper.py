@@ -53,7 +53,7 @@ def dump_module(module):
     out += "  }\n  targets {\n"
     for name in module.targets.iterkeys():
         out += _indent(_indent(_dump_target(module.targets[name])))
-    out +=  "  }\n}"
+    out +=  "  }\n}\n\n"
 
     return out
 
