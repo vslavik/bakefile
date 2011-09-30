@@ -139,10 +139,12 @@ def normalize_srcdir_paths(model):
                     e.components = self.prefix + e.components
                 e.anchor = bkl.expr.ANCHOR_TOP_SRCDIR
 
-    top_srcdir = os.path.abspath(model.top_module.source_file)
+    top_srcdir = os.path.abspath(os.path.dirname(model.top_module.source_file))
     for module in model.modules:
-        srcdir = os.path.abspath(module.source_file)
+        srcdir = os.path.abspath(os.path.dirname(module.source_file))
         prefix = os.path.relpath(srcdir, start=top_srcdir)
+        logger.debug('translating paths from %s with prefix "%s"', 
+                     module.source_file, prefix)
         norm = PathsNormalizer(prefix)
         for var in module.all_variables():
             norm.visit(var.value)
