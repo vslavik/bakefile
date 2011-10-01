@@ -117,12 +117,6 @@ class ModelPart(object):
         self.variables = utils.OrderedDict()
         self.source_pos = source_pos
 
-    # This is needed to make deepcopy work: it doesn't like neither cyclic
-    # references (self.parent) nor weakrefs. So we exclude self.parent from
-    # pickling and deepcopy -- it is added back by Project.__deepcopy__.
-    def __getstate__(self):
-        return dict(x for x in self.__dict__.iteritems() if x[0] != "parent")
-
     @property
     def project(self):
         """
@@ -241,16 +235,6 @@ class Project(ModelPart):
     def __init__(self):
         super(Project, self).__init__(parent=None)
         self.modules = []
-
-    def __deepcopy__(self, memo):
-        c = Project()
-        c.variables = copy.deepcopy(self.variables, memo)
-        c.modules = copy.deepcopy(self.modules, memo)
-        for m in c.modules:
-            m.parent = c
-            for t in m.targets.itervalues():
-                t.parent = m
-        return c
 
     def __str__(self):
         return "the project"
