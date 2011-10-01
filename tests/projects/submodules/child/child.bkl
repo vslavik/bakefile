@@ -1,0 +1,4 @@
+exe child {
+    sources { child.cpp }
+}
+

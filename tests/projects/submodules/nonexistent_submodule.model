@@ -1,0 +1,2 @@
+ERROR:
+submodules/nonexistent_submodule.bkl:3:10: No such file or directory: submodules/child/fake_file.bkl

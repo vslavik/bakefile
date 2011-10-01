@@ -1,0 +1,24 @@
+module submodules/main.bkl {
+  submodules {
+    submodules/child/child.bkl
+  }
+  variables {
+    toolsets = [gnu, vs2010]
+  }
+  targets {
+    exe main {
+        sources = [@top_srcdir/main.cpp]
+    }
+  }
+}
+
+module submodules/child/child.bkl {
+  variables {
+  }
+  targets {
+    exe child {
+        sources = [@top_srcdir/child/child.cpp]
+    }
+  }
+}
+

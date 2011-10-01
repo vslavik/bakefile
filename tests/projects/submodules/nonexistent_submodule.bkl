@@ -1,0 +1,8 @@
+toolsets = gnu vs2010;
+
+submodule child/fake_file.bkl;
+
+exe main {
+    sources { main.cpp }
+}
+
