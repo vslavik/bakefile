@@ -114,8 +114,9 @@ class GnuMakefileFormatter(MakefileFormatter):
     """
     Formatter for the GNU Make syntax.
     """
-    # The basics are common to all makes, nothing to add (yet)
-    pass
+    @staticmethod
+    def submake_command(directory, filename):
+        return "$(MAKE) -C %s -f %s" % (directory, filename)
 
 
 class GnuToolset(MakefileToolset):

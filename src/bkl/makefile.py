@@ -114,6 +114,14 @@ class MakefileFormatter(Extension):
         out += "\n\n"
         return out
 
+    @staticmethod
+    def submake_command(directory, filename):
+        """
+        Returns string with command to invoke ``make`` in subdirectory
+        *directory* on makefile *filename*.
+        """
+        raise NotImplementedError
+
 
 class _MakefileExprFormatter(expr.Formatter):
     def __init__(self, makefile_formatter, paths_info):
@@ -186,8 +194,19 @@ class MakefileToolset(Toolset):
             return expr_fmt.format(out)
 
         # Write the "all" target:
-        all_targets = [_format_dep(t) for t in module.targets]
+        all_targets = (
+                      [_format_dep(t) for t in module.targets] + 
+                      [sub.name for sub in module.submodules]
+                      )
         f.write(self.Formatter.target(name="all", deps=all_targets, commands=None))
+
+        for sub in module.submodules:
+            subpath = sub.get_variable_value("%s.makefile" % self.name)
+            # FIXME: use $dirname(), $basename() functions, this is hacky
+            subdir = expr.PathExpr(subpath.components[:-1], anchor=subpath.anchor)
+            subfile = subpath.components[-1]
+            subcmd = self.Formatter.submake_command(expr_fmt.format(subdir), expr_fmt.format(subfile))
+            f.write(self.Formatter.target(name=sub.name, deps=[], commands=[subcmd]))
 
         for t in module.targets.itervalues():
             graph = build_graphs[t]
