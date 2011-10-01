@@ -24,6 +24,7 @@
 
 import copy
 import types
+import os.path
 
 import logging
 logger = logging.getLogger("bkl.model")
@@ -306,6 +307,11 @@ class Module(ModelPart):
     @property
     def source_file(self):
         return self.source_pos.filename
+
+    @property
+    def name(self):
+        """Name of the module"""
+        return os.path.splitext(os.path.basename(self.source_file))[0]
     
     @property
     def submodules(self):

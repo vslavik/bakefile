@@ -144,31 +144,51 @@ class XmlFormatter(object):
 
 
 class VS2010Solution(OutputFile):
-    def __init__(self, name, filename):
-        super(VS2010Solution, self).__init__(filename, EOL_WINDOWS)
-        self.name = name
+    def __init__(self, module):
+        slnfile = module.get_variable_value("vs2010.solutionfile").as_native_path_for_output(module)
+        super(VS2010Solution, self).__init__(slnfile, EOL_WINDOWS)
+        self.name = module.name
         self.write(codecs.BOM_UTF8)
         self.write("\n")
         self.write("Microsoft Visual Studio Solution File, Format Version 11.00\n")
         self.write("# Visual Studio 2010\n")
-        self.guids = []
-        self.projects = ''
+        self.projects = []
+        self.subsolutions = []
+        paths_info = bkl.expr.PathAnchorsInfo(
+                                    dirsep="\\",
+                                    outfile=slnfile,
+                                    builddir=os.path.dirname(slnfile), # unused
+                                    model=module)
+        self.formatter = VS2010ExprFormatter(paths_info)
 
-    def add(self, name, guid, filename):
-        p = ('Project("8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942") = "%s", "%s", "%s"\nEndProject\n' %
-             (name, filename, guid))
-        self.guids.append(guid)
-        self.projects += str(p)
+    def add_project(self, name, guid, projectfile):
+        self.projects.append((name, guid, projectfile))
+
+    def add_subsolution(self, solution):
+        self.subsolutions.append(solution)
+
+    def all_projects(self):
+        for p in self.projects:
+            yield p
+        for sln in self.subsolutions:
+            for p in sln.all_projects():
+                yield p
 
     def commit(self):
-        self.write(self.projects)
+        guids = []
+        for name, guid, filename in self.all_projects():
+            guids.append(guid)
+            p = ('Project("8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942") = "%s", "%s", "%s"\nEndProject\n' %
+                 (name, self.formatter.format(filename), guid))
+            self.write(str(p))
+
         self.write("Global\n")
         self.write("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n")
         self.write("\t\tDebug|Win32 = Debug|Win32\n")
         self.write("\t\tRelease|Win32 = Release|Win32\n")
         self.write("\tEndGlobalSection\n")
         self.write("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n")
-        for guid in self.guids:
+        for guid in guids:
             self.write("\t\t%s.Debug|Win32.ActiveCfg = Debug|Win32\n" % guid)
             self.write("\t\t%s.Debug|Win32.Build.0 = Debug|Win32\n" % guid)
             self.write("\t\t%s.Release|Win32.ActiveCfg = Release|Win32\n" % guid)
@@ -182,8 +202,7 @@ class VS2010Solution(OutputFile):
 #       are implemented, as $(dirname(vs2010.solutionfile)/$(id).vcxproj)
 def _default_solution_name(module):
     """same directory and name as the module's bakefile, with ``.sln`` extension"""
-    basename = os.path.splitext(os.path.basename(module.source_file))[0]
-    return bkl.expr.PathExpr([bkl.expr.LiteralExpr(basename + ".sln")])
+    return bkl.expr.PathExpr([bkl.expr.LiteralExpr(module.name + ".sln")])
 
 def _project_name_from_solution(target):
     """``$(id).vcxproj`` in the same directory as the ``.sln`` file"""
@@ -215,28 +234,37 @@ class VS2010Toolset(Toolset):
         ]
 
     def generate(self, project):
+        # generate vcxproj files and prepare solutions
         for m in project.modules:
             self.gen_for_module(m)
+        # Commit solutions; this must be done after processing all modules
+        # because of inter-module dependencies and references.
+        for m in project.modules:
+            for sub in m.submodules:
+                m.solution.add_subsolution(sub.solution)
+        for m in project.modules:
+            m.solution.commit()
 
 
     def gen_for_module(self, module):
-        output_dir = os.path.dirname(module.source_file)
-        output_name = os.path.splitext(os.path.basename(module.source_file))[0]
+        # attach VS2010-specific data to the model
+        module.solution = VS2010Solution(module)
 
-        slnfile = module.get_variable_value("vs2010.solutionfile").as_native_path_for_output(module)
-        sln = VS2010Solution(output_name, slnfile)
         for t in module.targets.itervalues():
             try:
-                projfile = t.get_variable_value("vs2010.projectfile").as_native_path_for_output(t)
-                self.gen_for_target(t, projfile, sln)
+                self.gen_for_target(t)
             except bkl.error.Error as e:
                 if e.pos is None:
                     e.pos = t.source_pos
                 raise
-        sln.commit()
 
 
-    def gen_for_target(self, target, filename, sln):
+    def gen_for_target(self, target):
+        sln = target.parent.solution
+        
+        projectfile = target.get_variable_value("vs2010.projectfile")
+        filename = projectfile.as_native_path_for_output(target)
+
         paths_info = bkl.expr.PathAnchorsInfo(
                                     dirsep="\\",
                                     outfile=filename,
@@ -363,7 +391,7 @@ class VS2010Toolset(Toolset):
         f = OutputFile(filename, EOL_WINDOWS)
         f.write(XmlFormatter(paths_info).format(root))
         f.commit()
-        sln.add(target.name, guid, os.path.basename(filename))
+        sln.add_project(target.name, guid, projectfile)
 
         self._write_filters_file_for(filename)
 
