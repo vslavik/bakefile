@@ -37,22 +37,27 @@ class NativeCompiledType(TargetType):
             Property("sources",
                  type=ListType(PathType()),
                  default=[],
+                 inheritable=False,
                  doc="Source files."),
             Property("headers",
                  type=ListType(PathType()),
                  default=[],
+                 inheritable=False,
                  doc="Header files."),
             Property("defines",
                  type=ListType(StringType()),
                  default=[],
+                 inheritable=True,
                  doc="List of preprocessor macros to define."),
             Property("includedirs",
                  type=ListType(PathType()),
                  default=[],
+                 inheritable=True,
                  doc="Directories where to look for header files."),
             Property("cppflags",
                  type=ListType(StringType()),
                  default=[],
+                 inheritable=True,
                  doc="""
                      Additional compiler flags common to C and C++.
                      These should be limited to flags related to preprocessor,
@@ -66,6 +71,7 @@ class NativeCompiledType(TargetType):
             Property("win32-unicode",
                  type=BoolType(),
                  default=True,
+                 inheritable=True,
                  doc="Compile win32 code in Unicode mode? If enabled, "
                      "``_UNICODE`` symbol is defined and the wide character "
                      "entry point (``WinMain``, ...) is used."),
@@ -98,6 +104,7 @@ class LibraryType(NativeCompiledType):
             Property("libname",
                  type=StringType(),
                  default="lib$(id).a",
+                 inheritable=False,
                  doc="Library file name. (TEMPORARY, DO NOT USE.)"), # FIXME
         ]
 

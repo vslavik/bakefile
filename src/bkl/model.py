@@ -128,13 +128,12 @@ class ModelPart(object):
         return prj
 
 
-    def get_variable(self, name):
+    def get_variable(self, name, recursively=False):
         """
         Returns variable object for given variable or None if it is not
-        defined. If the variable is not defined in this scope, looks in the
-        parent. In other words, None is returned only if the variable isn't
-        defined anywhere.
-
+        defined.
+        
+        :param recursively: Look for the variable recursively in the parent.
         .. seealso:: :meth:`get_variable_value()`
 
         .. note:: Unlike :meth:`get_variable_value()`, this method doesn't
@@ -143,8 +142,8 @@ class ModelPart(object):
         if name in self.variables:
             return self.variables[name]
         else:
-            if self.parent:
-                return self.parent.get_variable(name)
+            if recursively and self.parent is not None:
+                return self.parent.get_variable(name, recursively)
             else:
                 return None
 
@@ -155,9 +154,15 @@ class ModelPart(object):
         value. Throws and exception if the variable isn't defined, neither in
         this scope or in any of its parent scopes.
 
-        If variable *name* is not explicitly defined in the model, but a
-        property with the same name exists in this scope, then its default
-        value is used.
+        If variable *name* is not explicitly defined, but a property with the
+        same name exists in this scope, then its default value is used.
+
+        If the variable is not defined in this scope at all, looks in the
+        parent -- but only if *name* doesn't correspond to non-inheritable
+        property. In other words, fails only if the variable isn't defined for
+        use in this scope.
+
+        Throws if the value cannot be found.
 
         .. seealso:: :meth:`get_variable()`
         """
@@ -166,14 +171,26 @@ class ModelPart(object):
         if var is not None:
             return var.value
 
-        # else, as last bet, try to find a property with this name
-        scope = self
-        while scope:
-            p = scope.get_prop(name)
-            if p is not None:
-                return p.default_expr(scope)
-            scope = scope.parent
-        raise error.Error("unknown variable \"%s\"" % name)
+        # there may be a property with this name (with default value):
+        p = self.get_prop(name)
+        if p is not None:
+            if p.inheritable:
+                # try to obtain the value from higher scope
+                higher = self.parent
+                while higher is not None:
+                    var = higher.get_variable(name)
+                    if var is not None:
+                        return var.value
+                    higher = higher.parent
+                # that failed, so try default value as with non-inheritables
+            return p.default_expr(self)
+        else: # p is None
+            # 'name' is not a property, so it can only be a user-defined
+            # variable. Try to find it at a higher scope.
+            if self.parent:
+                return self.parent.get_variable_value(name)
+            else:
+                raise error.Error("unknown variable \"%s\"" % name)
 
 
     def add_variable(self, var):
@@ -217,7 +234,7 @@ class ModelPart(object):
         for p in self.enum_props():
             if p.toolsets and toolset not in p.toolsets:
                 continue
-            if self.get_variable(p.name) is None:
+            if self.get_variable(p.name, recursively=p.inheritable) is None:
                 var = Variable.from_property(p, p.default_expr(self))
                 self.add_variable(var)
                 logger.debug("%s: setting default of %s: %s", self, var.name, var.value)

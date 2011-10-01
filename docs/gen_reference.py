@@ -96,7 +96,8 @@ def write_property(prop):
                 "__doc__" in dir(default)):
                 default = default.__doc__
             desc += "\n*Default:* %s\n" % default
-
+    desc += "\n*Inheritable from parent:* %s\n" % ("yes" if prop.inheritable else "no")
+            
     txt = "**%s** (type: %s)\n\n" % (prop.name, prop.type.name)
     txt += "    " + "\n    ".join(desc.split("\n"))
     txt += "\n"

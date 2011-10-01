@@ -142,6 +142,7 @@ class MakefileToolset(Toolset):
         yield Property("%s.makefile" % cls.name,
                        type=PathType(),
                        default=cls.default_makefile,
+                       inheritable=False,
                        doc="Name of output file for module's makefile.")
 
     def generate(self, project):

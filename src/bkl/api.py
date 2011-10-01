@@ -238,6 +238,14 @@ class Property(object):
        (e.g. ``exe``) for scoping on specific target name. May be list of
        such items for multiscope properties. Finally, may be :const:`None`
        for default (depending from where the property was obtained from).
+    
+    .. attribute:: inheritable
+
+       A property is *iheritable* if its value can be specified in the
+       (grand-)parent scope. For example, an inheritable property on a target
+       may be specified at the module level or even in the parent module; an
+       iheritable property on a source file (e.g. "defines") may be specified
+       on the target, the module and so on.
 
     .. attribute:: toolsets
 
@@ -270,11 +278,13 @@ class Property(object):
     SCOPE_MODULE = "module"
     SCOPE_TARGET = "target"
 
-    def __init__(self, name, type, default=None, readonly=False, doc=None):
+    def __init__(self, name, type, default=None, readonly=False,
+                 inheritable=False, doc=None):
         self.name = name
         self.type = type
         self.default = default
         self.readonly = readonly
+        self.inheritable = inheritable
         self.scope = None
         self.toolsets = None
         self.__doc__ = doc

@@ -202,6 +202,7 @@ class VS2010Toolset(Toolset):
         Property("vs2010.projectfile",
                  type=PathType(),
                  default=_project_name_from_solution,
+                 inheritable=False,
                  doc="File name of the project for the target."),
         ]
 
@@ -209,6 +210,7 @@ class VS2010Toolset(Toolset):
         Property("vs2010.solutionfile",
                  type=PathType(),
                  default=_default_solution_name,
+                 inheritable=False,
                  doc="File name of the solution file for the module."),
         ]
 

@@ -39,11 +39,13 @@ def std_target_props():
                  type=IdType(),
                  default=lambda t: expr.LiteralExpr(t.name),
                  readonly=True,
+                 inheritable=False,
                  doc="Target's unique name (ID)."),
 
         Property("deps",
                  type=ListType(IdType()),
                  default=[],
+                 inheritable=False,
                  doc="Target's dependencies (list of IDs)."),
         ]
 
@@ -56,6 +58,7 @@ def std_module_props():
         Property("toolsets",
                  type=ListType(toolsets_enum_type),
                  default=[],
+                 inheritable=True,
                  doc="List of toolsets to generate makefiles/projects for."),
         ]
 
@@ -69,6 +72,7 @@ def std_project_props():
                  type=toolsets_enum_type,
                  default=expr.UndeterminedExpr(),
                  readonly=True,
+                 inheritable=False,
                  doc="The toolset makefiles or projects are being generated for. "
                      "This property is set by Bakefile and can be used for performing "
                      "toolset-specific tasks or modifications."
