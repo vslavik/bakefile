@@ -87,12 +87,11 @@ class GnuLinker(GnuFileCompiler):
     out_type = bkl.compilers.NativeExeFileType.get()
 
     def commands(self, target, input, output):
+        cmd = [LiteralExpr("c++ -o $@"), input]
+        cmd += target.get_variable_value("ldflags").items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
-        return [ListExpr([
-                  LiteralExpr("c++ -o $@"),
-                  input
-                ])]
+        return [ListExpr(cmd)]
 
 
 class GnuLibLinker(GnuFileCompiler):

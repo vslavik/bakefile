@@ -369,6 +369,10 @@ class VS2010Toolset(Toolset):
             if c == "Release":
                 n_link.add("EnableCOMDATFolding", True)
                 n_link.add("OptimizeReferences", True)
+            if is_exe:
+                ldflags = target.get_variable_value("ldflags").as_py()
+                if ldflags:
+                    n_link.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(ldflags))
             n.add(n_link)
             root.add(n)
 

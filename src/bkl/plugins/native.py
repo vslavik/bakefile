@@ -84,6 +84,20 @@ class ExeType(NativeCompiledType):
     """
     name = "exe"
 
+    properties = [
+            Property("ldflags",
+                 type=ListType(StringType()),
+                 default=[],
+                 inheritable=True,
+                 doc="""
+                     Additional linker flags.
+
+                     Note that the flags are compiler/linker-specific and so this
+                     property should only be set conditionally for particular
+                     compilers that recognize the flags.
+                     """),
+        ]
+
     def get_build_subgraph(self, toolset, target):
         return get_compilation_subgraph(
                         toolset,
