@@ -28,6 +28,23 @@ import logging
 from optparse import OptionParser
 
 
+class BklFormatter(logging.Formatter):
+    def format(self, record):
+        if record.levelno == logging.ERROR or record.levelno == logging.WARNING:
+            msg = ""
+            if "pos" in dir(record):
+                msg = "%s: " % record.pos
+            msg += "%s: %s" % (record.levelname.lower(), record.msg)
+            return msg
+        else:
+            return super(BklFormatter, self).format(record)
+
+logger = logging.getLogger()
+log_handler = logging.StreamHandler()
+log_handler.setFormatter(BklFormatter())
+logger.addHandler(log_handler)
+
+
 parser = OptionParser()
 parser.add_option("-v", "--verbose",
                   action="store_true", dest="verbose", default=False,
@@ -77,5 +94,5 @@ except bkl.error.Error as e:
     if options.debug:
         raise
     else:
-        sys.stderr.write("%s\n" % e)
+        logging.error(e.msg, extra={"pos":e.pos})
         sys.exit(1)
