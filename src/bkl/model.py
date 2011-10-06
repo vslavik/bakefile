@@ -58,6 +58,10 @@ class Variable(object):
 
        Indicates if the variable is read-only. Read-only variables can only
        be assigned once and cannot be modified afterwards.
+
+    .. attribute:: is_property
+
+       Indicates if the variable corresponds to a property.
     """
     def __init__(self, name, value, type=None, readonly=False):
         self.name = name
@@ -66,6 +70,7 @@ class Variable(object):
         self.type = type
         self.value = value
         self.readonly = readonly
+        self.is_property = False
 
     @staticmethod
     def from_property(prop, value=None):
@@ -78,6 +83,7 @@ class Variable(object):
                      value=value,
                      type=prop.type,
                      readonly=prop.readonly)
+        v.is_property = True
         return v
 
     def set_value(self, value):

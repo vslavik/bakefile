@@ -87,6 +87,37 @@ def detect_self_references(model):
         visitor.check(var)
 
 
+def detect_unused_vars(model):
+    """
+    Warns about unused variables -- they may indicate typos.
+    """
+    class VariablesChecker(Visitor):
+        def __init__(self):
+            self.found = set()
+
+        literal = Visitor.noop
+        bool_value = Visitor.noop
+        null = Visitor.noop
+        concat = Visitor.visit_children
+        list = Visitor.visit_children
+        path = Visitor.visit_children
+        bool = Visitor.visit_children
+        if_ = Visitor.visit_children
+
+        def reference(self, e):
+            var = e.context.get_variable(e.var)
+            if var is not None and not var.is_property:
+                self.found.add(id(var))
+
+    visitor = VariablesChecker()
+    for var in model.all_variables():
+        visitor.visit(var.value)
+    used_vars = visitor.found
+    for var in model.all_variables():
+        if not var.is_property and id(var) not in used_vars:
+            logger.warning('variable "%s" is never used', var.name, extra={"pos":var.value.pos})
+
+
 def normalize_and_validate_vars(model):
     """
     Normalizes variables' values with respect to their types. For example,

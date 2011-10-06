@@ -135,6 +135,7 @@ class Interpreter(object):
         """
         logger.debug("finalizing the model")
         passes.detect_self_references(self.model)
+        passes.detect_unused_vars(self.model)
         passes.normalize_and_validate_vars(self.model)
         passes.normalize_srcdir_paths(self.model)
         passes.simplify_exprs(self.model)
