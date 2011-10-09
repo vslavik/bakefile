@@ -58,9 +58,9 @@ class GnuCCompiler(GnuFileCompiler):
     def commands(self, target, input, output):
         cmd = [LiteralExpr("%s -c -o $@" % self._compiler)]
         # FIXME: evaluating the flags here every time is inefficient
-        cmd += bkl.expr.add_prefix("-D", target.get_variable_value("defines")).items
-        cmd += bkl.expr.add_prefix("-I", target.get_variable_value("includedirs")).items
-        cmd += target.get_variable_value("cppflags").items
+        cmd += bkl.expr.add_prefix("-D", target["defines"]).items
+        cmd += bkl.expr.add_prefix("-I", target["includedirs"]).items
+        cmd += target["cppflags"].items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         cmd.append(input)
@@ -88,7 +88,7 @@ class GnuLinker(GnuFileCompiler):
 
     def commands(self, target, input, output):
         cmd = [LiteralExpr("c++ -o $@"), input]
-        cmd += target.get_variable_value("ldflags").items
+        cmd += target["ldflags"].items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         return [ListExpr(cmd)]

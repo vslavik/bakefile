@@ -217,7 +217,7 @@ class MakefileToolset(Toolset):
                     assert len(node.outputs) == 1
                     out = node.outputs[0]
                 deps = [expr_fmt.format(i) for i in node.inputs]
-                deps += [_format_dep(t) for t in t.get_variable_value("deps").as_py()]
+                deps += [_format_dep(x) for x in t["deps"].as_py()]
                 text = self.Formatter.target(
                         name=expr_fmt.format(out),
                         deps=deps,

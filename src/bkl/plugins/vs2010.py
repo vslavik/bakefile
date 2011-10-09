@@ -68,7 +68,7 @@ class Node(object):
         Or it may be key-value pair, where the value is bkl.expr.Expr or any Python
         value convertible to string:
         >>> n.add("ProjectGuid", "{31DC1570-67C5-40FD-9130-C5F57BAEBA88}")
-        >>> n.add("LinkIncremental", target.get_variable_value("vs-incremental-link"))
+        >>> n.add("LinkIncremental", target["vs-incremental-link"])
 
         Or it can take the same arguments that Node constructor takes:
         >>> n.add("ImportGroup", Label="PropertySheets")
@@ -145,7 +145,7 @@ class XmlFormatter(object):
 
 class VS2010Solution(OutputFile):
     def __init__(self, module):
-        slnfile = module.get_variable_value("vs2010.solutionfile").as_native_path_for_output(module)
+        slnfile = module["vs2010.solutionfile"].as_native_path_for_output(module)
         super(VS2010Solution, self).__init__(slnfile, EOL_WINDOWS)
         self.name = module.name
         self.write(codecs.BOM_UTF8)
@@ -197,7 +197,7 @@ class VS2010Solution(OutputFile):
         self.write("EndGlobal\n")
         super(VS2010Solution, self).commit()
 
-    
+
 # TODO: Both of these should be done as an expression once proper functions
 #       are implemented, as $(dirname(vs2010.solutionfile)/$(id).vcxproj)
 def _default_solution_name(module):
@@ -206,7 +206,7 @@ def _default_solution_name(module):
 
 def _project_name_from_solution(target):
     """``$(id).vcxproj`` in the same directory as the ``.sln`` file"""
-    sln = target.get_variable_value("vs2010.solutionfile")
+    sln = target["vs2010.solutionfile"]
     return bkl.expr.PathExpr(sln.components[:-1] + [bkl.expr.LiteralExpr("%s.vcxproj" % target.name)], sln.anchor)
 
 
@@ -261,8 +261,8 @@ class VS2010Toolset(Toolset):
 
     def gen_for_target(self, target):
         sln = target.parent.solution
-        
-        projectfile = target.get_variable_value("vs2010.projectfile")
+
+        projectfile = target["vs2010.projectfile"]
         filename = projectfile.as_native_path_for_output(target)
 
         paths_info = bkl.expr.PathAnchorsInfo(
@@ -309,7 +309,7 @@ class VS2010Toolset(Toolset):
             else:
                 assert False, "unknown target type %s" % target.type.name
             n.add("UseDebugLibraries", c == "Debug")
-            if target.get_variable_value("win32-unicode").as_py():
+            if target["win32-unicode"].as_py():
                 n.add("CharacterSet", "Unicode")
             else:
                 n.add("CharacterSet", "MultiByte")
@@ -355,11 +355,11 @@ class VS2010Toolset(Toolset):
                 std_defs += ";_LIB"
             std_defs += ";%(PreprocessorDefinitions)"
             defs = bkl.expr.ListExpr(
-                            target.get_variable_value("defines").items +
+                            target["defines"].items +
                             [bkl.expr.LiteralExpr(std_defs)])
             n_cl.add("PreprocessorDefinitions", defs)
-            n_cl.add("AdditionalIncludeDirectories", target.get_variable_value("includedirs"))
-            cppflags = target.get_variable_value("cppflags").as_py()
+            n_cl.add("AdditionalIncludeDirectories", target["includedirs"])
+            cppflags = target["cppflags"].as_py()
             if cppflags:
                 n_cl.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(cppflags))
             n.add(n_cl)
@@ -370,7 +370,7 @@ class VS2010Toolset(Toolset):
                 n_link.add("EnableCOMDATFolding", True)
                 n_link.add("OptimizeReferences", True)
             if is_exe:
-                ldflags = target.get_variable_value("ldflags").as_py()
+                ldflags = target["ldflags"].as_py()
                 if ldflags:
                     n_link.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(ldflags))
             n.add(n_link)
@@ -378,11 +378,11 @@ class VS2010Toolset(Toolset):
 
         # Source files:
         items = Node("ItemGroup")
-        for sfile in target.get_variable_value("sources").items:
+        for sfile in target["sources"].items:
             items.add("ClCompile", Include=sfile)
         root.add(items)
         # Headers files:
-        headers = target.get_variable_value("headers").items
+        headers = target["headers"].items
         if headers:
             items = Node("ItemGroup")
             for sfile in headers:

@@ -103,8 +103,8 @@ class ExeType(NativeCompiledType):
                         toolset,
                         target,
                         ft_to=NativeExeFileType.get(),
-                        outfile=target.get_variable_value("id"), # FIXME
-                        sources=target.get_variable_value("sources"))
+                        outfile=target["id"], # FIXME
+                        sources=target["sources"])
 
 
 class LibraryType(NativeCompiledType):
@@ -127,5 +127,5 @@ class LibraryType(NativeCompiledType):
                         toolset,
                         target,
                         ft_to=NativeLibFileType.get(),
-                        outfile=target.get_variable_value("libname"), # FIXME
-                        sources=target.get_variable_value("sources"))
+                        outfile=target["libname"], # FIXME
+                        sources=target["sources"])

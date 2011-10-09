@@ -137,7 +137,7 @@ class ModelPart(object):
         """
         Returns variable object for given variable or None if it is not
         defined.
-        
+
         :param recursively: Look for the variable recursively in the parent.
         .. seealso:: :meth:`get_variable_value()`
 
@@ -168,6 +168,9 @@ class ModelPart(object):
         use in this scope.
 
         Throws if the value cannot be found.
+
+        As a shorthand syntax for this function, key indices may be used:
+        >>> target["includedirs"]
 
         .. seealso:: :meth:`get_variable()`
         """
@@ -223,7 +226,7 @@ class ModelPart(object):
 
         Like :meth:`get_prop()`, this method doesn't work recursively upwards,
         but lists only properties that are defined for this scope.
-        
+
         .. seealso:: :meth:`get_prop()`
         """
         raise NotImplementedError
@@ -243,6 +246,13 @@ class ModelPart(object):
                 var = Variable.from_property(p, p.default_expr(self))
                 self.add_variable(var)
                 logger.debug("%s: setting default of %s: %s", self, var.name, var.value)
+
+
+    def __getitem__(self, key):
+        try:
+            return self.get_variable_value(key)
+        except error.Error as e:
+            raise KeyError(str(e))
 
 
 class Project(ModelPart):
