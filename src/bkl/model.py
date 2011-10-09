@@ -132,6 +132,12 @@ class ModelPart(object):
             prj = prj.parent
         return prj
 
+    def child_parts(self):
+        """
+        Yields model parts that are (direct) children of this.
+        """
+        raise NotImplementedError
+
 
     def get_variable(self, name, recursively=False):
         """
@@ -248,6 +254,18 @@ class ModelPart(object):
                 logger.debug("%s: setting default of %s: %s", self, var.name, var.value)
 
 
+    def all_variables(self):
+        """
+        Returns iterator over all variables in the target. Works recursively,
+        i.e. scans all modules and targets under this object too.
+        """
+        for v in self.variables.itervalues():
+            yield v
+        for c in self.child_parts():
+            for v in c.all_variables():
+                yield v
+
+
     def __getitem__(self, key):
         try:
             return self.get_variable_value(key)
@@ -271,6 +289,9 @@ class Project(ModelPart):
     def __str__(self):
         return "the project"
 
+    def child_parts(self):
+        return self.modules
+
     @property
     def top_module(self):
         """
@@ -283,17 +304,6 @@ class Project(ModelPart):
 
     def enum_props(self):
         return props.enum_project_props()
-
-    def all_variables(self):
-        """
-        Returns iterator over all variables in the project. Works recursively,
-        i.e. scans all modules and targets under this object too.
-        """
-        for v in self.variables.itervalues():
-            yield v
-        for m in self.modules:
-            for v in m.all_variables():
-                yield v
 
 
 class Module(ModelPart):
@@ -317,6 +327,9 @@ class Module(ModelPart):
 
     def __str__(self):
         return "module %s" % self.source_file
+
+    def child_parts(self):
+        return self.targets.itervalues()
 
     @property
     def source_file(self):
@@ -346,17 +359,6 @@ class Module(ModelPart):
 
     def enum_props(self):
         return props.enum_module_props()
-
-    def all_variables(self):
-        """
-        Returns iterator over all variables in the project. Works recursively,
-        i.e. scans all modules and targets under this object too.
-        """
-        for v in self.variables.itervalues():
-            yield v
-        for t in self.targets.itervalues():
-            for v in t.variables.itervalues():
-                yield v
 
 
 class Target(ModelPart):
