@@ -29,12 +29,19 @@ from optparse import OptionParser
 
 
 class BklFormatter(logging.Formatter):
+
+    def __init__(self):
+        super(BklFormatter, self).__init__(fmt=logging.BASIC_FORMAT)
+
     def format(self, record):
-        if record.levelno == logging.ERROR or record.levelno == logging.WARNING:
+        level = record.levelno
+        if level == logging.ERROR or level == logging.WARNING or level == logging.INFO:
             msg = ""
             if "pos" in dir(record):
                 msg = "%s: " % record.pos
-            msg += "%s: %s" % (record.levelname.lower(), record.msg)
+            if level != logging.INFO:
+                msg += "%s: " % record.levelname.lower()
+            msg += record.getMessage()
             return msg
         else:
             return super(BklFormatter, self).format(record)
@@ -71,7 +78,7 @@ elif options.verbose:
     log_level = logging.INFO
 else:
     log_level = logging.WARNING
-logging.basicConfig(level=log_level)
+logger.setLevel(log_level)
 
 
 # note: we intentionally import bakefile this late so that the logging
