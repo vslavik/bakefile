@@ -22,14 +22,12 @@
 #  IN THE SOFTWARE.
 #
 
-import copy
-import types
 import os.path
 
 import logging
 logger = logging.getLogger("bkl.model")
 
-import error, expr, vartypes, utils
+import error, vartypes, utils
 import props
 
 class Variable(object):

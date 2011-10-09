@@ -28,7 +28,6 @@ from ..model import Module, Target, Variable
 from ..parser.ast import *
 from ..error import Error, ParserError
 from ..vartypes import ListType
-import bkl.parser.BakefileParser as BakefileParser
 
 
 class Builder(object):

@@ -29,7 +29,6 @@ All makefile-based toolsets should derive from MakefileToolset defined
 in this module.
 """
 
-import types
 import os.path
 
 import io
