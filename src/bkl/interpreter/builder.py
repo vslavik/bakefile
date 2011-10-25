@@ -30,7 +30,7 @@ from ..error import Error, ParserError
 from ..vartypes import ListType
 
 
-class Builder(object):
+class Builder(object, CondTrackingMixin):
     """
     interpreter.Builder processes parsed AST and builds a project model
     from it.
@@ -50,10 +50,6 @@ class Builder(object):
        descending into a target, it is temporarily set to said target and
        then restored and so on.
     """
-
-    active_if_cond = property(lambda self: self.if_stack[-1] if self.if_stack else None,
-                              doc="Currently active 'if' statement condition, if any.")
-
     def __init__(self, on_submodule=None):
         """
         Constructor.
@@ -61,8 +57,8 @@ class Builder(object):
         :param on_module: Callback to call (with filename as argument) on
                 ``submodule`` statement.
         """
+        CondTrackingMixin.__init__(self)
         self.context = None
-        self.if_stack = []
         self.on_submodule_callback = on_submodule
 
 
@@ -211,16 +207,9 @@ class Builder(object):
 
 
     def on_if(self, node):
-        cond = self._build_expression(node.cond)
-        if self.active_if_cond:
-            # combine this condition with the outer 'if':
-            cond = BoolExpr(BoolExpr.AND,
-                            self.active_if_cond,
-                            cond,
-                            pos=node.pos)
-        self.if_stack.append(cond)
+        self.push_cond(self._build_expression(node.cond))
         self.handle_children(node.content, self.context)
-        self.if_stack.pop()
+        self.pop_cond()
 
 
     def on_submodule(self, node):

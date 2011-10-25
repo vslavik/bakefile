@@ -714,6 +714,31 @@ class Formatter(Visitor):
         # cannot be determined.
         return self.format(e.get_value())
 
+        
+class CondTrackingMixin:
+    """
+    Helper mixin class for tracking currently active condition.
+    Useful for handling e.g. nested if statements.
+    """
+
+    active_if_cond = property(lambda self: self.if_stack[-1] if self.if_stack else None,
+                              doc="Currently active condition, if any.")
+
+    def __init__(self):
+        self.if_stack = []
+
+    def push_cond(self, cond):
+        if self.active_if_cond:
+            # combine this condition with the outer 'if':
+            cond = BoolExpr(BoolExpr.AND,
+                            self.active_if_cond,
+                            cond,
+                            pos=cond.pos)
+        self.if_stack.append(cond)
+    
+    def pop_cond(self):
+        self.if_stack.pop()
+
 
 def split(e, sep):
     """
