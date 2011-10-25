@@ -4,8 +4,10 @@ module {
   }
   targets {
     exe hello {
-        sources = [@top_srcdir/hello.c]
-        defines = [PRINT_DETAILS, (($(toolset) == gnu) ? PLATFORM_UNIX : null), (($(toolset) == vs2010) ? PLATFORM_WINDOWS : null)]
+      defines = [PRINT_DETAILS, (($(toolset) == gnu) ? PLATFORM_UNIX : null), (($(toolset) == vs2010) ? PLATFORM_WINDOWS : null)]
+      sources {
+        file @top_srcdir/hello.c
+      }
     }
   }
 }

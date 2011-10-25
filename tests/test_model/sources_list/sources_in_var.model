@@ -5,7 +5,9 @@ module {
   }
   targets {
     exe hello {
-        sources = [@top_srcdir/hello.c]
+      sources {
+        file @top_srcdir/hello.c
+      }
     }
   }
 }

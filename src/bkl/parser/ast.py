@@ -168,11 +168,12 @@ class AppendNode(AssignmentNode):
     append = True
 
 
-class FilesListNode(AppendNode):
+class FilesListNode(Node):
     """Setting of sources/headers."""
-    # TODO: handling this as AppendNode is temporary hack until the
-    # source/header statement grows more syntactically complicated
-    pass
+    kind = property(lambda self: self.children[0].text,
+                    doc="Sources/headers")
+    files = property(lambda self: self.children[1],
+                     doc="List of files.")
 
 
 class TargetNode(Node):

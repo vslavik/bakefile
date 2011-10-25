@@ -95,8 +95,22 @@ def _dump_variable(var):
     return "%s = %s" % (var.name, var.value)
 
 
+def _dump_source(source):
+    return str(source)
+
 def _dump_target(target):
     out = "%s %s {\n" % (target.type.name, target.name)
-    out += _indent(_dump_vars(target))
+    out += _dump_vars(target)
+    out_files=""
+    if target.sources:
+        out_files += "sources {\n"
+        out_files += _indent("\n".join(_dump_source(s) for s in target.sources))
+        out_files += "\n}"
+    if target.headers:
+        out_files += "headers {\n"
+        out_files += _indent("\n".join(_dump_source(s) for s in target.headers))
+        out_files += "\n}"
+    if out_files:
+        out += _indent(out_files)
     out += "\n}"
     return out

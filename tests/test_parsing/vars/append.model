@@ -4,7 +4,7 @@ module {
   }
   targets {
     exe dummy {
-        xxx = [one.c, two.c, three.c]
+      xxx = [one.c, two.c, three.c]
     }
   }
 }

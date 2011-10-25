@@ -374,17 +374,61 @@ class Target(ModelPart):
     .. attribute:: target_type
 
        Type of the target, as :class:`bkl.api.TargetType` instance.
+
+    .. attribute:: sources
+
+       List of source files, as SourceFile instances.
+
+    .. attribute:: headers
+
+       List of header files, as SourceFile instances. The difference from
+       :attr:`sources` is that headers are installable and usable for
+       compilation of other targets, while sources are not.
     """
     def __init__(self, parent, name, target_type, source_pos):
         super(Target, self).__init__(parent, source_pos)
         self.name = name
         self.type = target_type
+        self.sources = []
+        self.headers = []
 
     def __str__(self):
         return 'target "%s"' % self.name
+
+    def child_parts(self):
+        for x in self.sources: yield x
+        for x in self.headers: yield x
 
     def get_prop(self, name):
         return props.get_target_prop(self.type, name)
 
     def enum_props(self):
         return props.enum_target_props(self.type)
+
+
+class SourceFile(ModelPart):
+    """
+    Source file object.
+    """
+    def __init__(self, parent, filename, source_pos):
+        super(SourceFile, self).__init__(parent, source_pos)
+        fn = Variable.from_property(self.get_prop("filename"), filename)
+        self.add_variable(fn)
+
+    @property
+    def filename(self):
+        return self["filename"]
+
+    def __str__(self):
+        return "file %s" % self.filename
+
+    def child_parts(self):
+        return []
+
+    def get_prop(self, name):
+        # TODO: need to pass file type to it
+        return props.get_file_prop(name)
+
+    def enum_props(self):
+        # TODO: need to pass file type to it
+        return props.enum_file_props()

@@ -104,7 +104,7 @@ def get_compiler(toolset, ft_from, ft_to):
     return __cache_compilers[key]
 
 
-def get_compilation_subgraph(toolset, target, ft_to, outfile, sources):
+def get_compilation_subgraph(toolset, target, ft_to, outfile):
     """
     Given list of source files (as :class:`bkl.expr.ListExpr`), produces build
     graph with appropriate :class:`bkl.api.BuildNode` nodes.
@@ -113,17 +113,15 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile, sources):
     :param target: The target object for which the invocation is done.
     :param ft_to:   Type of the output file to compile to.
     :param outfile: Name of the output file (as :class:`bkl.expr.PathExpr`).
-    :param sources: List of source files (as :class:`bkl.expr.PathExpr`).
     """
     
-    source_files = expr.all_possible_elements(sources)
-
     # FIXME: support direct many-files-into-one (e.g. java->jar, .cs->exe)
     # compilation too
 
     objects = []
 
-    for src in source_files:
+    for srcfile in target.sources:
+        src = srcfile.filename
         assert isinstance(src, expr.PathExpr)
 
         ext = src.get_extension()

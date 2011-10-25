@@ -238,7 +238,7 @@ class Property(object):
        (e.g. ``exe``) for scoping on specific target name. May be list of
        such items for multiscope properties. Finally, may be :const:`None`
        for default (depending from where the property was obtained from).
-    
+
     .. attribute:: inheritable
 
        A property is *iheritable* if its value can be specified in the
@@ -277,6 +277,7 @@ class Property(object):
     SCOPE_PROJECT = "project"
     SCOPE_MODULE = "module"
     SCOPE_TARGET = "target"
+    SCOPE_FILE = "file"
 
     def __init__(self, name, type, default=None, readonly=False,
                  inheritable=False, doc=None):

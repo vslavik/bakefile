@@ -7,7 +7,9 @@ module submodules/main.bkl {
   }
   targets {
     exe main {
-        sources = [@top_srcdir/main.cpp]
+      sources {
+        file @top_srcdir/main.cpp
+      }
     }
   }
 }
@@ -17,7 +19,9 @@ module submodules/child/child.bkl {
   }
   targets {
     exe child {
-        sources = [@top_srcdir/child/child.cpp]
+      sources {
+        file @top_srcdir/child/child.cpp
+      }
     }
   }
 }

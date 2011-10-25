@@ -24,7 +24,7 @@
 
 from ..api import TargetType
 from ..expr import *
-from ..model import Module, Target, Variable
+from ..model import Module, Target, Variable, SourceFile
 from ..parser.ast import *
 from ..error import Error, ParserError
 from ..vartypes import ListType
@@ -179,9 +179,25 @@ class Builder(object, CondTrackingMixin):
 
 
     def on_sources_or_headers(self, node):
-        # TODO: handling this as AppendNode is temporary hack until the
-        # source/header statement grows more syntactically complicated
-        self.on_assignment(node)
+        if self.active_if_cond:
+            raise ParserError("conditionally built sources not supported yet"
+                              ' (condition "%s" set at %s)' % (
+                                  self.active_if_cond, self.active_if_cond.pos))
+        if node.kind == "sources":
+            filelist = self.context.sources
+        elif node.kind == "headers":
+            filelist = self.context.headers
+        else:
+            assert False, 'invalid files list kind "%s"' % node.kind
+
+        files = self._build_expression(node.files)
+        for cond, f in enum_possible_values(files):
+            if cond:
+                raise ParserError("conditionally built sources not supported yet"
+                                  ' (condition "%s" set at %s)' % (
+                                      cond, cond.pos))
+            obj = SourceFile(self.context, f, source_pos=f.pos)
+            filelist.append(obj)
 
 
     def on_target(self, node):

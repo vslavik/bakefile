@@ -4,7 +4,10 @@ module {
   }
   targets {
     library helpers {
-        sources = [@top_srcdir/common.cpp, @top_srcdir/helpers.cpp]
+      sources {
+        file @top_srcdir/common.cpp
+        file @top_srcdir/helpers.cpp
+      }
     }
   }
 }

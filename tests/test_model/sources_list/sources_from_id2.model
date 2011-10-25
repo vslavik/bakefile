@@ -4,9 +4,11 @@ module {
   }
   targets {
     exe hello {
-        name = hello
-        src = hello
-        sources = [@top_srcdir/hello.c]
+      name = hello
+      src = hello
+      sources {
+        file @top_srcdir/hello.c
+      }
     }
   }
 }

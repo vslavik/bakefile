@@ -791,68 +791,86 @@ def split(e, sep):
                     pos = e.pos)
 
 
-def all_possible_values(e):
+class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
+    def __init__(self):
+        CondTrackingMixin.__init__(self)
+
+    def null(self, e):
+        return []
+
+    def literal(self, e):
+        return [(self.active_if_cond, e)]
+
+    def bool_value(self, e):
+        return [(self.active_if_cond, e)]
+
+    def reference(self, e):
+        return self.visit(e.get_value())
+
+    def bool(self, e):
+        assert False, "this should never be called"
+
+    def if_(self, e):
+        try:
+            self.push_cond(e.cond)
+            yes = self.visit(e.value_yes)
+        finally:
+            self.pop_cond()
+        try:
+            self.push_cond(BoolExpr(BoolExpr.NOT, e.cond, pos=e.cond.pos))
+            no = self.visit(e.value_no)
+        finally:
+            self.pop_cond()
+        return yes + no
+
+    def list(self, e):
+        # for lists, simply return the items, see enum_possible_values() docstring:
+        items = []
+        for x in e.items:
+            items += self.visit(x)
+        return items
+
+    def _get_cond_for_list(self, lst):
+            conds = [c for c,e in lst if c is not None]
+            if conds:
+                if len(conds) > 1:
+                    raise ParserError("too complicated conditional expression, please report this as a bug", pos=e.pos)
+                else:
+                    return conds[0]
+            else:
+                return None
+
+    def concat(self, e):
+        items = [self.visit(x) for x in e.items]
+        items = [x for x in items if x] # filter out nulls
+        out = []
+        for result in itertools.product(*items):
+            cond = self._get_cond_for_list(result)
+            out.append((cond, ConcatExpr([e for c,e in result], pos=e.pos)))
+        return out
+
+    def path(self, e):
+        components = [self.visit(x) for x in e.components]
+        components = [x for x in components if x] # filter out nulls
+        out = []
+        for result in itertools.product(*components):
+            cond = self._get_cond_for_list(result)
+            out.append((cond, PathExpr([e for c,e in result], anchor=e.anchor, pos=e.pos)))
+        return out
+
+
+def enum_possible_values(e):
     """
-    Given an expression *e*, returns a Python iterator over all its possible
-    values, as :class:`bkl.expr.Expr` instances.
+    Returns all values that are possible, together with their respective
+    conditions, as an iteratable of (condition, value) tuples. The condition
+    may be :const:`None` if the value is always there, otherwise it is a
+    boolean :class:`bkl.expr.Expr`.
 
-    Note that if called on a list, it returns a list of all possible lists,
-    which is probably not something you want and
-    :func:`bkl.expr.all_possible_elements()` is a better choice.
+    Note that this function returns possible elements for lists. It skips null
+    expressions as well.
     """
-    assert not isinstance(e, ListExpr), \
-           "use all_possible_elements() with lists (%s)" % e
-
-    if isinstance(e, LiteralExpr):
-        yield e
-
-    elif isinstance(e, ReferenceExpr):
-        yield all_possible_values(e.get_value())
-
-    elif isinstance(e, ConcatExpr):
-        possibilities = [ all_possible_values(i) for i in e.items ]
-        for i in itertools.product(*possibilities):
-            yield ConcatExpr(list(i))
-
-    elif isinstance(e, PathExpr):
-        possibilities = [ all_possible_values(i) for i in e.components ]
-        for i in itertools.product(*possibilities):
-            yield PathExpr(list(i), e.anchor)
-
-    else:
-        raise Error("cannot determine all possible values of expression \"%s\"" % e,
-                    pos=e.pos)
-
-
-def all_possible_elements(e):
-    """
-    Given a list expression (:class:`bkl.expr.ListExpr`) *e*, returns a Python
-    iterator of all possible values of the list, as :class:`bkl.expr.Expr`
-    instances.
-    """
-    assert isinstance(e, ListExpr)
-
-    # Keep track of duplicates; add str(e) to the set to easily detect
-    # different instances of equal expressions.
-    already_added = set()
-
-    for i in e.items:
-        # Go into a referenced variable. Note that this is intentionally done
-        # before the assert below so that the test for nested lists is
-        # performed both for literal nested lists (unlikely) and for references
-        # to lists (typical: e.g. "sources = $(MY_SRC) $(YOUR_SRC)" before
-        # flattening).
-        if isinstance(i, ReferenceExpr):
-            i = i.get_value()
-
-        assert not isinstance(i, ListExpr), \
-               "nested lists are supposed to be flattened by now"
-
-        for v in all_possible_values(i):
-            key = str(v)
-            if key not in already_added:
-                already_added.add(key)
-                yield v
+    v = _PossibleValuesVisitor()
+    return v.visit(e)
 
 
 def are_equal(a, b):

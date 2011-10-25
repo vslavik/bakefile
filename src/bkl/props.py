@@ -29,8 +29,19 @@ Also define standard, always available, properties.
 """
 
 import expr, api, utils
-from vartypes import IdType, EnumType, ListType
+from vartypes import IdType, EnumType, ListType, PathType
 from api import Property
+
+def std_file_props():
+    """Creates list of all standard source file properties."""
+    return [
+        Property("filename",
+             type=PathType(),
+             default=[],
+             inheritable=False,
+             doc="Source file name."),
+        ]
+
 
 def std_target_props():
     """Creates list of all standard target properties."""
@@ -98,6 +109,7 @@ class PropertiesRegistry(object):
     """
     def __init__(self):
         self.all_targets = None
+        self.all_files = None
         self.modules = None
         self.project = None
         self.target_types = {}
@@ -131,7 +143,16 @@ class PropertiesRegistry(object):
             return self.all_targets[name]
         else:
             return self.target_types[target_type].get(name, None)
-    
+
+    def get_file_prop(self, name):
+        """
+        Returns property *name* on source file level if such property exists, or
+        :const:`None` otherwise.
+        """
+        if self.all_files is None:
+            self._init_file_props()
+        return self.all_files.get(name, None)
+
     def enum_project_props(self):
         if self.project is None:
             self._init_project_props()
@@ -150,6 +171,12 @@ class PropertiesRegistry(object):
         for p in self.target_types[target_type].itervalues():
             yield p
         for p in self.all_targets.itervalues():
+            yield p
+
+    def enum_file_props(self):
+        if self.all_files is None:
+            self._init_file_props()
+        for p in self.all_files.itervalues():
             yield p
 
     def _init_project_props(self):
@@ -189,13 +216,25 @@ class PropertiesRegistry(object):
                     props.add(p)
             self.target_types[target_type] = props
 
+    def _init_file_props(self):
+        if self.all_files is not None:
+            return
+        self.all_files = _fill_prop_dict(std_file_props())
+        for toolset in api.Toolset.all():
+            for p in toolset.all_properties("properties_file"):
+                p.toolsets = [toolset.name]
+                p.scope = api.Property.SCOPE_FILE
+                self.all_files.add(p)
+
 
 registry = PropertiesRegistry()
 
 get_project_prop = registry.get_project_prop
 get_module_prop = registry.get_module_prop
 get_target_prop = registry.get_target_prop
+get_file_prop = registry.get_file_prop
 
 enum_project_props = registry.enum_project_props
 enum_module_props = registry.enum_module_props
 enum_target_props = registry.enum_target_props
+enum_file_props = registry.enum_file_props
