@@ -121,25 +121,29 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
     objects = []
 
     for srcfile in target.sources:
-        src = srcfile.filename
-        assert isinstance(src, expr.PathExpr)
+        try:
+            src = srcfile.filename
+            assert isinstance(src, expr.PathExpr)
 
-        ext = src.get_extension()
-        objname = src.change_extension(toolset.object_type.extensions[0]) # FIXME
-        # FIXME: needs to flatten the path too
-        objname.anchor = expr.ANCHOR_BUILDDIR
+            ext = src.get_extension()
+            objname = src.change_extension(toolset.object_type.extensions[0]) # FIXME
+            # FIXME: needs to flatten the path too
+            objname.anchor = expr.ANCHOR_BUILDDIR
 
-        ft_from = get_file_type(ext)
-        # FIXME: toolset.object_type shouldn't be needed
-        compiler = get_compiler(toolset, ft_from, toolset.object_type)
-        if compiler is None:
-            raise Error("cannot determine how to compile \"%s\" files into \"%s\"" % (ft_from.name, toolset.object_type.name),
-                        pos=sources.pos)
+            ft_from = get_file_type(ext)
+            # FIXME: toolset.object_type shouldn't be needed
+            compiler = get_compiler(toolset, ft_from, toolset.object_type)
+            if compiler is None:
+                raise Error("don't know how to compile \"%s\" files into \"%s\"" % (ft_from.name, toolset.object_type.name))
 
-        node = BuildNode(commands=compiler.commands(target, src, objname),
-                         inputs=[src],
-                         outputs=[objname])
-        objects.append(node)
+            node = BuildNode(commands=compiler.commands(target, src, objname),
+                             inputs=[src],
+                             outputs=[objname])
+            objects.append(node)
+        except Error as e:
+            if e.pos is None:
+                e.pos = srcfile.source_pos
+            raise
 
     linker = get_compiler(toolset, toolset.object_type, ft_to)
     assert linker
