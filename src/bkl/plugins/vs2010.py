@@ -378,15 +378,14 @@ class VS2010Toolset(Toolset):
 
         # Source files:
         items = Node("ItemGroup")
-        for sfile in target["sources"].items:
-            items.add("ClCompile", Include=sfile)
+        for sfile in target.sources:
+            items.add("ClCompile", Include=sfile.filename)
         root.add(items)
         # Headers files:
-        headers = target["headers"].items
-        if headers:
+        if target.headers:
             items = Node("ItemGroup")
-            for sfile in headers:
-                items.add("ClInclude", Include=sfile)
+            for sfile in target.headers:
+                items.add("ClInclude", Include=sfile.filename)
             root.add(items)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.targets")
