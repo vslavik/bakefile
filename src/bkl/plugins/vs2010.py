@@ -28,6 +28,7 @@ import os.path
 import codecs
 from xml.sax.saxutils import escape, quoteattr
 
+import bkl.compilers
 import bkl.expr
 import bkl.error
 from bkl.api import Toolset, Property
@@ -138,6 +139,8 @@ class XmlFormatter(object):
             s = self.expr_formatter.format(val)
         elif isinstance(val, types.BooleanType):
             s = "true" if val else "false"
+        elif isinstance(val, types.ListType):
+            s = ";".join(self._format_value(x) for x in val)
         else:
             s = str(val)
         return s
@@ -378,15 +381,33 @@ class VS2010Toolset(Toolset):
 
         # Source files:
         items = Node("ItemGroup")
-        for sfile in target.sources:
-            items.add("ClCompile", Include=sfile.filename)
         root.add(items)
+        for sfile in target.sources:
+            ext = sfile.filename.get_extension()
+            # FIXME: make this more solid
+            if ext in ['cpp', 'c']:
+                items.add("ClCompile", Include=sfile.filename)
+            else:
+                # FIXME: handle both compilation into cpp and c files
+                genfiletype = bkl.compilers.CxxFileType.get()
+                genname = sfile.filename.change_extension("cpp")
+                # FIXME: needs to flatten the path too
+                genname.anchor = bkl.expr.ANCHOR_BUILDDIR
+                ft_from = bkl.compilers.get_file_type(ext)
+                compiler = bkl.compilers.get_compiler(self, ft_from, genfiletype)
+
+                customBuild = Node("CustomBuild", Include=sfile.filename)
+                customBuild.add("Command", compiler.commands(target, sfile.filename, genname))
+                customBuild.add("Outputs", genname)
+                items.add(customBuild)
+                items.add("ClCompile", Include=genname)
+
         # Headers files:
         if target.headers:
             items = Node("ItemGroup")
+            root.add(items)
             for sfile in target.headers:
                 items.add("ClInclude", Include=sfile.filename)
-            root.add(items)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.targets")
         root.add("ImportGroup", Label="ExtensionTargets")

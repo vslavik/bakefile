@@ -28,6 +28,7 @@ Helpers for working with :class:`bkl.api.FileType` and
 """
 
 from api import FileType, FileCompiler, BuildNode
+import model
 from error import Error
 import expr
 
@@ -59,8 +60,29 @@ class CxxFileType(FileType):
 
 
 # misc caches:
-__cache_types = {}
+__cache_types = None
 __cache_compilers = {}
+__cache_compilers_initialized = set()
+
+def __ensure_cache_types():
+    global __cache_types
+    if __cache_types is not None:
+        return
+    __cache_types = {}
+    for ft in FileType.all():
+        for ext in ft.extensions:
+            __cache_types[ext] = ft
+
+def __ensure_cache_compilers(toolset):
+    global __cache_compilers
+    global __cache_compilers_initialized
+    if toolset in __cache_compilers_initialized:
+        return
+    for c in FileCompiler.all():
+        if c.is_supported(toolset):
+            key = (toolset, c.in_type, c.out_type)
+            __cache_compilers[key] = c
+    __cache_compilers_initialized.add(toolset)
 
 
 def get_file_type(extension):
@@ -73,14 +95,11 @@ def get_file_type(extension):
     >>> b = get_file_type("cpp")
     >>> assert a is b
     """
-    global __cache_types
-    if extension not in __cache_types:
-        for ft in FileType.all():
-            if extension in ft.extensions:
-                __cache_types[extension] = ft
-                return __cache_types[extension]
+    __ensure_cache_types()
+    try:
+        return __cache_types[extension]
+    except KeyError:
         raise Error("unknown file extension \".%s\"" % extension)
-    return __cache_types[extension]
 
 
 def get_compiler(toolset, ft_from, ft_to):
@@ -91,17 +110,58 @@ def get_compiler(toolset, ft_from, ft_to):
     The returned object is a singleton. If such compiler cannot be found,
     returns None.
     """
-    key = (toolset, ft_from, ft_to)
+    __ensure_cache_compilers(toolset)
+    try:
+        key = (toolset, ft_from, ft_to)
+        return __cache_compilers[key]
+    except KeyError:
+        return None
 
-    global __cache_compilers
-    if key not in __cache_compilers:
-        __cache_compilers[key] = None
-        for c in FileCompiler.all():
-            if c.in_type == ft_from and c.out_type == ft_to and c.is_supported(toolset):
-                __cache_compilers[key] = c
-                break
 
-    return __cache_compilers[key]
+def get_file_types_compilable_into(toolset, ft):
+    """
+    Returns file types that can be compiled into *ft*.
+    """
+    __ensure_cache_compilers(toolset)
+    for ts, ft_from, ft_to in __cache_compilers:
+        if ts == toolset and ft_to == ft:
+            yield ft_from
+
+
+def _make_build_nodes_for_file(toolset, target, srcfile, ft_to):
+    src = srcfile.filename
+    assert isinstance(src, expr.PathExpr)
+
+    ext = src.get_extension()
+    objname = src.change_extension(ft_to.extensions[0]) # FIXME
+    # FIXME: needs to flatten the path too
+    objname.anchor = expr.ANCHOR_BUILDDIR
+
+    ft_from = get_file_type(ext)
+    compiler = get_compiler(toolset, ft_from, ft_to)
+    if compiler is None:
+        # Try to compile into source file, then into binaries. A typical use of
+        # this is flex/bison parser generator.
+        for ft_source in get_file_types_compilable_into(toolset, ft_to):
+            if get_compiler(toolset, ft_from, ft_source) is not None:
+                compilables, allnodes = _make_build_nodes_for_file(toolset, target, srcfile, ft_source)
+                objects = []
+                for o in compilables:
+                    for outf in o.outputs:
+                        objn, alln = _make_build_nodes_for_file(
+                                            toolset,
+                                            target,
+                                            model.SourceFile(target, outf, None),
+                                            ft_to)
+                        objects += objn
+                        allnodes += alln
+                return (objects, allnodes)
+        raise Error("don't know how to compile \"%s\" files into \"%s\"" % (ft_from.name, ft_to.name))
+
+    node = BuildNode(commands=compiler.commands(target, src, objname),
+                     inputs=[src],
+                     outputs=[objname])
+    return ([node], [node])
 
 
 def get_compilation_subgraph(toolset, target, ft_to, outfile):
@@ -114,32 +174,19 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
     :param ft_to:   Type of the output file to compile to.
     :param outfile: Name of the output file (as :class:`bkl.expr.PathExpr`).
     """
-    
+
     # FIXME: support direct many-files-into-one (e.g. java->jar, .cs->exe)
     # compilation too
 
     objects = []
+    allnodes = []
 
     for srcfile in target.sources:
         try:
-            src = srcfile.filename
-            assert isinstance(src, expr.PathExpr)
-
-            ext = src.get_extension()
-            objname = src.change_extension(toolset.object_type.extensions[0]) # FIXME
-            # FIXME: needs to flatten the path too
-            objname.anchor = expr.ANCHOR_BUILDDIR
-
-            ft_from = get_file_type(ext)
             # FIXME: toolset.object_type shouldn't be needed
-            compiler = get_compiler(toolset, ft_from, toolset.object_type)
-            if compiler is None:
-                raise Error("don't know how to compile \"%s\" files into \"%s\"" % (ft_from.name, toolset.object_type.name))
-
-            node = BuildNode(commands=compiler.commands(target, src, objname),
-                             inputs=[src],
-                             outputs=[objname])
-            objects.append(node)
+            obj, all = _make_build_nodes_for_file(toolset, target, srcfile, toolset.object_type)
+            objects += obj
+            allnodes += all
         except Error as e:
             if e.pos is None:
                 e.pos = srcfile.source_pos
@@ -154,4 +201,4 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
                           inputs=object_files,
                           outputs=[outfile])
 
-    return [link_node] + objects
+    return [link_node] + allnodes
