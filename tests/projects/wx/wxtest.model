@@ -1,0 +1,13 @@
+module {
+  variables {
+    toolsets = [gnu, vs2010]
+  }
+  targets {
+    exe wxtest {
+      sources {
+        file @top_srcdir/wxtest.cpp
+        file @top_srcdir/resources.xrc
+      }
+    }
+  }
+}
