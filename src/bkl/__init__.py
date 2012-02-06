@@ -46,18 +46,19 @@ def load_plugin(filename):
     imp.load_source(modname, filename)
 
 
-def load_plugins_from_dir(dirname):
+def find_all_plugins(paths):
     """
-    Loads all Bakefile plugins from given directory, recursively.
+    Finds all Bakefile plugins in given directories and yields them.
     """
-    for root, dirs, files in os.walk(dirname):
-        for f in files:
-            if not f.endswith(".py"):
-                continue
-            if f == "__init__.py":
-                continue
-            filename = os.path.join(root, f)
-            load_plugin(filename)
+    for dirname in paths:
+        for root, dirs, files in os.walk(dirname):
+            for f in files:
+                if not f.endswith(".py"):
+                    continue
+                if f == "__init__.py":
+                    continue
+                filename = os.path.join(root, f)
+                yield filename
 
 
 # import all plugins:
@@ -65,7 +66,9 @@ def load_plugins_from_dir(dirname):
 PLUGINS_PATH = [os.path.join(p, "plugins") for p in __path__]
 logger.debug("plugins search path: %s", PLUGINS_PATH)
 
-sys.modules["bkl.plugins"] = imp.new_module("bkl.plugins")
+plugin_files = list(find_all_plugins(PLUGINS_PATH))
+assert plugin_files, "No plugins found - broken Bakefile installation?"
 
-for p in PLUGINS_PATH:
-    load_plugins_from_dir(p)
+sys.modules["bkl.plugins"] = imp.new_module("bkl.plugins")
+for fn in plugin_files:
+    load_plugin(fn)
