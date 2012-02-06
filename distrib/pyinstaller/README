@@ -1,0 +1,8 @@
+This directory contains PyInstaller (http://www.pyinstaller.org) scripts for
+building Windows version of Bakefile self-container in a single bkl.exe
+executable.
+
+PyInstaller with support for private hook files with 'datas' support is needed,
+i.e. at least 2.0dev.
+
+Usage: run `pyinstaller.py bkl.spec` from this directory.

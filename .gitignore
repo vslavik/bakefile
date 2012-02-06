@@ -6,3 +6,6 @@ docs/.doctrees
 docs/.build
 docs/html
 *.py[oc]
+*.exe
+*.log
+distrib/pyinstaller/build
