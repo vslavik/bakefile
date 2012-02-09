@@ -135,3 +135,6 @@ class GnuToolset(MakefileToolset):
     default_makefile = "GNUmakefile"
 
     object_type = GnuObjectFileType.get()
+
+    def on_phony_targets(self, file, targets):
+        file.write(".PHONY: %s\n" % " ".join(targets))

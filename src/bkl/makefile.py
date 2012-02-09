@@ -208,11 +208,13 @@ class MakefileToolset(Toolset):
             subcmd = self.Formatter.submake_command(expr_fmt.format(subdir), expr_fmt.format(subfile))
             f.write(self.Formatter.target(name=sub.name, deps=[], commands=[subcmd]))
 
+        phony = []
         for t in module.targets.itervalues():
             graph = build_graphs[t]
             for node in graph:
                 if node.name:
                     out = node.name
+                    phony.append(expr_fmt.format(out))
                 else:
                     # FIXME: handle multi-output nodes too
                     assert len(node.outputs) == 1
@@ -226,4 +228,14 @@ class MakefileToolset(Toolset):
                 f.write(text)
                 all_targets.append(expr_fmt.format(out))
 
+        if phony:
+            self.on_phony_targets(f, phony)
+
         f.commit()
+
+    def on_phony_targets(self, file, targets):
+        """
+        Called with a list of all phony (i.e. not producing actual files)
+        targets (as their names as strings) when generating given file.
+        """
+        pass
