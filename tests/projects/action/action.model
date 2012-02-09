@@ -1,0 +1,11 @@
+module {
+  variables {
+    toolsets = [gnu]
+  }
+  targets {
+    action hello {
+      commands = [echo Hello, cwd is:, pwd]
+    }
+  }
+}
+

@@ -1,0 +1,7 @@
+toolsets = gnu;
+
+action hello {
+    commands = "echo Hello, cwd is:"
+               "pwd"
+               ;
+}
