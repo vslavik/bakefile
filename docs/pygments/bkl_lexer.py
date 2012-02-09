@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2011 Vaclav Slavik
+# Copyright (C) 2009-2012 Vaclav Slavik
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
