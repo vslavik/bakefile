@@ -178,6 +178,7 @@ class MakefileToolset(Toolset):
         build_graphs = utils.OrderedDict()
         for t in module.targets.itervalues():
             build_graphs[t] = t.type.get_build_subgraph(self, t)
+            assert len(build_graphs[t]) > 0, "Build graph for %s is empty" % t
 
         #FIXME: make this part of the formatter for (future) IdRefExpr
         def _format_dep(target_name):
