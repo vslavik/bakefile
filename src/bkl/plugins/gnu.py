@@ -42,7 +42,7 @@ class GnuObjectFileType(FileType):
 
 class GnuFileCompiler(FileCompiler):
     def is_supported(self, toolset):
-        return toolset == GnuToolset.get()
+        return isinstance(toolset, GnuToolset)
 
 
 class GnuCCompiler(GnuFileCompiler):
@@ -120,7 +120,7 @@ class GnuMakefileFormatter(MakefileFormatter):
 
 class GnuToolset(MakefileToolset):
     """
-    GNU toolchain.
+    GNU toolchain for Unix systems.
 
     This toolset generates makefiles for the GNU toolchain -- GNU Make, GCC compiler,
     GNU LD linker etc. -- running on Unix system.
@@ -128,6 +128,8 @@ class GnuToolset(MakefileToolset):
     Currently, only Linux systems (or something sufficiently compatible) are supported.
     In particular, file extensions and linker behavior (symlinks, sonames) are assumed
     to be Linux ones.
+
+    See :ref:`ref_toolset_gnu-osx` for OS X variant.
     """
     name = "gnu"
 
@@ -138,3 +140,18 @@ class GnuToolset(MakefileToolset):
 
     def on_phony_targets(self, file, targets):
         file.write(".PHONY: %s\n" % " ".join(targets))
+
+
+class OSXGnuToolset(GnuToolset):
+    """
+    GNU toolchain for OS X.
+
+    This toolset is for building on OS X using makefiles, not Xcode. It
+    incorporates some of the oddities of OS X's toolchain and should be used
+    instead of :ref:`ref_toolset_gnu`.
+    """
+    # FIXME: This is temporary solution, will be integrated into GnuToolset
+    #        with runtime platform detection.
+    name = "gnu-osx"
+
+    default_makefile = "Makefile.osx"

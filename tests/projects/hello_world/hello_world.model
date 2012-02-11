@@ -1,6 +1,6 @@
 module {
   variables {
-    toolsets = [gnu, vs2010]
+    toolsets = [gnu, gnu-osx, vs2010]
   }
   targets {
     exe hello {
