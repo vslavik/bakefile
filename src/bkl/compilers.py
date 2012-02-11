@@ -158,7 +158,7 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to):
                 return (objects, allnodes)
         raise Error("don't know how to compile \"%s\" files into \"%s\"" % (ft_from.name, ft_to.name))
 
-    node = BuildNode(commands=compiler.commands(target, src, objname),
+    node = BuildNode(commands=compiler.commands(toolset, target, src, objname),
                      inputs=[src],
                      outputs=[objname])
     return ([node], [node])
@@ -196,7 +196,7 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
     assert linker
 
     object_files = [o.outputs[0] for o in objects]
-    link_commands = linker.commands(target, expr.ListExpr(object_files), outfile)
+    link_commands = linker.commands(toolset, target, expr.ListExpr(object_files), outfile)
     link_node = BuildNode(commands=link_commands,
                           inputs=object_files,
                           outputs=[outfile])

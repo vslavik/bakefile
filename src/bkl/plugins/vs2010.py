@@ -397,7 +397,7 @@ class VS2010Toolset(Toolset):
                 compiler = bkl.compilers.get_compiler(self, ft_from, genfiletype)
 
                 customBuild = Node("CustomBuild", Include=sfile.filename)
-                customBuild.add("Command", compiler.commands(target, sfile.filename, genname))
+                customBuild.add("Command", compiler.commands(self, target, sfile.filename, genname))
                 customBuild.add("Outputs", genname)
                 items.add(customBuild)
                 items.add("ClCompile", Include=genname)

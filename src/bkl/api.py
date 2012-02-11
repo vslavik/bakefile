@@ -438,11 +438,12 @@ class FileCompiler(Extension):
         return True
 
     @abstractmethod
-    def commands(self, target, input, output):
+    def commands(self, toolset, target, input, output):
         """
         Returns list of commands (as :class:`bkl.expr.Expr`) to invoke
         the compiler.
 
+        :param toolset: Toolset used.
         :param target: The target object for which the invocation is done.
         :param input:  Input file (:class:`bkl.expr.PathExpr`) or
             files (:class:`bkl.expr.ListExpr`), depending on cardinality.

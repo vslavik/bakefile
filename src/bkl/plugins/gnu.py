@@ -55,7 +55,7 @@ class GnuCCompiler(GnuFileCompiler):
 
     _compiler = "cc"
 
-    def commands(self, target, input, output):
+    def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("%s -c -o $@" % self._compiler)]
         # FIXME: evaluating the flags here every time is inefficient
         cmd += bkl.expr.add_prefix("-D", target["defines"]).items
@@ -86,7 +86,7 @@ class GnuLinker(GnuFileCompiler):
     in_type = GnuObjectFileType.get()
     out_type = bkl.compilers.NativeExeFileType.get()
 
-    def commands(self, target, input, output):
+    def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("c++ -o $@"), input]
         cmd += target["ldflags"].items
         # FIXME: use a parser instead of constructing the expression manually
@@ -102,7 +102,7 @@ class GnuLibLinker(GnuFileCompiler):
     in_type = GnuObjectFileType.get()
     out_type = bkl.compilers.NativeLibFileType.get()
 
-    def commands(self, target, input, output):
+    def commands(self, toolset, target, input, output):
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         return [ListExpr([LiteralExpr("ar rcu $@"), input]),

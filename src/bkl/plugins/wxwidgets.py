@@ -45,7 +45,7 @@ class WXRCCompiler(FileCompiler):
     in_type = XRCFileType.get()
     out_type = CxxFileType.get()
 
-    def commands(self, target, input, output):
+    def commands(self, toolset, target, input, output):
         # FIXME: make this easier to write with parsing
         cmd = ConcatExpr([
                     LiteralExpr("wxrc --cpp-code -o "),
