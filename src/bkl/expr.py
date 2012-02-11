@@ -907,3 +907,16 @@ def add_prefix(prefix, e):
         return ListExpr([add_prefix(prefix, i) for i in e.items], pos=e.pos)
     else:
         return ConcatExpr([prefix, e], pos=e.pos)
+
+
+def concat(*parts):
+    """
+    Concatenates all arguments and returns :class:`bkl.expr.ConcatExpr`.
+    The arguments may be expressions or string literals.
+    """
+    items = []
+    for p in parts:
+        if not isinstance(p, Expr):
+            p = LiteralExpr(p)
+        items.append(p)
+    return ConcatExpr(items)
