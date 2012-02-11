@@ -89,6 +89,9 @@ class Node(object):
                     return
         assert 0, "add() is confused: what are you trying to do?"
 
+    def has_children(self):
+        return len(self.children) > 0
+
 
 class VS2010ExprFormatter(bkl.expr.Formatter):
     list_sep = ";"
@@ -220,6 +223,9 @@ class VS2010Toolset(Toolset):
 
     name = "vs2010"
 
+    exename_extension = "exe"
+    libname_extension = "lib"
+
     properties_target = [
         Property("vs2010.projectfile",
                  type=PathType(),
@@ -335,8 +341,11 @@ class VS2010Toolset(Toolset):
         for c in configs:
             n = Node("PropertyGroup")
             if not is_library:
-                n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % c
                 n.add("LinkIncremental", c == "Debug")
+            # TODO: add TargetName only if it's non-default
+            n.add("TargetName", target[target.type.basename_prop])
+            if n.has_children():
+                n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % c
             root.add(n)
 
         for c in configs:

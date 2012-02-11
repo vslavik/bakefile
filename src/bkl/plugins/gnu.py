@@ -141,6 +141,9 @@ class GnuToolset(MakefileToolset):
 
     object_type = GnuObjectFileType.get()
 
+    libname_prefix = "lib"
+    libname_extension = "a"
+
     def on_phony_targets(self, file, targets):
         file.write(".PHONY: %s\n" % " ".join(targets))
 
