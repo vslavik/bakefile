@@ -29,7 +29,7 @@
           <title>set</title>
           <para>
             Sets a variable. There are two forms of the command. The first
-            one if for setting variables unconditionally:
+            one is for setting variables unconditionally:
             <programlisting><![CDATA[
 <set var="NAME" [append="APP"] [prepend="PREP"] [overwrite="OVERWRITE"]
      [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]>

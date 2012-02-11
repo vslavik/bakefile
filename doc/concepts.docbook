@@ -141,7 +141,7 @@
 <set var="RESULT_11" cond="NUM1+NUM2==11">yes</set>
         
 <option name="BUILD">
-  <values>debug release</values>
+  <values>debug,release</values>
   <default-value>release</default-value>
 </option>
 
