@@ -46,7 +46,9 @@ def dump_module(module):
     is an instance of bakefile.model.Module.
     """
     if len(module.project.modules) > 1:
-        out = "module %s {\n" % module.source_file
+        # use Unix filename syntax in the dumps even on Windows
+        filename = module.source_file.replace("\\", "/")
+        out = "module %s {\n" % filename
     else:
         out = "module {\n"
 
@@ -54,9 +56,11 @@ def dump_module(module):
     if submodules:
         out += "  submodules {\n"
         for s in submodules:
-            out += "    %s\n" % s.source_file
+            # use Unix filename syntax in the dumps even on Windows
+            filename = s.source_file.replace("\\", "/")
+            out += "    %s\n" % filename
         out += "  }\n"
-    
+
     out += "  variables {\n"
     out += _indent(_dump_vars(module))
     out += "  }\n"

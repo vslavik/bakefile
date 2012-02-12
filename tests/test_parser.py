@@ -62,7 +62,7 @@ def _do_test_parser_on_file(input, ast_file):
         t = bkl.parser.parse_file(input)
         as_text = t.toStringTree()
     except bkl.error.Error, e:
-        as_text = "ERROR:\n%s" % e
+        as_text = "ERROR:\n%s" % str(e).replace("\\", "/")
     print """
 parsed tree:
 ---

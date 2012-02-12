@@ -66,7 +66,7 @@ def _do_test_builder_on_file(input, model_file):
         i.finalize()
         as_text = bkl.dumper.dump_project(i.model)
     except bkl.error.Error, e:
-        as_text = "ERROR:\n%s" % e
+        as_text = "ERROR:\n%s" % str(e).replace("\\", "/")
     print """
 created model:
 ---
