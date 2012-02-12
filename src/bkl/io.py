@@ -81,7 +81,7 @@ class OutputFile(object):
             self.text = self.text.replace("\n", "\r\n")
 
         try:
-            with open(self.filename, "rt") as f:
+            with open(self.filename, "rb") as f:
                 old = f.read()
         except IOError:
             old = None
@@ -102,5 +102,5 @@ class OutputFile(object):
             dirname = os.path.dirname(self.filename)
             if dirname and not os.path.isdir(dirname):
                 os.makedirs(dirname)
-            with open(self.filename, "wt") as f:
+            with open(self.filename, "wb") as f:
                 f.write(self.text)
