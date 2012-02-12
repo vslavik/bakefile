@@ -371,7 +371,7 @@ class Target(ModelPart):
 
        Name (ID) of the target. This must be unique in the entire project.
 
-    .. attribute:: target_type
+    .. attribute:: type
 
        Type of the target, as :class:`bkl.api.TargetType` instance.
 
