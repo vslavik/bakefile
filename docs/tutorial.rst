@@ -117,8 +117,6 @@ target:
 
 .. FIXME: specifying quoted define values doesn't seem to be possible
 
-.. TODO: mention cflags and cxxflags once they're implemented
-
 These properties can be set more than once but each subsequent assignment
 overrides the previous value which is not particular useful. It can be more
 helpful to append another value to the property instead, for example:
@@ -149,6 +147,26 @@ assignment is more interesting:
 
 would define ``LINUX`` only for makefile-based build and ``MSW`` for the
 project files.
+
+While ``defines`` and ``includedirs`` are usually enough to cover 90% of your
+needs, sometimes some other compiler options may need to be specified. The
+``cppflags``, ``cflags`` and ``cxxflags`` properties can be used for this.
+The first of them sets the flags for C/C++ preprocessor, which is used when
+compiling both C and C++ files. The second and third ones are used when
+compiling C and C++ files, respectively. Please don't confuse ``cppflags`` and
+``cxxflags`` properties, in C++ projects you will usually need the latter one.
+
+One aspect of using these flags options is that different compilers use
+different format for their flags, so it's usually impossible to use the same
+value for all of them. Moreover, sometimes you may actually need to use custom
+options for a single toolset only. This can be done by explicitly testing for
+the toolset being used. For example, to use C++ 11 features with GNU compiler
+you could do
+
+.. code-block:: bkl
+
+    if ( $(toolset) == gnu )
+        cxxflags = "-std=c++11"
 
 
 Similarly, any non trivial project usually links with some external libraries.

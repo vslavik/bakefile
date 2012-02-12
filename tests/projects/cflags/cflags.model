@@ -1,0 +1,17 @@
+module {
+  variables {
+    toolsets = [gnu, vs2010]
+  }
+  targets {
+    exe hello {
+      defines = [DEF_ALL]
+      cppflags = [-DDEF_CPP]
+      cflags = [-DDEF_C]
+      cxxflags = [-DEF_CXX]
+      sources {
+        file @top_srcdir/foo.c
+        file @top_srcdir/bar.cpp
+      }
+    }
+  }
+}

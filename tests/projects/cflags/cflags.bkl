@@ -1,0 +1,9 @@
+toolsets = gnu vs2010;
+
+exe hello {
+    sources { foo.c bar.cpp }
+    defines = DEF_ALL;
+    cppflags = -DDEF_CPP;
+    cflags = -DDEF_C;
+    cxxflags = -DEF_CXX;
+}

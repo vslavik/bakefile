@@ -59,10 +59,33 @@ class NativeCompiledType(TargetType):
                  default=[],
                  inheritable=True,
                  doc="""
-                     Additional compiler flags common to C and C++.
-                     These should be limited to flags related to preprocessor,
-                     i.e. include options etc. *Compiler* flags should be put
-                     in ``cflags`` or ``cxxflags`` properties.
+                     Additional preprocessor flags. Wherever possible,
+                     ``defines`` or ``includedirs`` properties should be used
+                     instead. *Compiler* flags should be put in ``cflags`` or
+                     ``cxxflags`` properties, don't confuse this property with
+                     ``cxxflags``.
+
+                     Note that the flags are compiler-specific and so this
+                     property should only be set conditionally for particular
+                     compilers that recognize the flags.
+                     """),
+            Property("cflags",
+                 type=ListType(StringType()),
+                 default=[],
+                 inheritable=True,
+                 doc="""
+                     Additional flags for C compiler.
+
+                     Note that the flags are compiler-specific and so this
+                     property should only be set conditionally for particular
+                     compilers that recognize the flags.
+                     """),
+            Property("cxxflags",
+                 type=ListType(StringType()),
+                 default=[],
+                 inheritable=True,
+                 doc="""
+                     Additional flags for C++ compiler.
 
                      Note that the flags are compiler-specific and so this
                      property should only be set conditionally for particular

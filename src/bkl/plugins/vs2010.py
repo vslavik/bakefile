@@ -362,9 +362,13 @@ class VS2010Toolset(Toolset):
                             [bkl.expr.LiteralExpr(std_defs)])
             n_cl.add("PreprocessorDefinitions", defs)
             n_cl.add("AdditionalIncludeDirectories", target["includedirs"])
-            cppflags = target["cppflags"].as_py()
-            if cppflags:
-                n_cl.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(cppflags))
+            # Currently we don't make any distinction between preprocessor, C
+            # and C++ flags as they're basically all the same at MSVS level
+            # too and all go into the same place in the IDE and same
+            # AdditionalOptions node in the project file.
+            all_cflags = target["cppflags"].as_py() + target["cflags"].as_py() + target["cxxflags"].as_py()
+            if all_cflags:
+                n_cl.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(all_cflags))
             n.add(n_cl)
             n_link = Node("Link")
             n_link.add("SubSystem", "Console" if is_exe else "Windows")
