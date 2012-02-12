@@ -31,7 +31,7 @@ from optparse import OptionParser
 class BklFormatter(logging.Formatter):
 
     def __init__(self):
-        super(BklFormatter, self).__init__(fmt=logging.BASIC_FORMAT)
+        logging.Formatter.__init__(self, fmt=logging.BASIC_FORMAT)
 
     def format(self, record):
         level = record.levelno
@@ -44,7 +44,7 @@ class BklFormatter(logging.Formatter):
             msg += record.getMessage()
             return msg
         else:
-            return super(BklFormatter, self).format(record)
+            return logging.Formatter.format(self, record)
 
 logger = logging.getLogger()
 log_handler = logging.StreamHandler()
