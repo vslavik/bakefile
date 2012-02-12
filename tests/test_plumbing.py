@@ -31,6 +31,7 @@ import copy
 
 import bkl.interpreter
 import bkl.dumper
+import bkl.io
 
 import projects
 projects_dir = os.path.dirname(projects.__file__) 
@@ -44,3 +45,20 @@ def test_model_deepcopy():
     model_txt = bkl.dumper.dump_project(model)
     model_copy_txt = bkl.dumper.dump_project(model_copy)
     assert model_txt == model_copy_txt
+
+
+def test_file_io_unix(tmpdir):
+    p = tmpdir.join("textfile")
+    f = bkl.io.OutputFile(str(p), bkl.io.EOL_UNIX)
+    f.write("one\ntwo\n")
+    f.commit()
+    text_read = p.read("rb")
+    assert text_read == "one\ntwo\n"
+
+def test_file_io_win(tmpdir):
+    p = tmpdir.join("textfile")
+    f = bkl.io.OutputFile(str(p), bkl.io.EOL_WINDOWS)
+    f.write("one\ntwo\n")
+    f.commit()
+    text_read = p.read("rb")
+    assert text_read == "one\r\ntwo\r\n"
