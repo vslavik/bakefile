@@ -254,7 +254,7 @@ class ListType(Type):
     """
     def __init__(self, item_type):
         self.item_type = item_type
-        self.name = "list of %s" % item_type.name
+        self.name = "list of %ss" % item_type.name
 
     def _normalize_impl(self, e):
         # A non-list expression with single value is a special case of list
