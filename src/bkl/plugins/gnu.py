@@ -83,7 +83,7 @@ class GnuCXXompiler(GnuCCompiler):
 
 class GnuLinker(GnuFileCompiler):
     """
-    GNU linker.
+    GNU executables linker.
     """
     name = "GNU LD"
     in_type = GnuObjectFileType.get()
@@ -91,6 +91,22 @@ class GnuLinker(GnuFileCompiler):
 
     def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("c++ -o $@"), input]
+        cmd += target["ldflags"].items
+        # FIXME: use a parser instead of constructing the expression manually
+        #        in here
+        return [ListExpr(cmd)]
+
+
+class GnuSharedLibLinker(GnuLinker):
+    """
+    GNU shared libraries linker.
+    """
+    name = "GNU shared LD"
+    in_type = GnuObjectFileType.get()
+    out_type = bkl.compilers.NativeDllFileType.get()
+
+    def commands(self, toolset, target, input, output):
+        cmd = [LiteralExpr("c++ -shared -o $@"), input]
         cmd += target["ldflags"].items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
@@ -141,8 +157,10 @@ class GnuToolset(MakefileToolset):
 
     object_type = GnuObjectFileType.get()
 
-    libname_prefix = "lib"
-    libname_extension = "a"
+    library_prefix = "lib"
+    library_extension = "a"
+    dll_prefix = "lib"
+    dll_extension = "so"
 
     def on_phony_targets(self, file, targets):
         file.write(".PHONY: %s\n" % " ".join(targets))
@@ -161,3 +179,5 @@ class OSXGnuToolset(GnuToolset):
     name = "gnu-osx"
 
     default_makefile = "Makefile.osx"
+
+    dll_extension = "dylib"

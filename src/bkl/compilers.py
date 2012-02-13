@@ -43,6 +43,11 @@ class NativeLibFileType(FileType):
     name = "library"
     # FIXME: extensions
 
+#: Native dynamic library file type
+class NativeDllFileType(FileType):
+    name = "dll"
+    # FIXME: extensions
+
 
 #: C files
 class CFileType(FileType):

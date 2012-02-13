@@ -223,8 +223,8 @@ class VS2010Toolset(Toolset):
 
     name = "vs2010"
 
-    exename_extension = "exe"
-    libname_extension = "lib"
+    exe_extension = "exe"
+    library_extension = "lib"
 
     properties_target = [
         Property("vs2010.projectfile",
@@ -283,6 +283,7 @@ class VS2010Toolset(Toolset):
 
         is_library = (target.type.name == "library")
         is_exe = (target.type.name == "exe")
+        is_dll = (target.type.name == "dll")
 
         root = Node("Project")
         root["DefaultTargets"] = "Build"
@@ -315,7 +316,10 @@ class VS2010Toolset(Toolset):
                 n.add("ConfigurationType", "Application")
             elif is_library:
                 n.add("ConfigurationType", "StaticLibrary")
+            elif is_dll:
+                n.add("ConfigurationType", "DynamicLibrary")
             else:
+                # TODO: handle this as generic action target
                 assert False, "unknown target type %s" % target.type.name
             n.add("UseDebugLibraries", c == "Debug")
             if target["win32-unicode"].as_py():
@@ -365,6 +369,8 @@ class VS2010Toolset(Toolset):
                 std_defs += ";_CONSOLE"
             if is_library:
                 std_defs += ";_LIB"
+            if is_dll:
+                std_defs += ";_USRDLL;%s_EXPORTS" % target.name.upper()
             std_defs += ";%(PreprocessorDefinitions)"
             defs = bkl.expr.ListExpr(
                             target["defines"].items +
@@ -385,7 +391,7 @@ class VS2010Toolset(Toolset):
             if c == "Release":
                 n_link.add("EnableCOMDATFolding", True)
                 n_link.add("OptimizeReferences", True)
-            if is_exe:
+            if not is_library:
                 ldflags = target["ldflags"].as_py()
                 if ldflags:
                     n_link.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(ldflags))

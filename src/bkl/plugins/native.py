@@ -104,19 +104,19 @@ class NativeCompiledType(TargetType):
         """
         Returns main filename of the target.
         """
-        return self._get_filename(toolset, target, self.basename_prop)
+        return self._get_filename(toolset, target, self.basename_prop, self.name)
 
     # property with target's main name, overriden by derived classes
     basename_prop = None
 
-    def _get_filename(self, toolset, target, propname):
+    def _get_filename(self, toolset, target, propname, fileclass):
         """
         Returns expression with filename of the target using given property
         (e.g. libname, exename) for use with given toolset.
         """
         tdir = dir(toolset)
-        prefix = "%s_prefix" % propname
-        ext = "%s_extension" % propname
+        prefix = "%s_prefix" % fileclass
+        ext = "%s_extension" % fileclass
         parts = []
         if prefix in tdir:
             parts.append(getattr(toolset, prefix))
@@ -126,7 +126,23 @@ class NativeCompiledType(TargetType):
         return PathExpr([concat(*parts)], ANCHOR_BUILDDIR)
 
 
-class ExeType(NativeCompiledType):
+class NativeLinkedType(NativeCompiledType):
+    properties = [
+            Property("ldflags",
+                 type=ListType(StringType()),
+                 default=[],
+                 inheritable=True,
+                 doc="""
+                     Additional linker flags.
+
+                     Note that the flags are compiler/linker-specific and so this
+                     property should only be set conditionally for particular
+                     compilers that recognize the flags.
+                     """),
+        ]
+
+
+class ExeType(NativeLinkedType):
     """
     Executable program.
     """
@@ -152,17 +168,6 @@ class ExeType(NativeCompiledType):
                           // use mytool2.exe or /usr/bin/mytool2
                           exename = $(id)$(vermajor);
                         }
-                     """),
-            Property("ldflags",
-                 type=ListType(StringType()),
-                 default=[],
-                 inheritable=True,
-                 doc="""
-                     Additional linker flags.
-
-                     Note that the flags are compiler/linker-specific and so this
-                     property should only be set conditionally for particular
-                     compilers that recognize the flags.
                      """),
         ]
 
@@ -212,4 +217,46 @@ class LibraryType(NativeCompiledType):
                         toolset,
                         target,
                         ft_to=NativeLibFileType.get(),
+                        outfile=self.target_file(toolset, target))
+
+
+class DllType(NativeLinkedType):
+    """
+    Dynamically loaded library.
+    """
+    name = "dll"
+
+    properties = [
+            Property("libname",
+                 type=StringType(),
+                 default="$(id)",
+                 inheritable=False,
+                 doc="""
+                     Base name of the library.
+
+                     This is not full filename or even path, it's only its base part,
+                     to which platform-specific prefix and/or extension are
+                     added. By default, it's the same as target's ID, but it can be changed e.g.
+                     if the filename should contain version number, which would be impractical
+                     to use as target identifier in the bakefile.
+
+                     .. code-block:: bkl
+
+                        dll utils {
+                          // use myapp_utils.lib, myapp_utils.dll, libmyapp_utils.so
+                          libname = myapp_utils;
+                        }
+                     """),
+            # TODO: add "dllname" for the name of the shared lib itself, when it differs from
+            #       import library name
+            # TODO: add libtool-style sonames support
+        ]
+
+    basename_prop = "libname"
+
+    def get_build_subgraph(self, toolset, target):
+        return get_compilation_subgraph(
+                        toolset,
+                        target,
+                        ft_to=NativeDllFileType.get(),
                         outfile=self.target_file(toolset, target))
