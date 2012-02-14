@@ -57,7 +57,18 @@ def std_target_props():
                  type=ListType(IdType()),
                  default=[],
                  inheritable=False,
-                 doc="Target's dependencies (list of IDs)."),
+                 doc="""
+                     Dependencies of the target (list of IDs).
+
+                     The dependencies are handled in target-specific ways.
+                     At the very least, they are added to the list of
+                     dependencies in generated makefiles or projects to ensure
+                     correct build order. Some targets may be smart about some
+                     kinds of the dependencies and do more.
+
+                     In particular, compiled targets (executables, DLLs) will
+                     automatically link against all libraries found in `deps`.
+                     """),
         ]
 
 

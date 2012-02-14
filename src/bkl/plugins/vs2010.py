@@ -448,6 +448,17 @@ class VS2010Toolset(Toolset):
             for sfile in target.headers:
                 items.add("ClInclude", Include=sfile.filename)
 
+        # Dependencies:
+        target_deps = target["deps"].as_py()
+        if target_deps:
+            refs = Node("ItemGroup")
+            root.add(refs)
+            for dep_id in target_deps:
+                dep = module.get_target(dep_id)
+                depnode = Node("ProjectReference", Include=dep["vs2010.projectfile"])
+                depnode.add("Project", dep["vs2010.guid"].as_py().lower())
+                refs.add(depnode)
+
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.targets")
         root.add("ImportGroup", Label="ExtensionTargets")
 

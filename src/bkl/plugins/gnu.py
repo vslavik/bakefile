@@ -91,6 +91,7 @@ class GnuLinker(GnuFileCompiler):
 
     def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("c++ -o $@"), input]
+        cmd += target.type.get_all_libs(toolset, target)
         cmd += target["ldflags"].items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
@@ -107,6 +108,7 @@ class GnuSharedLibLinker(GnuLinker):
 
     def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("c++ -shared -o $@"), input]
+        cmd += target.type.get_all_libs(toolset, target)
         cmd += target["ldflags"].items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here

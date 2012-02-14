@@ -125,6 +125,31 @@ class NativeCompiledType(TargetType):
             parts.append("." + getattr(toolset, ext))
         return PathExpr([concat(*parts)], ANCHOR_BUILDDIR)
 
+    def get_all_libs(self, toolset, target):
+        """
+        Returns list of libraries to link with.
+        Dependencies of these libs are returned as well.
+        """
+        visited = set()
+        libs = []
+        self._collect_all_libs(toolset, target, visited, libs)
+        return libs
+
+    def _collect_all_libs(self, toolset, target, visited, libs):
+        if target in visited:
+            return
+        visited.add(target)
+        module = target.parent
+        deps = [module.get_target(x) for x in target["deps"].as_py()]
+        todo = [x for x in deps if
+                isinstance(x.type, LibraryType) or isinstance(x.type, DllType)]
+        for dep in todo:
+            f = dep.type.target_file(toolset, dep)
+            if f not in libs:
+                libs.append(f)
+        for dep in todo:
+            self._collect_all_libs(toolset, dep, visited, libs)
+
 
 class NativeLinkedType(NativeCompiledType):
     properties = [

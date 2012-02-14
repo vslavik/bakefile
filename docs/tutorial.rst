@@ -212,9 +212,8 @@ of all of them:
     }
 
 In this case, the libraries will be built before the main executable and will
-be linked with it.
-
-.. FIXME: currently they're not linked!
+be linked with it. Bakefile is smart about linking and if a library has
+dependencies of its own, these will be linked in as well.
 
 Alternatively, you can define each library or executable in its own bakefile.
 This is especially convenient if each of them is built in a separate
