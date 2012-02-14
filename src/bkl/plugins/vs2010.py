@@ -435,6 +435,7 @@ class VS2010Toolset(Toolset):
         root.add("ImportGroup", Label="ExtensionTargets")
 
         f = OutputFile(filename, EOL_WINDOWS)
+        f.write(codecs.BOM_UTF8)
         f.write(XmlFormatter(paths_info).format(root))
         f.commit()
         sln.add_project(target.name, guid, projectfile)
