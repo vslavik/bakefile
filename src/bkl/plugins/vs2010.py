@@ -184,7 +184,7 @@ class VS2010Solution(OutputFile):
         guids = []
         for name, guid, filename in self.all_projects():
             guids.append(guid)
-            p = ('Project("8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942") = "%s", "%s", "%s"\nEndProject\n' %
+            p = ('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\nEndProject\n' %
                  (name, self.formatter.format(filename), guid))
             self.write(str(p))
 
@@ -199,6 +199,9 @@ class VS2010Solution(OutputFile):
             self.write("\t\t%s.Debug|Win32.Build.0 = Debug|Win32\n" % guid)
             self.write("\t\t%s.Release|Win32.ActiveCfg = Release|Win32\n" % guid)
             self.write("\t\t%s.Release|Win32.Build.0 = Release|Win32\n" % guid)
+        self.write("\tEndGlobalSection\n")
+        self.write("\tGlobalSection(SolutionProperties) = preSolution\n")
+        self.write("\t\tHideSolutionNode = FALSE\n")
         self.write("\tEndGlobalSection\n")
         self.write("EndGlobal\n")
         super(VS2010Solution, self).commit()
