@@ -406,6 +406,7 @@ class VS2010Toolset(Toolset):
                 n_cl.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(all_cflags))
             n.add(n_cl)
             n_link = Node("Link")
+            n.add(n_link)
             n_link.add("SubSystem", "Console" if is_exe else "Windows")
             n_link.add("GenerateDebugInformation", True)
             if c == "Release":
@@ -415,7 +416,12 @@ class VS2010Toolset(Toolset):
                 ldflags = target["ldflags"].as_py()
                 if ldflags:
                     n_link.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(ldflags))
-            n.add(n_link)
+            if is_library:
+                libs = target["libs"].as_py()
+                if libs:
+                    n_lib = Node("Lib")
+                    n.add(n_lib)
+                    n_lib.add("AdditionalDependencies", " ".join("%s.lib" % x for x in libs))
             root.add(n)
 
         # Source files:

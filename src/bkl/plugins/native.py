@@ -91,6 +91,20 @@ class NativeCompiledType(TargetType):
                      property should only be set conditionally for particular
                      compilers that recognize the flags.
                      """),
+            Property("libs",
+                 type=ListType(StringType()),
+                 default=[],
+                 inheritable=True,
+                 doc="""
+                     Additional libraries to link with.
+
+                     Do not use this property to link with libraries built as
+                     part of your project; use `deps` for that.
+
+                     When this list is non-empty on a
+                     :ref:`ref_target_library`, it will be used when linking
+                     executables that use the library.
+                     """),
             Property("win32-unicode",
                  type=BoolType(),
                  default=True,
@@ -127,15 +141,17 @@ class NativeCompiledType(TargetType):
 
     def get_all_libs(self, toolset, target):
         """
-        Returns list of libraries to link with.
+        Returns a tuple of two lists: list of internal (aka dependencies) and
+        external libraries to link with.
         Dependencies of these libs are returned as well.
         """
         visited = set()
-        libs = []
-        self._collect_all_libs(toolset, target, visited, libs)
-        return libs
+        deplibs = []
+        ldlibs = []
+        self._collect_all_libs(toolset, target, visited, deplibs, ldlibs)
+        return (deplibs, ldlibs)
 
-    def _collect_all_libs(self, toolset, target, visited, libs):
+    def _collect_all_libs(self, toolset, target, visited, deplibs, ldlibs):
         if target in visited:
             return
         visited.add(target)
@@ -145,10 +161,14 @@ class NativeCompiledType(TargetType):
                 isinstance(x.type, LibraryType) or isinstance(x.type, DllType)]
         for dep in todo:
             f = dep.type.target_file(toolset, dep)
-            if f not in libs:
-                libs.append(f)
+            if f not in deplibs:
+                deplibs.append(f)
+        for lib in target["libs"].items:
+            # TODO: use some ordered-set type and just merge them
+            if lib not in ldlibs:
+                ldlibs.append(lib)
         for dep in todo:
-            self._collect_all_libs(toolset, dep, visited, libs)
+            self._collect_all_libs(toolset, dep, visited, deplibs, ldlibs)
 
 
 class NativeLinkedType(NativeCompiledType):

@@ -170,23 +170,14 @@ you could do
 
 
 Similarly, any non trivial project usually links with some external libraries.
-To specify these libraries, you currently need to assign to the ``ldflags``
-property and, as its format is toolset-dependent, you need to do it separately
-for each toolset:
+To specify these libraries, you need to assign to the ``libs``
+property:
 
 .. code-block:: bkl
 
     exe hello {
-        if ( $(toolset) == gnu )
-            ldflags = -lfoo;
-        if ( $(toolset) == vs2010 )
-            ldflags = foo.lib;
+        libs = foo;
     }
-
-This is only a temporary solution and a better one will be implemented
-very soon.
-
-.. TODO: document the right way to link with external libraries later
 
 
 Multiple Modules
