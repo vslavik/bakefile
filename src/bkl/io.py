@@ -56,16 +56,18 @@ class OutputFile(object):
 
     Notice the need to explicitly call commit().
     """
-    def __init__(self, filename, eol):
+    def __init__(self, filename, eol, charset="utf-8"):
         """
         Creates output file.
 
         :param filename: Name of the output file. Should be either relative
                          to CWD or absolute; the latter is recommended.
         :param eol:      Line endings to use. One of EOL_WINDOWS and EOL_UNIX.
+        :param charset:  Charset to use if Unicode string is passed to write().
         """
         self.filename = filename
         self.eol = eol
+        self.charset = charset
         self.text = ""
 
     def write(self, text):
@@ -74,6 +76,8 @@ class OutputFile(object):
         needed. Note that the changes don't take effect until you call
         commit().
         """
+        if isinstance(text, unicode):
+            text = text.encode(self.charset)
         self.text += text
 
     def commit(self):
