@@ -159,6 +159,7 @@ class VS2010Solution(OutputFile):
         self.write("# Visual Studio 2010\n")
         self.projects = []
         self.subsolutions = []
+        self.guids_map = {}
         paths_info = bkl.expr.PathAnchorsInfo(
                                     dirsep="\\",
                                     outfile=slnfile,
@@ -166,8 +167,9 @@ class VS2010Solution(OutputFile):
                                     model=module)
         self.formatter = VS2010ExprFormatter(paths_info)
 
-    def add_project(self, name, guid, projectfile):
-        self.projects.append((name, guid, projectfile))
+    def add_project(self, name, guid, projectfile, deps):
+        self.guids_map[name] = guid
+        self.projects.append((name, guid, projectfile, deps))
 
     def add_subsolution(self, solution):
         self.subsolutions.append(solution)
@@ -181,11 +183,16 @@ class VS2010Solution(OutputFile):
 
     def commit(self):
         guids = []
-        for name, guid, filename in self.all_projects():
+        for name, guid, filename, deps in self.all_projects():
             guids.append(guid)
-            p = ('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\nEndProject\n' %
-                 (name, self.formatter.format(filename), guid))
-            self.write(str(p))
+            self.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\n' %
+                       (name, self.formatter.format(filename), str(guid)))
+            if deps:
+                self.write("\tProjectSection(ProjectDependencies) = postProject\n")
+                for d in deps:
+                    self.write("\t\t%(g)s = %(g)s\n" % {'g':self.guids_map[d]})
+                self.write("\tEndProjectSection\n")
+            self.write("EndProject\n")
 
         self.write("Global\n")
         self.write("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n")
@@ -281,7 +288,7 @@ class VS2010Toolset(Toolset):
 
 
     def gen_for_target(self, target):
-        sln = target.parent.solution
+        module = target.parent
 
         projectfile = target["vs2010.projectfile"]
         filename = projectfile.as_native_path_for_output(target)
@@ -448,7 +455,7 @@ class VS2010Toolset(Toolset):
         f.write(codecs.BOM_UTF8)
         f.write(XmlFormatter(paths_info).format(root))
         f.commit()
-        sln.add_project(target.name, guid, projectfile)
+        module.solution.add_project(target.name, guid, projectfile, target_deps)
 
         self._write_filters_file_for(filename)
 
