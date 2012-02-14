@@ -32,12 +32,11 @@ import bkl.compilers
 import bkl.expr
 import bkl.error
 from bkl.api import Toolset, Property
-from bkl.vartypes import PathType
+from bkl.vartypes import PathType, StringType
 from bkl.utils import OrderedDict
 from bkl.io import OutputFile, EOL_WINDOWS
 
 # TODO: Move this somewhere else, where it could be reused.
-# TODO: make this model-visible type with validation (for user-settable GUIDs)
 NAMESPACE_PRJ = uuid.UUID("{D9BD5916-F055-4D77-8C69-9448E02BF433}")
 
 def GUID(namespace, solution, data):
@@ -218,6 +217,10 @@ def _project_name_from_solution(target):
     sln = target["vs2010.solutionfile"]
     return bkl.expr.PathExpr(sln.components[:-1] + [bkl.expr.LiteralExpr("%s.vcxproj" % target.name)], sln.anchor)
 
+def _default_guid_for_project(target):
+    """automatically generated"""
+    return '"%s"' % GUID(NAMESPACE_PRJ, target.parent.name, target.name)
+
 
 class VS2010Toolset(Toolset):
     """
@@ -235,6 +238,12 @@ class VS2010Toolset(Toolset):
                  default=_project_name_from_solution,
                  inheritable=False,
                  doc="File name of the project for the target."),
+        Property("vs2010.guid",
+                 # TODO: use custom GUID type, so that user-provided GUIDs can be validated
+                 type=StringType(),
+                 default=_default_guid_for_project,
+                 inheritable=False,
+                 doc="GUID of the project."),
         ]
 
     properties_module = [
@@ -293,7 +302,7 @@ class VS2010Toolset(Toolset):
         root["ToolsVersion"] = "4.0"
         root["xmlns"] = "http://schemas.microsoft.com/developer/msbuild/2003"
 
-        guid = GUID(NAMESPACE_PRJ, sln.name, target.name)
+        guid = target["vs2010.guid"]
         configs = ["Debug", "Release"]
 
         n_configs = Node("ItemGroup", Label="ProjectConfigurations")
