@@ -1,0 +1,26 @@
+module {
+  variables {
+    toolsets = [gnu, gnu-osx, vs2010]
+  }
+  targets {
+    library common {
+      sources {
+        file @top_srcdir/common.c
+      }
+    }
+    library libA {
+      libname = A
+      deps = [common]
+      sources {
+        file @top_srcdir/libA.c
+      }
+    }
+    exe testdeps {
+      deps = [libA]
+      sources {
+        file @top_srcdir/testdeps.c
+      }
+    }
+  }
+}
+
