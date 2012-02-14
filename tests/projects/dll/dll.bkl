@@ -1,0 +1,5 @@
+toolsets = gnu gnu-osx vs2010;
+
+dll mydll {
+    sources { common.cpp helpers.cpp }
+}

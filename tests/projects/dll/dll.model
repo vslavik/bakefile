@@ -1,0 +1,13 @@
+module {
+  variables {
+    toolsets = [gnu, gnu-osx, vs2010]
+  }
+  targets {
+    dll mydll {
+      sources {
+        file @top_srcdir/common.cpp
+        file @top_srcdir/helpers.cpp
+      }
+    }
+  }
+}
