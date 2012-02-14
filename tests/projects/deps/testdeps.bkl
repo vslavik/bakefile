@@ -2,6 +2,11 @@ toolsets = gnu gnu-osx vs2010;
 
 library common {
     sources { common.c }
+
+    if ( $(toolset) == gnu || $(toolset) == gnu-osx )
+        libs += iconv;
+    if ( $(toolset) == vs2010 )
+        libs += wininet;
 }
 
 library libA {

@@ -4,6 +4,7 @@ module {
   }
   targets {
     library common {
+      libs = [((($(toolset) == gnu) || ($(toolset) == gnu-osx)) ? iconv : null), (($(toolset) == vs2010) ? wininet : null)]
       sources {
         file @top_srcdir/common.c
       }
@@ -23,4 +24,3 @@ module {
     }
   }
 }
-
