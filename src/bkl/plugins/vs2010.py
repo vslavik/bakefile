@@ -379,6 +379,7 @@ class VS2010Toolset(Toolset):
                             target["defines"].items +
                             [bkl.expr.LiteralExpr(std_defs)])
             n_cl.add("PreprocessorDefinitions", defs)
+            n_cl.add("MultiProcessorCompilation", True)
             n_cl.add("AdditionalIncludeDirectories", target["includedirs"])
             # Currently we don't make any distinction between preprocessor, C
             # and C++ flags as they're basically all the same at MSVS level
