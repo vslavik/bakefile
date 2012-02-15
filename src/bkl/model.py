@@ -352,6 +352,8 @@ class Module(ModelPart):
 
     def get_target(self, id):
         """Returns Target object identified by its string ID."""
+        if id not in self.targets:
+            raise error.Error("target \"%s\" doesn't exist" % id)
         return self.targets[id]
 
     def get_prop(self, name):
