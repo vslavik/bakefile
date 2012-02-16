@@ -26,6 +26,7 @@ import uuid
 import types
 import os.path
 import codecs
+import itertools
 from xml.sax.saxutils import escape, quoteattr
 
 import bkl.compilers
@@ -159,6 +160,7 @@ class VS2010Solution(OutputFile):
         self.write("# Visual Studio 2010\n")
         self.projects = []
         self.subsolutions = []
+        self.parent_solution = None
         self.guids_map = {}
         paths_info = bkl.expr.PathAnchorsInfo(
                                     dirsep="\\",
@@ -173,6 +175,7 @@ class VS2010Solution(OutputFile):
 
     def add_subsolution(self, solution):
         self.subsolutions.append(solution)
+        solution.parent_solution = self
 
     def all_projects(self):
         for p in self.projects:
@@ -181,16 +184,70 @@ class VS2010Solution(OutputFile):
             for p in sln.all_projects():
                 yield p
 
+    def _get_project_info(self, id):
+        for p in self.projects:
+            if p[0] == id:
+                return p
+        for sln in self.subsolutions:
+            p = sln._get_project_info(id)
+            if p:
+                return p
+        return None
+
+    def additional_deps(self):
+        """
+        Yields additional projects to include, "external" deps e.g. from
+        parents, in the same format all_projects() uses.
+        """
+        top = self
+        while top.parent_solution:
+            top = top.parent_solution
+        if top is self:
+            return
+
+        included = set(x[0] for x in self.all_projects())
+        todo = set()
+        for name, guid, projectfile, deps in self.all_projects():
+            todo.update(deps)
+
+        prev_count = 0
+        while prev_count != len(included):
+            prev_count = len(included)
+            todo = set(x for x in todo if x not in included)
+            for todo_item in todo:
+                included.add(todo_item)
+                prj = top._get_project_info(todo_item)
+                todo.update(prj[3])
+                yield prj
+
+    def _try_get_target_guid(self, id):
+        if id in self.guids_map:
+            return self.guids_map[id]
+        else:
+            for sln in self.subsolutions:
+                guid = sln._try_get_target_guid(id)
+                if guid:
+                    return guid
+            if self.parent_solution:
+                return self.parent_solution._try_get_target_guid(id)
+            return None
+
+    def _get_target_guid(self, id):
+        guid = self._try_get_target_guid(id)
+        assert guid, "can't find GUID of project '%s'" % id
+        return guid
+
     def commit(self):
         guids = []
-        for name, guid, filename, deps in self.all_projects():
+        self.additional_deps()
+        for name, guid, filename, deps in itertools.chain(self.all_projects(), self.additional_deps()):
             guids.append(guid)
             self.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\n' %
                        (name, self.formatter.format(filename), str(guid)))
             if deps:
                 self.write("\tProjectSection(ProjectDependencies) = postProject\n")
                 for d in deps:
-                    self.write("\t\t%(g)s = %(g)s\n" % {'g':self.guids_map[d]})
+                    self.write("\t\t%(g)s = %(g)s\n" % {'g':self._get_target_guid(d)})
                 self.write("\tEndProjectSection\n")
             self.write("EndProject\n")
 
