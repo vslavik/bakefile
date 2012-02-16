@@ -32,7 +32,7 @@ import os.path
 import itertools
 from abc import ABCMeta, abstractmethod
 
-from error import NonConstError, Error
+from error import NonConstError, Error, error_context
 
 
 class Expr(object):
@@ -187,12 +187,8 @@ class ReferenceExpr(Expr):
         Returns value of the referenced variable. Throws an exception if
         the reference couldn't be resolved.
         """
-        try:
+        with error_context(self):
             return self.context.get_variable_value(self.var)
-        except Error as e:
-            if self.pos:
-                e.pos = self.pos
-            raise
 
     def __str__(self):
         return "$(%s)" % self.var
@@ -323,12 +319,8 @@ class IfExpr(Expr):
         :attr:`value_yes` or :attr:`value_no`, depending on what the condition
         evaluates to. Throws if the condition cannot be evaluated.
         """
-        try:
+        with error_context(self):
             return self.value_yes if self.cond.as_py() else self.value_no
-        except Error as e:
-            if self.pos:
-                e.pos = self.pos
-            raise
 
     def __str__(self):
         return "(%s ? %s : %s)" % (self.cond, self.value_yes, self.value_no)

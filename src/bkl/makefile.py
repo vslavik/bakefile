@@ -34,6 +34,7 @@ import os.path
 import io
 import expr
 import utils
+from bkl.error import Error, error_context
 from bkl.api import Extension, Toolset, Property
 from bkl.vartypes import PathType
 
@@ -154,7 +155,8 @@ class MakefileToolset(Toolset):
 
     def generate(self, project):
         for m in project.modules:
-            self._gen_makefile(m)
+            with error_context(m):
+                self._gen_makefile(m)
 
     def _gen_makefile(self, module):
         output_value = module.get_variable_value("%s.makefile" % self.name)
@@ -210,23 +212,24 @@ class MakefileToolset(Toolset):
 
         phony = []
         for t in module.targets.itervalues():
-            graph = build_graphs[t]
-            for node in graph:
-                if node.name:
-                    out = node.name
-                    phony.append(expr_fmt.format(out))
-                else:
-                    # FIXME: handle multi-output nodes too
-                    assert len(node.outputs) == 1
-                    out = node.outputs[0]
-                deps = [expr_fmt.format(i) for i in node.inputs]
-                deps += [_format_dep(x) for x in t["deps"].as_py()]
-                text = self.Formatter.target(
-                        name=expr_fmt.format(out),
-                        deps=deps,
-                        commands=[expr_fmt.format(c) for c in node.commands])
-                f.write(text)
-                all_targets.append(expr_fmt.format(out))
+            with error_context(t):
+                graph = build_graphs[t]
+                for node in graph:
+                    if node.name:
+                        out = node.name
+                        phony.append(expr_fmt.format(out))
+                    else:
+                        # FIXME: handle multi-output nodes too
+                        assert len(node.outputs) == 1
+                        out = node.outputs[0]
+                    deps = [expr_fmt.format(i) for i in node.inputs]
+                    deps += [_format_dep(x) for x in t["deps"].as_py()]
+                    text = self.Formatter.target(
+                            name=expr_fmt.format(out),
+                            deps=deps,
+                            commands=[expr_fmt.format(c) for c in node.commands])
+                    f.write(text)
+                    all_targets.append(expr_fmt.format(out))
 
         if phony:
             self.on_phony_targets(f, phony)

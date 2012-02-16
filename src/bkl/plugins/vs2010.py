@@ -279,12 +279,8 @@ class VS2010Toolset(Toolset):
         module.solution = VS2010Solution(module)
 
         for t in module.targets.itervalues():
-            try:
+            with bkl.error.error_context(t):
                 self.gen_for_target(t)
-            except bkl.error.Error as e:
-                if e.pos is None:
-                    e.pos = t.source_pos
-                raise
 
 
     def gen_for_target(self, target):

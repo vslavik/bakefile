@@ -130,3 +130,34 @@ class UndefinedError(Error):
     have a value.
     """
     pass
+
+
+class error_context:
+    """
+    Error context for adding positional information to exceptions thrown
+    without one. This can happen in some situations when the particular
+    expression causing the error isn't available. In such situations, it's much
+    better to provide coarse position information (e.g. a target) instead of
+    not providing any at all.
+
+    Usage:
+
+    .. code-block:: python
+
+       with error_context(target):
+          ...do something that may throw...
+    """
+    def __init__(self, context):
+        self.context = context
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_value is not None:
+            if isinstance(exc_value, Error) and exc_value.pos is None:
+                c = self.context
+                if "source_pos" in dir(c):
+                    exc_value.pos = c.source_pos
+                elif "pos" in dir(c):
+                    exc_value.pos = c.pos

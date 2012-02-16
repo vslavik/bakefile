@@ -29,7 +29,7 @@ Helpers for working with :class:`bkl.api.FileType` and
 
 from api import FileType, FileCompiler, BuildNode
 import model
-from error import Error
+from error import Error, error_context
 import expr
 
 
@@ -187,15 +187,11 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
     allnodes = []
 
     for srcfile in target.sources:
-        try:
+        with error_context(srcfile):
             # FIXME: toolset.object_type shouldn't be needed
             obj, all = _make_build_nodes_for_file(toolset, target, srcfile, toolset.object_type)
             objects += obj
             allnodes += all
-        except Error as e:
-            if e.pos is None:
-                e.pos = srcfile.source_pos
-            raise
 
     linker = get_compiler(toolset, toolset.object_type, ft_to)
     assert linker

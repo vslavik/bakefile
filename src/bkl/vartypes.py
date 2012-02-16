@@ -31,7 +31,7 @@ of variable values and other expressions.
 import types
 
 import expr
-from error import TypeError
+from error import TypeError, error_context
 
 
 class Type(object):
@@ -78,7 +78,7 @@ class Type(object):
         Note that this method transparently handles references and conditional
         expressions.
         """
-        try:
+        with error_context(e):
             if isinstance(e, expr.NullExpr):
                 # Null expression is rarely a valid value, but it can happen all
                 # over the place due to conditional processing
@@ -103,10 +103,6 @@ class Type(object):
             else:
                 # finally, perform actual type-specific validation:
                 self._validate_impl(e)
-        except TypeError as err:
-            if e.pos and not err.pos:
-                err.pos = e.pos
-            raise
 
     def _validate_impl(self, e):
         # Implementation of validate(), to be overriden in derived classes.
