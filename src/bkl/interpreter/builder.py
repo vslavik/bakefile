@@ -203,7 +203,8 @@ class Builder(object, CondTrackingMixin):
     def on_target(self, node):
         name = node.name.text
         if name in self.context.targets:
-            raise ParserError("target ID \"%s\" not unique" % name)
+            raise ParserError("target with ID \"%s\" already exists (see %s)" %
+                              (name, self.context.get_target(name).source_pos))
 
         if self.active_if_cond:
             raise ParserError("conditionally built targets not supported yet"
