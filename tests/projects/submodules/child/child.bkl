@@ -1,4 +1,5 @@
 exe child {
     sources { child.cpp }
+    deps = common;
 }
 

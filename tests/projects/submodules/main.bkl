@@ -1,8 +1,10 @@
 toolsets = gnu vs2010;
 
+submodule lib/libcommon.bkl;
 submodule child/child.bkl;
 
 exe main {
     sources { main.cpp }
+    deps = common;
 }
 

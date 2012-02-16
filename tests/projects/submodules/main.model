@@ -1,5 +1,6 @@
 module submodules/main.bkl {
   submodules {
+    submodules/lib/libcommon.bkl
     submodules/child/child.bkl
   }
   variables {
@@ -7,8 +8,21 @@ module submodules/main.bkl {
   }
   targets {
     exe main {
+      deps = [common]
       sources {
         file @top_srcdir/main.cpp
+      }
+    }
+  }
+}
+
+module submodules/lib/libcommon.bkl {
+  variables {
+  }
+  targets {
+    library common {
+      sources {
+        file @top_srcdir/lib/utils.cpp
       }
     }
   }
@@ -19,10 +33,10 @@ module submodules/child/child.bkl {
   }
   targets {
     exe child {
+      deps = [common]
       sources {
         file @top_srcdir/child/child.cpp
       }
     }
   }
 }
-

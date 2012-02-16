@@ -1,0 +1,4 @@
+
+library common {
+    sources { utils.cpp }
+}
