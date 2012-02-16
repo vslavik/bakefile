@@ -65,6 +65,7 @@ class Builder(object, CondTrackingMixin):
     def create_model(self, ast, parent):
         """Returns constructed model, as :class:`bkl.model.Module` instance."""
         mod = Module(parent, source_pos=ast.pos)
+        mod.source_pos.line = mod.source_pos.column = None
         self.context = mod
 
         self.handle_children(ast.children, self.context)
