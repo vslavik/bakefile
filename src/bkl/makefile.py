@@ -184,7 +184,7 @@ class MakefileToolset(Toolset):
 
         #FIXME: make this part of the formatter for (future) IdRefExpr
         def _format_dep(target_name):
-            t = module.get_target(target_name)
+            t = module.project.get_target(target_name)
             # FIXME: instead of using the first node, use some main_node
             g = build_graphs[t][0]
             if g.name:

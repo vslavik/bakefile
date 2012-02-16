@@ -456,7 +456,7 @@ class VS2010Toolset(Toolset):
             refs = Node("ItemGroup")
             root.add(refs)
             for dep_id in target_deps:
-                dep = module.get_target(dep_id)
+                dep = target.project.get_target(dep_id)
                 depnode = Node("ProjectReference", Include=dep["vs2010.projectfile"])
                 depnode.add("Project", dep["vs2010.guid"].as_py().lower())
                 refs.add(depnode)

@@ -172,8 +172,8 @@ class NativeCompiledType(TargetType):
         if target in visited:
             return
         visited.add(target)
-        module = target.parent
-        deps = [module.get_target(x) for x in target["deps"].as_py()]
+        project = target.project
+        deps = [project.get_target(x) for x in target["deps"].as_py()]
         todo = [x for x in deps if
                 isinstance(x.type, LibraryType) or isinstance(x.type, DllType)]
         for dep in todo:

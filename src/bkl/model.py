@@ -281,10 +281,15 @@ class Project(ModelPart):
     .. attribute: modules
 
        List of all modules included in the project.
+
+    .. attribute: all_targets
+
+       Dictionary of all targets in the entire project.
     """
     def __init__(self):
         super(Project, self).__init__(parent=None)
         self.modules = []
+        self.all_targets = {}
 
     def __str__(self):
         return "the project"
@@ -298,6 +303,13 @@ class Project(ModelPart):
         The toplevel module of this project.
         """
         return self.modules[0]
+
+    def get_target(self, id):
+        """Returns Target object identified by its string ID."""
+        try:
+            return self.all_targets[id]
+        except KeyError:
+            raise error.Error("target \"%s\" doesn't exist" % id)
 
     def get_prop(self, name):
         return props.get_project_prop(name)
@@ -339,22 +351,18 @@ class Module(ModelPart):
     def name(self):
         """Name of the module"""
         return os.path.splitext(os.path.basename(self.source_file))[0]
-    
+
     @property
     def submodules(self):
         """Submodules of this module."""
         return (x for x in self.project.modules if x.parent is self)
 
     def add_target(self, target):
-        """Adds a new target object."""
+        """Adds a new target object to this module."""
         assert target.name not in self.targets
+        assert target.name not in self.project.all_targets
         self.targets[target.name] = target
-
-    def get_target(self, id):
-        """Returns Target object identified by its string ID."""
-        if id not in self.targets:
-            raise error.Error("target \"%s\" doesn't exist" % id)
-        return self.targets[id]
+        self.project.all_targets[target.name] = target
 
     def get_prop(self, name):
         return props.get_module_prop(name)
