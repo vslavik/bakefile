@@ -449,7 +449,7 @@ class PathExpr(Expr):
         if dot != -1:
             tail = "%s.%s" % (last.value[:dot], newext)
         else:
-            tail = "%s.%s" (last.value, newext)
+            tail = "%s.%s" % (last.value, newext)
 
         comps = self.components[:-1] + [LiteralExpr(tail)]
         return PathExpr(comps, self.anchor)
