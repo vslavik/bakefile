@@ -89,14 +89,19 @@ class GnuLinker(GnuFileCompiler):
     in_type = GnuObjectFileType.get()
     out_type = bkl.compilers.NativeExeFileType.get()
 
-    def commands(self, toolset, target, input, output):
-        cmd = [LiteralExpr("c++ -o $@"), input]
+    def _linker_flags(self, toolset, target):
+        cmd = []
         libs, ldlibs = target.type.get_all_libs(toolset, target)
         cmd += libs
         cmd += bkl.expr.add_prefix("-l", ListExpr(ldlibs)).items
         cmd += target["ldflags"].items
+        return cmd
+
+    def commands(self, toolset, target, input, output):
+        cmd = [LiteralExpr("c++ -o $@"), input]
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
+        cmd += self._linker_flags(toolset, target)
         return [ListExpr(cmd)]
 
 
@@ -110,12 +115,9 @@ class GnuSharedLibLinker(GnuLinker):
 
     def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("c++ -shared -o $@"), input]
-        libs, ldlibs = target.type.get_all_libs(toolset, target)
-        cmd += libs
-        cmd += bkl.expr.add_prefix("-l", ListExpr(ldlibs)).items
-        cmd += target["ldflags"].items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
+        cmd += self._linker_flags(toolset, target)
         return [ListExpr(cmd)]
 
 
