@@ -138,9 +138,9 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to):
     assert isinstance(src, expr.PathExpr)
 
     ext = src.get_extension()
-    objname = src.change_extension(ft_to.extensions[0]) # FIXME
-    # FIXME: needs to flatten the path too
-    objname.anchor = expr.ANCHOR_BUILDDIR
+    objname = expr.PathExpr([expr.LiteralExpr(src.get_basename())],
+                            expr.ANCHOR_BUILDDIR,
+                            pos=src.pos).change_extension(ft_to.extensions[0])
 
     ft_from = get_file_type(ext)
     compiler = get_compiler(toolset, ft_from, ft_to)

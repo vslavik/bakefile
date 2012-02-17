@@ -416,6 +416,24 @@ class PathExpr(Expr):
         comp = (e.as_py() for e in self.components)
         return os.path.join(top_srcdir, os.path.sep.join(comp))
 
+    def get_basename(self):
+        """
+        Returns basename of the filename path (i.e. the name without directory
+        or extension). Throws if it cannot be determined.
+        """
+        if not self.components:
+            raise Error("cannot get basename of empty path", self.pos)
+
+        last = self.components[-1]
+        if isinstance(last, LiteralExpr):
+            dot = last.value.rfind(".")
+            if dot != -1:
+                return last.value[:dot]
+            else:
+                return last.value
+
+        raise Error("cannot determine basename of \"%s\"" % self, self.pos)
+
     def get_extension(self):
         """
         Returns extension of the filename path. Throws if it cannot be
