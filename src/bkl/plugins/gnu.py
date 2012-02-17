@@ -34,6 +34,12 @@ import bkl.expr
 # FIXME: shouldn't be needed later
 from bkl.expr import ListExpr, LiteralExpr
 
+# GCC flags for supported architectures:
+OSX_ARCH_FLAGS = {
+    'x86'    : '-arch i386',
+    'x86_64' : '-arch x86_64',
+}
+
 class GnuObjectFileType(FileType):
     name = "gnu-object"
     def __init__(self):
@@ -41,8 +47,20 @@ class GnuObjectFileType(FileType):
 
 
 class GnuFileCompiler(FileCompiler):
+    """Base class for GNU compilers/linkers."""
     def is_supported(self, toolset):
         return isinstance(toolset, GnuToolset)
+
+    # TODO: a hack, not exactly clean
+    def _arch_flags(self, toolset, target):
+        if isinstance(toolset, OSXGnuToolset):
+            flags = []
+            for a in target["archs"].as_py():
+                if a in OSX_ARCH_FLAGS:
+                    flags.append(LiteralExpr(OSX_ARCH_FLAGS[a]))
+            return flags
+        else:
+            return []
 
 
 class GnuCCompiler(GnuFileCompiler):
@@ -59,6 +77,7 @@ class GnuCCompiler(GnuFileCompiler):
     def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("%s -c -o $@" % self._compiler)]
         # FIXME: evaluating the flags here every time is inefficient
+        cmd += self._arch_flags(toolset, target)
         cmd += bkl.expr.add_prefix("-D", target["defines"]).items
         cmd += bkl.expr.add_prefix("-I", target["includedirs"]).items
         cmd += target["cppflags"].items
@@ -90,7 +109,7 @@ class GnuLinker(GnuFileCompiler):
     out_type = bkl.compilers.NativeExeFileType.get()
 
     def _linker_flags(self, toolset, target):
-        cmd = []
+        cmd = self._arch_flags(toolset, target)
         libs, ldlibs = target.type.get_all_libs(toolset, target)
         cmd += libs
         cmd += bkl.expr.add_prefix("-l", ListExpr(ldlibs)).items

@@ -4,6 +4,7 @@ module {
   }
   targets {
     exe hello {
+      archs = [x86, x86_64]
       sources {
         file @top_srcdir/hello.c
       }

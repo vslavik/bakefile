@@ -105,6 +105,23 @@ class NativeCompiledType(TargetType):
                      :ref:`ref_target_library`, it will be used when linking
                      executables that use the library.
                      """),
+            Property("archs",
+                 type=ListType(EnumType("architecture", ["x86", "x86_64"])),
+                 default=[], # TODO: should be toolset-specific values (?)
+                 inheritable=True,
+                 doc="""
+                     Architectures to compile for.
+
+                     Adds support for building binaries for specified
+                     architectures, if supported by the toolset. Support may
+                     take the form of either multi-arch binaries (OS X) or
+                     additional build configurations (Visual Studio).
+
+                     The default empty value means to do whatever the default
+                     behavior of the toolset is.
+
+                     Currently only supported on OS X.
+                     """),
             Property("win32-unicode",
                  type=BoolType(),
                  default=True,
