@@ -318,6 +318,11 @@ class VS2010Toolset(Toolset):
                  doc="File name of the solution file for the module."),
         ]
 
+    def get_builddir_for(self, target):
+        prj = target["vs2010.projectfile"]
+        # TODO: reference Configuration setting properly, as bkl setting
+        return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr("$(Configuration)")], prj.anchor)
+
     def generate(self, project):
         # generate vcxproj files and prepare solutions
         for m in project.modules:
@@ -349,8 +354,7 @@ class VS2010Toolset(Toolset):
         paths_info = bkl.expr.PathAnchorsInfo(
                                     dirsep="\\",
                                     outfile=filename,
-                                    # FIXME: this needs to be config-specific
-                                    builddir=os.path.dirname(filename),
+                                    builddir=self.get_builddir_for(target).as_native_path_for_output(target),
                                     model=target)
 
         is_library = (target.type.name == "library")

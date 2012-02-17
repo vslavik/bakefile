@@ -502,6 +502,22 @@ class Toolset(Extension):
     properties = []
 
     @abstractmethod
+    def get_builddir_for(self, target):
+        """
+        Returns build directory used for *target*.
+
+        Returned value must be a :class:`bkl.expr.PathExpr` expression object,
+        but it doesn't have to be a constant (for example, it may reference
+        configuration name, as e.g. Visual Studio does).
+
+        The function is called after the model is fully loaded and partially
+        simplified, on a model already specialized for this toolset only. It is
+        used to replace path expression with the relative `@builddir` anchor
+        with absolute paths.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     def generate(self, project):
         """
         Generates all output files for this toolset.

@@ -137,7 +137,7 @@ class Interpreter(object):
         passes.detect_self_references(self.model)
         passes.detect_unused_vars(self.model)
         passes.normalize_and_validate_vars(self.model)
-        passes.normalize_srcdir_paths(self.model)
+        passes.normalize_paths_in_model(self.model, toolset=None)
         passes.simplify_exprs(self.model)
 
 
@@ -145,14 +145,18 @@ class Interpreter(object):
         """
         Finalizes after "toolset" variable was set.
         """
+        # TODO: do this in finalize() instead
         passes.make_variables_for_missing_props(toolset_model, toolset)
+
         passes.eliminate_superfluous_conditionals(toolset_model)
 
         # This is done second time here (in addition to finalize()) to deal
-        # with paths added by make_variables_for_missing_props(); ideally we
-        # wouldn't do it, but hopefully it's not all that inefficient, as no
-        # real work is done for paths that are already normalized:
-        passes.normalize_srcdir_paths(toolset_model)
+        # with paths added by make_variables_for_missing_props() and paths with
+        # @builddir (which is toolset specific and couldn't be resolved
+        # earlier).  Ideally we wouldn't do it, but hopefully it's not all that
+        # inefficient, as no real work is done for paths that are already
+        # normalized:
+        passes.normalize_paths_in_model(toolset_model, toolset)
 
 
     def generate(self):

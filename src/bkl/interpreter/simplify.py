@@ -91,6 +91,12 @@ class BasicSimplifier(Visitor):
         # for (scalar) literals and other references only, though -- if the
         # value is e.g. a list, we want to keep it as a variable to avoid
         # duplication of large values.
+        #
+        # NOTE: We *must not* do this for PathExpr instances with @builddir
+        #       anchors, because they are replaced with absolute versions only
+        #       after a toolset-specific model is made. But it doesn't make
+        #       send to substitute paths, generally speaking, they tend to be
+        #       larger.
         ref = e.get_value()
         if isinstance(ref, LiteralExpr) or isinstance(ref, ReferenceExpr):
             return self.visit(ref)

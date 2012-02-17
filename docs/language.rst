@@ -88,7 +88,7 @@ in front of the path. The following anchors are recognized:
  1. ``@top_srcdir`` is the top level source directory, i.e. *srcdir* of the
     top-most bakefile of the project.
 
- 2. ``@builddir`` is the directory where build files of the current bakefile
+ 2. ``@builddir`` is the directory where build files of the current target
     are placed. Note that this is not where the generated makefiles or projects
     go either. It's often a dedicated directory just for the build artifacts
     and typically depends on make-time configuration. Visual Studio, for

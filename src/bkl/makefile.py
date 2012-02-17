@@ -33,10 +33,10 @@ import os.path
 
 import io
 import expr
-import utils
 from bkl.error import Error, error_context
 from bkl.api import Extension, Toolset, Property
 from bkl.vartypes import PathType
+from bkl.interpreter.passes import PathsNormalizer
 
 
 class MakefileFormatter(Extension):
@@ -153,19 +153,41 @@ class MakefileToolset(Toolset):
                        inheritable=False,
                        doc="Name of output file for module's makefile.")
 
+    def get_builddir_for(self, target):
+        # FIXME: use configurable build dir
+        return expr.PathExpr([], expr.ANCHOR_SRCDIR)
+
     def generate(self, project):
+        # We need to know build graphs of all targets so that we can generate
+        # dependencies on produced files. Worse yet, we need to have them for
+        # all modules before generating the output, because of cross-module
+        # dependencies.
+        # TODO-MT: read only, can be ran in parallel
+        build_graphs = {}
+        norm = PathsNormalizer(self)
+        for t in project.all_targets.itervalues():
+            with error_context(t):
+                norm.set_context(t)
+                graph = t.type.get_build_subgraph(self, t)
+                assert len(graph) > 0, "Build graph for %s is empty" % t
+                for node in graph:
+                    norm.visit_all(node.inputs)
+                    norm.visit_all(node.outputs)
+                    norm.visit_all(node.commands)
+                build_graphs[t] = graph
+
         for m in project.modules:
             with error_context(m):
-                self._gen_makefile(m)
+                self._gen_makefile(build_graphs, m)
 
-    def _gen_makefile(self, module):
+    def _gen_makefile(self, build_graphs, module):
         output_value = module.get_variable_value("%s.makefile" % self.name)
         output = output_value.as_native_path_for_output(module)
 
         paths_info = expr.PathAnchorsInfo(
                 dirsep="/", # FIXME - format-configurable
                 outfile=output,
-                builddir=os.path.dirname(output), # FIXME
+                builddir=os.path.dirname(output), # FIXME: use configurable build dir
                 model=module)
 
         expr_fmt = _MakefileExprFormatter(self.Formatter, paths_info)
@@ -175,19 +197,14 @@ class MakefileToolset(Toolset):
         for v in module.variables:
             pass
 
-        # We need to know build graphs of all targets so that we can generate
-        # dependencies on produced files:
-        build_graphs = utils.OrderedDict()
-        for t in module.targets.itervalues():
-            build_graphs[t] = t.type.get_build_subgraph(self, t)
-            assert len(build_graphs[t]) > 0, "Build graph for %s is empty" % t
-
         #FIXME: make this part of the formatter for (future) IdRefExpr
         def _format_dep(target_name):
             t = module.project.get_target(target_name)
             # FIXME: instead of using the first node, use some main_node
             g = build_graphs[t][0]
             if g.name:
+                if t not in module.targets.values():
+                    raise Error("cross-module dependencies on phony targets (\"%s\") not supported" % target_name)
                 out = g.name
             else:
                 # FIXME: handle multi-output nodes too
