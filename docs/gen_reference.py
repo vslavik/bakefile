@@ -44,6 +44,7 @@ sys.path = [bkl_path] + sys.path
 import bkl
 import bkl.api
 from bkl.props import registry
+from bkl.vartypes import ListType, EnumType
 
 OUT_DIR = os.path.join(docs_path, "ref")
 shutil.rmtree(OUT_DIR, ignore_errors=True)
@@ -72,6 +73,15 @@ def prop_scope(symbolic):
     assert False, "unrecognized scope"
 
 
+def _get_allowed_values(vartype):
+    if isinstance(vartype, ListType):
+        return _get_allowed_values(vartype.item_type)
+    elif isinstance(vartype, EnumType):
+        return vartype.format_allowed_values()
+    else:
+        return None
+
+
 def write_property(prop):
     desc = ""
     if prop.__doc__:
@@ -96,8 +106,13 @@ def write_property(prop):
                 "__doc__" in dir(default)):
                 default = default.__doc__
             desc += "\n*Default:* %s\n" % default
+
+    allowed_values = _get_allowed_values(prop.type)
+    if allowed_values:
+        desc += "\n*Allowed values:* %s\n" % allowed_values
+
     desc += "\n*Inheritable from parent:* %s\n" % ("yes" if prop.inheritable else "no")
-            
+
     txt = "**%s** (type: %s)\n\n" % (prop.name, prop.type.name)
     txt += "    " + "\n    ".join(desc.split("\n"))
     txt += "\n"

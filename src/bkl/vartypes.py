@@ -225,17 +225,20 @@ class EnumType(Type):
     """
     name = "enum"
 
-    def __init__(self, allowed_values):
+    def __init__(self, name, allowed_values):
+        self.name = name
         assert allowed_values, "list of values cannot be empty"
         self.allowed_values = [unicode(x) for x in allowed_values]
+
+    def format_allowed_values(self):
+        return ", ".join('"%s"' % x for x in self.allowed_values)
 
     def _validate_impl(self, e):
         if isinstance(e, expr.LiteralExpr):
             assert isinstance(e.value, types.UnicodeType)
             if e.value not in self.allowed_values:
                 raise TypeError(self, e,
-                                msg="must be one of %s" %
-                                [str(x) for x in self.allowed_values])
+                                msg="must be one of %s" % self.format_allowed_values())
         else:
             raise TypeError(self, e)
 
@@ -250,7 +253,7 @@ class ListType(Type):
     """
     def __init__(self, item_type):
         self.item_type = item_type
-        self.name = "list of %ss" % item_type.name
+        self.name = "list of %ss" % str(item_type)
 
     def _normalize_impl(self, e):
         # A non-list expression with single value is a special case of list
