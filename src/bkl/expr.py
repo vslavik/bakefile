@@ -596,7 +596,8 @@ class PathAnchorsInfo(object):
 
     .. attribute:: outdir_abs
 
-       Absolute native path to the output directory.
+       Absolute native path to the output directory -- the directory where the
+       project or makefile currently being generated is written to.
 
     .. attribute:: builddir_abs
 
@@ -612,9 +613,10 @@ class PathAnchorsInfo(object):
                 attribute.
 
         :param outfile:
-                (Native) path to the output file. Paths in the output
-                will be typically formatted relatively to this path.
-                The :attr:`outdir` attribute is computed from this parameter.
+                (Native) path to the output file (project, makefile). Paths in
+                the output will be typically formatted relatively to this path.
+                The :attr:`outdir_abs` attribute is computed from this
+                parameter.
 
         :param builddir:
                 (Native) path to the build directory.
