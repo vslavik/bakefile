@@ -462,7 +462,7 @@ class PathExpr(Expr):
             tail = "%s.%s" % (last.value, newext)
 
         comps = self.components[:-1] + [LiteralExpr(tail)]
-        return PathExpr(comps, self.anchor)
+        return PathExpr(comps, self.anchor, pos=self.pos)
 
 
 class Visitor(object):
