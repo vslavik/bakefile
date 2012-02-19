@@ -163,7 +163,7 @@ class VS2010Solution(OutputFile):
         paths_info = bkl.expr.PathAnchorsInfo(
                                     dirsep="\\",
                                     outfile=slnfile,
-                                    builddir=os.path.dirname(slnfile), # unused
+                                    builddir=None,
                                     model=module)
         self.formatter = VS2010ExprFormatter(paths_info)
 

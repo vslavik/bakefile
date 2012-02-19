@@ -619,32 +619,38 @@ class PathAnchorsInfo(object):
                 parameter.
 
         :param builddir:
-                (Native) path to the build directory.
+                (Native) path to the build directory. May be None if
+                builddir-relative paths make no sense in this context (e.g. for
+                VS2010 solution files).
 
         :param model:
                 Part of the model (:class:`bkl.model.Module` or
                 :class:`bkl.model.Target`) that *outfile* corresponds to.
         """
 
+        self.dirsep = dirsep
         outdir = os.path.dirname(os.path.abspath(outfile))
-        builddir = os.path.abspath(builddir)
+        self.outdir_abs = outdir
+
         top_srcdir = os.path.dirname(os.path.abspath(model.project.top_module.source_file))
-
         to_top_srcdir = os.path.relpath(top_srcdir, start=outdir)
-        to_builddir = os.path.relpath(builddir, start=outdir)
-
         if to_top_srcdir == ".":
             self.top_srcdir = []
         else:
             self.top_srcdir = to_top_srcdir.split(os.path.sep)
-        if to_builddir == ".":
-            self.builddir = []
-        else:
-            self.builddir = to_builddir.split(os.path.sep)
-        self.dirsep = dirsep
         self.top_srcdir_abs = top_srcdir
-        self.outdir_abs = outdir
-        self.builddir_abs = builddir
+
+        if builddir is not None:
+            builddir = os.path.abspath(builddir)
+            to_builddir = os.path.relpath(builddir, start=outdir)
+            if to_builddir == ".":
+                self.builddir = []
+            else:
+                self.builddir = to_builddir.split(os.path.sep)
+            self.builddir_abs = builddir
+        else:
+            self.builddir = None
+            self.builddir_abs = None
 
 
 class Formatter(Visitor):
@@ -699,6 +705,8 @@ class Formatter(Visitor):
             base = pi.top_srcdir
             base_abs = pi.top_srcdir_abs
         elif e.anchor == ANCHOR_BUILDDIR:
+            if pi.builddir is None:
+                raise Error("%s anchor is unknown in this context (\"%s\")" % (e.anchor, e), pos=e.pos)
             base = pi.builddir
             base_abs = pi.builddir_abs
         else:
