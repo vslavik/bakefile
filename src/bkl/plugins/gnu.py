@@ -72,7 +72,7 @@ class GnuCCompiler(GnuFileCompiler):
     out_type = GnuObjectFileType.get()
 
     _compiler = "cc"
-    _flags = "cflags"
+    _flags = "c-compiler-options"
 
     def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("%s -c -o $@" % self._compiler)]
@@ -80,7 +80,7 @@ class GnuCCompiler(GnuFileCompiler):
         cmd += self._arch_flags(toolset, target)
         cmd += bkl.expr.add_prefix("-D", target["defines"]).items
         cmd += bkl.expr.add_prefix("-I", target["includedirs"]).items
-        cmd += target["cppflags"].items
+        cmd += target["compiler-options"].items
         cmd += target[self._flags].items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
@@ -97,7 +97,7 @@ class GnuCXXompiler(GnuCCompiler):
     out_type = GnuObjectFileType.get()
 
     _compiler = "c++"
-    _flags = "cxxflags"
+    _flags = "cxx-compiler-options"
 
 
 class GnuLinker(GnuFileCompiler):
@@ -113,7 +113,7 @@ class GnuLinker(GnuFileCompiler):
         libs, ldlibs = target.type.get_all_libs(toolset, target)
         cmd += libs
         cmd += bkl.expr.add_prefix("-l", ListExpr(ldlibs)).items
-        cmd += target["ldflags"].items
+        cmd += target["link-options"].items
         return cmd
 
     def commands(self, toolset, target, input, output):

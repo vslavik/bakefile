@@ -5,9 +5,9 @@ module {
   targets {
     exe hello {
       defines = [DEF_ALL]
-      cppflags = [-DDEF_CPP]
-      cflags = [-DDEF_C]
-      cxxflags = [-DEF_CXX]
+      compiler-options = [-DDEF_CPP]
+      c-compiler-options = [-DDEF_C]
+      cxx-compiler-options = [-DEF_CXX]
       sources {
         file @top_srcdir/foo.c
         file @top_srcdir/bar.cpp

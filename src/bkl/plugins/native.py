@@ -54,42 +54,39 @@ class NativeCompiledType(TargetType):
                  default=[],
                  inheritable=True,
                  doc="Directories where to look for header files."),
-            Property("cppflags",
+            Property("compiler-options",
                  type=ListType(StringType()),
                  default=[],
                  inheritable=True,
                  doc="""
-                     Additional preprocessor flags. Wherever possible,
-                     ``defines`` or ``includedirs`` properties should be used
-                     instead. *Compiler* flags should be put in ``cflags`` or
-                     ``cxxflags`` properties, don't confuse this property with
-                     ``cxxflags``.
+                     Additional compiler options common to all C-like compilers
+                     (C, C++, Objective-C, Objective-C++).
 
-                     Note that the flags are compiler-specific and so this
+                     Note that the options are compiler-specific and so this
                      property should only be set conditionally for particular
-                     compilers that recognize the flags.
+                     compilers that recognize the options.
                      """),
-            Property("cflags",
+            Property("c-compiler-options",
                  type=ListType(StringType()),
                  default=[],
                  inheritable=True,
                  doc="""
-                     Additional flags for C compiler.
+                     Additional options for C compiler.
 
-                     Note that the flags are compiler-specific and so this
+                     Note that the options are compiler-specific and so this
                      property should only be set conditionally for particular
-                     compilers that recognize the flags.
+                     compilers that recognize the options.
                      """),
-            Property("cxxflags",
+            Property("cxx-compiler-options",
                  type=ListType(StringType()),
                  default=[],
                  inheritable=True,
                  doc="""
-                     Additional flags for C++ compiler.
+                     Additional options for C++ compiler.
 
-                     Note that the flags are compiler-specific and so this
+                     Note that the options are compiler-specific and so this
                      property should only be set conditionally for particular
-                     compilers that recognize the flags.
+                     compilers that recognize the options.
                      """),
             Property("libs",
                  type=ListType(StringType()),
@@ -204,16 +201,16 @@ class NativeCompiledType(TargetType):
 
 class NativeLinkedType(NativeCompiledType):
     properties = [
-            Property("ldflags",
+            Property("link-options",
                  type=ListType(StringType()),
                  default=[],
                  inheritable=True,
                  doc="""
-                     Additional linker flags.
+                     Additional linker options.
 
-                     Note that the flags are compiler/linker-specific and so this
+                     Note that the options are compiler/linker-specific and so this
                      property should only be set conditionally for particular
-                     compilers that recognize the flags.
+                     compilers that recognize the options.
                      """),
         ]
 

@@ -461,7 +461,7 @@ class VS2010Toolset(Toolset):
             # and C++ flags as they're basically all the same at MSVS level
             # too and all go into the same place in the IDE and same
             # AdditionalOptions node in the project file.
-            all_cflags = target["cppflags"].as_py() + target["cflags"].as_py() + target["cxxflags"].as_py()
+            all_cflags = target["compiler-options"].as_py() + target["c-compiler-options"].as_py() + target["cxx-compiler-options"].as_py()
             if all_cflags:
                 n_cl.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(all_cflags))
             n.add(n_cl)
@@ -473,7 +473,7 @@ class VS2010Toolset(Toolset):
                 n_link.add("EnableCOMDATFolding", True)
                 n_link.add("OptimizeReferences", True)
             if not is_library:
-                ldflags = target["ldflags"].as_py()
+                ldflags = target["link-options"].as_py()
                 if ldflags:
                     n_link.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(ldflags))
             if is_library:
