@@ -424,6 +424,9 @@ class VS2010Toolset(Toolset):
                 n.add("LinkIncremental", c == "Debug")
             # TODO: add TargetName only if it's non-default
             n.add("TargetName", target[target.type.basename_prop])
+            # TODO: handle the defaults in a nicer way
+            if target["outputdir"].as_native_path(paths_info) != paths_info.builddir_abs:
+                n.add("OutDir", target["outputdir"])
             if n.has_children():
                 n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % c
             root.add(n)

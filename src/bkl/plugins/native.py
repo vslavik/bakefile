@@ -129,6 +129,19 @@ class NativeCompiledType(TargetType):
                  doc="Compile win32 code in Unicode mode? If enabled, "
                      "``_UNICODE`` symbol is defined and the wide character "
                      "entry point (``WinMain``, ...) is used."),
+            Property("outputdir",
+                 type=PathType(),
+                 default=PathExpr([],anchor=ANCHOR_BUILDDIR),
+                 inheritable=True,
+                 doc="""
+                     Directory where final binaries are put.
+
+                     Note that this is not the directory for intermediate files
+                     such as object files -- these are put in ``@builddir``. By
+                     default, output location is the same, ``@builddir``, but
+                     can be overwritten to for example put all executables into
+                     ``bin/`` subdirectory.
+                     """),
         ]
 
     def target_file(self, toolset, target):
@@ -154,7 +167,8 @@ class NativeCompiledType(TargetType):
         parts.append(target[propname])
         if ext in tdir:
             parts.append("." + getattr(toolset, ext))
-        return PathExpr([concat(*parts)], ANCHOR_BUILDDIR)
+        outdir = target["outputdir"]
+        return PathExpr(outdir.components + [concat(*parts)], outdir.anchor)
 
     def get_all_libs(self, toolset, target):
         """
