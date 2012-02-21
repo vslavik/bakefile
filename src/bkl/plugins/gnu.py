@@ -197,7 +197,8 @@ class GnuToolset(MakefileToolset):
         file.write(".PHONY: %s\n" % " ".join(targets))
 
     def on_footer(self, file):
-        file.write("# Dependencies tracking:\n"
+        file.write("\n"
+                   "# Dependencies tracking:\n"
                    "-include *.d\n")
 
 
