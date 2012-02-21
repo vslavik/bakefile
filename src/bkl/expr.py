@@ -441,6 +441,8 @@ class PathExpr(Expr):
             dot = last.value.rfind(".")
             if dot != -1:
                 return last.value[dot+1:]
+            else:
+                return ""
 
         raise Error("cannot determine extension of \"%s\"" % self, self.pos)
 
