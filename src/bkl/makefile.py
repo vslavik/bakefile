@@ -37,6 +37,7 @@ from bkl.error import Error, error_context
 from bkl.api import Extension, Toolset, Property
 from bkl.vartypes import PathType
 from bkl.interpreter.passes import PathsNormalizer
+from bkl.utils import OrderedDict
 
 
 class MakefileFormatter(Extension):
@@ -205,13 +206,12 @@ class MakefileToolset(Toolset):
             pass
 
         #FIXME: make this part of the formatter for (future) IdRefExpr
-        def _format_dep(target_name):
-            t = module.project.get_target(target_name)
+        def _format_dep(t):
             # FIXME: instead of using the first node, use some main_node
             g = build_graphs[t][0]
             if g.name:
-                if t not in module.targets.values():
-                    raise Error("cross-module dependencies on phony targets (\"%s\") not supported" % target_name)
+                if t.parent is not module:
+                    raise Error("cross-module dependencies on phony targets (\"%s\") not supported yet" % t.name) # TODO
                 out = g.name
             else:
                 # FIXME: handle multi-output nodes too
@@ -221,21 +221,22 @@ class MakefileToolset(Toolset):
 
         # Write the "all" target:
         all_targets = (
-                      [_format_dep(t) for t in module.targets] +
+                      [_format_dep(t) for t in module.targets.itervalues()] +
                       [sub.name for sub in module.submodules]
                       )
         f.write(self.Formatter.target(name="all", deps=all_targets, commands=None))
 
         phony_targets = ["all", "clean"]
 
-        submakefiles = []
+        targets_from_submodules = OrderedDict()
+        submakefiles = OrderedDict()
         for sub in module.submodules:
             subpath = sub.get_variable_value("%s.makefile" % self.name)
             # FIXME: use $dirname(), $basename() functions, this is hacky
             subdir = expr.PathExpr(subpath.components[:-1], anchor=subpath.anchor)
             subfile = subpath.components[-1]
-            submakefiles.append((sub.name, expr_fmt.format(subdir), expr_fmt.format(subfile)))
-        for subname, subdir, subfile in submakefiles:
+            submakefiles[sub] = (sub.name, expr_fmt.format(subdir), expr_fmt.format(subfile))
+        for subname, subdir, subfile in submakefiles.itervalues():
             subcmd = self.Formatter.submake_command(subdir, subfile, "all")
             f.write(self.Formatter.target(name=subname, deps=[], commands=[subcmd]))
             phony_targets.append(subname)
@@ -251,8 +252,19 @@ class MakefileToolset(Toolset):
                         # FIXME: handle multi-output nodes too
                         assert len(node.outputs) == 1
                         out = node.outputs[0]
+
                     deps = [expr_fmt.format(i) for i in node.inputs]
-                    deps += [_format_dep(x) for x in t["deps"].as_py()]
+                    for dep in t["deps"].as_py():
+                        tdep = module.project.get_target(dep)
+                        tdepstr = _format_dep(tdep)
+                        deps.append(tdepstr)
+                        if tdep.parent is not module:
+                            # link external dependencies with submodules to build them
+                            tmod = tdep.parent
+                            while tmod.parent is not None and tmod.parent is not module:
+                                tmod = tmod.parent
+                            if tmod in module.submodules:
+                                targets_from_submodules[tdepstr] = tmod
                     text = self.Formatter.target(
                             name=expr_fmt.format(out),
                             deps=deps,
@@ -260,11 +272,17 @@ class MakefileToolset(Toolset):
                     f.write(text)
                     all_targets.append(expr_fmt.format(out))
 
+        # dependencies on submodules to build targets from them:
+        if targets_from_submodules:
+            f.write("# Targets from sub-makefiles:\n")
+            for t, tsub in targets_from_submodules.iteritems():
+                f.write(self.Formatter.target(name=t, deps=[submakefiles[tsub][0]], commands=None))
+
         # Write the "clean" target:
         clean_cmds = self._get_clean_commands(
                         expr_fmt,
                         (build_graphs[t] for t in module.targets.itervalues()),
-                        submakefiles)
+                        submakefiles.itervalues())
         f.write(self.Formatter.target(name="clean", deps=[], commands=clean_cmds))
 
         self.on_phony_targets(f, phony_targets)
