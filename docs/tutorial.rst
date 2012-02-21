@@ -149,24 +149,24 @@ would define ``LINUX`` only for makefile-based build and ``MSW`` for the
 project files.
 
 While ``defines`` and ``includedirs`` are usually enough to cover 90% of your
-needs, sometimes some other compiler options may need to be specified. The
-``cppflags``, ``cflags`` and ``cxxflags`` properties can be used for this.
-The first of them sets the flags for C/C++ preprocessor, which is used when
-compiling both C and C++ files. The second and third ones are used when
-compiling C and C++ files, respectively. Please don't confuse ``cppflags`` and
-``cxxflags`` properties, in C++ projects you will usually need the latter one.
+needs, sometimes some other compiler options may need to be specified and the
+``compiler-options`` property can be used for this: you can simply any options
+you want to be passed to C or C++ compiler into it. If you need to be more
+precise and only use some options with a particular compiler in a project
+using more than one of them, you can also use ``c-compiler-options`` or
+``cxx-compiler-options``.
 
-One aspect of using these flags options is that different compilers use
-different format for their flags, so it's usually impossible to use the same
-value for all of them. Moreover, sometimes you may actually need to use custom
-options for a single toolset only. This can be done by explicitly testing for
-the toolset being used. For example, to use C++ 11 features with GNU compiler
-you could do
+One aspect of using these properties is that different compilers use different
+format for their options, so it's usually impossible to use the same value for
+all of them. Moreover, sometimes you may actually need to use custom options
+for a single toolset only. This can be done by explicitly testing for the
+toolset being used. For example, to use C++ 11 features with GNU compiler you
+could do
 
 .. code-block:: bkl
 
     if ( $(toolset) == gnu )
-        cxxflags = "-std=c++11"
+        cxx-compiler-options = "-std=c++11"
 
 
 Similarly, any non trivial project usually links with some external libraries.
