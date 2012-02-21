@@ -97,6 +97,12 @@ try:
     intr.process_file(args[0])
 except KeyboardInterrupt:
     sys.exit(2)
+except IOError as e:
+    if options.debug:
+        raise
+    else:
+        logging.error(e)
+        sys.exit(1)
 except bkl.error.Error as e:
     if options.debug:
         raise
