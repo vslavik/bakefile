@@ -76,6 +76,7 @@ class GnuCCompiler(GnuFileCompiler):
 
     def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("%s -c -o $@" % self._compiler)]
+        cmd += [LiteralExpr("-MD -MP")]
         # FIXME: evaluating the flags here every time is inefficient
         cmd += self._arch_flags(toolset, target)
         cmd += bkl.expr.add_prefix("-D", target["defines"]).items
@@ -191,6 +192,10 @@ class GnuToolset(MakefileToolset):
 
     def on_phony_targets(self, file, targets):
         file.write(".PHONY: %s\n" % " ".join(targets))
+
+    def on_footer(self, file):
+        file.write("# Dependencies tracking:\n"
+                   "-include *.d\n")
 
 
 class OSXGnuToolset(GnuToolset):

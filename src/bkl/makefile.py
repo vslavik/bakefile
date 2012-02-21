@@ -250,6 +250,7 @@ class MakefileToolset(Toolset):
 
         if phony:
             self.on_phony_targets(f, phony)
+        self.on_footer(f)
 
         f.commit()
 
@@ -257,5 +258,12 @@ class MakefileToolset(Toolset):
         """
         Called with a list of all phony (i.e. not producing actual files)
         targets (as their names as strings) when generating given file.
+        """
+        pass
+
+    def on_footer(self, file):
+        """
+        Called at the end of generating the output to add any ending text, for
+        example unconditional inclusion of dependencies tracking code.
         """
         pass
