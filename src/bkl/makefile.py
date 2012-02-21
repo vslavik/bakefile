@@ -115,10 +115,10 @@ class MakefileFormatter(Extension):
         return out
 
     @staticmethod
-    def submake_command(directory, filename):
+    def submake_command(directory, filename, target):
         """
         Returns string with command to invoke ``make`` in subdirectory
-        *directory* on makefile *filename*.
+        *directory* on makefile *filename*, running *target*.
         """
         raise NotImplementedError
 
@@ -144,6 +144,13 @@ class MakefileToolset(Toolset):
 
     #: Default filename from output makefile.
     default_makefile = None
+
+    #: Files with extensions from this list will be automatically deleted
+    #: by "make clean".
+    autoclean_extensions = []
+
+    #: Command used to delete files
+    del_command = None
 
     @classmethod
     def properties_module(cls):
@@ -214,27 +221,32 @@ class MakefileToolset(Toolset):
 
         # Write the "all" target:
         all_targets = (
-                      [_format_dep(t) for t in module.targets] + 
+                      [_format_dep(t) for t in module.targets] +
                       [sub.name for sub in module.submodules]
                       )
         f.write(self.Formatter.target(name="all", deps=all_targets, commands=None))
 
+        phony_targets = ["all", "clean"]
+
+        submakefiles = []
         for sub in module.submodules:
             subpath = sub.get_variable_value("%s.makefile" % self.name)
             # FIXME: use $dirname(), $basename() functions, this is hacky
             subdir = expr.PathExpr(subpath.components[:-1], anchor=subpath.anchor)
             subfile = subpath.components[-1]
-            subcmd = self.Formatter.submake_command(expr_fmt.format(subdir), expr_fmt.format(subfile))
-            f.write(self.Formatter.target(name=sub.name, deps=[], commands=[subcmd]))
+            submakefiles.append((sub.name, expr_fmt.format(subdir), expr_fmt.format(subfile)))
+        for subname, subdir, subfile in submakefiles:
+            subcmd = self.Formatter.submake_command(subdir, subfile, "all")
+            f.write(self.Formatter.target(name=subname, deps=[], commands=[subcmd]))
+            phony_targets.append(subname)
 
-        phony = []
         for t in module.targets.itervalues():
             with error_context(t):
                 graph = build_graphs[t]
                 for node in graph:
                     if node.name:
                         out = node.name
-                        phony.append(expr_fmt.format(out))
+                        phony_targets.append(expr_fmt.format(out))
                     else:
                         # FIXME: handle multi-output nodes too
                         assert len(node.outputs) == 1
@@ -248,11 +260,28 @@ class MakefileToolset(Toolset):
                     f.write(text)
                     all_targets.append(expr_fmt.format(out))
 
-        if phony:
-            self.on_phony_targets(f, phony)
+        # Write the "clean" target:
+        clean_cmds = self._get_clean_commands(
+                        expr_fmt,
+                        (build_graphs[t] for t in module.targets.itervalues()),
+                        submakefiles)
+        f.write(self.Formatter.target(name="clean", deps=[], commands=clean_cmds))
+
+        self.on_phony_targets(f, phony_targets)
         self.on_footer(f)
 
         f.commit()
+
+    def _get_clean_commands(self, expr_fmt, graphs, submakefiles):
+        for e in self.autoclean_extensions:
+            yield "%s *.%s" % (self.del_command, e)
+        for g in graphs:
+            for node in g:
+                for f in node.outputs:
+                    if f.get_extension() not in self.autoclean_extensions:
+                        yield "%s %s" % (self.del_command, expr_fmt.format(f))
+        for subname, subdir, subfile in submakefiles:
+            yield self.Formatter.submake_command(subdir, subfile, "clean")
 
     def on_phony_targets(self, file, targets):
         """

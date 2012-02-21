@@ -161,8 +161,8 @@ class GnuMakefileFormatter(MakefileFormatter):
     Formatter for the GNU Make syntax.
     """
     @staticmethod
-    def submake_command(directory, filename):
-        return "$(MAKE) -C %s -f %s" % (directory, filename)
+    def submake_command(directory, filename, target):
+        return "$(MAKE) -C %s -f %s %s" % (directory, filename, target)
 
 
 class GnuToolset(MakefileToolset):
@@ -182,6 +182,9 @@ class GnuToolset(MakefileToolset):
 
     Formatter = GnuMakefileFormatter
     default_makefile = "GNUmakefile"
+
+    autoclean_extensions = ["o", "d"]
+    del_command = "rm -f"
 
     object_type = GnuObjectFileType.get()
 
