@@ -435,6 +435,8 @@ class PathExpr(Expr):
             raise Error("cannot get extension of empty path", self.pos)
 
         last = self.components[-1]
+        if isinstance(last, ConcatExpr):
+            last = last.items[-1]
         if isinstance(last, LiteralExpr):
             dot = last.value.rfind(".")
             if dot != -1:
@@ -451,6 +453,8 @@ class PathExpr(Expr):
             raise Error("cannot change extension of empty path", self.pos)
 
         last = self.components[-1]
+        if isinstance(last, ConcatExpr):
+            last = last.items[-1]
         if not isinstance(last, LiteralExpr):
             raise Error("cannot change extension of \"%s\" to .%s" % (self, newext),
                         self.pos)
