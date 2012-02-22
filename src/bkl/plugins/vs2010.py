@@ -461,7 +461,11 @@ class VS2010Toolset(Toolset):
             # and C++ flags as they're basically all the same at MSVS level
             # too and all go into the same place in the IDE and same
             # AdditionalOptions node in the project file.
-            all_cflags = target["compiler-options"].as_py() + target["c-compiler-options"].as_py() + target["cxx-compiler-options"].as_py()
+            all_cflags = []
+            for options_name in ["compiler-options", "c-compiler-options", "cxx-compiler-options"]:
+                options = target[options_name].as_py()
+                if options is not None:
+                    all_cflags += options
             if all_cflags:
                 n_cl.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(all_cflags))
             n.add(n_cl)
