@@ -214,11 +214,13 @@ class VS2010Solution(OutputFile):
         while prev_count != len(included):
             prev_count = len(included)
             todo = set(x for x in todo if x not in included)
+            todo_new = set()
             for todo_item in todo:
                 included.add(todo_item)
                 prj = top._get_project_info(todo_item)
-                todo.update(prj[3])
+                todo_new.update(prj[3])
                 yield prj
+            todo.update(todo_new)
 
     def _find_target_guid_recursively(self, id):
         """Recursively search for the target in all submodules and return its GUID."""
