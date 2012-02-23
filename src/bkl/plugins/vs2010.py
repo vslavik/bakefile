@@ -220,22 +220,26 @@ class VS2010Solution(OutputFile):
                 todo.update(prj[3])
                 yield prj
 
-    def _try_get_target_guid(self, id):
+    def _find_target_guid_recursively(self, id):
+        """Recursively search for the target in all submodules and return its GUID."""
+        if id in self.guids_map:
+            return self.guids_map[id]
+        for sln in self.subsolutions:
+            guid = sln._find_target_guid_recursively(id)
+            if guid:
+                return guid
+        return None
+
+    def _get_target_guid(self, id):
         if id in self.guids_map:
             return self.guids_map[id]
         else:
-            for sln in self.subsolutions:
-                guid = sln._try_get_target_guid(id)
-                if guid:
-                    return guid
-            if self.parent_solution:
-                return self.parent_solution._try_get_target_guid(id)
-            return None
-
-    def _get_target_guid(self, id):
-        guid = self._try_get_target_guid(id)
-        assert guid, "can't find GUID of project '%s'" % id
-        return guid
+            top = self
+            while top.parent_solution:
+                top = top.parent_solution
+            guid = top._find_target_guid_recursively(id)
+            assert guid, "can't find GUID of project '%s'" % id
+            return guid
 
     def commit(self):
         guids = []
