@@ -63,10 +63,15 @@ class BasicSimplifier(Visitor):
     def list(self, e):
         new, changed = self._process_children(e.items)
         if changed:
-            if len(new):
-                return ListExpr(new, pos=e.pos)
-            else:
-                return NullExpr(pos=e.pos)
+            # FIXME: re-enable this later. This prevents simplification
+            #        of some of conditionally set lists, but is necessary as
+            #        long as toolsets code assumes properties have ListExpr
+            #        values and directly accesses ListExpr.items.
+            # if len(new):
+            #     return ListExpr(new, pos=e.pos)
+            # else:
+            #     return NullExpr(pos=e.pos)
+            return ListExpr(new, pos=e.pos)
         else:
             return e
 
