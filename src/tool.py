@@ -61,6 +61,10 @@ parser.add_option(
         "", "--dry-run",
         action="store_true", dest="dry_run", default=False,
         help="don't write any files, just pretend to do it")
+parser.add_option(
+        "", "--force",
+        action="store_true", dest="force", default=False,
+        help="touch output files even if they're unchanged")
 
 debug_group = OptionGroup(parser, "Debug Options")
 debug_group.add_option(
@@ -102,6 +106,7 @@ import bkl.io
 
 try:
     bkl.io.dry_run = options.dry_run
+    bkl.io.force_output = options.force
     if options.dump:
         intr = bkl.dumper.DumpingInterpreter()
     elif options.dump_toolset:
