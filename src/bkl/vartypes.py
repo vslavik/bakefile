@@ -31,7 +31,7 @@ of variable values and other expressions.
 import types
 
 import expr
-from error import TypeError, error_context
+from error import Error, TypeError, error_context
 
 
 class Type(object):
@@ -190,8 +190,10 @@ class PathType(Type):
     def _normalize_impl(self, e):
         if isinstance(e, expr.PathExpr):
             return e
-
-        components = expr.split(e, "/")
+        try:
+            components = expr.split(e, "/")
+        except Error as err:
+            raise TypeError(self, e, msg=err.msg)
         if not components:
             return e # empty path = invalid
         first = components[0]
