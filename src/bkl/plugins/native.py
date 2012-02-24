@@ -243,12 +243,12 @@ class ExeType(NativeLinkedType):
                         }
                      """),
             Property("win32-subsystem",
-                 type=EnumType("subsystem", ["console", "gui"]),
+                 type=EnumType("subsystem", ["console", "windows"]),
                  default="console",
                  inheritable=True,
                  doc="""
                      Windows subsystem the executable runs in. Must be set to
-                     ``gui`` for console-less applications.
+                     ``windows`` for console-less applications.
                      """),
         ]
 

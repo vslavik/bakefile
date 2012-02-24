@@ -475,7 +475,7 @@ class VS2010Toolset(Toolset):
             n.add(n_link)
             if is_exe:
                 n_link.add("SubSystem",
-                           "Windows" if target["win32-subsystem"].as_py() == "gui" else "Console")
+                           "Windows" if target["win32-subsystem"].as_py() == "windows" else "Console")
             else:
                 n_link.add("SubSystem", "Windows")
             n_link.add("GenerateDebugInformation", True)
