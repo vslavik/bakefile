@@ -204,7 +204,7 @@ class ModelPart(object):
             if self.parent:
                 return self.parent.get_variable_value(name)
             else:
-                raise error.Error("unknown variable \"%s\"" % name)
+                raise error.UndefinedError("unknown variable \"%s\"" % name)
 
 
     def add_variable(self, var):
@@ -269,7 +269,7 @@ class ModelPart(object):
     def __getitem__(self, key):
         try:
             return self.get_variable_value(key)
-        except error.Error as e:
+        except error.UndefinedError as e:
             raise KeyError(str(e))
 
 
