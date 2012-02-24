@@ -60,7 +60,7 @@ class CFileType(FileType):
 class CxxFileType(FileType):
     name = "C++"
     def __init__(self):
-        FileType.__init__(self, extensions=["cpp", "cxx", "cc", "C"])
+        FileType.__init__(self, extensions=["cpp", "cxx", "cc"])
 
 
 

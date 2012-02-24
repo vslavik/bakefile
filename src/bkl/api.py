@@ -387,7 +387,7 @@ class FileType(Extension):
 
     .. attribute:: extensions
 
-       List of extensions for this file type, e.g. ``["cpp", "cxx", "C"]``.
+       List of extensions for this file type, e.g. ``["cpp", "cxx", "cc"]``.
     """
     def __init__(self, extensions=[]):
         self.extensions = extensions

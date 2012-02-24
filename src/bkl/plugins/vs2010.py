@@ -500,7 +500,7 @@ class VS2010Toolset(Toolset):
         for sfile in target.sources:
             ext = sfile.filename.get_extension()
             # FIXME: make this more solid
-            if ext in ['cpp', 'cxx', 'cc', 'c', 'C']:
+            if ext in ['cpp', 'cxx', 'cc', 'c']:
                 items.add("ClCompile", Include=sfile.filename)
             else:
                 # FIXME: handle both compilation into cpp and c files
