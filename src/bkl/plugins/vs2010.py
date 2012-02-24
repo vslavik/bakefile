@@ -473,7 +473,11 @@ class VS2010Toolset(Toolset):
             n.add(n_cl)
             n_link = Node("Link")
             n.add(n_link)
-            n_link.add("SubSystem", "Console" if is_exe else "Windows")
+            if is_exe:
+                n_link.add("SubSystem",
+                           "Windows" if target["win32-subsystem"].as_py() == "gui" else "Console")
+            else:
+                n_link.add("SubSystem", "Windows")
             n_link.add("GenerateDebugInformation", True)
             if c == "Release":
                 n_link.add("EnableCOMDATFolding", True)

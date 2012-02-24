@@ -242,6 +242,14 @@ class ExeType(NativeLinkedType):
                           exename = $(id)$(vermajor);
                         }
                      """),
+            Property("win32-subsystem",
+                 type=EnumType("subsystem", ["console", "gui"]),
+                 default="console",
+                 inheritable=True,
+                 doc="""
+                     Windows subsystem the executable runs in. Must be set to
+                     ``gui`` for console-less applications.
+                     """),
         ]
 
     basename_prop = "exename"
