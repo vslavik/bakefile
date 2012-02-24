@@ -71,18 +71,20 @@ class GnuCCompiler(GnuFileCompiler):
     in_type = bkl.compilers.CFileType.get()
     out_type = GnuObjectFileType.get()
 
-    _compiler = "cc"
-    _flags = "c-compiler-options"
+    _compiler = "$(CC)"
+    _flags_var_name = "CFLAGS"
+    _options_prop_name = "c-compiler-options"
 
     def commands(self, toolset, target, input, output):
-        cmd = [LiteralExpr("%s -c -o $@" % self._compiler)]
+        cmd = [LiteralExpr("%s -c -o $@ $(CPPFLAGS) $(%s)" %
+                (self._compiler, self._flags_var_name))]
         cmd += [LiteralExpr("-MD -MP")]
         # FIXME: evaluating the flags here every time is inefficient
         cmd += self._arch_flags(toolset, target)
         cmd += bkl.expr.add_prefix("-D", target["defines"]).items
         cmd += bkl.expr.add_prefix("-I", target["includedirs"]).items
         cmd += target["compiler-options"].items
-        cmd += target[self._flags].items
+        cmd += target[self._options_prop_name].items
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         cmd.append(input)
@@ -97,8 +99,9 @@ class GnuCXXompiler(GnuCCompiler):
     in_type = bkl.compilers.CxxFileType.get()
     out_type = GnuObjectFileType.get()
 
-    _compiler = "c++"
-    _flags = "cxx-compiler-options"
+    _compiler = "$(CXX)"
+    _flags_var_name = "CXXFLAGS"
+    _options_prop_name = "cxx-compiler-options"
 
 
 class GnuLinker(GnuFileCompiler):
@@ -118,7 +121,7 @@ class GnuLinker(GnuFileCompiler):
         return cmd
 
     def commands(self, toolset, target, input, output):
-        cmd = [LiteralExpr("c++ -o $@"), input]
+        cmd = [LiteralExpr("$(CXX) -o $@ $(LDFLAGS)"), input]
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         cmd += self._linker_flags(toolset, target)
@@ -134,7 +137,7 @@ class GnuSharedLibLinker(GnuLinker):
     out_type = bkl.compilers.NativeDllFileType.get()
 
     def commands(self, toolset, target, input, output):
-        cmd = [LiteralExpr("c++ -shared -o $@"), input]
+        cmd = [LiteralExpr("$(CXX) -shared -o $@ $(LDFLAGS)"), input]
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         cmd += self._linker_flags(toolset, target)
@@ -152,7 +155,7 @@ class GnuLibLinker(GnuFileCompiler):
     def commands(self, toolset, target, input, output):
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
-        return [ListExpr([LiteralExpr("ar rcu $@"), input]),
+        return [ListExpr([LiteralExpr("$(AR) rcu $@"), input]),
                 ListExpr([LiteralExpr("ranlib $@")])]
 
 
