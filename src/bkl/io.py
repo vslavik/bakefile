@@ -37,6 +37,10 @@ logger = logging.getLogger("bkl.io")
 # Set to true to prevent any output from being written
 dry_run = False
 
+# Set to true to force writing of output files, even if they exist and would be
+# unchanged. In other words, always touch output files. This is useful for
+# makefiles that support automatic regeneration.
+force_output = False
 
 EOL_WINDOWS = "win"
 EOL_UNIX    = "unix"
@@ -84,27 +88,30 @@ class OutputFile(object):
         if self.eol == EOL_WINDOWS:
             self.text = self.text.replace("\n", "\r\n")
 
-        try:
-            with open(self.filename, "rb") as f:
-                old = f.read()
-        except IOError:
-            old = None
-
         note = " (dry run)" if dry_run else ""
 
-        if old == self.text:
-            logger.info("no changes in file %s", self.filename)
+        if not force_output:
+            try:
+                with open(self.filename, "rb") as f:
+                    old = f.read()
+            except IOError:
+                old = None
+            if old == self.text:
+                logger.info("no changes in file %s", self.filename)
+                return
         else:
-            if old is None:
-                logger.info("creating file %s%s", self.filename, note)
-            else:
-                logger.info("updating file %s%s", self.filename, note)
+            old = None
 
-            if dry_run:
-                return # nothing to do, just pretending to write output
+        if old is None:
+            logger.info("creating file %s%s", self.filename, note)
+        else:
+            logger.info("updating file %s%s", self.filename, note)
 
-            dirname = os.path.dirname(self.filename)
-            if dirname and not os.path.isdir(dirname):
-                os.makedirs(dirname)
-            with open(self.filename, "wb") as f:
-                f.write(self.text)
+        if dry_run:
+            return # nothing to do, just pretending to write output
+
+        dirname = os.path.dirname(self.filename)
+        if dirname and not os.path.isdir(dirname):
+            os.makedirs(dirname)
+        with open(self.filename, "wb") as f:
+            f.write(self.text)
