@@ -25,7 +25,7 @@
 
 import sys
 import logging
-from optparse import OptionParser
+from optparse import OptionParser, OptionGroup
 
 
 class BklFormatter(logging.Formatter):
@@ -53,18 +53,25 @@ logger.addHandler(log_handler)
 
 
 parser = OptionParser()
-parser.add_option("-v", "--verbose",
-                  action="store_true", dest="verbose", default=False,
-                  help="show verbose output")
-parser.add_option("", "--dry-run",
-                  action="store_true", dest="dry_run", default=False,
-                  help="don't write any files, just pretend to do it")
-parser.add_option("", "--debug",
-                  action="store_true", dest="debug", default=False,
-                  help="show debug log")
-parser.add_option("", "--dump-model",
-                  action="store_true", dest="dump", default=False,
-                  help="dump project's model to stdout instead of generating output")
+parser.add_option(
+        "-v", "--verbose",
+        action="store_true", dest="verbose", default=False,
+        help="show verbose output")
+parser.add_option(
+        "", "--dry-run",
+        action="store_true", dest="dry_run", default=False,
+        help="don't write any files, just pretend to do it")
+
+debug_group = OptionGroup(parser, "Debug Options")
+debug_group.add_option(
+        "", "--debug",
+        action="store_true", dest="debug", default=False,
+        help="show debug log")
+debug_group.add_option(
+        "", "--dump-model",
+        action="store_true", dest="dump", default=False,
+        help="dump project's model to stdout instead of generating output")
+parser.add_option_group(debug_group)
 
 options, args = parser.parse_args(sys.argv[1:])
 
