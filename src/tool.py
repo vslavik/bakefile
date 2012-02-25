@@ -71,6 +71,11 @@ debug_group.add_option(
         "", "--dump-model",
         action="store_true", dest="dump", default=False,
         help="dump project's model to stdout instead of generating output")
+debug_group.add_option(
+        "", "--dump-model-for",
+        action="store", dest="dump_toolset", default=False,
+        metavar="TOOLSET",
+        help="like --dump-model, but with toolset-optimized model")
 parser.add_option_group(debug_group)
 
 options, args = parser.parse_args(sys.argv[1:])
@@ -99,6 +104,8 @@ try:
     bkl.io.dry_run = options.dry_run
     if options.dump:
         intr = bkl.dumper.DumpingInterpreter()
+    elif options.dump_toolset:
+        intr = bkl.dumper.DumpingInterpreter(options.dump_toolset)
     else:
         intr = Interpreter()
     intr.process_file(args[0])
