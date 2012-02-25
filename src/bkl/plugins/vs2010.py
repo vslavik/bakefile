@@ -503,6 +503,16 @@ class VS2010Toolset(Toolset):
                     n_lib = Node("Lib")
                     n.add(n_lib)
                     n_lib.add("AdditionalDependencies", " ".join("%s.lib" % x for x in libs))
+            pre_build = target["pre-build-commands"].as_py()
+            if pre_build:
+                n_script = Node("PreBuildEvent")
+                n_script.add("Command", "\n".join(pre_build))
+                n.add(n_script)
+            post_build = target["post-build-commands"].as_py()
+            if post_build:
+                n_script = Node("PostBuildEvent")
+                n_script.add("Command", "\n".join(post_build))
+                n.add(n_script)
             root.add(n)
 
         # Source files:

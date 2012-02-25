@@ -1,0 +1,14 @@
+module {
+  variables {
+    toolsets = [vs2010]
+  }
+  targets {
+    exe testapp {
+      pre-build-commands = [echo Running pre-build script..., echo ...done]
+      post-build-commands = [echo Running post-build script for $(Configuration)..., echo ...done]
+      sources {
+        file @top_srcdir/test.cpp
+      }
+    }
+  }
+}

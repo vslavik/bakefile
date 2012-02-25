@@ -39,7 +39,9 @@ class ActionTargetType(TargetType):
     tasks that don't fit the model of compiling or creating files, such as
     packaging files, installing, uploading, running tests and so on.
 
-    Actions are currently only supported by makefile-based toolsets.
+    Actions are currently only supported by makefile-based toolsets. See the
+    ``pre-build-commands`` and ``post-build-commands`` properties for another
+    alternative that is supported by Visual Studio projects.
 
     .. code-block:: bkl
 

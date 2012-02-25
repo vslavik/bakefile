@@ -29,7 +29,7 @@ Also define standard, always available, properties.
 """
 
 import expr, api, utils
-from vartypes import IdType, EnumType, ListType, PathType
+from vartypes import IdType, EnumType, ListType, PathType, StringType
 from api import Property
 
 def std_file_props():
@@ -68,6 +68,35 @@ def std_target_props():
 
                      In particular, compiled targets (executables, DLLs) will
                      automatically link against all libraries found in `deps`.
+                     """),
+
+        Property("pre-build-commands",
+                 type=ListType(StringType()),
+                 default=[],
+                 inheritable=False,
+                 doc="""
+                     Custom commands to run before building the target.
+
+                     The value is a list of shell commands to run.  Notice that
+                     the commands are platform-specific and so typically need
+                     to be set conditionally depending on the value of
+                     ``toolset``.
+
+                     Currently only implemented by Visual Studio.
+                     """),
+        Property("post-build-commands",
+                 type=ListType(StringType()),
+                 default=[],
+                 inheritable=False,
+                 doc="""
+                     Custom commands to run after building the target.
+
+                     The value is a list of shell commands to run.  Notice that
+                     the commands are platform-specific and so typically need
+                     to be set conditionally depending on the value of
+                     ``toolset``.
+
+                     Currently only implemented by Visual Studio.
                      """),
         ]
 

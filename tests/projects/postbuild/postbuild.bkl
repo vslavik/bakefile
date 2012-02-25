@@ -1,0 +1,14 @@
+toolsets = vs2010;
+
+exe testapp {
+    sources { test.cpp }
+
+    pre-build-commands =
+            "echo Running pre-build script..."
+            "echo ...done"
+            ;
+    post-build-commands =
+            "echo Running post-build script for $(Configuration)..."
+            "echo ...done"
+            ;
+}
