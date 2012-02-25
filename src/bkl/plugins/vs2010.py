@@ -33,7 +33,7 @@ import bkl.compilers
 import bkl.expr
 import bkl.error
 from bkl.api import Toolset, Property
-from bkl.vartypes import PathType, StringType
+from bkl.vartypes import PathType, StringType, BoolType
 from bkl.utils import OrderedDict
 from bkl.io import OutputFile, EOL_WINDOWS
 
@@ -322,6 +322,15 @@ class VS2010Toolset(Toolset):
                  default=_default_solution_name,
                  inheritable=False,
                  doc="File name of the solution file for the module."),
+        Property("vs2010.generate-solution",
+                 type=BoolType(),
+                 default=True,
+                 inheritable=True,
+                 doc="""
+                     Whether to generate solution file for the module. Set to
+                     ``false`` if you want to omit the solution, e.g. for some
+                     submodules with only a single target.
+                     """),
         ]
 
     def get_builddir_for(self, target):
@@ -339,7 +348,8 @@ class VS2010Toolset(Toolset):
             for sub in m.submodules:
                 m.solution.add_subsolution(sub.solution)
         for m in project.modules:
-            m.solution.commit()
+            if m["vs2010.generate-solution"].as_py() == True:
+                m.solution.commit()
 
 
     def gen_for_module(self, module):
