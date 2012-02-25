@@ -201,6 +201,7 @@ class MakefileToolset(Toolset):
         expr_fmt = _MakefileExprFormatter(self.Formatter, paths_info)
 
         f = io.OutputFile(output, io.EOL_UNIX)
+        self.on_header(f)
 
         for v in module.variables:
             pass
@@ -300,6 +301,13 @@ class MakefileToolset(Toolset):
                         yield "%s %s" % (self.del_command, expr_fmt.format(f))
         for subname, subdir, subfile in submakefiles:
             yield self.Formatter.submake_command(subdir, subfile, "clean")
+
+    def on_header(self, file):
+        """
+        Called before starting generating the output to add any header text,
+        typically used to insert a warning about the file being auto-generated.
+        """
+        pass
 
     def on_phony_targets(self, file, targets):
         """
