@@ -159,6 +159,20 @@ class Interpreter(object):
         passes.normalize_paths_in_model(toolset_model, toolset)
 
 
+    def make_toolset_specific_model(self, toolset):
+        """
+        Returns toolset-specific model, i.e. one that works only with
+        *toolset*, has the ``toolset`` property set to it. The caller
+        still needs to call finalize_for_toolset() on it.
+        """
+        model = deepcopy(self.model)
+        # don't use Variable.from_property(), because it's read-only
+        model.add_variable(bkl.model.Variable.from_property(
+                                              model.get_prop("toolset"),
+                                              bkl.expr.LiteralExpr(toolset)))
+        return model
+
+
     def generate(self):
         """
         Generates output files.
@@ -179,14 +193,11 @@ class Interpreter(object):
 
 
     def generate_for_toolset(self, toolset):
+        """
+        Generates output for given *toolset*.
+        """
         logger.debug("preparing model for toolset %s", toolset)
-        model = deepcopy(self.model)
-
-        # don't use Variable.from_property(), because it's read-only
-        model.add_variable(bkl.model.Variable.from_property(
-                                              model.get_prop("toolset"),
-                                              bkl.expr.LiteralExpr(toolset)))
-
+        model = self.make_toolset_specific_model(toolset)
         self.finalize_for_toolset(model, toolset)
 
         logger.debug("generating for toolset %s", toolset)

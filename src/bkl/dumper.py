@@ -74,8 +74,17 @@ def dump_module(module):
 
 
 class DumpingInterpreter(Interpreter):
+    def __init__(self, toolset=None):
+        super(DumpingInterpreter, self).__init__()
+        self.toolset = toolset
+
     def generate(self):
-        print dump_project(self.model)
+        if self.toolset:
+            model = self.make_toolset_specific_model(self.toolset)
+            self.finalize_for_toolset(model, self.toolset)
+        else:
+            model = self.model
+        print dump_project(model)
 
 
 def _indent(text):
