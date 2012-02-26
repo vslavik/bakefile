@@ -9,3 +9,15 @@ docs/html
 *.exe
 *.log
 distrib/pyinstaller/build
+Debug
+Release
+*.vcxproj*
+*.sln
+*.suo
+*.o
+*.d
+*.a
+*.so
+*.dylib
+GNUmakefile
+Makefile.osx
