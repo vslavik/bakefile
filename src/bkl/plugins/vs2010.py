@@ -26,7 +26,6 @@ import uuid
 import types
 import os.path
 import codecs
-import itertools
 from xml.sax.saxutils import escape, quoteattr
 
 import bkl.compilers
@@ -38,7 +37,9 @@ from bkl.utils import OrderedDict
 from bkl.io import OutputFile, EOL_WINDOWS
 
 # TODO: Move this somewhere else, where it could be reused.
-NAMESPACE_PRJ = uuid.UUID("{D9BD5916-F055-4D77-8C69-9448E02BF433}")
+NAMESPACE_PROJECT   = uuid.UUID("{D9BD5916-F055-4D77-8C69-9448E02BF433}")
+NAMESPACE_SLN_GROUP = uuid.UUID("{2D0C29E0-512F-47BE-9AC4-F4CAE74AE16E}")
+NAMESPACE_INTERNAL =  uuid.UUID("{BAA4019E-6D67-4EF1-B3CB-AE6CD82E4060}")
 
 def GUID(namespace, solution, data):
     """
@@ -154,6 +155,7 @@ class VS2010Solution(OutputFile):
         slnfile = module["vs2010.solutionfile"].as_native_path_for_output(module)
         super(VS2010Solution, self).__init__(slnfile, EOL_WINDOWS)
         self.name = module.name
+        self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.name)
         self.write(codecs.BOM_UTF8)
         self.write("\n")
         self.write("Microsoft Visual Studio Solution File, Format Version 11.00\n")
@@ -184,6 +186,12 @@ class VS2010Solution(OutputFile):
             for p in sln.all_projects():
                 yield p
 
+    def all_subsolutions(self):
+        for sln in self.subsolutions:
+            yield sln
+            for s in sln.all_subsolutions():
+                yield s
+
     def _get_project_info(self, id):
         for p in self.projects:
             if p[0] == id:
@@ -196,14 +204,15 @@ class VS2010Solution(OutputFile):
 
     def additional_deps(self):
         """
-        Yields additional projects to include, "external" deps e.g. from
+        Returns additional projects to include, "external" deps e.g. from
         parents, in the same format all_projects() uses.
         """
+        additional = []
         top = self
         while top.parent_solution:
             top = top.parent_solution
         if top is self:
-            return
+            return additional
 
         included = set(x[0] for x in self.all_projects())
         todo = set()
@@ -219,8 +228,9 @@ class VS2010Solution(OutputFile):
                 included.add(todo_item)
                 prj = top._get_project_info(todo_item)
                 todo_new.update(prj[3])
-                yield prj
+                additional.append(prj)
             todo.update(todo_new)
+        return additional
 
     def _find_target_guid_recursively(self, id):
         """Recursively search for the target in all submodules and return its GUID."""
@@ -244,9 +254,10 @@ class VS2010Solution(OutputFile):
             return guid
 
     def commit(self):
+        # Projects:
         guids = []
-        self.additional_deps()
-        for name, guid, filename, deps in itertools.chain(self.all_projects(), self.additional_deps()):
+        additional_deps = self.additional_deps()
+        for name, guid, filename, deps in list(self.all_projects()) + additional_deps:
             guids.append(guid)
             self.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\n' %
                        (name, self.formatter.format(filename), str(guid)))
@@ -257,6 +268,22 @@ class VS2010Solution(OutputFile):
                 self.write("\tEndProjectSection\n")
             self.write("EndProject\n")
 
+        # Folders in the solution:
+        all_folders = list(self.all_subsolutions())
+        if additional_deps:
+            class AdditionalDepsFolder: pass
+            extras = AdditionalDepsFolder()
+            extras.name = "Additional Dependencies"
+            extras.guid = GUID(NAMESPACE_INTERNAL, self.name, extras.name)
+            extras.projects = additional_deps
+            extras.subsolutions = []
+            all_folders.append(extras)
+        for sln in all_folders:
+            self.write('Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "%s", "%s", "%s"\n' %
+                       (sln.name, sln.name, sln.guid))
+            self.write("EndProject\n")
+
+        # Global settings:
         self.write("Global\n")
         self.write("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n")
         self.write("\t\tDebug|Win32 = Debug|Win32\n")
@@ -272,6 +299,18 @@ class VS2010Solution(OutputFile):
         self.write("\tGlobalSection(SolutionProperties) = preSolution\n")
         self.write("\t\tHideSolutionNode = FALSE\n")
         self.write("\tEndGlobalSection\n")
+
+        # Nesting of projects and folders in the tree:
+        if all_folders:
+            self.write("\tGlobalSection(NestedProjects) = preSolution\n")
+            for sln in all_folders:
+                for prj in sln.projects:
+                    prjguid = prj[1]
+                    self.write("\t\t%s = %s\n" % (prjguid, sln.guid))
+                for subsln in sln.subsolutions:
+                    self.write("\t\t%s = %s\n" % (subsln.guid, sln.guid))
+            self.write("\tEndGlobalSection\n")
+
         self.write("EndGlobal\n")
         super(VS2010Solution, self).commit()
 
@@ -289,7 +328,7 @@ def _project_name_from_solution(target):
 
 def _default_guid_for_project(target):
     """automatically generated"""
-    return '"%s"' % GUID(NAMESPACE_PRJ, target.parent.name, target.name)
+    return '"%s"' % GUID(NAMESPACE_PROJECT, target.parent.name, target.name)
 
 
 class VS2010Toolset(Toolset):
