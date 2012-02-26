@@ -62,3 +62,24 @@ def test_file_io_win(tmpdir):
     f.commit()
     text_read = p.read("rb")
     assert text_read == "one\r\ntwo\r\n"
+
+
+def test_expr_as_bool():
+    from bkl.expr import BoolValueExpr, ListExpr, LiteralExpr, ConcatExpr
+    bool_yes = BoolValueExpr(True)
+    bool_no = BoolValueExpr(False)
+    empty_list = ListExpr([])
+    a_list = ListExpr([bool_yes, bool_no])
+    literal = LiteralExpr("foo")
+    empty_literal = LiteralExpr("")
+    concat = ConcatExpr([empty_literal, literal, literal])
+    empty_concat = ConcatExpr([empty_literal, empty_literal])
+
+    assert bool(bool_yes)
+    assert bool(a_list)
+    assert bool(literal)
+    assert bool(concat)
+    assert not bool(bool_no)
+    assert not bool(empty_list)
+    assert not bool(empty_literal)
+    assert not bool(empty_concat)

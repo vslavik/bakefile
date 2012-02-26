@@ -348,7 +348,7 @@ class VS2010Toolset(Toolset):
             for sub in m.submodules:
                 m.solution.add_subsolution(sub.solution)
         for m in project.modules:
-            if m["vs2010.generate-solution"].as_py() == True:
+            if m["vs2010.generate-solution"]:
                 m.solution.commit()
 
 
@@ -414,7 +414,7 @@ class VS2010Toolset(Toolset):
                 # TODO: handle this as generic action target
                 assert False, "unknown target type %s" % target.type.name
             n.add("UseDebugLibraries", c == "Debug")
-            if target["win32-unicode"].as_py():
+            if target["win32-unicode"]:
                 n.add("CharacterSet", "Unicode")
             else:
                 n.add("CharacterSet", "MultiByte")

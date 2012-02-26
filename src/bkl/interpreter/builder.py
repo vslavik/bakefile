@@ -180,7 +180,7 @@ class Builder(object, CondTrackingMixin):
 
 
     def on_sources_or_headers(self, node):
-        if self.active_if_cond:
+        if self.active_if_cond is not None:
             raise ParserError("conditionally built sources not supported yet"
                               ' (condition "%s" set at %s)' % (
                                   self.active_if_cond, self.active_if_cond.pos))
@@ -193,7 +193,7 @@ class Builder(object, CondTrackingMixin):
 
         files = self._build_expression(node.files)
         for cond, f in enum_possible_values(files):
-            if cond:
+            if cond is not None:
                 raise ParserError("conditionally built sources not supported yet"
                                   ' (condition "%s" set at %s)' % (
                                       cond, cond.pos))
@@ -207,7 +207,7 @@ class Builder(object, CondTrackingMixin):
             raise ParserError("target with ID \"%s\" already exists (see %s)" %
                               (name, self.context.project.get_target(name).source_pos))
 
-        if self.active_if_cond:
+        if self.active_if_cond is not None:
             raise ParserError("conditionally built targets not supported yet"
                               ' (condition "%s" set at %s)' % (
                                   self.active_if_cond, self.active_if_cond.pos))
@@ -231,7 +231,7 @@ class Builder(object, CondTrackingMixin):
 
 
     def on_submodule(self, node):
-        if self.active_if_cond:
+        if self.active_if_cond is not None:
             raise ParserError("conditionally included submodules not supported yet"
                               ' (condition "%s" set at %s)' % (
                                   self.active_if_cond, self.active_if_cond.pos))
