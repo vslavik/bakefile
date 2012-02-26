@@ -357,6 +357,13 @@ class Module(ModelPart):
         """Submodules of this module."""
         return (x for x in self.project.modules if x.parent is self)
 
+    def is_submodule_of(self, module):
+        """Returns True if this module is (grand-)*child of *module*."""
+        m = self.parent
+        while m and m is not module:
+            m = m.parent
+        return m is module
+
     def add_target(self, target):
         """Adds a new target object to this module."""
         assert target.name not in self.targets

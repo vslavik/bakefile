@@ -188,6 +188,26 @@ class MakefileToolset(Toolset):
             with error_context(m):
                 self._gen_makefile(build_graphs, m)
 
+    def _get_submodule_deps(self, main, submodule):
+        """
+        Return list of dependencies that 'submodule' has on other submodules of
+        'main'.  Submodules have dependency if a target from one depends on a
+        target from another.
+        """
+        mod_deps = set()
+        project = main.project
+        inspect = [submodule] + [p for p in project.modules if p.is_submodule_of(submodule)]
+        for mod in inspect:
+            for target in mod.targets.itervalues():
+                for dep in target["deps"].as_py():
+                    tdep = project.get_target(dep)
+                    tmod = tdep.parent
+                    if tmod.is_submodule_of(main):
+                        while tmod.parent is not main:
+                            tmod = tmod.parent
+                        mod_deps.add(tmod.name)
+        return sorted(mod_deps)
+
     def _gen_makefile(self, build_graphs, module):
         output_value = module.get_variable_value("%s.makefile" % self.name)
         output = output_value.as_native_path_for_output(module)
@@ -236,10 +256,13 @@ class MakefileToolset(Toolset):
             # FIXME: use $dirname(), $basename() functions, this is hacky
             subdir = expr.PathExpr(subpath.components[:-1], anchor=subpath.anchor)
             subfile = subpath.components[-1]
-            submakefiles[sub] = (sub.name, expr_fmt.format(subdir), expr_fmt.format(subfile))
-        for subname, subdir, subfile in submakefiles.itervalues():
+            submakefiles[sub] = (sub.name,
+                                 expr_fmt.format(subdir),
+                                 expr_fmt.format(subfile),
+                                 self._get_submodule_deps(module, sub))
+        for subname, subdir, subfile, subdeps in submakefiles.itervalues():
             subcmd = self.Formatter.submake_command(subdir, subfile, "all")
-            f.write(self.Formatter.target(name=subname, deps=[], commands=[subcmd]))
+            f.write(self.Formatter.target(name=subname, deps=subdeps, commands=[subcmd]))
             phony_targets.append(subname)
 
         for t in module.targets.itervalues():
@@ -299,7 +322,7 @@ class MakefileToolset(Toolset):
                 for f in node.outputs:
                     if f.get_extension() not in self.autoclean_extensions:
                         yield "%s %s" % (self.del_command, expr_fmt.format(f))
-        for subname, subdir, subfile in submakefiles:
+        for subname, subdir, subfile, subdeps in submakefiles:
             yield self.Formatter.submake_command(subdir, subfile, "clean")
 
     def on_header(self, file):
