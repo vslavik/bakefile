@@ -103,7 +103,9 @@ class BasicSimplifier(Visitor):
         #       send to substitute paths, generally speaking, they tend to be
         #       larger.
         ref = e.get_value()
-        if isinstance(ref, LiteralExpr) or isinstance(ref, ReferenceExpr):
+        if (isinstance(ref, LiteralExpr) or
+            isinstance(ref, ReferenceExpr) or
+            isinstance(ref, BoolValueExpr)):
             return self.visit(ref)
         else:
             return e
