@@ -83,6 +83,11 @@ class Expr(object):
         """
         raise NotImplementedError
 
+    def __nonzero__(self):
+        # Derived expression classes should override this to make testing for
+        # non-empty values ("if expr:") work without the need to call as_py().
+        raise NotImplementedError
+
 
 class LiteralExpr(Expr):
     """
@@ -103,6 +108,9 @@ class LiteralExpr(Expr):
     def as_py(self):
         return self.value
 
+    def __nonzero__(self):
+        return bool(self.value)
+
     def __str__(self):
         return str(self.value)
 
@@ -117,6 +125,9 @@ class ListExpr(Expr):
 
     def as_py(self):
         return [ i.as_py() for i in self.items ]
+
+    def __nonzero__(self):
+        return bool(self.items)
 
     def __str__(self):
         return "[%s]" % ", ".join(str(x) for x in self.items)
@@ -135,6 +146,12 @@ class ConcatExpr(Expr):
     def as_py(self):
         return "".join(i.as_py() for i in self.items)
 
+    def __nonzero__(self):
+        for i in self.items:
+            if i:
+                return True
+        return False
+
     def __str__(self):
         return "".join(str(i) for i in self.items)
 
@@ -145,6 +162,9 @@ class NullExpr(Expr):
     """
     def as_py(self):
         return None
+
+    def __nonzero__(self):
+        return False
 
     def __str__(self):
         return "null"
@@ -190,6 +210,9 @@ class ReferenceExpr(Expr):
         with error_context(self):
             return self.context.get_variable_value(self.var)
 
+    def __nonzero__(self):
+        return bool(self.get_value())
+
     def __str__(self):
         return "$(%s)" % self.var
 
@@ -207,6 +230,9 @@ class BoolValueExpr(Expr):
         self.value = value
 
     def as_py(self):
+        return self.value
+
+    def __nonzero__(self):
         return self.value
 
     def __str__(self):
@@ -278,6 +304,19 @@ class BoolExpr(Expr):
         else:
             assert False, "invalid BoolExpr operator"
 
+    def __nonzero__(self):
+        left = bool(self.left)
+        right = bool(self.right)
+        op = self.operator
+        if op == BoolExpr.AND:
+            return left and right
+        elif op == BoolExpr.OR:
+            return left or right
+        elif op == BoolExpr.NOT:
+            return not left
+        else:
+            return self.as_py()
+
     def __str__(self):
         if self.operator == BoolExpr.NOT:
             return "!%s" % self.left
@@ -321,6 +360,15 @@ class IfExpr(Expr):
         """
         with error_context(self):
             return self.value_yes if self.cond.as_py() else self.value_no
+
+    def __nonzero__(self):
+        try:
+            if self.cond.as_py():
+                return bool(self.value_yes)
+            else:
+                return bool(self.value_no)
+        except NonConstError:
+            return bool(self.value_yes) or bool(self.value_no)
 
     def __str__(self):
         return "(%s ? %s : %s)" % (self.cond, self.value_yes, self.value_no)
@@ -370,6 +418,9 @@ class PathExpr(Expr):
 
     def as_py(self):
         raise NotImplementedError
+
+    def __nonzero__(self):
+        True
 
     def __str__(self):
         return "%s/%s" % (self.anchor, "/".join(str(e) for e in self.components))
@@ -740,7 +791,7 @@ class Formatter(Visitor):
         # cannot be determined.
         return self.format(e.get_value())
 
-        
+
 class CondTrackingMixin:
     """
     Helper mixin class for tracking currently active condition.
@@ -754,14 +805,14 @@ class CondTrackingMixin:
         self.if_stack = []
 
     def push_cond(self, cond):
-        if self.active_if_cond:
+        if self.active_if_cond is not None:
             # combine this condition with the outer 'if':
             cond = BoolExpr(BoolExpr.AND,
                             self.active_if_cond,
                             cond,
                             pos=cond.pos)
         self.if_stack.append(cond)
-    
+
     def pop_cond(self):
         self.if_stack.pop()
 
