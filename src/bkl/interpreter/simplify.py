@@ -163,9 +163,25 @@ class ConditionalsSimplifier(BasicSimplifier):
             if op == BoolExpr.NOT:
                 return BoolValueExpr(not e.left.as_py(), pos=e.pos)
             elif op == BoolExpr.AND:
-                return BoolValueExpr(e.left.as_py() and e.right.as_py(), pos=e.pos)
+                # We can simplify AND expressions even if one part is undeterminable
+                left = right = None
+                try:
+                    left = e.left.as_py()
+                except NonConstError:
+                    pass
+                try:
+                    right = e.right.as_py()
+                except NonConstError:
+                    pass
+                if left is not None and right is not None:
+                    return BoolValueExpr(left and right, pos=e.pos)
+                elif left is not None and left == True:
+                    return e.right
+                elif right is not None and right == True:
+                    return e.left
+
             elif op == BoolExpr.OR:
-                # We can simplify or expressions even if one part is undeterminable
+                # We can simplify OR expressions even if one part is undeterminable
                 left = right = None
                 try:
                     left = e.left.as_py()
