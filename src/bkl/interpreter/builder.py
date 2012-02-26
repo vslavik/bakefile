@@ -251,6 +251,8 @@ class Builder(object, CondTrackingMixin):
         if t is LiteralNode:
             # FIXME: type handling
             e = LiteralExpr(ast.text)
+        elif t is BoolvalNode:
+            e = BoolValueExpr(ast.value)
         elif t is VarReferenceNode:
             e= ReferenceExpr(ast.var, self.context)
         elif t is ListNode:

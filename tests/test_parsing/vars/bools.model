@@ -1,0 +1,10 @@
+module {
+  variables {
+    one = true
+    two = false
+    three = true
+    four = false
+  }
+  targets {
+  }
+}
