@@ -125,11 +125,12 @@ class ModelPart(object):
     @property
     def project(self):
         """
-        The :class:`bkl.mode.Project` project this part belongs to.
+        The :class:`bkl.model.Project` project this part belongs to.
         """
         prj = self
         while prj.parent is not None:
             prj = prj.parent
+        assert isinstance(prj, Project)
         return prj
 
     def child_parts(self):
@@ -281,15 +282,10 @@ class Project(ModelPart):
     .. attribute: modules
 
        List of all modules included in the project.
-
-    .. attribute: all_targets
-
-       Dictionary of all targets in the entire project.
     """
     def __init__(self):
         super(Project, self).__init__(parent=None)
         self.modules = []
-        self.all_targets = {}
 
     def __str__(self):
         return "the project"
@@ -304,12 +300,25 @@ class Project(ModelPart):
         """
         return self.modules[0]
 
+    def all_targets(self):
+        """Returns iterator over all targets in the project."""
+        for mod in self.modules:
+            for t in mod.targets.itervalues():
+                yield t
+
     def get_target(self, id):
         """Returns Target object identified by its string ID."""
-        try:
-            return self.all_targets[id]
-        except KeyError:
-            raise error.Error("target \"%s\" doesn't exist" % id)
+        for t in self.all_targets():
+            if t.name == id:
+                return t
+        raise error.Error("target \"%s\" doesn't exist" % id)
+
+    def has_target(self, id):
+        """Returns true if target with given name exists."""
+        for t in self.all_targets():
+            if t.name == id:
+                return True
+        return False
 
     def get_prop(self, name):
         return props.get_project_prop(name)
@@ -336,6 +345,7 @@ class Module(ModelPart):
     def __init__(self, parent, source_pos):
         super(Module, self).__init__(parent, source_pos)
         self.targets = utils.OrderedDict()
+        self.project.modules.append(self)
 
     def __str__(self):
         return "module %s" % self.source_file
@@ -356,13 +366,6 @@ class Module(ModelPart):
     def submodules(self):
         """Submodules of this module."""
         return (x for x in self.project.modules if x.parent is self)
-
-    def add_target(self, target):
-        """Adds a new target object to this module."""
-        assert target.name not in self.targets
-        assert target.name not in self.project.all_targets
-        self.targets[target.name] = target
-        self.project.all_targets[target.name] = target
 
     def get_prop(self, name):
         return props.get_module_prop(name)
@@ -401,6 +404,10 @@ class Target(ModelPart):
         self.type = target_type
         self.sources = []
         self.headers = []
+
+        assert isinstance(parent, Module)
+        assert not parent.project.has_target(name)
+        parent.targets[name] = self
 
     def __str__(self):
         return 'target "%s"' % self.name

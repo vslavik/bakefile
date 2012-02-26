@@ -112,7 +112,6 @@ class Interpreter(object):
         b = Builder(on_submodule=lambda fn, pos: submodules.append((fn,pos)))
 
         module = b.create_model(ast, parent)
-        self.model.modules.append(module)
 
         while submodules:
             sub_filename, sub_pos = submodules[0]

@@ -173,7 +173,7 @@ class MakefileToolset(Toolset):
         # TODO-MT: read only, can be ran in parallel
         build_graphs = {}
         norm = PathsNormalizer(self)
-        for t in project.all_targets.itervalues():
+        for t in project.all_targets():
             with error_context(t):
                 norm.set_context(t)
                 graph = t.type.get_build_subgraph(self, t)

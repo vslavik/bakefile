@@ -199,7 +199,7 @@ class Builder(object, CondTrackingMixin):
 
     def on_target(self, node):
         name = node.name.text
-        if name in self.context.project.all_targets:
+        if self.context.project.has_target(name):
             raise ParserError("target with ID \"%s\" already exists (see %s)" %
                               (name, self.context.project.get_target(name).source_pos))
 
@@ -212,7 +212,6 @@ class Builder(object, CondTrackingMixin):
         try:
             target_type = TargetType.get(type_name)
             target = Target(self.context, name, target_type, source_pos=node.pos)
-            self.context.add_target(target)
         except KeyError:
             raise ParserError("unknown target type \"%s\"" % type_name)
 
