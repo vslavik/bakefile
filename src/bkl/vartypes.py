@@ -143,13 +143,15 @@ class BoolType(Type):
             return e
 
     def _validate_impl(self, e):
-        if isinstance(e, expr.LiteralExpr):
-            if e.value not in self.allowed_values:
-                raise TypeError(self, e)
+        if isinstance(e, expr.BoolValueExpr):
+            return
         elif isinstance(e, expr.BoolExpr):
-            return
-        elif isinstance(e, expr.BoolValueExpr):
-            return
+            op = e.operator
+            if op == expr.BoolExpr.AND or op == expr.BoolExpr.OR:
+                self.validate(e.left)
+                self.validate(e.right)
+            elif op == expr.BoolExpr.NOT:
+                self.validate(e.left)
         else:
             raise TypeError(self, e)
 
