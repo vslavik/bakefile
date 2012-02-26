@@ -9,13 +9,14 @@ parser_file  := src/bkl/parser/BakefileParser.py
 lexer_file   := src/bkl/parser/BakefileLexer.py
 
 
-all: $(parser_file) $(lexer_file) doc
+all: parser doc
 
+parser: $(parser_file) $(lexer_file)
 
 %Parser.py %Lexer.py: %.g
 	$(ANTLR) $<
 
-doc:
+doc: parser
 	$(MAKE) -C docs all
 
 clean:
@@ -27,4 +28,4 @@ test: all
 	$(PYTEST)
 
 
-.PHONY: clean test doc
+.PHONY: clean test doc parser
