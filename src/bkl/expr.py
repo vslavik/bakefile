@@ -32,7 +32,7 @@ import os.path
 import itertools
 from abc import ABCMeta, abstractmethod
 
-from error import NonConstError, Error, error_context
+from error import NonConstError, CannotDetermineError, Error, error_context
 
 
 class Expr(object):
