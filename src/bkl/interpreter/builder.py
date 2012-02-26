@@ -26,7 +26,7 @@ from ..api import TargetType
 from ..expr import *
 from ..model import Module, Target, Variable, SourceFile
 from ..parser.ast import *
-from ..error import Error, ParserError
+from ..error import ParserError, error_context
 from ..vartypes import ListType
 
 
@@ -99,15 +99,11 @@ class Builder(object, CondTrackingMixin):
 
     def _handle_node(self, node):
         func = self._ast_dispatch[type(node)]
-        try:
+        # Assign position to the error if it wasn't done already; it's
+        # often more convenient to do it here than to keep track of the
+        # position across a hierarchy of nested calls.
+        with error_context(node):
             func(self, node)
-        except Error as e:
-            # Assign position to the error if it wasn't done already; it's
-            # often more convenient to do it here than to keep track of the
-            # position across a hierarchy of nested calls.
-            if e.pos is None and node.pos is not None:
-                e.pos = node.pos
-            raise e
 
 
     def on_assignment(self, node):
