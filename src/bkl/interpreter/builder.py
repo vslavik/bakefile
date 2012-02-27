@@ -29,6 +29,9 @@ from ..parser.ast import *
 from ..error import ParserError, error_context
 from ..vartypes import ListType
 
+import logging
+logger = logging.getLogger("bkl.builder")
+
 
 class Builder(object, CondTrackingMixin):
     """
@@ -111,6 +114,10 @@ class Builder(object, CondTrackingMixin):
         append = node.append
         value = self._build_expression(node.value)
         var = self.context.get_variable(varname)
+
+        if varname[0] == "_":
+            logger.warning("variable names beginning with underscore are reserved for internal use (\"%s\")",
+                           varname, extra={"pos":node.pos})
 
         has_cond = self.active_if_cond is not None
         if has_cond:

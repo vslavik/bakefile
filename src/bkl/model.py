@@ -443,11 +443,11 @@ class SourceFile(ModelPart):
     """
     def __init__(self, parent, filename, source_pos):
         super(SourceFile, self).__init__(parent, source_pos)
-        self.set_property_value("filename", filename)
+        self.set_property_value("_filename", filename)
 
     @property
     def filename(self):
-        return self["filename"]
+        return self["_filename"]
 
     def __str__(self):
         return "file %s" % self.filename

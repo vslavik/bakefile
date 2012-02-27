@@ -35,9 +35,10 @@ from api import Property
 def std_file_props():
     """Creates list of all standard source file properties."""
     return [
-        Property("filename",
+        Property("_filename",
              type=PathType(),
              default=[],
+             readonly=True,
              inheritable=False,
              doc="Source file name."),
         ]
