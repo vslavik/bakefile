@@ -277,8 +277,15 @@ class VS2010Solution(OutputFile):
             extras.guid = GUID(NAMESPACE_INTERNAL, self.name, extras.name)
             extras.projects = additional_deps
             extras.subsolutions = []
+            extras.parent_solution = None
             all_folders.append(extras)
         for sln in all_folders:
+            # don't have folders with just one item in them:
+            sln.omit_from_tree = (sln.parent_solution and
+                                  (len(sln.projects) + len(sln.subsolutions)) <= 1)
+            if sln.omit_from_tree:
+                print sln, sln.name, len(sln.projects), sln.parent_solution.name
+                continue
             self.write('Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "%s", "%s", "%s"\n' %
                        (sln.name, sln.name, sln.guid))
             self.write("EndProject\n")
@@ -306,7 +313,8 @@ class VS2010Solution(OutputFile):
             for sln in all_folders:
                 for prj in sln.projects:
                     prjguid = prj[1]
-                    self.write("\t\t%s = %s\n" % (prjguid, sln.guid))
+                    parentguid = sln.guid if not sln.omit_from_tree else sln.parent_solution.guid
+                    self.write("\t\t%s = %s\n" % (prjguid, parentguid))
                 for subsln in sln.subsolutions:
                     self.write("\t\t%s = %s\n" % (subsln.guid, sln.guid))
             self.write("\tEndGlobalSection\n")
