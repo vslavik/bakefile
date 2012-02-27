@@ -1,10 +1,35 @@
-toolsets = gnu vs2010;
+toolsets = gnu gnu-osx vs2010;
 
-exe hello {
-    sources { hello.c }
-    defines = PRINT_DETAILS;
-    if ($(toolset) == gnu)
-        defines += PLATFORM_UNIX;
-    if ($(toolset) == vs2010)
-        defines += PLATFORM_WINDOWS;
-}
+build_something = true;
+
+if ( $(build_something) ) {
+
+    if ( $(toolset) == gnu || $(toolset) == vs2010 ) {
+
+        exe hello {
+            sources { hello.c }
+            defines = PRINT_DETAILS;
+            if ($(toolset) == gnu)
+                defines += PLATFORM_UNIX;
+            if ($(toolset) == vs2010)
+                defines += PLATFORM_WINDOWS;
+        }
+
+    } // toolset is gnu/vs2010
+
+
+    if ( $(toolset) == gnu || $(toolset) == gnu-osx ) {
+        exe hello_gnu {
+            sources { hello.c }
+            if ( $(toolset) == gnu-osx )
+                sources { hello_osx.c }
+        }
+    }
+
+    if ( $(toolset) == vs2010 ) {
+        exe hello_windows {
+            sources { hello.c }
+        }
+    }
+
+} // build_something

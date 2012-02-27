@@ -35,7 +35,7 @@ import simplify
 import bkl.vartypes
 import bkl.expr
 import bkl.model
-from bkl.error import Error
+from bkl.error import Error, NonConstError
 from bkl.expr import Visitor
 from bkl.utils import memoized
 
@@ -136,6 +136,45 @@ def normalize_and_validate_vars(model):
     logger.debug("checking types of variables")
     for var in model.all_variables():
         var.type.validate(var.value)
+
+
+def remove_disabled_model_parts(model):
+    """
+    Removes disabled targets, source files etc. from the model. Disabled parts
+    are those with ``condition`` variable evaluating to false.
+    """
+
+    def _should_remove(part):
+        if part.condition is None:
+            return False
+        try:
+            return not part.condition.as_py()
+        except NonConstError:
+            cond = simplify.simplify(part.condition)
+            raise Error("condition for building %s couldn't be resolved\n(condition \"%s\" set at %s)" %
+                        (part, cond, cond.pos),
+                        pos=part.source_pos)
+
+    def _remove_from_list(parts):
+        to_del = []
+        for p in parts:
+            if _should_remove(p):
+                to_del.append(p)
+        for p in to_del:
+            logger.debug("removing disabled %s from %s", p, p.parent)
+            parts.remove(p)
+
+    for module in model.modules:
+        targets_to_del = []
+        for target in module.targets.itervalues():
+            if _should_remove(target):
+                targets_to_del.append(target)
+                continue
+            _remove_from_list(target.sources)
+            _remove_from_list(target.headers)
+        for target in targets_to_del:
+            logger.debug("removing disabled %s", target)
+            del module.targets[target.name]
 
 
 class PathsNormalizer(Visitor):

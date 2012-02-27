@@ -816,6 +816,15 @@ class CondTrackingMixin:
     def pop_cond(self):
         self.if_stack.pop()
 
+    def reset_cond_stack(self):
+        s = self.if_stack
+        self.if_stack = []
+        return s
+
+    def restore_cond_stack(self, stack):
+        assert not self.if_stack
+        self.if_stack = stack
+
 
 def split(e, sep):
     """
@@ -936,7 +945,7 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
         return out
 
 
-def enum_possible_values(e):
+def enum_possible_values(e, global_cond=None):
     """
     Returns all values that are possible, together with their respective
     conditions, as an iteratable of (condition, value) tuples. The condition
@@ -945,8 +954,18 @@ def enum_possible_values(e):
 
     Note that this function returns possible elements for lists. It skips null
     expressions as well.
+
+    :param e:
+            Expression to extract possible values from.
+    :param global_cond:
+            Optional condition expression (:class:`bkl.expr.Expr`) to apply to
+            all items. If specified, then every tuple in returned list will
+            have the condition set to either *global_cond* (for unconditional
+            items) or its combination with per-item condition.
     """
     v = _PossibleValuesVisitor()
+    if global_cond is not None:
+        v.push_cond(global_cond)
     return v.visit(e)
 
 

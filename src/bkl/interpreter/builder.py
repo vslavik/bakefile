@@ -183,10 +183,6 @@ class Builder(object, CondTrackingMixin):
 
 
     def on_sources_or_headers(self, node):
-        if self.active_if_cond is not None:
-            raise ParserError("conditionally built sources not supported yet"
-                              ' (condition "%s" set at %s)' % (
-                                  self.active_if_cond, self.active_if_cond.pos))
         if node.kind == "sources":
             filelist = self.context.sources
         elif node.kind == "headers":
@@ -195,12 +191,10 @@ class Builder(object, CondTrackingMixin):
             assert False, 'invalid files list kind "%s"' % node.kind
 
         files = self._build_expression(node.files)
-        for cond, f in enum_possible_values(files):
-            if cond is not None:
-                raise ParserError("conditionally built sources not supported yet"
-                                  ' (condition "%s" set at %s)' % (
-                                      cond, cond.pos))
+        for cond, f in enum_possible_values(files, global_cond=self.active_if_cond):
             obj = SourceFile(self.context, f, source_pos=f.pos)
+            if cond is not None:
+                obj.set_property_value("_condition", cond)
             filelist.append(obj)
 
 
@@ -210,20 +204,20 @@ class Builder(object, CondTrackingMixin):
             raise ParserError("target with ID \"%s\" already exists (see %s)" %
                               (name, self.context.project.get_target(name).source_pos))
 
-        if self.active_if_cond is not None:
-            raise ParserError("conditionally built targets not supported yet"
-                              ' (condition "%s" set at %s)' % (
-                                  self.active_if_cond, self.active_if_cond.pos))
-
         type_name = node.type.text
+
         try:
             target_type = TargetType.get(type_name)
             target = Target(self.context, name, target_type, source_pos=node.pos)
+            if self.active_if_cond is not None:
+                target.set_property_value("_condition", self.active_if_cond)
         except KeyError:
             raise ParserError("unknown target type \"%s\"" % type_name)
 
         # handle target-specific variables assignments etc:
+        condstack = self.reset_cond_stack()
         self.handle_children(node.content, target)
+        self.restore_cond_stack(condstack)
 
 
     def on_if(self, node):

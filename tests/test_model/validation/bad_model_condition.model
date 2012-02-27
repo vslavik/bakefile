@@ -1,0 +1,2 @@
+ERROR:
+validation/bad_model_condition.bkl:3:5: expression "foobar" is not a valid bool value

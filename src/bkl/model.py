@@ -140,6 +140,24 @@ class ModelPart(object):
         raise NotImplementedError
 
 
+    @property
+    def condition(self):
+        """
+        Condition expression (:class:`bkl.expr.Expr`) that describes when should
+        this part of the model be included. If it evaluates to true, the part is
+        build, otherwise it is not.  Typical use is enabling some targets or
+        source files only for some toolsets, but it may be more complicated.
+        Depending on the context and the toolset, the expression may even be
+        undeterminable until make-time, if it references some user options (but
+        not all toolsets can handle this). Is :const:`None` if no condition is
+        associated.
+        """
+        try:
+            return self.variables["_condition"].value
+        except KeyError:
+            return None
+
+
     def get_variable(self, name, recursively=False):
         """
         Returns variable object for given variable or None if it is not

@@ -144,6 +144,8 @@ class Interpreter(object):
         """
         Finalizes after "toolset" variable was set.
         """
+        passes.remove_disabled_model_parts(toolset_model)
+
         # TODO: do this in finalize() instead
         passes.make_variables_for_missing_props(toolset_model, toolset)
 
