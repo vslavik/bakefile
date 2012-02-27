@@ -214,6 +214,20 @@ class ModelPart(object):
         self.variables[var.name] = var
 
 
+    def set_property_value(self, prop, value):
+        """
+        Adds variable with a value for property *prop*.
+
+        The property must exist on this model part. This is just a convenience
+        wrapper around :meth:`add_variable()` and :meth:`get_prop()`.
+        """
+        if prop in self.variables:
+            self.variables[prop].value = value
+        else:
+            v = Variable.from_property(self.get_prop(prop), value)
+            self.add_variable(v)
+
+
     def get_prop(self, name):
         """
         Try to get a property *name*. Called by get_variable_value() if no
@@ -429,8 +443,7 @@ class SourceFile(ModelPart):
     """
     def __init__(self, parent, filename, source_pos):
         super(SourceFile, self).__init__(parent, source_pos)
-        fn = Variable.from_property(self.get_prop("filename"), filename)
-        self.add_variable(fn)
+        self.set_property_value("filename", filename)
 
     @property
     def filename(self):
