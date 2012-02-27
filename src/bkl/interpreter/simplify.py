@@ -217,3 +217,13 @@ class ConditionalsSimplifier(BasicSimplifier):
                 return e.value_no
         except NonConstError:
             return e
+
+
+def simplify(e):
+    """
+    Simplifies given expression as much as possible, employing all tricks in
+    the book.
+
+    Currently, that means applying ConditionalsSimplifier on it.
+    """
+    return ConditionalsSimplifier().visit(e)
