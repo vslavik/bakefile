@@ -284,7 +284,6 @@ class VS2010Solution(OutputFile):
             sln.omit_from_tree = (sln.parent_solution and
                                   (len(sln.projects) + len(sln.subsolutions)) <= 1)
             if sln.omit_from_tree:
-                print sln, sln.name, len(sln.projects), sln.parent_solution.name
                 continue
             self.write('Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "%s", "%s", "%s"\n' %
                        (sln.name, sln.name, sln.guid))
