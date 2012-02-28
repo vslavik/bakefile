@@ -138,7 +138,7 @@ def normalize_and_validate_vars(model):
         var.type.validate(var.value)
 
 
-def remove_disabled_model_parts(model):
+def remove_disabled_model_parts(model, toolset):
     """
     Removes disabled targets, source files etc. from the model. Disabled parts
     are those with ``condition`` variable evaluating to false.
@@ -175,6 +175,23 @@ def remove_disabled_model_parts(model):
         for target in targets_to_del:
             logger.debug("removing disabled %s", target)
             del module.targets[target.name]
+
+    # remove any empty submodules:
+    mods_to_del = []
+    for module in model.modules:
+        if module is model.top_module:
+            continue
+        if not list(module.submodules) and not module.targets:
+            logger.debug("removing empty %s", module)
+            mods_to_del.append(module)
+        mod_toolsets = module.get_variable("toolsets")
+        if mod_toolsets and toolset not in mod_toolsets.value.as_py():
+            logger.debug("removing %s, because it isn't for toolset %s (is for: %s)",
+                         module, toolset, mod_toolsets.value.as_py())
+            mods_to_del.append(module)
+    for module in mods_to_del:
+        model.modules.remove(module)
+
 
 
 class PathsNormalizer(Visitor):
