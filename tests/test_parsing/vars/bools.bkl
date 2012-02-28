@@ -1,0 +1,7 @@
+// Verify that true/false are parsed as booleans, but quoted values
+// ("true") as literals.
+
+one = true;
+two = false;
+three = "true";
+four = "false";

@@ -125,11 +125,12 @@ class ModelPart(object):
     @property
     def project(self):
         """
-        The :class:`bkl.mode.Project` project this part belongs to.
+        The :class:`bkl.model.Project` project this part belongs to.
         """
         prj = self
         while prj.parent is not None:
             prj = prj.parent
+        assert isinstance(prj, Project)
         return prj
 
     def child_parts(self):
@@ -137,6 +138,24 @@ class ModelPart(object):
         Yields model parts that are (direct) children of this.
         """
         raise NotImplementedError
+
+
+    @property
+    def condition(self):
+        """
+        Condition expression (:class:`bkl.expr.Expr`) that describes when should
+        this part of the model be included. If it evaluates to true, the part is
+        build, otherwise it is not.  Typical use is enabling some targets or
+        source files only for some toolsets, but it may be more complicated.
+        Depending on the context and the toolset, the expression may even be
+        undeterminable until make-time, if it references some user options (but
+        not all toolsets can handle this). Is :const:`None` if no condition is
+        associated.
+        """
+        try:
+            return self.variables["_condition"].value
+        except KeyError:
+            return None
 
 
     def get_variable(self, name, recursively=False):
@@ -213,6 +232,20 @@ class ModelPart(object):
         self.variables[var.name] = var
 
 
+    def set_property_value(self, prop, value):
+        """
+        Adds variable with a value for property *prop*.
+
+        The property must exist on this model part. This is just a convenience
+        wrapper around :meth:`add_variable()` and :meth:`get_prop()`.
+        """
+        if prop in self.variables:
+            self.variables[prop].value = value
+        else:
+            v = Variable.from_property(self.get_prop(prop), value)
+            self.add_variable(v)
+
+
     def get_prop(self, name):
         """
         Try to get a property *name*. Called by get_variable_value() if no
@@ -281,15 +314,10 @@ class Project(ModelPart):
     .. attribute: modules
 
        List of all modules included in the project.
-
-    .. attribute: all_targets
-
-       Dictionary of all targets in the entire project.
     """
     def __init__(self):
         super(Project, self).__init__(parent=None)
         self.modules = []
-        self.all_targets = {}
 
     def __str__(self):
         return "the project"
@@ -304,12 +332,25 @@ class Project(ModelPart):
         """
         return self.modules[0]
 
+    def all_targets(self):
+        """Returns iterator over all targets in the project."""
+        for mod in self.modules:
+            for t in mod.targets.itervalues():
+                yield t
+
     def get_target(self, id):
         """Returns Target object identified by its string ID."""
-        try:
-            return self.all_targets[id]
-        except KeyError:
-            raise error.Error("target \"%s\" doesn't exist" % id)
+        for t in self.all_targets():
+            if t.name == id:
+                return t
+        raise error.Error("target \"%s\" doesn't exist" % id)
+
+    def has_target(self, id):
+        """Returns true if target with given name exists."""
+        for t in self.all_targets():
+            if t.name == id:
+                return True
+        return False
 
     def get_prop(self, name):
         return props.get_project_prop(name)
@@ -336,6 +377,7 @@ class Module(ModelPart):
     def __init__(self, parent, source_pos):
         super(Module, self).__init__(parent, source_pos)
         self.targets = utils.OrderedDict()
+        self.project.modules.append(self)
 
     def __str__(self):
         return "module %s" % self.source_file
@@ -363,13 +405,6 @@ class Module(ModelPart):
         while m and m is not module:
             m = m.parent
         return m is module
-
-    def add_target(self, target):
-        """Adds a new target object to this module."""
-        assert target.name not in self.targets
-        assert target.name not in self.project.all_targets
-        self.targets[target.name] = target
-        self.project.all_targets[target.name] = target
 
     def get_prop(self, name):
         return props.get_module_prop(name)
@@ -409,6 +444,10 @@ class Target(ModelPart):
         self.sources = []
         self.headers = []
 
+        assert isinstance(parent, Module)
+        assert not parent.project.has_target(name)
+        parent.targets[name] = self
+
     def __str__(self):
         return 'target "%s"' % self.name
 
@@ -429,12 +468,11 @@ class SourceFile(ModelPart):
     """
     def __init__(self, parent, filename, source_pos):
         super(SourceFile, self).__init__(parent, source_pos)
-        fn = Variable.from_property(self.get_prop("filename"), filename)
-        self.add_variable(fn)
+        self.set_property_value("_filename", filename)
 
     @property
     def filename(self):
-        return self["filename"]
+        return self["_filename"]
 
     def __str__(self):
         return "file %s" % self.filename

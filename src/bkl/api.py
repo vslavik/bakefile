@@ -291,6 +291,14 @@ class Property(object):
         self.toolsets = None
         self.__doc__ = doc
 
+    @property
+    def internal(self):
+        """
+        True if the property is for internal purposes and shouldn't be used by
+        users, False otherwise.
+        """
+        return self.name[0] == "_"
+
     def default_expr(self, for_obj):
         """
         Returns the value of :attr:`default` expression. Always returns

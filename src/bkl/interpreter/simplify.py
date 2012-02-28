@@ -103,7 +103,9 @@ class BasicSimplifier(Visitor):
         #       send to substitute paths, generally speaking, they tend to be
         #       larger.
         ref = e.get_value()
-        if isinstance(ref, LiteralExpr) or isinstance(ref, ReferenceExpr):
+        if (isinstance(ref, LiteralExpr) or
+            isinstance(ref, ReferenceExpr) or
+            isinstance(ref, BoolValueExpr)):
             return self.visit(ref)
         else:
             return e
@@ -161,9 +163,25 @@ class ConditionalsSimplifier(BasicSimplifier):
             if op == BoolExpr.NOT:
                 return BoolValueExpr(not e.left.as_py(), pos=e.pos)
             elif op == BoolExpr.AND:
-                return BoolValueExpr(e.left.as_py() and e.right.as_py(), pos=e.pos)
+                # We can simplify AND expressions even if one part is undeterminable
+                left = right = None
+                try:
+                    left = e.left.as_py()
+                except NonConstError:
+                    pass
+                try:
+                    right = e.right.as_py()
+                except NonConstError:
+                    pass
+                if left is not None and right is not None:
+                    return BoolValueExpr(left and right, pos=e.pos)
+                elif left is not None and left == True:
+                    return e.right
+                elif right is not None and right == True:
+                    return e.left
+
             elif op == BoolExpr.OR:
-                # We can simplify or expressions even if one part is undeterminable
+                # We can simplify OR expressions even if one part is undeterminable
                 left = right = None
                 try:
                     left = e.left.as_py()
@@ -199,3 +217,13 @@ class ConditionalsSimplifier(BasicSimplifier):
                 return e.value_no
         except NonConstError:
             return e
+
+
+def simplify(e):
+    """
+    Simplifies given expression as much as possible, employing all tricks in
+    the book.
+
+    Currently, that means applying ConditionalsSimplifier on it.
+    """
+    return ConditionalsSimplifier().visit(e)

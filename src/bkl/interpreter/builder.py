@@ -29,6 +29,9 @@ from ..parser.ast import *
 from ..error import ParserError, error_context
 from ..vartypes import ListType
 
+import logging
+logger = logging.getLogger("bkl.builder")
+
 
 class Builder(object, CondTrackingMixin):
     """
@@ -112,6 +115,10 @@ class Builder(object, CondTrackingMixin):
         value = self._build_expression(node.value)
         var = self.context.get_variable(varname)
 
+        if varname[0] == "_":
+            logger.warning("variable names beginning with underscore are reserved for internal use (\"%s\")",
+                           varname, extra={"pos":node.pos})
+
         has_cond = self.active_if_cond is not None
         if has_cond:
             if append and isinstance(value, ListExpr):
@@ -176,10 +183,6 @@ class Builder(object, CondTrackingMixin):
 
 
     def on_sources_or_headers(self, node):
-        if self.active_if_cond is not None:
-            raise ParserError("conditionally built sources not supported yet"
-                              ' (condition "%s" set at %s)' % (
-                                  self.active_if_cond, self.active_if_cond.pos))
         if node.kind == "sources":
             filelist = self.context.sources
         elif node.kind == "headers":
@@ -188,36 +191,33 @@ class Builder(object, CondTrackingMixin):
             assert False, 'invalid files list kind "%s"' % node.kind
 
         files = self._build_expression(node.files)
-        for cond, f in enum_possible_values(files):
-            if cond is not None:
-                raise ParserError("conditionally built sources not supported yet"
-                                  ' (condition "%s" set at %s)' % (
-                                      cond, cond.pos))
+        for cond, f in enum_possible_values(files, global_cond=self.active_if_cond):
             obj = SourceFile(self.context, f, source_pos=f.pos)
+            if cond is not None:
+                obj.set_property_value("_condition", cond)
             filelist.append(obj)
 
 
     def on_target(self, node):
         name = node.name.text
-        if name in self.context.project.all_targets:
+        if self.context.project.has_target(name):
             raise ParserError("target with ID \"%s\" already exists (see %s)" %
                               (name, self.context.project.get_target(name).source_pos))
 
-        if self.active_if_cond is not None:
-            raise ParserError("conditionally built targets not supported yet"
-                              ' (condition "%s" set at %s)' % (
-                                  self.active_if_cond, self.active_if_cond.pos))
-
         type_name = node.type.text
+
         try:
             target_type = TargetType.get(type_name)
             target = Target(self.context, name, target_type, source_pos=node.pos)
-            self.context.add_target(target)
+            if self.active_if_cond is not None:
+                target.set_property_value("_condition", self.active_if_cond)
         except KeyError:
             raise ParserError("unknown target type \"%s\"" % type_name)
 
         # handle target-specific variables assignments etc:
+        condstack = self.reset_cond_stack()
         self.handle_children(node.content, target)
+        self.restore_cond_stack(condstack)
 
 
     def on_if(self, node):
@@ -251,6 +251,8 @@ class Builder(object, CondTrackingMixin):
         if t is LiteralNode:
             # FIXME: type handling
             e = LiteralExpr(ast.text)
+        elif t is BoolvalNode:
+            e = BoolValueExpr(ast.value)
         elif t is VarReferenceNode:
             e= ReferenceExpr(ast.var, self.context)
         elif t is ListNode:

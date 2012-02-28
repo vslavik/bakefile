@@ -29,15 +29,29 @@ Also define standard, always available, properties.
 """
 
 import expr, api, utils
-from vartypes import IdType, EnumType, ListType, PathType, StringType
+from vartypes import IdType, EnumType, ListType, PathType, StringType, BoolType
 from api import Property
+
+def _std_model_part_props():
+    return [
+        Property("_condition",
+             type=BoolType(),
+             default=True,
+             readonly=True,
+             inheritable=False,
+             doc="""
+                 Whether to include this object in the build.
+                 Typically a more complicated boolean expression.
+                 """),
+        ]
 
 def std_file_props():
     """Creates list of all standard source file properties."""
-    return [
-        Property("filename",
+    return _std_model_part_props() + [
+        Property("_filename",
              type=PathType(),
              default=[],
+             readonly=True,
              inheritable=False,
              doc="Source file name."),
         ]
@@ -45,7 +59,7 @@ def std_file_props():
 
 def std_target_props():
     """Creates list of all standard target properties."""
-    return [
+    return _std_model_part_props() + [
         Property("id",
                  type=IdType(),
                  default=lambda t: expr.LiteralExpr(t.name),

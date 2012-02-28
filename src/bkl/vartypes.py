@@ -132,24 +132,16 @@ class BoolType(Type):
     """
     name = "bool"
 
-    TRUE  = "true"
-    FALSE = "false"
-    allowed_values = [TRUE, FALSE]
-
-    def _normalize_impl(self, e):
-        if isinstance(e, expr.LiteralExpr):
-            return expr.BoolValueExpr(e.value == self.TRUE)
-        else:
-            return e
-
     def _validate_impl(self, e):
-        if isinstance(e, expr.LiteralExpr):
-            if e.value not in self.allowed_values:
-                raise TypeError(self, e)
+        if isinstance(e, expr.BoolValueExpr):
+            return
         elif isinstance(e, expr.BoolExpr):
-            return
-        elif isinstance(e, expr.BoolValueExpr):
-            return
+            op = e.operator
+            if op == expr.BoolExpr.AND or op == expr.BoolExpr.OR:
+                self.validate(e.left)
+                self.validate(e.right)
+            elif op == expr.BoolExpr.NOT:
+                self.validate(e.left)
         else:
             raise TypeError(self, e)
 
@@ -282,6 +274,8 @@ def guess_expr_type(e):
         return PathType()
     if isinstance(e, expr.ListExpr):
         return ListType(AnyType())
+    if isinstance(e, expr.BoolExpr) or isinstance(e, expr.BoolValueExpr):
+        return BoolType()
     return AnyType()
 
 

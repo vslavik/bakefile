@@ -1,7 +1,7 @@
 RootNode
     AssignmentNode
         IdNode foo
-        LiteralNode "true"
+        BoolvalNode True
     AppendNode
         IdNode foo
         LiteralNode "FOO"

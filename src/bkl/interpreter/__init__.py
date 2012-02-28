@@ -112,7 +112,6 @@ class Interpreter(object):
         b = Builder(on_submodule=lambda fn, pos: submodules.append((fn,pos)))
 
         module = b.create_model(ast, parent)
-        self.model.modules.append(module)
 
         while submodules:
             sub_filename, sub_pos = submodules[0]
@@ -145,6 +144,8 @@ class Interpreter(object):
         """
         Finalizes after "toolset" variable was set.
         """
+        passes.remove_disabled_model_parts(toolset_model, toolset)
+
         # TODO: do this in finalize() instead
         passes.make_variables_for_missing_props(toolset_model, toolset)
 
@@ -196,9 +197,9 @@ class Interpreter(object):
         """
         Generates output for given *toolset*.
         """
-        logger.debug("preparing model for toolset %s", toolset)
+        logger.debug("****** preparing model for toolset %s ******", toolset)
         model = self.make_toolset_specific_model(toolset)
         self.finalize_for_toolset(model, toolset)
 
-        logger.debug("generating for toolset %s", toolset)
+        logger.debug("****** generating for toolset %s ********", toolset)
         bkl.api.Toolset.get(toolset).generate(model)

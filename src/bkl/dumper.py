@@ -109,7 +109,13 @@ def _dump_variable(var):
 
 
 def _dump_source(source):
-    return str(source)
+    out = str(source)
+    vars = [x for x in source.variables.iterkeys() if x != "_filename"]
+    if vars:
+        out += "\t{ "
+        out += "; ".join(_dump_variable(source.variables[name]) for name in vars)
+        out += " }"
+    return out
 
 def _dump_target(target):
     out = "%s %s {\n" % (target.type.name, target.name)

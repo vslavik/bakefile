@@ -37,6 +37,7 @@ tokens {
     ASSIGN;
     APPEND;
     LITERAL;
+    BOOLVAL;
     VAR_REFERENCE;
     LIST_OR_CONCAT;
     LIST;
@@ -147,6 +148,7 @@ element
 
 element_part
     : literal                              -> literal
+    | bool_value                           -> bool_value
     | '$' LPAREN identifier RPAREN         -> ^(VAR_REFERENCE identifier)
     ;
 
@@ -156,6 +158,9 @@ literal
     : t=TEXT                   -> LITERAL[$t]
     | t=QUOTED_TEXT            -> LITERAL[$t, $t.text[1:-1\]]
     ;
+
+bool_value
+    : (t=TRUE | t=FALSE)       -> BOOLVAL[$t];
 
 // ---------------------------------------------------------------------------
 // Targets
@@ -193,6 +198,9 @@ NOT_EQUAL: '!=';
 
 LPAREN:    '(';
 RPAREN:    ')';
+
+TRUE:      'true';
+FALSE:     'false';
 
 QUOTED_TEXT: '"' (options{greedy=false;}:.)* '"';
 

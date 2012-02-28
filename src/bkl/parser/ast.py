@@ -120,6 +120,16 @@ class LiteralNode(Node):
         return '%s "%s"' % (self.__class__.__name__, self.text)
 
 
+class BoolvalNode(Node):
+    """Boolean constant (true/false)."""
+
+    #: Value of the node, as boolean
+    value = property(lambda self: self.text == "true")
+
+    def __str__(self):
+        return "%s %s" % (self.__class__.__name__, self.value)
+
+
 class ListNode(Node):
     """
     Right side of variable assignment, contains list of values (LiteralNode,
@@ -222,6 +232,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
     TOKENS_MAP = {
         BakefileParser.PROGRAM        : RootNode,
         BakefileParser.LITERAL        : LiteralNode,
+        BakefileParser.BOOLVAL        : BoolvalNode,
         BakefileParser.ID             : IdNode,
         BakefileParser.LIST           : ListNode,
         BakefileParser.CONCAT         : ConcatNode,

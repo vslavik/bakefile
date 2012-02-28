@@ -127,7 +127,8 @@ def write_properties(props_func):
     txt = "\n\nProperties\n----------\n\n"
 
     for p in props:
-        txt += write_property(p)
+        if not p.internal:
+            txt += write_property(p)
 
     return txt
 
@@ -174,7 +175,7 @@ def write_extension_docs(kind, extension, props_func=None):
     else:
         ptext = "\n\n%s\n\n" % underline("Properties", "-")
         for pkind in extension.all_properties_kinds():
-            pall = list(extension.all_properties(pkind))
+            pall = list(p for p in extension.all_properties(pkind) if not p.internal)
             if pall:
                 ptext += "\n\n%s\n\n" % underline(prop_scope(pkind), "^")
                 for p in pall:
