@@ -197,9 +197,9 @@ class Interpreter(object):
         """
         Generates output for given *toolset*.
         """
-        logger.debug("preparing model for toolset %s", toolset)
+        logger.debug("****** preparing model for toolset %s ******", toolset)
         model = self.make_toolset_specific_model(toolset)
         self.finalize_for_toolset(model, toolset)
 
-        logger.debug("generating for toolset %s", toolset)
+        logger.debug("****** generating for toolset %s ********", toolset)
         bkl.api.Toolset.get(toolset).generate(model)
