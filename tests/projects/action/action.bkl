@@ -1,4 +1,4 @@
-toolsets = gnu;
+toolsets = gnu gnu-osx;
 
 action hello {
     commands = "echo Hello, cwd is:"
