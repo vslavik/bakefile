@@ -221,7 +221,7 @@ class MakefileToolset(Toolset):
         expr_fmt = _MakefileExprFormatter(self.Formatter, paths_info)
 
         f = io.OutputFile(output, io.EOL_UNIX)
-        self.on_header(f)
+        self.on_header(f, module)
 
         for v in module.variables:
             pass
@@ -310,7 +310,7 @@ class MakefileToolset(Toolset):
         f.write(self.Formatter.target(name="clean", deps=[], commands=clean_cmds))
 
         self.on_phony_targets(f, phony_targets)
-        self.on_footer(f)
+        self.on_footer(f, module)
 
         f.commit()
 
@@ -325,7 +325,7 @@ class MakefileToolset(Toolset):
         for subname, subdir, subfile, subdeps in submakefiles:
             yield self.Formatter.submake_command(subdir, subfile, "clean")
 
-    def on_header(self, file):
+    def on_header(self, file, module):
         """
         Called before starting generating the output to add any header text,
         typically used to insert a warning about the file being auto-generated.
@@ -339,7 +339,7 @@ class MakefileToolset(Toolset):
         """
         pass
 
-    def on_footer(self, file):
+    def on_footer(self, file, module):
         """
         Called at the end of generating the output to add any ending text, for
         example unconditional inclusion of dependencies tracking code.
