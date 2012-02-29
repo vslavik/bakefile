@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product
+        Id="E2DC5E3C-FE8E-4A6E-ABCD-DE5094579B0D"
+        Name="Bakefile"
+        Language="1033"
+        Version="1.0.0.0"
+        Manufacturer="Bakefile Developers"
+        UpgradeCode="3333163D-CC42-4920-B26E-E4B58611ABCF">
+
+        <Package Compressed="yes" InstallPrivileges="limited"/>
+        <Media Id="1" Cabinet="main.cab" EmbedCab="yes"/>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLDIR" Name="bakefile">
+                    <Directory Id="DOCSDIR" Name="docs">
+                        <Directory Id="DOCSSTATICDIR" Name="_static" />
+                        <Directory Id="DOCSREFDIR" Name="ref" />
+                    </Directory>
+                </Directory>
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="Bakefile"/>
+            </Directory>
+        </Directory>
+
+        <DirectoryRef Id="INSTALLDIR">
+            <Component Id="cmpbkl" Guid="*">
+                <File Id="File_Bkl" Source="../../bkl.exe" KeyPath="yes"/>
+            </Component>
+            <Component Id="cmpreadme" Guid="*">
+                <File Id="File_Readme" Source="../../Readme" KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="ApplicationProgramsFolder">
+            <Component Id="ApplicationShortcut" Guid="1C34A3D7-2ACB-4544-B70E-80B039E2AF30">
+                <Shortcut Id="DocsShortcut"
+                          Name="Bakefile Documentation"
+                          Description="View Bakefile documentation"
+                          Target="[DOCSDIR]intro.html"/>
+                <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="Software\Bakefile" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="DOCSDIR">
+            <Component Id="cmpC98710486B03095BD51CFE70377E2CBD" Guid="*">
+                <File Id="fil224A8A8AD6C343BC38B25B4512FF9271" KeyPath="yes" Source="..\..\docs\html\api.html" />
+            </Component>
+            <Component Id="cmpA522226B406D37D261D727046A90E0F3" Guid="*">
+                <File Id="fil263FC45BC8500DFF42673D0097FE12F0" KeyPath="yes" Source="..\..\docs\html\devel.html" />
+            </Component>
+            <Component Id="cmp3DD3317E5E83314C449F3BCD0D755905" Guid="*">
+                <File Id="fil088532905C5643B1B598BE00DE223713" KeyPath="yes" Source="..\..\docs\html\genindex.html" />
+            </Component>
+            <Component Id="cmpC7FED05B4F634817D86787D80BD4AF6A" Guid="*">
+                <File Id="fil02DB1444C8F949C950381E7E8954B30F" KeyPath="yes" Source="..\..\docs\html\glossary.html" />
+            </Component>
+            <Component Id="cmp663E332619001D4BEB7C03AAB670DEEB" Guid="*">
+                <File Id="fil160197F2CC10122BE69F98AEF8004373" KeyPath="yes" Source="..\..\docs\html\index.html" />
+            </Component>
+            <Component Id="cmp48681B53BFCB65D1197817C0142E7BF5" Guid="*">
+                <File Id="fil24765C31FB3A1C697CE7122AE9C7A31D" KeyPath="yes" Source="..\..\docs\html\internals.html" />
+            </Component>
+            <Component Id="cmp815A1A206992686D72397A5775E8F8A4" Guid="*">
+                <File Id="fil8AC056DF0ADF1EA298D6EBB0A4BF2B60" KeyPath="yes" Source="..\..\docs\html\intro.html" />
+            </Component>
+            <Component Id="cmpB7AA09E1E701A9BF4A93B7D2CD6964C2" Guid="*">
+                <File Id="filF0BC49BF6005A3778D4C073B5E89FC42" KeyPath="yes" Source="..\..\docs\html\language.html" />
+            </Component>
+            <Component Id="cmpF33A7352F7AA7FF2AAC22664BE20BA76" Guid="*">
+                <File Id="fil42A3352F244880C1789E855BAB71920C" KeyPath="yes" Source="..\..\docs\html\py-modindex.html" />
+            </Component>
+            <Component Id="cmp8B624C71BCF38DC615689FF93D27BB1B" Guid="*">
+                <File Id="fil02A070FDC14C66BF10535D544A5524B0" KeyPath="yes" Source="..\..\docs\html\ref.html" />
+            </Component>
+            <Component Id="cmp4CF156D8BFB2F3BD00F4D538124EE5DC" Guid="*">
+                <File Id="filF6FE2D68AB8E33C610D4E7CE288889A1" KeyPath="yes" Source="..\..\docs\html\ref_targets.html" />
+            </Component>
+            <Component Id="cmp0266AD8FE57FDD20C63DE8BAA74B197C" Guid="*">
+                <File Id="filD2887523907CEE1563B2F9937954DD70" KeyPath="yes" Source="..\..\docs\html\ref_toolsets.html" />
+            </Component>
+            <Component Id="cmp8B7C9A071D1250DF3AD5A07094066748" Guid="*">
+                <File Id="fil9D2776A700CCEABED4AEDCE9E1ADF191" KeyPath="yes" Source="..\..\docs\html\search.html" />
+            </Component>
+            <Component Id="cmp17A9083142799E7DDBA9997744A930B4" Guid="*">
+                <File Id="fil862E9F2E0288CDF6F65C61672C194FFF" KeyPath="yes" Source="..\..\docs\html\searchindex.js" />
+            </Component>
+            <Component Id="cmp7137658A3C3285153C74DB9FA34DC9C0" Guid="*">
+                <File Id="filEEA79A0A508BD93863FB9345358DDBA5" KeyPath="yes" Source="..\..\docs\html\tutorial.html" />
+            </Component>
+        </DirectoryRef>
+        <DirectoryRef Id="DOCSREFDIR">
+            <Component Id="cmp4DBFC9BBD7885E42BF34C763507097F4" Guid="*">
+                <File Id="fil59531FBDD680089C1E2EC1315E48B9FC" KeyPath="yes" Source="..\..\docs\html\ref\module.html" />
+            </Component>
+            <Component Id="cmp711AD01965535658539828074944FB0E" Guid="*">
+                <File Id="filE1F39C25231C91BE935D13ED14F181EF" KeyPath="yes" Source="..\..\docs\html\ref\project.html" />
+            </Component>
+            <Component Id="cmp3A1E774B374338B9F32F71F744130185" Guid="*">
+                <File Id="fil8E981AA7C4D745B41791CBC5BE163CB5" KeyPath="yes" Source="..\..\docs\html\ref\target_action.html" />
+            </Component>
+            <Component Id="cmp2926DA8C41539E7D675BFDA7AEAC9E04" Guid="*">
+                <File Id="fil0C41705696B4274322E838959765BA80" KeyPath="yes" Source="..\..\docs\html\ref\target_dll.html" />
+            </Component>
+            <Component Id="cmp3ED6B7E145717A01773513BA67D10BE9" Guid="*">
+                <File Id="fil000068F973890EA7ECAD1A03FCB58C41" KeyPath="yes" Source="..\..\docs\html\ref\target_exe.html" />
+            </Component>
+            <Component Id="cmp81F829AD41FD435BF590C598728C1048" Guid="*">
+                <File Id="fil95EBE3D9B79469EB6B51EC56262F8C5B" KeyPath="yes" Source="..\..\docs\html\ref\target_library.html" />
+            </Component>
+            <Component Id="cmp8ACDF6FA39B6977FC5DA434D7065721F" Guid="*">
+                <File Id="fil835C7A92E7B749B8ECC8D889C7716E36" KeyPath="yes" Source="..\..\docs\html\ref\toolset_gnu-osx.html" />
+            </Component>
+            <Component Id="cmpB50F710404CE3EB856417242BE4A0C70" Guid="*">
+                <File Id="filF70442C1B6AF0EB85977951311FFA58F" KeyPath="yes" Source="..\..\docs\html\ref\toolset_gnu.html" />
+            </Component>
+            <Component Id="cmp672626F29398317F1DBE014276666B3E" Guid="*">
+                <File Id="filCE909D6E29D7B04D70405D89FAF4A1BC" KeyPath="yes" Source="..\..\docs\html\ref\toolset_vs2010.html" />
+            </Component>
+        </DirectoryRef>
+        <DirectoryRef Id="DOCSSTATICDIR">
+            <Component Id="cmp90CA274F3F4BDE2F4C2F0495FBD548ED" Guid="*">
+                <File Id="fil7A0FE26817C66E7E1C03B6A40B3EE822" KeyPath="yes" Source="..\..\docs\html\_static\agogo.css" />
+            </Component>
+            <Component Id="cmp9D8F3A548226819C41DBCA0FCA995137" Guid="*">
+                <File Id="filEA487F4433550C7C0D6B585A69167692" KeyPath="yes" Source="..\..\docs\html\_static\ajax-loader.gif" />
+            </Component>
+            <Component Id="cmpD75A49152FD7D2B0E1B0892286BF0FA5" Guid="*">
+                <File Id="filEDDF3466A4207ACCD3246E3095DCA47F" KeyPath="yes" Source="..\..\docs\html\_static\basic.css" />
+            </Component>
+            <Component Id="cmpE54E435CE277D6A42DCAC2E2FD7A7A0B" Guid="*">
+                <File Id="fil792090BAD0B0D0C58413A9969209F9AB" KeyPath="yes" Source="..\..\docs\html\_static\bgfooter.png" />
+            </Component>
+            <Component Id="cmpAA5D254E5260DE8FE890DC1DB264F2E2" Guid="*">
+                <File Id="fil4FC3C1002B6A28EA63F69051793C2EFB" KeyPath="yes" Source="..\..\docs\html\_static\bgtop.png" />
+            </Component>
+            <Component Id="cmpBA67FDE04841D193CB2D4807CE0E0456" Guid="*">
+                <File Id="filB62965FC44E81C6FE34ADFCEC8B43313" KeyPath="yes" Source="..\..\docs\html\_static\comment-bright.png" />
+            </Component>
+            <Component Id="cmpCCBE459B407E07B1BFA268B920E5E5AF" Guid="*">
+                <File Id="fil9FA76BE3C336F6AD114D6C21E355DA67" KeyPath="yes" Source="..\..\docs\html\_static\comment-close.png" />
+            </Component>
+            <Component Id="cmpA1B6AE5F61AC0B521AD10B65F0793958" Guid="*">
+                <File Id="fil784E14E4B865E4391DFD405D342EC91C" KeyPath="yes" Source="..\..\docs\html\_static\comment.png" />
+            </Component>
+            <Component Id="cmpD7384FEF667F1090AD82156676E4006F" Guid="*">
+                <File Id="fil6021FBF7D208CEA2BD93506F1A6A80E0" KeyPath="yes" Source="..\..\docs\html\_static\doctools.js" />
+            </Component>
+            <Component Id="cmpCC344115227ECDC51568138F07F888B2" Guid="*">
+                <File Id="fil3716F7155465F60D4C5A65F3E0748416" KeyPath="yes" Source="..\..\docs\html\_static\down-pressed.png" />
+            </Component>
+            <Component Id="cmp78DE18F497CCA17D139A2B912EE2EDFF" Guid="*">
+                <File Id="fil3C0A90692A1FFA835BBE8B4512199861" KeyPath="yes" Source="..\..\docs\html\_static\down.png" />
+            </Component>
+            <Component Id="cmp4776F548C2DE45582C229E6A7DECEF81" Guid="*">
+                <File Id="filF9AB2F745A963F74D03142C4FBB5289D" KeyPath="yes" Source="..\..\docs\html\_static\file.png" />
+            </Component>
+            <Component Id="cmp6689B445A1DDB8C4C2B63A8357C4D24F" Guid="*">
+                <File Id="fil58E885120538B498A19E87874DB928A1" KeyPath="yes" Source="..\..\docs\html\_static\jquery.js" />
+            </Component>
+            <Component Id="cmp1691F91B57CF2FBCA9B17A92F8D813B1" Guid="*">
+                <File Id="fil2261A4ED4DC73B49557403EDECFD2B66" KeyPath="yes" Source="..\..\docs\html\_static\minus.png" />
+            </Component>
+            <Component Id="cmp70BD1E6F60604781C1F4B933C6D7623F" Guid="*">
+                <File Id="fil52A85A1EC7A6CEDBEEA626DB2D9E1A33" KeyPath="yes" Source="..\..\docs\html\_static\plus.png" />
+            </Component>
+            <Component Id="cmpE729DC3486D0F9D36943E1012C0774D6" Guid="*">
+                <File Id="fil387869966433474FA009348915E9B01F" KeyPath="yes" Source="..\..\docs\html\_static\pygments.css" />
+            </Component>
+            <Component Id="cmpA6657AD7D59A0A381AE58FFB7532D9A0" Guid="*">
+                <File Id="filEBB04971A507450AB11DCF8607AD9E1E" KeyPath="yes" Source="..\..\docs\html\_static\searchtools.js" />
+            </Component>
+            <Component Id="cmpFFD3E54A0D733BC54478659277018E81" Guid="*">
+                <File Id="fil1F78658BEDB091BE5682C47DDE29E844" KeyPath="yes" Source="..\..\docs\html\_static\underscore.js" />
+            </Component>
+            <Component Id="cmp6D499B1FC5DA2C0BDF3A0C9A781199E8" Guid="*">
+                <File Id="fil74EC49F573DB583B55FE292B49695BCE" KeyPath="yes" Source="..\..\docs\html\_static\up-pressed.png" />
+            </Component>
+            <Component Id="cmp7D371C372A3F54997A6CC4F440686762" Guid="*">
+                <File Id="filA40F35256C8BA2841B4E859533B38A7F" KeyPath="yes" Source="..\..\docs\html\_static\up.png" />
+            </Component>
+            <Component Id="cmp52BC493F4514CC9922F1958FE05AFF8B" Guid="*">
+                <File Id="fil6D7209729D6D837821353BDA4B25E881" KeyPath="yes" Source="..\..\docs\html\_static\websupport.js" />
+            </Component>
+        </DirectoryRef>
+
+
+        <Feature Id="Feat_Main" Title="Main program" Level="1">
+            <ComponentRef Id="cmpbkl"/>
+        </Feature>
+        <Feature Id="Feat_Doc" Title="Documentation" Level="1">
+            <ComponentRef Id="cmpreadme"/>
+            <ComponentRef Id="ApplicationShortcut"/>
+            <ComponentRef Id="cmpC98710486B03095BD51CFE70377E2CBD"/>
+            <ComponentRef Id="cmpA522226B406D37D261D727046A90E0F3"/>
+            <ComponentRef Id="cmp3DD3317E5E83314C449F3BCD0D755905"/>
+            <ComponentRef Id="cmpC7FED05B4F634817D86787D80BD4AF6A"/>
+            <ComponentRef Id="cmp663E332619001D4BEB7C03AAB670DEEB"/>
+            <ComponentRef Id="cmp48681B53BFCB65D1197817C0142E7BF5"/>
+            <ComponentRef Id="cmp815A1A206992686D72397A5775E8F8A4"/>
+            <ComponentRef Id="cmpB7AA09E1E701A9BF4A93B7D2CD6964C2"/>
+            <ComponentRef Id="cmpF33A7352F7AA7FF2AAC22664BE20BA76"/>
+            <ComponentRef Id="cmp8B624C71BCF38DC615689FF93D27BB1B"/>
+            <ComponentRef Id="cmp4CF156D8BFB2F3BD00F4D538124EE5DC"/>
+            <ComponentRef Id="cmp0266AD8FE57FDD20C63DE8BAA74B197C"/>
+            <ComponentRef Id="cmp8B7C9A071D1250DF3AD5A07094066748"/>
+            <ComponentRef Id="cmp17A9083142799E7DDBA9997744A930B4"/>
+            <ComponentRef Id="cmp7137658A3C3285153C74DB9FA34DC9C0"/>
+            <ComponentRef Id="cmp4DBFC9BBD7885E42BF34C763507097F4"/>
+            <ComponentRef Id="cmp711AD01965535658539828074944FB0E"/>
+            <ComponentRef Id="cmp3A1E774B374338B9F32F71F744130185"/>
+            <ComponentRef Id="cmp2926DA8C41539E7D675BFDA7AEAC9E04"/>
+            <ComponentRef Id="cmp3ED6B7E145717A01773513BA67D10BE9"/>
+            <ComponentRef Id="cmp81F829AD41FD435BF590C598728C1048"/>
+            <ComponentRef Id="cmp8ACDF6FA39B6977FC5DA434D7065721F"/>
+            <ComponentRef Id="cmpB50F710404CE3EB856417242BE4A0C70"/>
+            <ComponentRef Id="cmp672626F29398317F1DBE014276666B3E"/>
+            <ComponentRef Id="cmp90CA274F3F4BDE2F4C2F0495FBD548ED"/>
+            <ComponentRef Id="cmp9D8F3A548226819C41DBCA0FCA995137"/>
+            <ComponentRef Id="cmpD75A49152FD7D2B0E1B0892286BF0FA5"/>
+            <ComponentRef Id="cmpE54E435CE277D6A42DCAC2E2FD7A7A0B"/>
+            <ComponentRef Id="cmpAA5D254E5260DE8FE890DC1DB264F2E2"/>
+            <ComponentRef Id="cmpBA67FDE04841D193CB2D4807CE0E0456"/>
+            <ComponentRef Id="cmpCCBE459B407E07B1BFA268B920E5E5AF"/>
+            <ComponentRef Id="cmpA1B6AE5F61AC0B521AD10B65F0793958"/>
+            <ComponentRef Id="cmpD7384FEF667F1090AD82156676E4006F"/>
+            <ComponentRef Id="cmpCC344115227ECDC51568138F07F888B2"/>
+            <ComponentRef Id="cmp78DE18F497CCA17D139A2B912EE2EDFF"/>
+            <ComponentRef Id="cmp4776F548C2DE45582C229E6A7DECEF81"/>
+            <ComponentRef Id="cmp6689B445A1DDB8C4C2B63A8357C4D24F"/>
+            <ComponentRef Id="cmp1691F91B57CF2FBCA9B17A92F8D813B1"/>
+            <ComponentRef Id="cmp70BD1E6F60604781C1F4B933C6D7623F"/>
+            <ComponentRef Id="cmpE729DC3486D0F9D36943E1012C0774D6"/>
+            <ComponentRef Id="cmpA6657AD7D59A0A381AE58FFB7532D9A0"/>
+            <ComponentRef Id="cmpFFD3E54A0D733BC54478659277018E81"/>
+            <ComponentRef Id="cmp6D499B1FC5DA2C0BDF3A0C9A781199E8"/>
+            <ComponentRef Id="cmp7D371C372A3F54997A6CC4F440686762"/>
+            <ComponentRef Id="cmp52BC493F4514CC9922F1958FE05AFF8B"/>
+        </Feature>
+
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+        <WixVariable Id="WixUILicenseRtf" Value="Copying.rtf" />
+        <!-- TODO: customize WixUIBannerBmp, WixUIUpIco &c too -->
+        <UIRef Id="WixUI_InstallDir"/>
+    </Product>
+</Wix>

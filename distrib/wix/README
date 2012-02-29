@@ -1,0 +1,19 @@
+This directory contains the files needed to build a Windows installer (MSI)
+for bakefile.
+
+Notice that the installer is very much experimental and work in progress.
+
+To use it you need to install WiX (http://wix.sourceforge.net/index.html).
+Version 3.5 was used for testing.
+
+Assuming WiX tools are in the path, simply run the following commands to
+produce bkl.msi:
+
+	candle bkl.wxs
+	light -ext WixUIExtension bkl.wixobj
+
+Then you can do
+
+	msiexec /i bkl.msi
+
+to test installation.
