@@ -45,7 +45,10 @@ def _is_multiarch_target(target):
     Checks if the target builds for >1 archs, i.e. would use more -arch options
     and be incompatible with gcc's -M* flags.
     """
-    return len(target["archs"].as_py()) > 1
+    try:
+        return len(target["archs"].as_py()) > 1
+    except KeyError:
+        return False # not an executable
 
 
 # Apple's GCC doesn't handle the standard -MD -MP flags (which are used to
@@ -291,6 +294,8 @@ class OSXGnuToolset(GnuToolset):
     dll_extension = "dylib"
 
     def on_footer(self, file, module):
-        if list(t for t in module.targets.itervalues() if _is_multiarch_target(t)):
-            file.write(OSX_GCC_DEPS_RULES)
+        for t in module.targets.itervalues():
+            if _is_multiarch_target(t):
+                file.write(OSX_GCC_DEPS_RULES)
+                break
         super(OSXGnuToolset, self).on_footer(file, module)
