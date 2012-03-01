@@ -13,7 +13,7 @@
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder">
-                <Directory Id="INSTALLDIR" Name="bakefile">
+                <Directory Id="INSTALLDIR" Name="Bakefile">
                     <Directory Id="DOCSDIR" Name="docs">
                         <Directory Id="DOCSSTATICDIR" Name="_static" />
                         <Directory Id="DOCSREFDIR" Name="ref" />
