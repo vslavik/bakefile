@@ -51,8 +51,17 @@ log_handler = logging.StreamHandler()
 log_handler.setFormatter(BklFormatter())
 logger.addHandler(log_handler)
 
+# OptionParser only allows a string version argument, it can't be a callback.
+# That's too bad, because it's too early to import bkl.version now, it would
+# import bkl too and we don't have debug logging set up yet (see the comments
+# below as well). This class delays import until --version is actually used.
+# TODO: Use 2.7's argparse module and get rid of this hack
+class BklOptionParser(OptionParser):
+    def get_version(self):
+        import bkl.version
+        return "bakefile %s" % bkl.version.get_version()
 
-parser = OptionParser()
+parser = BklOptionParser(version="bakefile")
 parser.add_option(
         "-v", "--verbose",
         action="store_true", dest="verbose", default=False,
