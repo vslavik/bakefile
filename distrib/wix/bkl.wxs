@@ -32,6 +32,11 @@
             <Component Id="cmpreadme" Guid="*">
                 <File Id="File_Readme" Source="../../Readme" KeyPath="yes"/>
             </Component>
+            <Component Id="cmpenvpath" Guid="F834E56E-B074-4C8E-B3C9-638640BC6397">
+                <CreateFolder/>
+                <Environment Id="envpath" Name="PATH" Value="[INSTALLDIR]"
+                             Action="set" Part="last" Permanent="no"/>
+            </Component>
         </DirectoryRef>
 
         <DirectoryRef Id="ApplicationProgramsFolder">
@@ -190,6 +195,7 @@
 
         <Feature Id="Feat_Main" Title="Main program" Level="1">
             <ComponentRef Id="cmpbkl"/>
+            <ComponentRef Id="cmpenvpath"/>
         </Feature>
         <Feature Id="Feat_Doc" Title="Documentation" Level="1">
             <ComponentRef Id="cmpreadme"/>
