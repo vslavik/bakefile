@@ -26,4 +26,24 @@
 VERSION="1.0"
 
 def get_version():
+    # check to see if we're running from a git checkout and report more exact
+    # version if we do:
+    import os.path
+    gitdir = os.path.join(os.path.dirname(__file__), "../../.git")
+    if os.path.isdir(gitdir):
+        import subprocess
+        try:
+            ver = subprocess.check_output(["git", "--git-dir=%s" % gitdir, "describe"])
+            ver = ver.strip()
+            if ver:
+                if ver[0] == "v": ver = ver[1:]
+                ver = ver.split("-")
+                if len(ver) > 1:
+                    return "%s-%s" % (ver[0], ver[1])
+                else:
+                    return ver
+        # fall back to normal version information in case of any error
+        # (e.g. missing git, problem running git, Python 2.6 w/o check_output):
+        except Exception:
+            pass
     return VERSION
