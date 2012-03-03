@@ -205,7 +205,8 @@ class MakefileToolset(Toolset):
                     if tmod.is_submodule_of(main):
                         while tmod.parent is not main:
                             tmod = tmod.parent
-                        mod_deps.add(tmod.name)
+                        if tmod is not submodule:
+                            mod_deps.add(tmod.name)
         return sorted(mod_deps)
 
     def _gen_makefile(self, build_graphs, module):
