@@ -8,7 +8,7 @@
         Manufacturer="Bakefile Developers"
         UpgradeCode="3333163D-CC42-4920-B26E-E4B58611ABCF">
 
-        <Package Compressed="yes" InstallPrivileges="limited"/>
+        <Package Compressed="yes"/>
         <Media Id="1" Cabinet="main.cab" EmbedCab="yes"/>
 
         <Directory Id="TARGETDIR" Name="SourceDir">
