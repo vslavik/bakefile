@@ -1,9 +1,36 @@
 
+  1. Using Bakefile
+=====================
 
-Building from sources
----------------------
+If you obtained one of the prebuilt packages (MSI or ZIP file for windows or
+the -bin.tar.bz2 tarball for Unix and OS X), then you can simply unpack it
+somewhere and run the 'bkl' tool in its top directory.
 
-You'll need the following to get Bakefile running:
+On Windows, you don't need anything else, bkl.exe is self-contained executable.
+On other systems, you must have Python (2.6 or newer) installed.
+
+Also see the documentation in the docs/ subdirectory.
+
+
+
+  2. Reporting bugs etc.
+==========================
+
+Source code repository, bug tracker, wiki:
+https://github.com/vslavik/bakefile
+https://github.com/vslavik/bakefile/issues
+https://github.com/vslavik/bakefile/wiki
+
+Mailing list for discussion of Bakefile issues:
+bakefile-devel@lists.sourceforge.net
+
+
+
+  3. Building from sources
+============================
+
+You'll need the following to compile Bakefile from sources obtained from
+the git repository:
 
 1. Python >= 2.6+
 
@@ -31,5 +58,4 @@ You'll need the following to get Bakefile running:
        easy_install pytest
 
 Once all tools are installed, you can build Bakefile by running `make`. This
-generates the parser from ANTLR grammar and build the HTML documentation. Use
-the `./bkl` script to run Bakefile.
+generates the parser from ANTLR grammar and build the HTML documentation.
