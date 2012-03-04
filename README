@@ -26,6 +26,10 @@ You'll need the following to get Bakefile running:
 
        easy_install Sphinx
 
+5. If you want to run the test suite, you'll need py.test too:
+
+       easy_install pytest
+
 Once all tools are installed, you can build Bakefile by running `make`. This
 generates the parser from ANTLR grammar and build the HTML documentation. Use
 the `./bkl` script to run Bakefile.

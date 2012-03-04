@@ -1,6 +1,8 @@
 
 This directory contains Bakefile test suite. It is written using the py.test
-testing framework that can be obtained from
-http://codespeak.net/py/dist/test.html
+testing framework that can be obtained from http://pytest.org or simply
+installed with easy_install:
+
+    easy_install pytest
 
 Usage: run py.test in the tests directory or in its parent directory.
