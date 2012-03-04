@@ -1,0 +1,3 @@
+[submodule "3rdparty/antlr3"]
+	path = 3rdparty/antlr3
+	url = git://github.com/antlr/antlr3.git
