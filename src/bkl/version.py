@@ -41,7 +41,7 @@ def get_version():
                 if len(ver) > 1:
                     return "%s-%s" % (ver[0], ver[1])
                 else:
-                    return ver
+                    return ver[0]
         # fall back to normal version information in case of any error
         # (e.g. missing git, problem running git, Python 2.6 w/o check_output):
         except Exception:
