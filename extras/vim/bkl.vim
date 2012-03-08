@@ -20,6 +20,7 @@ syn keyword	bklGlobalProp	toolsets
 syn keyword	bklTargetProp	compiler-options c-compiler-options cxx-compiler-options defines link-options contained
 syn keyword	bklTargetProp	deps includedirs sources contained
 syn keyword	bklTargetProp	vs2010.projectfile pre-build-commands post-build-commands contained
+syn match	bklTargetProp	"vs2010\.option\(\.\w\+\)\{1,2}"
 
 syn keyword	bklBoolProp	false true contained
 syn match	bklTargetProp	"win32-unicode *=.*$"he=s+13 contains=bklBoolProp

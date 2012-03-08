@@ -116,7 +116,13 @@ def detect_unused_vars(model):
         visitor.visit(var.value)
     used_vars = visitor.found
     for var in model.all_variables():
-        if not var.is_property and id(var) not in used_vars:
+        if (id(var) not in used_vars and
+                not var.is_property and
+                # FIXME: Handle these cases properly. Have a properties group
+                #        declaration similar to Property, with type checking and
+                #        automated docs and all. Then test for it here as other
+                #        properties are tested for.
+                not var.name.startswith("vs2010.option.")):
             logger.warning('variable "%s" is never used', var.name, extra={"pos":var.value.pos})
 
 

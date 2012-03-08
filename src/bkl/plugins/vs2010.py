@@ -60,6 +60,9 @@ class Node(object):
     def __setitem__(self, key, value):
         self.attrs[key] = value
 
+    def __getitem__(self, key):
+        return self.attrs[key]
+
     def add(self, *args, **kwargs):
         """
         Add a child to this node. There are several ways of invoking add():
@@ -96,8 +99,12 @@ class Node(object):
 
 class VS2010ExprFormatter(bkl.expr.Formatter):
     list_sep = ";"
+
     def reference(self, e):
         assert False, "All references should be expanded in VS output"
+
+    def bool_value(self, e):
+        return "true" if e.value else "false"
 
 
 XML_HEADER = """\
@@ -341,6 +348,32 @@ def _default_guid_for_project(target):
 class VS2010Toolset(Toolset):
     """
     Visual Studio 2010.
+
+
+    Special properties
+    ------------------
+    In addition to the properties described below, it's possible to specify any
+    of the ``vcxproj`` properties directly in a bakefile. To do so, you have to
+    set specially named variables on the target.
+
+    The variables are prefixed with ``vs2010.option.``, followed by node name and
+    property name. The following nodes are supported:
+
+      - ``vs2010.option.Globals.*``
+      - ``vs2010.option.Configuration.*``
+      - ``vs2010.option.*`` (this is the unnamed ``PropertyGroup`` with
+        global settings such as ``TargetName``)
+      - ``vs2010.option.ClCompile.*``
+      - ``vs2010.option.Link.*``
+      - ``vs2010.option.Lib.*``
+
+    Examples:
+
+    .. code-block:: bkl
+
+        vs2010.option.GenerateManifest = false;
+        vs2010.option.Link.CreateHotPatchableImage = Enabled;
+
     """
 
     name = "vs2010"
@@ -440,6 +473,7 @@ class VS2010Toolset(Toolset):
         root.add(n_configs)
 
         n_globals = Node("PropertyGroup", Label="Globals")
+        self._add_extra_options_to_node(target, n_globals)
         n_globals.add("ProjectGuid", guid)
         n_globals.add("Keyword", "Win32Proj")
         n_globals.add("RootNamespace", target.name)
@@ -449,6 +483,7 @@ class VS2010Toolset(Toolset):
 
         for c in configs:
             n = Node("PropertyGroup", Label="Configuration")
+            self._add_extra_options_to_node(target, n)
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % c
             if is_exe:
                 n.add("ConfigurationType", "Application")
@@ -482,6 +517,7 @@ class VS2010Toolset(Toolset):
 
         for c in configs:
             n = Node("PropertyGroup")
+            self._add_extra_options_to_node(target, n)
             if not is_library:
                 n.add("LinkIncremental", c == "Debug")
             # TODO: add TargetName only if it's non-default
@@ -497,6 +533,7 @@ class VS2010Toolset(Toolset):
             n = Node("ItemDefinitionGroup")
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % c
             n_cl = Node("ClCompile")
+            self._add_extra_options_to_node(target, n_cl)
             n_cl.add("WarningLevel", "Level3")
             if c == "Debug":
                 n_cl.add("Optimization", "Disabled")
@@ -537,6 +574,7 @@ class VS2010Toolset(Toolset):
                 n_cl.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(all_cflags))
             n.add(n_cl)
             n_link = Node("Link")
+            self._add_extra_options_to_node(target, n_link)
             n.add(n_link)
             if is_exe:
                 n_link.add("SubSystem",
@@ -555,6 +593,7 @@ class VS2010Toolset(Toolset):
                 libs = target["libs"].as_py()
                 if libs:
                     n_lib = Node("Lib")
+                    self._add_extra_options_to_node(target, n_lib)
                     n.add(n_lib)
                     n_lib.add("AdditionalDependencies", " ".join("%s.lib" % x for x in libs))
             pre_build = target["pre-build-commands"].as_py()
@@ -620,6 +659,21 @@ class VS2010Toolset(Toolset):
         module.solution.add_project(target.name, guid, projectfile, target_deps)
 
         self._write_filters_file_for(filename)
+
+
+    def _add_extra_options_to_node(self, target, node):
+        """Add extra native options specified in vs2010.option.* properties."""
+        try:
+            scope = "vs2010.option.%s" % node["Label"]
+        except KeyError:
+            if node.name == "PropertyGroup":
+                scope = "vs2010.option"
+            else:
+                scope = "vs2010.option.%s" % node.name
+        for var in target.variables.itervalues():
+            split = var.name.rsplit(".", 1)
+            if len(split) == 2 and split[0] == scope:
+                node.add(str(split[1]), var.value)
 
 
     def _write_filters_file_for(self, filename):
