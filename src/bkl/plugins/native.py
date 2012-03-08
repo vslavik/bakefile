@@ -119,6 +119,18 @@ class NativeCompiledType(TargetType):
 
                      Currently only supported on OS X.
                      """),
+            Property("win32-crt-linkage",
+                 type=EnumType("linkage", ["static", "dll"]),
+                 default="dll",
+                 inheritable=True,
+                 doc="""
+                     How to link against the C Runtime Library.
+
+                     If ``dll`` (the default), the executable may depend on
+                     some DLLs provided by the compiler. If ``static`` then a
+                     static version of the CRT is linked directly into the
+                     executable.
+                     """),
             Property("win32-unicode",
                  type=BoolType(),
                  default=True,

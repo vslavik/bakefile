@@ -28,9 +28,12 @@ syn match	bklGlobalProp	"vs2010.generate-solution *=.*$"he=s+24 contains=bklBool
 syn keyword	bklSubsystem	console windows contained
 syn match	bklTargetProp	"win32-subsystem *=.*$"he=s+15 contains=bklSubsystem
 
+syn keyword	bklLinkage	static dll contained
+syn match	bklTargetProp	"win32-crt-linkage *=.*$"he=s+17 contains=bklLinkage
+
 syn match	bklVar		"\$(\w\+)"hs=s+2,he=e-1
 
-syn region	bklTargetBody	start="{" end="}" contains=ALLBUT,bklGlobalProp,bklGlobalStat,bklTarget,bklBoolProp,bklSubsystem,bklError transparent
+syn region	bklTargetBody	start="{" end="}" contains=ALLBUT,bklGlobalProp,bklGlobalStat,bklTarget,bklBoolProp,bklSubsystem,bklLinkage,bklError transparent
 
 " Comments definitions stolen from the standard c.vim.
 syn region	bklCommentL	start="//" skip="\\$" end="$" keepend contains=@bklCommentGroup,@Spell
@@ -45,6 +48,7 @@ hi def link bklFilename		bklString
 hi def link bklGlobalProp	Keyword
 hi def link bklGlobalStat	Statement
 hi def link bklIf		Conditional
+hi def link bklLinkage		Constant
 hi def link bklString		String
 hi def link bklSubsystem	Constant
 hi def link bklTarget		Statement

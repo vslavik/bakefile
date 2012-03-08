@@ -520,6 +520,14 @@ class VS2010Toolset(Toolset):
             n_cl.add("MultiProcessorCompilation", True)
             n_cl.add("MinimalRebuild", False)
             n_cl.add("AdditionalIncludeDirectories", target["includedirs"])
+
+            crt = "MultiThreaded"
+            if c == "Debug":
+                crt += "Debug"
+            if target["win32-crt-linkage"].as_py() == "dll":
+                crt += "DLL"
+            n_cl.add("RuntimeLibrary", crt)
+
             # Currently we don't make any distinction between preprocessor, C
             # and C++ flags as they're basically all the same at MSVS level
             # too and all go into the same place in the IDE and same
