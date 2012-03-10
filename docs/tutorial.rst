@@ -211,20 +211,20 @@ This is especially convenient if each of them is built in a separate
 directory. In this case you can use ``submodule`` keyword to include the
 sub-bakefiles.
 
-.. FIXME: but then deps doesn't work!
-
 
 
 Assorted Other Options
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO: console vs GUI Windows programs?
+Under Windows, console and GUI programs are compiled differently. By default,
+Bakefile builds console executables. You can change this by setting the
+``win32-subsystem`` property to ``windows``.
 
-Under Windows, standard C run-time library headers as well as Platform SDK
-headers are compiled differently depending on whether ``_UNICODE`` and
-``UNICODE`` macros, respectively, are defined or not. By default, Bakefile
-does define these macros but you can set ``win32-unicode`` target property to
-``false`` to prevent it from doing it.
+Another Windows-specific peculiarity is that standard C run-time library
+headers as well as Platform SDK headers are compiled differently depending on
+whether ``_UNICODE`` and ``UNICODE`` macros, respectively, are defined or not.
+By default, Bakefile does define these macros but you can set ``win32-unicode``
+target property to ``false`` to prevent it from doing it.
 
 
 .. [*] So no meaningful tabulations or backslashes for line continuation.
