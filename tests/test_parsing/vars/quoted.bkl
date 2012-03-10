@@ -1,5 +1,7 @@
 // This test has two quoted variables, to verify that the lexer
-// isn't greedy when parsing quoted blocks.
+// isn't greedy when parsing quoted blocks. We also verify escaping of " in
+// there.
 
 foo = "one two" "three";
 bar = "1 2 3";
+zar = "this is called \"escaping\"";

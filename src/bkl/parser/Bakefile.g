@@ -156,7 +156,7 @@ identifier: t=TEXT             -> ID[$t];
 
 literal
     : t=TEXT                   -> LITERAL[$t]
-    | t=QUOTED_TEXT            -> LITERAL[$t, $t.text[1:-1\]]
+    | t=QUOTED_TEXT            -> LITERAL[$t, self.unescape($t.text[1:-1\])]
     ;
 
 bool_value
@@ -202,7 +202,10 @@ RPAREN:    ')';
 TRUE:      'true';
 FALSE:     'false';
 
-QUOTED_TEXT: '"' (options{greedy=false;}:.)* '"';
+QUOTED_TEXT: '"' ( ESCAPE_SEQ | ~('"' | '\\') )* '"';
+
+fragment
+ESCAPE_SEQ: '\\' . ;
 
 // a chunk of simple text, used for identifiers, values etc.
 TEXT: ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_' | '.' | '/' | '@')+;

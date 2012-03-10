@@ -115,8 +115,6 @@ target:
         ...
     }
 
-.. FIXME: specifying quoted define values doesn't seem to be possible
-
 These properties can be set more than once but each subsequent assignment
 overrides the previous value which is not particular useful. It can be more
 helpful to append another value to the property instead, for example:
@@ -129,12 +127,14 @@ helpful to append another value to the property instead, for example:
         defines += BAR;
         ...
         defines += "VERSION=17";
+        defines += "VERSION_STR=\"v17\"";
     }
 
 will define "FOO" and "BAR" symbols (without value) as well as "VERSION" with
-the value of 17 during compilation. This is still not very exciting as all
-these values could have been set at once, but the possibility of conditional
-assignment is more interesting:
+the value of 17 and "VERSION_STR" with the value as a C string during
+compilation. This is still not very exciting as all these values could have
+been set at once, but the possibility of conditional assignment is more
+interesting:
 
 .. code-block:: bkl
 

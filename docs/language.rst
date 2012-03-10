@@ -32,8 +32,12 @@ Values, types and literals
 
 Similarly to the ``make`` syntax, quotes around literals are optional --
 anything not a keyword or special character or otherwise specially marked is a
-literal; specifically, a string literal. Quoting is only needed when the
-literal contains whitespace.
+literal; specifically, a string literal.
+
+Quoting is only needed when the literal contains whitespace or special
+characters such as ``=`` or quotes. Quoted strings are enclosed between ``"``
+characters and may contain any characters except for quotes. Additionally,
+backslash (``\``) can be used inside quoted strings to escape any character. [1]_
 
 Values in Bakefile are typed: properties have types associated with them and
 only values that are valid for that type can be assigned to them. The language
@@ -243,7 +247,7 @@ LINUX]`` when generating makefiles for the ``gnu`` toolset and only one item,
 ``BUILD``, for other toolsets.
 The condition doesn't have to be constant, it may reference e.g. options, where
 the value isn't known until make-time; Bakefile will correctly translate them into
-generated code. [1]_
+generated code. [2]_
 
 A long form with curly brackets is accepted as well; unlike the short form,
 this one can contain more than one statement:
@@ -323,7 +327,12 @@ They can also be included in an expression:
 
 
 
-.. [1] Although the syntax imposes few limits, it's not always possible to
+
+.. [1] A string literal containing quotes can therefore be written as, say,
+       ``"VERSION=\"1.2\""``; backslashes must be escaped as double backslashes
+       (``"\\"``).
+
+.. [2] Although the syntax imposes few limits, it's not always possible to
        generate makefiles or projects with complicated conditional content even
        though the syntax supports it. In that case, Bakefile will exit with an
        explanatory error message.

@@ -22,6 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
+import re
 import antlr3
 import ast
 from BakefileLexer import BakefileLexer
@@ -52,13 +53,21 @@ class _BakefileErrorsMixin(object):
             return repr(str(s))
 
 
+UNESCAPE_REGEX = re.compile(r'\\(.)')
+
 # The lexer and parser used to parse .bkl files.
 # Do not use directly, use parse() function instead.
 class _Lexer(_BakefileErrorsMixin, BakefileLexer):
     pass
 
 class _Parser(_BakefileErrorsMixin, BakefileParser):
-    pass
+
+    def unescape(self, text):
+        """Removes \\ escapes from the text."""
+        if '\\' not in text:
+            return text
+        else:
+            return UNESCAPE_REGEX.sub(r'\1', text)
 
 
 def get_parser(code, filename=None):

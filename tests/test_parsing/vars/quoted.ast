@@ -7,3 +7,6 @@ RootNode
     AssignmentNode
         IdNode bar
         LiteralNode "1 2 3"
+    AssignmentNode
+        IdNode zar
+        LiteralNode "this is called "escaping""

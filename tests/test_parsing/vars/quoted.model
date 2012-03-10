@@ -2,6 +2,7 @@ module {
   variables {
     foo = [one two, three]
     bar = 1 2 3
+    zar = this is called "escaping"
   }
   targets {
   }
