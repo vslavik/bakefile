@@ -51,7 +51,7 @@ syn keyword	bklLinkage	static dll contained
 syn region	bklLinkageRHS	matchgroup=Normal start="= *" end=";" contains=bklLinkage contained
 syn match	bklBuildProp	"\<win32-crt-linkage\ze *=" nextgroup=bklLinkageRHS skipwhite contained
 
-syn match	bklVar		"\$(\w\+)"hs=s+2,he=e-1
+syn match	bklVar		"\$(\k\+)"hs=s+2,he=e-1
 
 " Comments definitions stolen from the standard c.vim.
 syn region	bklCommentL	start="//" skip="\\$" end="$" keepend contains=@Spell
@@ -64,10 +64,10 @@ syn region	bklBlock	start="{" end="}" transparent
 " Cluster of syntax items that can occur in any block.
 syn cluster	bklAnyBlock	contains=bklBlock,bklComment,bklCommentL,bklCommonProp,bklIf,bklVar
 
-syn region	bklExeBlock	matchgroup=Normal start="\%\(exe \+\w\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp
-syn region	bklDllBlock	matchgroup=Normal start="\%\(dll \+\w\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklDllProp
-syn region	bklLibBlock	matchgroup=Normal start="\%\(library \+\w\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklLibProp
-syn region	bklActionBlock	matchgroup=Normal start="\%\(action \+\w\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
+syn region	bklExeBlock	matchgroup=Normal start="\%\(exe \+\k\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp
+syn region	bklDllBlock	matchgroup=Normal start="\%\(dll \+\k\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklDllProp
+syn region	bklLibBlock	matchgroup=Normal start="\%\(library \+\k\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklLibProp
+syn region	bklActionBlock	matchgroup=Normal start="\%\(action \+\k\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
 
 
 " Define the default highlighting.
