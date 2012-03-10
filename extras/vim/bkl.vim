@@ -17,9 +17,10 @@ syn keyword	bklIf		if
 " Properties names.
 syn keyword	bklGlobalStat	submodule
 syn keyword	bklGlobalProp	toolsets
-syn keyword	bklTargetProp	compiler-options c-compiler-options cxx-compiler-options defines link-options contained
-syn keyword	bklTargetProp	deps includedirs sources contained
-syn keyword	bklTargetProp	vs2010.projectfile pre-build-commands post-build-commands contained
+syn keyword	bklTargetProp	archs compiler-options c-compiler-options cxx-compiler-options defines link-options contained
+syn keyword	bklTargetProp	deps headers includedirs libs sources contained
+syn keyword	bklTargetProp	outputdir pre-build-commands post-build-commands contained
+syn keyword	bklTargetProp	vs2010.guid vs2010.projectfile contained
 syn match	bklTargetProp	"vs2010\.option\(\.\w\+\)\{1,2}" contained
 
 syn keyword	bklBool 	false true contained
