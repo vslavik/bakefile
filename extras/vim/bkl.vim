@@ -8,7 +8,7 @@ if exists("b:current_syntax")
 endif
 
 syn case match
-set isk+=".-"
+set isk+=.,-
 
 " Simple keywords.
 syn keyword	bklTarget	action dll exe library
