@@ -74,6 +74,11 @@ parser.add_option(
         "", "--force",
         action="store_true", dest="force", default=False,
         help="touch output files even if they're unchanged")
+parser.add_option(
+        "-t", "--toolset",
+        action="append", dest="toolsets",
+        metavar="TOOLSET",
+        help="only generate files for the given toolset (may be specified more than once)")
 
 debug_group = OptionGroup(parser, "Debug Options")
 debug_group.add_option(
@@ -122,6 +127,8 @@ try:
         intr = bkl.dumper.DumpingInterpreter(options.dump_toolset)
     else:
         intr = Interpreter()
+    if options.toolsets:
+        intr.limit_toolsets(options.toolsets)
     intr.process_file(args[0])
 except KeyboardInterrupt:
     sys.exit(2)

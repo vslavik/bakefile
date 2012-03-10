@@ -57,10 +57,25 @@ class Interpreter(object):
 
        Model of the project, as :class:`bkl.model.Project`. It's state always
        reflects current state of processing.
+
+    .. attribute: toolsets_to_use
+
+       Set of toolsets to generate for. This list may contain only a subset of
+       toolsets the bakefile is written for and may even contain toolsets not
+       specified in the bakefile.
+
+       If :const:`None` (the default), then the toolsets listed in the bakefile
+       are used.
     """
 
     def __init__(self):
         self.model = bkl.model.Project()
+        self.toolsets_to_use = None
+
+
+    def limit_toolsets(self, toolsets):
+        """Sets :attr:`toolsets_to_use`."""
+        self.toolsets_to_use = set(toolsets)
 
 
     def process(self, ast):
@@ -181,9 +196,25 @@ class Interpreter(object):
         # collect all requested toolsets:
         toolsets = set()
         for module in self.model.modules:
-            module_toolsets = module.get_variable_value("toolsets").as_py()
-            toolsets.update(module_toolsets)
+            module_toolsets = module.get_variable("toolsets")
+            if module_toolsets:
+                toolsets.update(module_toolsets.value.as_py())
         logger.debug("toolsets to generate for: %s", list(toolsets))
+
+        if self.toolsets_to_use:
+            for t in self.toolsets_to_use:
+                if t not in toolsets:
+                    try:
+                        bkl.api.Toolset.get(t)
+                    except KeyError:
+                        raise Error("unknown toolset \"%s\" given on command line" % t)
+                    logger.warning("toolset \"%s\" is not supported by the project, there may be issues", t)
+                    # Add the forced toolset to all submodules:
+                    for module in self.model.modules:
+                        module_toolsets = module.get_variable("toolsets")
+                        if module_toolsets:
+                            module_toolsets.value.items.append(bkl.expr.LiteralExpr(t))
+            toolsets = self.toolsets_to_use
 
         if not toolsets:
             raise Error("nothing to generate, \"toolsets\" property is empty")
