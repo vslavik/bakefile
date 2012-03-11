@@ -275,6 +275,9 @@ class VS2010Solution(OutputFile):
                 self.write("\tEndProjectSection\n")
             self.write("EndProject\n")
 
+        if not guids:
+            return # don't write empty solution files
+
         # Folders in the solution:
         all_folders = list(self.all_subsolutions())
         if additional_deps:
