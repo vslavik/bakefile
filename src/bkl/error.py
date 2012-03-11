@@ -28,6 +28,12 @@ particular, the :exc:`Error` class keeps track of the position in source code
 where the error occurred or to which it relates to.
 """
 
+import threading
+
+import logging
+logger = logging.getLogger("bkl.error")
+
+
 class Error(Exception):
     """
     Base class for all Bakefile errors.
@@ -132,6 +138,32 @@ class UndefinedError(Error):
     pass
 
 
+class _LocalContextStack(threading.local):
+    """
+    Helper class for keeping track of :class:`error_context` instances.
+    """
+    stack = []
+
+    def push(self, ctx):
+        if not self.stack:
+            self.stack = [ctx]
+        else:
+            self.stack.append(ctx)
+
+    def pop(self):
+        self.stack.pop()
+
+    @property
+    def pos(self):
+        for c in reversed(self.stack):
+            p = c.pos
+            if p: return p
+        return None
+
+
+_context_stack = _LocalContextStack()
+
+
 class error_context:
     """
     Error context for adding positional information to exceptions thrown
@@ -146,18 +178,56 @@ class error_context:
 
        with error_context(target):
           ...do something that may throw...
+
+    .. attribute:: pos
+
+        :class:`bkl.parser.ast.Position` object with location of the error.
+        May be :const:`None`.
     """
     def __init__(self, context):
         self.context = context
 
     def __enter__(self):
-        pass
+        _context_stack.push(self)
 
     def __exit__(self, exc_type, exc_value, traceback):
+        _context_stack.pop()
         if exc_value is not None:
             if isinstance(exc_value, Error) and exc_value.pos is None:
-                c = self.context
-                if "source_pos" in dir(c):
-                    exc_value.pos = c.source_pos
-                elif "pos" in dir(c):
-                    exc_value.pos = c.pos
+                exc_value.pos = self.pos
+
+    @property
+    def pos(self):
+        c = self.context
+        if "source_pos" in dir(c):
+            return c.source_pos
+        elif "pos" in dir(c):
+            return c.pos
+        else:
+            return None
+
+
+def warning(msg, *args, **kwargs):
+    """
+    Logs a warning.
+
+    The function takes position arguments similarly to logging module's
+    functions. It also accepts options *pos* argument with position information
+    as :class:`bkl.parser.ast.Position`.
+
+    Uses active :class:`error_context` instances to decorate the warning with
+    position information if not provided.
+
+    Usage:
+
+    .. code-block:: python
+
+       bkl.error.warning("target %s not supported", t.name, pos=t.source_pos)
+    """
+    text = msg % args
+    e = {}
+    try:
+        e["pos"] = kwargs["pos"]
+    except KeyError:
+        e["pos"] = _context_stack.pos
+    logger.warning(text, extra=e)

@@ -26,11 +26,8 @@ from ..api import TargetType
 from ..expr import *
 from ..model import Module, Target, Variable, SourceFile
 from ..parser.ast import *
-from ..error import ParserError, error_context
+from ..error import ParserError, error_context, warning
 from ..vartypes import ListType
-
-import logging
-logger = logging.getLogger("bkl.builder")
 
 
 class Builder(object, CondTrackingMixin):
@@ -116,8 +113,8 @@ class Builder(object, CondTrackingMixin):
         var = self.context.get_variable(varname)
 
         if varname[0] == "_":
-            logger.warning("variable names beginning with underscore are reserved for internal use (\"%s\")",
-                           varname, extra={"pos":node.pos})
+            warning("variable names beginning with underscore are reserved for internal use (\"%s\")",
+                    varname, pos=node.pos)
 
         has_cond = self.active_if_cond is not None
         if has_cond:

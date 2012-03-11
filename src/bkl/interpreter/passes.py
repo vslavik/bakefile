@@ -35,7 +35,7 @@ import simplify
 import bkl.vartypes
 import bkl.expr
 import bkl.model
-from bkl.error import Error, NonConstError
+from bkl.error import Error, NonConstError, warning
 from bkl.expr import Visitor
 from bkl.utils import memoized
 
@@ -123,7 +123,7 @@ def detect_unused_vars(model):
                 #        automated docs and all. Then test for it here as other
                 #        properties are tested for.
                 not var.name.startswith("vs2010.option.")):
-            logger.warning('variable "%s" is never used', var.name, extra={"pos":var.value.pos})
+            warning('variable "%s" is never used', var.name, pos=var.value.pos)
 
 
 def normalize_and_validate_vars(model):
