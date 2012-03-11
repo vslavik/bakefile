@@ -30,7 +30,7 @@ from xml.sax.saxutils import escape, quoteattr
 
 import bkl.compilers
 import bkl.expr
-import bkl.error
+from bkl.error import error_context, warning
 from bkl.api import Toolset, Property
 from bkl.vartypes import PathType, StringType, BoolType
 from bkl.utils import OrderedDict
@@ -436,7 +436,7 @@ class VS2010Toolset(Toolset):
         module.solution = VS2010Solution(module)
 
         for t in module.targets.itervalues():
-            with bkl.error.error_context(t):
+            with error_context(t):
                 self.gen_for_target(t)
 
 
@@ -493,7 +493,9 @@ class VS2010Toolset(Toolset):
                 n.add("ConfigurationType", "DynamicLibrary")
             else:
                 # TODO: handle this as generic action target
-                assert False, "unknown target type %s" % target.type.name
+                warning("target type \"%s\" is not supported by vs2010 toolset, ignoring", target.type.name)
+                return
+
             n.add("UseDebugLibraries", c == "Debug")
             if target["win32-unicode"]:
                 n.add("CharacterSet", "Unicode")
