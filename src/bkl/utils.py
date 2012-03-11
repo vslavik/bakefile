@@ -35,8 +35,7 @@ class OrderedDict(dict):
     This is specialization of dictionary that preserves order of insertion
     when enumerating keys or items.
     """
-    # FIXME: replace this class with collections.OrderedDict() from
-    #        Python 2.7/3.1
+    # TODO-PY26: replace this class with collections.OrderedDict() from Python 2.7/3.1
 
     # These must be overriden in derived class:
     def __init__(self):
