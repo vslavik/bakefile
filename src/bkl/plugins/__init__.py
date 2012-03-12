@@ -27,6 +27,43 @@ import logging
 __logger = logging.getLogger("bkl.plugins")
 
 
+def load_from_file(filename):
+    """
+    Load a Bakefile plugin from given file.
+    """
+    import os.path
+    import imp
+    from bkl.error import Error
+    basename = os.path.splitext(os.path.basename(filename))[0]
+    if basename.startswith("bkl.plugins."):
+        modname = basename
+    else:
+        modname = "bkl.plugins.%s" % basename.replace(".", "_")
+
+    if modname in sys.modules:
+        prev_file = sys.modules[modname].__file__
+        if filename == prev_file or filename == prev_file[:-1]: #.pyc->.py
+            # plugin already loaded from this file, skip it
+            __logger.debug("plugin %s from %s is already loaded, nothing to do", modname, filename)
+            return
+        else:
+            raise Error("cannot load plugin %s from %s: plugin with the same name already loaded from %s" %
+                        (modname, filename, prev_file))
+
+    try:
+        global __all__
+        __logger.debug("loading plugin %s from %s", modname, filename)
+        globals()[basename] = imp.load_source(modname, filename)
+        __all__.append(basename)
+    except Error:
+        raise
+    except IOError as e:
+        raise Error("failed to load plugin %s:\n%s" % (filename, e))
+    except Exception:
+        import traceback
+        raise Error("failed to load plugin %s:\n%s" % (filename, traceback.format_exc()))
+
+
 def __find_all_plugins(paths):
     """
     Finds all Bakefile plugins in given directories that aren't loaded yet and
