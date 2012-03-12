@@ -30,11 +30,13 @@ from xml.sax.saxutils import escape, quoteattr
 
 import bkl.compilers
 import bkl.expr
-from bkl.error import error_context, warning
+from bkl.error import error_context, warning, Error
 from bkl.api import Toolset, Property
 from bkl.vartypes import PathType, StringType, BoolType
 from bkl.utils import OrderedDict
 from bkl.io import OutputFile, EOL_WINDOWS
+
+from bkl.plugins.vsbase import VSProjectBase
 
 # TODO: Move this somewhere else, where it could be reused.
 NAMESPACE_PROJECT   = uuid.UUID("{D9BD5916-F055-4D77-8C69-9448E02BF433}")
@@ -178,9 +180,10 @@ class VS2010Solution(OutputFile):
                                     model=module)
         self.formatter = VS2010ExprFormatter(paths_info)
 
-    def add_project(self, name, guid, projectfile, deps):
-        self.guids_map[name] = guid
-        self.projects.append((name, guid, projectfile, deps))
+    def add_project(self, prj):
+        self.guids_map[prj.name] = prj.guid
+        # TODO: store VSProjectBase instances directly here
+        self.projects.append((prj.name, prj.guid, prj.projectfile, prj.dependencies))
 
     def add_subsolution(self, solution):
         self.subsolutions.append(solution)
@@ -332,6 +335,20 @@ class VS2010Solution(OutputFile):
         super(VS2010Solution, self).commit()
 
 
+# TODO: Put more content into this class, use it properly
+class VS2010Project(VSProjectBase):
+    """
+    """
+    version = 2010
+
+    def __init__(self, name, guid, projectfile, deps):
+        self.name = name
+        self.guid = guid
+        self.projectfile = projectfile
+        self.dependencies = deps
+
+
+
 # TODO: Both of these should be done as an expression once proper functions
 #       are implemented, as $(dirname(vs2010.solutionfile)/$(id).vcxproj)
 def _default_solution_name(module):
@@ -379,6 +396,7 @@ class VS2010Toolset(Toolset):
 
     """
 
+    version = 2010
     name = "vs2010"
 
     exe_extension = "exe"
@@ -440,12 +458,13 @@ class VS2010Toolset(Toolset):
 
         for t in module.targets.itervalues():
             with error_context(t):
-                self.gen_for_target(t)
+                prj = self.gen_for_target(t)
+                if not prj:
+                    continue
+                module.solution.add_project(prj)
 
 
     def gen_for_target(self, target):
-        module = target.parent
-
         projectfile = target["vs2010.projectfile"]
         filename = projectfile.as_native_path_for_output(target)
 
@@ -497,7 +516,7 @@ class VS2010Toolset(Toolset):
             else:
                 # TODO: handle this as generic action target
                 warning("target type \"%s\" is not supported by vs2010 toolset, ignoring", target.type.name)
-                return
+                return None
 
             n.add("UseDebugLibraries", c == "Debug")
             if target["win32-unicode"]:
@@ -661,9 +680,9 @@ class VS2010Toolset(Toolset):
         f.write(codecs.BOM_UTF8)
         f.write(XmlFormatter(paths_info).format(root))
         f.commit()
-        module.solution.add_project(target.name, guid, projectfile, target_deps)
-
         self._write_filters_file_for(filename)
+
+        return VS2010Project(target.name, guid, projectfile, target_deps)
 
 
     def _add_extra_options_to_node(self, target, node):
