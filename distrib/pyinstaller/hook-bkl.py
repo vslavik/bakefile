@@ -6,7 +6,7 @@ def _find_all_plugins():
             if f.endswith('.py') and not f == '__init__.py':
                 yield 'plugins.%s' % f[:-3]
 
-hiddenimports = ['plugins'] + list(_find_all_plugins())
+hiddenimports = list(_find_all_plugins())
 
 datas = [
     ('../../src/bkl/plugins/*.py', 'plugins'),
