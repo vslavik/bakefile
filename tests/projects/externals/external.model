@@ -1,0 +1,13 @@
+module {
+  variables {
+    toolsets = [vs2010]
+  }
+  targets {
+    external HelloWorldManual {
+      file = @top_srcdir/HelloWorldManual.vcxproj
+    }
+    external xmlwrapp {
+      file = @top_srcdir/xmlwrapp_vc9_xmlwrapp.vcproj
+    }
+  }
+}

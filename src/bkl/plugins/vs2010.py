@@ -460,7 +460,26 @@ class VS2010Toolset(Toolset):
             with error_context(t):
                 prj = self.gen_for_target(t)
                 if not prj:
-                    continue
+                    # Not natively supported; try if the TargetType has an implementation
+                    try:
+                        prj = t.type.vs_project(self, t)
+                    except NotImplementedError:
+                        # TODO: handle this as generic action target
+                        warning("target type \"%s\" is not supported by vs2010 toolset, ignoring", t.type.name)
+                        continue
+                if prj.name != t.name:
+                    # TODO: This is only for the solution file; we should remap the name instead of
+                    #       failure. Note that we don't always control prj.name, it may come from external
+                    #       project file.
+                    raise Error("project name (\"%s\") differs from target name (\"%s\"), they must be the same" %
+                                (prj.name, t.name))
+                if prj.version != self.version:
+                    if prj.version > self.version:
+                        raise Error("project %s is for Visual Studio %s and will not work with %s" %
+                                    (prj.projectfile, prj.version, self.version))
+                    else:
+                        warning("project %s is for Visual Studio %s, not %s, will be converted when built",
+                                prj.projectfile, prj.version, self.version)
                 module.solution.add_project(prj)
 
 
@@ -514,8 +533,6 @@ class VS2010Toolset(Toolset):
             elif is_dll:
                 n.add("ConfigurationType", "DynamicLibrary")
             else:
-                # TODO: handle this as generic action target
-                warning("target type \"%s\" is not supported by vs2010 toolset, ignoring", target.type.name)
                 return None
 
             n.add("UseDebugLibraries", c == "Debug")

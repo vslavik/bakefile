@@ -13,7 +13,7 @@ set isk+=.,-
 
 " Simple keywords that can occur anywhere (this is not really true for
 " bklTarget but we can't easily avoid recognizing it inside another target).
-syn keyword	bklTarget	action dll exe library
+syn keyword	bklTarget	action dll exe library external
 syn keyword	bklIf		if
 
 " Statements and properties that can only appear at global scope, outside of

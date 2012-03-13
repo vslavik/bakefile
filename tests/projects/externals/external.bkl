@@ -1,0 +1,9 @@
+toolsets = vs2010;
+
+external HelloWorldManual {
+    file = HelloWorldManual.vcxproj;
+}
+
+external xmlwrapp {
+    file = xmlwrapp_vc9_xmlwrapp.vcproj;
+}

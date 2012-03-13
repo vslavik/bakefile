@@ -521,6 +521,16 @@ class TargetType(Extension):
         """
         raise NotImplementedError
 
+    def vs_project(self, toolset, target):
+        """
+        Returns Visual Studio project file object (derived from
+        :class:`bkl.plugins.vsbase.VSProjectBase`) if the target type can be
+        implemented as a Visual Studio project.
+
+        Implementing this method is strictly optional.
+        """
+        raise NotImplementedError
+
 
 class Toolset(Extension):
     """
