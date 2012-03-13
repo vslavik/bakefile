@@ -25,6 +25,7 @@
 from abc import ABCMeta, abstractmethod
 import copy
 import types
+import os.path
 
 import expr
 import error
@@ -35,7 +36,8 @@ class _ExtensionMetaclass(ABCMeta):
     def __init__(cls, name, bases, dct):
         super(_ExtensionMetaclass, cls).__init__(name, bases, dct)
 
-        assert len(bases) == 1, "multiple inheritance not supported"
+        if len(bases) > 1:
+            assert bases[0] is Extension, "multiple inheritance only supported if first base class is Extension"
 
         # skip base classes, only register implementations:
         if name == "Extension":
@@ -388,7 +390,49 @@ class BuildNode(object):
                "phony target must have a name, non-phony must have outputs"
 
 
-class FileType(Extension):
+class FileRecognizer(object):
+    """
+    Mixin base class for extensions that handle certain file types and need to
+    be associated with a file automatically. The class provides easy to use
+    get_for_file() mechanism.
+
+    To use this class, derive from both :class:`bkl.api.Extension` and this one.
+    """
+
+    #: List of file extensions recognized by this extension, without dots
+    #: (e.g. ``["vcproj", "vcxproj"]``).
+    extensions = []
+
+    def detect(self, filename):
+        """
+        Returns True if the file *filename* is supported by the class.  Note
+        that it is only called if the file has one of the extensions listed in
+        :attr:`extensions`. By default, returns :const:`True`.
+
+        :param filename: Name of the file to check. Note that this is native
+                         filename (as a string) and points to existing file.
+        """
+        return True
+
+    @classmethod
+    def get_for_file(cls, filename):
+        """
+        Returns appropriate implementation of the class for given file.
+
+        Throws :class:`bkl.error.UnsupportedError` if no implementation could
+        be found.
+
+        :param filename: Name of the file, as a native path.
+        """
+        ext = os.path.splitext(filename)[1]
+        if ext: ext = ext[1:]
+        for impl in cls.all():
+            if ext in impl.extensions and impl.detect(filename):
+                return impl
+        raise error.UnsupportedError("unrecognized type of file %s" % filename)
+
+
+class FileType(Extension, FileRecognizer):
     """
     Description of a file type. File types are used by
     :class:`bkl.api.FileCompiler` to define both input and output files.
@@ -399,17 +443,6 @@ class FileType(Extension):
     """
     def __init__(self, extensions=[]):
         self.extensions = extensions
-
-    def detect(self, filename):
-        """
-        Returns True if the file is of this file type. This method is only
-        called if the file has one of the extensions listed in
-        :attr:`extensions`. By default, returns True.
-
-        :param filename: Name of the file to check. Note that this is native
-                         filename and points to existing file.
-        """
-        return True
 
 
 class FileCompiler(Extension):

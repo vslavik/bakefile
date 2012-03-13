@@ -71,6 +71,14 @@ class ParserError(Error):
     pass
 
 
+class UnsupportedError(Error):
+    """
+    Exception class for errors when something is unsupported, e.g. unrecognized
+    file extension.
+    """
+    pass
+
+
 class TypeError(Error):
     """
     Exception class for variable type errors.
