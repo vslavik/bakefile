@@ -26,6 +26,7 @@ syn keyword	bklIf		if
 " any block.
 syn keyword	bklGlobalStat	submodule
 syn keyword	bklGlobalStat	import
+syn keyword	bklGlobalStat	plugin
 syn keyword	bklGlobalStat	requires
 syn keyword	bklGlobalStat	srcdir
 syn keyword	bklGlobalStat	configuration

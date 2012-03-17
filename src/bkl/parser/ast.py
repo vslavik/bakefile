@@ -241,6 +241,12 @@ class ImportNode(Node):
                     doc="File to include")
 
 
+class PluginNode(Node):
+    """Inclusion of a plugin."""
+    file = property(lambda self: self.children[0].text,
+                    doc="File with plugin code")
+
+
 class SrcdirNode(Node):
     """Overriding of the @srcdir value."""
     srcdir = property(lambda self: self.children[0].text,
@@ -323,6 +329,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.NOT_EQUAL      : NotEqualNode,
         BakefileParser.SUBMODULE      : SubmoduleNode,
         BakefileParser.IMPORT         : ImportNode,
+        BakefileParser.PLUGIN         : PluginNode,
         BakefileParser.SRCDIR         : SrcdirNode,
         BakefileParser.BASE_LIST      : BaseListNode,
         BakefileParser.CONFIGURATION  : ConfigurationNode,

@@ -674,6 +674,29 @@ specified one.
 
 
 
+Loading plugins
+---------------
+
+Standard Bakefile plugins are loaded automatically. But sometimes a custom
+plugin needed only for a specific project is needed and such plugins must be
+loaded explicitly, using the ``plugin`` keyword:
+
+.. code-block:: bkl
+
+   plugin my_compiler.py;
+
+Its argument is a path to a valid Python file that will be loaded into the
+``bkl.plugins`` module. You can also use full name of the module to make it
+clear the file is a Bakefile plugin:
+
+.. code-block:: bkl
+
+   plugin bkl.plugins.my_compiler.py;
+
+See the :ref:`writing_plugins` chapter for more information about plugins.
+
+
+
 Comments
 --------
 

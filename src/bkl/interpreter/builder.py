@@ -427,6 +427,16 @@ class Builder(object, CondTrackingMixin):
             raise Error(msg)
 
 
+    def on_plugin(self, node):
+        if self.active_if_cond is not None:
+            raise ParserError("plugins cannot be loaded conditionally"
+                              ' (condition "%s" set at %s)' % (
+                                  self.active_if_cond, self.active_if_cond.pos))
+        fn = os.path.join(os.path.dirname(node.pos.filename), node.file)
+        import bkl.plugins
+        bkl.plugins.load_from_file(fn)
+
+
     def on_srcdir(self, node):
         assert isinstance(self.context, Module)
         assert self.active_if_cond is None
@@ -452,6 +462,7 @@ class Builder(object, CondTrackingMixin):
         SettingNode        : on_setting,
         SubmoduleNode      : on_submodule,
         ImportNode         : on_import,
+        PluginNode         : on_plugin,
         SrcdirNode         : on_srcdir,
         NilNode            : lambda self,x: x, # do nothing
     }

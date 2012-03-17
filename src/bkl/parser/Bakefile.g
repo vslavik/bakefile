@@ -50,6 +50,7 @@ tokens {
     FILES_LIST;
     SUBMODULE;
     IMPORT;
+    PLUGIN;
     SRCDIR;
     CONFIGURATION;
     TEMPLATE;
@@ -95,6 +96,7 @@ stmt_global_scope
     : target_stmt
     | submodule_stmt
     | import_stmt
+    | plugin_stmt
     | requires_stmt
     | configuration_stmt
     | setting_stmt
@@ -146,6 +148,10 @@ submodule_stmt
 
 import_stmt
     : 'import' literal ';'             -> ^(IMPORT literal)
+    ;
+
+plugin_stmt
+    : 'plugin' literal ';'             -> ^(PLUGIN literal)
     ;
 
 srcdir_stmt
