@@ -46,7 +46,7 @@ def _is_multiarch_target(target):
     and be incompatible with gcc's -M* flags.
     """
     try:
-        return len(target["archs"].as_py()) > 1
+        return len(target["archs"]) > 1
     except KeyError:
         return False # not an executable
 
@@ -85,7 +85,8 @@ class GnuFileCompiler(FileCompiler):
     def _arch_flags(self, toolset, target):
         if isinstance(toolset, OSXGnuToolset):
             flags = []
-            for a in target["archs"].as_py():
+            for a in target["archs"]:
+                a = a.as_py()
                 if a in OSX_ARCH_FLAGS:
                     flags.append(LiteralExpr(OSX_ARCH_FLAGS[a]))
             return flags
@@ -116,10 +117,10 @@ class GnuCCompiler(GnuFileCompiler):
             cmd += [LiteralExpr(GCC_DEPS_FLAGS)]
         # FIXME: evaluating the flags here every time is inefficient
         cmd += self._arch_flags(toolset, target)
-        cmd += bkl.expr.add_prefix("-D", target["defines"]).items
-        cmd += bkl.expr.add_prefix("-I", target["includedirs"]).items
-        cmd += target["compiler-options"].items
-        cmd += target[self._options_prop_name].items
+        cmd += bkl.expr.add_prefix("-D", target["defines"])
+        cmd += bkl.expr.add_prefix("-I", target["includedirs"])
+        cmd += target["compiler-options"]
+        cmd += target[self._options_prop_name]
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         cmd.append(input)
@@ -129,10 +130,10 @@ class GnuCCompiler(GnuFileCompiler):
             # add command for generating the deps:
             cmd = [LiteralExpr("$(call cc_deps_cmd,%s,$(CPPFLAGS) $(%s)" %
                     (self._compiler, self._flags_var_name))]
-            cmd += bkl.expr.add_prefix("-D", target["defines"]).items
-            cmd += bkl.expr.add_prefix("-I", target["includedirs"]).items
-            cmd += target["compiler-options"].items
-            cmd += target[self._options_prop_name].items
+            cmd += bkl.expr.add_prefix("-D", target["defines"])
+            cmd += bkl.expr.add_prefix("-I", target["includedirs"])
+            cmd += target["compiler-options"]
+            cmd += target[self._options_prop_name]
             cmd.append(input)
             cmd.append(LiteralExpr(")"))
             retval.append(ListExpr(cmd))

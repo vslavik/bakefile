@@ -129,6 +129,12 @@ class ListExpr(Expr):
     def __nonzero__(self):
         return bool(self.items)
 
+    def __len__(self):
+        return len(self.items)
+
+    def __iter__(self):
+        return iter(self.items)
+
     def __str__(self):
         return "[%s]" % ", ".join(str(x) for x in self.items)
 
@@ -165,6 +171,12 @@ class NullExpr(Expr):
 
     def __nonzero__(self):
         return False
+
+    def __len__(self):
+        return 0
+
+    def __iter__(self):
+        return iter([])
 
     def __str__(self):
         return "null"
@@ -347,10 +359,7 @@ class IfExpr(Expr):
         self.value_no = no
 
     def as_py(self):
-        if self.cond.as_py():
-            return self.value_yes.as_py()
-        else:
-            return self.value_no.as_py()
+        return self.get_value().as_py()
 
     def get_value(self):
         """
@@ -363,12 +372,15 @@ class IfExpr(Expr):
 
     def __nonzero__(self):
         try:
-            if self.cond.as_py():
-                return bool(self.value_yes)
-            else:
-                return bool(self.value_no)
+            return bool(self.get_value())
         except NonConstError:
             return bool(self.value_yes) or bool(self.value_no)
+
+    def __len__(self):
+        return len(self.get_value())
+
+    def __iter__(self):
+        return iter(self.get_value())
 
     def __str__(self):
         return "(%s ? %s : %s)" % (self.cond, self.value_yes, self.value_no)

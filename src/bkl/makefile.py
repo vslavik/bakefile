@@ -199,8 +199,8 @@ class MakefileToolset(Toolset):
         inspect = [submodule] + [p for p in project.modules if p.is_submodule_of(submodule)]
         for mod in inspect:
             for target in mod.targets.itervalues():
-                for dep in target["deps"].as_py():
-                    tdep = project.get_target(dep)
+                for dep in target["deps"]:
+                    tdep = project.get_target(dep.as_py())
                     tmod = tdep.parent
                     if tmod.is_submodule_of(main):
                         while tmod.parent is not main:
@@ -279,8 +279,8 @@ class MakefileToolset(Toolset):
                         out = node.outputs[0]
 
                     deps = [expr_fmt.format(i) for i in node.inputs]
-                    for dep in t["deps"].as_py():
-                        tdep = module.project.get_target(dep)
+                    for dep in t["deps"]:
+                        tdep = module.project.get_target(dep.as_py())
                         tdepstr = _format_dep(tdep)
                         deps.append(tdepstr)
                         if tdep.parent is not module:

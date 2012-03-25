@@ -196,14 +196,14 @@ class NativeCompiledType(TargetType):
             return
         visited.add(target)
         project = target.project
-        deps = [project.get_target(x) for x in target["deps"].as_py()]
+        deps = [project.get_target(x.as_py()) for x in target["deps"]]
         todo = [x for x in deps if
                 isinstance(x.type, LibraryType) or isinstance(x.type, DllType)]
         for dep in todo:
             f = dep.type.target_file(toolset, dep)
             if f not in deplibs:
                 deplibs.append(f)
-        for lib in target["libs"].items:
+        for lib in target["libs"]:
             # TODO: use some ordered-set type and just merge them
             if lib not in ldlibs:
                 ldlibs.append(lib)

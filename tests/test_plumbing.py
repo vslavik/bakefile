@@ -33,6 +33,8 @@ import bkl.interpreter
 import bkl.dumper
 import bkl.io
 
+from bkl.expr import BoolValueExpr, ListExpr, LiteralExpr, ConcatExpr, NullExpr
+
 import projects
 projects_dir = os.path.dirname(projects.__file__) 
 
@@ -65,7 +67,6 @@ def test_file_io_win(tmpdir):
 
 
 def test_expr_as_bool():
-    from bkl.expr import BoolValueExpr, ListExpr, LiteralExpr, ConcatExpr
     bool_yes = BoolValueExpr(True)
     bool_no = BoolValueExpr(False)
     empty_list = ListExpr([])
@@ -83,3 +84,18 @@ def test_expr_as_bool():
     assert not bool(empty_list)
     assert not bool(empty_literal)
     assert not bool(empty_concat)
+
+def test_list_expr_iterator():
+    bool_yes = BoolValueExpr(True)
+    bool_no = BoolValueExpr(False)
+    empty_list = ListExpr([])
+    a_list = ListExpr([bool_yes, bool_no])
+    assert len(empty_list) == 0
+    assert not empty_list
+    assert len(a_list) == 2
+    assert a_list
+    assert list(a_list) == [bool_yes, bool_no]
+
+    null = NullExpr()
+    assert not null
+    assert len(null) == 0

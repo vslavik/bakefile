@@ -592,7 +592,7 @@ class VS2010Toolset(Toolset):
                 std_defs += ";_USRDLL;%s_EXPORTS" % target.name.upper()
             std_defs += ";%(PreprocessorDefinitions)"
             defs = bkl.expr.ListExpr(
-                            target["defines"].items +
+                            list(target["defines"]) +
                             [bkl.expr.LiteralExpr(std_defs)])
             n_cl.add("PreprocessorDefinitions", defs)
             n_cl.add("MultiProcessorCompilation", True)
@@ -627,25 +627,25 @@ class VS2010Toolset(Toolset):
                 n_link.add("EnableCOMDATFolding", True)
                 n_link.add("OptimizeReferences", True)
             if not is_library:
-                ldflags = target["link-options"].as_py()
+                ldflags = target["link-options"]
                 if ldflags:
-                    n_link.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(ldflags))
+                    n_link.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(ldflags.as_py()))
             if is_library:
-                libs = target["libs"].as_py()
+                libs = target["libs"]
                 if libs:
                     n_lib = Node("Lib")
                     self._add_extra_options_to_node(target, n_lib)
                     n.add(n_lib)
-                    n_lib.add("AdditionalDependencies", " ".join("%s.lib" % x for x in libs))
-            pre_build = target["pre-build-commands"].as_py()
+                    n_lib.add("AdditionalDependencies", " ".join("%s.lib" % x.as_py() for x in libs))
+            pre_build = target["pre-build-commands"]
             if pre_build:
                 n_script = Node("PreBuildEvent")
-                n_script.add("Command", "\n".join(pre_build))
+                n_script.add("Command", "\n".join(pre_build.as_py()))
                 n.add(n_script)
-            post_build = target["post-build-commands"].as_py()
+            post_build = target["post-build-commands"]
             if post_build:
                 n_script = Node("PostBuildEvent")
-                n_script.add("Command", "\n".join(post_build))
+                n_script.add("Command", "\n".join(post_build.as_py()))
                 n.add(n_script)
             root.add(n)
 
