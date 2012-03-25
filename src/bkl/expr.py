@@ -88,6 +88,12 @@ class Expr(object):
         # non-empty values ("if expr:") work without the need to call as_py().
         raise NotImplementedError
 
+    def __eq__(self, other):
+        return are_equal(self, other)
+
+    def __ne__(self, other):
+        return not are_equal(self, other)
+
 
 class LiteralExpr(Expr):
     """
@@ -429,7 +435,9 @@ class PathExpr(Expr):
         self.anchor = anchor
 
     def as_py(self):
-        raise NotImplementedError
+        # We can't represent a path as something natively useful (e.g. native
+        # path), so let's return a tuple of (anchor, relpath) instead:
+        return (self.anchor, '/'.join(x.as_py() for x in self.components))
 
     def __nonzero__(self):
         True
@@ -991,7 +999,11 @@ def are_equal(a, b):
     try:
         # FIXME: This is not good enough, the comparison should be done
         #        symbolically as much as possible.
-        return a.as_py() == b.as_py()
+        if isinstance(a, Expr):
+            a = a.as_py()
+        if isinstance(b, Expr):
+            b = b.as_py()
+        return a == b
     except NonConstError:
         raise CannotDetermineError
 

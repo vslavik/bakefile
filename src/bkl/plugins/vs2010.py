@@ -602,7 +602,7 @@ class VS2010Toolset(Toolset):
             crt = "MultiThreaded"
             if c == "Debug":
                 crt += "Debug"
-            if target["win32-crt-linkage"].as_py() == "dll":
+            if target["win32-crt-linkage"] == "dll":
                 crt += "DLL"
             n_cl.add("RuntimeLibrary", crt)
 
@@ -619,7 +619,7 @@ class VS2010Toolset(Toolset):
             n.add(n_link)
             if is_exe:
                 n_link.add("SubSystem",
-                           "Windows" if target["win32-subsystem"].as_py() == "windows" else "Console")
+                           "Windows" if target["win32-subsystem"] == "windows" else "Console")
             else:
                 n_link.add("SubSystem", "Windows")
             n_link.add("GenerateDebugInformation", True)
