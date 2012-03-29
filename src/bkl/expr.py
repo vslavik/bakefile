@@ -1023,7 +1023,9 @@ def add_prefix(prefix, e):
     if not isinstance(prefix, Expr):
         prefix = LiteralExpr(prefix)
 
-    if isinstance(e, ListExpr):
+    if isinstance(e, NullExpr):
+        return e
+    elif isinstance(e, ListExpr):
         return ListExpr([add_prefix(prefix, i) for i in e.items], pos=e.pos)
     else:
         return ConcatExpr([prefix, e], pos=e.pos)
