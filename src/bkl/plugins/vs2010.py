@@ -441,7 +441,8 @@ class VS2010Toolset(Toolset):
     def generate(self, project):
         # generate vcxproj files and prepare solutions
         for m in project.modules:
-            self.gen_for_module(m)
+            with error_context(m):
+                self.gen_for_module(m)
         # Commit solutions; this must be done after processing all modules
         # because of inter-module dependencies and references.
         for m in project.modules:
