@@ -22,25 +22,19 @@
 #  IN THE SOFTWARE.
 #
 
-import re
 import antlr3
 import ast
 from BakefileLexer import BakefileLexer
 from BakefileParser import BakefileParser
 
-from bkl.error import ParserError
+from bkl.error import ParserError, warning
 
 
 # Helper to implement errors handling in a way we prefer
 class _BakefileErrorsMixin(object):
     def displayRecognitionError(self, tokenNames, e):
-        pos = ast.Position()
-        pos.filename = self.filename
-        pos.line = e.line
-        if e.charPositionInLine != -1:
-            pos.column = e.charPositionInLine
-
         msg = self.getErrorMessage(e, tokenNames)
+        pos = self._get_position(e)
         raise ParserError(msg, pos=pos)
 
     def getTokenErrorDisplay(self, t):
@@ -52,8 +46,14 @@ class _BakefileErrorsMixin(object):
         else:
             return repr(str(s))
 
+    def _get_position(self, e):
+        pos = ast.Position()
+        pos.filename = self.filename
+        pos.line = e.line
+        if e.charPositionInLine != -1:
+            pos.column = e.charPositionInLine
+        return pos
 
-UNESCAPE_REGEX = re.compile(r'\\(.)')
 
 # The lexer and parser used to parse .bkl files.
 # Do not use directly, use parse() function instead.
@@ -62,12 +62,26 @@ class _Lexer(_BakefileErrorsMixin, BakefileLexer):
 
 class _Parser(_BakefileErrorsMixin, BakefileParser):
 
-    def unescape(self, text):
+    def unescape(self, token, text):
         """Removes \\ escapes from the text."""
-        if '\\' not in text:
-            return text
-        else:
-            return UNESCAPE_REGEX.sub(r'\1', text)
+        out = ""
+        start = 0
+        while True:
+            pos = text.find('\\', start)
+            if pos == -1:
+                out += text[start:]
+                break
+            else:
+                out += text[start:pos]
+                c = text[pos+1]
+                out += c
+                start = pos+2
+                if c != '"' and c != '\\':
+                    source_pos = self._get_position(token)
+                    source_pos.column += pos+1
+                    warning("unnecessary escape sequence '\\%s' (did you mean '\\\\%s'?)" % (c, c),
+                            pos=source_pos)
+        return out
 
 
 def get_parser(code, filename=None):

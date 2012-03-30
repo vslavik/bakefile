@@ -156,7 +156,7 @@ identifier: t=TEXT             -> ID[$t];
 
 literal
     : t=TEXT                   -> LITERAL[$t]
-    | t=QUOTED_TEXT            -> LITERAL[$t, self.unescape($t.text[1:-1\])]
+    | t=QUOTED_TEXT            -> LITERAL[$t, self.unescape($t, $t.text[1:-1\])]
     ;
 
 bool_value
