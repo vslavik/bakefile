@@ -105,9 +105,9 @@ class VSExternalProject200x(VSExternalProjectBase):
     @property
     def version(self):
         v = self.xml.get("Version")
-        if   v == "7.10": return 2003
-        elif v == "8.00": return 2005
-        elif v == "9.00": return 2008
+        if   v == "7.10": return 7.1
+        elif v == "8.00": return 8
+        elif v == "9.00": return 9
         else:
             raise Error("unrecognized version of Visual Studio project %s: Version=\"%s\"",
                         self.projectfile, v)

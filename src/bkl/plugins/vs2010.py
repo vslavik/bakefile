@@ -339,7 +339,7 @@ class VS2010Solution(OutputFile):
 class VS2010Project(VSProjectBase):
     """
     """
-    version = 2010
+    version = 10
 
     def __init__(self, name, guid, projectfile, deps):
         self.name = name
@@ -396,7 +396,7 @@ class VS2010Toolset(Toolset):
 
     """
 
-    version = 2010
+    version = 10
     name = "vs2010"
 
     exe_extension = "exe"
