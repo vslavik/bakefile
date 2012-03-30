@@ -342,6 +342,12 @@ class Property(object):
         self.type.validate(e)
         return e
 
+    def _add_toolset(self, toolset):
+        if self.toolsets:
+            self.toolsets.append(toolset)
+        else:
+            self.toolsets = [toolset]
+
 
 class BuildNode(object):
     """
