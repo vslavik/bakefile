@@ -164,6 +164,7 @@ class ModelPart(object):
         defined.
 
         :param recursively: Look for the variable recursively in the parent.
+
         .. seealso:: :meth:`get_variable_value()`
 
         .. note:: Unlike :meth:`get_variable_value()`, this method doesn't
