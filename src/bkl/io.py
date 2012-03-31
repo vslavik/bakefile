@@ -45,6 +45,7 @@ force_output = False
 EOL_WINDOWS = "win"
 EOL_UNIX    = "unix"
 
+_all_written_files = {}
 
 class OutputFile(object):
     """
@@ -60,7 +61,8 @@ class OutputFile(object):
 
     Notice the need to explicitly call commit().
     """
-    def __init__(self, filename, eol, charset="utf-8"):
+    def __init__(self, filename, eol, charset="utf-8",
+                 creator=None, create_for=None):
         """
         Creates output file.
 
@@ -68,7 +70,15 @@ class OutputFile(object):
                          to CWD or absolute; the latter is recommended.
         :param eol:      Line endings to use. One of EOL_WINDOWS and EOL_UNIX.
         :param charset:  Charset to use if Unicode string is passed to write().
+        :param creator:  Who is creating the file; typically toolset object.
+        :param create_for: Object the file is created for, e.g. a module or a target.
         """
+        if filename in _all_written_files:
+            creator1, create_for1 = _all_written_files[filename]
+            from bkl.error import Error
+            raise Error("conflict in file %(filename)s, generated both by %(creator1)s for %(create_for1)s and %(creator)s for %(create_for)s" % locals())
+        _all_written_files[filename] = (creator, create_for)
+
         self.filename = filename
         self.eol = eol
         self.charset = charset

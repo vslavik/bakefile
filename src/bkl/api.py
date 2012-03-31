@@ -550,6 +550,10 @@ class Toolset(Extension):
     puts all the components (platform-specific commands, make syntax, compiler
     invocation, ...) together and writes out the makefiles or projects.
     """
+
+    def __str__(self):
+        return "toolset %s" % self.name
+
     #: This toolset's compiler's object files type, as :class:`bkl.api.FileType`.
     # TODO: shouldn't be needed, get_compilation_subgraph() should figure it out.
     object_type = None

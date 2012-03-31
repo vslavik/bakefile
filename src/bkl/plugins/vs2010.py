@@ -170,7 +170,8 @@ class VS2010Solution(OutputFile):
 
     def __init__(self, toolset, module):
         slnfile = module["%s.solutionfile" % toolset.name].as_native_path_for_output(module)
-        super(VS2010Solution, self).__init__(slnfile, EOL_WINDOWS)
+        super(VS2010Solution, self).__init__(slnfile, EOL_WINDOWS,
+                                             creator=toolset, create_for=module)
         self.name = module.name
         self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.name)
         self.write_header()
@@ -689,7 +690,8 @@ class VS201xToolsetBase(Toolset):
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.targets")
         root.add("ImportGroup", Label="ExtensionTargets")
 
-        f = OutputFile(filename, EOL_WINDOWS)
+        f = OutputFile(filename, EOL_WINDOWS,
+                       creator=self, create_for=target)
         f.write(codecs.BOM_UTF8)
         f.write(XmlFormatter(paths_info).format(root))
         f.commit()
@@ -717,7 +719,8 @@ class VS201xToolsetBase(Toolset):
 
 
     def _write_filters_file_for(self, filename):
-        f = OutputFile(filename + ".filters", EOL_WINDOWS)
+        f = OutputFile(filename + ".filters", EOL_WINDOWS,
+                       creator=self, create_for=filename)
         f.write("""\
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
