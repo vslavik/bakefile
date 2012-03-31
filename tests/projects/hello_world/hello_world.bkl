@@ -1,6 +1,10 @@
-toolsets = gnu gnu-osx vs2010;
+toolsets = gnu gnu-osx vs2010 vs11;
+
+vs11.solutionfile = hello_world_vs11.sln;
 
 exe hello {
     archs = x86 x86_64;
     sources { hello.c }
+
+    vs11.projectfile = hello_vs11.vcxproj;
 }

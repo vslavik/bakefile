@@ -1,10 +1,12 @@
 module {
   variables {
-    toolsets = [gnu, gnu-osx, vs2010]
+    toolsets = [gnu, gnu-osx, vs2010, vs11]
+    vs11.solutionfile = @top_srcdir/hello_world_vs11.sln
   }
   targets {
     exe hello {
       archs = [x86, x86_64]
+      vs11.projectfile = @top_srcdir/hello_vs11.vcxproj
       sources {
         file @top_srcdir/hello.c
       }
