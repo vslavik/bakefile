@@ -49,7 +49,34 @@ def GUID(namespace, solution, data):
 
 
 class Node(object):
+    """
+    Convenience representation of XML node for project file output. It provides
+    two useful features:
+
+      1. Ability to concisely specify attributes
+      2. Values aren't limited to strings, they may be any Python objects
+         convertible to strings. In particular, they may be
+         :class:`bkl.expr.Expr` instances and they will be formatted correctly.
+
+    Attributes are added to the node using keyword arguments to the constructor
+    or using dictionary-like access:
+    >>> node["Label"] = "PropertySheets"
+
+    Child nodes are added using the :meth:`add()` method.
+    """
     def __init__(self, name, text=None, **kwargs):
+        """
+        Creates an XML node with given element name. If provided, the text is
+        used for its textual content. Any provided keyword arguments are used
+        to add attributes to the node.
+
+        Examples:
+
+        >>> Node("ImportGroup", Label="PropertySheets", Foo="A")
+            # creates <ImportGroup Label="PropertySheets" Foo="a"/>
+        >>> Node("LinkIncremental", True)
+            # creates <LinkIncremental>true</LinkIncremental>
+        """
         self.name = name
         self.text = text
         self.attrs = OrderedDict()
@@ -69,12 +96,15 @@ class Node(object):
         The argument may be another node:
         >>> n.add(Node("foo"))
 
-        Or it may be key-value pair, where the value is bkl.expr.Expr or any Python
-        value convertible to string:
+        Or it may be key-value pair, where the value is bkl.expr.Expr or any
+        Python value convertible to string; the first argument is name of child
+        element and the second one is its textual value:
         >>> n.add("ProjectGuid", "{31DC1570-67C5-40FD-9130-C5F57BAEBA88}")
         >>> n.add("LinkIncremental", target["vs-incremental-link"])
 
-        Or it can take the same arguments that Node constructor takes:
+        Or it can take the same arguments that Node constructor takes; this is
+        equivalent to creating a Node using the same arguments and than adding
+        it using the first form of add():
         >>> n.add("ImportGroup", Label="PropertySheets")
         """
         assert len(args) > 0
@@ -113,13 +143,18 @@ XML_HEADER = """\
 
 class XmlFormatter(object):
     """
-    Formats Node hierarchy into XML output that looks like Visual Studio's native format.
+    Formats Node hierarchy into XML output that looks like Visual Studio's
+    native format.
     """
 
     def __init__(self, paths_info):
         self.expr_formatter = VSExprFormatter(paths_info)
 
     def format(self, node):
+        """
+        Formats given node as an XML document and returns the document as a
+        string.
+        """
         return XML_HEADER + self._format_node(node, "")
 
     def _format_node(self, n, indent):
