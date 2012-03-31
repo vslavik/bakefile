@@ -122,16 +122,20 @@ class VSExternalProject200x(VSExternalProjectBase):
 
 class VSExternalProject201x(VSExternalProjectBase):
     """
-    Wrapper around VS 2010/2011 project files.
+    Wrapper around VS 2010/11 project files.
     """
     @property
     def version(self):
         v = self.xml.get("ToolsVersion")
-        if v == "4.0":
-            return 2010
-        else:
+        if v != "4.0":
             raise Error("unrecognized version of Visual Studio project %s: ToolsVersion=\"%s\"",
                         self.projectfile, v)
+        # TODO-PY26: use "PropertyGroup[@Label='Configuration']"
+        t = self.xml.findtext("ms:PropertyGroup/ms:PlatformToolset", namespaces=VS_NAMESPACES)
+        if t == "v110":
+            return 11
+        else:
+            return 10
 
     @property
     def name(self):

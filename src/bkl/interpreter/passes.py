@@ -122,7 +122,8 @@ def detect_unused_vars(model):
                 #        declaration similar to Property, with type checking and
                 #        automated docs and all. Then test for it here as other
                 #        properties are tested for.
-                not var.name.startswith("vs2010.option.")):
+                not var.name.startswith("vs2010.option.") and
+                not var.name.startswith("vs11.option.")):
             warning('variable "%s" is never used', var.name, pos=var.value.pos)
 
 

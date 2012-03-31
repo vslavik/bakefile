@@ -53,8 +53,9 @@ def GUID(namespace, solution, data):
 
 
 class Node(object):
-    def __init__(self, name, **kwargs):
+    def __init__(self, name, text=None, **kwargs):
         self.name = name
+        self.text = text
         self.attrs = OrderedDict()
         self.children = []
         self.attrs.update(kwargs)
@@ -130,6 +131,7 @@ class XmlFormatter(object):
         for key, value in n.attrs.iteritems():
             s += ' %s=%s' % (key, quoteattr(self._format_value(value)))
         if n.children:
+            assert not n.text, "nodes with both text and children not implemented"
             s += ">\n"
             subindent = indent + "  "
             for key, value in n.children:
@@ -143,6 +145,8 @@ class XmlFormatter(object):
                     # else: empty value, don't write that
 
             s += "%s</%s>\n" % (indent, n.name)
+        elif n.text:
+            s += ">%s</%s>\n" % (n.text, n.name)
         else:
             s += " />\n"
         return s
@@ -160,15 +164,16 @@ class XmlFormatter(object):
 
 
 class VS2010Solution(OutputFile):
-    def __init__(self, module):
-        slnfile = module["vs2010.solutionfile"].as_native_path_for_output(module)
+
+    format_version = "11.00"
+    human_version = "2010"
+
+    def __init__(self, toolset, module):
+        slnfile = module["%s.solutionfile" % toolset.name].as_native_path_for_output(module)
         super(VS2010Solution, self).__init__(slnfile, EOL_WINDOWS)
         self.name = module.name
         self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.name)
-        self.write(codecs.BOM_UTF8)
-        self.write("\n")
-        self.write("Microsoft Visual Studio Solution File, Format Version 11.00\n")
-        self.write("# Visual Studio 2010\n")
+        self.write_header()
         self.projects = []
         self.subsolutions = []
         self.parent_solution = None
@@ -179,6 +184,12 @@ class VS2010Solution(OutputFile):
                                     builddir=None,
                                     model=module)
         self.formatter = VS2010ExprFormatter(paths_info)
+
+    def write_header(self):
+        self.write(codecs.BOM_UTF8)
+        self.write("\n")
+        self.write("Microsoft Visual Studio Solution File, Format Version %s\n" % self.format_version)
+        self.write("# Visual Studio %s\n" % self.human_version)
 
     def add_project(self, prj):
         self.guids_map[prj.name] = prj.guid
@@ -365,76 +376,55 @@ def _default_guid_for_project(target):
     return '"%s"' % GUID(NAMESPACE_PROJECT, target.parent.name, target.name)
 
 
-class VS2010Toolset(Toolset):
-    """
-    Visual Studio 2010.
+class VS201xToolsetBase(Toolset):
+    """Base class for VS2010 and VS11 toolsets."""
 
-
-    Special properties
-    ------------------
-    In addition to the properties described below, it's possible to specify any
-    of the ``vcxproj`` properties directly in a bakefile. To do so, you have to
-    set specially named variables on the target.
-
-    The variables are prefixed with ``vs2010.option.``, followed by node name and
-    property name. The following nodes are supported:
-
-      - ``vs2010.option.Globals.*``
-      - ``vs2010.option.Configuration.*``
-      - ``vs2010.option.*`` (this is the unnamed ``PropertyGroup`` with
-        global settings such as ``TargetName``)
-      - ``vs2010.option.ClCompile.*``
-      - ``vs2010.option.Link.*``
-      - ``vs2010.option.Lib.*``
-
-    Examples:
-
-    .. code-block:: bkl
-
-        vs2010.option.GenerateManifest = false;
-        vs2010.option.Link.CreateHotPatchableImage = Enabled;
-
-    """
-
-    version = 10
-    name = "vs2010"
+    # Project files versions that are natively supported, sorted list
+    proj_versions = None
+    # PlatformToolset property
+    platform_toolset = None
+    # Solution class for this VS version
+    Solution = VS2010Solution
+    #: Project class for this VS version
+    Project = VS2010Solution
 
     exe_extension = "exe"
     library_extension = "lib"
 
-    properties_target = [
-        Property("vs2010.projectfile",
-                 type=PathType(),
-                 default=_project_name_from_solution,
-                 inheritable=False,
-                 doc="File name of the project for the target."),
-        Property("vs2010.guid",
-                 # TODO: use custom GUID type, so that user-provided GUIDs can be validated
-                 type=StringType(),
-                 default=_default_guid_for_project,
-                 inheritable=False,
-                 doc="GUID of the project."),
-        ]
+    @classmethod
+    def properties_target(cls):
+        yield Property("%s.projectfile" % cls.name,
+                       type=PathType(),
+                       default=_project_name_from_solution,
+                       inheritable=False,
+                       doc="File name of the project for the target.")
+        yield Property("%s.guid" % cls.name,
+                       # TODO: use custom GUID type, so that user-provided GUIDs can be validated
+                       # TODO: make this vs.guid and share among VS toolsets
+                       type=StringType(),
+                       default=_default_guid_for_project,
+                       inheritable=False,
+                       doc="GUID of the project.")
 
-    properties_module = [
-        Property("vs2010.solutionfile",
-                 type=PathType(),
-                 default=_default_solution_name,
-                 inheritable=False,
-                 doc="File name of the solution file for the module."),
-        Property("vs2010.generate-solution",
-                 type=BoolType(),
-                 default=True,
-                 inheritable=True,
-                 doc="""
-                     Whether to generate solution file for the module. Set to
-                     ``false`` if you want to omit the solution, e.g. for some
-                     submodules with only a single target.
-                     """),
-        ]
+    @classmethod
+    def properties_module(cls):
+        yield Property("%s.solutionfile" % cls.name,
+                       type=PathType(),
+                       default=_default_solution_name,
+                       inheritable=False,
+                       doc="File name of the solution file for the module.")
+        yield Property("%s.generate-solution" % cls.name,
+                       type=BoolType(),
+                       default=True,
+                       inheritable=True,
+                       doc="""
+                           Whether to generate solution file for the module. Set to
+                           ``false`` if you want to omit the solution, e.g. for some
+                           submodules with only a single target.
+                           """)
 
     def get_builddir_for(self, target):
-        prj = target["vs2010.projectfile"]
+        prj = target["%s.projectfile" % self.name]
         # TODO: reference Configuration setting properly, as bkl setting
         return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr("$(Configuration)")], prj.anchor)
 
@@ -449,13 +439,13 @@ class VS2010Toolset(Toolset):
             for sub in m.submodules:
                 m.solution.add_subsolution(sub.solution)
         for m in project.modules:
-            if m["vs2010.generate-solution"]:
+            if m["%s.generate-solution" % self.name]:
                 m.solution.commit()
 
 
     def gen_for_module(self, module):
         # attach VS2010-specific data to the model
-        module.solution = VS2010Solution(module)
+        module.solution = self.Solution(self, module)
 
         for t in module.targets.itervalues():
             with error_context(t):
@@ -474,8 +464,8 @@ class VS2010Toolset(Toolset):
                     #       project file.
                     raise Error("project name (\"%s\") differs from target name (\"%s\"), they must be the same" %
                                 (prj.name, t.name))
-                if prj.version != self.version:
-                    if prj.version > self.version:
+                if prj.version not in self.proj_versions:
+                    if prj.version > self.proj_versions[-1]:
                         raise Error("project %s is for Visual Studio %s and will not work with %s" %
                                     (prj.projectfile, prj.version, self.version))
                     else:
@@ -485,7 +475,7 @@ class VS2010Toolset(Toolset):
 
 
     def gen_for_target(self, target):
-        projectfile = target["vs2010.projectfile"]
+        projectfile = target["%s.projectfile" % self.name]
         filename = projectfile.as_native_path_for_output(target)
 
         paths_info = bkl.expr.PathAnchorsInfo(
@@ -503,7 +493,7 @@ class VS2010Toolset(Toolset):
         root["ToolsVersion"] = "4.0"
         root["xmlns"] = "http://schemas.microsoft.com/developer/msbuild/2003"
 
-        guid = target["vs2010.guid"]
+        guid = target["%s.guid" % self.name]
         configs = ["Debug", "Release"]
 
         n_configs = Node("ItemGroup", Label="ProjectConfigurations")
@@ -513,6 +503,8 @@ class VS2010Toolset(Toolset):
             n.add("Platform", "Win32")
             n_configs.add(n)
         root.add(n_configs)
+
+        self._set_VCTargetsPath(root)
 
         n_globals = Node("PropertyGroup", Label="Globals")
         self._add_extra_options_to_node(target, n_globals)
@@ -537,6 +529,8 @@ class VS2010Toolset(Toolset):
                 return None
 
             n.add("UseDebugLibraries", c == "Debug")
+            if self.platform_toolset:
+                n.add("PlatformToolset", self.platform_toolset)
             if target["win32-unicode"]:
                 n.add("CharacterSet", "Unicode")
             else:
@@ -688,8 +682,8 @@ class VS2010Toolset(Toolset):
             root.add(refs)
             for dep_id in target_deps:
                 dep = target.project.get_target(dep_id)
-                depnode = Node("ProjectReference", Include=dep["vs2010.projectfile"])
-                depnode.add("Project", dep["vs2010.guid"].as_py().lower())
+                depnode = Node("ProjectReference", Include=dep["%s.projectfile" % self.name])
+                depnode.add("Project", dep["%s.guid" % self.name].as_py().lower())
                 refs.add(depnode)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.targets")
@@ -701,18 +695,21 @@ class VS2010Toolset(Toolset):
         f.commit()
         self._write_filters_file_for(filename)
 
-        return VS2010Project(target.name, guid, projectfile, target_deps)
+        return self.Project(target.name, guid, projectfile, target_deps)
+
+    def _set_VCTargetsPath(self, root):
+        pass
 
 
     def _add_extra_options_to_node(self, target, node):
         """Add extra native options specified in vs2010.option.* properties."""
         try:
-            scope = "vs2010.option.%s" % node["Label"]
+            scope = "%s.option.%s" % (self.name, node["Label"])
         except KeyError:
             if node.name == "PropertyGroup":
-                scope = "vs2010.option"
+                scope = "%s.option" % self.name
             else:
-                scope = "vs2010.option.%s" % node.name
+                scope = "%s.option.%s" % (self.name, node.name)
         for var in target.variables.itervalues():
             split = var.name.rsplit(".", 1)
             if len(split) == 2 and split[0] == scope:
@@ -743,3 +740,89 @@ class VS2010Toolset(Toolset):
         f.commit()
 
 
+
+class VS2010Toolset(VS201xToolsetBase):
+    """
+    Visual Studio 2010.
+
+
+    Special properties
+    ------------------
+    In addition to the properties described below, it's possible to specify any
+    of the ``vcxproj`` properties directly in a bakefile. To do so, you have to
+    set specially named variables on the target.
+
+    The variables are prefixed with ``vs2010.option.``, followed by node name and
+    property name. The following nodes are supported:
+
+      - ``vs2010.option.Globals.*``
+      - ``vs2010.option.Configuration.*``
+      - ``vs2010.option.*`` (this is the unnamed ``PropertyGroup`` with
+        global settings such as ``TargetName``)
+      - ``vs2010.option.ClCompile.*``
+      - ``vs2010.option.Link.*``
+      - ``vs2010.option.Lib.*``
+
+    Examples:
+
+    .. code-block:: bkl
+
+        vs2010.option.GenerateManifest = false;
+        vs2010.option.Link.CreateHotPatchableImage = Enabled;
+
+    """
+    name = "vs2010"
+
+    version = 10
+    proj_versions = [10]
+    # don't set to "v100" because vs2010 doesn't explicitly set it by default:
+    platform_toolset = None
+    Solution = VS2010Solution
+    Project = VS2010Project
+
+
+
+class VS11Solution(VS2010Solution):
+    format_version = "12.00"
+    human_version = "11"
+
+
+class VS11Project(VS2010Project):
+    version = 11
+
+
+class VS11Toolset(VS201xToolsetBase):
+    """
+    Visual Studio 11.
+
+
+    Special properties
+    ------------------
+    This toolset supports the same special properties that
+    :ref:`ref_toolset_vs2010`. The only difference is that they are prefixed
+    with ``vs11.option.`` instead of ``vs2010.option.``, i.e. the nodes are:
+
+      - ``vs11.option.Globals.*``
+      - ``vs11.option.Configuration.*``
+      - ``vs11.option.*`` (this is the unnamed ``PropertyGroup`` with
+        global settings such as ``TargetName``)
+      - ``vs11.option.ClCompile.*``
+      - ``vs11.option.Link.*``
+      - ``vs11.option.Lib.*``
+
+    """
+
+    name = "vs11"
+
+    version = 11
+    proj_versions = [10, 11]
+    platform_toolset = "v110"
+    Solution = VS11Solution
+    Project = VS11Project
+
+    def _set_VCTargetsPath(self, root):
+        n = Node("PropertyGroup", Label="Globals")
+        root.add(n)
+        n.add(Node("VCTargetsPath",
+                   "$(VCTargetsPath11)",
+                   Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''"))
