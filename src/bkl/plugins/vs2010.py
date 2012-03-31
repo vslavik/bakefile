@@ -22,9 +22,7 @@
 #  IN THE SOFTWARE.
 #
 
-import uuid
 import types
-import os.path
 import codecs
 from xml.sax.saxutils import escape, quoteattr
 
@@ -36,20 +34,7 @@ from bkl.vartypes import PathType, StringType, BoolType
 from bkl.utils import OrderedDict
 from bkl.io import OutputFile, EOL_WINDOWS
 
-from bkl.plugins.vsbase import VSProjectBase
-
-# TODO: Move this somewhere else, where it could be reused.
-NAMESPACE_PROJECT   = uuid.UUID("{D9BD5916-F055-4D77-8C69-9448E02BF433}")
-NAMESPACE_SLN_GROUP = uuid.UUID("{2D0C29E0-512F-47BE-9AC4-F4CAE74AE16E}")
-NAMESPACE_INTERNAL =  uuid.UUID("{BAA4019E-6D67-4EF1-B3CB-AE6CD82E4060}")
-
-def GUID(namespace, solution, data):
-    """
-    Generates GUID in given namespace, for given solution (bkl project), with
-    given data (typically, target ID).
-    """
-    g = uuid.uuid5(namespace, '%s/%s' % (str(solution), str(data)))
-    return "{%s}" % str(g).upper()
+from bkl.plugins.vsbase import *
 
 
 class Node(object):

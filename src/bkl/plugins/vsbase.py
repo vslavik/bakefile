@@ -26,6 +26,22 @@
 Base classes for all Visual Studio toolsets.
 """
 
+import uuid
+
+# Namespace constants for the GUID function
+NAMESPACE_PROJECT   = uuid.UUID("{D9BD5916-F055-4D77-8C69-9448E02BF433}")
+NAMESPACE_SLN_GROUP = uuid.UUID("{2D0C29E0-512F-47BE-9AC4-F4CAE74AE16E}")
+NAMESPACE_INTERNAL =  uuid.UUID("{BAA4019E-6D67-4EF1-B3CB-AE6CD82E4060}")
+
+def GUID(namespace, solution, data):
+    """
+    Generates GUID in given namespace, for given solution (bkl project), with
+    given data (typically, target ID).
+    """
+    g = uuid.uuid5(namespace, '%s/%s' % (str(solution), str(data)))
+    return "{%s}" % str(g).upper()
+
+
 class VSProjectBase(object):
     """
     Base class for all Visual Studio projects.
