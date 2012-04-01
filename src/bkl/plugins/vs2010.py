@@ -483,10 +483,13 @@ class VS201xToolsetBase(Toolset):
             # and C++ flags as they're basically all the same at MSVS level
             # too and all go into the same place in the IDE and same
             # AdditionalOptions node in the project file.
-            all_cflags = list(target["compiler-options"]) + list(target["c-compiler-options"]) + list(target["cxx-compiler-options"])
+            all_cflags = VSList(" ", target["compiler-options"],
+                                     target["c-compiler-options"],
+                                     target["cxx-compiler-options"])
             if all_cflags:
-                n_cl.add("AdditionalOptions",
-                         "%s %%(AdditionalOptions)" % " ".join(x.as_py() for x in all_cflags))
+                all_cflags.append("%(AdditionalOptions)")
+                n_cl.add("AdditionalOptions", all_cflags)
+
             n.add(n_cl)
             n_link = Node("Link")
             self._add_extra_options_to_node(target, n_link)
@@ -501,9 +504,10 @@ class VS201xToolsetBase(Toolset):
                 n_link.add("EnableCOMDATFolding", True)
                 n_link.add("OptimizeReferences", True)
             if not is_library:
-                ldflags = target["link-options"]
+                ldflags = VSList(" ", target["link-options"])
                 if ldflags:
-                    n_link.add("AdditionalOptions", "%s %%(AdditionalOptions)" % " ".join(ldflags.as_py()))
+                    ldflags.append("%(AdditionalOptions)")
+                    n_link.add("AdditionalOptions", ldflags)
             if is_library:
                 libs = target["libs"]
                 if libs:
@@ -514,12 +518,12 @@ class VS201xToolsetBase(Toolset):
             pre_build = target["pre-build-commands"]
             if pre_build:
                 n_script = Node("PreBuildEvent")
-                n_script.add("Command", "\n".join(pre_build.as_py()))
+                n_script.add("Command", VSList("\n", pre_build))
                 n.add(n_script)
             post_build = target["post-build-commands"]
             if post_build:
                 n_script = Node("PostBuildEvent")
-                n_script.add("Command", "\n".join(post_build.as_py()))
+                n_script.add("Command", VSList("\n", post_build))
                 n.add(n_script)
             root.add(n)
 
