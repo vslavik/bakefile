@@ -34,18 +34,18 @@ from bkl.io import OutputFile, EOL_WINDOWS
 from bkl.plugins.vsbase import *
 
 
-class VS2010Solution(OutputFile):
+class VS2010Solution(object):
+    """
+    Representation of a Visual Studio solution file.
+    """
 
     format_version = "11.00"
     human_version = "2010"
 
     def __init__(self, toolset, module):
         slnfile = module["%s.solutionfile" % toolset.name].as_native_path_for_output(module)
-        super(VS2010Solution, self).__init__(slnfile, EOL_WINDOWS,
-                                             creator=toolset, create_for=module)
         self.name = module.name
         self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.name)
-        self.write_header()
         self.projects = []
         self.subsolutions = []
         self.parent_solution = None
@@ -56,12 +56,8 @@ class VS2010Solution(OutputFile):
                                     builddir=None,
                                     model=module)
         self.formatter = VSExprFormatter(paths_info)
-
-    def write_header(self):
-        self.write(codecs.BOM_UTF8)
-        self.write("\n")
-        self.write("Microsoft Visual Studio Solution File, Format Version %s\n" % self.format_version)
-        self.write("# Visual Studio %s\n" % self.human_version)
+        self.outf = OutputFile(slnfile, EOL_WINDOWS,
+                               creator=toolset, create_for=module)
 
     def add_project(self, prj):
         self.guids_map[prj.name] = prj.guid
@@ -146,20 +142,30 @@ class VS2010Solution(OutputFile):
             assert guid, "can't find GUID of project '%s'" % id
             return guid
 
-    def commit(self):
+    def write_header(self, file):
+        file.write(codecs.BOM_UTF8)
+        file.write("\n")
+        file.write("Microsoft Visual Studio Solution File, Format Version %s\n" % self.format_version)
+        file.write("# Visual Studio %s\n" % self.human_version)
+
+    def write(self):
+        """Writes the solution to the file."""
+        outf = self.outf
+        self.write_header(outf)
+
         # Projects:
         guids = []
         additional_deps = self.additional_deps()
         for name, guid, filename, deps in list(self.all_projects()) + additional_deps:
             guids.append(guid)
-            self.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\n' %
+            outf.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\n' %
                        (name, self.formatter.format(filename), str(guid)))
             if deps:
-                self.write("\tProjectSection(ProjectDependencies) = postProject\n")
+                outf.write("\tProjectSection(ProjectDependencies) = postProject\n")
                 for d in deps:
-                    self.write("\t\t%(g)s = %(g)s\n" % {'g':self._get_target_guid(d)})
-                self.write("\tEndProjectSection\n")
-            self.write("EndProject\n")
+                    outf.write("\t\t%(g)s = %(g)s\n" % {'g':self._get_target_guid(d)})
+                outf.write("\tEndProjectSection\n")
+            outf.write("EndProject\n")
 
         if not guids:
             return # don't write empty solution files
@@ -181,41 +187,41 @@ class VS2010Solution(OutputFile):
                                   (len(sln.projects) + len(sln.subsolutions)) <= 1)
             if sln.omit_from_tree:
                 continue
-            self.write('Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "%s", "%s", "%s"\n' %
+            outf.write('Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "%s", "%s", "%s"\n' %
                        (sln.name, sln.name, sln.guid))
-            self.write("EndProject\n")
+            outf.write("EndProject\n")
 
         # Global settings:
-        self.write("Global\n")
-        self.write("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n")
-        self.write("\t\tDebug|Win32 = Debug|Win32\n")
-        self.write("\t\tRelease|Win32 = Release|Win32\n")
-        self.write("\tEndGlobalSection\n")
-        self.write("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n")
+        outf.write("Global\n")
+        outf.write("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n")
+        outf.write("\t\tDebug|Win32 = Debug|Win32\n")
+        outf.write("\t\tRelease|Win32 = Release|Win32\n")
+        outf.write("\tEndGlobalSection\n")
+        outf.write("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n")
         for guid in guids:
-            self.write("\t\t%s.Debug|Win32.ActiveCfg = Debug|Win32\n" % guid)
-            self.write("\t\t%s.Debug|Win32.Build.0 = Debug|Win32\n" % guid)
-            self.write("\t\t%s.Release|Win32.ActiveCfg = Release|Win32\n" % guid)
-            self.write("\t\t%s.Release|Win32.Build.0 = Release|Win32\n" % guid)
-        self.write("\tEndGlobalSection\n")
-        self.write("\tGlobalSection(SolutionProperties) = preSolution\n")
-        self.write("\t\tHideSolutionNode = FALSE\n")
-        self.write("\tEndGlobalSection\n")
+            outf.write("\t\t%s.Debug|Win32.ActiveCfg = Debug|Win32\n" % guid)
+            outf.write("\t\t%s.Debug|Win32.Build.0 = Debug|Win32\n" % guid)
+            outf.write("\t\t%s.Release|Win32.ActiveCfg = Release|Win32\n" % guid)
+            outf.write("\t\t%s.Release|Win32.Build.0 = Release|Win32\n" % guid)
+        outf.write("\tEndGlobalSection\n")
+        outf.write("\tGlobalSection(SolutionProperties) = preSolution\n")
+        outf.write("\t\tHideSolutionNode = FALSE\n")
+        outf.write("\tEndGlobalSection\n")
 
         # Nesting of projects and folders in the tree:
         if all_folders:
-            self.write("\tGlobalSection(NestedProjects) = preSolution\n")
+            outf.write("\tGlobalSection(NestedProjects) = preSolution\n")
             for sln in all_folders:
                 for prj in sln.projects:
                     prjguid = prj[1]
                     parentguid = sln.guid if not sln.omit_from_tree else sln.parent_solution.guid
-                    self.write("\t\t%s = %s\n" % (prjguid, parentguid))
+                    outf.write("\t\t%s = %s\n" % (prjguid, parentguid))
                 for subsln in sln.subsolutions:
-                    self.write("\t\t%s = %s\n" % (subsln.guid, sln.guid))
-            self.write("\tEndGlobalSection\n")
+                    outf.write("\t\t%s = %s\n" % (subsln.guid, sln.guid))
+            outf.write("\tEndGlobalSection\n")
 
-        self.write("EndGlobal\n")
-        super(VS2010Solution, self).commit()
+        outf.write("EndGlobal\n")
+        outf.commit()
 
 
 # TODO: Put more content into this class, use it properly
@@ -312,7 +318,7 @@ class VS201xToolsetBase(Toolset):
                 m.solution.add_subsolution(sub.solution)
         for m in project.modules:
             if m["%s.generate-solution" % self.name]:
-                m.solution.commit()
+                m.solution.write()
 
 
     def gen_for_module(self, module):
