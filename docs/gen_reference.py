@@ -32,7 +32,6 @@ it in ref/ directory.
 import sys
 import os
 import os.path
-import types
 import shutil
 import sphinx.util.docstrings
 from functools import partial
@@ -101,9 +100,8 @@ def write_property(prop):
             default = prop.default
             if default == []:
                 default = "empty"
-            elif ((isinstance(default, types.FunctionType) or
-                 isinstance(default, types.MethodType)) and
-                "__doc__" in dir(default)):
+            elif (hasattr(default, "__call__") and
+                  hasattr(default, "__doc__")):
                 default = default.__doc__
             desc += "\n*Default:* %s\n" % default
 

@@ -317,7 +317,7 @@ class Property(object):
         return self._make_expr(self.default, for_obj)
 
     def _make_expr(self, val, for_obj):
-        if (type(val) is types.FunctionType or type(val) is types.MethodType):
+        if hasattr(val, "__call__"):
             # default is defined as a callback function
             val = val(for_obj)
         if isinstance(val, expr.Expr):
