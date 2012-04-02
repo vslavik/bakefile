@@ -207,9 +207,9 @@ class error_context:
     @property
     def pos(self):
         c = self.context
-        if "source_pos" in dir(c):
+        if hasattr(c, "source_pos"):
             return c.source_pos
-        elif "pos" in dir(c):
+        elif hasattr(c, "pos"):
             return c.pos
         else:
             return None
