@@ -560,10 +560,10 @@ class VSToolsetBase(Toolset):
                                 (prj.name, t.name))
                 if prj.version not in self.proj_versions:
                     if prj.version > self.proj_versions[-1]:
-                        raise Error("project %s is for Visual Studio %s and will not work with %s" %
+                        raise Error("project %s is for Visual Studio %.1f and will not work with %.1f" %
                                     (prj.projectfile, prj.version, self.version))
                     else:
-                        warning("project %s is for Visual Studio %s, not %s, will be converted when built",
+                        warning("project %s is for Visual Studio %.1f, not %.1f, will be converted when built",
                                 prj.projectfile, prj.version, self.version)
                 module.solution.add_project(prj)
 
