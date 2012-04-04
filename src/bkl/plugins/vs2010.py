@@ -562,8 +562,9 @@ class VS2010Toolset(Toolset):
             self._add_extra_options_to_node(target, n)
             if not is_library:
                 n.add("LinkIncremental", c == "Debug")
-            # TODO: add TargetName only if it's non-default
-            n.add("TargetName", target[target.type.basename_prop])
+            targetname = target[target.type.basename_prop]
+            if targetname != target.name:
+                n.add("TargetName", targetname)
             # TODO: handle the defaults in a nicer way
             if target["outputdir"].as_native_path(paths_info) != paths_info.builddir_abs:
                 n.add("OutDir", target["outputdir"])
