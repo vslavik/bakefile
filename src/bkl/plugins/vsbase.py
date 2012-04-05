@@ -517,10 +517,6 @@ class VSToolsetBase(Toolset):
                            submodules with only a single target.
                            """)
 
-    def get_builddir_for(self, target):
-        prj = target["%s.projectfile" % self.name]
-        # TODO: reference Configuration setting properly, as bkl setting
-        return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr("$(Configuration)")], prj.anchor)
 
     def generate(self, project):
         # generate vcxproj files and prepare solutions
@@ -570,3 +566,38 @@ class VSToolsetBase(Toolset):
 
     def gen_for_target(self, target):
         raise NotImplementedError
+
+
+    # Misc helpers for derived classes:
+
+    def get_builddir_for(self, target):
+        prj = target["%s.projectfile" % self.name]
+        # TODO: reference Configuration setting properly, as bkl setting
+        return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr("$(Configuration)")], prj.anchor)
+
+    def get_std_defines(self, target, cfg):
+        """
+        Returns list of predefined preprocessor symbols to use.
+        """
+        defs = ["WIN32"]
+        defs.append("_DEBUG" if cfg == "Debug" else "NDEBUG")
+        if is_exe(target):
+            defs.append("_CONSOLE")
+        elif is_library(target):
+            defs.append("_LIB")
+        elif is_dll(target):
+            defs.append("_USRDLL")
+            defs.append("%s_EXPORTS" % target.name.upper())
+        return defs
+
+
+# Misc helpers:
+
+def is_library(target):
+    return target.type.name == "library"
+
+def is_exe(target):
+    return target.type.name == "exe"
+
+def is_dll(target):
+    return target.type.name == "dll"

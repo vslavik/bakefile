@@ -64,10 +64,6 @@ class VS201xToolsetBase(VSToolsetBase):
                                     builddir=self.get_builddir_for(target).as_native_path_for_output(target),
                                     model=target)
 
-        is_library = (target.type.name == "library")
-        is_exe = (target.type.name == "exe")
-        is_dll = (target.type.name == "dll")
-
         root = Node("Project")
         root["DefaultTargets"] = "Build"
         root["ToolsVersion"] = "4.0"
@@ -99,11 +95,11 @@ class VS201xToolsetBase(VSToolsetBase):
             n = Node("PropertyGroup", Label="Configuration")
             self._add_extra_options_to_node(target, n)
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % c
-            if is_exe:
+            if is_exe(target):
                 n.add("ConfigurationType", "Application")
-            elif is_library:
+            elif is_library(target):
                 n.add("ConfigurationType", "StaticLibrary")
-            elif is_dll:
+            elif is_dll(target):
                 n.add("ConfigurationType", "DynamicLibrary")
             else:
                 return None
@@ -134,7 +130,7 @@ class VS201xToolsetBase(VSToolsetBase):
         for c in configs:
             n = Node("PropertyGroup")
             self._add_extra_options_to_node(target, n)
-            if not is_library:
+            if not is_library(target):
                 n.add("LinkIncremental", c == "Debug")
             # TODO: add TargetName only if it's non-default
             n.add("TargetName", target[target.type.basename_prop])
@@ -153,23 +149,13 @@ class VS201xToolsetBase(VSToolsetBase):
             n_cl.add("WarningLevel", "Level3")
             if c == "Debug":
                 n_cl.add("Optimization", "Disabled")
-                std_defs = "WIN32;_DEBUG"
             else:
                 n_cl.add("Optimization", "MaxSpeed")
                 n_cl.add("FunctionLevelLinking", True)
                 n_cl.add("IntrinsicFunctions", True)
-                std_defs = "WIN32;NDEBUG"
-            if is_exe:
-                std_defs += ";_CONSOLE"
-            if is_library:
-                std_defs += ";_LIB"
-            if is_dll:
-                std_defs += ";_USRDLL;%s_EXPORTS" % target.name.upper()
-            std_defs += ";%(PreprocessorDefinitions)"
-            defs = bkl.expr.ListExpr(
-                            list(target["defines"]) +
-                            [bkl.expr.LiteralExpr(std_defs)])
-            n_cl.add("PreprocessorDefinitions", defs)
+            std_defs = self.get_std_defines(target, c)
+            std_defs.append("%(PreprocessorDefinitions)")
+            n_cl.add("PreprocessorDefinitions", list(target["defines"]) + std_defs)
             n_cl.add("MultiProcessorCompilation", True)
             n_cl.add("MinimalRebuild", False)
             n_cl.add("AdditionalIncludeDirectories", target["includedirs"])
@@ -196,16 +182,15 @@ class VS201xToolsetBase(VSToolsetBase):
             n_link = Node("Link")
             self._add_extra_options_to_node(target, n_link)
             n.add(n_link)
-            if is_exe:
-                n_link.add("SubSystem",
-                           "Windows" if target["win32-subsystem"] == "windows" else "Console")
+            if is_exe(target) and target["win32-subsystem"] == "console":
+                n_link.add("SubSystem", "Console")
             else:
                 n_link.add("SubSystem", "Windows")
             n_link.add("GenerateDebugInformation", True)
             if c == "Release":
                 n_link.add("EnableCOMDATFolding", True)
                 n_link.add("OptimizeReferences", True)
-            if not is_library:
+            if not is_library(target):
                 ldflags = VSList(" ", target["link-options"])
                 if ldflags:
                     ldflags.append("%(AdditionalOptions)")
@@ -214,7 +199,7 @@ class VS201xToolsetBase(VSToolsetBase):
             if libs:
                 addlibs = VSList(";", ("%s.lib" % x.as_py() for x in libs))
                 addlibs.append("%(AdditionalDependencies)")
-                if is_library:
+                if is_library(target):
                     n_lib = Node("Lib")
                     self._add_extra_options_to_node(target, n_lib)
                     n.add(n_lib)
