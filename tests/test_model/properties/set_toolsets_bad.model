@@ -1,2 +1,2 @@
 ERROR:
-properties/set_toolsets_bad.bkl:1:11: expression "nonexistent" is not a valid toolset value: must be one of "gnu-osx", "vs11", "vs2010", "gnu"
+properties/set_toolsets_bad.bkl:1:11: expression "nonexistent" is not a valid toolset value: must be one of "gnu-osx", "vs11", "vs2008", "vs2010", "gnu"
