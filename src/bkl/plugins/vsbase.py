@@ -86,7 +86,8 @@ class Node(object):
         self.text = text
         self.attrs = OrderedDict()
         self.children = []
-        self.attrs.update(kwargs)
+        for key in sorted(kwargs.keys()):
+            self.attrs[key] = kwargs[key]
 
     def __setitem__(self, key, value):
         self.attrs[key] = value
