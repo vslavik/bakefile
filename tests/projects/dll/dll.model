@@ -1,6 +1,7 @@
 module {
   variables {
-    toolsets = [gnu, gnu-osx, vs2010]
+    toolsets = [gnu, gnu-osx, vs2008, vs2010]
+    vs2008.solutionfile = @top_srcdir/dll2008.sln
   }
   targets {
     dll mydll {

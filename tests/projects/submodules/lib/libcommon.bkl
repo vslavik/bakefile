@@ -1,4 +1,6 @@
 
+vs2008.solutionfile = common2008.sln;
+
 library common {
     sources { utils.cpp }
 }
