@@ -3,3 +3,5 @@
 exe foo {
    my_var = 42; // the meaning of life, the universe, and everything
 }
+//
+///
