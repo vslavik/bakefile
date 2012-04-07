@@ -489,9 +489,10 @@ def _default_solution_name(module):
     """same directory and name as the module's bakefile, with ``.sln`` extension"""
     return bkl.expr.PathExpr([bkl.expr.LiteralExpr(module.name + ".sln")])
 
-def _project_name_from_solution(proj_ext, target):
+def _project_name_from_solution(toolset_class, target):
     """``$(id).vcxproj`` in the same directory as the ``.sln`` file"""
-    sln = target["vs2010.solutionfile"]
+    sln = target["%s.solutionfile" % toolset_class.name]
+    proj_ext = toolset_class.proj_extension
     return bkl.expr.PathExpr(sln.components[:-1] +
                              [bkl.expr.LiteralExpr("%s.%s" % (target.name, proj_ext))],
                              sln.anchor)
@@ -520,7 +521,7 @@ class VSToolsetBase(Toolset):
     def properties_target(cls):
         yield Property("%s.projectfile" % cls.name,
                        type=PathType(),
-                       default=update_wrapper(partial(_project_name_from_solution, cls.proj_extension), _project_name_from_solution),
+                       default=update_wrapper(partial(_project_name_from_solution, cls), _project_name_from_solution),
                        inheritable=False,
                        doc="File name of the project for the target.")
         yield Property("%s.guid" % cls.name,
