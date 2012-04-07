@@ -578,7 +578,8 @@ class VSToolsetBase(Toolset):
                         prj = t.type.vs_project(self, t)
                     except NotImplementedError:
                         # TODO: handle this as generic action target
-                        warning("target type \"%s\" is not supported by vs2010 toolset, ignoring", t.type.name)
+                        warning("target type \"%s\" is not supported by the %s toolset, ignoring",
+                                t.type.name, self.name)
                         continue
                 if prj.name != t.name:
                     # TODO: This is only for the solution file; we should remap the name instead of
