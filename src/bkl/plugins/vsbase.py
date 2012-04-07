@@ -29,7 +29,7 @@ Base classes for all Visual Studio toolsets.
 import uuid
 import types
 from xml.sax.saxutils import escape, quoteattr
-from functools import partial
+from functools import partial, update_wrapper
 
 import bkl.expr
 from bkl.utils import OrderedDict
@@ -520,7 +520,7 @@ class VSToolsetBase(Toolset):
     def properties_target(cls):
         yield Property("%s.projectfile" % cls.name,
                        type=PathType(),
-                       default=partial(_project_name_from_solution, cls.proj_extension),
+                       default=update_wrapper(partial(_project_name_from_solution, cls.proj_extension), _project_name_from_solution),
                        inheritable=False,
                        doc="File name of the project for the target.")
         yield Property("%s.guid" % cls.name,
