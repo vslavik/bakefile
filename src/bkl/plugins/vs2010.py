@@ -274,20 +274,17 @@ class VS201xToolsetBase(VSToolsetBase):
     def _set_VCTargetsPath(self, root):
         pass
 
-
     def _add_extra_options_to_node(self, target, node):
         """Add extra native options specified in vs2010.option.* properties."""
         try:
-            scope = "%s.option.%s" % (self.name, node["Label"])
+            scope = node["Label"]
         except KeyError:
             if node.name == "PropertyGroup":
-                scope = "%s.option" % self.name
+                scope = ""
             else:
-                scope = "%s.option.%s" % (self.name, node.name)
-        for var in target.variables.itervalues():
-            split = var.name.rsplit(".", 1)
-            if len(split) == 2 and split[0] == scope:
-                node.add(str(split[1]), var.value)
+                scope = node.name
+        for key, value in self.collect_extra_options_for_node(target, scope):
+            node.add(key, value)
 
 
     def _write_filters_file_for(self, filename):

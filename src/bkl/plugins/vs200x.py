@@ -183,6 +183,7 @@ class VS200xToolsetBase(VSToolsetBase):
         root["RootNamespace"] = target.name
         root["Keyword"] = "Win32Proj"
         root["TargetFrameworkVersion"] = 196613
+        self._add_extra_options_to_node(target, root)
 
         n_platforms = Node("Platforms")
         n_platforms.add("Platform", Name="Win32")
@@ -211,6 +212,7 @@ class VS200xToolsetBase(VSToolsetBase):
                 return None
             if target["win32-unicode"]:
                 n["CharacterSet"] = 1
+            self._add_extra_options_to_node(target, n)
 
             for tool in self.tool_functions:
                 if hasattr(self, tool):
@@ -219,6 +221,7 @@ class VS200xToolsetBase(VSToolsetBase):
                 else:
                     n_tool = Node("Tool", Name=tool)
                 if n_tool:
+                    self._add_extra_options_to_node(target, n_tool)
                     n.add(n_tool)
 
         root.add(Node("References"))
@@ -369,11 +372,47 @@ class VS200xToolsetBase(VSToolsetBase):
         files.add(resources)
         return files
 
+    def _add_extra_options_to_node(self, target, node):
+        """Add extra native options specified in vs200x.option.* properties."""
+        if node.name == "VisualStudioProject":
+            scope = ""
+        elif node.name == "Configuration":
+            scope = "Configuration"
+        else:
+            scope = node["Name"]
+        for key, value in self.collect_extra_options_for_node(target, scope):
+            node[key] = value
+
 
 
 class VS2008Toolset(VS200xToolsetBase):
     """
     Visual Studio 2008.
+
+
+    Special properties
+    ------------------
+    In addition to the properties described below, it's possible to specify any
+    of the ``vcproj`` properties directly in a bakefile. To do so, you have to
+    set specially named variables on the target.
+
+    The variables are prefixed with ``vs2008.option.``, followed by tool name and
+    attribute name. For example:
+
+      - ``vs2008.option.VCCLCompilerTool.EnableFunctionLevelLinking``
+      - ``vs2008.option.VCLinkerTool.EnableCOMDATFolding``
+
+    Additionally, the following are support for non-tool nodes:
+    The following nodes are supported:
+
+      - ``vs2008.option.*`` (attributes of the root ``VisualStudioProject`` node)
+      - ``vs2008.option.Configuration.*`` (``Configuration`` node attributes)
+
+    Examples:
+
+    .. code-block:: bkl
+
+        vs2008.option.VCCLCompilerTool.EnableFunctionLevelLinking = false;
     """
     name = "vs2008"
 

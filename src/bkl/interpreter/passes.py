@@ -93,6 +93,9 @@ def detect_unused_vars(model):
     """
     Warns about unused variables -- they may indicate typos.
     """
+    import re
+    regex_vs_option = re.compile(r'vs[0-9]+\.option\.')
+
     class VariablesChecker(Visitor):
         def __init__(self):
             self.found = set()
@@ -122,8 +125,7 @@ def detect_unused_vars(model):
                 #        declaration similar to Property, with type checking and
                 #        automated docs and all. Then test for it here as other
                 #        properties are tested for.
-                not var.name.startswith("vs2010.option.") and
-                not var.name.startswith("vs11.option.")):
+                not regex_vs_option.match(var.name)):
             warning('variable "%s" is never used', var.name, pos=var.value.pos)
 
 

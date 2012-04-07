@@ -623,6 +623,28 @@ class VSToolsetBase(Toolset):
             defs.append("%s_EXPORTS" % target.name.upper())
         return defs
 
+    def collect_extra_options_for_node(self, target, prefix):
+        """
+        Collects extra options from target variables. Extra options are those not supported
+        directly by Bakefile, but expressed as specially-named variables, e.g.
+        ``vs2010.option.GenerateManifest``.
+
+        Yields tuples of (name, value) for collected values.
+
+        :param target:  Target to collect variables from.
+        :param prefix:  Prefix of the variables, without "<target>.option.". For example,
+                        it may be "Link" to collect from e.g. ``vs2010.option.Link.*`` or
+                        "" to collect from ``vs2010.option.*``.
+        """
+        if prefix:
+            scope = "%s.option.%s" % (self.name, prefix)
+        else:
+            scope = "%s.option" % self.name
+        for var in target.variables.itervalues():
+            split = var.name.rsplit(".", 1)
+            if len(split) == 2 and split[0] == scope:
+                yield (str(split[1]), var.value)
+
 
 # Misc helpers:
 
