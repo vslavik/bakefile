@@ -240,12 +240,14 @@ class VS200xToolsetBase(VSToolsetBase):
 
 
     def VCPreBuildEventTool(self, target, cfg):
-        # FIXME
-        return Node("Tool", Name="VCPreBuildEventTool")
+        n = Node("Tool", Name="VCPreBuildEventTool")
+        n["CommandLine"] = VSList("\r\n", target["pre-build-commands"])
+        return n
 
     def VCPostBuildEventTool(self, target, cfg):
-        # FIXME
-        return Node("Tool", Name="VCPostBuildEventTool")
+        n = Node("Tool", Name="VCPostBuildEventTool")
+        n["CommandLine"] = VSList("\r\n", target["post-build-commands"])
+        return n
 
     def VCAppVerifierTool(self, target, cfg):
         return Node("Tool", Name="VCAppVerifierTool") if is_exe(target) else None
