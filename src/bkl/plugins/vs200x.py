@@ -82,12 +82,20 @@ debugEditAndContinue    = 4
 VCPROJ_CHARSET = "Windows-1252"
 
 
+class VS200xExprFormatter(VSExprFormatter):
+    def literal(self, e):
+        if '"' in e.value:
+            return e.value.replace('"', '\\"')
+        else:
+            return e.value
+
 class VS200xXmlFormatter(XmlFormatter):
     """
     XmlFormatter for VS 200x output.
     """
 
     indent_step = "\t"
+    ExprFormatter = VS200xExprFormatter
 
     def __init__(self, paths_info):
         super(VS200xXmlFormatter, self).__init__(paths_info, charset=VCPROJ_CHARSET)

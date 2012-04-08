@@ -181,9 +181,12 @@ class XmlFormatter(object):
     #: String used to increase indentation
     indent_step = "  "
 
+    #: Class for expressions formatting
+    ExprFormatter = VSExprFormatter
+
     def __init__(self, paths_info, charset="utf-8"):
         self.charset = charset
-        self.expr_formatter = VSExprFormatter(paths_info)
+        self.expr_formatter = self.ExprFormatter(paths_info)
 
     def format(self, node):
         """
