@@ -606,11 +606,6 @@ class VSToolsetBase(Toolset):
 
     # Misc helpers for derived classes:
 
-    def get_builddir_for(self, target):
-        prj = target["%s.projectfile" % self.name]
-        # TODO: reference Configuration setting properly, as bkl setting
-        return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr("$(Configuration)")], prj.anchor)
-
     def get_std_defines(self, target, cfg):
         """
         Returns list of predefined preprocessor symbols to use.

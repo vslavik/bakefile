@@ -312,6 +312,11 @@ class VS201xToolsetBase(VSToolsetBase):
 """)
         f.commit()
 
+    def get_builddir_for(self, target):
+        prj = target["%s.projectfile" % self.name]
+        # TODO: reference Configuration setting properly, as bkl setting, move this to vsbase
+        return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr("$(Configuration)")], prj.anchor)
+
 
 
 
