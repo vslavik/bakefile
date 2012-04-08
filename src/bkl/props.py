@@ -117,7 +117,7 @@ def std_target_props():
 
 def std_module_props():
     """Creates list of all standard module properties."""
-    toolsets_enum_type = EnumType("toolset", api.Toolset.all_names())
+    toolsets_enum_type = EnumType("toolset", sorted(api.Toolset.all_names()))
 
     return [
         Property("toolsets",
@@ -130,7 +130,7 @@ def std_module_props():
 
 def std_project_props():
     """Creates list of all standard project properties."""
-    toolsets_enum_type = EnumType("toolset", api.Toolset.all_names())
+    toolsets_enum_type = EnumType("toolset", sorted(api.Toolset.all_names()))
 
     return [
         Property("toolset",
