@@ -173,6 +173,11 @@ class VS200xToolsetBase(VSToolsetBase):
     # TODO: temporary hardcoded configs
     configs = ["Debug", "Release"]
 
+    #: Whether /MP switch is supported
+    has_parallel_compilation = False
+    #: Whether Detect64BitPortabilityProblems is supported
+    detect_64bit_problems = True
+
     def gen_for_target(self, target):
         projectfile = target["%s.projectfile" % self.name]
         filename = projectfile.as_native_path_for_output(target)
@@ -192,7 +197,6 @@ class VS200xToolsetBase(VSToolsetBase):
         root["ProjectGUID"] = guid
         root["RootNamespace"] = target.name
         root["Keyword"] = "Win32Proj"
-        root["TargetFrameworkVersion"] = 196613
         self._add_extra_options_to_node(target, root)
 
         n_platforms = Node("Platforms")
@@ -262,6 +266,9 @@ class VS200xToolsetBase(VSToolsetBase):
     def VCAppVerifierTool(self, target, cfg):
         return Node("Tool", Name="VCAppVerifierTool") if is_exe(target) else None
 
+    def VCWebDeploymentTool(self, target, cfg):
+        return Node("Tool", Name="VCWebDeploymentTool") if is_exe(target) else None
+
 
     def VCCLCompilerTool(self, target, cfg):
         n = Node("Tool", Name="VCCLCompilerTool")
@@ -273,7 +280,8 @@ class VS200xToolsetBase(VSToolsetBase):
         all_cflags = VSList(" ", target["compiler-options"],
                                  target["c-compiler-options"],
                                  target["cxx-compiler-options"])
-        all_cflags.append("/MP") # parallel compilation
+        if self.has_parallel_compilation:
+            all_cflags.append("/MP") # parallel compilation
         n["AdditionalOptions"] = all_cflags
         n["Optimization"] = optimizeMaxSpeed if cfg == "Release" else optimizeDisabled
         if cfg == "Release":
@@ -281,6 +289,8 @@ class VS200xToolsetBase(VSToolsetBase):
         n["AdditionalIncludeDirectories"] = target["includedirs"]
         n["PreprocessorDefinitions"] = list(target["defines"]) + self.get_std_defines(target, cfg)
 
+        if not self.has_parallel_compilation and cfg == "Debug":
+            n["MinimalRebuild"] = True
         if target["win32-crt-linkage"] == "dll":
             n["RuntimeLibrary"] = rtMultiThreadedDebugDLL if cfg == "Debug" else rtMultiThreadedDLL
         else:
@@ -290,6 +300,8 @@ class VS200xToolsetBase(VSToolsetBase):
             n["EnableFunctionLevelLinking"] = True
         n["UsePrecompiledHeader"] = pchNone
         n["WarningLevel"] = 3
+        if self.detect_64bit_problems:
+            n["Detect64BitPortabilityProblems"] = True
         n["DebugInformationFormat"] = debugEditAndContinue if cfg == "Debug" else debugEnabled
 
         return n
@@ -355,6 +367,7 @@ class VS200xToolsetBase(VSToolsetBase):
         "VCBscMakeTool",
         "VCFxCopTool",
         "VCAppVerifierTool",
+        "VCWebDeploymentTool",
         "VCPostBuildEventTool",
         ]
 
@@ -460,3 +473,29 @@ class VS2008Toolset(VS200xToolsetBase):
     proj_versions = [9]
     Solution = VS2008Solution
     Project = VS2008Project
+    has_parallel_compilation = True
+    detect_64bit_problems = False
+
+    def VCWebDeploymentTool(self, target, cfg):
+        # This tool was removed in 2008
+        return None
+
+
+class VS2005Toolset(VS200xToolsetBase):
+    """
+    Visual Studio 2005.
+
+    Special properties
+    ------------------
+    This toolset supports the same special properties that
+    :ref:`ref_toolset_vs2008`. The only difference is that they are prefixed
+    with ``vs2005.option.`` instead of ``vs2008.option.``.
+    """
+    name = "vs2005"
+
+    version = 8
+    proj_versions = [8]
+    Solution = VS2005Solution
+    Project = VS2005Project
+    has_parallel_compilation = False
+    detect_64bit_problems = True
