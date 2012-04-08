@@ -62,8 +62,9 @@ subSystemWindows        = 2
 
 pchNone                 = 0
 pchCreateUsingSpecific  = 1
-pchGenerateAuto         = 2
-pchUseUsingSpecificic   = 3
+pchGenerateAuto_VC7     = 2
+pchUseUsingSpecificic_VC7 = 3
+pchUseUsingSpecificic_VC89 = 2
 
 rtMultiThreaded         = 0
 rtMultiThreadedDebug    = 1
@@ -167,6 +168,9 @@ class VS2008Solution(VSSolutionBase):
 class VS200xToolsetBase(VSToolsetBase):
     """Base class for VS200{358} toolsets."""
 
+    #: XML formatting class
+    XmlFormatter = VS200xXmlFormatter
+
     #: Extension of format files
     proj_extension = "vcproj"
 
@@ -203,7 +207,7 @@ class VS200xToolsetBase(VSToolsetBase):
         n_platforms.add("Platform", Name="Win32")
         root.add(n_platforms)
 
-        root.add(Node("ToolFiles"))
+        self._add_ToolFiles(root)
 
         n_configs = Node("Configurations")
         root.add(n_configs)
@@ -246,12 +250,14 @@ class VS200xToolsetBase(VSToolsetBase):
 
         f = OutputFile(filename, EOL_WINDOWS, charset=VCPROJ_CHARSET,
                        creator=self, create_for=target)
-        f.write(VS200xXmlFormatter(paths_info).format(root))
+        f.write(self.XmlFormatter(paths_info).format(root))
         f.commit()
 
         target_deps = target["deps"].as_py()
         return self.Project(target.name, guid, projectfile, target_deps)
 
+    def _add_ToolFiles(self, root):
+        root.add(Node("ToolFiles"))
 
     def VCPreBuildEventTool(self, target, cfg):
         n = Node("Tool", Name="VCPreBuildEventTool")
@@ -481,6 +487,7 @@ class VS2008Toolset(VS200xToolsetBase):
         return None
 
 
+
 class VS2005Toolset(VS200xToolsetBase):
     """
     Visual Studio 2005.
@@ -499,3 +506,69 @@ class VS2005Toolset(VS200xToolsetBase):
     Project = VS2005Project
     has_parallel_compilation = False
     detect_64bit_problems = True
+
+
+
+class VS2003ExprFormatter(VS200xExprFormatter):
+    def bool_value(self, e):
+        return "TRUE" if e.value else "FALSE"
+
+class VS2003XmlFormatter(VS200xXmlFormatter):
+    ExprFormatter = VS2003ExprFormatter
+    # VS2003 formats > after attributes list differently:
+    def format_node(self, name, attrs, text, children_markup, indent):
+        s = "%s<%s" % (indent, name)
+        if attrs:
+            for key, value in attrs:
+                s += "\n%s\t%s=%s" % (indent, key, value)
+        if text:
+            s += ">%s</%s>\n" % (text, name)
+        elif children_markup:
+            s += ">\n%s%s</%s>\n" % (children_markup, indent, name)
+        else:
+            if name in self.elems_not_collapsed:
+                s += ">\n%s</%s>\n" % (indent, name)
+            else:
+                s += "/>\n"
+        return s
+
+
+class VS2003Toolset(VS200xToolsetBase):
+    """
+    Visual Studio 2003.
+
+    Special properties
+    ------------------
+    This toolset supports the same special properties that
+    :ref:`ref_toolset_vs2008`. The only difference is that they are prefixed
+    with ``vs2003.option.`` instead of ``vs2008.option.``.
+    """
+    name = "vs2003"
+
+    version = 7.1
+    proj_versions = [7.1]
+    Solution = VS2003Solution
+    Project = VS2003Project
+    XmlFormatter = VS2003XmlFormatter
+    has_parallel_compilation = False
+    detect_64bit_problems = True
+
+    tool_functions = [
+        "VCCLCompilerTool",
+        "VCCustomBuildTool",
+        "VCLibrarianTool",
+        "VCLinkerTool",
+        "VCMIDLTool",
+        "VCPostBuildEventTool",
+        "VCPreBuildEventTool",
+        "VCPreLinkEventTool",
+        "VCResourceCompilerTool",
+        "VCWebServiceProxyGeneratorTool",
+        "VCXMLDataGeneratorTool",
+        "VCWebDeploymentTool",
+        "VCManagedWrapperGeneratorTool",
+        "VCAuxiliaryManagedWrapperGeneratorTool",
+        ]
+
+    def _add_ToolFiles(self, root):
+        pass

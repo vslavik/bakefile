@@ -239,16 +239,15 @@ class XmlFormatter(object):
         Formats given value (of any type) into XML text.
         """
         if isinstance(val, bkl.expr.Expr):
-            s = self.expr_formatter.format(val)
+            return self.expr_formatter.format(val)
         elif isinstance(val, types.BooleanType):
-            s = "true" if val else "false"
+            return self.expr_formatter.bool_value(bkl.expr.BoolValueExpr(val))
         elif isinstance(val, types.ListType):
-            s = self.expr_formatter.list_sep.join(self.format_value(x) for x in val)
+            return self.expr_formatter.list_sep.join(self.format_value(x) for x in val)
         elif isinstance(val, VSList):
-            s = val.list_sep.join(self.format_value(x) for x in val)
+            return val.list_sep.join(self.format_value(x) for x in val)
         else:
-            s = str(val)
-        return s
+            return str(val)
 
     def _get_quoted_nonempty_attrs(self, n):
         ret = []
