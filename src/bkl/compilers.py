@@ -138,7 +138,9 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to):
     assert isinstance(src, expr.PathExpr)
 
     ext = src.get_extension()
-    objname = expr.PathExpr([expr.LiteralExpr(src.get_basename())],
+    # FIXME: don't use target_basename.o form for object files, use just the basename,
+    #        unless there's a conflict
+    objname = expr.PathExpr([expr.LiteralExpr("%s_%s" % (target.name, src.get_basename()))],
                             expr.ANCHOR_BUILDDIR,
                             pos=src.pos).change_extension(ft_to.extensions[0])
 
