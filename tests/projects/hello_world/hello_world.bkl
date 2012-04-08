@@ -3,4 +3,5 @@ toolsets = gnu gnu-osx vs2010;
 exe hello {
     archs = x86 x86_64;
     sources { hello.c }
+    defines += "SALUTATION=\"Hello\"";
 }
