@@ -223,6 +223,7 @@ class VS201xToolsetBase(VSToolsetBase):
         root.add(items)
         for sfile in target.sources:
             ext = sfile.filename.get_extension()
+            # TODO: share this code with VS200x
             # FIXME: make this more solid
             if ext in ['cpp', 'cxx', 'cc', 'c']:
                 items.add("ClCompile", Include=sfile.filename)

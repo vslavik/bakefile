@@ -170,6 +170,9 @@ class VS200xToolsetBase(VSToolsetBase):
     #: Extension of format files
     proj_extension = "vcproj"
 
+    # TODO: temporary hardcoded configs
+    configs = ["Debug", "Release"]
+
     def gen_for_target(self, target):
         projectfile = target["%s.projectfile" % self.name]
         filename = projectfile.as_native_path_for_output(target)
@@ -181,7 +184,6 @@ class VS200xToolsetBase(VSToolsetBase):
                                     model=target)
 
         guid = target["%s.guid" % self.name]
-        configs = ["Debug", "Release"]
 
         root = Node("VisualStudioProject")
         root["ProjectType"] = "Visual C++"
@@ -201,7 +203,7 @@ class VS200xToolsetBase(VSToolsetBase):
 
         n_configs = Node("Configurations")
         root.add(n_configs)
-        for c in configs:
+        for c in self.configs:
             n = Node("Configuration", Name="%s|Win32" % c)
             n_configs.add(n)
             # TODO: handle the defaults in a nicer way
@@ -234,7 +236,7 @@ class VS200xToolsetBase(VSToolsetBase):
 
         root.add(Node("References"))
 
-        root.add(self.build_files_list(target, c))
+        root.add(self.build_files_list(target))
 
         root.add(Node("Globals"))
 
@@ -357,7 +359,7 @@ class VS200xToolsetBase(VSToolsetBase):
         ]
 
 
-    def build_files_list(self, target, cfg):
+    def build_files_list(self, target):
         files = Node("Files")
         # TODO: use groups definition, filter into groups, add Resource Files
 
@@ -365,8 +367,31 @@ class VS200xToolsetBase(VSToolsetBase):
         sources["Filter"] = "cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
         sources["UniqueIdentifier"] = "{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
         for sfile in target.sources:
-            # TODO: implement custom builds for unsupported file types
-            sources.add("File", RelativePath=sfile.filename)
+            ext = sfile.filename.get_extension()
+            # TODO: share this code with VS2010
+            # FIXME: make this more solid
+            if ext in ['cpp', 'cxx', 'cc', 'c']:
+                sources.add("File", RelativePath=sfile.filename)
+            else:
+                # FIXME: handle both compilation into cpp and c files
+                genfiletype = bkl.compilers.CxxFileType.get()
+                genname = bkl.expr.PathExpr([bkl.expr.LiteralExpr(sfile.filename.get_basename())],
+                                            bkl.expr.ANCHOR_BUILDDIR,
+                                            pos=sfile.filename.pos).change_extension("cpp")
+
+                ft_from = bkl.compilers.get_file_type(ext)
+                compiler = bkl.compilers.get_compiler(self, ft_from, genfiletype)
+
+                n_file = Node("File", RelativePath=sfile.filename)
+                sources.add(n_file)
+                for cfg in self.configs:
+                    n_cfg = Node("FileConfiguration", Name=cfg)
+                    tool = Node("Tool", Name="VCCustomBuildTool")
+                    tool["CommandLine"] = compiler.commands(self, target, sfile.filename, genname)
+                    tool["Outputs"] = genname
+                    n_cfg.add(tool)
+                    n_file.add(n_cfg)
+                sources.add("File", RelativePath=genname)
         files.add(sources)
 
         headers = Node("Filter", Name="Header Files")
