@@ -129,6 +129,12 @@ class _MakefileExprFormatter(expr.Formatter):
         super(_MakefileExprFormatter, self).__init__(paths_info)
         self.makefile_formatter = makefile_formatter
 
+    def literal(self, e):
+        if '"' in e.value:
+            return e.value.replace('"', '\\"')
+        else:
+            return e.value
+
     def reference(self, e):
         # FIXME: don't do this for references to options or other stuff
         #        that isn't meant to be expanded
