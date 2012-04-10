@@ -117,7 +117,7 @@ def std_target_props():
 
 def std_module_props():
     """Creates list of all standard module properties."""
-    toolsets_enum_type = EnumType("toolset", api.Toolset.all_names())
+    toolsets_enum_type = EnumType("toolset", sorted(api.Toolset.all_names()))
 
     return [
         Property("toolsets",
@@ -130,7 +130,7 @@ def std_module_props():
 
 def std_project_props():
     """Creates list of all standard project properties."""
-    toolsets_enum_type = EnumType("toolset", api.Toolset.all_names())
+    toolsets_enum_type = EnumType("toolset", sorted(api.Toolset.all_names()))
 
     return [
         Property("toolset",
@@ -239,7 +239,7 @@ class PropertiesRegistry(object):
         self.project = _fill_prop_dict(std_project_props())
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_project"):
-                p.toolsets = [toolset.name]
+                p._add_toolset(toolset.name)
                 p.scope = api.Property.SCOPE_PROJECT
                 self.project.add(p)
 
@@ -249,7 +249,7 @@ class PropertiesRegistry(object):
         self.modules = _fill_prop_dict(std_module_props())
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_module"):
-                p.toolsets = [toolset.name]
+                p._add_toolset(toolset.name)
                 p.scope = api.Property.SCOPE_MODULE
                 self.modules.add(p)
 
@@ -258,14 +258,14 @@ class PropertiesRegistry(object):
             self.all_targets = _fill_prop_dict(std_target_props())
             for toolset in api.Toolset.all():
                 for p in toolset.all_properties("properties_target"):
-                    p.toolsets = [toolset.name]
+                    p._add_toolset(toolset.name)
                     p.scope = api.Property.SCOPE_TARGET
                     self.all_targets.add(p)
         if target_type not in self.target_types:
             props = _fill_prop_dict(target_type.all_properties())
             for toolset in api.Toolset.all():
                 for p in toolset.all_properties("properties_%s" % target_type):
-                    p.toolsets = [toolset.name]
+                    p._add_toolset(toolset.name)
                     p.scope = target_type
                     props.add(p)
             self.target_types[target_type] = props
@@ -276,7 +276,7 @@ class PropertiesRegistry(object):
         self.all_files = _fill_prop_dict(std_file_props())
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_file"):
-                p.toolsets = [toolset.name]
+                p._add_toolset(toolset.name)
                 p.scope = api.Property.SCOPE_FILE
                 self.all_files.add(p)
 

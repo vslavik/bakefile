@@ -1,3 +1,5 @@
+vs2008.solutionfile = child2008.sln;
+
 exe child {
     sources { child.cpp }
     deps = common;

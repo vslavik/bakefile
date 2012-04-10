@@ -37,7 +37,7 @@ class BklFormatter(logging.Formatter):
         level = record.levelno
         if level == logging.ERROR or level == logging.WARNING or level == logging.INFO:
             msg = ""
-            if "pos" in dir(record) and record.pos:
+            if hasattr(record, "pos") and record.pos:
                 msg = "%s: " % record.pos
             if level != logging.INFO:
                 msg += "%s: " % record.levelname.lower()

@@ -20,12 +20,21 @@ syn keyword	bklIf		if
 " any block.
 syn keyword	bklGlobalStat	submodule
 syn keyword	bklGlobalProp	toolsets
-syn match	bklGlobalProp	"\<vs2010.generate-solution\ze *=" nextgroup=bklBoolRHS skipwhite
+syn match	bklGlobalProp	"\<vs\(2003\|2005\|2008\|2010\|11\).generate-solution\ze *=" nextgroup=bklBoolRHS skipwhite
+syn keyword	bklCommonProp	vs2003.solutionfile
+syn keyword	bklCommonProp	vs2005.solutionfile
+syn keyword	bklCommonProp	vs2008.solutionfile
+syn keyword	bklCommonProp	vs2010.solutionfile
+syn keyword	bklCommonProp	vs11.solutionfile
 
 " Properties common to absolutely all targets.
 syn keyword	bklCommonProp	deps pre-build-commands post-build-commands contained
+syn keyword	bklCommonProp	vs2003.guid vs2003.projectfile contained
+syn keyword	bklCommonProp	vs2005.guid vs2005.projectfile contained
+syn keyword	bklCommonProp	vs2008.guid vs2008.projectfile contained
 syn keyword	bklCommonProp	vs2010.guid vs2010.projectfile contained
-syn match	bklCommonProp	"vs2010\.option\(\.\w\+\)\{1,2}" contained
+syn keyword	bklCommonProp	vs11.guid vs11.projectfile contained
+syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|11\)\.option\(\.\w\+\)\{1,2}" contained
 
 " Properties that can occur inside action/exe/lib/dll targets only.
 syn keyword	bklActionProp	commands contained

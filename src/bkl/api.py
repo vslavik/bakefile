@@ -317,7 +317,7 @@ class Property(object):
         return self._make_expr(self.default, for_obj)
 
     def _make_expr(self, val, for_obj):
-        if (type(val) is types.FunctionType or type(val) is types.MethodType):
+        if hasattr(val, "__call__"):
             # default is defined as a callback function
             val = val(for_obj)
         if isinstance(val, expr.Expr):
@@ -341,6 +341,12 @@ class Property(object):
         e = self.type.normalize(e)
         self.type.validate(e)
         return e
+
+    def _add_toolset(self, toolset):
+        if self.toolsets:
+            self.toolsets.append(toolset)
+        else:
+            self.toolsets = [toolset]
 
 
 class BuildNode(object):
@@ -544,6 +550,10 @@ class Toolset(Extension):
     puts all the components (platform-specific commands, make syntax, compiler
     invocation, ...) together and writes out the makefiles or projects.
     """
+
+    def __str__(self):
+        return "toolset %s" % self.name
+
     #: This toolset's compiler's object files type, as :class:`bkl.api.FileType`.
     # TODO: shouldn't be needed, get_compilation_subgraph() should figure it out.
     object_type = None

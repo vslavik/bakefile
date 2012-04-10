@@ -1,7 +1,12 @@
-toolsets = gnu gnu-osx vs2010;
+toolsets = gnu gnu-osx vs2008 vs2010 vs11;
+
+vs11.solutionfile = hello_world_vs11.sln;
+vs2008.solutionfile = hello_world_vs2008.sln;
 
 exe hello {
     archs = x86 x86_64;
     sources { hello.c }
     defines += "SALUTATION=\"Hello\"";
+
+    vs11.projectfile = hello_vs11.vcxproj;
 }

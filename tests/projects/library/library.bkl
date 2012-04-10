@@ -1,4 +1,6 @@
-toolsets = gnu vs2010;
+toolsets = gnu vs2008 vs2010;
+
+vs2008.solutionfile = library2008.sln;
 
 library helpers {
     sources { common.cpp helpers.cpp }

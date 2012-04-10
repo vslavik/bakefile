@@ -105,9 +105,9 @@ class VSExternalProject200x(VSExternalProjectBase):
     @property
     def version(self):
         v = self.xml.get("Version")
-        if   v == "7.10": return 2003
-        elif v == "8.00": return 2005
-        elif v == "9.00": return 2008
+        if   v == "7.10": return 7.1
+        elif v == "8.00": return 8
+        elif v == "9.00": return 9
         else:
             raise Error("unrecognized version of Visual Studio project %s: Version=\"%s\"",
                         self.projectfile, v)
@@ -122,16 +122,20 @@ class VSExternalProject200x(VSExternalProjectBase):
 
 class VSExternalProject201x(VSExternalProjectBase):
     """
-    Wrapper around VS 2010/2011 project files.
+    Wrapper around VS 2010/11 project files.
     """
     @property
     def version(self):
         v = self.xml.get("ToolsVersion")
-        if v == "4.0":
-            return 2010
-        else:
+        if v != "4.0":
             raise Error("unrecognized version of Visual Studio project %s: ToolsVersion=\"%s\"",
                         self.projectfile, v)
+        # TODO-PY26: use "PropertyGroup[@Label='Configuration']"
+        t = self.xml.findtext("ms:PropertyGroup/ms:PlatformToolset", namespaces=VS_NAMESPACES)
+        if t == "v110":
+            return 11
+        else:
+            return 10
 
     @property
     def name(self):
