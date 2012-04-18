@@ -71,6 +71,13 @@ class ParserError(Error):
     pass
 
 
+class VersionError(Error):
+    """
+    Exception raised when Bakefile version is too old for the input.
+    """
+    pass
+
+
 class UnsupportedError(Error):
     """
     Exception class for errors when something is unsupported, e.g. unrecognized

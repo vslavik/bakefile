@@ -27,7 +27,7 @@ import ast
 from BakefileLexer import BakefileLexer
 from BakefileParser import BakefileParser
 
-from bkl.error import ParserError, warning
+from bkl.error import ParserError, VersionError, warning
 
 
 # Helper to implement errors handling in a way we prefer
@@ -83,6 +83,15 @@ class _Parser(_BakefileErrorsMixin, BakefileParser):
                             pos=source_pos)
         return out
 
+    def check_version(self, token):
+        """Checks Bakefile version, throwing if too old."""
+        try:
+            from bkl.version import check_version
+            check_version(token.text)
+        except VersionError as e:
+            e.pos = self._get_position(token)
+            raise
+
 
 def get_parser(code, filename=None):
     """
@@ -105,7 +114,7 @@ def get_parser(code, filename=None):
     return parser
 
 
-def parse(code, filename=None):
+def parse(code, filename=None, detect_compatibility_errors=True):
     """
     Reads Bakefile code from string argument passed in and returns parsed AST.
     The optional filename argument allows specifying input file name for the purpose
@@ -114,13 +123,30 @@ def parse(code, filename=None):
     parser = get_parser(code, filename)
     try:
         return parser.program().tree
-    except ParserError:
+    except ParserError as err:
+        if not detect_compatibility_errors:
+            raise
         # Report usage of bkl-ng with old bkl files in user-friendly way:
         if code.startswith("<?xml"):
             raise ParserError("this file is incompatible with new Bakefile versions; please use Bakefile 0.2.x to process it",
                               pos=ast.Position(filename))
         else:
-            raise
+            # Another possible problem is that that this version of Bakefile
+            # may be too old and doesn't recognize some newly introduced
+            # syntax. Try to report that nicely too.
+            code_lines = code.splitlines()
+            for idx in xrange(0, len(code_lines)):
+                ln = code_lines[idx]
+                if "requires" in ln:
+                    try:
+                        parse(ln, detect_compatibility_errors=False)
+                    except VersionError as e:
+                        e.pos.filename = filename
+                        e.pos.line = idx+1
+                        raise
+                    except ParserError as e:
+                        pass
+            raise err
 
 
 def parse_file(filename):

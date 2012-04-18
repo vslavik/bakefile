@@ -296,6 +296,23 @@ conditionally (i.e. inside an ``if`` statement).
 
 
 
+Version checking
+----------------
+
+If a bakefile depends on features (or even syntax) not available in older
+versions, it is possible to declare this dependency using the ``requires``
+keyword.
+
+.. code-block:: bkl
+
+   // Feature XYZ was added in Bakefile 1.1:
+   requires 1.1;
+
+This statement causes fatal error if Bakefile version is older than the
+specified one.
+
+
+
 Comments
 --------
 

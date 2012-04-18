@@ -86,3 +86,15 @@ def test_parsing_bakefile_0_2_xml():
     d = os.path.dirname(test_parsing.__file__)
     with pytest.raises(bkl.error.ParserError):
         bkl.parser.parse_file(os.path.join(d, "bakefile_0_2.bkl"))
+
+def test_parsing_old_version():
+    import test_parsing
+    d = os.path.dirname(test_parsing.__file__)
+    with pytest.raises(bkl.error.VersionError):
+        bkl.parser.parse_file(os.path.join(d, "version_old.bkl"))
+
+def test_parsing_very_old_version():
+    import test_parsing
+    d = os.path.dirname(test_parsing.__file__)
+    with pytest.raises(bkl.error.VersionError):
+        bkl.parser.parse_file(os.path.join(d, "version_very_old.bkl"))

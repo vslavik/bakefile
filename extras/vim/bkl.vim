@@ -19,6 +19,7 @@ syn keyword	bklIf		if
 " Statements and properties that can only appear at global scope, outside of
 " any block.
 syn keyword	bklGlobalStat	submodule
+syn keyword	bklGlobalStat	requires
 syn keyword	bklGlobalProp	toolsets
 syn match	bklGlobalProp	"\<vs\(2003\|2005\|2008\|2010\|11\).generate-solution\ze *=" nextgroup=bklBoolRHS skipwhite
 syn keyword	bklCommonProp	vs2003.solutionfile

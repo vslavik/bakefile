@@ -47,3 +47,28 @@ def get_version():
         except Exception:
             pass
     return VERSION
+
+
+def get_version_tuple(version_str=None):
+    if version_str is None:
+        version_str = get_version()
+    import re
+    components = re.split(r'[.-]', version_str)
+    return tuple(int(x) for x in components)
+
+
+def check_version(required):
+    """
+    Checks if given version requirement is satisfied and throws if not."
+    """
+    bkl_ver = get_version_tuple()
+    try:
+        req_ver = get_version_tuple(required)
+    except ValueError:
+        from bkl.error import ParserError
+        raise ParserError("invalid version number \"%s\"" % required)
+
+    if bkl_ver < req_ver:
+        from bkl.error import VersionError
+        raise VersionError("Bakefile version >= %s is required (you have %s)" %
+                           (required, get_version()))

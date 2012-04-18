@@ -75,6 +75,7 @@ stmt
 stmt_outside_target
     : target_stmt
     | submodule_stmt
+    | requires_stmt
     ;
 
 // and those only allowed inside target:
@@ -100,6 +101,13 @@ if_body
 
 submodule_stmt
     : 'submodule' literal ';'          -> ^(SUBMODULE literal)
+    ;
+
+requires_stmt
+    : 'requires' t=TEXT ';'
+      // Do the check here and not the interepreter, because too old version
+      // may mean that the input will be unparseable:
+      { self.check_version($t) } -> // produce no AST
     ;
 
 // ---------------------------------------------------------------------------
