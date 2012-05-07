@@ -450,6 +450,7 @@ class VSSolutionBase(object):
             outf.write('Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "%s", "%s", "%s"\n' %
                        (sln.name, sln.name, sln.guid))
             outf.write("EndProject\n")
+        all_folders = list(x for x in all_folders if not x.omit_from_tree)
 
         # Global settings:
         outf.write("Global\n")
@@ -471,12 +472,25 @@ class VSSolutionBase(object):
         # Nesting of projects and folders in the tree:
         if all_folders:
             outf.write("\tGlobalSection(NestedProjects) = preSolution\n")
+
+            def _gather_folder_children(sln):
+                prjs = [p for p in sln.projects]
+                slns = []
+                for s in slns:
+                    if s.omit_from_tree:
+                        p2, s2 = _gather_folder_children(s)
+                        prjs += p2
+                        slns += s2
+                    else:
+                        slns.append(s)
+                return (prjs, slns)
+
             for sln in all_folders:
-                for prj in sln.projects:
+                prjs, subslns = _gather_folder_children(sln)
+                for prj in prjs:
                     prjguid = prj[1]
-                    parentguid = sln.guid if not sln.omit_from_tree else sln.parent_solution.guid
-                    outf.write("\t\t%s = %s\n" % (prjguid, parentguid))
-                for subsln in sln.subsolutions:
+                    outf.write("\t\t%s = %s\n" % (prjguid, sln.guid))
+                for subsln in subslns:
                     outf.write("\t\t%s = %s\n" % (subsln.guid, sln.guid))
             outf.write("\tEndGlobalSection\n")
 
