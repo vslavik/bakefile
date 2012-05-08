@@ -62,17 +62,18 @@ class BasicSimplifier(Visitor):
     
     def list(self, e):
         new, changed = self._process_children(e.items)
-        if changed:
-            if len(new):
-                return ListExpr(new, pos=e.pos)
-            else:
-                return NullExpr(pos=e.pos)
-        else:
+        if not changed:
             return e
+        if len(new):
+            return ListExpr(new, pos=e.pos)
+        else:
+            return NullExpr(pos=e.pos)
 
     def concat(self, e):
         # merge concatenated literals:
         items, changed = self._process_children(e.items)
+        if not changed:
+            return e
         if len(items) == 0:
             return NullExpr(pos=e.pos)
         out = [items[0]]
@@ -107,13 +108,12 @@ class BasicSimplifier(Visitor):
 
     def path(self, e):
         components, changed = self._process_children(e.components)
-        if changed:
-            if not components:
-                return NullExpr(pos=e.pos)
-            else:
-                return PathExpr(components, e.anchor, pos=e.pos)
-        else:
+        if not changed:
             return e
+        if not components:
+            return NullExpr(pos=e.pos)
+        else:
+            return PathExpr(components, e.anchor, pos=e.pos)
 
     def bool(self, e):
         left = self.visit(e.left)
