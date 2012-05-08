@@ -347,6 +347,7 @@ def eliminate_superfluous_conditionals(model):
             old = var.value
             var.value = simplifier.visit(var.value)
             if old is not var.value:
+                logger.debug("new pass triggered because of this change: {%s} -> {%s}", old, var.value)
                 modified = True
         if modified:
             iteration += 1
