@@ -646,6 +646,80 @@ class Visitor(object):
             self.visit(e.value_no)
 
 
+class RewritingVisitor(Visitor):
+    """
+    Base class for visitors that perform some changes to the expression.
+
+    RewritingVisitor is smart about the rewrites and if nothing changes,
+    returns the same instance, instead of creating an identical copy.
+
+    It also implements all Visitor methods to do the right thing by default, so
+    you only need to override the ones that are of interest. Default
+    implementations of the others will do the right thing: for example, if an
+    item in the list is rewritten, the list() method will detect it and return
+    a new list.
+    """
+
+    def _process_children(self, children):
+        """
+        Process all items from the *children* list. Returns a tuple of two
+        items: the first one is the new list of items, the second one is a
+        boolean value indicating whether anything changed.
+        """
+        new = []
+        changed = False
+        for i in children:
+            j = self.visit(i)
+            if i is not j:
+                changed = True
+            if isinstance(j, NullExpr):
+                changed = True
+            else:
+                new.append(j)
+        if not changed:
+            new = children
+        return (new, changed)
+
+    bool_value = Visitor.noop
+    literal = Visitor.noop
+    null = Visitor.noop
+    reference = Visitor.noop
+
+    def list(self, e):
+        new, changed = self._process_children(e.items)
+        if not changed:
+            return e
+        return ListExpr(new, pos=e.pos)
+
+    def concat(self, e):
+        # merge concatenated literals:
+        items, changed = self._process_children(e.items)
+        if not changed:
+            return e
+        return ConcatExpr(items, pos=e.pos)
+
+    def path(self, e):
+        components, changed = self._process_children(e.components)
+        if not changed:
+            return e
+        return PathExpr(components, e.anchor, pos=e.pos)
+
+    def bool(self, e):
+        left = self.visit(e.left)
+        right = None if e.right is None else self.visit(e.right)
+        if left is e.left and right is e.right:
+            return e
+        return BoolExpr(e.operator, left, right, pos=e.pos)
+
+    def if_(self, e):
+        cond = self.visit(e.cond)
+        yes = self.visit(e.value_yes)
+        no = self.visit(e.value_no)
+        if cond is e.cond and yes is e.value_yes and no is e.value_no:
+            return e
+        return IfExpr(cond, yes, no, pos=e.pos)
+
+
 class PathAnchorsInfo(object):
     """
     Struct with information about real values for symbolic *anchors* of

@@ -34,32 +34,13 @@ from bkl.expr import *
 from bkl.error import NonConstError
 
 
-class BasicSimplifier(Visitor):
+class BasicSimplifier(RewritingVisitor):
     """
     Simplify expression *e*. This does "cheap" simplifications such
     as merging concatenated literals, recognizing always-false conditions,
     eliminating unnecessary variable references (turn ``foo=$(x);bar=$(foo)``
     into ``bar=$(x)``) etc.
     """
-    def _process_children(self, children):
-        new = []
-        changed = False
-        for i in children:
-            j = self.visit(i)
-            if i is not j:
-                changed = True
-            if isinstance(j, NullExpr):
-                changed = True
-            else:
-                new.append(j)
-        if not changed:
-            new = children
-        return (new, changed)
-    
-    bool_value = Visitor.noop
-    literal = Visitor.noop
-    null = Visitor.noop
-    
     def list(self, e):
         new, changed = self._process_children(e.items)
         if not changed:
