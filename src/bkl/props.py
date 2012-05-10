@@ -135,7 +135,7 @@ def std_project_props():
     return [
         Property("toolset",
                  type=toolsets_enum_type,
-                 default=expr.UndeterminedExpr(),
+                 default=expr.PlaceholderExpr("toolset"),
                  readonly=True,
                  inheritable=False,
                  doc="The toolset makefiles or projects are being generated for. "

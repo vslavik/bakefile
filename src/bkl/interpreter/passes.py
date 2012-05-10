@@ -60,6 +60,7 @@ def detect_self_references(model):
         path = Visitor.visit_children
         bool = Visitor.visit_children
         if_ = Visitor.visit_children
+        placeholder = Visitor.noop
 
         def reference(self, e):
             var = e.context.get_variable(e.var)
@@ -108,6 +109,7 @@ def detect_unused_vars(model):
         path = Visitor.visit_children
         bool = Visitor.visit_children
         if_ = Visitor.visit_children
+        placeholder = Visitor.noop
 
         def reference(self, e):
             var = e.context.get_variable(e.var)
@@ -263,6 +265,7 @@ class PathsNormalizer(Visitor):
     bool_value = Visitor.noop
     null = Visitor.noop
     reference = Visitor.noop
+    placeholder = Visitor.noop
     concat = Visitor.visit_children
     list = Visitor.visit_children
     bool = Visitor.visit_children

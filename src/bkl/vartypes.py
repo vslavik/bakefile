@@ -98,8 +98,10 @@ class Type(object):
             elif isinstance(e, expr.IfExpr):
                 self.validate(e.value_yes)
                 self.validate(e.value_no)
-            elif isinstance(e, expr.UndeterminedExpr):
-                raise TypeError(self, e, "value not determinable")
+            elif isinstance(e, expr.PlaceholderExpr):
+                # FIXME: once settings are implemented, check their types
+                pass
+                # raise TypeError(self, e, "value not determinable")
             else:
                 # finally, perform actual type-specific validation:
                 self._validate_impl(e)
@@ -284,13 +286,14 @@ class _BoolNormalizer(expr.Visitor):
     bool_value = expr.Visitor.noop
     null = expr.Visitor.noop
     reference = expr.Visitor.noop
+    placeholder = expr.Visitor.noop
 
     concat = expr.Visitor.visit_children
     list = expr.Visitor.visit_children
     path = expr.Visitor.visit_children
 
     _bool_type = BoolType()
-    
+
     def bool(self, e):
         self.visit_children(e)
         if e.has_bool_operands():
