@@ -135,8 +135,13 @@ class Node(object):
 class VSExprFormatter(bkl.expr.Formatter):
     list_sep = ";"
 
+    configuration_ref = "$(Configuration)"
+
     def reference(self, e):
-        assert False, "All references should be expanded in VS output"
+        if e.var == "config":
+            return self.configuration_ref
+        else:
+            assert False, "All references should be expanded in VS output"
 
     def bool_value(self, e):
         return "true" if e.value else "false"
@@ -624,7 +629,7 @@ class VSToolsetBase(Toolset):
         Returns list of predefined preprocessor symbols to use.
         """
         defs = ["WIN32"]
-        defs.append("_DEBUG" if cfg == "Debug" else "NDEBUG")
+        defs.append("_DEBUG" if cfg.is_debug else "NDEBUG")
         if is_exe(target):
             defs.append("_CONSOLE")
         elif is_library(target):

@@ -49,6 +49,12 @@ class Builder(object, CondTrackingMixin):
        :class:`bkl.model.Module` instance by :meth:`create_model`. When
        descending into a target, it is temporarily set to said target and
        then restored and so on.
+
+    .. attribute:: config_ast
+
+       Dictionary of ASTs of configurations' definitions. The key is
+       configuration name, the content is a list of AST nodes for per-config
+       assignments.
     """
     def __init__(self, on_submodule=None):
         """
@@ -60,6 +66,9 @@ class Builder(object, CondTrackingMixin):
         CondTrackingMixin.__init__(self)
         self.context = None
         self.on_submodule_callback = on_submodule
+        self.config_ast = {}
+        self.config_ast["Debug"] = []
+        self.config_ast["Release"] = []
 
 
     def create_model(self, ast, parent):
@@ -223,6 +232,40 @@ class Builder(object, CondTrackingMixin):
         self.pop_cond()
 
 
+    def on_configuration(self, node):
+        project = self.context.project
+        if node.name in ["Debug", "Release"]:
+            if node.base:
+                raise ParserError("Debug and Release configurations can't be derived from another")
+            cfg = self.context.project.configurations[node.name]
+        else:
+            if not node.base:
+                raise ParserError("configurations other than Debug and Release must derive from another")
+            if node.name in self.config_ast:
+                raise ParserError("configuration \"%s\" already defined (at %s)" %
+                                  (node.name, project.configurations[node.name].source_pos))
+
+            try:
+                base = project.configurations[node.base]
+                cfg = base.clone(node.name, source_pos=node.pos)
+                self.context.project.add_configuration(cfg)
+            except KeyError:
+                raise ParserError("unknown base configuration \"%s\"" % node.base)
+        if node.base:
+            content = self.config_ast[node.base] + node.content
+        else:
+            content = node.content
+        self.config_ast[node.name] = content
+
+        config_cond = BoolExpr(BoolExpr.EQUAL,
+                               ReferenceExpr("config", self.context),
+                               LiteralExpr(node.name),
+                               pos=node.pos)
+        self.push_cond(config_cond)
+        self.handle_children(content, self.context)
+        self.pop_cond()
+
+
     def on_submodule(self, node):
         if self.active_if_cond is not None:
             raise ParserError("conditionally included submodules not supported yet"
@@ -233,13 +276,14 @@ class Builder(object, CondTrackingMixin):
 
 
     _ast_dispatch = {
-        AssignmentNode : on_assignment,
-        AppendNode     : on_assignment,
-        FilesListNode  : on_sources_or_headers,
-        TargetNode     : on_target,
-        IfNode         : on_if,
-        SubmoduleNode  : on_submodule,
-        NilNode        : lambda self,x: x, # do nothing
+        AssignmentNode     : on_assignment,
+        AppendNode         : on_assignment,
+        FilesListNode      : on_sources_or_headers,
+        TargetNode         : on_target,
+        IfNode             : on_if,
+        ConfigurationNode  : on_configuration,
+        SubmoduleNode      : on_submodule,
+        NilNode            : lambda self,x: x, # do nothing
     }
 
 

@@ -29,6 +29,7 @@ logger = logging.getLogger("bkl.model")
 
 import error, vartypes, utils
 import props
+import expr
 
 class Variable(object):
     """
@@ -95,6 +96,34 @@ class Variable(object):
             raise error.Error("variable \"%s\" is read-only" % self.name)
         # FIXME: type checks
         self.value = value
+
+
+class Configuration(object):
+    """
+    Class representing a configuration.
+
+    Each model has two special configurations, Debug and Release, predefined.
+
+    .. attribute:: name
+
+       Name of the configuration
+
+    .. attribute:: is_debug
+
+       Is this a debug configuration?
+
+    .. attribute:: source_pos
+
+       Source code position of object's definition, or :const:`None`.
+    """
+    def __init__(self, name, is_debug, source_pos=None):
+        self.name = name
+        self.is_debug = is_debug
+        self.source_pos = source_pos
+
+    def clone(self, new_name, source_pos=None):
+        """Returns a new copy of this configuration with a new name."""
+        return Configuration(new_name, self.is_debug, source_pos)
 
 
 class ModelPart(object):
@@ -315,10 +344,17 @@ class Project(ModelPart):
     .. attribute: modules
 
        List of all modules included in the project.
+
+    .. attribute: configurations
+
+       All configurations defined in the project.
     """
     def __init__(self):
         super(Project, self).__init__(parent=None)
         self.modules = []
+        self.configurations = utils.OrderedDict()
+        self.add_configuration(Configuration("Debug", is_debug=True))
+        self.add_configuration(Configuration("Release", is_debug=False))
 
     def __str__(self):
         return "the project"
@@ -358,6 +394,11 @@ class Project(ModelPart):
 
     def enum_props(self):
         return props.enum_project_props()
+
+    def add_configuration(self, config):
+        """Adds a new configuration to the project."""
+        assert config.name not in self.configurations
+        self.configurations[config.name] = config
 
 
 class Module(ModelPart):
@@ -461,6 +502,75 @@ class Target(ModelPart):
 
     def enum_props(self):
         return props.enum_target_props(self.type)
+
+    @property
+    def configurations(self):
+        """
+        Returns all configurations for this target, as ConfigurationProxy
+        objects that can be used similarly to the way the target object
+        itself is. In particular, it's [] operator works the same.
+
+        The proxies are intended to be used in place of targets in code that
+        needs to get per-configuration values of properties.
+
+        >>> for cfg in target.configurations:
+        ...     outdir = cfg["outdir"]
+        """
+        prj = self.project
+        cfglist = self["configurations"]
+        for cname in cfglist.as_py():
+            try:
+                cfg = prj.configurations[cname]
+            except KeyError:
+                # TODO: validate the values earlier, as part of vartypes validation
+                raise error.Error("configuration \"%s\" not defined" % cname, pos=cfglist.pos)
+            yield ConfigurationProxy(self, cfg)
+
+
+class _ProxyIfResolver(expr.RewritingVisitor):
+    """
+    Replaces references to $(config) with value, allowing the expressions
+    to be evaluated.
+    """
+    def __init__(self, config):
+        self.config = config
+        self.inside_cond = 0
+
+    def placeholder(self, e):
+        if self.inside_cond and e.var == "config":
+            return expr.LiteralExpr(self.config, pos=e.pos)
+        else:
+            return e
+
+    def if_(self, e):
+        try:
+            self.inside_cond += 1
+            cond = self.visit(e.cond)
+        finally:
+            self.inside_cond -= 1
+        yes = self.visit(e.value_yes)
+        no = self.visit(e.value_no)
+        return expr.IfExpr(cond, yes, no, pos=e.pos)
+
+
+class ConfigurationProxy(object):
+    """
+    Proxy for accessing model part's variables as configuration-specific. All
+    expressions obtained using operator[] are processed to remove conditionals
+    depending on the value of "config", by substituting appropriate value
+    according to the configuration name passed to proxy's constructor.
+
+    See :meth:`bkl.model.Target.configurations` for more information.
+    """
+    def __init__(self, model, config):
+        self.config = config
+        self.name = config.name
+        self.is_debug = config.is_debug
+        self.model = model
+        self._visitor = _ProxyIfResolver(config.name)
+
+    def __getitem__(self, key):
+        return self._visitor.visit(self.model[key])
 
 
 class SourceFile(ModelPart):
