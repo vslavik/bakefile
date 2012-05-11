@@ -300,10 +300,9 @@ class VSSolutionBase(object):
         slnfile = module["%s.solutionfile" % toolset.name].as_native_path_for_output(module)
         self.name = module.name
         self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.name)
-        self.projects = []
+        self.projects = OrderedDict()
         self.subsolutions = []
         self.parent_solution = None
-        self.guids_map = {}
         paths_info = bkl.expr.PathAnchorsInfo(
                                     dirsep="\\",
                                     outfile=slnfile,
@@ -317,9 +316,7 @@ class VSSolutionBase(object):
         """
         Adds a project (VSProjectBase-derived object) to the solution.
         """
-        self.guids_map[prj.name] = prj.guid
-        # TODO: store VSProjectBase instances directly here
-        self.projects.append((prj.name, prj.guid, prj.projectfile, prj.dependencies))
+        self.projects[prj.name] = prj
 
     def add_subsolution(self, solution):
         """
@@ -330,7 +327,7 @@ class VSSolutionBase(object):
         solution.parent_solution = self
 
     def all_projects(self):
-        for p in self.projects:
+        for p in self.projects.itervalues():
             yield p
         for sln in self.subsolutions:
             for p in sln.all_projects():
@@ -342,15 +339,15 @@ class VSSolutionBase(object):
             for s in sln.all_subsolutions():
                 yield s
 
-    def _get_project_info(self, id):
-        for p in self.projects:
-            if p[0] == id:
-                return p
-        for sln in self.subsolutions:
-            p = sln._get_project_info(id)
-            if p:
-                return p
-        return None
+    def _get_project_by_id(self, id):
+        try:
+            return self.projects[id]
+        except KeyError:
+            for sln in self.subsolutions:
+                p = sln._get_project_by_id(id)
+                if p:
+                    return p
+            return None
 
     def additional_deps(self):
         """
@@ -364,10 +361,10 @@ class VSSolutionBase(object):
         if top is self:
             return additional
 
-        included = set(x[0] for x in self.all_projects())
+        included = set(x.name for x in self.all_projects())
         todo = set()
-        for name, guid, projectfile, deps in self.all_projects():
-            todo.update(deps)
+        for prj in self.all_projects():
+            todo.update(prj.dependencies)
 
         prev_count = 0
         while prev_count != len(included):
@@ -376,26 +373,27 @@ class VSSolutionBase(object):
             todo_new = set()
             for todo_item in todo:
                 included.add(todo_item)
-                prj = top._get_project_info(todo_item)
-                todo_new.update(prj[3])
+                prj = top._get_project_by_id(todo_item)
+                todo_new.update(prj.dependencies)
                 additional.append(prj)
             todo.update(todo_new)
         return additional
 
     def _find_target_guid_recursively(self, id):
         """Recursively search for the target in all submodules and return its GUID."""
-        if id in self.guids_map:
-            return self.guids_map[id]
-        for sln in self.subsolutions:
-            guid = sln._find_target_guid_recursively(id)
-            if guid:
-                return guid
-        return None
+        try:
+            return self.projects[id].guid
+        except KeyError:
+            for sln in self.subsolutions:
+                guid = sln._find_target_guid_recursively(id)
+                if guid:
+                    return guid
+            return None
 
     def _get_target_guid(self, id):
-        if id in self.guids_map:
-            return self.guids_map[id]
-        else:
+        try:
+            return self.projects[id].guid
+        except KeyError:
             top = self
             while top.parent_solution:
                 top = top.parent_solution
@@ -414,21 +412,21 @@ class VSSolutionBase(object):
         self.write_header(outf)
 
         # Projects:
-        guids = []
         additional_deps = self.additional_deps()
-        for name, guid, filename, deps in list(self.all_projects()) + additional_deps:
-            guids.append(guid)
+        included_projects = list(self.all_projects()) + additional_deps
+
+        if not included_projects:
+            return # don't write empty solution files
+
+        for prj in included_projects:
             outf.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\n' %
-                       (name, self.formatter.format(filename), str(guid)))
-            if deps:
+                       (prj.name, self.formatter.format(prj.projectfile), str(prj.guid)))
+            if prj.dependencies:
                 outf.write("\tProjectSection(ProjectDependencies) = postProject\n")
-                for d in deps:
+                for d in prj.dependencies:
                     outf.write("\t\t%(g)s = %(g)s\n" % {'g':self._get_target_guid(d)})
                 outf.write("\tEndProjectSection\n")
             outf.write("EndProject\n")
-
-        if not guids:
-            return # don't write empty solution files
 
         # Folders in the solution:
         all_folders = list(self.all_subsolutions())
@@ -437,7 +435,9 @@ class VSSolutionBase(object):
             extras = AdditionalDepsFolder()
             extras.name = "Additional Dependencies"
             extras.guid = GUID(NAMESPACE_INTERNAL, self.name, extras.name)
-            extras.projects = additional_deps
+            extras.projects = OrderedDict()
+            for prj in additional_deps:
+                extras.projects[prj.name] = prj
             extras.subsolutions = []
             extras.parent_solution = None
             all_folders.append(extras)
@@ -459,7 +459,8 @@ class VSSolutionBase(object):
         outf.write("\t\tRelease|Win32 = Release|Win32\n")
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n")
-        for guid in guids:
+        for prj in included_projects:
+            guid = prj.guid
             outf.write("\t\t%s.Debug|Win32.ActiveCfg = Debug|Win32\n" % guid)
             outf.write("\t\t%s.Debug|Win32.Build.0 = Debug|Win32\n" % guid)
             outf.write("\t\t%s.Release|Win32.ActiveCfg = Release|Win32\n" % guid)
@@ -474,7 +475,7 @@ class VSSolutionBase(object):
             outf.write("\tGlobalSection(NestedProjects) = preSolution\n")
 
             def _gather_folder_children(sln):
-                prjs = [p for p in sln.projects]
+                prjs = [p for p in sln.projects.itervalues()]
                 slns = []
                 for s in slns:
                     if s.omit_from_tree:
@@ -488,8 +489,7 @@ class VSSolutionBase(object):
             for sln in all_folders:
                 prjs, subslns = _gather_folder_children(sln)
                 for prj in prjs:
-                    prjguid = prj[1]
-                    outf.write("\t\t%s = %s\n" % (prjguid, sln.guid))
+                    outf.write("\t\t%s = %s\n" % (prj.guid, sln.guid))
                 for subsln in subslns:
                     outf.write("\t\t%s = %s\n" % (subsln.guid, sln.guid))
             outf.write("\tEndGlobalSection\n")
