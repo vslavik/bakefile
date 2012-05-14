@@ -20,7 +20,9 @@ syn keyword	bklIf		if
 " any block.
 syn keyword	bklGlobalStat	submodule
 syn keyword	bklGlobalStat	requires
+syn keyword	bklGlobalStat	configuration
 syn keyword	bklGlobalProp	toolsets
+syn keyword	bklGlobalProp	configurations
 syn match	bklGlobalProp	"\<vs\(2003\|2005\|2008\|2010\|11\).generate-solution\ze *=" nextgroup=bklBoolRHS skipwhite
 syn keyword	bklCommonProp	vs2003.solutionfile
 syn keyword	bklCommonProp	vs2005.solutionfile
@@ -45,7 +47,8 @@ syn keyword	bklLibProp	libname contained
 
 " Properties that can only occur in the targets building something i.e.
 " exe/lib/dll ones.
-syn keyword	bklBuildProp	archs compiler-options c-compiler-options cxx-compiler-options contained
+syn keyword	bklBuildProp	archs configurations contained
+syn keyword	bklBuildProp	compiler-options c-compiler-options cxx-compiler-options contained
 syn keyword	bklBuildProp	defines headers includedirs libs link-options outputdir sources contained
 
 syn keyword	bklBool 	false true contained
