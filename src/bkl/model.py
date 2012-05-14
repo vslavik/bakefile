@@ -536,6 +536,9 @@ class _ProxyIfResolver(expr.RewritingVisitor):
         self.config = config
         self.inside_cond = 0
 
+    def reference(self, e):
+        return self.visit(e.get_value())
+
     def placeholder(self, e):
         if self.inside_cond and e.var == "config":
             return expr.LiteralExpr(self.config, pos=e.pos)
