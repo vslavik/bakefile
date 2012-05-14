@@ -1,0 +1,22 @@
+module {
+  variables {
+    toolsets = [vs2010]
+    diagnostics = (($(config) == MyRelease) ? true : (($(config) == MyDebug) ? true : false))
+    configurations = [Release, Debug, MyRelease, MyDebug]
+  }
+  targets {
+    library helpers {
+      configurations = [Release, Debug]
+      sources {
+        file @top_srcdir/helpers.cpp
+      }
+    }
+    exe hello {
+      deps = [helpers]
+      defines = [($(diagnostics) ? ENABLE_DIAGNOSTICS : null)]
+      sources {
+        file @top_srcdir/hello.cpp
+      }
+    }
+  }
+}
