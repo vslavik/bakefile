@@ -14,7 +14,7 @@ all: parser doc
 parser: $(parser_file) $(lexer_file)
 
 %Parser.py %Lexer.py: %.g
-	$(ANTLR) $<
+	cd $(dir $<) && $(ANTLR) $(notdir $<)
 
 doc: parser
 	$(MAKE) -C docs all
