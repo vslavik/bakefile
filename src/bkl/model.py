@@ -120,6 +120,9 @@ class Configuration(object):
         self.name = name
         self.is_debug = is_debug
         self.source_pos = source_pos
+        # for internal use, this is a list of AST nodes that
+        # define the configuration
+        self._definition = []
 
     def clone(self, new_name, source_pos=None):
         """Returns a new copy of this configuration with a new name."""
