@@ -138,11 +138,12 @@ class VS200xXmlFormatter(XmlFormatter):
 
 # TODO: Put more content into these classes, use them properly
 class VS200xProject(VSProjectBase):
-    def __init__(self, name, guid, projectfile, deps):
+    def __init__(self, name, guid, projectfile, deps, configs):
         self.name = name
         self.guid = guid
         self.projectfile = projectfile
         self.dependencies = deps
+        self.configurations = configs
 
 class VS2003Project(VS200xProject):
     version = 7.1
@@ -254,7 +255,11 @@ class VS200xToolsetBase(VSToolsetBase):
         f.commit()
 
         target_deps = target["deps"].as_py()
-        return self.Project(target.name, guid, projectfile, target_deps)
+        return self.Project(target.name,
+                            guid,
+                            projectfile,
+                            target_deps,
+                            [x.name for x in target.configurations])
 
     def _add_ToolFiles(self, root):
         root.add(Node("ToolFiles"))

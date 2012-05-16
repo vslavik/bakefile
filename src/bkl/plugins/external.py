@@ -124,6 +124,13 @@ class VSExternalProject200x(VSExternalProjectBase):
     def guid(self):
         return self.xml.get("ProjectGUID")
 
+    @property
+    @memoized
+    def configurations(self):
+        return [x.get("Name").partition("|")[0]
+                for x in self.xml.findall("Configurations/Configuration")]
+
+
 class VSExternalProject201x(VSExternalProjectBase):
     """
     Wrapper around VS 2010/11 project files.
@@ -153,6 +160,14 @@ class VSExternalProject201x(VSExternalProjectBase):
     def guid(self):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
         return self.xml.findtext("ms:PropertyGroup/ms:ProjectGuid", namespaces=VS_NAMESPACES)
+
+    @property
+    @memoized
+    def configurations(self):
+        # TODO-PY26: use "ItemGroup[@Label='ProjectConfigurations']"
+        return [x.text for x in
+                self.xml.findall("ms:ItemGroup/ms:ProjectConfiguration/ms:Configuration", namespaces=VS_NAMESPACES)]
+
 
 
 class VisualStudioHandler(ExternalBuildHandler):

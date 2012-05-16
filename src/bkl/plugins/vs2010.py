@@ -37,11 +37,12 @@ class VS2010Project(VSProjectBase):
     """
     version = 10
 
-    def __init__(self, name, guid, projectfile, deps):
+    def __init__(self, name, guid, projectfile, deps, configs):
         self.name = name
         self.guid = guid
         self.projectfile = projectfile
         self.dependencies = deps
+        self.configurations = configs
 
 
 
@@ -271,7 +272,11 @@ class VS201xToolsetBase(VSToolsetBase):
         f.commit()
         self._write_filters_file_for(filename)
 
-        return self.Project(target.name, guid, projectfile, target_deps)
+        return self.Project(target.name,
+                            guid,
+                            projectfile,
+                            target_deps,
+                            [x.name for x in target.configurations])
 
     def _set_VCTargetsPath(self, root):
         pass

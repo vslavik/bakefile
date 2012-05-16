@@ -287,6 +287,9 @@ class VSProjectBase(object):
     #: List of dependencies of this project, as names."""
     dependencies = []
 
+    #: List of names of configurations."""
+    configurations = []
+
 
 class VSSolutionBase(object):
     """
@@ -406,6 +409,17 @@ class VSSolutionBase(object):
             assert guid, "can't find GUID of project '%s'" % id
             return guid
 
+    def _get_matching_project_config(self, cfg, prj):
+        if cfg in prj.configurations:
+            return cfg
+        # else: try to find a similar name (i.e. when one name is substring of
+        # the other):
+        for pc in prj.configurations:
+            if (pc in cfg) or (cfg in pc):
+                return pc
+        # if all failed, just pick the first config
+        return prj.configurations[0]
+
     def write_header(self, file):
         file.write("Microsoft Visual Studio Solution File, Format Version %s\n" % self.format_version)
         if self.human_version:
@@ -422,6 +436,12 @@ class VSSolutionBase(object):
 
         if not included_projects:
             return # don't write empty solution files
+
+        configurations = []
+        for prj in included_projects:
+            for cfg in prj.configurations:
+                if cfg not in configurations:
+                    configurations.append(cfg)
 
         for prj in included_projects:
             outf.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\n' %
@@ -460,16 +480,16 @@ class VSSolutionBase(object):
         # Global settings:
         outf.write("Global\n")
         outf.write("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n")
-        outf.write("\t\tDebug|Win32 = Debug|Win32\n")
-        outf.write("\t\tRelease|Win32 = Release|Win32\n")
+        for cfg in configurations:
+            outf.write("\t\t%s|Win32 = %s|Win32\n" % (cfg, cfg))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n")
         for prj in included_projects:
             guid = prj.guid
-            outf.write("\t\t%s.Debug|Win32.ActiveCfg = Debug|Win32\n" % guid)
-            outf.write("\t\t%s.Debug|Win32.Build.0 = Debug|Win32\n" % guid)
-            outf.write("\t\t%s.Release|Win32.ActiveCfg = Release|Win32\n" % guid)
-            outf.write("\t\t%s.Release|Win32.Build.0 = Release|Win32\n" % guid)
+            for cfg in configurations:
+                cfgp = self._get_matching_project_config(cfg, prj)
+                outf.write("\t\t%s.%s|Win32.ActiveCfg = %s|Win32\n" % (guid, cfg, cfgp))
+                outf.write("\t\t%s.%s|Win32.Build.0 = %s|Win32\n" % (guid, cfg, cfgp))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(SolutionProperties) = preSolution\n")
         outf.write("\t\tHideSolutionNode = FALSE\n")
