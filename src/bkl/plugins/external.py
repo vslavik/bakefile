@@ -30,6 +30,7 @@ from bkl.api import Extension, Property, TargetType, FileRecognizer
 from bkl.vartypes import PathType
 from bkl.error import Error, error_context
 from bkl.plugins.vsbase import VSProjectBase
+from bkl.utils import memoized
 
 import xml.etree.ElementTree
 
@@ -103,6 +104,7 @@ class VSExternalProject200x(VSExternalProjectBase):
     Wrapper around VS 200{3,5,8} project files.
     """
     @property
+    @memoized
     def version(self):
         v = self.xml.get("Version")
         if   v == "7.10": return 7.1
@@ -113,10 +115,12 @@ class VSExternalProject200x(VSExternalProjectBase):
                         self.projectfile, v)
 
     @property
+    @memoized
     def name(self):
         return self.xml.get("Name")
 
     @property
+    @memoized
     def guid(self):
         return self.xml.get("ProjectGUID")
 
@@ -125,6 +129,7 @@ class VSExternalProject201x(VSExternalProjectBase):
     Wrapper around VS 2010/11 project files.
     """
     @property
+    @memoized
     def version(self):
         v = self.xml.get("ToolsVersion")
         if v != "4.0":
@@ -138,11 +143,13 @@ class VSExternalProject201x(VSExternalProjectBase):
             return 10
 
     @property
+    @memoized
     def name(self):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
         return self.xml.findtext("ms:PropertyGroup/ms:RootNamespace", namespaces=VS_NAMESPACES)
 
     @property
+    @memoized
     def guid(self):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
         return self.xml.findtext("ms:PropertyGroup/ms:ProjectGuid", namespaces=VS_NAMESPACES)
