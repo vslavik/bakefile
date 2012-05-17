@@ -110,7 +110,7 @@ def detect_unused_vars(model):
         if_ = Visitor.visit_children
 
         def reference(self, e):
-            var = e.context.get_variable(e.var)
+            var = e.get_variable()
             if var is not None and not var.is_property:
                 self.found.add(id(var))
 

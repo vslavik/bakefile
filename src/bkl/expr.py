@@ -228,6 +228,20 @@ class ReferenceExpr(Expr):
         with error_context(self):
             return self.context.get_variable_value(self.var)
 
+    def get_variable(self):
+        """
+        Return the variable object this reference points to.
+
+        Use this method only if necessary; whenever possible,
+        :meth:`get_value()` should be used instead.
+
+        Note that the returned value may be None, either if the referenced
+        variable doesn't exist or when the reference is to a property that
+        wasn't explicitly set and uses the default value.
+        """
+        # recursive lookup corresponds to what get_variable_value() does
+        return self.context.get_variable(self.var, recursively=True)
+
     def __nonzero__(self):
         return bool(self.get_value())
 
