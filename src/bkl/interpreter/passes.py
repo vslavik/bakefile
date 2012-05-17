@@ -127,7 +127,9 @@ def detect_unused_vars(model):
                 #        declaration similar to Property, with type checking and
                 #        automated docs and all. Then test for it here as other
                 #        properties are tested for.
-                not regex_vs_option.match(var.name)):
+                not regex_vs_option.match(var.name) and
+                # FIXME: Handle this case properly.
+                var.name != "configurations"):
             warning('variable "%s" is never used', var.name, pos=var.value.pos)
 
 
