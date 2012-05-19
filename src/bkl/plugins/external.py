@@ -95,6 +95,7 @@ class VSExternalProjectBase(VSProjectBase):
     def __init__(self, target):
         self.projectfile = target["file"]
         self.dependencies = []
+        self.source_pos = target.source_pos
         xmldoc = xml.etree.ElementTree.parse(self.projectfile.as_native_path_for_output(target))
         self.xml = xmldoc.getroot()
 

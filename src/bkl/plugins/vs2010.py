@@ -37,12 +37,13 @@ class VS2010Project(VSProjectBase):
     """
     version = 10
 
-    def __init__(self, name, guid, projectfile, deps, configs):
+    def __init__(self, name, guid, projectfile, deps, configs, source_pos=None):
         self.name = name
         self.guid = guid
         self.projectfile = projectfile
         self.dependencies = deps
         self.configurations = configs
+        self.source_pos = source_pos
 
 
 

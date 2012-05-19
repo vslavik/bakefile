@@ -290,6 +290,9 @@ class VSProjectBase(object):
     #: List of names of configurations."""
     configurations = []
 
+    #: Location in the sources where the project originated from
+    source_pos = None
+
 
 class VSSolutionBase(object):
     """

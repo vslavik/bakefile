@@ -138,12 +138,13 @@ class VS200xXmlFormatter(XmlFormatter):
 
 # TODO: Put more content into these classes, use them properly
 class VS200xProject(VSProjectBase):
-    def __init__(self, name, guid, projectfile, deps, configs):
+    def __init__(self, name, guid, projectfile, deps, configs, source_pos=None):
         self.name = name
         self.guid = guid
         self.projectfile = projectfile
         self.dependencies = deps
         self.configurations = configs
+        self.source_pos = source_pos
 
 class VS2003Project(VS200xProject):
     version = 7.1
