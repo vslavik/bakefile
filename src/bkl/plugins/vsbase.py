@@ -420,15 +420,16 @@ class VSSolutionBase(object):
             if cfg in prj.configurations:
                 return cfg
 
-            # else: try to find a similar name (i.e. when one name is substring of
-            # the other):
+            # else: try to find a configuration closest to the given one, i.e.
+            # the one from which it inherits via the minimal number of
+            # intermediate configurations:
             compatibles = []
             for pc in prj.configurations:
                 degree = pc.derived_from(cfg) + cfg.derived_from(pc)
                 if degree:
                     compatibles.append((degree, pc))
             if compatibles:
-                sorted(compatibles)
+                compatibles.sort()
                 degree, ret = compatibles[0]
                 logger.debug("%s: solution config \"%s\" -> project %s config \"%s\" (dg %d)",
                              self.outf.filename, cfg.name, prj.projectfile, ret.name, degree)
