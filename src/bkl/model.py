@@ -108,6 +108,11 @@ class Configuration(object):
 
        Name of the configuration
 
+    .. attribute:: base
+
+       Base configuration this one is derived from, as a :class:`Configuration`
+       instance, or :const:`None` for "Debug" and "Release" configurations.
+
     .. attribute:: is_debug
 
        Is this a debug configuration?
@@ -116,8 +121,9 @@ class Configuration(object):
 
        Source code position of object's definition, or :const:`None`.
     """
-    def __init__(self, name, is_debug, source_pos=None):
+    def __init__(self, name, base, is_debug, source_pos=None):
         self.name = name
+        self.base = base
         self.is_debug = is_debug
         self.source_pos = source_pos
         # for internal use, this is a list of AST nodes that
@@ -126,7 +132,26 @@ class Configuration(object):
 
     def clone(self, new_name, source_pos=None):
         """Returns a new copy of this configuration with a new name."""
-        return Configuration(new_name, self.is_debug, source_pos)
+        return Configuration(new_name, self, self.is_debug, source_pos)
+
+    def derived_from(self, cfg):
+        """
+        Returns true if *self* derives, directly or indirectly, from
+        configuration *cfg*.
+
+        Returns 0 if not derived. Returns degree of inheritance if derived: 1
+        if *cfg* is a direct base, 2 if it is a base of *self*'s base etc.
+        """
+        if self.base is cfg:
+            return 1
+        elif self.base is None:
+            return 0
+        else:
+            b = self.base.derived_from(cfg)
+            if b:
+                return b + 1
+            else:
+                return 0
 
 
 class ModelPart(object):
@@ -356,8 +381,8 @@ class Project(ModelPart):
         super(Project, self).__init__(parent=None)
         self.modules = []
         self.configurations = utils.OrderedDict()
-        self.add_configuration(Configuration("Debug", is_debug=True))
-        self.add_configuration(Configuration("Release", is_debug=False))
+        self.add_configuration(Configuration("Debug",   base=None, is_debug=True))
+        self.add_configuration(Configuration("Release", base=None, is_debug=False))
 
     def __str__(self):
         return "the project"
