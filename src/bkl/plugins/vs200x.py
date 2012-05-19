@@ -260,7 +260,8 @@ class VS200xToolsetBase(VSToolsetBase):
                             guid,
                             projectfile,
                             target_deps,
-                            [x.name for x in target.configurations])
+                            [x.config for x in target.configurations],
+                            target.source_pos)
 
     def _add_ToolFiles(self, root):
         root.add(Node("ToolFiles"))

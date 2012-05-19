@@ -277,7 +277,8 @@ class VS201xToolsetBase(VSToolsetBase):
                             guid,
                             projectfile,
                             target_deps,
-                            [x.name for x in target.configurations])
+                            [x.config for x in target.configurations],
+                            target.source_pos)
 
     def _set_VCTargetsPath(self, root):
         pass

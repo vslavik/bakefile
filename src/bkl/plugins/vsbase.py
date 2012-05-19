@@ -31,6 +31,9 @@ import types
 from xml.sax.saxutils import escape, quoteattr
 from functools import partial, update_wrapper
 
+import logging
+logger = logging.getLogger("bkl.vsbase")
+
 import bkl.expr
 from bkl.utils import OrderedDict
 from bkl.error import error_context, warning, Error
@@ -287,7 +290,7 @@ class VSProjectBase(object):
     #: List of dependencies of this project, as names."""
     dependencies = []
 
-    #: List of names of configurations."""
+    #: List of configuration objects."""
     configurations = []
 
     #: Location in the sources where the project originated from
@@ -413,15 +416,37 @@ class VSSolutionBase(object):
             return guid
 
     def _get_matching_project_config(self, cfg, prj):
-        if cfg in prj.configurations:
-            return cfg
-        # else: try to find a similar name (i.e. when one name is substring of
-        # the other):
-        for pc in prj.configurations:
-            if (pc in cfg) or (cfg in pc):
-                return pc
-        # if all failed, just pick the first config
-        return prj.configurations[0]
+        with error_context(prj):
+            if cfg in prj.configurations:
+                return cfg
+
+            # else: try to find a similar name (i.e. when one name is substring of
+            # the other):
+            compatibles = []
+            for pc in prj.configurations:
+                degree = pc.derived_from(cfg) + cfg.derived_from(pc)
+                if degree:
+                    compatibles.append((degree, pc))
+            if compatibles:
+                sorted(compatibles)
+                degree, ret = compatibles[0]
+                logger.debug("%s: solution config \"%s\" -> project %s config \"%s\" (dg %d)",
+                             self.outf.filename, cfg.name, prj.projectfile, ret.name, degree)
+                return ret
+
+            # if all failed, just pick the first config, but at least try to match
+            # debug/release setting:
+            compatibles = [x for x in prj.configurations if x.is_debug == cfg.is_debug]
+            if compatibles:
+                ret = compatibles[0]
+                warning("project %s: using unrelated project configuration \"%s\" for solution configuration \"%s\"",
+                        prj.projectfile, ret.name, cfg.name)
+                return ret
+            else:
+                ret = prj.configurations[0]
+                warning("project %s: using incompatible project configuration \"%s\" for solution configuration \"%s\"",
+                        prj.projectfile, ret.name, cfg.name)
+                return ret
 
     def write_header(self, file):
         file.write("Microsoft Visual Studio Solution File, Format Version %s\n" % self.format_version)
@@ -484,15 +509,15 @@ class VSSolutionBase(object):
         outf.write("Global\n")
         outf.write("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n")
         for cfg in configurations:
-            outf.write("\t\t%s|Win32 = %s|Win32\n" % (cfg, cfg))
+            outf.write("\t\t%s|Win32 = %s|Win32\n" % (cfg.name, cfg.name))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n")
         for prj in included_projects:
             guid = prj.guid
             for cfg in configurations:
                 cfgp = self._get_matching_project_config(cfg, prj)
-                outf.write("\t\t%s.%s|Win32.ActiveCfg = %s|Win32\n" % (guid, cfg, cfgp))
-                outf.write("\t\t%s.%s|Win32.Build.0 = %s|Win32\n" % (guid, cfg, cfgp))
+                outf.write("\t\t%s.%s|Win32.ActiveCfg = %s|Win32\n" % (guid, cfg.name, cfgp.name))
+                outf.write("\t\t%s.%s|Win32.Build.0 = %s|Win32\n" % (guid, cfg.name, cfgp.name))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(SolutionProperties) = preSolution\n")
         outf.write("\t\tHideSolutionNode = FALSE\n")

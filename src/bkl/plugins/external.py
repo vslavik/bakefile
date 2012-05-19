@@ -27,6 +27,7 @@ Implementation of 'external' target type.
 """
 
 from bkl.api import Extension, Property, TargetType, FileRecognizer
+from bkl.model import Configuration
 from bkl.vartypes import PathType
 from bkl.error import Error, error_context
 from bkl.plugins.vsbase import VSProjectBase
@@ -93,11 +94,31 @@ class VSExternalProjectBase(VSProjectBase):
     Wrapper around externally-provided project file, base class.
     """
     def __init__(self, target):
+        self._known_configurations = target.project.configurations
         self.projectfile = target["file"]
         self.dependencies = []
         self.source_pos = target.source_pos
         xmldoc = xml.etree.ElementTree.parse(self.projectfile.as_native_path_for_output(target))
         self.xml = xmldoc.getroot()
+
+    @property
+    @memoized
+    def configurations(self):
+        known = self._known_configurations
+        lst = []
+        for name in self._extract_configurations_names():
+            try:
+                lst.append(known[name])
+            except KeyError:
+                if "Debug" in name:
+                    base = known["Debug"]
+                elif "Release" in name:
+                    base = known["Release"]
+                else:
+                    raise Error("don't know whether the \"%s\" configuration from external %s is debug or release; please define it in your bakefile explicitly" % (name, self.projectfile),
+                                pos=self.source_pos)
+                lst.append(base.clone(name))
+        return lst
 
 
 class VSExternalProject200x(VSExternalProjectBase):
@@ -125,9 +146,7 @@ class VSExternalProject200x(VSExternalProjectBase):
     def guid(self):
         return self.xml.get("ProjectGUID")
 
-    @property
-    @memoized
-    def configurations(self):
+    def _extract_configurations_names(self):
         return [x.get("Name").partition("|")[0]
                 for x in self.xml.findall("Configurations/Configuration")]
 
@@ -162,9 +181,7 @@ class VSExternalProject201x(VSExternalProjectBase):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
         return self.xml.findtext("ms:PropertyGroup/ms:ProjectGuid", namespaces=VS_NAMESPACES)
 
-    @property
-    @memoized
-    def configurations(self):
+    def _extract_configurations_names(self):
         # TODO-PY26: use "ItemGroup[@Label='ProjectConfigurations']"
         return [x.text for x in
                 self.xml.findall("ms:ItemGroup/ms:ProjectConfiguration/ms:Configuration", namespaces=VS_NAMESPACES)]
