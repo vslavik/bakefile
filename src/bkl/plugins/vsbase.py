@@ -425,11 +425,34 @@ class VSSolutionBase(object):
             # intermediate configurations:
             compatibles = []
             for pc in prj.configurations:
-                degree = pc.derived_from(cfg) + cfg.derived_from(pc)
+                degree = cfg.derived_from(pc)
                 if degree:
                     compatibles.append((degree, pc))
+
+            if not compatibles:
+                # if we don't have any project configurations from which this
+                # one inherits, check if we have any which inherit from this
+                # one themselves as they should be a reasonably good fallback:
+                for pc in prj.configurations:
+                    degree = pc.derived_from(cfg)
+                    if degree:
+                        compatibles.append((degree, pc))
+
             if compatibles:
-                compatibles.sort()
+                if len(compatibles) > 1:
+                    compatibles.sort()
+                    # It can happen that we have 2 project configurations
+                    # inheriting from the solution configuration with the same
+                    # degree. In this case there we can't really make the
+                    # right choice automatically, so we must warn the user.
+                    degree = compatibles[0][0]
+                    if compatibles[1][0] == degree:
+                        good_ones = [x[1].name for x in compatibles if x[0] == degree]
+                        warning("project %s: no unambiguous choice of project configuration to use for the solution configuration \"%s\", equally good candidates are: \"%s\"",
+                                prj.projectfile,
+                                cfg.name,
+                                '", "'.join(good_ones))
+
                 degree, ret = compatibles[0]
                 logger.debug("%s: solution config \"%s\" -> project %s config \"%s\" (dg %d)",
                              self.outf.filename, cfg.name, prj.projectfile, ret.name, degree)
