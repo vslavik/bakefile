@@ -98,8 +98,6 @@ class OutputFile(object):
         if self.eol == EOL_WINDOWS:
             self.text = self.text.replace("\n", "\r\n")
 
-        note = " (dry run)" if dry_run else ""
-
         if not force_output:
             try:
                 with open(self.filename, "rb") as f:
@@ -107,15 +105,18 @@ class OutputFile(object):
             except IOError:
                 old = None
             if old == self.text:
-                logger.info("no changes in file %s", self.filename)
+                status = "."
+                logger.info("%s\t%s", status, self.filename)
                 return
         else:
             old = None
 
         if old is None:
-            logger.info("creating file %s%s", self.filename, note)
+            status = "A"
         else:
-            logger.info("updating file %s%s", self.filename, note)
+            status = "U"
+
+        logger.info("%s\t%s", status, self.filename)
 
         if dry_run:
             return # nothing to do, just pretending to write output
