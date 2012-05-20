@@ -223,6 +223,16 @@ class SubmoduleNode(Node):
                     doc="File with submodule definition")
 
 
+class ConfigurationNode(Node):
+    """Definition of a configuration."""
+    name = property(lambda self: self.children[0].text,
+                    doc="Name of the configuration")
+    base = property(lambda self: self.children[1].text if not isinstance(self.children[1], NilNode) else None,
+                    doc="Name of the base configuration or None")
+    content = property(lambda self: self.children[2:],
+                       doc="Other content: variables assignments and such")
+
+
 class _TreeAdaptor(CommonTreeAdaptor):
     """Adaptor for ANTLR3 AST tree creation."""
     def __init__(self, filename):
@@ -230,6 +240,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
 
     # mapping of token types to AST node classes
     TOKENS_MAP = {
+        BakefileParser.NIL            : NilNode,
         BakefileParser.PROGRAM        : RootNode,
         BakefileParser.LITERAL        : LiteralNode,
         BakefileParser.BOOLVAL        : BoolvalNode,
@@ -249,6 +260,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.EQUAL          : EqualNode,
         BakefileParser.NOT_EQUAL      : NotEqualNode,
         BakefileParser.SUBMODULE      : SubmoduleNode,
+        BakefileParser.CONFIGURATION  : ConfigurationNode,
     }
 
     def createWithPayload(self, payload):

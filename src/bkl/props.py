@@ -112,6 +112,13 @@ def std_target_props():
 
                      Currently only implemented by Visual Studio.
                      """),
+
+        Property("configurations",
+                 type=ListType(StringType()), # FIXME: use a custom type that validates config names
+                 default="Debug Release",
+                 inheritable=True,
+                 doc="List of configurations to use for this target."
+                 ),
         ]
 
 
@@ -135,12 +142,21 @@ def std_project_props():
     return [
         Property("toolset",
                  type=toolsets_enum_type,
-                 default=expr.UndeterminedExpr(),
+                 default=expr.PlaceholderExpr("toolset"),
                  readonly=True,
                  inheritable=False,
                  doc="The toolset makefiles or projects are being generated for. "
                      "This property is set by Bakefile and can be used for performing "
                      "toolset-specific tasks or modifications."
+                 ),
+        Property("config",
+                 type=StringType(),
+                 default=expr.PlaceholderExpr("config"),
+                 readonly=True,
+                 inheritable=False,
+                 doc="Current configuration. "
+                     "This property is set by Bakefile and can be used for performing "
+                     "per-configuration modifications."
                  ),
         ]
 

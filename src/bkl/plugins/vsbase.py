@@ -31,6 +31,9 @@ import types
 from xml.sax.saxutils import escape, quoteattr
 from functools import partial, update_wrapper
 
+import logging
+logger = logging.getLogger("bkl.vsbase")
+
 import bkl.expr
 from bkl.utils import OrderedDict
 from bkl.error import error_context, warning, Error
@@ -135,8 +138,13 @@ class Node(object):
 class VSExprFormatter(bkl.expr.Formatter):
     list_sep = ";"
 
+    configuration_ref = "$(Configuration)"
+
     def reference(self, e):
-        assert False, "All references should be expanded in VS output"
+        if e.var == "config":
+            return self.configuration_ref
+        else:
+            assert False, "All references should be expanded in VS output"
 
     def bool_value(self, e):
         return "true" if e.value else "false"
@@ -282,6 +290,12 @@ class VSProjectBase(object):
     #: List of dependencies of this project, as names."""
     dependencies = []
 
+    #: List of configuration objects."""
+    configurations = []
+
+    #: Location in the sources where the project originated from
+    source_pos = None
+
 
 class VSSolutionBase(object):
     """
@@ -300,10 +314,9 @@ class VSSolutionBase(object):
         slnfile = module["%s.solutionfile" % toolset.name].as_native_path_for_output(module)
         self.name = module.name
         self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.name)
-        self.projects = []
+        self.projects = OrderedDict()
         self.subsolutions = []
         self.parent_solution = None
-        self.guids_map = {}
         paths_info = bkl.expr.PathAnchorsInfo(
                                     dirsep="\\",
                                     outfile=slnfile,
@@ -317,9 +330,7 @@ class VSSolutionBase(object):
         """
         Adds a project (VSProjectBase-derived object) to the solution.
         """
-        self.guids_map[prj.name] = prj.guid
-        # TODO: store VSProjectBase instances directly here
-        self.projects.append((prj.name, prj.guid, prj.projectfile, prj.dependencies))
+        self.projects[prj.name] = prj
 
     def add_subsolution(self, solution):
         """
@@ -330,7 +341,7 @@ class VSSolutionBase(object):
         solution.parent_solution = self
 
     def all_projects(self):
-        for p in self.projects:
+        for p in self.projects.itervalues():
             yield p
         for sln in self.subsolutions:
             for p in sln.all_projects():
@@ -342,15 +353,15 @@ class VSSolutionBase(object):
             for s in sln.all_subsolutions():
                 yield s
 
-    def _get_project_info(self, id):
-        for p in self.projects:
-            if p[0] == id:
-                return p
-        for sln in self.subsolutions:
-            p = sln._get_project_info(id)
-            if p:
-                return p
-        return None
+    def _get_project_by_id(self, id):
+        try:
+            return self.projects[id]
+        except KeyError:
+            for sln in self.subsolutions:
+                p = sln._get_project_by_id(id)
+                if p:
+                    return p
+            return None
 
     def additional_deps(self):
         """
@@ -364,10 +375,10 @@ class VSSolutionBase(object):
         if top is self:
             return additional
 
-        included = set(x[0] for x in self.all_projects())
+        included = set(x.name for x in self.all_projects())
         todo = set()
-        for name, guid, projectfile, deps in self.all_projects():
-            todo.update(deps)
+        for prj in self.all_projects():
+            todo.update(prj.dependencies)
 
         prev_count = 0
         while prev_count != len(included):
@@ -376,32 +387,90 @@ class VSSolutionBase(object):
             todo_new = set()
             for todo_item in todo:
                 included.add(todo_item)
-                prj = top._get_project_info(todo_item)
-                todo_new.update(prj[3])
+                prj = top._get_project_by_id(todo_item)
+                todo_new.update(prj.dependencies)
                 additional.append(prj)
             todo.update(todo_new)
         return additional
 
     def _find_target_guid_recursively(self, id):
         """Recursively search for the target in all submodules and return its GUID."""
-        if id in self.guids_map:
-            return self.guids_map[id]
-        for sln in self.subsolutions:
-            guid = sln._find_target_guid_recursively(id)
-            if guid:
-                return guid
-        return None
+        try:
+            return self.projects[id].guid
+        except KeyError:
+            for sln in self.subsolutions:
+                guid = sln._find_target_guid_recursively(id)
+                if guid:
+                    return guid
+            return None
 
     def _get_target_guid(self, id):
-        if id in self.guids_map:
-            return self.guids_map[id]
-        else:
+        try:
+            return self.projects[id].guid
+        except KeyError:
             top = self
             while top.parent_solution:
                 top = top.parent_solution
             guid = top._find_target_guid_recursively(id)
             assert guid, "can't find GUID of project '%s'" % id
             return guid
+
+    def _get_matching_project_config(self, cfg, prj):
+        with error_context(prj):
+            if cfg in prj.configurations:
+                return cfg
+
+            # else: try to find a configuration closest to the given one, i.e.
+            # the one from which it inherits via the minimal number of
+            # intermediate configurations:
+            compatibles = []
+            for pc in prj.configurations:
+                degree = cfg.derived_from(pc)
+                if degree:
+                    compatibles.append((degree, pc))
+
+            if not compatibles:
+                # if we don't have any project configurations from which this
+                # one inherits, check if we have any which inherit from this
+                # one themselves as they should be a reasonably good fallback:
+                for pc in prj.configurations:
+                    degree = pc.derived_from(cfg)
+                    if degree:
+                        compatibles.append((degree, pc))
+
+            if compatibles:
+                if len(compatibles) > 1:
+                    compatibles.sort()
+                    # It can happen that we have 2 project configurations
+                    # inheriting from the solution configuration with the same
+                    # degree. In this case there we can't really make the
+                    # right choice automatically, so we must warn the user.
+                    degree = compatibles[0][0]
+                    if compatibles[1][0] == degree:
+                        good_ones = [x[1].name for x in compatibles if x[0] == degree]
+                        warning("project %s: no unambiguous choice of project configuration to use for the solution configuration \"%s\", equally good candidates are: \"%s\"",
+                                prj.projectfile,
+                                cfg.name,
+                                '", "'.join(good_ones))
+
+                degree, ret = compatibles[0]
+                logger.debug("%s: solution config \"%s\" -> project %s config \"%s\" (dg %d)",
+                             self.outf.filename, cfg.name, prj.projectfile, ret.name, degree)
+                return ret
+
+            # if all failed, just pick the first config, but at least try to match
+            # debug/release setting:
+            compatibles = [x for x in prj.configurations if x.is_debug == cfg.is_debug]
+            if compatibles:
+                ret = compatibles[0]
+                warning("project %s: using unrelated project configuration \"%s\" for solution configuration \"%s\"",
+                        prj.projectfile, ret.name, cfg.name)
+                return ret
+            else:
+                ret = prj.configurations[0]
+                warning("project %s: using incompatible project configuration \"%s\" for solution configuration \"%s\"",
+                        prj.projectfile, ret.name, cfg.name)
+                return ret
 
     def write_header(self, file):
         file.write("Microsoft Visual Studio Solution File, Format Version %s\n" % self.format_version)
@@ -414,21 +483,27 @@ class VSSolutionBase(object):
         self.write_header(outf)
 
         # Projects:
-        guids = []
         additional_deps = self.additional_deps()
-        for name, guid, filename, deps in list(self.all_projects()) + additional_deps:
-            guids.append(guid)
+        included_projects = list(self.all_projects()) + additional_deps
+
+        if not included_projects:
+            return # don't write empty solution files
+
+        configurations = []
+        for prj in included_projects:
+            for cfg in prj.configurations:
+                if cfg not in configurations:
+                    configurations.append(cfg)
+
+        for prj in included_projects:
             outf.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\n' %
-                       (name, self.formatter.format(filename), str(guid)))
-            if deps:
+                       (prj.name, self.formatter.format(prj.projectfile), str(prj.guid)))
+            if prj.dependencies:
                 outf.write("\tProjectSection(ProjectDependencies) = postProject\n")
-                for d in deps:
+                for d in prj.dependencies:
                     outf.write("\t\t%(g)s = %(g)s\n" % {'g':self._get_target_guid(d)})
                 outf.write("\tEndProjectSection\n")
             outf.write("EndProject\n")
-
-        if not guids:
-            return # don't write empty solution files
 
         # Folders in the solution:
         all_folders = list(self.all_subsolutions())
@@ -437,7 +512,9 @@ class VSSolutionBase(object):
             extras = AdditionalDepsFolder()
             extras.name = "Additional Dependencies"
             extras.guid = GUID(NAMESPACE_INTERNAL, self.name, extras.name)
-            extras.projects = additional_deps
+            extras.projects = OrderedDict()
+            for prj in additional_deps:
+                extras.projects[prj.name] = prj
             extras.subsolutions = []
             extras.parent_solution = None
             all_folders.append(extras)
@@ -455,15 +532,16 @@ class VSSolutionBase(object):
         # Global settings:
         outf.write("Global\n")
         outf.write("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n")
-        outf.write("\t\tDebug|Win32 = Debug|Win32\n")
-        outf.write("\t\tRelease|Win32 = Release|Win32\n")
+        for cfg in configurations:
+            outf.write("\t\t%s|Win32 = %s|Win32\n" % (cfg.name, cfg.name))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n")
-        for guid in guids:
-            outf.write("\t\t%s.Debug|Win32.ActiveCfg = Debug|Win32\n" % guid)
-            outf.write("\t\t%s.Debug|Win32.Build.0 = Debug|Win32\n" % guid)
-            outf.write("\t\t%s.Release|Win32.ActiveCfg = Release|Win32\n" % guid)
-            outf.write("\t\t%s.Release|Win32.Build.0 = Release|Win32\n" % guid)
+        for prj in included_projects:
+            guid = prj.guid
+            for cfg in configurations:
+                cfgp = self._get_matching_project_config(cfg, prj)
+                outf.write("\t\t%s.%s|Win32.ActiveCfg = %s|Win32\n" % (guid, cfg.name, cfgp.name))
+                outf.write("\t\t%s.%s|Win32.Build.0 = %s|Win32\n" % (guid, cfg.name, cfgp.name))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(SolutionProperties) = preSolution\n")
         outf.write("\t\tHideSolutionNode = FALSE\n")
@@ -474,7 +552,7 @@ class VSSolutionBase(object):
             outf.write("\tGlobalSection(NestedProjects) = preSolution\n")
 
             def _gather_folder_children(sln):
-                prjs = [p for p in sln.projects]
+                prjs = [p for p in sln.projects.itervalues()]
                 slns = []
                 for s in slns:
                     if s.omit_from_tree:
@@ -488,8 +566,7 @@ class VSSolutionBase(object):
             for sln in all_folders:
                 prjs, subslns = _gather_folder_children(sln)
                 for prj in prjs:
-                    prjguid = prj[1]
-                    outf.write("\t\t%s = %s\n" % (prjguid, sln.guid))
+                    outf.write("\t\t%s = %s\n" % (prj.guid, sln.guid))
                 for subsln in subslns:
                     outf.write("\t\t%s = %s\n" % (subsln.guid, sln.guid))
             outf.write("\tEndGlobalSection\n")
@@ -624,7 +701,7 @@ class VSToolsetBase(Toolset):
         Returns list of predefined preprocessor symbols to use.
         """
         defs = ["WIN32"]
-        defs.append("_DEBUG" if cfg == "Debug" else "NDEBUG")
+        defs.append("_DEBUG" if cfg.is_debug else "NDEBUG")
         if is_exe(target):
             defs.append("_CONSOLE")
         elif is_library(target):

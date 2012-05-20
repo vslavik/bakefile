@@ -278,6 +278,89 @@ for *and*, ``||`` for *or*, ``!`` for *not* and ``==`` and ``!=`` for equality
 and inequality tests respectively.
 
 
+Build configurations
+--------------------
+
+A feature common to many IDEs is support for different build configurations,
+i.e. for building the same project using different compilation options.
+Bakefile generates the two standard "Debug" and "Release" configurations by
+default for the toolsets that use them (currently "vs*") but you may also
+define your own *custom configurations*.
+
+Here is a step by step guide to doing this. First, you need to define the new
+configuration. This is done by using a configuration declaration in the global
+scope, i.e. outside of any target, e.g.:
+
+.. code-block:: bkl
+
+    configuration ExtraDebug : Debug {
+    }
+
+The syntax for configuration definition is reminiscent of C++ class definition
+and, as could be expected, the identifier after the colon is the name of the
+*base configuration*. The new configuration inherits the variables defined in
+its base configuration.
+
+Notice that all custom configurations must derive from another existing one,
+which can be either a standard "Debug" or "Release" configuration or a
+previously defined another custom configuration.
+
+Defining a configuration doesn't do anything on its own, it also needs to be
+used by at least some targets. To do it, the custom configuration name must be
+listed in an assignment to the special ``configurations`` variable:
+
+.. code-block:: bkl
+
+    configurations = Debug ExtraDebug Release;
+
+This statement can appear either in the global scope, like above, in which
+case it affects all the targets, or inside one or more targets, in which case
+the specified configuration is only used for these targets. So if you only
+wanted to enable extra debugging for "hello" executable you could do
+
+.. code-block:: bkl
+
+    exe hello {
+        configurations = Debug ExtraDebug Release;
+    }
+
+However even if the configuration is present in the generated project files
+after doing all this, it is still not very useful as no custom options are
+defined for it. To change this, you will usually also want to set some project
+options conditionally depending on the configuration being used, e.g.:
+
+.. code-block:: bkl
+
+    exe hello {
+        if ( $(config) == ExtraDebug ) {
+            defines += EXTRA_DEBUG;
+        }
+    }
+
+``config`` is a special variable automatically set by bakefile to the name of
+the current configuration and may be used in conditional expressions as any
+other variable.
+
+For simple cases like the above, testing ``config`` explicitly is usually all
+you need but in more complex situations it might be preferable to define some
+variables inside the configuration definition and then test these variables
+instead. Here is a complete example doing the same thing as the above snippets
+using this approach:
+
+.. code-block:: bkl
+
+    configuration ExtraDebug : Debug {
+        extra_debug = true;
+    }
+
+    configurations = Debug ExtraDebug Release;
+
+    exe hello {
+        if ( $(extra_debug) ) {
+            defines += EXTRA_DEBUG;
+        }
+    }
+
 
 Submodules
 ----------

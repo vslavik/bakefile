@@ -1,0 +1,28 @@
+
+toolsets = vs2010;
+
+diagnostics = false;
+
+configuration MyDebug : Debug {
+    diagnostics = true;
+}
+
+configuration MyRelease : Release {
+    diagnostics = true;
+}
+
+configurations = Release Debug MyRelease MyDebug;
+
+library helpers {
+    sources { helpers.cpp }
+    // Use only Debug/Release configs for the library
+    configurations = Release Debug;
+}
+
+exe hello {
+    deps += helpers;
+    sources { hello.cpp }
+    if ( $(diagnostics) ) {
+        defines += ENABLE_DIAGNOSTICS;
+    }
+}

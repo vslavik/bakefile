@@ -84,6 +84,9 @@ VCPROJ_CHARSET = "Windows-1252"
 
 
 class VS200xExprFormatter(VSExprFormatter):
+
+    configuration_ref = "$(ConfigurationName)"
+
     def literal(self, e):
         if '"' in e.value:
             return e.value.replace('"', '\\"')
@@ -135,11 +138,13 @@ class VS200xXmlFormatter(XmlFormatter):
 
 # TODO: Put more content into these classes, use them properly
 class VS200xProject(VSProjectBase):
-    def __init__(self, name, guid, projectfile, deps):
+    def __init__(self, name, guid, projectfile, deps, configs, source_pos=None):
         self.name = name
         self.guid = guid
         self.projectfile = projectfile
         self.dependencies = deps
+        self.configurations = configs
+        self.source_pos = source_pos
 
 class VS2003Project(VS200xProject):
     version = 7.1
@@ -173,9 +178,6 @@ class VS200xToolsetBase(VSToolsetBase):
 
     #: Extension of format files
     proj_extension = "vcproj"
-
-    # TODO: temporary hardcoded configs
-    configs = ["Debug", "Release"]
 
     #: Whether /MP switch is supported
     has_parallel_compilation = False
@@ -211,12 +213,12 @@ class VS200xToolsetBase(VSToolsetBase):
 
         n_configs = Node("Configurations")
         root.add(n_configs)
-        for c in self.configs:
-            n = Node("Configuration", Name="%s|Win32" % c)
+        for cfg in target.configurations:
+            n = Node("Configuration", Name="%s|Win32" % cfg.name)
             n_configs.add(n)
             # TODO: handle the defaults in a nicer way
-            if target["outputdir"].as_native_path(paths_info) != paths_info.builddir_abs:
-                n["OutputDirectory"] = target["outputdir"]
+            if cfg["outputdir"].as_native_path(paths_info) != paths_info.builddir_abs:
+                n["OutputDirectory"] = cfg["outputdir"]
             else:
                 n["OutputDirectory"] = "$(SolutionDir)$(ConfigurationName)"
             n["IntermediateDirectory"] = "$(ConfigurationName)"
@@ -228,14 +230,14 @@ class VS200xToolsetBase(VSToolsetBase):
                 n["ConfigurationType"] = typeDynamicLibrary
             else:
                 return None
-            if target["win32-unicode"]:
+            if cfg["win32-unicode"]:
                 n["CharacterSet"] = 1
             self._add_extra_options_to_node(target, n)
 
             for tool in self.tool_functions:
                 if hasattr(self, tool):
                     f_tool = getattr(self, tool)
-                    n_tool = f_tool(target, c)
+                    n_tool = f_tool(target, cfg)
                 else:
                     n_tool = Node("Tool", Name=tool)
                 if n_tool:
@@ -254,19 +256,24 @@ class VS200xToolsetBase(VSToolsetBase):
         f.commit()
 
         target_deps = target["deps"].as_py()
-        return self.Project(target.name, guid, projectfile, target_deps)
+        return self.Project(target.name,
+                            guid,
+                            projectfile,
+                            target_deps,
+                            [x.config for x in target.configurations],
+                            target.source_pos)
 
     def _add_ToolFiles(self, root):
         root.add(Node("ToolFiles"))
 
     def VCPreBuildEventTool(self, target, cfg):
         n = Node("Tool", Name="VCPreBuildEventTool")
-        n["CommandLine"] = VSList("\r\n", target["pre-build-commands"])
+        n["CommandLine"] = VSList("\r\n", cfg["pre-build-commands"])
         return n
 
     def VCPostBuildEventTool(self, target, cfg):
         n = Node("Tool", Name="VCPostBuildEventTool")
-        n["CommandLine"] = VSList("\r\n", target["post-build-commands"])
+        n["CommandLine"] = VSList("\r\n", cfg["post-build-commands"])
         return n
 
     def VCAppVerifierTool(self, target, cfg):
@@ -283,32 +290,32 @@ class VS200xToolsetBase(VSToolsetBase):
         # and C++ flags as they're basically all the same at MSVS level
         # too and all go into the same place in the IDE and same
         # AdditionalOptions node in the project file.
-        all_cflags = VSList(" ", target["compiler-options"],
-                                 target["c-compiler-options"],
-                                 target["cxx-compiler-options"])
+        all_cflags = VSList(" ", cfg["compiler-options"],
+                                 cfg["c-compiler-options"],
+                                 cfg["cxx-compiler-options"])
         if self.has_parallel_compilation:
             all_cflags.append("/MP") # parallel compilation
         n["AdditionalOptions"] = all_cflags
-        n["Optimization"] = optimizeMaxSpeed if cfg == "Release" else optimizeDisabled
-        if cfg == "Release":
+        n["Optimization"] = optimizeDisabled if cfg.is_debug else optimizeMaxSpeed
+        if not cfg.is_debug:
             n["EnableIntrinsicFunctions"] = True
-        n["AdditionalIncludeDirectories"] = target["includedirs"]
-        n["PreprocessorDefinitions"] = list(target["defines"]) + self.get_std_defines(target, cfg)
+        n["AdditionalIncludeDirectories"] = cfg["includedirs"]
+        n["PreprocessorDefinitions"] = list(cfg["defines"]) + self.get_std_defines(target, cfg)
 
-        if not self.has_parallel_compilation and cfg == "Debug":
+        if not self.has_parallel_compilation and cfg.is_debug:
             n["MinimalRebuild"] = True
-        if target["win32-crt-linkage"] == "dll":
-            n["RuntimeLibrary"] = rtMultiThreadedDebugDLL if cfg == "Debug" else rtMultiThreadedDLL
+        if cfg["win32-crt-linkage"] == "dll":
+            n["RuntimeLibrary"] = rtMultiThreadedDebugDLL if cfg.is_debug else rtMultiThreadedDLL
         else:
-            n["RuntimeLibrary"] = rtMultiThreadedDebug if cfg == "Debug" else rtMultiThreaded
+            n["RuntimeLibrary"] = rtMultiThreadedDebug if cfg.is_debug else rtMultiThreaded
 
-        if cfg == "Release":
+        if not cfg.is_debug:
             n["EnableFunctionLevelLinking"] = True
         n["UsePrecompiledHeader"] = pchNone
         n["WarningLevel"] = 3
         if self.detect_64bit_problems:
             n["Detect64BitPortabilityProblems"] = True
-        n["DebugInformationFormat"] = debugEditAndContinue if cfg == "Debug" else debugEnabled
+        n["DebugInformationFormat"] = debugEditAndContinue if cfg.is_debug else debugEnabled
 
         return n
 
@@ -317,26 +324,26 @@ class VS200xToolsetBase(VSToolsetBase):
         if is_library(target):
             return None
         n = Node("Tool", Name="VCLinkerTool")
-        n["AdditionalOptions"] = VSList(" ", target["link-options"])
-        libs = target["libs"]
+        n["AdditionalOptions"] = VSList(" ", cfg["link-options"])
+        libs = cfg["libs"]
         if libs:
             n["AdditionalDependencies"] = VSList(" ", ("%s.lib" % x.as_py() for x in libs))
 
-        targetname = target[target.type.basename_prop]
+        targetname = cfg[target.type.basename_prop]
         if targetname != target.name:
             n["OutputFile"] = concat("$(OutDir)\\", targetname, ".", target.type.target_file(self, target).get_extension())
 
-        if cfg == "Debug":
+        if cfg.is_debug:
             n["LinkIncremental"] = linkIncrementalYes
         else:
             n["LinkIncremental"] = linkIncrementalNo
         # VS: creates debug info for release too; TODO: make this configurable
         n["GenerateDebugInformation"] = True
-        if is_exe(target) and target["win32-subsystem"] == "console":
+        if is_exe(target) and cfg["win32-subsystem"] == "console":
             n["SubSystem"] = subSystemConsole
         else:
             n["SubSystem"] = subSystemWindows
-        if cfg == "Release":
+        if not cfg.is_debug:
             n["OptimizeReferences"] = optReferences
             n["EnableCOMDATFolding"] = optFolding
         n["TargetMachine"] = machineX86
@@ -347,7 +354,7 @@ class VS200xToolsetBase(VSToolsetBase):
         if not is_library(target):
             return None
         n = Node("Tool", Name="VCLibrarianTool")
-        targetname = target[target.type.basename_prop]
+        targetname = cfg[target.type.basename_prop]
         if targetname != target.name:
             n["OutputFile"] = concat("$(OutDir)\\", targetname, ".", target.type.target_file(self, target).get_extension())
         return n
@@ -403,8 +410,8 @@ class VS200xToolsetBase(VSToolsetBase):
 
                 n_file = Node("File", RelativePath=sfile.filename)
                 sources.add(n_file)
-                for cfg in self.configs:
-                    n_cfg = Node("FileConfiguration", Name=cfg)
+                for cfg in target.configurations:
+                    n_cfg = Node("FileConfiguration", Name=cfg.name)
                     tool = Node("Tool", Name="VCCustomBuildTool")
                     tool["CommandLine"] = compiler.commands(self, target, sfile.filename, genname)
                     tool["Outputs"] = genname

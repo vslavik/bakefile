@@ -60,6 +60,7 @@ def detect_self_references(model):
         path = Visitor.visit_children
         bool = Visitor.visit_children
         if_ = Visitor.visit_children
+        placeholder = Visitor.noop
 
         def reference(self, e):
             var = e.context.get_variable(e.var)
@@ -108,6 +109,7 @@ def detect_unused_vars(model):
         path = Visitor.visit_children
         bool = Visitor.visit_children
         if_ = Visitor.visit_children
+        placeholder = Visitor.noop
 
         def reference(self, e):
             var = e.get_variable()
@@ -125,7 +127,9 @@ def detect_unused_vars(model):
                 #        declaration similar to Property, with type checking and
                 #        automated docs and all. Then test for it here as other
                 #        properties are tested for.
-                not regex_vs_option.match(var.name)):
+                not regex_vs_option.match(var.name) and
+                # FIXME: Handle this case properly.
+                var.name != "configurations"):
             warning('variable "%s" is never used', var.name, pos=var.value.pos)
 
 
@@ -263,6 +267,7 @@ class PathsNormalizer(Visitor):
     bool_value = Visitor.noop
     null = Visitor.noop
     reference = Visitor.noop
+    placeholder = Visitor.noop
     concat = Visitor.visit_children
     list = Visitor.visit_children
     bool = Visitor.visit_children

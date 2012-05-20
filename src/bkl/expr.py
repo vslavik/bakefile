@@ -188,12 +188,20 @@ class NullExpr(Expr):
         return "null"
 
 
-class UndeterminedExpr(Expr):
+class PlaceholderExpr(Expr):
     """
     This is a hack. It is used as placeholder for expressions with not yet known value.
     In particular, it is used for the "toolset" property before the model is split into
     toolset-specific copies, to allow partial evaluation common to all of them.
+
+    .. attribute:: var
+
+       Name of referenced setting (e.g. "config" or "toolset").
     """
+    def __init__(self, var, pos=None):
+        super(PlaceholderExpr, self).__init__(pos)
+        self.var = var
+
     def as_py(self):
         raise NonConstError(self)
 
@@ -604,6 +612,11 @@ class Visitor(object):
         raise NotImplementedError
 
     @abstractmethod
+    def placeholder(self, e):
+        """Called on :class:`PlaceholderExpr` expressions."""
+        raise NotImplementedError
+
+    @abstractmethod
     def path(self, e):
         """Called on :class:`PathExpr` expressions."""
         raise NotImplementedError
@@ -624,15 +637,16 @@ class Visitor(object):
         raise NotImplementedError
 
     _dispatch = {
-        NullExpr      : lambda self,e: self.null(e),
-        LiteralExpr   : lambda self,e: self.literal(e),
-        ListExpr      : lambda self,e: self.list(e),
-        ConcatExpr    : lambda self,e: self.concat(e),
-        ReferenceExpr : lambda self,e: self.reference(e),
-        PathExpr      : lambda self,e: self.path(e),
-        BoolValueExpr : lambda self,e: self.bool_value(e),
-        BoolExpr      : lambda self,e: self.bool(e),
-        IfExpr        : lambda self,e: self.if_(e),
+        NullExpr         : lambda self,e: self.null(e),
+        LiteralExpr      : lambda self,e: self.literal(e),
+        ListExpr         : lambda self,e: self.list(e),
+        ConcatExpr       : lambda self,e: self.concat(e),
+        ReferenceExpr    : lambda self,e: self.reference(e),
+        PlaceholderExpr  : lambda self,e: self.placeholder(e),
+        PathExpr         : lambda self,e: self.path(e),
+        BoolValueExpr    : lambda self,e: self.bool_value(e),
+        BoolExpr         : lambda self,e: self.bool(e),
+        IfExpr           : lambda self,e: self.if_(e),
     }
 
     #: Helper to quickly implement handler functions that do nothing.
@@ -658,6 +672,81 @@ class Visitor(object):
             self.visit(e.cond)
             self.visit(e.value_yes)
             self.visit(e.value_no)
+
+
+class RewritingVisitor(Visitor):
+    """
+    Base class for visitors that perform some changes to the expression.
+
+    RewritingVisitor is smart about the rewrites and if nothing changes,
+    returns the same instance, instead of creating an identical copy.
+
+    It also implements all Visitor methods to do the right thing by default, so
+    you only need to override the ones that are of interest. Default
+    implementations of the others will do the right thing: for example, if an
+    item in the list is rewritten, the list() method will detect it and return
+    a new list.
+    """
+
+    def _process_children(self, children):
+        """
+        Process all items from the *children* list. Returns a tuple of two
+        items: the first one is the new list of items, the second one is a
+        boolean value indicating whether anything changed.
+        """
+        new = []
+        changed = False
+        for i in children:
+            j = self.visit(i)
+            if i is not j:
+                changed = True
+            if isinstance(j, NullExpr):
+                changed = True
+            else:
+                new.append(j)
+        if not changed:
+            new = children
+        return (new, changed)
+
+    bool_value = Visitor.noop
+    literal = Visitor.noop
+    null = Visitor.noop
+    reference = Visitor.noop
+    placeholder = Visitor.noop
+
+    def list(self, e):
+        new, changed = self._process_children(e.items)
+        if not changed:
+            return e
+        return ListExpr(new, pos=e.pos)
+
+    def concat(self, e):
+        # merge concatenated literals:
+        items, changed = self._process_children(e.items)
+        if not changed:
+            return e
+        return ConcatExpr(items, pos=e.pos)
+
+    def path(self, e):
+        components, changed = self._process_children(e.components)
+        if not changed:
+            return e
+        return PathExpr(components, e.anchor, pos=e.pos)
+
+    def bool(self, e):
+        left = self.visit(e.left)
+        right = None if e.right is None else self.visit(e.right)
+        if left is e.left and right is e.right:
+            return e
+        return BoolExpr(e.operator, left, right, pos=e.pos)
+
+    def if_(self, e):
+        cond = self.visit(e.cond)
+        yes = self.visit(e.value_yes)
+        no = self.visit(e.value_no)
+        if cond is e.cond and yes is e.value_yes and no is e.value_no:
+            return e
+        return IfExpr(cond, yes, no, pos=e.pos)
 
 
 class PathAnchorsInfo(object):
@@ -825,6 +914,9 @@ class Formatter(Visitor):
         # cannot be determined.
         return self.format(e.get_value())
 
+    def placeholder(self, e):
+        return self.reference(e)
+
 
 class CondTrackingMixin:
     """
@@ -902,7 +994,7 @@ def split(e, sep):
         else:
             return [e]
 
-    elif isinstance(e, NullExpr) or isinstance(e, UndeterminedExpr):
+    elif isinstance(e, NullExpr) or isinstance(e, PlaceholderExpr):
         return [e]
 
     else:
@@ -926,6 +1018,9 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
 
     def reference(self, e):
         return self.visit(e.get_value())
+
+    def placeholder(self, e):
+        return [(self.active_if_cond, e)]
 
     def bool(self, e):
         assert False, "this should never be called"

@@ -32,6 +32,7 @@ options {
 
 tokens {
     // Tokens used in the output AST, but not in lexer:
+    NIL;
     PROGRAM;
     ID;
     ASSIGN;
@@ -46,6 +47,7 @@ tokens {
     TARGET;
     FILES_LIST;
     SUBMODULE;
+    CONFIGURATION;
 }
 
 scope StmtScope {
@@ -76,6 +78,7 @@ stmt_outside_target
     : target_stmt
     | submodule_stmt
     | requires_stmt
+    | configuration_stmt
     ;
 
 // and those only allowed inside target:
@@ -109,6 +112,15 @@ requires_stmt
       // may mean that the input will be unparseable:
       { self.check_version($t) } -> // produce no AST
     ;
+
+configuration_stmt
+    : 'configuration' name=literal
+      (configuration_assignments | ';')  -> ^(CONFIGURATION $name NIL configuration_assignments?)
+    | 'configuration' name=literal ':' base=literal
+      (configuration_assignments | ';')  -> ^(CONFIGURATION $name $base configuration_assignments?)
+    ;
+
+configuration_assignments : '{' assignment_stmt* '}' -> assignment_stmt*;
 
 // ---------------------------------------------------------------------------
 // Expressions
