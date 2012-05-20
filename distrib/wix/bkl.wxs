@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product
-        Id="E2DC5E3C-FE8E-4A6E-ABCD-DE5094579B0D"
+        Id="*"
         Name="Bakefile"
         Language="1033"
         Version="1.1.0.0"
@@ -9,6 +9,7 @@
         UpgradeCode="3333163D-CC42-4920-B26E-E4B58611ABCF">
 
         <Package Compressed="yes"/>
+        <MajorUpgrade DowngradeErrorMessage='A more recent version of [ProductName] is already installed.'/>
         <Media Id="1" Cabinet="main.cab" EmbedCab="yes"/>
 
         <Directory Id="TARGETDIR" Name="SourceDir">
