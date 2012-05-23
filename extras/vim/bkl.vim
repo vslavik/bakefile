@@ -9,7 +9,7 @@ endif
 
 syn case match
 syn sync fromstart
-set isk+=.,-
+setl isk+=.,-
 
 " Simple keywords that can occur anywhere (this is not really true for
 " bklTarget but we can't easily avoid recognizing it inside another target).
