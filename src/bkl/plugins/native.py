@@ -213,6 +213,11 @@ class NativeCompiledType(TargetType):
 
 class NativeLinkedType(NativeCompiledType):
     properties = [
+            Property("libdirs",
+                 type=ListType(PathType()),
+                 default=[],
+                 inheritable=True,
+                 doc="Additional directories where to look for libraries."),
             Property("link-options",
                  type=ListType(StringType()),
                  default=[],
