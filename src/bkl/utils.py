@@ -115,3 +115,20 @@ class memoized(object):
     def __get__(self, obj, objtype):
         """Support instance methods."""
         return functools.partial(self.__call__, obj)
+
+
+class memoized_property(object):
+    """
+    Decorator for lazily evaluated properties.
+
+    Use as the `@property` decorator. The method will only be called once,
+    though. Subsequent uses of the property will use the previously returned
+    value.
+    """
+    def __init__(self, func):
+        self.func = func
+
+    def __get__(self, obj, ownerClass=None):
+        x = self.func(obj)
+        setattr(obj, self.func.__name__, x)
+        return x

@@ -31,7 +31,7 @@ from bkl.model import Configuration
 from bkl.vartypes import PathType
 from bkl.error import Error, error_context
 from bkl.plugins.vsbase import VSProjectBase
-from bkl.utils import memoized
+from bkl.utils import memoized_property
 
 import xml.etree.ElementTree
 
@@ -101,8 +101,7 @@ class VSExternalProjectBase(VSProjectBase):
         xmldoc = xml.etree.ElementTree.parse(self.projectfile.as_native_path_for_output(target))
         self.xml = xmldoc.getroot()
 
-    @property
-    @memoized
+    @memoized_property
     def configurations(self):
         known = self._known_configurations
         lst = []
@@ -125,8 +124,7 @@ class VSExternalProject200x(VSExternalProjectBase):
     """
     Wrapper around VS 200{3,5,8} project files.
     """
-    @property
-    @memoized
+    @memoized_property
     def version(self):
         v = self.xml.get("Version")
         if   v == "7.10": return 7.1
@@ -136,13 +134,11 @@ class VSExternalProject200x(VSExternalProjectBase):
             raise Error("unrecognized version of Visual Studio project %s: Version=\"%s\"",
                         self.projectfile, v)
 
-    @property
-    @memoized
+    @memoized_property
     def name(self):
         return self.xml.get("Name")
 
-    @property
-    @memoized
+    @memoized_property
     def guid(self):
         return self.xml.get("ProjectGUID")
 
@@ -155,8 +151,7 @@ class VSExternalProject201x(VSExternalProjectBase):
     """
     Wrapper around VS 2010/11 project files.
     """
-    @property
-    @memoized
+    @memoized_property
     def version(self):
         v = self.xml.get("ToolsVersion")
         if v != "4.0":
@@ -169,14 +164,12 @@ class VSExternalProject201x(VSExternalProjectBase):
         else:
             return 10
 
-    @property
-    @memoized
+    @memoized_property
     def name(self):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
         return self.xml.findtext("ms:PropertyGroup/ms:RootNamespace", namespaces=VS_NAMESPACES)
 
-    @property
-    @memoized
+    @memoized_property
     def guid(self):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
         return self.xml.findtext("ms:PropertyGroup/ms:ProjectGuid", namespaces=VS_NAMESPACES)
