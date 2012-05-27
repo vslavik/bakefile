@@ -49,7 +49,7 @@ syn keyword	bklLibProp	libname contained
 " exe/lib/dll ones.
 syn keyword	bklBuildProp	archs configurations contained
 syn keyword	bklBuildProp	compiler-options c-compiler-options cxx-compiler-options contained
-syn keyword	bklBuildProp	defines headers includedirs libs link-options outputdir sources contained
+syn keyword	bklBuildProp	defines headers includedirs libdirs libs link-options outputdir sources contained
 
 syn keyword	bklBool 	false true contained
 syn region	bklBoolRHS	matchgroup=Normal start="= *" end=";" contains=bklBool contained

@@ -193,6 +193,10 @@ class VS201xToolsetBase(VSToolsetBase):
                 n_link.add("EnableCOMDATFolding", True)
                 n_link.add("OptimizeReferences", True)
             if not is_library(target):
+                libdirs = VSList(";", cfg["libdirs"])
+                if libdirs:
+                    libdirs.append("%(AdditionalLibraryDirectories)")
+                    n_link.add("AdditionalLibraryDirectories", libdirs)
                 ldflags = VSList(" ", cfg["link-options"])
                 if ldflags:
                     ldflags.append("%(AdditionalOptions)")

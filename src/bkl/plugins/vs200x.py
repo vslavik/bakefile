@@ -329,6 +329,8 @@ class VS200xToolsetBase(VSToolsetBase):
         if libs:
             n["AdditionalDependencies"] = VSList(" ", ("%s.lib" % x.as_py() for x in libs))
 
+        n["AdditionalLibraryDirectories"] = cfg["libdirs"]
+
         targetname = cfg[target.type.basename_prop]
         if targetname != target.name:
             n["OutputFile"] = concat("$(OutDir)\\", targetname, ".", target.type.target_file(self, target).get_extension())

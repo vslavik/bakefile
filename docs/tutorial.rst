@@ -170,14 +170,24 @@ could do
 
 
 Similarly, any non trivial project usually links with some external libraries.
-To specify these libraries, you need to assign to the ``libs``
-property:
+To specify these libraries, you need to assign to the ``libs`` property and
+also may need to set ``libdirs`` if these libraries are not present in the
+standard search path:
 
 .. code-block:: bkl
 
     exe hello {
-        libs = foo;
+        libdirs = ../3rdparty/somelib/lib;
+        libs = somelib;
     }
+
+Notice that you only need to do the latter if the libraries are not built as
+part of the same project, otherwise you should simply list them as
+dependencies as shown in the next section.
+
+And if you need to use any other linker option you can specify it using
+``link-options`` property. As with compiler options, you would normally test
+for the toolkit before doing it as linker options are toolset-specific.
 
 
 Multiple Modules
