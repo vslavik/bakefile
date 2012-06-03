@@ -81,13 +81,12 @@ class VS201xToolsetBase(VSToolsetBase):
             n_configs.add(n)
         root.add(n_configs)
 
-        self._set_VCTargetsPath(root)
-
         n_globals = Node("PropertyGroup", Label="Globals")
         self._add_extra_options_to_node(target, n_globals)
         n_globals.add("ProjectGuid", guid)
         n_globals.add("Keyword", "Win32Proj")
         n_globals.add("RootNamespace", target.name)
+        self._add_VCTargetsPath(n_globals)
         root.add(n_globals)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.Default.props")
@@ -106,12 +105,12 @@ class VS201xToolsetBase(VSToolsetBase):
                 return None
 
             n.add("UseDebugLibraries", cfg.is_debug)
-            if self.platform_toolset:
-                n.add("PlatformToolset", self.platform_toolset)
             if cfg["win32-unicode"]:
                 n.add("CharacterSet", "Unicode")
             else:
                 n.add("CharacterSet", "MultiByte")
+            if self.platform_toolset:
+                n.add("PlatformToolset", self.platform_toolset)
             root.add(n)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.props")
@@ -280,7 +279,7 @@ class VS201xToolsetBase(VSToolsetBase):
                             [x.config for x in target.configurations],
                             target.source_pos)
 
-    def _set_VCTargetsPath(self, root):
+    def _add_VCTargetsPath(self, node):
         pass
 
     def _add_extra_options_to_node(self, target, node):
@@ -417,9 +416,7 @@ class VS2012Toolset(VS201xToolsetBase):
     Solution = VS2012Solution
     Project = VS2012Project
 
-    def _set_VCTargetsPath(self, root):
-        n = Node("PropertyGroup", Label="Globals")
-        root.add(n)
-        n.add(Node("VCTargetsPath",
-                   "$(VCTargetsPath11)",
-                   Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''"))
+    def _add_VCTargetsPath(self, node):
+        node.add(Node("VCTargetsPath",
+                      "$(VCTargetsPath11)",
+                      Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''"))
