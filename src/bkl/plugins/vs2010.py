@@ -48,7 +48,7 @@ class VS2010Project(VSProjectBase):
 
 
 class VS201xToolsetBase(VSToolsetBase):
-    """Base class for VS2010 and VS11 toolsets."""
+    """Base class for VS2010 and VS2012 toolsets."""
 
     #: Extension of format files
     proj_extension = "vcxproj"
@@ -379,43 +379,43 @@ class VS2010Toolset(VS201xToolsetBase):
 
 
 
-class VS11Solution(VS2010Solution):
+class VS2012Solution(VS2010Solution):
     format_version = "12.00"
-    human_version = "11"
+    human_version = "2012"
 
 
-class VS11Project(VS2010Project):
+class VS2012Project(VS2010Project):
     version = 11
 
 
-class VS11Toolset(VS201xToolsetBase):
+class VS2012Toolset(VS201xToolsetBase):
     """
-    Visual Studio 11.
+    Visual Studio 2012.
 
 
     Special properties
     ------------------
     This toolset supports the same special properties that
     :ref:`ref_toolset_vs2010`. The only difference is that they are prefixed
-    with ``vs11.option.`` instead of ``vs2010.option.``, i.e. the nodes are:
+    with ``vs2012.option.`` instead of ``vs2010.option.``, i.e. the nodes are:
 
-      - ``vs11.option.Globals.*``
-      - ``vs11.option.Configuration.*``
-      - ``vs11.option.*`` (this is the unnamed ``PropertyGroup`` with
+      - ``vs2012.option.Globals.*``
+      - ``vs2012.option.Configuration.*``
+      - ``vs2012.option.*`` (this is the unnamed ``PropertyGroup`` with
         global settings such as ``TargetName``)
-      - ``vs11.option.ClCompile.*``
-      - ``vs11.option.Link.*``
-      - ``vs11.option.Lib.*``
+      - ``vs2012.option.ClCompile.*``
+      - ``vs2012.option.Link.*``
+      - ``vs2012.option.Lib.*``
 
     """
 
-    name = "vs11"
+    name = "vs2012"
 
     version = 11
     proj_versions = [10, 11]
     platform_toolset = "v110"
-    Solution = VS11Solution
-    Project = VS11Project
+    Solution = VS2012Solution
+    Project = VS2012Project
 
     def _set_VCTargetsPath(self, root):
         n = Node("PropertyGroup", Label="Globals")
