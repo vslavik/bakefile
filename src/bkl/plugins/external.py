@@ -149,7 +149,7 @@ class VSExternalProject200x(VSExternalProjectBase):
 
 class VSExternalProject201x(VSExternalProjectBase):
     """
-    Wrapper around VS 2010/11 project files.
+    Wrapper around VS 2010/2012 project files.
     """
     @memoized_property
     def version(self):

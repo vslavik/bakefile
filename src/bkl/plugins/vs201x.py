@@ -48,7 +48,7 @@ class VS2010Project(VSProjectBase):
 
 
 class VS201xToolsetBase(VSToolsetBase):
-    """Base class for VS2010 and VS11 toolsets."""
+    """Base class for VS2010 and VS2012 toolsets."""
 
     #: Extension of format files
     proj_extension = "vcxproj"
@@ -81,13 +81,12 @@ class VS201xToolsetBase(VSToolsetBase):
             n_configs.add(n)
         root.add(n_configs)
 
-        self._set_VCTargetsPath(root)
-
         n_globals = Node("PropertyGroup", Label="Globals")
         self._add_extra_options_to_node(target, n_globals)
         n_globals.add("ProjectGuid", guid)
         n_globals.add("Keyword", "Win32Proj")
         n_globals.add("RootNamespace", target.name)
+        self._add_VCTargetsPath(n_globals)
         root.add(n_globals)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.Default.props")
@@ -106,12 +105,12 @@ class VS201xToolsetBase(VSToolsetBase):
                 return None
 
             n.add("UseDebugLibraries", cfg.is_debug)
-            if self.platform_toolset:
-                n.add("PlatformToolset", self.platform_toolset)
             if cfg["win32-unicode"]:
                 n.add("CharacterSet", "Unicode")
             else:
                 n.add("CharacterSet", "MultiByte")
+            if self.platform_toolset:
+                n.add("PlatformToolset", self.platform_toolset)
             root.add(n)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.props")
@@ -284,7 +283,7 @@ class VS201xToolsetBase(VSToolsetBase):
                             [x.config for x in target.configurations],
                             target.source_pos)
 
-    def _set_VCTargetsPath(self, root):
+    def _add_VCTargetsPath(self, node):
         pass
 
     def _add_extra_options_to_node(self, target, node):
@@ -383,47 +382,45 @@ class VS2010Toolset(VS201xToolsetBase):
 
 
 
-class VS11Solution(VS2010Solution):
+class VS2012Solution(VS2010Solution):
     format_version = "12.00"
-    human_version = "11"
+    human_version = "2012"
 
 
-class VS11Project(VS2010Project):
+class VS2012Project(VS2010Project):
     version = 11
 
 
-class VS11Toolset(VS201xToolsetBase):
+class VS2012Toolset(VS201xToolsetBase):
     """
-    Visual Studio 11.
+    Visual Studio 2012.
 
 
     Special properties
     ------------------
     This toolset supports the same special properties that
     :ref:`ref_toolset_vs2010`. The only difference is that they are prefixed
-    with ``vs11.option.`` instead of ``vs2010.option.``, i.e. the nodes are:
+    with ``vs2012.option.`` instead of ``vs2010.option.``, i.e. the nodes are:
 
-      - ``vs11.option.Globals.*``
-      - ``vs11.option.Configuration.*``
-      - ``vs11.option.*`` (this is the unnamed ``PropertyGroup`` with
+      - ``vs2012.option.Globals.*``
+      - ``vs2012.option.Configuration.*``
+      - ``vs2012.option.*`` (this is the unnamed ``PropertyGroup`` with
         global settings such as ``TargetName``)
-      - ``vs11.option.ClCompile.*``
-      - ``vs11.option.Link.*``
-      - ``vs11.option.Lib.*``
+      - ``vs2012.option.ClCompile.*``
+      - ``vs2012.option.Link.*``
+      - ``vs2012.option.Lib.*``
 
     """
 
-    name = "vs11"
+    name = "vs2012"
 
     version = 11
     proj_versions = [10, 11]
     platform_toolset = "v110"
-    Solution = VS11Solution
-    Project = VS11Project
+    Solution = VS2012Solution
+    Project = VS2012Project
 
-    def _set_VCTargetsPath(self, root):
-        n = Node("PropertyGroup", Label="Globals")
-        root.add(n)
-        n.add(Node("VCTargetsPath",
-                   "$(VCTargetsPath11)",
-                   Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''"))
+    def _add_VCTargetsPath(self, node):
+        node.add(Node("VCTargetsPath",
+                      "$(VCTargetsPath11)",
+                      Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''"))
