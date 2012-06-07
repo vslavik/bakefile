@@ -18,6 +18,8 @@ import sys, os
 # absolute, like shown here.
 sys.path.append(os.path.abspath('../src'))
 
+import bkl.version
+
 # General configuration
 # ---------------------
 
@@ -42,9 +44,9 @@ copyright = '2009-2012 Vaclav Slavik'
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '0.5'
+version = '%d.%d' % bkl.version.get_version_tuple()[0:2]
 # The full version, including alpha/beta/rc tags.
-release = '0.5'
+release = bkl.version.get_version()
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
