@@ -85,8 +85,10 @@ class ExternalTargetType(TargetType):
 # Support for Visual Studio projects
 # -----------------------------------------------------------------------
 
-VS_NAMESPACES = {
-    "ms": "http://schemas.microsoft.com/developer/msbuild/2003"
+# TODO-PY26: use namespaces={...} argument to findtext() instead of using this
+# to substitute %s (see git history)
+XMLNS = {
+    "ms" : "http://schemas.microsoft.com/developer/msbuild/2003"
 }
 
 class VSExternalProjectBase(VSProjectBase):
@@ -158,7 +160,7 @@ class VSExternalProject201x(VSExternalProjectBase):
             raise Error("unrecognized version of Visual Studio project %s: ToolsVersion=\"%s\"",
                         self.projectfile, v)
         # TODO-PY26: use "PropertyGroup[@Label='Configuration']"
-        t = self.xml.findtext("ms:PropertyGroup/ms:PlatformToolset", namespaces=VS_NAMESPACES)
+        t = self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}PlatformToolset" % XMLNS)
         if t == "v110":
             return 11
         else:
@@ -167,17 +169,17 @@ class VSExternalProject201x(VSExternalProjectBase):
     @memoized_property
     def name(self):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
-        return self.xml.findtext("ms:PropertyGroup/ms:RootNamespace", namespaces=VS_NAMESPACES)
+        return self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}RootNamespace" % XMLNS)
 
     @memoized_property
     def guid(self):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
-        return self.xml.findtext("ms:PropertyGroup/ms:ProjectGuid", namespaces=VS_NAMESPACES)
+        return self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}ProjectGuid" % XMLNS)
 
     def _extract_configurations_names(self):
         # TODO-PY26: use "ItemGroup[@Label='ProjectConfigurations']"
         return [x.text for x in
-                self.xml.findall("ms:ItemGroup/ms:ProjectConfiguration/ms:Configuration", namespaces=VS_NAMESPACES)]
+                self.xml.findall("{%(ms)s}ItemGroup/{%(ms)s}ProjectConfiguration/{%(ms)s}Configuration" % XMLNS)]
 
 
 
