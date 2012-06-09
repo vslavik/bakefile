@@ -27,7 +27,7 @@ from ..expr import *
 from ..model import Module, Target, Variable, SourceFile
 from ..parser.ast import *
 from ..error import ParserError, error_context, warning
-from ..vartypes import ListType
+from ..vartypes import ListType, AnyType
 
 
 class Builder(object, CondTrackingMixin):
@@ -158,8 +158,12 @@ class Builder(object, CondTrackingMixin):
             # modify existing variable
             if append:
                 if not isinstance(var.type, ListType):
-                    raise ParserError('cannot append to non-list variable "%s" (type: %s)' %
-                                      (varname, var.type))
+                    if isinstance(var.type, AnyType):
+                        # if the type is undetermined, it can as well be a list
+                        var.type = ListType(var.type)
+                    else:
+                        raise ParserError('cannot append to non-list variable "%s" (type: %s)' %
+                                          (varname, var.type))
                 if isinstance(value, ListExpr):
                     new_values = value.items
                 else:
