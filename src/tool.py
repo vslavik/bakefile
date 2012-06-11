@@ -131,7 +131,10 @@ try:
         intr.limit_toolsets(options.toolsets)
     intr.process_file(args[0])
 except KeyboardInterrupt:
-    sys.exit(2)
+    if options.debug:
+        raise
+    else:
+        sys.exit(2)
 except IOError as e:
     if options.debug:
         raise
