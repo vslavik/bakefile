@@ -35,7 +35,7 @@ import simplify
 import bkl.vartypes
 import bkl.expr
 import bkl.model
-from bkl.error import Error, NonConstError, warning
+from bkl.error import Error, NonConstError, TypeError, warning
 from bkl.expr import Visitor
 from bkl.utils import memoized
 
@@ -148,7 +148,12 @@ def normalize_and_validate_vars(model):
 
     logger.debug("checking types of variables")
     for var in model.all_variables():
-        var.type.validate(var.value)
+        try:
+            var.type.validate(var.value)
+        except TypeError as err:
+            # TODO: add this as a remark to the error object
+            err.msg = "variable \"%s\" (%s): %s" % (var.name, var.type, err.msg)
+            raise
 
 
 def remove_disabled_model_parts(model, toolset):

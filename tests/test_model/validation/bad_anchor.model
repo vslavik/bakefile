@@ -1,2 +1,2 @@
 ERROR:
-validation/bad_anchor.bkl:3:32: expression "@invalid/bar.c" is not a valid path value: invalid anchor "@invalid"
+validation/bad_anchor.bkl:3:32: variable "_filename" (path): expression "@invalid/bar.c" is not a valid path value: invalid anchor "@invalid"
