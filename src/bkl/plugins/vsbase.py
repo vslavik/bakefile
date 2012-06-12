@@ -251,11 +251,17 @@ class XmlFormatter(object):
         elif isinstance(val, types.BooleanType):
             return self.expr_formatter.bool_value(bkl.expr.BoolValueExpr(val))
         elif isinstance(val, types.ListType):
-            return self.expr_formatter.list_sep.join(self.format_value(x) for x in val)
+            return self.expr_formatter.list_sep.join(self._formatted_list_items(val))
         elif isinstance(val, VSList):
-            return val.list_sep.join(self.format_value(x) for x in val)
+            return val.list_sep.join(self._formatted_list_items(val))
         else:
             return str(val)
+
+    def _formatted_list_items(self, items):
+        for x in items:
+            f = self.format_value(x)
+            if f:
+                yield f
 
     def _get_quoted_nonempty_attrs(self, n):
         ret = []
