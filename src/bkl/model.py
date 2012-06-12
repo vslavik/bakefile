@@ -215,25 +215,50 @@ class ModelPart(object):
             return None
 
 
-    def get_variable(self, name, recursively=False):
+    def get_variable(self, name):
+        """
+        Returns variable object for given variable or None if it is not
+        defined *at this scope*.
+
+        This method does not do any recursive resolution or account for
+        properties and their default values; it merely gets the variable object
+        if it is defined at this scope.
+
+        .. seealso:: :meth:`get_variable_value()`, :meth:`resolve_variable()`
+        """
+        try:
+            return self.variables[name]
+        except KeyError:
+            return None
+
+
+    def resolve_variable(self, name):
         """
         Returns variable object for given variable or None if it is not
         defined.
 
-        :param recursively: Look for the variable recursively in the parent.
+        Unlike :meth:`get_variable()`, this method does perform recursive
+        resolution and finds the variable (if it exists) according to the same
+        rules that apply to `$(...)` expressions and to
+        :meth:`get_variable_value()`.
 
-        .. seealso:: :meth:`get_variable_value()`
+        .. seealso:: :meth:`get_variable()`, :meth:`get_variable_value()`
 
         .. note:: Unlike :meth:`get_variable_value()`, this method doesn't
                   look for properties' default values.
         """
-        if name in self.variables:
-            return self.variables[name]
-        else:
-            if recursively and self.parent is not None:
-                return self.parent.get_variable(name, recursively)
-            else:
-                return None
+        var = self.get_variable(name)
+        if var is not None:
+            return var
+
+        if self.parent:
+            # there may be a property with this name; if so, we must check it for
+            # its 'inheritable' flag:
+            p = self.get_prop(name)
+            can_inherit = (p is None) or p.inheritable
+            if can_inherit:
+                return self.parent.resolve_variable(name)
+        return None
 
 
     def get_variable_value(self, name):
@@ -255,33 +280,21 @@ class ModelPart(object):
         As a shorthand syntax for this function, key indices may be used:
         >>> target["includedirs"]
 
-        .. seealso:: :meth:`get_variable()`
+        .. seealso:: :meth:`resolve_variable()`
         """
-        var = self.get_variable(name)
-
+        var = self.resolve_variable(name)
         if var is not None:
             return var.value
 
-        # there may be a property with this name (with default value):
-        p = self.get_prop(name)
-        if p is not None:
-            if p.inheritable:
-                # try to obtain the value from higher scope
-                higher = self.parent
-                while higher is not None:
-                    var = higher.get_variable(name)
-                    if var is not None:
-                        return var.value
-                    higher = higher.parent
-                # that failed, so try default value as with non-inheritables
-            return p.default_expr(self)
-        else: # p is None
-            # 'name' is not a property, so it can only be a user-defined
-            # variable. Try to find it at a higher scope.
-            if self.parent:
-                return self.parent.get_variable_value(name)
-            else:
-                raise error.UndefinedError("unknown variable \"%s\"" % name)
+        # there may be a property with this name; try to find it and use its
+        # default value
+        scope = self
+        while scope:
+            p = scope.get_prop(name)
+            if p is not None:
+                return p.default_expr(self)
+            scope = scope.parent
+        raise error.UndefinedError("unknown variable \"%s\"" % name)
 
 
     def add_variable(self, var):
@@ -339,7 +352,7 @@ class ModelPart(object):
         for p in self.enum_props():
             if p.toolsets and toolset not in p.toolsets:
                 continue
-            if self.get_variable(p.name, recursively=p.inheritable) is None:
+            if self.resolve_variable(p.name) is None:
                 var = Variable.from_property(p, p.default_expr(self))
                 self.add_variable(var)
                 logger.debug("%s: setting default of %s: %s", self, var.name, var.value)

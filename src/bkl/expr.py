@@ -247,8 +247,8 @@ class ReferenceExpr(Expr):
         variable doesn't exist or when the reference is to a property that
         wasn't explicitly set and uses the default value.
         """
-        # recursive lookup corresponds to what get_variable_value() does
-        return self.context.get_variable(self.var, recursively=True)
+        with error_context(self):
+            return self.context.resolve_variable(self.var)
 
     def __nonzero__(self):
         return bool(self.get_value())

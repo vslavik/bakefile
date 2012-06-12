@@ -107,33 +107,22 @@ class Builder(object, CondTrackingMixin):
 
 
     def on_assignment(self, node):
-        varname = node.var
         append = node.append
         value = self._build_expression(node.value)
-        var = self.context.get_variable(varname)
+        has_cond = self.active_if_cond is not None
 
+        varname = node.var
         if varname[0] == "_":
             warning("variable names beginning with underscore are reserved for internal use (\"%s\")",
                     varname, pos=node.pos)
 
-        has_cond = self.active_if_cond is not None
-        if has_cond:
-            if append and isinstance(value, ListExpr):
-                # If conditionally appending more items to an existing list,
-                # it's better to associate the condition with individual items.
-                ifs = [IfExpr(self.active_if_cond,
-                              yes=i,
-                              no=NullExpr(),
-                              pos=i.pos)
-                       for i in value.items]
-                value = ListExpr(ifs, pos=value.pos)
-            else:
-                # But when just setting the value, keep it all together as
-                # a single value inside single IfExpr.
-                value = IfExpr(self.active_if_cond,
-                               yes=value,
-                               no=NullExpr(),
-                               pos=node.pos)
+        var = self.context.get_variable(varname)
+        if var is None:
+            # the variable may still exist in a higher scope, in which case we
+            # need to inherit the value from that, not from a property
+            previous_value = self.context.resolve_variable(varname)
+        else:
+            previous_value = var
 
         if var is None:
             # If there's an appropriate property with the same name, then
@@ -148,39 +137,69 @@ class Builder(object, CondTrackingMixin):
                     propval = NullExpr() # we'll set it below
                 var = Variable.from_property(prop, propval)
                 self.context.add_variable(var)
+                # and if we didn't get previous value from anywhere else yet,
+                # we'll need to use the property:
+                if previous_value is None:
+                    previous_value = var
 
-        if var is None:
+        # if the value is set conditionally, modify 'value' so that it reflects
+        # the condition:
+        if has_cond:
             if append:
-                raise ParserError('unknown variable "%s"' % varname)
-            # Create new variable.
-            self.context.add_variable(Variable(varname, value))
-        else:
-            # modify existing variable
-            if append:
-                if not isinstance(var.type, ListType):
-                    if isinstance(var.type, AnyType):
-                        # if the type is undetermined, it can as well be a list
-                        var.type = ListType(var.type)
-                    else:
-                        raise ParserError('cannot append to non-list variable "%s" (type: %s)' %
-                                          (varname, var.type))
+                # If conditionally appending more items to an existing list,
+                # it's better to associate the condition with individual items.
                 if isinstance(value, ListExpr):
-                    new_values = value.items
+                    ifs = [IfExpr(self.active_if_cond,
+                                  yes=i,
+                                  no=NullExpr(),
+                                  pos=i.pos)
+                           for i in value.items]
+                    value = ListExpr(ifs, pos=value.pos)
                 else:
-                    new_values = [value]
-                if isinstance(var.value, ListExpr):
-                    value = ListExpr(var.value.items + new_values)
-                else:
-                    value = ListExpr([var.value] + new_values)
-                value.pos = node.pos
-                var.set_value(value)
+                    value = IfExpr(self.active_if_cond,
+                                   yes=value,
+                                   no=NullExpr(),
+                                   pos=node.pos)
             else:
-                if not isinstance(var.value, NullExpr):
-                    # Preserve previous value. Consider this code:
-                    #   foo = one
-                    #   if ( someCond ) foo = two
-                    value.value_no = var.value
-                var.set_value(value)
+                # But when just setting the value, keep it all together as
+                # a single value inside single IfExpr.
+                value = IfExpr(self.active_if_cond,
+                               yes=value,
+                               no=previous_value.value if previous_value else NullExpr(),
+                               pos=node.pos)
+
+        # create the variable if necessary:
+        if var is None:
+            if append and previous_value is None:
+                raise ParserError('unknown variable "%s"' % varname)
+            if previous_value:
+                var = Variable(varname, previous_value.value, previous_value.type)
+            else:
+                var = Variable(varname, value)
+            self.context.add_variable(var)
+
+        # finally, modify variable value:
+        if append:
+            assert previous_value is not None
+            if not isinstance(var.type, ListType):
+                if isinstance(var.type, AnyType):
+                    # if the type is undetermined, it can as well be a list
+                    var.type = ListType(var.type)
+                else:
+                    raise ParserError('cannot append to non-list variable "%s" (type: %s)' %
+                                      (varname, var.type))
+            if isinstance(value, ListExpr):
+                new_values = value.items
+            else:
+                new_values = [value]
+            if isinstance(previous_value.value, ListExpr):
+                value = ListExpr(previous_value.value.items + new_values)
+            else:
+                value = ListExpr([previous_value.value] + new_values)
+            value.pos = node.pos
+            var.set_value(value)
+        else:
+            var.set_value(value)
 
 
     def on_sources_or_headers(self, node):
