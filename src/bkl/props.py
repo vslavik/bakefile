@@ -178,6 +178,7 @@ class PropertiesRegistry(object):
     Registry of existing properties.
     """
     def __init__(self):
+        self._initialized = False
         self.all_targets = None
         self.all_files = None
         self.modules = None
@@ -189,8 +190,8 @@ class PropertiesRegistry(object):
         Returns property *name* on module level if such property exists, or
         :const:`None` otherwise.
         """
-        if self.project is None:
-            self._init_project_props()
+        if not self._initialized:
+            self._init_props()
         return self.project.get(name, None)
 
     def get_module_prop(self, name):
@@ -198,8 +199,8 @@ class PropertiesRegistry(object):
         Returns property *name* on module level if such property exists, or
         :const:`None` otherwise.
         """
-        if self.modules is None:
-            self._init_module_props()
+        if not self._initialized:
+            self._init_props()
         return self.modules.get(name, None)
 
     def get_target_prop(self, target_type, name):
@@ -207,8 +208,8 @@ class PropertiesRegistry(object):
         Returns property *name* on target level for targets of type *target_type*
         if such property exists, or :const:`None` otherwise.
         """
-        if self.all_targets is None or target_type not in self.target_types:
-            self._init_target_props(target_type)
+        if not self._initialized:
+            self._init_props()
         if name in self.all_targets:
             return self.all_targets[name]
         else:
@@ -219,39 +220,40 @@ class PropertiesRegistry(object):
         Returns property *name* on source file level if such property exists, or
         :const:`None` otherwise.
         """
-        if self.all_files is None:
-            self._init_file_props()
+        if not self._initialized:
+            self._init_props()
         return self.all_files.get(name, None)
 
     def enum_project_props(self):
-        if self.project is None:
-            self._init_project_props()
+        if not self._initialized:
+            self._init_props()
         for p in self.project.itervalues():
             yield p
 
     def enum_module_props(self):
-        if self.modules is None:
-            self._init_module_props()
+        if not self._initialized:
+            self._init_props()
         for p in self.modules.itervalues():
             yield p
 
     def enum_target_props(self, target_type):
-        if self.all_targets is None or target_type not in self.target_types:
-            self._init_target_props(target_type)
+        if not self._initialized:
+            self._init_props()
         for p in self.target_types[target_type].itervalues():
             yield p
         for p in self.all_targets.itervalues():
             yield p
 
     def enum_file_props(self):
-        if self.all_files is None:
-            self._init_file_props()
+        if not self._initialized:
+            self._init_props()
         for p in self.all_files.itervalues():
             yield p
 
-    def _init_project_props(self):
-        if self.project is not None:
-            return
+    def _init_props(self):
+        assert not self._initialized
+
+        # Project:
         self.project = _fill_prop_dict(std_project_props())
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_project"):
@@ -259,9 +261,7 @@ class PropertiesRegistry(object):
                 p.scope = api.Property.SCOPE_PROJECT
                 self.project.add(p)
 
-    def _init_module_props(self):
-        if self.modules is not None:
-            return
+        # Modules:
         self.modules = _fill_prop_dict(std_module_props())
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_module"):
@@ -269,15 +269,16 @@ class PropertiesRegistry(object):
                 p.scope = api.Property.SCOPE_MODULE
                 self.modules.add(p)
 
-    def _init_target_props(self, target_type):
-        if self.all_targets is None:
-            self.all_targets = _fill_prop_dict(std_target_props())
-            for toolset in api.Toolset.all():
-                for p in toolset.all_properties("properties_target"):
-                    p._add_toolset(toolset.name)
-                    p.scope = api.Property.SCOPE_TARGET
-                    self.all_targets.add(p)
-        if target_type not in self.target_types:
+        # All targets:
+        self.all_targets = _fill_prop_dict(std_target_props())
+        for toolset in api.Toolset.all():
+            for p in toolset.all_properties("properties_target"):
+                p._add_toolset(toolset.name)
+                p.scope = api.Property.SCOPE_TARGET
+                self.all_targets.add(p)
+
+        # Specific target types:
+        for target_type in api.TargetType.all():
             props = _fill_prop_dict(target_type.all_properties())
             for toolset in api.Toolset.all():
                 for p in toolset.all_properties("properties_%s" % target_type):
@@ -286,15 +287,15 @@ class PropertiesRegistry(object):
                     props.add(p)
             self.target_types[target_type] = props
 
-    def _init_file_props(self):
-        if self.all_files is not None:
-            return
+        # File types:
         self.all_files = _fill_prop_dict(std_file_props())
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_file"):
                 p._add_toolset(toolset.name)
                 p.scope = api.Property.SCOPE_FILE
                 self.all_files.add(p)
+
+        self._initialized = True
 
 
 registry = PropertiesRegistry()
