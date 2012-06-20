@@ -301,6 +301,22 @@ class Property(object):
         self.toolsets = None
         self.__doc__ = doc
 
+    def _scope_is_for(self, model_part):
+        """True if the property is defined for this scope."""
+        assert self.scope is not None
+        import bkl.model
+        if self.scope == self.SCOPE_PROJECT:
+            return isinstance(model_part, bkl.model.Project)
+        elif self.scope == self.SCOPE_MODULE:
+            return isinstance(model_part, bkl.model.Module)
+        elif self.scope == self.SCOPE_FILE:
+            return isinstance(model_part, bkl.model.SourceFile)
+        elif self.scope == self.SCOPE_TARGET:
+            return isinstance(model_part, bkl.model.Target)
+        else: # target type scope
+            return (isinstance(model_part, bkl.model.Target) and
+                    model_part.type.name == self.scope)
+
     @property
     def internal(self):
         """

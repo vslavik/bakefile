@@ -162,15 +162,41 @@ def std_project_props():
 
 
 class PropertiesDict(utils.OrderedDict):
-    """Dictionary of properties, keyed by their names."""
+    """
+    Dictionary of properties, keyed by their names.
+    """
+    def __init__(self, scope):
+        super(PropertiesDict, self). __init__()
+        self.scope = scope
+
     def add(self, prop):
+        if prop.name in self:
+            # The same property may be shared by different target types (e.g.
+            # "defines" for any native compiled target: exe, lib, dll, ...).
+            # That is OK, the property comes from a common base class then and
+            # is the same instance. Having two different properties with the
+            # same name is not OK, though.
+            if self[prop.name] is not prop:
+                raise RuntimeError("property \"%s\" defined more than once at the same scope (%s)" %
+                                   (prop.name, self.scope))
+        if prop.scope is None:
+            prop.scope = self.scope
         self[prop.name] = prop
 
-def _fill_prop_dict(props):
-    d = PropertiesDict()
+def _fill_prop_dict(props, scope):
+    d = PropertiesDict(scope)
     for p in props:
         d.add(p)
     return d
+
+def _propagate_inheritables(props, into):
+    """
+    Add inheritable properties from *props* into *into* dictionary, which holds
+    properties for a higher-level scope.
+    """
+    for p in props.itervalues():
+        if p.inheritable:
+            into.add(p)
 
 
 class PropertiesRegistry(object):
@@ -254,46 +280,45 @@ class PropertiesRegistry(object):
         assert not self._initialized
 
         # Project:
-        self.project = _fill_prop_dict(std_project_props())
+        self.project = _fill_prop_dict(std_project_props(), api.Property.SCOPE_PROJECT)
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_project"):
                 p._add_toolset(toolset.name)
-                p.scope = api.Property.SCOPE_PROJECT
                 self.project.add(p)
 
         # Modules:
-        self.modules = _fill_prop_dict(std_module_props())
+        self.modules = _fill_prop_dict(std_module_props(), api.Property.SCOPE_MODULE)
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_module"):
                 p._add_toolset(toolset.name)
-                p.scope = api.Property.SCOPE_MODULE
                 self.modules.add(p)
 
         # All targets:
-        self.all_targets = _fill_prop_dict(std_target_props())
+        self.all_targets = _fill_prop_dict(std_target_props(), api.Property.SCOPE_TARGET)
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_target"):
                 p._add_toolset(toolset.name)
-                p.scope = api.Property.SCOPE_TARGET
                 self.all_targets.add(p)
+        _propagate_inheritables(self.all_targets, self.modules)
 
         # Specific target types:
         for target_type in api.TargetType.all():
-            props = _fill_prop_dict(target_type.all_properties())
+            props = _fill_prop_dict(target_type.all_properties(), target_type.name)
             for toolset in api.Toolset.all():
                 for p in toolset.all_properties("properties_%s" % target_type):
                     p._add_toolset(toolset.name)
-                    p.scope = target_type
                     props.add(p)
             self.target_types[target_type] = props
+            _propagate_inheritables(props, self.modules)
 
         # File types:
-        self.all_files = _fill_prop_dict(std_file_props())
+        self.all_files = _fill_prop_dict(std_file_props(), api.Property.SCOPE_FILE)
         for toolset in api.Toolset.all():
             for p in toolset.all_properties("properties_file"):
                 p._add_toolset(toolset.name)
-                p.scope = api.Property.SCOPE_FILE
                 self.all_files.add(p)
+        _propagate_inheritables(self.all_files, self.all_targets)
+        _propagate_inheritables(self.all_files, self.modules)
 
         self._initialized = True
 
