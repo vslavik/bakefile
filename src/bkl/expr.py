@@ -952,32 +952,44 @@ class CondTrackingMixin:
         self.if_stack = stack
 
 
-def split(e, sep):
-    """
-    Splits expression *e* into a list of expressions, using *sep* as the
-    delimiter character. Works with conditional expressions and variable
-    references too.
-    """
-    assert len(sep) == 1
 
-    if isinstance(e, LiteralExpr):
-        vals = e.value.split(sep)
+class _SplitVisitor(Visitor):
+    """
+    Helper for the split() function.
+    """
+    def __init__(self, sep):
+        self.sep = sep
+
+    def _noop_list(self, e):
+        return [e]
+
+    bool = lambda self, e: [e]
+    bool_value = lambda self, e: [e]
+    null = lambda self, e: [e]
+    placeholder = lambda self, e: [e]
+
+    def literal(self, e):
+        vals = e.value.split(self.sep)
         if len(vals) == 1:
             return [e]
         return [LiteralExpr(v, pos=e.pos) for v in vals]
 
-    elif isinstance(e, ReferenceExpr):
-        value_split = split(e.get_value(), sep)
-        if len(value_split) == 1:
+    def reference(self, e):
+        vals = self.visit(e.get_value())
+        if len(vals) == 1:
             return [e]
         else:
-            return value_split
+            return vals
 
-    elif isinstance(e, ConcatExpr):
+    def list(self, e):
+        new = [self.visit(x) for x in e.items]
+        return ListExpr(new, pos=e.pos)
+
+    def concat(self, e):
         any_change = False
         out = []
         for i in e.items:
-            i_out = split(i, sep)
+            i_out = self.visit(i)
             if i is not i_out:
                 any_change = True
             if out:
@@ -994,13 +1006,29 @@ def split(e, sep):
         else:
             return [e]
 
-    elif isinstance(e, NullExpr) or isinstance(e, PlaceholderExpr):
-        return [e]
+    def path(self, e):
+        raise Error("can't split a path", pos=e.pos)
 
-    else:
-        raise Error("don't know how to split expression \"%s\" with separator \"%s\""
-                    % (e, sep),
-                    pos = e.pos)
+    def if_(self, e):
+        yes = self.visit(e.value_yes)
+        no = self.visit(e.value_no)
+        if len(yes) == 1 and len(no) == 1:
+            return [e]
+        elif len(yes) == len(no):
+            return [IfExpr(e.cond, yes[i], no[i], pos=e.pos) for i in xrange(0, len(yes))]
+        else:
+            raise Error("conditional value \"%s\" cannot be split with \"%s\", true and false branches have different lengths" % (e, self.sep))
+
+
+def split(e, sep):
+    """
+    Splits expression *e* into a list of expressions, using *sep* as the
+    delimiter character. Works with conditional expressions and variable
+    references too.
+    """
+    assert len(sep) == 1
+    with error_context(e):
+        return _SplitVisitor(sep).visit(e)
 
 
 class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
