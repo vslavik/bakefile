@@ -135,8 +135,7 @@ class VS201xToolsetBase(VSToolsetBase):
             targetname = cfg[target.type.basename_prop]
             if targetname != target.name:
                 n.add("TargetName", targetname)
-            # TODO: handle the defaults in a nicer way
-            if cfg["outputdir"].as_native_path(paths_info) != paths_info.builddir_abs:
+            if target.is_variable_explicitly_set("outputdir"):
                 n.add("OutDir", cfg["outputdir"])
             if n.has_children():
                 n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name

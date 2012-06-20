@@ -61,6 +61,11 @@ class Variable(object):
     .. attribute:: is_property
 
        Indicates if the variable corresponds to a property.
+
+    .. attribute:: is_explicitly_set
+
+       Indicates if the value was set explicitly by the user.
+       Normally true, only false for properties' default values.
     """
     def __init__(self, name, value, type=None, readonly=False):
         self.name = name
@@ -70,6 +75,7 @@ class Variable(object):
         self.value = value
         self.readonly = readonly
         self.is_property = False
+        self.is_explicitly_set = True
 
     @staticmethod
     def from_property(prop, value=None):
@@ -297,6 +303,14 @@ class ModelPart(object):
         raise error.UndefinedError("unknown variable \"%s\"" % name)
 
 
+    def is_variable_explicitly_set(self, name):
+        """
+        Returns true if the variable was set in the bakefiles explicitly.
+        """
+        var = self.resolve_variable(name)
+        return var.is_explicitly_set if var else False
+
+
     def add_variable(self, var):
         """Adds a new variable object."""
         assert var.name not in self.variables
@@ -358,6 +372,7 @@ class ModelPart(object):
                     # levels than what they're defined for
                     continue
                 var = Variable.from_property(p, p.default_expr(self))
+                var.is_explicitly_set = False
                 self.add_variable(var)
                 logger.debug("%s: setting default of %s: %s", self, var.name, var.value)
 

@@ -216,8 +216,7 @@ class VS200xToolsetBase(VSToolsetBase):
         for cfg in target.configurations:
             n = Node("Configuration", Name="%s|Win32" % cfg.name)
             n_configs.add(n)
-            # TODO: handle the defaults in a nicer way
-            if cfg["outputdir"].as_native_path(paths_info) != paths_info.builddir_abs:
+            if target.is_variable_explicitly_set("outputdir"):
                 n["OutputDirectory"] = cfg["outputdir"]
             else:
                 n["OutputDirectory"] = "$(SolutionDir)$(ConfigurationName)"
