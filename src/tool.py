@@ -32,6 +32,13 @@ class BklFormatter(logging.Formatter):
 
     def __init__(self):
         logging.Formatter.__init__(self, fmt=logging.BASIC_FORMAT)
+        try:
+            from clint.textui import colored
+            self.format_warning = colored.yellow
+            self.format_error = colored.red
+        except ImportError:
+            self.format_warning = lambda x: x
+            self.format_error = lambda x: x
 
     def format(self, record):
         level = record.levelno
@@ -42,6 +49,10 @@ class BklFormatter(logging.Formatter):
             if level != logging.INFO:
                 msg += "%s: " % record.levelname.lower()
             msg += record.getMessage()
+            if level == logging.ERROR:
+                msg = self.format_error(msg)
+            elif level == logging.WARNING:
+                msg = self.format_warning(msg)
             return msg
         else:
             return logging.Formatter.format(self, record)
