@@ -497,7 +497,7 @@ class PathExpr(Expr):
         """
         if self.anchor != ANCHOR_TOP_SRCDIR:
             raise Error('path "%s" is not srcdir-relative' % self, pos=self.pos)
-        top_srcdir = os.path.dirname(model.project.top_module.source_file)
+        top_srcdir = model.project.top_module.srcdir
         comp = (e.as_py() for e in self.components)
         return os.path.normpath(os.path.join(top_srcdir, os.path.sep.join(comp)))
 
@@ -812,7 +812,7 @@ class PathAnchorsInfo(object):
         outdir = os.path.dirname(os.path.abspath(outfile))
         self.outdir_abs = outdir
 
-        top_srcdir = os.path.dirname(os.path.abspath(model.project.top_module.source_file))
+        top_srcdir = os.path.abspath(model.project.top_module.srcdir)
         to_top_srcdir = os.path.relpath(top_srcdir, start=outdir)
         if to_top_srcdir == ".":
             self.top_srcdir = []

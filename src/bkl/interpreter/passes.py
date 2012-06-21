@@ -250,8 +250,8 @@ class PathsNormalizer(Visitor):
 
     @memoized
     def _src_prefix(self, module):
-        top_srcdir = os.path.abspath(os.path.dirname(module.project.top_module.source_file))
-        srcdir = os.path.abspath(os.path.dirname(module.source_file))
+        top_srcdir = os.path.abspath(module.project.top_module.srcdir)
+        srcdir = os.path.abspath(module.srcdir)
         prefix = os.path.relpath(srcdir, start=top_srcdir)
         logger.debug('translating paths from %s with prefix "%s"',
                      module.source_file, prefix)

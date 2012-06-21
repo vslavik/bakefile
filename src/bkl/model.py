@@ -475,6 +475,10 @@ class Module(ModelPart):
     .. attribute:: source_file
 
        Path to the input ``.bkl`` source file this module was created from.
+
+    .. attribute:: srcdir
+
+       @srcdir path effective for this module.
     """
     def __init__(self, parent, source_pos):
         super(Module, self).__init__(parent, source_pos)
@@ -490,6 +494,10 @@ class Module(ModelPart):
     @property
     def source_file(self):
         return self.source_pos.filename
+
+    @property
+    def srcdir(self):
+        return os.path.dirname(self.source_file)
 
     @property
     def name(self):
