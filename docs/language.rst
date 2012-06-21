@@ -89,10 +89,13 @@ For such situations, Bakefile has the ability to *anchor* paths under a
 different root. This is done by adding a prefix of the form of ``@<anchor>/``
 in front of the path. The following anchors are recognized:
 
- 1. ``@top_srcdir`` is the top level source directory, i.e. *srcdir* of the
-    top-most bakefile of the project.
+ 1. ``@srcdir``, as described above.
 
- 2. ``@builddir`` is the directory where build files of the current target
+ 2. ``@top_srcdir`` is the top level source directory, i.e. *srcdir* of the
+    top-most bakefile of the project. This is only different from @srcdir if
+    this bakefile was included from another one as a submodule.
+
+ 3. ``@builddir`` is the directory where build files of the current target
     are placed. Note that this is not where the generated makefiles or projects
     go either. It's often a dedicated directory just for the build artifacts
     and typically depends on make-time configuration. Visual Studio, for
