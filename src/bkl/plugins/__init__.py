@@ -55,4 +55,4 @@ assert __all__, "No plugins found - broken Bakefile installation?"
 __logger.debug("loaded plugins:")
 for p in __all__:
     m = sys.modules["bkl.plugins.%s" % p]
-    __logger.debug("    %s (from %s)", m.__name__, m.__file__)
+    __logger.debug("    %-25s (from %s)", m.__name__, m.__file__)
