@@ -29,6 +29,11 @@ from ..parser.ast import *
 from ..error import ParserError, error_context, warning
 from ..vartypes import ListType, AnyType
 
+import os.path
+
+import logging
+logger = logging.getLogger("bkl.interpreter.builder")
+
 
 class Builder(object, CondTrackingMixin):
     """
@@ -288,6 +293,16 @@ class Builder(object, CondTrackingMixin):
         self.on_submodule_callback(fn, node.pos)
 
 
+    def on_srcdir(self, node):
+        assert isinstance(self.context, Module)
+        assert self.active_if_cond is None
+
+        srcdir = os.path.normpath(os.path.join(os.path.dirname(self.context.source_file),
+                                               node.srcdir))
+        logger.debug("setting @srcdir for %s to %s", self.context, srcdir)
+        self.context.srcdir = srcdir
+
+
     _ast_dispatch = {
         AssignmentNode     : on_assignment,
         AppendNode         : on_assignment,
@@ -296,6 +311,7 @@ class Builder(object, CondTrackingMixin):
         IfNode             : on_if,
         ConfigurationNode  : on_configuration,
         SubmoduleNode      : on_submodule,
+        SrcdirNode         : on_srcdir,
         NilNode            : lambda self,x: x, # do nothing
     }
 

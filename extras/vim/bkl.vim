@@ -20,6 +20,7 @@ syn keyword	bklIf		if
 " any block.
 syn keyword	bklGlobalStat	submodule
 syn keyword	bklGlobalStat	requires
+syn keyword	bklGlobalStat	srcdir
 syn keyword	bklGlobalStat	configuration
 syn keyword	bklGlobalProp	toolsets
 syn keyword	bklGlobalProp	configurations

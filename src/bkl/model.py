@@ -484,6 +484,7 @@ class Module(ModelPart):
         super(Module, self).__init__(parent, source_pos)
         self.targets = utils.OrderedDict()
         self.project.modules.append(self)
+        self.srcdir = os.path.dirname(self.source_file)
 
     def __str__(self):
         return "module %s" % self.source_file
@@ -494,10 +495,6 @@ class Module(ModelPart):
     @property
     def source_file(self):
         return self.source_pos.filename
-
-    @property
-    def srcdir(self):
-        return os.path.dirname(self.source_file)
 
     @property
     def name(self):

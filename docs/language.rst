@@ -80,9 +80,11 @@ All paths in bakefiles must be written using a notation similar to the Unix
 one, using ``/`` as the separator, and are always relative. By default, if you
 don't say otherwise and write the path as a normal Unix path (e.g.
 ``src/main.cpp``), it's relative to the *source directory* (or *srcdir* for
-short). *Srcdir* is the directory where the input bakefile, in which the path
-is written, is. Note that this may be -- and often is -- different from the
-location where the generated *output* files are written to.
+short). *Srcdir* is the implicitly assumed directory for the input files
+specified using relative paths. By default, it is the directory containing the
+bakefile itself but it can be changed as described below.  Note that this may
+be -- and often is -- different from the location where the generated *output*
+files are written to.
 
 This is usually the most convenient choice, but it's sometimes not sufficient.
 For such situations, Bakefile has the ability to *anchor* paths under a
@@ -113,6 +115,50 @@ Here are some examples showing common uses for the anchors:
    }
    includedirs += @top_srcdir/include;
 
+
+Changing *srcdir*
+^^^^^^^^^^^^^^^^^
+
+As mentioned above, ``@srcdir`` can be changed if its default value is
+inconvenient, as, for example, is the case when the bakefile itself is in a
+subdirectory of the source tree.
+
+Take this for an example:
+
+.. code-block:: bkl
+
+   // build/bakefiles/foo.bkl
+   library foo {
+       includedirs += ../../include;
+       sources {
+           ../../src/foo.cpp
+           ../../src/bar.cpp
+       }
+   }
+
+This can be made much nicer using ``scrdir``:
+
+.. code-block:: bkl
+
+   // build/bakefiles/foo.bkl
+   srcdir ../..;
+
+   library foo {
+       includedirs += include;
+       sources {
+           src/foo.cpp
+           src/bar.cpp
+       }
+   }
+
+The ``srcdir`` statement takes one argument, path to the new *srcdir* (relative
+to the location of the bakefile). It affects all ``@srcdir``-anchored paths,
+including implicitly anchored ones, i.e. those without any explicit anchor, in
+the module (but not its submodules).
+
+Notice that because it affects the interpretation of all path expressions in
+the file, it can only be used before any assignments, target definitions etc.
+The only thing that can precede it is ``requires``.
 
 
 Variables and properties

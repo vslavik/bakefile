@@ -47,6 +47,7 @@ tokens {
     TARGET;
     FILES_LIST;
     SUBMODULE;
+    SRCDIR;
     CONFIGURATION;
 }
 
@@ -63,7 +64,7 @@ scope StmtScope {
 program
 scope StmtScope;
 @init { $StmtScope::insideTarget = False }
-    : stmt* EOF -> ^(PROGRAM stmt*);
+    : introductory_stmt* stmt* EOF -> ^(PROGRAM introductory_stmt* stmt*);
 
 stmt
     : assignment_stmt
@@ -79,6 +80,12 @@ stmt_outside_target
     | submodule_stmt
     | requires_stmt
     | configuration_stmt
+    ;
+
+// statements only allowed at the beginning of a module:
+introductory_stmt
+    : requires_stmt
+    | srcdir_stmt
     ;
 
 // and those only allowed inside target:
@@ -104,6 +111,10 @@ if_body
 
 submodule_stmt
     : 'submodule' literal ';'          -> ^(SUBMODULE literal)
+    ;
+
+srcdir_stmt
+    : 'srcdir' literal ';'             -> ^(SRCDIR literal)
     ;
 
 requires_stmt

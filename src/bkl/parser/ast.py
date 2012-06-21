@@ -223,6 +223,12 @@ class SubmoduleNode(Node):
                     doc="File with submodule definition")
 
 
+class SrcdirNode(Node):
+    """Overriding of the @srcdir value."""
+    srcdir = property(lambda self: self.children[0].text,
+                      doc="The new srcdir directory")
+
+
 class ConfigurationNode(Node):
     """Definition of a configuration."""
     name = property(lambda self: self.children[0].text,
@@ -260,6 +266,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.EQUAL          : EqualNode,
         BakefileParser.NOT_EQUAL      : NotEqualNode,
         BakefileParser.SUBMODULE      : SubmoduleNode,
+        BakefileParser.SRCDIR         : SrcdirNode,
         BakefileParser.CONFIGURATION  : ConfigurationNode,
     }
 
