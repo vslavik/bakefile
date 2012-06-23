@@ -127,6 +127,20 @@ class Interpreter(object):
         b = Builder(on_submodule=lambda fn, pos: submodules.append((fn,pos)))
 
         module = b.create_model(ast, parent)
+        # Normalize variables, especially paths, immediately. In particular,
+        # before some @srcdir-anchored path value from a variable in 'model'
+        # gets used in a submodule and then mis-interpreted as relative to that
+        # submodule instead of 'module'.
+        #
+        # This is safe, because it doesn't resolve references and so couldn't
+        # depend on some not-yet-loaded modules or enter an endless loop (that
+        # detect_self_references() checks for in finalize()).
+        #
+        # TODO: This may still be insufficient and we may need to normalize all
+        #       expressions immediately *on assignment*. Do it if this code
+        #       causes further trouble.
+        passes.normalize_vars(module)
+        passes.normalize_paths_in_model(module, toolset=None)
 
         while submodules:
             sub_filename, sub_pos = submodules[0]
@@ -151,9 +165,7 @@ class Interpreter(object):
         passes.detect_self_references(self.model)
         passes.detect_unused_vars(self.model)
         passes.normalize_and_validate_bool_subexpressions(self.model)
-        passes.normalize_vars(self.model)
         passes.validate_vars(self.model)
-        passes.normalize_paths_in_model(self.model, toolset=None)
         passes.simplify_exprs(self.model)
 
 

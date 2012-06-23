@@ -322,7 +322,11 @@ def normalize_paths_in_model(model, toolset):
         toolset = bkl.api.Toolset.get(toolset)
     norm = PathsNormalizer(toolset)
 
-    for module in model.modules:
+    if isinstance(model, bkl.model.Module):
+        todo = [model]
+    else:
+        todo = model.modules
+    for module in todo:
         norm.set_context(module)
         norm.visit_all(var.value for var in module.variables.itervalues())
         for target in module.targets.itervalues():
