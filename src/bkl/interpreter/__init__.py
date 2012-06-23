@@ -150,7 +150,9 @@ class Interpreter(object):
         logger.debug("finalizing the model")
         passes.detect_self_references(self.model)
         passes.detect_unused_vars(self.model)
-        passes.normalize_and_validate_vars(self.model)
+        passes.normalize_and_validate_bool_subexpressions(self.model)
+        passes.normalize_vars(self.model)
+        passes.validate_vars(self.model)
         passes.normalize_paths_in_model(self.model, toolset=None)
         passes.simplify_exprs(self.model)
 

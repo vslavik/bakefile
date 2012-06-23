@@ -133,19 +133,32 @@ def detect_unused_vars(model):
             warning('variable "%s" is never used', var.name, pos=var.value.pos)
 
 
-def normalize_and_validate_vars(model):
+def normalize_and_validate_bool_subexpressions(model):
     """
-    Normalizes variables' values with respect to their types. For example,
-    changes non-list value expressions for lists into single-item lists.
+    Normalizes bool expressions, i.e. ensures the conditions are valid bools.
+    variables' values with respect to their types.
     """
     logger.debug("checking boolean expressions")
     for var in model.all_variables():
         bkl.vartypes.normalize_and_validate_bool_subexpressions(var.value)
 
+
+def normalize_vars(model):
+    """
+    Normalizes variables' values with respect to their types. For example,
+    changes non-list value expressions for lists into single-item lists.
+    """
     logger.debug("normalizing variables")
     for var in model.all_variables():
         var.value = var.type.normalize(var.value)
 
+
+def validate_vars(model):
+    """
+    Validates variables' values with respect to their types, i.e. check
+    the correctness of the values. It is assumed that normalize_vars() was
+    executed beforehand.
+    """
     logger.debug("checking types of variables")
     for var in model.all_variables():
         try:
