@@ -585,7 +585,7 @@ class VSSolutionBase(object):
 # TODO: Both of these should be done as an expression once proper functions
 #       are implemented, as $(dirname(vs2010.solutionfile)/$(id).vcxproj)
 def _default_solution_name(module):
-    """same directory and name as the module's bakefile, with ``.sln`` extension"""
+    """same name as the module's bakefile, with ``.sln`` extension, in ``@srcdir``"""
     return bkl.expr.PathExpr([bkl.expr.LiteralExpr(module.name + ".sln")])
 
 def _project_name_from_solution(toolset_class, target):

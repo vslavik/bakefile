@@ -154,7 +154,8 @@ This can be made much nicer using ``scrdir``:
 The ``srcdir`` statement takes one argument, path to the new *srcdir* (relative
 to the location of the bakefile). It affects all ``@srcdir``-anchored paths,
 including implicitly anchored ones, i.e. those without any explicit anchor, in
-the module (but not its submodules).
+the module (but not its submodules). Notably, (default) paths for generated
+files are also affected, because these too are relative to ``@srcdir``.
 
 Notice that because it affects the interpretation of all path expressions in
 the file, it can only be used before any assignments, target definitions etc.
