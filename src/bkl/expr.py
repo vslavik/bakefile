@@ -499,7 +499,7 @@ class PathExpr(Expr):
             raise Error('path "%s" is not srcdir-relative' % self, pos=self.pos)
         top_srcdir = model.project.top_module.srcdir
         comp = (e.as_py() for e in self.components)
-        return os.path.abspath(os.path.join(top_srcdir, os.path.sep.join(comp)))
+        return os.path.join(top_srcdir, os.path.sep.join(comp))
 
     def get_basename(self):
         """
