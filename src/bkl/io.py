@@ -97,6 +97,7 @@ class OutputFile(object):
     def commit(self):
         if self.eol == EOL_WINDOWS:
             self.text = self.text.replace("\n", "\r\n")
+        rel_fn = os.path.relpath(self.filename)
 
         if not force_output:
             try:
@@ -106,7 +107,7 @@ class OutputFile(object):
                 old = None
             if old == self.text:
                 status = "."
-                logger.info("%s\t%s", status, self.filename)
+                logger.info("%s\t%s", status, rel_fn)
                 return
         else:
             old = None
@@ -116,7 +117,7 @@ class OutputFile(object):
         else:
             status = "U"
 
-        logger.info("%s\t%s", status, self.filename)
+        logger.info("%s\t%s", status, rel_fn)
 
         if dry_run:
             return # nothing to do, just pretending to write output
