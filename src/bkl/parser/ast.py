@@ -171,7 +171,7 @@ class AssignmentNode(Node):
     value = property(lambda self: self.children[1],
                      doc="Value being assigned.")
     append = False
-                     
+
 
 class AppendNode(AssignmentNode):
     """Assignment of value to a variable by appending (operator +=)."""
@@ -188,9 +188,9 @@ class FilesListNode(Node):
 
 class TargetNode(Node):
     """Creation of a makefile target."""
-    type = property(lambda self: self.children[0],
+    type = property(lambda self: self.children[0].text,
                     doc="Type of the target")
-    name = property(lambda self: self.children[1],
+    name = property(lambda self: self.children[1].text,
                     doc="Name of the target")
     content = property(lambda self: self.children[2:],
                        doc="Other content: variables assignments and such")

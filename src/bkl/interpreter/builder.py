@@ -224,12 +224,12 @@ class Builder(object, CondTrackingMixin):
 
 
     def on_target(self, node):
-        name = node.name.text
+        name = node.name
         if self.context.project.has_target(name):
             raise ParserError("target with ID \"%s\" already exists (see %s)" %
                               (name, self.context.project.get_target(name).source_pos))
 
-        type_name = node.type.text
+        type_name = node.type
 
         try:
             target_type = TargetType.get(type_name)
