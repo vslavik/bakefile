@@ -5,6 +5,7 @@ RootNode
     TargetNode
         IdNode exe
         IdNode dummy
+        BaseListNode
         AssignmentNode
             IdNode xxx
             ListNode

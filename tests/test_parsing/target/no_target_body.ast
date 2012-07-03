@@ -1,2 +1,2 @@
 ERROR:
-target/no_target_body.bkl:2:0: mismatched input '<EOF>' expecting '{'
+target/no_target_body.bkl:2:0: no viable alternative at input '<EOF>'
