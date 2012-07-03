@@ -66,6 +66,7 @@ syn region	bklLinkageRHS	matchgroup=Normal start="= *" end=";" contains=bklLinka
 syn match	bklBuildProp	"\<win32-crt-linkage\ze *=" nextgroup=bklLinkageRHS skipwhite contained
 
 syn match	bklVar		"\$(\k\+)"hs=s+2,he=e-1
+syn match	bklVar		"\$\k\+"hs=s+1
 
 " Comments definitions stolen from the standard c.vim.
 syn region	bklCommentL	start="//" skip="\\$" end="$" keepend contains=@Spell

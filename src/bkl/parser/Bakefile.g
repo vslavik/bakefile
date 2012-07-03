@@ -178,8 +178,13 @@ element
     ;
 
 element_part
-    : literal                              -> literal
-    | bool_value                           -> bool_value
+    : literal
+    | bool_value
+    | var_reference
+    ;
+
+var_reference
+    : '$' identifier                       -> ^(VAR_REFERENCE identifier)
     | '$' LPAREN identifier RPAREN         -> ^(VAR_REFERENCE identifier)
     ;
 

@@ -198,6 +198,13 @@ Because literals aren't quoted, variables are referenced using the make-like
    platform = windows;
    sources { os/$(platform).cpp }
 
+A shorthand form, where the brackets are omitted, is also allowed when such use
+is unambiguous: [2]_
+
+.. code-block:: bkl
+
+   if ( $toolset == gnu ) { ... }
+
 Note that the substitution isn't done immediately. Instead, the reference is
 included in the object model of the bakefiles and is dereferenced at a later
 stage, when generating makefile and project files. Sometimes, they are kept in
@@ -297,7 +304,7 @@ LINUX]`` when generating makefiles for the ``gnu`` toolset and only one item,
 ``BUILD``, for other toolsets.
 The condition doesn't have to be constant, it may reference e.g. options, where
 the value isn't known until make-time; Bakefile will correctly translate them into
-generated code. [2]_
+generated code. [3]_
 
 A long form with curly brackets is accepted as well; unlike the short form,
 this one can contain more than one statement:
@@ -482,7 +489,12 @@ They can also be included in an expression:
        ``"VERSION=\"1.2\""``; backslashes must be escaped as double backslashes
        (``"\\"``).
 
-.. [2] Although the syntax imposes few limits, it's not always possible to
+.. [2] A typical example of *ambiguous* use is in a concatenation. You can't
+       write ``$toolset.cpp`` because ``.`` is a valid part of a literal; it
+       must be written as ``$(toolset).cpp`` so that it's clear which part is a
+       variable name and which is a literal appended to the reference.
+
+.. [3] Although the syntax imposes few limits, it's not always possible to
        generate makefiles or projects with complicated conditional content even
        though the syntax supports it. In that case, Bakefile will exit with an
        explanatory error message.
