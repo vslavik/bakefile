@@ -1,0 +1,31 @@
+
+template t_foo {
+    defines += "COMPONENT=\"$(id)\"";
+}
+
+template t_second {
+    defines += SECOND_TEMPLATE;
+    sources { second_file.c }
+}
+
+template t_combined : t_foo, t_second {}
+
+exe normal {
+    sources { test.c }
+}
+
+exe from_templ : t_foo {
+    sources { test.c }
+}
+
+exe from_two_templs : t_foo, t_second {
+    sources { test.c }
+}
+
+exe from_combined : t_combined {
+    sources { test.c }
+}
+
+exe from_combined_dupl : t_combined, /*these are noop:*/ t_foo, t_second {
+    sources { test.c }
+}

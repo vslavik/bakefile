@@ -1,0 +1,64 @@
+RootNode
+    TemplateNode
+        LiteralNode "t_foo"
+        BaseListNode
+        AppendNode
+            IdNode defines
+            LiteralNode "COMPONENT="$(id)""
+    TemplateNode
+        LiteralNode "t_second"
+        BaseListNode
+        AppendNode
+            IdNode defines
+            LiteralNode "SECOND_TEMPLATE"
+        FilesListNode
+            IdNode sources
+            LiteralNode "second_file.c"
+    TemplateNode
+        LiteralNode "t_combined"
+        BaseListNode
+            LiteralNode "t_foo"
+            LiteralNode "t_second"
+    TargetNode
+        IdNode exe
+        IdNode normal
+        BaseListNode
+        FilesListNode
+            IdNode sources
+            LiteralNode "test.c"
+    TargetNode
+        IdNode exe
+        IdNode from_templ
+        BaseListNode
+            LiteralNode "t_foo"
+        FilesListNode
+            IdNode sources
+            LiteralNode "test.c"
+    TargetNode
+        IdNode exe
+        IdNode from_two_templs
+        BaseListNode
+            LiteralNode "t_foo"
+            LiteralNode "t_second"
+        FilesListNode
+            IdNode sources
+            LiteralNode "test.c"
+    TargetNode
+        IdNode exe
+        IdNode from_combined
+        BaseListNode
+            LiteralNode "t_combined"
+        FilesListNode
+            IdNode sources
+            LiteralNode "test.c"
+    TargetNode
+        IdNode exe
+        IdNode from_combined_dupl
+        BaseListNode
+            LiteralNode "t_combined"
+            LiteralNode "t_foo"
+            LiteralNode "t_second"
+        FilesListNode
+            IdNode sources
+            LiteralNode "test.c"
+
