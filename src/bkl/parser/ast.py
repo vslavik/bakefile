@@ -188,16 +188,6 @@ class FilesListNode(Node):
                      doc="List of files.")
 
 
-class TargetNode(Node):
-    """Creation of a makefile target."""
-    type = property(lambda self: self.children[0].text,
-                    doc="Type of the target")
-    name = property(lambda self: self.children[1].text,
-                    doc="Name of the target")
-    content = property(lambda self: self.children[2:],
-                       doc="Other content: variables assignments and such")
-
-
 class IfNode(Node):
     """Conditional content node -- "if" statement."""
     cond = property(lambda self: self.children[0],
@@ -231,11 +221,39 @@ class SrcdirNode(Node):
                       doc="The new srcdir directory")
 
 
+class BaseListNode(Node):
+    """List of base templates."""
+    names = property(lambda self: self.children,
+                     doc="List of strings with base names")
+
+
+class TemplateNode(Node):
+    """Template definition node."""
+    name = property(lambda self: self.children[0].text,
+                    doc="Name of the target")
+    base_templates = property(lambda self: self.children[1].names,
+                              doc="List of names of base templates")
+    content = property(lambda self: self.children[2:],
+                       doc="Other content: variables assignments and such")
+
+
+class TargetNode(Node):
+    """Creation of a makefile target."""
+    type = property(lambda self: self.children[0].text,
+                    doc="Type of the target")
+    name = property(lambda self: self.children[1].text,
+                    doc="Name of the target")
+    base_templates = property(lambda self: self.children[2].names,
+                              doc="List of names of base templates")
+    content = property(lambda self: self.children[3:],
+                       doc="Other content: variables assignments and such")
+
+
 class ConfigurationNode(Node):
     """Definition of a configuration."""
     name = property(lambda self: self.children[0].text,
                     doc="Name of the configuration")
-    base = property(lambda self: self.children[1].text if not isinstance(self.children[1], NilNode) else None,
+    base = property(lambda self: self.children[1].names[0] if self.children[1].names else None,
                     doc="Name of the base configuration or None")
     content = property(lambda self: self.children[2:],
                        doc="Other content: variables assignments and such")
@@ -269,7 +287,9 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.NOT_EQUAL      : NotEqualNode,
         BakefileParser.SUBMODULE      : SubmoduleNode,
         BakefileParser.SRCDIR         : SrcdirNode,
+        BakefileParser.BASE_LIST      : BaseListNode,
         BakefileParser.CONFIGURATION  : ConfigurationNode,
+        BakefileParser.TEMPLATE       : TemplateNode,
     }
 
     def createWithPayload(self, payload):

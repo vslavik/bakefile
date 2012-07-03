@@ -24,7 +24,7 @@
 
 from ..api import TargetType
 from ..expr import *
-from ..model import Module, Target, Variable, SourceFile
+from ..model import Module, Target, Variable, SourceFile, Template
 from ..parser.ast import *
 from ..error import ParserError, error_context, warning
 from ..vartypes import ListType, AnyType
@@ -223,6 +223,30 @@ class Builder(object, CondTrackingMixin):
             filelist.append(obj)
 
 
+    def on_if(self, node):
+        self.push_cond(self._build_expression(node.cond))
+        self.handle_children(node.content, self.context)
+        self.pop_cond()
+
+
+    def _get_templates(self, node):
+        templates = self.context.project.templates
+        for t in node.base_templates:
+            try:
+                yield templates[t.text]
+            except KeyError:
+                raise ParserError("unknown base template \"%s\"" % t.text, pos=t.pos)
+
+    def _apply_templates(self, target, templates, applied):
+        for t in templates:
+            if t.name in applied:
+                logger.debug("skipping already-applied template %s on %s", t.name, target.name)
+                continue
+            self._apply_templates(target, t.bases, applied)
+            logger.debug("applying template %s to %s", t.name, target.name)
+            applied.add(t.name)
+            self.handle_children(t._definition, target)
+
     def on_target(self, node):
         name = node.name
         if self.context.project.has_target(name):
@@ -241,14 +265,28 @@ class Builder(object, CondTrackingMixin):
 
         # handle target-specific variables assignments etc:
         condstack = self.reset_cond_stack()
-        self.handle_children(node.content, target)
-        self.restore_cond_stack(condstack)
+        try:
+            self._apply_templates(target, self._get_templates(node), set())
+            self.handle_children(node.content, target)
+        finally:
+            self.restore_cond_stack(condstack)
 
 
-    def on_if(self, node):
-        self.push_cond(self._build_expression(node.cond))
-        self.handle_children(node.content, self.context)
-        self.pop_cond()
+    def on_template(self, node):
+        if self.active_if_cond is not None:
+            raise ParserError("templates can't be defined conditionally"
+                              ' (condition "%s" set at %s)' % (
+                                  self.active_if_cond, self.active_if_cond.pos))
+
+        project = self.context.project
+        if node.name in project.templates:
+            raise ParserError("template \"%s\" already defined (at %s)" %
+                              (node.name, project.templates[node.name].source_pos))
+
+        bases = list(self._get_templates(node))
+        t = Template(node.name, bases, source_pos=node.pos)
+        t._definition = node.content
+        project.add_template(t)
 
 
     def on_configuration(self, node):
@@ -265,13 +303,14 @@ class Builder(object, CondTrackingMixin):
                                   (node.name, project.configurations[node.name].source_pos))
 
             try:
-                base = project.configurations[node.base]
+                base = project.configurations[node.base.text]
                 cfg = base.clone(node.name, source_pos=node.pos)
                 project.add_configuration(cfg)
             except KeyError:
-                raise ParserError("unknown base configuration \"%s\"" % node.base)
+                raise ParserError("unknown base configuration \"%s\"" % node.base.text,
+                                  pos=node.base.pos)
         if node.base:
-            cfg._definition = project.configurations[node.base]._definition + node.content
+            cfg._definition = project.configurations[node.base.text]._definition + node.content
         else:
             cfg._definition = node.content
 
@@ -307,8 +346,9 @@ class Builder(object, CondTrackingMixin):
         AssignmentNode     : on_assignment,
         AppendNode         : on_assignment,
         FilesListNode      : on_sources_or_headers,
-        TargetNode         : on_target,
         IfNode             : on_if,
+        TargetNode         : on_target,
+        TemplateNode       : on_template,
         ConfigurationNode  : on_configuration,
         SubmoduleNode      : on_submodule,
         SrcdirNode         : on_srcdir,

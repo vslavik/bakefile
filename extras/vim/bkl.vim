@@ -22,6 +22,7 @@ syn keyword	bklGlobalStat	submodule
 syn keyword	bklGlobalStat	requires
 syn keyword	bklGlobalStat	srcdir
 syn keyword	bklGlobalStat	configuration
+syn keyword	bklGlobalStat	template
 syn keyword	bklGlobalProp	toolsets
 syn keyword	bklGlobalProp	configurations
 syn match	bklGlobalProp	"\<vs\(2003\|2005\|2008\|2010\|2012\).generate-solution\ze *=" nextgroup=bklBoolRHS skipwhite
