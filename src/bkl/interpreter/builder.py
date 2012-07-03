@@ -252,6 +252,11 @@ class Builder(object, CondTrackingMixin):
 
 
     def on_configuration(self, node):
+        if self.active_if_cond is not None:
+            raise ParserError("configurations can't be defined conditionally"
+                              ' (condition "%s" set at %s)' % (
+                                  self.active_if_cond, self.active_if_cond.pos))
+
         project = self.context.project
         if node.name in ["Debug", "Release"]:
             if node.base:
