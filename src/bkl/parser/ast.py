@@ -108,6 +108,8 @@ class NilNode(Node):
     """Empty node."""
     def __init__(self, payload=None):
         Node.__init__(self, payload)
+    def __nonzero__(self):
+        return False
 
 
 class LiteralNode(Node):
