@@ -2,3 +2,4 @@ RootNode
     TargetNode
         IdNode SillyTargetName
         IdNode foo
+        BaseListNode

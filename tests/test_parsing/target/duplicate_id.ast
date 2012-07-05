@@ -2,6 +2,8 @@ RootNode
     TargetNode
         IdNode exe
         IdNode one
+        BaseListNode
     TargetNode
         IdNode exe
         IdNode one
+        BaseListNode

@@ -286,6 +286,66 @@ sources and headers is that the latter may be used outside of the target (e.g.
 a library installs headers that are then used by users of the library).
 
 
+Templates
+---------
+
+It is often useful to share common settings or even code among multiple
+targets. This can be handled, to some degree, by setting properties such as
+``includedirs`` globally, but more flexibility is often needed.
+
+Bakefile provides a convenient way of doing just that: *templates*. A template
+is a named block of code that is applied and evaluated before target's own
+body. In a way, it's similar to C++ inheritance: targets correspond to derived
+classes and templates would be abstract base classes in this analogy.
+
+Templates can be derived from another template; both targets and templates can
+be based on more than one template.  They are applied in the order they are
+specified in, with base templates first and derived ones after them. Each
+template in the inheritance chain is applied exactly once, i.e. if a target
+uses the same template two or more times, its successive appearances are simply
+ignored.
+
+Templates may contain any code that is valid inside target definition and may
+reference any variables defined in the target.
+
+The syntax is similar to C++ inheritance syntax:
+
+.. code-block:: bkl
+
+   template commnon_stuff {
+       defines += BUILDING;
+   }
+
+   template with_logging : common_stuff {
+       defines += "LOGGING_ID=\"$(id)\"";
+       libs += logging;
+   }
+
+   exe hello : with_logging {
+       sources {
+           hello.cpp
+       }
+   }
+
+Or equivalently:
+
+.. code-block:: bkl
+
+   template commnon_stuff {
+       defines += BUILDING;
+   }
+
+   template with_logging {
+       defines += "LOGGING_ID=\"$(id)\"";
+       libs += logging;
+   }
+
+   exe hello : common_stuff, with_logging {
+       sources {
+           hello.cpp
+       }
+   }
+
 
 Conditional statements
 ----------------------

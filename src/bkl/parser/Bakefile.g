@@ -49,6 +49,8 @@ tokens {
     SUBMODULE;
     SRCDIR;
     CONFIGURATION;
+    TEMPLATE;
+    BASE_LIST;
 }
 
 scope StmtScope {
@@ -80,6 +82,7 @@ stmt_outside_target
     | submodule_stmt
     | requires_stmt
     | configuration_stmt
+    | template_stmt
     ;
 
 // statements only allowed at the beginning of a module:
@@ -125,13 +128,17 @@ requires_stmt
     ;
 
 configuration_stmt
-    : 'configuration' name=literal
-      (configuration_assignments | ';')  -> ^(CONFIGURATION $name NIL configuration_assignments?)
-    | 'configuration' name=literal ':' base=literal
-      (configuration_assignments | ';')  -> ^(CONFIGURATION $name $base configuration_assignments?)
+    : 'configuration' name=literal base=configuration_base
+      (configuration_content | ';')  -> ^(CONFIGURATION $name $base configuration_content?)
     ;
 
-configuration_assignments : '{' assignment_stmt* '}' -> assignment_stmt*;
+configuration_base
+    :              ->   BASE_LIST // empty
+    | ':' literal  -> ^(BASE_LIST literal)
+    ;
+
+configuration_content : '{' assignment_stmt* '}' -> assignment_stmt*;
+
 
 // ---------------------------------------------------------------------------
 // Expressions
@@ -198,8 +205,9 @@ literal
 bool_value
     : (t=TRUE | t=FALSE)       -> BOOLVAL[$t];
 
+
 // ---------------------------------------------------------------------------
-// Targets
+// Targets & templates
 // ---------------------------------------------------------------------------
 
 // examples:
@@ -209,10 +217,17 @@ bool_value
 target_stmt
 scope StmtScope;
 @init { $StmtScope::insideTarget = True }
-    : type=identifier id=identifier '{' stmt* '}'
-                            -> ^(TARGET $type $id stmt*)
+    : type=identifier id=identifier base=base_templates
+      '{' stmt* '}'         -> ^(TARGET $type $id $base stmt*)
     ;
 
+// templates are very similar to targets, structurally
+template_stmt
+scope StmtScope;
+@init { $StmtScope::insideTarget = True }
+    : 'template' id=literal base=base_templates
+      '{' stmt* '}'         -> ^(TEMPLATE $id $base stmt*)
+    ;
 
 sources_stmt
     : sources_keyword '{' element '}'
@@ -221,6 +236,12 @@ sources_stmt
 
 sources_keyword
     : (t='sources' | t='headers') -> ID[$t];
+
+base_templates
+    :                             ->   BASE_LIST // empty
+    | ':' literal (',' literal)*  -> ^(BASE_LIST literal literal*)
+    ;
+
 
 // ---------------------------------------------------------------------------
 // Basic tokens

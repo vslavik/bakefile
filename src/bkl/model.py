@@ -160,6 +160,31 @@ class Configuration(object):
                 return 0
 
 
+class Template(object):
+    """
+    A template.
+
+    .. attribute:: name
+
+       Name of the template.
+
+    .. attribute:: bases
+
+       List of base templates (as :class:`bkl.model.Template` objects).
+
+    .. attribute:: source_pos
+
+       Source code position of template's definition, or :const:`None`.
+    """
+    def __init__(self, name, bases, source_pos=None):
+        self.name = name
+        self.bases = bases
+        self.source_pos = source_pos
+        # for internal use, this is a list of AST nodes that
+        # define the configuration
+        self._definition = []
+
+
 class ModelPart(object):
     """
     Base class for model "parts", i.e. projects, modules or targets. Basically,
@@ -408,11 +433,16 @@ class Project(ModelPart):
     .. attribute: configurations
 
        All configurations defined in the project.
+
+    .. attribute: templates
+
+       Dictionary of all templates defined in the project.
     """
     def __init__(self):
         super(Project, self).__init__(parent=None)
         self.modules = []
         self.configurations = utils.OrderedDict()
+        self.templates = {}
         self.add_configuration(Configuration("Debug",   base=None, is_debug=True))
         self.add_configuration(Configuration("Release", base=None, is_debug=False))
 
@@ -459,6 +489,11 @@ class Project(ModelPart):
         """Adds a new configuration to the project."""
         assert config.name not in self.configurations
         self.configurations[config.name] = config
+
+    def add_template(self, templ):
+        """Adds a new template to the project."""
+        assert templ.name not in self.templates
+        self.templates[templ.name] = templ
 
 
 class Module(ModelPart):

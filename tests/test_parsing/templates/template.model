@@ -1,0 +1,38 @@
+module {
+  variables {
+  }
+  targets {
+    exe normal {
+      sources {
+        file @top_srcdir/test.c
+      }
+    }
+    exe from_templ {
+      defines = [COMPONENT="$(id)"]
+      sources {
+        file @top_srcdir/test.c
+      }
+    }
+    exe from_two_templs {
+      defines = [COMPONENT="$(id)", SECOND_TEMPLATE]
+      sources {
+        file @top_srcdir/second_file.c
+        file @top_srcdir/test.c
+      }
+    }
+    exe from_combined {
+      defines = [COMPONENT="$(id)", SECOND_TEMPLATE]
+      sources {
+        file @top_srcdir/second_file.c
+        file @top_srcdir/test.c
+      }
+    }
+    exe from_combined_dupl {
+      defines = [COMPONENT="$(id)", SECOND_TEMPLATE]
+      sources {
+        file @top_srcdir/second_file.c
+        file @top_srcdir/test.c
+      }
+    }
+  }
+}
