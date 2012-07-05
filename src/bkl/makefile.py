@@ -178,7 +178,7 @@ class MakefileToolset(Toolset):
         # dependencies.
         # TODO-MT: read only, can be ran in parallel
         build_graphs = {}
-        norm = PathsNormalizer(self)
+        norm = PathsNormalizer(project)
         for t in project.all_targets():
             with error_context(t):
                 norm.set_context(t)

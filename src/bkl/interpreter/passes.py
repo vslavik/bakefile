@@ -238,9 +238,13 @@ class PathsNormalizer(Visitor):
 
     Performs the normalization in-place.
     """
-    def __init__(self, toolset=None):
+    def __init__(self, project, toolset=None):
         self.toolset = toolset
         self.module = self.target = None
+        self.top_srcdir = os.path.abspath(project.top_module.srcdir)
+        self.srcdir_map = {}
+        for m in project.modules:
+            self.srcdir_map[m.source_file] = os.path.abspath(m.srcdir)
 
     def set_context(self, context):
         """
@@ -262,12 +266,10 @@ class PathsNormalizer(Visitor):
             self.visit(x)
 
     @memoized
-    def _src_prefix(self, module):
-        top_srcdir = os.path.abspath(module.project.top_module.srcdir)
-        srcdir = os.path.abspath(module.srcdir)
-        prefix = os.path.relpath(srcdir, start=top_srcdir)
-        logger.debug('translating paths from %s with prefix "%s"',
-                     module.source_file, prefix)
+    def _src_prefix(self, source_file):
+        srcdir = self.srcdir_map[source_file]
+        prefix = os.path.relpath(srcdir, start=self.top_srcdir)
+        logger.debug('translating paths from %s with prefix "%s"', source_file, prefix)
         if prefix == ".":
             return None
         else:
@@ -301,7 +303,8 @@ class PathsNormalizer(Visitor):
             e.components = bdir.components + e.components
         if e.anchor == bkl.expr.ANCHOR_SRCDIR:
             assert self.module is not None
-            prefix = self._src_prefix(self.module)
+            source_file = e.pos.filename if e.pos and e.pos.filename else self.module.source_file
+            prefix = self._src_prefix(source_file)
             if prefix is not None:
                 e.components = prefix + e.components
             e.anchor = bkl.expr.ANCHOR_TOP_SRCDIR
@@ -320,11 +323,12 @@ def normalize_paths_in_model(model, toolset):
 
     if toolset is not None:
         toolset = bkl.api.Toolset.get(toolset)
-    norm = PathsNormalizer(toolset)
 
     if isinstance(model, bkl.model.Module):
+        norm = PathsNormalizer(model.project, toolset)
         todo = [model]
     else:
+        norm = PathsNormalizer(model, toolset)
         todo = model.modules
     for module in todo:
         norm.set_context(module)
