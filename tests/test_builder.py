@@ -39,6 +39,8 @@ def test_builder():
     paths = [os.path.dirname(test_parsing.__file__),
              os.path.dirname(test_model.__file__)]
     for d in paths:
+        for f in glob("%s/*.model" % d):
+            yield _test_builder_on_file, d, str(f)
         for f in glob("%s/*/*.model" % d):
             yield _test_builder_on_file, d, str(f)
 

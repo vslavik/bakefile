@@ -38,6 +38,8 @@ def test_full():
     """
     import projects
     d = os.path.dirname(projects.__file__)
+    for f in glob("%s/*.bkl" % d):
+        yield _test_on_file, d, str(f)
     for f in glob("%s/*/*.bkl" % d):
         yield _test_on_file, d, str(f)
 
