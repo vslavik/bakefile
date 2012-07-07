@@ -672,6 +672,10 @@ class ConfigurationProxy(object):
         self.model = model
         self._visitor = _ProxyIfResolver(config.name)
 
+    @property
+    def project(self):
+        return self.model.project
+
     def __getitem__(self, key):
         return self._visitor.visit(self.model[key])
 

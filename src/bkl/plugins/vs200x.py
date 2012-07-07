@@ -323,12 +323,12 @@ class VS200xToolsetBase(VSToolsetBase):
         if is_library(target):
             return None
         n = Node("Tool", Name="VCLinkerTool")
-        n["AdditionalOptions"] = VSList(" ", cfg["link-options"])
+        n["AdditionalOptions"] = VSList(" ", target.type.get_link_options(cfg))
         libs = cfg["libs"]
         if libs:
             n["AdditionalDependencies"] = VSList(" ", ("%s.lib" % x.as_py() for x in libs))
 
-        n["AdditionalLibraryDirectories"] = cfg["libdirs"]
+        n["AdditionalLibraryDirectories"] = target.type.get_libdirs(cfg)
 
         targetname = cfg[target.type.basename_prop]
         if targetname != target.name:

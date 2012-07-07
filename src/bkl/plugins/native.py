@@ -30,6 +30,7 @@ from bkl.api import TargetType, Property, FileType
 from bkl.vartypes import *
 from bkl.compilers import *
 from bkl.expr import concat, PathExpr, ANCHOR_BUILDDIR
+from bkl.utils import memoized
 
 class NativeCompiledType(TargetType):
     """Base class for natively-compiled targets."""
@@ -97,6 +98,32 @@ class NativeCompiledType(TargetType):
 
                      Do not use this property to link with libraries built as
                      part of your project; use `deps` for that.
+
+                     When this list is non-empty on a
+                     :ref:`ref_target_library`, it will be used when linking
+                     executables that use the library.
+                     """),
+            Property("libdirs",
+                 type=ListType(PathType()),
+                 default=[],
+                 inheritable=True,
+                 doc="""
+                     Additional directories where to look for libraries.
+
+                     When this list is non-empty on a
+                     :ref:`ref_target_library`, it will be used when linking
+                     executables that use the library.
+                     """),
+            Property("link-options",
+                 type=ListType(StringType()),
+                 default=[],
+                 inheritable=True,
+                 doc="""
+                     Additional linker options.
+
+                     Note that the options are compiler/linker-specific and so this
+                     property should only be set conditionally for particular
+                     compilers that recognize the options.
 
                      When this list is non-empty on a
                      :ref:`ref_target_library`, it will be used when linking
@@ -179,57 +206,63 @@ class NativeCompiledType(TargetType):
         outdir = target["outputdir"]
         return PathExpr(outdir.components + [concat(*parts)], outdir.anchor)
 
-    def get_all_libs(self, toolset, target):
-        """
-        Returns a tuple of two lists: list of internal (aka dependencies) and
-        external libraries to link with.
-        Dependencies of these libs are returned as well.
-        """
-        visited = set()
-        deplibs = []
-        ldlibs = []
-        self._collect_all_libs(toolset, target, visited, deplibs, ldlibs)
-        return (deplibs, ldlibs)
-
-    def _collect_all_libs(self, toolset, target, visited, deplibs, ldlibs):
-        if target in visited:
-            return
-        visited.add(target)
-        project = target.project
-        deps = [project.get_target(x.as_py()) for x in target["deps"]]
-        todo = [x for x in deps if
-                isinstance(x.type, LibraryType) or isinstance(x.type, DllType)]
-        for dep in todo:
-            f = dep.type.target_file(toolset, dep)
-            if f not in deplibs:
-                deplibs.append(f)
-        for lib in target["libs"]:
-            # TODO: use some ordered-set type and just merge them
-            if lib not in ldlibs:
-                ldlibs.append(lib)
-        for dep in todo:
-            self._collect_all_libs(toolset, dep, visited, deplibs, ldlibs)
-
 
 class NativeLinkedType(NativeCompiledType):
-    properties = [
-            Property("libdirs",
-                 type=ListType(PathType()),
-                 default=[],
-                 inheritable=True,
-                 doc="Additional directories where to look for libraries."),
-            Property("link-options",
-                 type=ListType(StringType()),
-                 default=[],
-                 inheritable=True,
-                 doc="""
-                     Additional linker options.
+    """Base class for natively-linked targets."""
 
-                     Note that the options are compiler/linker-specific and so this
-                     property should only be set conditionally for particular
-                     compilers that recognize the options.
-                     """),
-        ]
+    def get_libfiles(self, toolset, target):
+        """
+        Returns list of internal libs (aka dependencies) to link with, as filenames.
+        """
+        deps = self._linkable_deps(target)
+        return [dep.type.target_file(toolset, dep) for dep in deps]
+
+    def get_ldlibs(self, target):
+        """
+        Returns list of external libs to link with.
+        """
+        return self._get_link_property(target, "libs")
+
+    def get_libdirs(self, target):
+        """
+        Returns list of library search paths to use when linking.
+        """
+        return self._get_link_property(target, "libdirs")
+
+    def get_link_options(self, target):
+        """
+        Returns list of linker options to use when linking.
+        """
+        return self._get_link_property(target, "link-options")
+
+    def _get_link_property(self, target, propname):
+        deps = self._linkable_deps(target)
+        out = []
+        for t in [target] + deps:
+            for x in t[propname]:
+                # TODO: use some ordered-set type and just merge them
+                if x not in out:
+                    out.append(x)
+        return out
+
+
+    @memoized
+    def _linkable_deps(self, target):
+        found = []
+        self._find_linkable_deps(target, found)
+        return found
+
+    def _find_linkable_deps(self, target, found):
+        project = target.project
+        deps = (project.get_target(x.as_py()) for x in target["deps"])
+        todo = (x for x in deps if
+                isinstance(x.type, LibraryType) or isinstance(x.type, DllType))
+        for t in todo:
+            if t in found:
+                continue
+            found.append(t)
+            self._find_linkable_deps(t, found)
+
 
 
 class ExeType(NativeLinkedType):

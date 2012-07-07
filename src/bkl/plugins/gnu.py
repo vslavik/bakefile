@@ -164,13 +164,14 @@ class GnuLinker(GnuFileCompiler):
 
     def _linker_flags(self, toolset, target):
         cmd = self._arch_flags(toolset, target)
-        libdirs = target["libdirs"]
+        libdirs = target.type.get_libdirs(target)
         if libdirs:
-            cmd += bkl.expr.add_prefix("-L", libdirs)
-        libs, ldlibs = target.type.get_all_libs(toolset, target)
+            cmd += bkl.expr.add_prefix("-L", ListExpr(libdirs))
+        libs = target.type.get_libfiles(toolset, target)
+        ldlibs = target.type.get_ldlibs(target)
         cmd += libs
         cmd += bkl.expr.add_prefix("-l", ListExpr(ldlibs)).items
-        cmd += target["link-options"].items
+        cmd += target.type.get_link_options(target)
         return cmd
 
     def commands(self, toolset, target, input, output):

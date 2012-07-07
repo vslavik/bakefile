@@ -5,10 +5,14 @@ vs2008.solutionfile = testdeps2008.sln;
 library common {
     sources { common.c }
 
-    if ( $(toolset) == gnu || $(toolset) == gnu-osx )
+    if ( $(toolset) == gnu || $(toolset) == gnu-osx ) {
+        libdirs += unix;
         libs += iconv;
-    if ( $(toolset) == vs2010 || $(toolset) == vs2008 )
+    }
+    if ( $(toolset) == vs2010 || $(toolset) == vs2008 ) {
+        libdirs += windows;
         libs += wininet;
+    }
 }
 
 library libA {

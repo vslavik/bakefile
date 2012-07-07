@@ -5,6 +5,7 @@ module {
   }
   targets {
     library common {
+      libdirs = [((($(toolset) == gnu) || ($(toolset) == gnu-osx)) ? @top_srcdir/unix : null), ((($(toolset) == vs2010) || ($(toolset) == vs2008)) ? @top_srcdir/windows : null)]
       libs = [((($(toolset) == gnu) || ($(toolset) == gnu-osx)) ? iconv : null), ((($(toolset) == vs2010) || ($(toolset) == vs2008)) ? wininet : null)]
       sources {
         file @top_srcdir/common.c
