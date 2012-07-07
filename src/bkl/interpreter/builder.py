@@ -224,9 +224,11 @@ class Builder(object, CondTrackingMixin):
 
 
     def on_if(self, node):
-        self.push_cond(self._build_expression(node.cond))
-        self.handle_children(node.content, self.context)
-        self.pop_cond()
+        try:
+            self.push_cond(self._build_expression(node.cond))
+            self.handle_children(node.content, self.context)
+        finally:
+            self.pop_cond()
 
 
     def _get_templates(self, node):
@@ -323,9 +325,11 @@ class Builder(object, CondTrackingMixin):
                                ReferenceExpr("config", self.context),
                                LiteralExpr(node.name),
                                pos=node.pos)
-        self.push_cond(config_cond)
-        self.handle_children(cfg._definition, self.context)
-        self.pop_cond()
+        try:
+            self.push_cond(config_cond)
+            self.handle_children(cfg._definition, self.context)
+        finally:
+            self.pop_cond()
 
 
     def on_submodule(self, node):

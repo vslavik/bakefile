@@ -1,0 +1,2 @@
+ERROR:
+exception_in_target_if.bkl:8:8: unknown variable "nonexistent_var"

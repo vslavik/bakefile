@@ -1,0 +1,10 @@
+// This tests proper unwinding of conditions stack in the even of an exception
+// inside an 'if' block.
+
+toolsets = gnu vs2010;
+
+library common {
+    if ( $(toolset) == gnu ) {
+        nonexistent_var += /opt/lib;
+    }
+}
