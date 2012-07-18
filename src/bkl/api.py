@@ -241,14 +241,15 @@ class Property(object):
        derived from some other value and exist as a convenience. An example
        of read-only property is the ``id`` property on targets.
 
-    .. attribute:: scope
+    .. attribute:: scopes
 
-       Optional scope of the property. May be one of
-       :const:`Property.SCOPE_PROJECT`, :const:`Property.SCOPE_MODULE`,
-       :const:`Property.SCOPE_TARGET` for any target or target type name
-       (e.g. ``exe``) for scoping on specific target name. May be list of
-       such items for multiscope properties. Finally, may be :const:`None`
-       for default (depending from where the property was obtained from).
+       Optional scope of the property, as list of strings. Each item may be one
+       of :const:`Property.SCOPE_PROJECT`, :const:`Property.SCOPE_MODULE`,
+       :const:`Property.SCOPE_TARGET` for any target or target type name (e.g.
+       ``exe``) for scoping on specific target name.
+
+       Finally, may be :const:`None` for default (depending from where the
+       property was obtained from).
 
     .. attribute:: inheritable
 
@@ -297,25 +298,38 @@ class Property(object):
         self.default = default
         self.readonly = readonly
         self.inheritable = inheritable
-        self.scope = None
+        self.scopes = None
         self.toolsets = None
         self.__doc__ = doc
 
-    def _scope_is_for(self, model_part):
+    def _scope_is_directly_for(self, model_part):
         """True if the property is defined for this scope."""
-        assert self.scope is not None
+        assert self.scopes is not None
         import bkl.model
-        if self.scope == self.SCOPE_PROJECT:
-            return isinstance(model_part, bkl.model.Project)
-        elif self.scope == self.SCOPE_MODULE:
-            return isinstance(model_part, bkl.model.Module)
-        elif self.scope == self.SCOPE_FILE:
-            return isinstance(model_part, bkl.model.SourceFile)
-        elif self.scope == self.SCOPE_TARGET:
-            return isinstance(model_part, bkl.model.Target)
-        else: # target type scope
-            return (isinstance(model_part, bkl.model.Target) and
-                    model_part.type.name == self.scope)
+        for sc in self.scopes:
+            if (sc == self.SCOPE_PROJECT and
+                    isinstance(model_part, bkl.model.Project)):
+                return True
+            elif (sc == self.SCOPE_MODULE and
+                    isinstance(model_part, bkl.model.Module)):
+                return True
+            elif (sc == self.SCOPE_FILE and
+                    isinstance(model_part, bkl.model.SourceFile)):
+                return True
+            elif (sc == self.SCOPE_TARGET and
+                    isinstance(model_part, bkl.model.Target)):
+                return True
+            # target type scope:
+            elif (isinstance(model_part, bkl.model.Target) and
+                        model_part.type.name == sc):
+                    return True
+        return False
+
+    def _add_scope(self, scope):
+        if self.scopes is None:
+            self.scopes = [scope]
+        else:
+            self.scopes.append(scope)
 
     @property
     def internal(self):

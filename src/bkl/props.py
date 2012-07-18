@@ -169,7 +169,7 @@ class PropertiesDict(utils.OrderedDict):
         super(PropertiesDict, self). __init__()
         self.scope = scope
 
-    def add(self, prop):
+    def add(self, prop, as_inherited=False):
         if prop.name in self:
             # The same property may be shared by different target types (e.g.
             # "defines" for any native compiled target: exe, lib, dll, ...).
@@ -179,8 +179,11 @@ class PropertiesDict(utils.OrderedDict):
             if self[prop.name] is not prop:
                 raise RuntimeError("property \"%s\" defined more than once at the same scope (%s)" %
                                    (prop.name, self.scope))
-        if prop.scope is None:
-            prop.scope = self.scope
+
+        if as_inherited:
+            assert prop.scopes # must have assigned scope from elsewhere already
+        else:
+            prop._add_scope(self.scope)
         self[prop.name] = prop
 
 def _fill_prop_dict(props, scope):
@@ -196,7 +199,7 @@ def _propagate_inheritables(props, into):
     """
     for p in props.itervalues():
         if p.inheritable:
-            into.add(p)
+            into.add(p, as_inherited=True)
 
 
 class PropertiesRegistry(object):

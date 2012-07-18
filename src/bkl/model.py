@@ -392,7 +392,7 @@ class ModelPart(object):
             if p.toolsets and toolset not in p.toolsets:
                 continue
             if self.resolve_variable(p.name) is None:
-                if p.inheritable and not p._scope_is_for(self):
+                if p.inheritable and not p._scope_is_directly_for(self):
                     # don't create default for inheritable properties at higher
                     # levels than what they're defined for
                     continue
