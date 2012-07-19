@@ -22,7 +22,19 @@
 #  IN THE SOFTWARE.
 #
 
-import antlr3
+try:
+    import antlr3
+except ImportError:
+    import os.path
+    antlr_path = os.path.join(os.path.dirname(__file__),
+                              "../../../3rdparty/antlr3/runtime/Python")
+    if os.path.isdir(antlr_path):
+        import sys
+        sys.path.append(os.path.abspath(antlr_path))
+        import antlr3
+    else:
+        raise
+
 import ast
 from BakefileLexer import BakefileLexer
 from BakefileParser import BakefileParser
