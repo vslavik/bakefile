@@ -1,3 +1,6 @@
 [submodule "3rdparty/antlr3"]
 	path = 3rdparty/antlr3
 	url = git://github.com/antlr/antlr3.git
+[submodule "3rdparty/pyinstaller"]
+	path = 3rdparty/pyinstaller
+	url = git://github.com/pyinstaller/pyinstaller.git
