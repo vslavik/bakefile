@@ -27,6 +27,13 @@ import sys
 import logging
 from optparse import OptionParser, OptionGroup
 
+# This is needed to initialize colored output on Windows. It must be done
+# before any stdout is done.
+try:
+    import clint.packages.colorama
+    clint.packages.colorama.init()
+except ImportError:
+    pass
 
 class BklFormatter(logging.Formatter):
 
