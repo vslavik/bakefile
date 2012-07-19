@@ -34,12 +34,12 @@ the git repository:
 
 1. Python >= 2.6+
 
-2. ANTLR 3.4 generator. Because of bugs in the official release, a patched
-   version is needed for now. You can download prebuilt binary from
-   https://github.com/downloads/vslavik/antlr/antlr-3.4-complete.jar
-   (the sources are available at https://github.com/vslavik/antlr). It has
-   to be available at the `PATH` under the `antlr-3.4` name, e.g. using the
-   following shell script:
+2. ANTLR 3.4 generator. Because of bugs in the official release, a git version
+   is needed for now. You can download prebuilt binary from
+   https://github.com/downloads/vslavik/bakefile/antlr-3.4-complete.jar (the sources
+   are available from the official ANTLR repository at
+   https://github.com/antlr/antlr3). It has to be available at the `PATH` under
+   the `antlr-3.4` name, e.g. using the following shell script:
 
        #!/bin/sh
        java -jar /path/to/antlr-3.4-complete.jar "$@"
@@ -47,7 +47,7 @@ the git repository:
 3. ANTLR 3.4 Python runtime (no patches needed). It can be installed with
    `easy_install`:
 
-       easy_install https://github.com/downloads/vslavik/antlr/antlr_python_runtime-3.4.tar.gz
+       easy_install https://github.com/downloads/vslavik/bakefile/antlr_python_runtime-3.4.tar.gz
 
 4. Sphinx documentation tool. Install it with
 
