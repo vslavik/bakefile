@@ -11,7 +11,7 @@ antlr: $(antlr_script)
 
 $(antlr_script): $(antlr_jar)
 	echo '#!/bin/sh' >$@
-	echo 'java -jar $(realpath $(antlr_jar)) "$$@"' >>$@
+	echo 'java -jar $(abspath $(antlr_jar)) "$$@"' >>$@
 	chmod +x $@
 
 $(antlr_jar):

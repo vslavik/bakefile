@@ -14,7 +14,7 @@ antlr_is_34 := $(if $(shell $(ANTLR) -version 2>&1 | grep 'Version 3.4'),yes,no)
 ifeq "$(antlr_is_34)" "yes"
 	antlr_path := $(shell which $(ANTLR))
 else
-	antlr_path := $(realpath $(antlr_from_submodule))
+	antlr_path := $(abspath $(antlr_from_submodule))
 endif
 
 all: parser doc
