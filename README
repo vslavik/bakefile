@@ -34,28 +34,43 @@ the git repository:
 
 1. Python >= 2.6+
 
-2. ANTLR 3.4 generator. Because of bugs in the official release, a git version
-   is needed for now. You can download prebuilt binary from
-   https://github.com/downloads/vslavik/bakefile/antlr-3.4-complete.jar (the sources
-   are available from the official ANTLR repository at
-   https://github.com/antlr/antlr3). It has to be available at the `PATH` under
-   the `antlr-3.4` name, e.g. using the following shell script:
-
-       #!/bin/sh
-       java -jar /path/to/antlr-3.4-complete.jar "$@"
-
-3. ANTLR 3.4 Python runtime (no patches needed). It can be installed with
-   `easy_install`:
-
-       easy_install https://github.com/downloads/vslavik/bakefile/antlr_python_runtime-3.4.tar.gz
-
-4. Sphinx documentation tool. Install it with
+2. Sphinx documentation tool. Install it with
 
        easy_install Sphinx
 
-5. If you want to run the test suite, you'll need py.test too:
+3. If you want to run the test suite, you'll need py.test too:
 
        easy_install pytest
+
+Moreover, a recent version of ANTLR 3.4 (newer than the 3.4 release) is
+required. You have two options:
+
+(a) If you are using a git checkout, then you just need to checkout the submodules:
+
+       git submodule init
+       git submodule update
+
+    Up-to-date version of ANTLR is included as a submodule and the makefile
+    takes care of using it.
+
+    JDK and Maven must be installed for this.
+
+(b) Alternatively, you can install ANLTR and its Python runtime system-wide:
+
+    4. ANTLR 3.4 generator. Because of bugs in the official release, a git
+       version is needed for now. You can download prebuilt binary from
+       https://github.com/downloads/vslavik/bakefile/antlr-3.4-complete.jar (the
+       sources are available from the official ANTLR repository at
+       https://github.com/antlr/antlr3). It has to be available at the `PATH`
+       under the `antlr-3.4` name, e.g. using the following shell script:
+
+           #!/bin/sh
+           java -jar /path/to/antlr-3.4-complete.jar "$@"
+
+    5. ANTLR 3.4 Python runtime (no patches needed). It can be installed with
+       `easy_install`:
+
+           easy_install https://github.com/downloads/vslavik/bakefile/antlr_python_runtime-3.4.tar.gz
 
 Once all tools are installed, you can build Bakefile by running `make`. This
 generates the parser from ANTLR grammar and build the HTML documentation.
