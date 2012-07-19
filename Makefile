@@ -8,13 +8,13 @@ grammar_file := src/bkl/parser/Bakefile.g
 parser_file  := src/bkl/parser/BakefileParser.py
 lexer_file   := src/bkl/parser/BakefileLexer.py
 
-antlr_from_submodule := 3rdparty/antlr3/target/antlr
+antlr_from_submodule := $(abspath 3rdparty/antlr3/target/antlr)
 
 antlr_is_34 := $(if $(shell $(ANTLR) -version 2>&1 | grep 'Version 3.4'),yes,no)
 ifeq "$(antlr_is_34)" "yes"
 	antlr_path := $(shell which $(ANTLR))
 else
-	antlr_path := $(abspath $(antlr_from_submodule))
+	antlr_path := $(antlr_from_submodule)
 endif
 
 all: parser doc
