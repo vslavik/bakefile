@@ -447,14 +447,22 @@ class PathExpr(Expr):
          This anchor should be used for all transient files (object files
          or other generated files).
 
+    .. attribute:: anchor_file
+
+       Name of the file the anchor was written in. This is important for @srcdir,
+       which is relative to this place.
+
     .. attribute:: pos
 
        Location of the expression in source tree.
     """
-    def __init__(self, components, anchor=ANCHOR_SRCDIR, pos=None):
+    def __init__(self, components, anchor=ANCHOR_SRCDIR, anchor_file=None, pos=None):
         super(PathExpr, self).__init__(pos)
+        if anchor_file is None and pos is not None:
+            anchor_file = pos.filename
         self.components = components
         self.anchor = anchor
+        self.anchor_file = anchor_file
 
     def as_py(self):
         # We can't represent a path as something natively useful (e.g. native
@@ -561,7 +569,7 @@ class PathExpr(Expr):
             tail = "%s.%s" % (last.value, newext)
 
         comps = self.components[:-1] + [LiteralExpr(tail)]
-        return PathExpr(comps, self.anchor, pos=self.pos)
+        return PathExpr(comps, self.anchor, self.anchor_file, pos=self.pos)
 
 
 class Visitor(object):
@@ -731,7 +739,7 @@ class RewritingVisitor(Visitor):
         components, changed = self._process_children(e.components)
         if not changed:
             return e
-        return PathExpr(components, e.anchor, pos=e.pos)
+        return PathExpr(components, e.anchor, e.anchor_file, pos=e.pos)
 
     def bool(self, e):
         left = self.visit(e.left)
@@ -1098,7 +1106,7 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
         out = []
         for result in itertools.product(*components):
             cond = self._get_cond_for_list(result)
-            out.append((cond, PathExpr([e for c,e in result], anchor=e.anchor, pos=e.pos)))
+            out.append((cond, PathExpr([e for c,e in result], anchor=e.anchor, anchor_file=e.anchor_file, pos=e.pos)))
         return out
 
 

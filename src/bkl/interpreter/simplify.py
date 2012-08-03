@@ -94,7 +94,7 @@ class BasicSimplifier(RewritingVisitor):
         if not components:
             return NullExpr(pos=e.pos)
         else:
-            return PathExpr(components, e.anchor, pos=e.pos)
+            return PathExpr(components, e.anchor, e.anchor_file, pos=e.pos)
 
     def bool(self, e):
         left = self.visit(e.left)

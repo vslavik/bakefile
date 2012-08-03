@@ -261,7 +261,7 @@ class MakefileToolset(Toolset):
         for sub in module.submodules:
             subpath = sub.get_variable_value("%s.makefile" % self.name)
             # FIXME: use $dirname(), $basename() functions, this is hacky
-            subdir = expr.PathExpr(subpath.components[:-1], anchor=subpath.anchor)
+            subdir = expr.PathExpr(subpath.components[:-1], anchor=subpath.anchor, anchor_file=subpath.anchor_file)
             subfile = subpath.components[-1]
             submakefiles[sub] = (sub.name,
                                  expr_fmt.format(subdir),

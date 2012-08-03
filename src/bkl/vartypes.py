@@ -191,12 +191,13 @@ class PathType(Type):
         if not components:
             return e # empty path = invalid
         first = components[0]
+        anchor_file = first.pos.filename if first.pos else None
         if (isinstance(first, expr.LiteralExpr) and
                 first.value and first.value[0] == "@"):
             anchor = first.value
-            return expr.PathExpr(components[1:], anchor, pos=e.pos)
+            return expr.PathExpr(components[1:], anchor, anchor_file, pos=e.pos)
         else:
-            return expr.PathExpr(components, pos=e.pos)
+            return expr.PathExpr(components, expr.ANCHOR_SRCDIR, anchor_file, pos=e.pos)
 
     def _validate_impl(self, e):
         if not isinstance(e, expr.PathExpr):

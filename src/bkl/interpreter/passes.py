@@ -303,7 +303,12 @@ class PathsNormalizer(Visitor):
             e.components = bdir.components + e.components
         if e.anchor == bkl.expr.ANCHOR_SRCDIR:
             assert self.module is not None
-            source_file = e.pos.filename if e.pos and e.pos.filename else self.module.source_file
+            if e.anchor_file:
+                source_file = e.anchor_file
+            elif e.pos and e.pos.filename:
+                source_file = e.pos.filename
+            else:
+                source_file = self.module.source_file
             prefix = self._src_prefix(source_file)
             if prefix is not None:
                 e.components = prefix + e.components

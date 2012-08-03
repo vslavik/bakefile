@@ -204,7 +204,7 @@ class NativeCompiledType(TargetType):
         if ext in tdir:
             parts.append("." + getattr(toolset, ext))
         outdir = target["outputdir"]
-        return PathExpr(outdir.components + [concat(*parts)], outdir.anchor)
+        return PathExpr(outdir.components + [concat(*parts)], outdir.anchor, outdir.anchor_file)
 
 
 class NativeLinkedType(NativeCompiledType):

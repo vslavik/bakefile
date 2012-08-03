@@ -594,7 +594,7 @@ def _project_name_from_solution(toolset_class, target):
     proj_ext = toolset_class.proj_extension
     return bkl.expr.PathExpr(sln.components[:-1] +
                              [bkl.expr.LiteralExpr("%s.%s" % (target.name, proj_ext))],
-                             sln.anchor)
+                             sln.anchor, sln.anchor_file)
 
 def _default_guid_for_project(target):
     """automatically generated"""
