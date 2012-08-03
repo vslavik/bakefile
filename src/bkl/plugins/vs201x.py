@@ -83,7 +83,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
         n_globals = Node("PropertyGroup", Label="Globals")
         self._add_extra_options_to_node(target, n_globals)
-        n_globals.add("ProjectGuid", guid)
+        n_globals.add("ProjectGuid", "{%s}" % guid)
         n_globals.add("Keyword", "Win32Proj")
         n_globals.add("RootNamespace", target.name)
         self._add_VCTargetsPath(n_globals)
@@ -262,7 +262,7 @@ class VS201xToolsetBase(VSToolsetBase):
             for dep_id in target_deps:
                 dep = target.project.get_target(dep_id)
                 depnode = Node("ProjectReference", Include=dep["%s.projectfile" % self.name])
-                depnode.add("Project", dep["%s.guid" % self.name].as_py().lower())
+                depnode.add("Project", "{%s}" % dep["%s.guid" % self.name].as_py().lower())
                 refs.add(depnode)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.targets")

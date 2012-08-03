@@ -53,7 +53,7 @@ def GUID(namespace, solution, data):
     given data (typically, target ID).
     """
     g = uuid.uuid5(namespace, '%s/%s' % (str(solution), str(data)))
-    return "{%s}" % str(g).upper()
+    return str(g).upper()
 
 
 class Node(object):
@@ -502,12 +502,12 @@ class VSSolutionBase(object):
                     configurations.append(cfg)
 
         for prj in included_projects:
-            outf.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "%s"\n' %
+            outf.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "{%s}"\n' %
                        (prj.name, self.formatter.format(prj.projectfile), str(prj.guid)))
             if prj.dependencies:
                 outf.write("\tProjectSection(ProjectDependencies) = postProject\n")
                 for d in prj.dependencies:
-                    outf.write("\t\t%(g)s = %(g)s\n" % {'g':self._get_target_guid(d)})
+                    outf.write("\t\t{%(g)s} = {%(g)s}\n" % {'g':self._get_target_guid(d)})
                 outf.write("\tEndProjectSection\n")
             outf.write("EndProject\n")
 
@@ -530,7 +530,7 @@ class VSSolutionBase(object):
                                   (len(sln.projects) + len(sln.subsolutions)) <= 1)
             if sln.omit_from_tree:
                 continue
-            outf.write('Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "%s", "%s", "%s"\n' %
+            outf.write('Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "%s", "%s", "{%s}"\n' %
                        (sln.name, sln.name, sln.guid))
             outf.write("EndProject\n")
         all_folders = list(x for x in all_folders if not x.omit_from_tree)
@@ -546,8 +546,8 @@ class VSSolutionBase(object):
             guid = prj.guid
             for cfg in configurations:
                 cfgp = self._get_matching_project_config(cfg, prj)
-                outf.write("\t\t%s.%s|Win32.ActiveCfg = %s|Win32\n" % (guid, cfg.name, cfgp.name))
-                outf.write("\t\t%s.%s|Win32.Build.0 = %s|Win32\n" % (guid, cfg.name, cfgp.name))
+                outf.write("\t\t{%s}.%s|Win32.ActiveCfg = %s|Win32\n" % (guid, cfg.name, cfgp.name))
+                outf.write("\t\t{%s}.%s|Win32.Build.0 = %s|Win32\n" % (guid, cfg.name, cfgp.name))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(SolutionProperties) = preSolution\n")
         outf.write("\t\tHideSolutionNode = FALSE\n")
@@ -572,9 +572,9 @@ class VSSolutionBase(object):
             for sln in all_folders:
                 prjs, subslns = _gather_folder_children(sln)
                 for prj in prjs:
-                    outf.write("\t\t%s = %s\n" % (prj.guid, sln.guid))
+                    outf.write("\t\t{%s} = {%s}\n" % (prj.guid, sln.guid))
                 for subsln in subslns:
-                    outf.write("\t\t%s = %s\n" % (subsln.guid, sln.guid))
+                    outf.write("\t\t{%s} = {%s}\n" % (subsln.guid, sln.guid))
             outf.write("\tEndGlobalSection\n")
 
         outf.write("EndGlobal\n")

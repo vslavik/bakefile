@@ -200,7 +200,7 @@ class VS200xToolsetBase(VSToolsetBase):
         root["ProjectType"] = "Visual C++"
         root["Version"] = "%.2f" % self.version
         root["Name"] =  target.name
-        root["ProjectGUID"] = guid
+        root["ProjectGUID"] = "{%s}" % guid
         root["RootNamespace"] = target.name
         root["Keyword"] = "Win32Proj"
         self._add_extra_options_to_node(target, root)
