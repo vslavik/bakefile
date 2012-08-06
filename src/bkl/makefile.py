@@ -185,9 +185,9 @@ class MakefileToolset(Toolset):
                 graph = t.type.get_build_subgraph(self, t)
                 assert len(graph) > 0, "Build graph for %s is empty" % t
                 for node in graph:
-                    norm.visit_all(node.inputs)
-                    norm.visit_all(node.outputs)
-                    norm.visit_all(node.commands)
+                    node.inputs = [norm.visit(e) for e in node.inputs]
+                    node.outputs = [norm.visit(e) for e in node.outputs]
+                    node.commands = [norm.visit(e) for e in node.commands]
                 build_graphs[t] = graph
 
         for m in project.modules:

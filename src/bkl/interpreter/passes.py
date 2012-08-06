@@ -36,7 +36,7 @@ import bkl.vartypes
 import bkl.expr
 import bkl.model
 from bkl.error import Error, NonConstError, TypeError, warning
-from bkl.expr import Visitor
+from bkl.expr import Visitor, RewritingVisitor
 from bkl.utils import memoized
 
 
@@ -225,7 +225,7 @@ def remove_disabled_model_parts(model, toolset):
 
 
 
-class PathsNormalizer(Visitor):
+class PathsNormalizer(RewritingVisitor):
     """
     Normalizes relative paths so that they are absolute. Paths relative to
     @srcdir are rewritten in terms of @top_srcdir. Paths relative to @builddir
@@ -235,8 +235,6 @@ class PathsNormalizer(Visitor):
     You must call :meth:`set_context()` to associate a module or target before
     calling :meth:`visit()`.  Paths relative to @builddir can only be processed
     if the context was set to a target.
-
-    Performs the normalization in-place.
     """
     def __init__(self, project, toolset=None):
         self.toolset = toolset
@@ -260,11 +258,6 @@ class PathsNormalizer(Visitor):
             self.module = context
             self.target = None
 
-    def visit_all(self, all):
-        """Visits all items in the iterable."""
-        for x in all:
-            self.visit(x)
-
     @memoized
     def _src_prefix(self, source_file):
         srcdir = self.srcdir_map[source_file]
@@ -283,24 +276,14 @@ class PathsNormalizer(Visitor):
         logger.debug('translating @builddir paths of %s into %s', target, builddir)
         return builddir
 
-    literal = Visitor.noop
-    bool_value = Visitor.noop
-    null = Visitor.noop
-    reference = Visitor.noop
-    placeholder = Visitor.noop
-    concat = Visitor.visit_children
-    list = Visitor.visit_children
-    bool = Visitor.visit_children
-    if_ = Visitor.visit_children
-
     def path(self, e):
-        self.visit_children(e)
         if e.anchor == bkl.expr.ANCHOR_BUILDDIR and self.toolset is not None:
             if self.target is None:
                 raise Error("@builddir references are not allowed outside of targets", pos=e.pos)
             bdir = self._builddir(self.target)
-            e.anchor = bdir.anchor
-            e.components = bdir.components + e.components
+            e = bkl.expr.PathExpr(bdir.components + e.components,
+                                  bdir.anchor, bdir.anchor_file,
+                                  pos=e.pos)
         if e.anchor == bkl.expr.ANCHOR_SRCDIR:
             assert self.module is not None
             if e.anchor_file:
@@ -310,9 +293,13 @@ class PathsNormalizer(Visitor):
             else:
                 source_file = self.module.source_file
             prefix = self._src_prefix(source_file)
+            components = e.components
             if prefix is not None:
-                e.components = prefix + e.components
-            e.anchor = bkl.expr.ANCHOR_TOP_SRCDIR
+                components = prefix + components
+            e = bkl.expr.PathExpr(components,
+                                  bkl.expr.ANCHOR_TOP_SRCDIR, None,
+                                  pos=e.pos)
+        return e
 
 
 def normalize_paths_in_model(model, toolset):
@@ -333,10 +320,12 @@ def normalize_paths_in_model(model, toolset):
 
     for module in model.modules:
         norm.set_context(module)
-        norm.visit_all(var.value for var in module.variables.itervalues())
+        for var in module.variables.itervalues():
+            var.value = norm.visit(var.value)
         for target in module.targets.itervalues():
             norm.set_context(target)
-            norm.visit_all(var.value for var in target.all_variables())
+            for var in target.all_variables():
+                var.value = norm.visit(var.value)
 
 
 def make_variables_for_missing_props(model, toolset):

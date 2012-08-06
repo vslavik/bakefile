@@ -470,7 +470,7 @@ class PathExpr(Expr):
         return (self.anchor, '/'.join(x.as_py() for x in self.components))
 
     def __nonzero__(self):
-        True
+        return bool(self.components)
 
     def __str__(self):
         return "%s/%s" % (self.anchor, "/".join(str(e) for e in self.components))

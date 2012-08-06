@@ -23,7 +23,6 @@
 #
 
 from abc import ABCMeta, abstractmethod
-import copy
 import types
 import os.path
 
@@ -359,7 +358,7 @@ class Property(object):
             # default is defined as a callback function
             val = val(for_obj)
         if isinstance(val, expr.Expr):
-            return copy.deepcopy(val)
+            return val
         elif isinstance(val, types.StringType):
             # parse strings as bkl language expressions, it's too useful to
             return self._parse_expr(val, for_obj)
