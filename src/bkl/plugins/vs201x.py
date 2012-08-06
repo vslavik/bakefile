@@ -225,12 +225,15 @@ class VS201xToolsetBase(VSToolsetBase):
         # Source files:
         items = Node("ItemGroup")
         root.add(items)
+        rc_files = []
         for sfile in target.sources:
             ext = sfile.filename.get_extension()
             # TODO: share this code with VS200x
             # FIXME: make this more solid
             if ext in ['cpp', 'cxx', 'cc', 'c']:
                 items.add("ClCompile", Include=sfile.filename)
+            elif ext == 'rc':
+                rc_files.append(sfile)
             else:
                 # FIXME: handle both compilation into cpp and c files
                 genfiletype = bkl.compilers.CxxFileType.get()
@@ -253,6 +256,13 @@ class VS201xToolsetBase(VSToolsetBase):
             root.add(items)
             for sfile in target.headers:
                 items.add("ClInclude", Include=sfile.filename)
+
+        # Resources:
+        if rc_files:
+            items = Node("ItemGroup")
+            root.add(items)
+            for sfile in rc_files:
+                items.add("ResourceCompile", Include=sfile.filename)
 
         # Dependencies:
         target_deps = target["deps"].as_py()

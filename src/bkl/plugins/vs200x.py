@@ -393,12 +393,23 @@ class VS200xToolsetBase(VSToolsetBase):
         sources = Node("Filter", Name="Source Files")
         sources["Filter"] = "cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
         sources["UniqueIdentifier"] = "{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+
+        headers = Node("Filter", Name="Header Files")
+        headers["Filter"] = "h;hpp;hxx;hm;inl;inc;xsd"
+        headers["UniqueIdentifier"] = "{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+
+        resources = Node("Filter", Name="Resource Files")
+        resources["Filter"] = "rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+        resources["UniqueIdentifier"] = "{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+
         for sfile in target.sources:
             ext = sfile.filename.get_extension()
             # TODO: share this code with VS2010
             # FIXME: make this more solid
             if ext in ['cpp', 'cxx', 'cc', 'c']:
                 sources.add("File", RelativePath=sfile.filename)
+            elif ext == 'rc':
+                resources.add("File", RelativePath=sfile.filename)
             else:
                 # FIXME: handle both compilation into cpp and c files
                 genfiletype = bkl.compilers.CxxFileType.get()
@@ -419,18 +430,13 @@ class VS200xToolsetBase(VSToolsetBase):
                     n_cfg.add(tool)
                     n_file.add(n_cfg)
                 sources.add("File", RelativePath=genname)
-        files.add(sources)
 
-        headers = Node("Filter", Name="Header Files")
-        headers["Filter"] = "h;hpp;hxx;hm;inl;inc;xsd"
-        headers["UniqueIdentifier"] = "{93995380-89BD-4b04-88EB-625FBE52EBFB}"
         for sfile in target.headers:
             headers.add("File", RelativePath=sfile.filename)
-        files.add(headers)
 
-        resources = Node("Filter", Name="Resource Files")
-        resources["Filter"] = "rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-        resources["UniqueIdentifier"] = "{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+
+        files.add(sources)
+        files.add(headers)
         files.add(resources)
         return files
 
