@@ -2,6 +2,11 @@ toolsets = gnu gnu-osx vs2008 vs2010;
 
 vs2008.solutionfile = dll2008.sln;
 
+loadable-module myplugin {
+    sources { plugin.c }
+}
+
 dll mydll {
+    deps += myplugin;
     sources { common.cpp helpers.cpp }
 }

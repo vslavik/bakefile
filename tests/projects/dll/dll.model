@@ -4,7 +4,13 @@ module {
     vs2008.solutionfile = @top_srcdir/dll2008.sln
   }
   targets {
+    loadable-module myplugin {
+      sources {
+        file @top_srcdir/plugin.c
+      }
+    }
     dll mydll {
+      deps = [myplugin]
       sources {
         file @top_srcdir/common.cpp
         file @top_srcdir/helpers.cpp

@@ -147,6 +147,8 @@ class VS201xToolsetBase(VSToolsetBase):
             targetname = cfg[target.type.basename_prop]
             if targetname != target.name:
                 n.add("TargetName", targetname)
+            if is_module_dll(target):
+                n.add("IgnoreImportLibrary", True)
             if target.is_variable_explicitly_set("outputdir"):
                 n.add("OutDir", cfg["outputdir"])
             if n.has_children():

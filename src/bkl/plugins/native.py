@@ -194,6 +194,7 @@ class NativeCompiledType(TargetType):
         Returns expression with filename of the target using given property
         (e.g. libname, exename) for use with given toolset.
         """
+        fileclass = fileclass.replace("-", "_")
         tdir = dir(toolset)
         prefix = "%s_prefix" % fileclass
         ext = "%s_extension" % fileclass
@@ -390,4 +391,42 @@ class DllType(NativeLinkedType):
                         toolset,
                         target,
                         ft_to=NativeDllFileType.get(),
+                        outfile=self.target_file(toolset, target))
+
+
+class LoadableModuleType(NativeLinkedType):
+    """
+    Runtime-loaded dynamic module (plugin).
+    """
+    name = "loadable-module"
+
+    properties = [
+            Property("dllname",
+                 type=StringType(),
+                 default="$(id)",
+                 inheritable=False,
+                 doc="""
+                     Base name of the loadable module.
+
+                     This is not full filename or even path, it's only its base part,
+                     to which platform-specific prefix and/or extension are
+                     added. By default, it's the same as target's ID, but it can be changed e.g.
+                     if the filename should contain version number, which would be impractical
+                     to use as target identifier in the bakefile.
+
+                     .. code-block:: bkl
+
+                        module myplugin {
+                          dllname = myplugin-v1;
+                        }
+                     """),
+        ]
+
+    basename_prop = "dllname"
+
+    def get_build_subgraph(self, toolset, target):
+        return get_compilation_subgraph(
+                        toolset,
+                        target,
+                        ft_to=NativeLoadableModuleFileType.get(),
                         outfile=self.target_file(toolset, target))

@@ -202,6 +202,24 @@ class GnuSharedLibLinker(GnuLinker):
         return [ListExpr(cmd)]
 
 
+class GnuLoadableModuleLinker(GnuLinker):
+    """
+    GNU loadable modules linker.
+    """
+    name = "GNU module LD"
+    in_type = GnuObjectFileType.get()
+    out_type = bkl.compilers.NativeLoadableModuleFileType.get()
+
+    def commands(self, toolset, target, input, output):
+        cmd = [LiteralExpr("$(CXX) %s -o $@" % toolset.loadable_module_link_flag)]
+        cmd.append(LiteralExpr("$(LDFLAGS)"))
+        cmd.append(input)
+        # FIXME: use a parser instead of constructing the expression manually
+        #        in here
+        cmd += self._linker_flags(toolset, target)
+        return [ListExpr(cmd)]
+
+
 class GnuLibLinker(GnuFileCompiler):
     """
     GNU library linker.
@@ -253,6 +271,9 @@ class GnuToolset(MakefileToolset):
     library_extension = "a"
     dll_prefix = "lib"
     dll_extension = "so"
+    loadable_module_prefix = ""
+    loadable_module_extension = "so"
+    loadable_module_link_flag = "-shared"
 
     use_sonames = True
 
@@ -303,6 +324,8 @@ class OSXGnuToolset(GnuToolset):
     default_makefile = "Makefile.osx"
 
     dll_extension = "dylib"
+    loadable_module_extension = "bundle"
+    loadable_module_link_flag = "-bundle"
 
     use_sonames = False
 

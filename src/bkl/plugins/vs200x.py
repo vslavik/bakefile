@@ -335,6 +335,8 @@ class VS200xToolsetBase(VSToolsetBase):
         if is_library(target):
             return None
         n = Node("Tool", Name="VCLinkerTool")
+        if is_module_dll(target):
+            n["IgnoreImportLibrary"] = True
         n["AdditionalOptions"] = VSList(" ", target.type.get_link_options(cfg))
         libs = cfg["libs"]
         if libs:

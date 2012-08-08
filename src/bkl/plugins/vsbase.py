@@ -771,4 +771,7 @@ def is_exe(target):
     return target.type.name == "exe"
 
 def is_dll(target):
-    return target.type.name == "dll"
+    return target.type.name == "dll" or target.type.name == "loadable-module"
+
+def is_module_dll(target):
+    return target.type.name == "loadable-module"

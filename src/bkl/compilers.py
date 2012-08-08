@@ -48,6 +48,11 @@ class NativeDllFileType(FileType):
     name = "dll"
     # FIXME: extensions
 
+#: Native runtime-loadable module file type
+class NativeLoadableModuleFileType(FileType):
+    name = "loadable-module"
+    # FIXME: extensions
+
 
 #: C files
 class CFileType(FileType):
