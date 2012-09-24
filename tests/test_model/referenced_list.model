@@ -1,0 +1,11 @@
+module {
+  variables {
+    toolsets = [vs2010]
+    wx_include_dirs = [../wxWidgets_setup_h, include]
+  }
+  targets {
+    library test {
+      includedirs = [@top_srcdir/../wxWidgets_setup_h, @top_srcdir/include]
+    }
+  }
+}

@@ -1,0 +1,9 @@
+// This tests proper unwinding of conditions stack in the even of an exception
+// inside an 'if' block.
+
+toolsets = vs2010;
+wx_include_dirs = ../wxWidgets_setup_h include;
+
+library test {
+    includedirs += $(wx_include_dirs);
+}

@@ -61,6 +61,10 @@ class Type(object):
                 return e
             else:
                 return expr.IfExpr(e.cond, yes, no, pos=e.pos)
+        elif isinstance(e, expr.ReferenceExpr):
+            val = e.get_value()
+            norm = self.normalize(val)
+            return norm if norm is not val else e
         else:
             return self._normalize_impl(e)
 
@@ -253,12 +257,16 @@ class ListType(Type):
         self.name = "list of %ss" % str(item_type)
 
     def _normalize_impl(self, e):
-        # A non-list expression with single value is a special case of list
-        # for convenience, we translate it into single-item list automagically:
-        if isinstance(e, expr.ListExpr):
-            return expr.ListExpr([self.item_type.normalize(i) for i in e.items], pos=e.pos)
-        else:
-            return expr.ListExpr([self.item_type.normalize(e)], pos=e.pos)
+        # Normalize the list: expand conditional expressions and references so
+        # that the value is ListExpr with one item per one individual item in
+        # the list. This makes implementing validate() straightforward.
+        items = []
+        for cond, item in expr.enum_possible_values(e):
+            norm = self.item_type.normalize(item)
+            if cond is not None:
+                norm = expr.IfExpr(cond, yes=norm, no=expr.NullExpr(pos=norm.pos), pos=norm.pos)
+            items.append(norm)
+        return expr.ListExpr(items, pos=e.pos)
 
     def _validate_impl(self, e):
         if isinstance(e, expr.ListExpr):
