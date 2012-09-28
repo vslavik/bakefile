@@ -93,7 +93,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
         for cfg in target.configurations:
             n = Node("PropertyGroup", Label="Configuration")
-            self._add_extra_options_to_node(target, n)
+            self._add_extra_options_to_node(cfg, n)
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
             if is_exe(target):
                 n.add("ConfigurationType", "Application")
@@ -129,7 +129,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
         for cfg in target.configurations:
             n = Node("PropertyGroup")
-            self._add_extra_options_to_node(target, n)
+            self._add_extra_options_to_node(cfg, n)
             if not is_library(target):
                 n.add("LinkIncremental", cfg.is_debug)
             targetname = cfg[target.type.basename_prop]
@@ -145,7 +145,7 @@ class VS201xToolsetBase(VSToolsetBase):
             n = Node("ItemDefinitionGroup")
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
             n_cl = Node("ClCompile")
-            self._add_extra_options_to_node(target, n_cl)
+            self._add_extra_options_to_node(cfg, n_cl)
             n_cl.add("WarningLevel", "Level3")
             if cfg.is_debug:
                 n_cl.add("Optimization", "Disabled")
@@ -180,7 +180,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
             n.add(n_cl)
             n_link = Node("Link")
-            self._add_extra_options_to_node(target, n_link)
+            self._add_extra_options_to_node(cfg, n_link)
             n.add(n_link)
             if is_exe(target) and target["win32-subsystem"] == "console":
                 n_link.add("SubSystem", "Console")
@@ -205,7 +205,7 @@ class VS201xToolsetBase(VSToolsetBase):
                 addlibs.append("%(AdditionalDependencies)")
                 if is_library(target):
                     n_lib = Node("Lib")
-                    self._add_extra_options_to_node(target, n_lib)
+                    self._add_extra_options_to_node(cfg, n_lib)
                     n.add(n_lib)
                     n_lib.add("AdditionalDependencies", addlibs)
                 else:

@@ -38,6 +38,7 @@ import bkl.expr
 from bkl.utils import OrderedDict
 from bkl.error import error_context, warning, Error, CannotDetermineError
 from bkl.api import Toolset, Property
+from bkl.model import ConfigurationProxy
 from bkl.vartypes import PathType, StringType, BoolType
 from bkl.io import OutputFile, EOL_WINDOWS
 
@@ -738,10 +739,16 @@ class VSToolsetBase(Toolset):
             scope = "%s.option.%s" % (self.name, prefix)
         else:
             scope = "%s.option" % self.name
-        for var in target.variables.itervalues():
-            split = var.name.rsplit(".", 1)
+
+        if isinstance(target, ConfigurationProxy):
+            variables = target.model.variables
+        else:
+            variables = target.variables
+
+        for varname in variables.iterkeys():
+            split = varname.rsplit(".", 1)
             if len(split) == 2 and split[0] == scope:
-                yield (str(split[1]), var.value)
+                yield (str(split[1]), target[varname])
 
 
 # Misc helpers:

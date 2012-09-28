@@ -231,7 +231,7 @@ class VS200xToolsetBase(VSToolsetBase):
                 return None
             if cfg["win32-unicode"]:
                 n["CharacterSet"] = 1
-            self._add_extra_options_to_node(target, n)
+            self._add_extra_options_to_node(cfg, n)
 
             for tool in self.tool_functions:
                 if hasattr(self, tool):
@@ -240,7 +240,7 @@ class VS200xToolsetBase(VSToolsetBase):
                 else:
                     n_tool = Node("Tool", Name=tool)
                 if n_tool:
-                    self._add_extra_options_to_node(target, n_tool)
+                    self._add_extra_options_to_node(cfg, n_tool)
                     n.add(n_tool)
 
         root.add(Node("References"))
