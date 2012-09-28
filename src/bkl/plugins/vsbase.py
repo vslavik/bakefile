@@ -741,14 +741,20 @@ class VSToolsetBase(Toolset):
             scope = "%s.option" % self.name
 
         if isinstance(target, ConfigurationProxy):
-            variables = target.model.variables
+            scope_for_vars = target.model
         else:
-            variables = target.variables
+            scope_for_vars = target
 
-        for varname in variables.iterkeys():
-            split = varname.rsplit(".", 1)
-            if len(split) == 2 and split[0] == scope:
-                yield (str(split[1]), target[varname])
+        already_found = set()
+        while scope_for_vars is not None:
+            for varname in scope_for_vars.variables.iterkeys():
+                if varname in already_found:
+                    continue
+                split = varname.rsplit(".", 1)
+                if len(split) == 2 and split[0] == scope:
+                    yield (str(split[1]), target[varname])
+            already_found.update(scope_for_vars.variables.iterkeys())
+            scope_for_vars = scope_for_vars.parent
 
 
 # Misc helpers:
