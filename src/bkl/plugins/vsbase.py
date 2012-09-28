@@ -36,7 +36,7 @@ logger = logging.getLogger("bkl.vsbase")
 
 import bkl.expr
 from bkl.utils import OrderedDict
-from bkl.error import error_context, warning, Error
+from bkl.error import error_context, warning, Error, CannotDetermineError
 from bkl.api import Toolset, Property
 from bkl.vartypes import PathType, StringType, BoolType
 from bkl.io import OutputFile, EOL_WINDOWS
@@ -214,10 +214,14 @@ class XmlFormatter(object):
                     assert key == value.name
                     children_markup += self._do_format_node(value, subindent)
                 else:
-                    v = escape(self.format_value(value))
-                    if v:
-                        children_markup += "%s<%s>%s</%s>\n" % (subindent, key, v, key)
-                    # else: empty value, don't write that
+                    try:
+                        v = escape(self.format_value(value))
+                        if v:
+                            children_markup += "%s<%s>%s</%s>\n" % (subindent, key, v, key)
+                        # else: empty value, don't write that
+                    except CannotDetermineError as e:
+                        raise Error("cannot set property \"%s\" to non-constant expression \"%s\" (%s)" %
+                                    (key, value, e.msg), pos=value.pos)
         else:
             children_markup = None
         return self.format_node(n.name, attrs, n.text, children_markup, indent)
