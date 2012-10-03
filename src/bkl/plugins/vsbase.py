@@ -334,8 +334,12 @@ class VSSolutionBase(object):
                                     builddir=None,
                                     model=module)
         self.formatter = VSExprFormatter(paths_info)
-        self.outf = OutputFile(slnfile, EOL_WINDOWS,
-                               creator=toolset, create_for=module)
+        self.generate_outf = module["%s.generate-solution" % toolset.name]
+        if self.generate_outf:
+            self.outf = OutputFile(slnfile, EOL_WINDOWS,
+                                   creator=toolset, create_for=module)
+        else:
+            self.outf = None
 
     def add_project(self, prj):
         """
@@ -490,6 +494,8 @@ class VSSolutionBase(object):
 
     def write(self):
         """Writes the solution to the file."""
+        if not self.generate_outf:
+            return # silently do nothing
         outf = self.outf
         self.write_header(outf)
 
@@ -665,8 +671,7 @@ class VSToolsetBase(Toolset):
             for sub in m.submodules:
                 m.solution.add_subsolution(sub.solution)
         for m in project.modules:
-            if m["%s.generate-solution" % self.name]:
-                m.solution.write()
+            m.solution.write()
 
 
     def gen_for_module(self, module):
