@@ -571,7 +571,7 @@ class VSSolutionBase(object):
             def _gather_folder_children(sln):
                 prjs = [p for p in sln.projects.itervalues()]
                 slns = []
-                for s in slns:
+                for s in sln.subsolutions:
                     if s.omit_from_tree:
                         p2, s2 = _gather_folder_children(s)
                         prjs += p2
