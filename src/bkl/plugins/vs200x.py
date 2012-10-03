@@ -319,6 +319,18 @@ class VS200xToolsetBase(VSToolsetBase):
         return n
 
 
+    def VCResourceCompilerTool(self, target, cfg):
+        n = Node("Tool", Name="VCResourceCompilerTool")
+        std_defs = []
+        if cfg["win32-unicode"]:
+            std_defs.append("_UNICODE")
+            std_defs.append("UNICODE")
+        n["PreprocessorDefinitions"] = list(cfg["defines"]) + std_defs
+        n["AdditionalIncludeDirectories"] = cfg["includedirs"]
+
+        return n
+
+
     def VCLinkerTool(self, target, cfg):
         if is_library(target):
             return None

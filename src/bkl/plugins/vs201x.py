@@ -66,6 +66,17 @@ class VS201xToolsetBase(VSToolsetBase):
                                     builddir=self.get_builddir_for(target).as_native_path_for_output(target),
                                     model=target)
 
+        rc_files = []
+        cl_files = []
+        for sfile in target.sources:
+            ext = sfile.filename.get_extension()
+            # TODO: share this code with VS200x
+            # FIXME: make this more solid
+            if ext == 'rc':
+                rc_files.append(sfile)
+            else:
+                cl_files.append(sfile)
+
         root = Node("Project")
         root["DefaultTargets"] = "Build"
         root["ToolsVersion"] = "4.0"
@@ -179,6 +190,19 @@ class VS201xToolsetBase(VSToolsetBase):
                 n_cl.add("AdditionalOptions", all_cflags)
 
             n.add(n_cl)
+
+            if rc_files:
+                n_res = Node("ResourceCompile")
+                self._add_extra_options_to_node(cfg, n_res)
+                n_res.add("AdditionalIncludeDirectories", cfg["includedirs"])
+                std_defs = []
+                if cfg["win32-unicode"]:
+                    std_defs.append("_UNICODE")
+                    std_defs.append("UNICODE")
+                std_defs.append("%(PreprocessorDefinitions)")
+                n_res.add("PreprocessorDefinitions", list(cfg["defines"]) + std_defs)
+                n.add(n_res)
+
             n_link = Node("Link")
             self._add_extra_options_to_node(cfg, n_link)
             n.add(n_link)
@@ -225,15 +249,12 @@ class VS201xToolsetBase(VSToolsetBase):
         # Source files:
         items = Node("ItemGroup")
         root.add(items)
-        rc_files = []
-        for sfile in target.sources:
+        for sfile in cl_files:
             ext = sfile.filename.get_extension()
             # TODO: share this code with VS200x
             # FIXME: make this more solid
             if ext in ['cpp', 'cxx', 'cc', 'c']:
                 items.add("ClCompile", Include=sfile.filename)
-            elif ext == 'rc':
-                rc_files.append(sfile)
             else:
                 # FIXME: handle both compilation into cpp and c files
                 genfiletype = bkl.compilers.CxxFileType.get()
@@ -369,6 +390,7 @@ class VS2010Toolset(VS201xToolsetBase):
       - ``vs2010.option.*`` (this is the unnamed ``PropertyGroup`` with
         global settings such as ``TargetName``)
       - ``vs2010.option.ClCompile.*``
+      - ``vs2010.option.ResourceCompile.*``
       - ``vs2010.option.Link.*``
       - ``vs2010.option.Lib.*``
 
@@ -416,6 +438,7 @@ class VS2012Toolset(VS201xToolsetBase):
       - ``vs2012.option.*`` (this is the unnamed ``PropertyGroup`` with
         global settings such as ``TargetName``)
       - ``vs2012.option.ClCompile.*``
+      - ``vs2010.option.ResourceCompile.*``
       - ``vs2012.option.Link.*``
       - ``vs2012.option.Lib.*``
 
