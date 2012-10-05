@@ -97,6 +97,7 @@ class VS201xToolsetBase(VSToolsetBase):
         n_globals.add("ProjectGuid", "{%s}" % guid)
         n_globals.add("Keyword", "Win32Proj")
         n_globals.add("RootNamespace", target.name)
+        n_globals.add("ProjectName", target.name)
         self._add_VCTargetsPath(n_globals)
         root.add(n_globals)
 
