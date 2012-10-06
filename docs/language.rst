@@ -312,7 +312,7 @@ The syntax is similar to C++ inheritance syntax:
 
 .. code-block:: bkl
 
-   template commnon_stuff {
+   template common_stuff {
        defines += BUILDING;
    }
 
@@ -331,7 +331,7 @@ Or equivalently:
 
 .. code-block:: bkl
 
-   template commnon_stuff {
+   template common_stuff {
        defines += BUILDING;
    }
 
