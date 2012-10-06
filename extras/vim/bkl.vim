@@ -19,7 +19,7 @@ setl isk+=.,-
 
 " Simple keywords that can occur anywhere (this is not really true for
 " bklTarget but we can't easily avoid recognizing it inside another target).
-syn keyword	bklTarget	action dll exe library external
+syn keyword	bklTarget	action dll exe library external template
 syn keyword	bklIf		if
 
 " Statements and properties that can only appear at global scope, outside of
@@ -28,7 +28,6 @@ syn keyword	bklGlobalStat	submodule
 syn keyword	bklGlobalStat	requires
 syn keyword	bklGlobalStat	srcdir
 syn keyword	bklGlobalStat	configuration
-syn keyword	bklGlobalStat	template
 syn keyword	bklGlobalProp	toolsets
 syn keyword	bklGlobalProp	configurations
 syn match	bklGlobalProp	"\<vs\(2003\|2005\|2008\|2010\|2012\).generate-solution\ze *=" nextgroup=bklBoolRHS skipwhite
@@ -86,10 +85,11 @@ syn region	bklBlock	start="{" end="}" transparent
 " Cluster of syntax items that can occur in any block.
 syn cluster	bklAnyBlock	contains=bklBlock,bklComment,bklCommentL,bklCommonProp,bklIf,bklVar
 
-syn region	bklExeBlock	matchgroup=Normal start="\%\(exe \+\k\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp
-syn region	bklDllBlock	matchgroup=Normal start="\%\(dll \+\k\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklDllProp
-syn region	bklLibBlock	matchgroup=Normal start="\%\(library \+\k\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklLibProp
-syn region	bklActionBlock	matchgroup=Normal start="\%\(action \+\k\+ \+\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
+syn region	bklExeBlock	matchgroup=Normal start="\%\(exe \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp
+syn region	bklDllBlock	matchgroup=Normal start="\%\(dll \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklDllProp
+syn region	bklLibBlock	matchgroup=Normal start="\%\(library \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklLibProp
+syn region	bklTemplBlock	matchgroup=Normal start="\%\(template \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp,bklDllProp,bklLibProp
+syn region	bklActionBlock	matchgroup=Normal start="\%\(action \+\k\+ *\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
 
 
 " Define the default highlighting.
