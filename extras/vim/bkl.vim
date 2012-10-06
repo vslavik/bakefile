@@ -7,6 +7,12 @@ if exists("b:current_syntax")
     finish
 endif
 
+if getline(1) =~# '<?xml .*'
+    " This is an old bakefile 0.x file using XML syntax, ignore it.
+    runtime syntax/xml.vim
+    finish
+endif
+
 syn case match
 syn sync fromstart
 setl isk+=.,-
