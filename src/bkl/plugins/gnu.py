@@ -188,7 +188,7 @@ class GnuSharedLibLinker(GnuLinker):
     """
     name = "GNU shared LD"
     in_type = GnuObjectFileType.get()
-    out_type = bkl.compilers.NativeDllFileType.get()
+    out_type = bkl.compilers.NativeSharedLibraryFileType.get()
 
     def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("$(CXX) -shared -o $@")]
@@ -269,8 +269,8 @@ class GnuToolset(MakefileToolset):
 
     library_prefix = "lib"
     library_extension = "a"
-    dll_prefix = "lib"
-    dll_extension = "so"
+    shared_library_prefix = "lib"
+    shared_lirary_extension = "so"
     loadable_module_prefix = ""
     loadable_module_extension = "so"
     loadable_module_link_flag = "-shared"
@@ -323,7 +323,7 @@ class OSXGnuToolset(GnuToolset):
 
     default_makefile = "Makefile.osx"
 
-    dll_extension = "dylib"
+    shared_library_extension = "dylib"
     loadable_module_extension = "bundle"
     loadable_module_link_flag = "-bundle"
 

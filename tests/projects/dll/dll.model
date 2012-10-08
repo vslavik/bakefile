@@ -9,7 +9,7 @@ module {
         file @top_srcdir/plugin.c
       }
     }
-    dll mydll {
+    shared-library mydll {
       deps = [myplugin]
       sources {
         file @top_srcdir/common.cpp

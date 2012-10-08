@@ -19,7 +19,7 @@ setl isk+=.,-
 
 " Simple keywords that can occur anywhere (this is not really true for
 " bklTarget but we can't easily avoid recognizing it inside another target).
-syn keyword	bklTarget	action dll loadable-module exe library external template
+syn keyword	bklTarget	action shared-library loadable-module exe library external template
 syn keyword	bklIf		if
 
 " Statements and properties that can only appear at global scope, outside of
@@ -49,7 +49,7 @@ syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\)\.option\(\.\w\+\)\{1
 " Properties that can occur inside action/exe/lib/dll targets only.
 syn keyword	bklActionProp	commands contained
 syn keyword	bklExeProp	exename contained
-syn keyword	bklDllProp	libname contained
+syn keyword	bklShLibProp	libname contained
 syn keyword	bklLibProp	libname contained
 
 " Properties that can only occur in the targets building something i.e.
@@ -86,9 +86,9 @@ syn region	bklBlock	start="{" end="}" transparent
 syn cluster	bklAnyBlock	contains=bklBlock,bklComment,bklCommentL,bklCommonProp,bklIf,bklVar
 
 syn region	bklExeBlock	matchgroup=Normal start="\%\(exe \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp
-syn region	bklDllBlock	matchgroup=Normal start="\%\(dll \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklDllProp
+syn region	bklShLibBlock	matchgroup=Normal start="\%\(shared-library \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklShLibProp
 syn region	bklLibBlock	matchgroup=Normal start="\%\(library \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklLibProp
-syn region	bklTemplBlock	matchgroup=Normal start="\%\(template \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp,bklDllProp,bklLibProp
+syn region	bklTemplBlock	matchgroup=Normal start="\%\(template \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp,bklShLibProp,bklLibProp
 syn region	bklActionBlock	matchgroup=Normal start="\%\(action \+\k\+ *\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
 
 
@@ -99,7 +99,7 @@ hi def link bklBuildProp	bklCommonProp
 hi def link bklComment		Comment
 hi def link bklCommentL		bklComment
 hi def link bklCommonProp	bklGlobalProp
-hi def link bklDllProp		bklCommonProp
+hi def link bklShLibProp	bklCommonProp
 hi def link bklError		Error
 hi def link bklExeProp		bklCommonProp
 hi def link bklFilename		bklString

@@ -6,7 +6,7 @@ loadable-module myplugin {
     sources { plugin.c }
 }
 
-dll mydll {
+shared-library mydll {
     deps += myplugin;
     sources { common.cpp helpers.cpp }
 }

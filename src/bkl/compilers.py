@@ -43,9 +43,9 @@ class NativeLibFileType(FileType):
     name = "library"
     # FIXME: extensions
 
-#: Native dynamic library file type
-class NativeDllFileType(FileType):
-    name = "dll"
+#: Native shared library file type
+class NativeSharedLibraryFileType(FileType):
+    name = "shared-library"
     # FIXME: extensions
 
 #: Native runtime-loadable module file type

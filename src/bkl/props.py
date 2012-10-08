@@ -172,7 +172,8 @@ class PropertiesDict(utils.OrderedDict):
     def add(self, prop, as_inherited=False):
         if prop.name in self:
             # The same property may be shared by different target types (e.g.
-            # "defines" for any native compiled target: exe, lib, dll, ...).
+            # "defines" for any native compiled target: programs, shared or
+            # static libraries, ...).
             # That is OK, the property comes from a common base class then and
             # is the same instance. Having two different properties with the
             # same name is not OK, though.

@@ -257,7 +257,7 @@ class NativeLinkedType(NativeCompiledType):
         project = target.project
         deps = (project.get_target(x.as_py()) for x in target["deps"])
         todo = (x for x in deps if
-                isinstance(x.type, LibraryType) or isinstance(x.type, DllType))
+                isinstance(x.type, LibraryType) or isinstance(x.type, SharedLibraryType))
         for t in todo:
             if t in found:
                 continue
@@ -352,11 +352,11 @@ class LibraryType(NativeCompiledType):
                         outfile=self.target_file(toolset, target))
 
 
-class DllType(NativeLinkedType):
+class SharedLibraryType(NativeLinkedType):
     """
     Dynamically loaded library.
     """
-    name = "dll"
+    name = "shared-library"
 
     properties = [
             Property("libname",
@@ -374,7 +374,7 @@ class DllType(NativeLinkedType):
 
                      .. code-block:: bkl
 
-                        dll utils {
+                        shared-library utils {
                           // use myapp_utils.lib, myapp_utils.dll, libmyapp_utils.so
                           libname = myapp_utils;
                         }
@@ -390,7 +390,7 @@ class DllType(NativeLinkedType):
         return get_compilation_subgraph(
                         toolset,
                         target,
-                        ft_to=NativeDllFileType.get(),
+                        ft_to=NativeSharedLibraryFileType.get(),
                         outfile=self.target_file(toolset, target))
 
 
