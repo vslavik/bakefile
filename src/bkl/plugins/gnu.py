@@ -160,7 +160,7 @@ class GnuLinker(GnuFileCompiler):
     """
     name = "GNU LD"
     in_type = GnuObjectFileType.get()
-    out_type = bkl.compilers.NativeExeFileType.get()
+    out_type = bkl.compilers.NativeProgramFileType.get()
 
     def _linker_flags(self, toolset, target):
         cmd = self._arch_flags(toolset, target)

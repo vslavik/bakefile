@@ -107,7 +107,7 @@ class VS201xToolsetBase(VSToolsetBase):
             n = Node("PropertyGroup", Label="Configuration")
             self._add_extra_options_to_node(cfg, n)
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
-            if is_exe(target):
+            if is_program(target):
                 n.add("ConfigurationType", "Application")
             elif is_library(target):
                 n.add("ConfigurationType", "StaticLibrary")
@@ -209,7 +209,7 @@ class VS201xToolsetBase(VSToolsetBase):
             n_link = Node("Link")
             self._add_extra_options_to_node(cfg, n_link)
             n.add(n_link)
-            if is_exe(target) and target["win32-subsystem"] == "console":
+            if is_program(target) and target["win32-subsystem"] == "console":
                 n_link.add("SubSystem", "Console")
             else:
                 n_link.add("SubSystem", "Windows")

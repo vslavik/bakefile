@@ -1,5 +1,5 @@
 RootNode
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode hello
         BaseListNode

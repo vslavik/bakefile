@@ -266,11 +266,11 @@ class NativeLinkedType(NativeCompiledType):
 
 
 
-class ExeType(NativeLinkedType):
+class ProgramType(NativeLinkedType):
     """
     Executable program.
     """
-    name = "exe"
+    name = "program"
 
     properties = [
             Property("exename",
@@ -288,7 +288,7 @@ class ExeType(NativeLinkedType):
 
                      .. code-block:: bkl
 
-                        exe mytool {
+                        program mytool {
                           // use mytool2.exe or /usr/bin/mytool2
                           exename = $(id)$(vermajor);
                         }
@@ -309,7 +309,7 @@ class ExeType(NativeLinkedType):
         return get_compilation_subgraph(
                         toolset,
                         target,
-                        ft_to=NativeExeFileType.get(),
+                        ft_to=NativeProgramFileType.get(),
                         outfile=self.target_file(toolset, target))
 
 

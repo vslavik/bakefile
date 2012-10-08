@@ -1,6 +1,6 @@
 vs2008.solutionfile = child2008.sln;
 
-exe child {
+program child {
     sources { child.cpp }
     deps = common;
 }

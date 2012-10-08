@@ -3,7 +3,7 @@ module {
     toolsets = [gnu]
   }
   targets {
-    exe dummy {
+    program dummy {
       xxx = [one.c, two.c, three.c]
     }
   }

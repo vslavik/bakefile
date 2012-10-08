@@ -221,7 +221,7 @@ class VS200xToolsetBase(VSToolsetBase):
             else:
                 n["OutputDirectory"] = "$(SolutionDir)$(ConfigurationName)"
             n["IntermediateDirectory"] = "$(ConfigurationName)"
-            if is_exe(target):
+            if is_program(target):
                 n["ConfigurationType"] = typeApplication
             elif is_library(target):
                 n["ConfigurationType"] = typeStaticLibrary
@@ -276,10 +276,10 @@ class VS200xToolsetBase(VSToolsetBase):
         return n
 
     def VCAppVerifierTool(self, target, cfg):
-        return Node("Tool", Name="VCAppVerifierTool") if is_exe(target) else None
+        return Node("Tool", Name="VCAppVerifierTool") if is_program(target) else None
 
     def VCWebDeploymentTool(self, target, cfg):
-        return Node("Tool", Name="VCWebDeploymentTool") if is_exe(target) else None
+        return Node("Tool", Name="VCWebDeploymentTool") if is_program(target) else None
 
 
     def VCCLCompilerTool(self, target, cfg):
@@ -354,7 +354,7 @@ class VS200xToolsetBase(VSToolsetBase):
             n["LinkIncremental"] = linkIncrementalNo
         # VS: creates debug info for release too; TODO: make this configurable
         n["GenerateDebugInformation"] = True
-        if is_exe(target) and cfg["win32-subsystem"] == "console":
+        if is_program(target) and cfg["win32-subsystem"] == "console":
             n["SubSystem"] = subSystemConsole
         else:
             n["SubSystem"] = subSystemWindows

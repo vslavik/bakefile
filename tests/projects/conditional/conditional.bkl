@@ -6,7 +6,7 @@ if ( $(build_something) ) {
 
     if ( $(toolset) == gnu || $(toolset) == vs2010 ) {
 
-        exe hello {
+        program hello {
             sources { hello.c }
             defines = PRINT_DETAILS;
             if ($(toolset) == gnu)
@@ -19,7 +19,7 @@ if ( $(build_something) ) {
 
 
     if ( $(toolset) == gnu || $(toolset) == gnu-osx ) {
-        exe hello_gnu {
+        program hello_gnu {
             sources { hello.c }
             if ( $(toolset) == gnu-osx )
                 sources { hello_osx.c }
@@ -27,7 +27,7 @@ if ( $(build_something) ) {
     }
 
     if ( $(toolset) == vs2010 ) {
-        exe hello_windows {
+        program hello_windows {
             sources { hello.c }
         }
     }

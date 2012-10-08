@@ -1,6 +1,6 @@
 toolsets = gnu;
 
-exe hello {
+program hello {
     name = $(id);
     // this tests expression simplifier pass - should be simplified to "hello"
     src = $(name);

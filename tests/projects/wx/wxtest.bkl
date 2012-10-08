@@ -1,6 +1,6 @@
 toolsets = gnu vs2010;
 
-exe wxtest {
+program wxtest {
     sources {
         wxtest.cpp
         resources.xrc

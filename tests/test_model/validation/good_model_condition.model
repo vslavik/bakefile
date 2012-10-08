@@ -3,7 +3,7 @@ module {
     toolsets = [gnu, vs2010]
   }
   targets {
-    exe hello {
+    program hello {
       _condition = ($(toolset) == gnu)
     }
   }

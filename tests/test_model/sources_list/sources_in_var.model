@@ -4,7 +4,7 @@ module {
     SOURCE_FILES = hello.c
   }
   targets {
-    exe hello {
+    program hello {
       sources {
         file @top_srcdir/hello.c
       }

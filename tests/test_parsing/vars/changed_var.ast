@@ -12,7 +12,7 @@ RootNode
         IdNode bar
         LiteralNode "changed_too"
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode a_target
         BaseListNode
         AssignmentNode

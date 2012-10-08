@@ -1,6 +1,6 @@
 RootNode
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode foo
         BaseListNode
         AssignmentNode

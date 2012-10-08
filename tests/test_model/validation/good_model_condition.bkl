@@ -1,5 +1,5 @@
 toolsets = gnu vs2010;
 
 if ( $(toolset) == gnu ) {
-  exe hello {}
+  program hello {}
 }

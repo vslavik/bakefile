@@ -19,7 +19,7 @@ library helpers {
     configurations = Release Debug;
 }
 
-exe hello {
+program hello {
     deps += helpers;
     sources { hello.cpp }
     if ( $(diagnostics) ) {

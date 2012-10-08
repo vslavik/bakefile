@@ -1,5 +1,5 @@
 toolsets = gnu;
 
 if ( foobar ) {
-  exe hello {}
+  program hello {}
 }

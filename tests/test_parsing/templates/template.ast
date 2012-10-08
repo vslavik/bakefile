@@ -20,14 +20,14 @@ RootNode
             LiteralNode "t_foo"
             LiteralNode "t_second"
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode normal
         BaseListNode
         FilesListNode
             IdNode sources
             LiteralNode "test.c"
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode from_templ
         BaseListNode
             LiteralNode "t_foo"
@@ -35,7 +35,7 @@ RootNode
             IdNode sources
             LiteralNode "test.c"
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode from_two_templs
         BaseListNode
             LiteralNode "t_foo"
@@ -44,7 +44,7 @@ RootNode
             IdNode sources
             LiteralNode "test.c"
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode from_combined
         BaseListNode
             LiteralNode "t_combined"
@@ -52,7 +52,7 @@ RootNode
             IdNode sources
             LiteralNode "test.c"
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode from_combined_dupl
         BaseListNode
             LiteralNode "t_combined"

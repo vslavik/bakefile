@@ -81,7 +81,7 @@ class Extension(object):
     extension at runtime. Use the get() method called on appropriate extension
     type to obtain it. For example:
 
-        exe = TargetType.get("exe")
+        program = TargetType.get("program")
         # ...do something with it...
 
     .. attribute:: name
@@ -245,7 +245,7 @@ class Property(object):
        Optional scope of the property, as list of strings. Each item may be one
        of :const:`Property.SCOPE_PROJECT`, :const:`Property.SCOPE_MODULE`,
        :const:`Property.SCOPE_TARGET` for any target or target type name (e.g.
-       ``exe``) for scoping on specific target name.
+       ``program``) for scoping on specific target name.
 
        Finally, may be :const:`None` for default (depending from where the
        property was obtained from).

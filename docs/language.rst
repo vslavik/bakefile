@@ -12,7 +12,7 @@ marked up in with ``{`` and ``}``, as in C. See an example:
 .. code-block:: bkl
 
    toolsets = gnu vs2010;
-   exe hello {
+   program hello {
        sources { hello.cpp }
    }
 
@@ -266,7 +266,7 @@ See an example:
 
 .. code-block:: bkl
 
-   exe hello {
+   program hello {
        sources {
            hello.cpp
            utils.cpp
@@ -321,7 +321,7 @@ The syntax is similar to C++ inheritance syntax:
        libs += logging;
    }
 
-   exe hello : with_logging {
+   program hello : with_logging {
        sources {
            hello.cpp
        }
@@ -340,7 +340,7 @@ Or equivalently:
        libs += logging;
    }
 
-   exe hello : common_stuff, with_logging {
+   program hello : common_stuff, with_logging {
        sources {
            hello.cpp
        }
@@ -381,7 +381,7 @@ Conditional statements may be nested, too:
 .. code-block:: bkl
 
    if ( $(build_tests) ) {
-       exe test {
+       program test {
            sources { main.cpp }
            if ( $(toolset) == gnu ) {
                defines += LINUX;
@@ -437,7 +437,7 @@ wanted to enable extra debugging for "hello" executable you could do
 
 .. code-block:: bkl
 
-    exe hello {
+    program hello {
         configurations = Debug ExtraDebug Release;
     }
 
@@ -448,7 +448,7 @@ options conditionally depending on the configuration being used, e.g.:
 
 .. code-block:: bkl
 
-    exe hello {
+    program hello {
         if ( $(config) == ExtraDebug ) {
             defines += EXTRA_DEBUG;
         }
@@ -472,7 +472,7 @@ using this approach:
 
     configurations = Debug ExtraDebug Release;
 
-    exe hello {
+    program hello {
         if ( $(extra_debug) ) {
             defines += EXTRA_DEBUG;
         }
@@ -538,7 +538,7 @@ They can also be included in an expression:
 
 .. code-block:: bkl
 
-   exe hello {
+   program hello {
        sources { hello.c /*main() impl*/ lib.c }
    }
 

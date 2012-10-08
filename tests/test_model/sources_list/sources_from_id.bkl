@@ -1,5 +1,5 @@
 toolsets = gnu;
 
-exe hello {
+program hello {
     sources { $(id).c }
 }

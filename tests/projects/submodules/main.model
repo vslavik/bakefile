@@ -8,7 +8,7 @@ module submodules/main.bkl {
     vs2008.solutionfile = @top_srcdir/main2008.sln
   }
   targets {
-    exe main {
+    program main {
       deps = [common]
       sources {
         file @top_srcdir/main.cpp
@@ -35,7 +35,7 @@ module submodules/child/child.bkl {
     vs2008.solutionfile = @top_srcdir/child/child2008.sln
   }
   targets {
-    exe child {
+    program child {
       deps = [common]
       sources {
         file @top_srcdir/child/child.cpp

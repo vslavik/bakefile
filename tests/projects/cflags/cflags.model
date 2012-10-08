@@ -3,7 +3,7 @@ module {
     toolsets = [gnu, vs2010]
   }
   targets {
-    exe hello {
+    program hello {
       defines = [DEF_ALL]
       compiler-options = [-DDEF_CPP]
       c-compiler-options = [-DDEF_C]

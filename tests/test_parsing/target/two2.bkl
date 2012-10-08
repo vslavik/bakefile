@@ -1,4 +1,4 @@
-exe one {
+program one {
 }
-exe two {
+program two {
 }

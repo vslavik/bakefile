@@ -21,7 +21,7 @@ library libA {
     sources { libA.c }
 }
 
-exe testdeps {
+program testdeps {
     deps = libA;
     sources { testdeps.c }
 }

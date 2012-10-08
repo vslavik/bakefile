@@ -1,6 +1,6 @@
 toolsets = gnu;
 
-exe dummy
+program dummy
     {
         xxx = one.c two.c;
         xxx += three.c;

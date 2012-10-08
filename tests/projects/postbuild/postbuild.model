@@ -4,7 +4,7 @@ module {
     vs2008.solutionfile = @top_srcdir/postbuild2008.sln
   }
   targets {
-    exe testapp {
+    program testapp {
       pre-build-commands = [echo Running pre-build script..., echo ...done]
       post-build-commands = [echo Running post-build script for $(Configuration)..., echo ...done]
       sources {

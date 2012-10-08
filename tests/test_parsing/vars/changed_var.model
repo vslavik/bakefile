@@ -4,7 +4,7 @@ module {
     bar = changed_too
   }
   targets {
-    exe a_target {
+    program a_target {
       my_var = my_take_2
     }
   }

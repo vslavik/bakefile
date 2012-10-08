@@ -1,6 +1,6 @@
 
 requires 99.0;
 
-exe hello {
+program hello {
     sources { hello.c }
 }

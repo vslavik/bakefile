@@ -11,7 +11,7 @@ module {
         file @top_srcdir/helpers.cpp
       }
     }
-    exe hello {
+    program hello {
       deps = [helpers]
       defines = [($(diagnostics) ? ENABLE_DIAGNOSTICS : null)]
       sources {

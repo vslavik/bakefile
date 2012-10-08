@@ -3,7 +3,7 @@ RootNode
         IdNode toolsets
         LiteralNode "gnu"
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode dummy
         BaseListNode
         AssignmentNode

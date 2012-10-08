@@ -1,9 +1,9 @@
 RootNode
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode one
         BaseListNode
     TargetNode
-        IdNode exe
+        IdNode program
         IdNode one
         BaseListNode

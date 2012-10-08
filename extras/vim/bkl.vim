@@ -19,7 +19,7 @@ setl isk+=.,-
 
 " Simple keywords that can occur anywhere (this is not really true for
 " bklTarget but we can't easily avoid recognizing it inside another target).
-syn keyword	bklTarget	action shared-library loadable-module exe library external template
+syn keyword	bklTarget	action shared-library loadable-module program library external template
 syn keyword	bklIf		if
 
 " Statements and properties that can only appear at global scope, outside of
@@ -46,14 +46,14 @@ syn keyword	bklCommonProp	vs2010.guid vs2010.projectfile contained
 syn keyword	bklCommonProp	vs2012.guid vs2012.projectfile contained
 syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\)\.option\(\.\w\+\)\{1,2}" contained
 
-" Properties that can occur inside action/exe/lib/dll targets only.
+" Properties that can occur inside action/program/lib/shlib targets only.
 syn keyword	bklActionProp	commands contained
-syn keyword	bklExeProp	exename contained
+syn keyword	bklProgramProp	exename contained
 syn keyword	bklShLibProp	libname contained
 syn keyword	bklLibProp	libname contained
 
 " Properties that can only occur in the targets building something i.e.
-" exe/lib/dll ones.
+" program/lib/dll ones.
 syn keyword	bklBuildProp	archs configurations contained
 syn keyword	bklBuildProp	compiler-options c-compiler-options cxx-compiler-options contained
 syn keyword	bklBuildProp	defines headers includedirs libdirs libs link-options outputdir sources contained
@@ -85,10 +85,10 @@ syn region	bklBlock	start="{" end="}" transparent
 " Cluster of syntax items that can occur in any block.
 syn cluster	bklAnyBlock	contains=bklBlock,bklComment,bklCommentL,bklCommonProp,bklIf,bklVar
 
-syn region	bklExeBlock	matchgroup=Normal start="\%\(exe \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp
+syn region	bklProgramBlock	matchgroup=Normal start="\%\(program \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklProgramProp
 syn region	bklShLibBlock	matchgroup=Normal start="\%\(shared-library \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklShLibProp
 syn region	bklLibBlock	matchgroup=Normal start="\%\(library \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklLibProp
-syn region	bklTemplBlock	matchgroup=Normal start="\%\(template \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklExeProp,bklShLibProp,bklLibProp
+syn region	bklTemplBlock	matchgroup=Normal start="\%\(template \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklProgramProp,bklShLibProp,bklLibProp
 syn region	bklActionBlock	matchgroup=Normal start="\%\(action \+\k\+ *\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
 
 
@@ -101,7 +101,7 @@ hi def link bklCommentL		bklComment
 hi def link bklCommonProp	bklGlobalProp
 hi def link bklShLibProp	bklCommonProp
 hi def link bklError		Error
-hi def link bklExeProp		bklCommonProp
+hi def link bklProgramProp	bklCommonProp
 hi def link bklFilename		bklString
 hi def link bklGlobalProp	Keyword
 hi def link bklGlobalStat	Statement

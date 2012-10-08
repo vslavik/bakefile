@@ -13,7 +13,7 @@ file ``hello.c``, here is the corresponding ``hello.bkl`` bakefile to build it:
 .. code-block:: bkl
 
    toolsets = gnu vs2010;
-   exe hello {
+   program hello {
        sources { hello.cpp } // could also have been "hello.c"
    }
 
@@ -64,7 +64,7 @@ special for Bakefile -- and hence is called "property" rather than a simple
 when it is ran. It must be present in all bakefiles as no output would be
 created without it.
 
-The next block -- ``exe hello { ... }`` -- defines an executable target with
+The next block -- ``program hello { ... }`` -- defines an executable target with
 the name "hello". All the declarations until the closing bracket affect this
 target only. In this simple example the only thing that we have here is the
 definition of the sources which should be compiled to build the target. Source
@@ -109,7 +109,7 @@ target:
 
 .. code-block:: bkl
 
-    exe hello {
+    program hello {
         defines = FOO "DEBUG=1";    // Quotes are needed if value is given
         includedirs = ../include;
         ...
@@ -121,7 +121,7 @@ helpful to append another value to the property instead, for example:
 
 .. code-block:: bkl
 
-    exe hello {
+    program hello {
         defines = FOO;
         ...
         defines += BAR;
@@ -138,7 +138,7 @@ interesting:
 
 .. code-block:: bkl
 
-    exe hello {
+    program hello {
         if ( $(toolset) == gnu )
             defines += LINUX;
         if ( $(toolset) == vs2010 )
@@ -176,7 +176,7 @@ standard search path:
 
 .. code-block:: bkl
 
-    exe hello {
+    program hello {
         libdirs = ../3rdparty/somelib/lib;
         libs = somelib;
     }
@@ -207,7 +207,7 @@ of all of them:
         sources { ... }
     }
 
-    exe main {
+    program main {
         deps = network gui;
         ...
     }

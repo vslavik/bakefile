@@ -34,8 +34,8 @@ import expr
 
 
 #: Native executable file type
-class NativeExeFileType(FileType):
-    name = "exe"
+class NativeProgramFileType(FileType):
+    name = "program"
     # FIXME: extensions
 
 #: Native static library file type

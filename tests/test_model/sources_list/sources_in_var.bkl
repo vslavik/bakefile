@@ -2,6 +2,6 @@ toolsets = gnu;
 
 SOURCE_FILES = hello.c;
 
-exe hello {
+program hello {
     sources { $(SOURCE_FILES) }
 }

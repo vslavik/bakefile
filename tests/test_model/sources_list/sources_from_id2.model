@@ -3,7 +3,7 @@ module {
     toolsets = [gnu]
   }
   targets {
-    exe hello {
+    program hello {
       name = hello
       src = hello
       sources {

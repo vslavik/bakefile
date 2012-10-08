@@ -212,7 +212,7 @@ bool_value
 
 // examples:
 //
-//     exe hello {}
+//     program hello {}
 
 target_stmt
 scope StmtScope;

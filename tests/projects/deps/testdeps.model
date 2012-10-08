@@ -18,7 +18,7 @@ module {
         file @top_srcdir/libA.c
       }
     }
-    exe testdeps {
+    program testdeps {
       deps = [libA]
       sources {
         file @top_srcdir/testdeps.c

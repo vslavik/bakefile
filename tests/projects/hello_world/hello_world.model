@@ -5,7 +5,7 @@ module {
     vs2008.solutionfile = @top_srcdir/hello_world_vs2008.sln
   }
   targets {
-    exe hello {
+    program hello {
       archs = [x86, x86_64]
       defines = [SALUTATION="Hello"]
       vs2012.projectfile = @top_srcdir/hello_vs2012.vcxproj

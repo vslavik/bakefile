@@ -624,7 +624,7 @@ class VSToolsetBase(Toolset):
     #: Project class for this VS version
     Project = None
 
-    exe_extension = "exe"
+    program_extension = "exe"
     library_extension = "lib"
 
     @classmethod
@@ -718,7 +718,7 @@ class VSToolsetBase(Toolset):
         """
         defs = ["WIN32"]
         defs.append("_DEBUG" if cfg.is_debug else "NDEBUG")
-        if is_exe(target):
+        if is_program(target):
             defs.append("_CONSOLE")
         elif is_library(target):
             defs.append("_LIB")
@@ -767,8 +767,8 @@ class VSToolsetBase(Toolset):
 def is_library(target):
     return target.type.name == "library"
 
-def is_exe(target):
-    return target.type.name == "exe"
+def is_program(target):
+    return target.type.name == "program"
 
 def is_dll(target):
     return target.type.name == "shared-library" or target.type.name == "loadable-module"

@@ -4,21 +4,21 @@ module {
     build_something = true
   }
   targets {
-    exe hello {
+    program hello {
       _condition = (true && (($(toolset) == gnu) || ($(toolset) == vs2010)))
       defines = [PRINT_DETAILS, (($(toolset) == gnu) ? PLATFORM_UNIX : null), (($(toolset) == vs2010) ? PLATFORM_WINDOWS : null)]
       sources {
         file @top_srcdir/hello.c
       }
     }
-    exe hello_gnu {
+    program hello_gnu {
       _condition = (true && (($(toolset) == gnu) || ($(toolset) == gnu-osx)))
       sources {
         file @top_srcdir/hello.c
         file @top_srcdir/hello_osx.c	{ _condition = ($(toolset) == gnu-osx) }
       }
     }
-    exe hello_windows {
+    program hello_windows {
       _condition = (true && ($(toolset) == vs2010))
       sources {
         file @top_srcdir/hello.c

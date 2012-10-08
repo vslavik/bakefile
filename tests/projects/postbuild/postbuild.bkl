@@ -2,7 +2,7 @@ toolsets = vs2008 vs2010;
 
 vs2008.solutionfile = postbuild2008.sln;
 
-exe testapp {
+program testapp {
     sources { test.cpp }
 
     pre-build-commands =

@@ -1,6 +1,6 @@
 toolsets = gnu vs2010;
 
-exe hello {
+program hello {
     sources { foo.c bar.cpp }
     defines = DEF_ALL;
     compiler-options = -DDEF_CPP;

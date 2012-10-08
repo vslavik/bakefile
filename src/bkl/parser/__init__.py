@@ -51,7 +51,7 @@ class _BakefileErrorsMixin(object):
 
     def getTokenErrorDisplay(self, t):
         # workaround for an ugly behavior in ANTLRv3's Python bindings: it
-        # formats tokens as e.g. u'exe', we prefer 'exe':
+        # formats tokens as e.g. u'program', we prefer 'program':
         s = t.text
         if s is None:
             return str(super(Parser, self).getTokenErrorDisplay(t))
