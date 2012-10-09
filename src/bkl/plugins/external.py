@@ -142,7 +142,7 @@ class VSExternalProject200x(VSExternalProjectBase):
 
     @memoized_property
     def guid(self):
-        return self.xml.get("ProjectGUID")
+        return self.xml.get("ProjectGUID")[1:-1]
 
     def _extract_configurations_names(self):
         return [x.get("Name").partition("|")[0]
@@ -177,7 +177,7 @@ class VSExternalProject201x(VSExternalProjectBase):
     @memoized_property
     def guid(self):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
-        return self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}ProjectGuid" % XMLNS)
+        return self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}ProjectGuid" % XMLNS)[1:-1]
 
     def _extract_configurations_names(self):
         # TODO-PY26: use "ItemGroup[@Label='ProjectConfigurations']"
