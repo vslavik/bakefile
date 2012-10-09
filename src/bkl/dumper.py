@@ -124,12 +124,12 @@ def _dump_target(target):
     if target.sources:
         out_files += "sources {\n"
         out_files += _indent("\n".join(_dump_source(s) for s in target.sources))
-        out_files += "\n}"
+        out_files += "\n}\n"
     if target.headers:
         out_files += "headers {\n"
         out_files += _indent("\n".join(_dump_source(s) for s in target.headers))
-        out_files += "\n}"
+        out_files += "\n}\n"
     if out_files:
         out += _indent(out_files)
-    out += "\n}"
+    out += "}"
     return out
