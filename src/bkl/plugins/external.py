@@ -169,7 +169,10 @@ class VSExternalProject201x(VSExternalProjectBase):
     @memoized_property
     def name(self):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
-        return self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}RootNamespace" % XMLNS)
+        name = self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}ProjectName" % XMLNS)
+        if name is None:
+            name = self.projectfile.get_basename()
+        return name
 
     @memoized_property
     def guid(self):
