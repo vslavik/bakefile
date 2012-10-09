@@ -56,9 +56,8 @@ class VS201xToolsetBase(VSToolsetBase):
     #: PlatformToolset property
     platform_toolset = None
 
-    def gen_for_target(self, target):
-        projectfile = target["%s.projectfile" % self.name]
-        filename = projectfile.as_native_path_for_output(target)
+    def gen_for_target(self, target, project):
+        filename = project.projectfile.as_native_path_for_output(target)
 
         paths_info = bkl.expr.PathAnchorsInfo(
                                     dirsep="\\",
@@ -82,8 +81,6 @@ class VS201xToolsetBase(VSToolsetBase):
         root["ToolsVersion"] = "4.0"
         root["xmlns"] = "http://schemas.microsoft.com/developer/msbuild/2003"
 
-        guid = target["%s.guid" % self.name]
-
         n_configs = Node("ItemGroup", Label="ProjectConfigurations")
         for cfg in target.configurations:
             n = Node("ProjectConfiguration", Include="%s|Win32" % cfg.name)
@@ -94,7 +91,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
         n_globals = Node("PropertyGroup", Label="Globals")
         self._add_extra_options_to_node(target, n_globals)
-        n_globals.add("ProjectGuid", "{%s}" % guid)
+        n_globals.add("ProjectGuid", "{%s}" % project.guid)
         n_globals.add("Keyword", "Win32Proj")
         n_globals.add("RootNamespace", target.name)
         n_globals.add("ProjectName", target.name)
@@ -114,7 +111,7 @@ class VS201xToolsetBase(VSToolsetBase):
             elif is_dll(target):
                 n.add("ConfigurationType", "DynamicLibrary")
             else:
-                return None
+                assert False, "this code should only be called for supported target types"
 
             n.add("UseDebugLibraries", cfg.is_debug)
             if cfg["win32-unicode"]:
@@ -295,8 +292,9 @@ class VS201xToolsetBase(VSToolsetBase):
             root.add(refs)
             for dep_id in target_deps:
                 dep = target.project.get_target(dep_id)
-                depnode = Node("ProjectReference", Include=dep["%s.projectfile" % self.name])
-                depnode.add("Project", "{%s}" % dep["%s.guid" % self.name].as_py().lower())
+                dep_prj = self.get_project_object(dep)
+                depnode = Node("ProjectReference", Include=dep_prj.projectfile)
+                depnode.add("Project", "{%s}" % dep_prj.guid.lower())
                 refs.add(depnode)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.targets")
@@ -309,12 +307,6 @@ class VS201xToolsetBase(VSToolsetBase):
         f.commit()
         self._write_filters_file_for(filename)
 
-        return self.Project(target.name,
-                            guid,
-                            projectfile,
-                            target_deps,
-                            [x.config for x in target.configurations],
-                            target.source_pos)
 
     def _add_VCTargetsPath(self, node):
         pass

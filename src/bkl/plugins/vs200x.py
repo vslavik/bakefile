@@ -184,9 +184,8 @@ class VS200xToolsetBase(VSToolsetBase):
     #: Whether Detect64BitPortabilityProblems is supported
     detect_64bit_problems = True
 
-    def gen_for_target(self, target):
-        projectfile = target["%s.projectfile" % self.name]
-        filename = projectfile.as_native_path_for_output(target)
+    def gen_for_target(self, target, project):
+        filename = project.projectfile.as_native_path_for_output(target)
 
         paths_info = bkl.expr.PathAnchorsInfo(
                                     dirsep="\\",
@@ -194,13 +193,11 @@ class VS200xToolsetBase(VSToolsetBase):
                                     builddir=self.get_builddir_for(target).as_native_path_for_output(target),
                                     model=target)
 
-        guid = target["%s.guid" % self.name]
-
         root = Node("VisualStudioProject")
         root["ProjectType"] = "Visual C++"
         root["Version"] = "%.2f" % self.version
         root["Name"] =  target.name
-        root["ProjectGUID"] = "{%s}" % guid
+        root["ProjectGUID"] = "{%s}" % project.guid
         root["RootNamespace"] = target.name
         root["Keyword"] = "Win32Proj"
         self._add_extra_options_to_node(target, root)
@@ -228,7 +225,7 @@ class VS200xToolsetBase(VSToolsetBase):
             elif is_dll(target):
                 n["ConfigurationType"] = typeDynamicLibrary
             else:
-                return None
+                assert False, "this code should only be called for supported target types"
             if cfg["win32-unicode"]:
                 n["CharacterSet"] = 1
             self._add_extra_options_to_node(cfg, n)
@@ -254,13 +251,6 @@ class VS200xToolsetBase(VSToolsetBase):
         f.write(self.XmlFormatter(paths_info).format(root))
         f.commit()
 
-        target_deps = target["deps"].as_py()
-        return self.Project(target.name,
-                            guid,
-                            projectfile,
-                            target_deps,
-                            [x.config for x in target.configurations],
-                            target.source_pos)
 
     def _add_ToolFiles(self, root):
         root.add(Node("ToolFiles"))

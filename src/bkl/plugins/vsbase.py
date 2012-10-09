@@ -35,7 +35,7 @@ import logging
 logger = logging.getLogger("bkl.vsbase")
 
 import bkl.expr
-from bkl.utils import OrderedDict
+from bkl.utils import OrderedDict, memoized
 from bkl.error import error_context, warning, Error, CannotDetermineError
 from bkl.api import Toolset, Property
 from bkl.model import ConfigurationProxy
@@ -680,16 +680,10 @@ class VSToolsetBase(Toolset):
 
         for t in module.targets.itervalues():
             with error_context(t):
-                prj = self.gen_for_target(t)
-                if not prj:
-                    # Not natively supported; try if the TargetType has an implementation
-                    try:
-                        prj = t.type.vs_project(self, t)
-                    except NotImplementedError:
-                        # TODO: handle this as generic action target
-                        warning("target type \"%s\" is not supported by the %s toolset, ignoring",
-                                t.type.name, self.name)
-                        continue
+                prj = self.get_project_object(t)
+                if prj is None:
+                    # TODO: see the TODO in get_project_object()
+                    continue
                 if prj.name != t.name:
                     # TODO: This is only for the solution file; we should remap the name instead of
                     #       failure. Note that we don't always control prj.name, it may come from external
@@ -703,10 +697,39 @@ class VSToolsetBase(Toolset):
                     else:
                         warning("project %s is for Visual Studio %.1f, not %.1f, will be converted when built",
                                 prj.projectfile, prj.version, self.version)
+
+                if self.is_natively_supported(t):
+                    self.gen_for_target(t, prj)
+
                 module.solution.add_project(prj)
 
 
-    def gen_for_target(self, target):
+    def is_natively_supported(self, target):
+        return is_program(target) or is_library(target) or is_dll(target)
+
+    @memoized
+    def get_project_object(self, target):
+        if self.is_natively_supported(target):
+            return self.Project(target.name,
+                                target["%s.guid" % self.name].as_py(),
+                                target["%s.projectfile" % self.name],
+                                target["deps"].as_py(),
+                                [x.config for x in target.configurations],
+                                target.source_pos)
+        else:
+            # Not natively supported; try if the TargetType has an implementation
+            try:
+                return target.type.vs_project(self, target)
+            except NotImplementedError:
+                # TODO: handle this as generic action target
+                warning("target type \"%s\" is not supported by the %s toolset, ignoring",
+                        target.type.name, self.name)
+                return None
+
+    def gen_for_target(self, target, project):
+        """
+        Generates output for natively supported target types.
+        """
         raise NotImplementedError
 
 
