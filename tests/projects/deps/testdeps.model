@@ -12,7 +12,7 @@ module {
       }
     }
     library libA {
-      libname = A
+      basename = A
       deps = [common]
       sources {
         file @top_srcdir/libA.c

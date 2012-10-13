@@ -16,7 +16,7 @@ library common {
 }
 
 library libA {
-    libname = A;
+    basename = A;
     deps = common;
     sources { libA.c }
 }

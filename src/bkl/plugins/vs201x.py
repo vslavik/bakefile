@@ -144,7 +144,7 @@ class VS201xToolsetBase(VSToolsetBase):
             self._add_extra_options_to_node(cfg, n)
             if not is_library(target):
                 n.add("LinkIncremental", cfg.is_debug)
-            targetname = cfg[target.type.basename_prop]
+            targetname = cfg["basename"]
             if targetname != target.name:
                 n.add("TargetName", targetname)
             if is_module_dll(target):

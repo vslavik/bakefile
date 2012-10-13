@@ -48,9 +48,9 @@ syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\)\.option\(\.\w\+\)\{1
 
 " Properties that can occur inside action/program/lib/shlib targets only.
 syn keyword	bklActionProp	commands contained
-syn keyword	bklProgramProp	exename contained
-syn keyword	bklShLibProp	libname contained
-syn keyword	bklLibProp	libname contained
+syn keyword	bklProgramProp	basename contained
+syn keyword	bklShLibProp	basename contained
+syn keyword	bklLibProp	basename contained
 
 " Properties that can only occur in the targets building something i.e.
 " program/lib/dll ones.

@@ -184,15 +184,12 @@ class NativeCompiledType(TargetType):
         """
         Returns main filename of the target.
         """
-        return self._get_filename(toolset, target, self.basename_prop, self.name)
-
-    # property with target's main name, overriden by derived classes
-    basename_prop = None
+        return self._get_filename(toolset, target, "basename", self.name)
 
     def _get_filename(self, toolset, target, propname, fileclass):
         """
         Returns expression with filename of the target using given property
-        (e.g. libname, exename) for use with given toolset.
+        (typically, "basename") for use with given toolset.
         """
         fileclass = fileclass.replace("-", "_")
         tdir = dir(toolset)
@@ -273,7 +270,7 @@ class ProgramType(NativeLinkedType):
     name = "program"
 
     properties = [
-            Property("exename",
+            Property("basename",
                  type=StringType(),
                  default="$(id)",
                  inheritable=False,
@@ -290,7 +287,7 @@ class ProgramType(NativeLinkedType):
 
                         program mytool {
                           // use mytool2.exe or /usr/bin/mytool2
-                          exename = $(id)$(vermajor);
+                          basename = $(id)$(vermajor);
                         }
                      """),
             Property("win32-subsystem",
@@ -302,8 +299,6 @@ class ProgramType(NativeLinkedType):
                      ``windows`` for console-less applications.
                      """),
         ]
-
-    basename_prop = "exename"
 
     def get_build_subgraph(self, toolset, target):
         return get_compilation_subgraph(
@@ -320,7 +315,7 @@ class LibraryType(NativeCompiledType):
     name = "library"
 
     properties = [
-            Property("libname",
+            Property("basename",
                  type=StringType(),
                  default="$(id)",
                  inheritable=False,
@@ -337,12 +332,10 @@ class LibraryType(NativeCompiledType):
 
                         library foo {
                           // use e.g. libfoo24.a on Unix and foo24.lib
-                          libname = foo$(vermajor)$(verminor);
+                          basename = foo$(vermajor)$(verminor);
                         }
                      """),
         ]
-
-    basename_prop = "libname"
 
     def get_build_subgraph(self, toolset, target):
         return get_compilation_subgraph(
@@ -359,7 +352,7 @@ class SharedLibraryType(NativeLinkedType):
     name = "shared-library"
 
     properties = [
-            Property("libname",
+            Property("basename",
                  type=StringType(),
                  default="$(id)",
                  inheritable=False,
@@ -376,15 +369,13 @@ class SharedLibraryType(NativeLinkedType):
 
                         shared-library utils {
                           // use myapp_utils.lib, myapp_utils.dll, libmyapp_utils.so
-                          libname = myapp_utils;
+                          basename = myapp_utils;
                         }
                      """),
-            # TODO: add "dllname" for the name of the shared lib itself, when it differs from
-            #       import library name
+            # TODO: add "libname" for the name of the import lib itself, when it differs from
+            #       DLL name
             # TODO: add libtool-style sonames support
         ]
-
-    basename_prop = "libname"
 
     def get_build_subgraph(self, toolset, target):
         return get_compilation_subgraph(
@@ -401,7 +392,7 @@ class LoadableModuleType(NativeLinkedType):
     name = "loadable-module"
 
     properties = [
-            Property("dllname",
+            Property("basename",
                  type=StringType(),
                  default="$(id)",
                  inheritable=False,
@@ -417,12 +408,10 @@ class LoadableModuleType(NativeLinkedType):
                      .. code-block:: bkl
 
                         module myplugin {
-                          dllname = myplugin-v1;
+                          basename = myplugin-v1;
                         }
                      """),
         ]
-
-    basename_prop = "dllname"
 
     def get_build_subgraph(self, toolset, target):
         return get_compilation_subgraph(
