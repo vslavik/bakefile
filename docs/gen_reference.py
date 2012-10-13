@@ -117,7 +117,7 @@ def write_property(prop):
     return txt
 
 
-def write_properties(props_func):
+def write_properties(props_func, scope=None):
     props = list(props_func())
     if not props:
         return ""
@@ -125,8 +125,11 @@ def write_properties(props_func):
     txt = "\n\nProperties\n----------\n\n"
 
     for p in props:
-        if not p.internal:
-            txt += write_property(p)
+        if p.internal:
+            continue
+        if scope and scope not in p.scopes:
+            continue
+        txt += write_property(p)
 
     return txt
 
@@ -195,6 +198,6 @@ for t in bkl.api.Toolset.all():
 
 # write docs for projects/modules:
 write_docs("project", "Global project properties",
-           write_properties(registry.enum_project_props))
+           write_properties(registry.enum_project_props, bkl.api.Property.SCOPE_PROJECT))
 write_docs("module", "Module properties",
-           write_properties(registry.enum_module_props))
+           write_properties(registry.enum_module_props, bkl.api.Property.SCOPE_MODULE))
