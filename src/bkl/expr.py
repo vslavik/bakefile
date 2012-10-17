@@ -32,7 +32,7 @@ import os.path
 import itertools
 from abc import ABCMeta, abstractmethod
 
-from error import NonConstError, CannotDetermineError, Error, error_context
+from error import NonConstError, CannotDetermineError, ParserError, Error, error_context
 
 
 class Expr(object):
@@ -1082,12 +1082,12 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
         return items
 
     def _get_cond_for_list(self, lst):
-            conds = [c for c,e in lst if c is not None]
+            conds = set(c for c,e in lst if c is not None)
             if conds:
                 if len(conds) > 1:
                     raise ParserError("too complicated conditional expression, please report this as a bug", pos=e.pos)
                 else:
-                    return conds[0]
+                    return conds.pop()
             else:
                 return None
 
