@@ -450,11 +450,6 @@ class VS200xToolsetBase(VSToolsetBase):
         for key, value in self.collect_extra_options_for_node(target, scope):
             node[key] = value
 
-    def get_builddir_for(self, target):
-        prj = target["%s.projectfile" % self.name]
-        # TODO: reference Configuration setting properly, as bkl setting, move this to vsbase
-        return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr("$(ConfigurationName)")], prj.anchor, prj.anchor_file)
-
 
 
 class VS2008Toolset(VS200xToolsetBase):

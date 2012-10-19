@@ -624,6 +624,9 @@ class VSToolsetBase(Toolset):
     #: Project class for this VS version
     Project = None
 
+    #: XML formatting class
+    XmlFormatter = XmlFormatter
+
     program_extension = "exe"
     library_extension = "lib"
 
@@ -734,6 +737,13 @@ class VSToolsetBase(Toolset):
                 warning("target type \"%s\" is not supported by the %s toolset, ignoring",
                         target.type.name, self.name)
                 return None
+
+
+    def get_builddir_for(self, target):
+        prj = target["%s.projectfile" % self.name]
+        configuration_ref = self.XmlFormatter.ExprFormatter.configuration_ref
+        return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr(configuration_ref)], prj.anchor, prj.anchor_file)
+
 
     def gen_for_target(self, target, project):
         """
