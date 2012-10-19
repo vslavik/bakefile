@@ -708,6 +708,15 @@ class VSToolsetBase(Toolset):
         return is_program(target) or is_library(target) or is_dll(target)
 
     @memoized
+    def get_project_paths_info(self, target, project):
+        filename = project.projectfile.as_native_path_for_output(target)
+        return bkl.expr.PathAnchorsInfo(
+                            dirsep="\\",
+                            outfile=filename,
+                            builddir=self.get_builddir_for(target).as_native_path_for_output(target),
+                            model=target)
+
+    @memoized
     def get_project_object(self, target):
         if self.is_natively_supported(target):
             return self.Project(target.name,

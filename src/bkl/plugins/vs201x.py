@@ -58,14 +58,6 @@ class VS201xToolsetBase(VSToolsetBase):
     platform_toolset = None
 
     def gen_for_target(self, target, project):
-        filename = project.projectfile.as_native_path_for_output(target)
-
-        paths_info = bkl.expr.PathAnchorsInfo(
-                                    dirsep="\\",
-                                    outfile=filename,
-                                    builddir=self.get_builddir_for(target).as_native_path_for_output(target),
-                                    model=target)
-
         rc_files = []
         cl_files = []
         for sfile in target.sources:
@@ -300,6 +292,9 @@ class VS201xToolsetBase(VSToolsetBase):
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.targets")
         root.add("ImportGroup", Label="ExtensionTargets")
+
+        filename = project.projectfile.as_native_path_for_output(target)
+        paths_info = self.get_project_paths_info(target, project)
 
         f = OutputFile(filename, EOL_WINDOWS,
                        creator=self, create_for=target)

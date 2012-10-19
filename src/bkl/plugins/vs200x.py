@@ -185,14 +185,6 @@ class VS200xToolsetBase(VSToolsetBase):
     detect_64bit_problems = True
 
     def gen_for_target(self, target, project):
-        filename = project.projectfile.as_native_path_for_output(target)
-
-        paths_info = bkl.expr.PathAnchorsInfo(
-                                    dirsep="\\",
-                                    outfile=filename,
-                                    builddir=self.get_builddir_for(target).as_native_path_for_output(target),
-                                    model=target)
-
         root = Node("VisualStudioProject")
         root["ProjectType"] = "Visual C++"
         root["Version"] = "%.2f" % self.version
@@ -245,6 +237,9 @@ class VS200xToolsetBase(VSToolsetBase):
         root.add(self.build_files_list(target))
 
         root.add(Node("Globals"))
+
+        filename = project.projectfile.as_native_path_for_output(target)
+        paths_info = self.get_project_paths_info(target, project)
 
         f = OutputFile(filename, EOL_WINDOWS, charset=VCPROJ_CHARSET,
                        creator=self, create_for=target)
