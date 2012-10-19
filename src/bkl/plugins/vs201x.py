@@ -29,6 +29,7 @@ import bkl.expr
 from bkl.io import OutputFile, EOL_WINDOWS
 
 from bkl.plugins.vsbase import *
+from bkl.expr import concat
 
 
 # TODO: Put more content into this class, use it properly
@@ -147,7 +148,7 @@ class VS201xToolsetBase(VSToolsetBase):
             if is_module_dll(target):
                 n.add("IgnoreImportLibrary", True)
             if target.is_variable_explicitly_set("outputdir"):
-                n.add("OutDir", cfg["outputdir"])
+                n.add("OutDir", concat(cfg["outputdir"], "\\"))
             if n.has_children():
                 n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
             root.add(n)

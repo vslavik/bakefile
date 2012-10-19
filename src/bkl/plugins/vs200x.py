@@ -214,7 +214,7 @@ class VS200xToolsetBase(VSToolsetBase):
             n = Node("Configuration", Name="%s|Win32" % cfg.name)
             n_configs.add(n)
             if target.is_variable_explicitly_set("outputdir"):
-                n["OutputDirectory"] = cfg["outputdir"]
+                n["OutputDirectory"] = concat(cfg["outputdir"], "\\")
             else:
                 n["OutputDirectory"] = "$(SolutionDir)$(ConfigurationName)"
             n["IntermediateDirectory"] = "$(ConfigurationName)"
