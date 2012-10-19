@@ -30,6 +30,7 @@ import uuid
 import types
 from xml.sax.saxutils import escape, quoteattr
 from functools import partial, update_wrapper
+from collections import defaultdict
 
 import logging
 logger = logging.getLogger("bkl.vsbase")
@@ -802,6 +803,33 @@ class VSToolsetBase(Toolset):
                     yield (str(split[1]), target[varname])
             already_found.update(scope_for_vars.variables.iterkeys())
             scope_for_vars = scope_for_vars.parent
+
+
+    def needs_custom_intermediate_dir(self, target):
+        """
+        Returns true if the project needs customized intermediate directory.
+
+        Visual Studio (especially 2010+ with its .tlog files) has issues with
+        building multiple projects in the same intermediate directory. The
+        safest route to avoid these problems is to simply not do that, so we
+        use e.g. Debug/$(id)/ intermediate directory instead of Debug as soon
+        as there's more than one project file in the same directory.
+        """
+        builddir = self.get_builddir_for(target).as_native_path_for_output(target)
+        dir_usage = self._project_dirs_usage(target.project)
+        return dir_usage[builddir] > 1
+
+    @memoized
+    def _project_dirs_usage(self, project):
+        """
+        Returns a map with keys being names of directories where project files
+        are stored and value being usage count.
+        """
+        d = defaultdict(int) # TODO-PY26: Use 2.7's Counter
+        for target in project.all_targets():
+            builddir = self.get_builddir_for(target).as_native_path_for_output(target)
+            d[builddir] += 1
+        return d
 
 
 # Misc helpers:

@@ -141,6 +141,8 @@ class VS201xToolsetBase(VSToolsetBase):
                 n.add("IgnoreImportLibrary", True)
             if target.is_variable_explicitly_set("outputdir"):
                 n.add("OutDir", concat(cfg["outputdir"], "\\"))
+            if self.needs_custom_intermediate_dir(target):
+                n.add("IntDir", concat(self.get_builddir_for(target), "\\$(ProjectName)\\"))
             if n.has_children():
                 n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
             root.add(n)

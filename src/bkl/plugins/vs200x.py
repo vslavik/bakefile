@@ -209,7 +209,10 @@ class VS200xToolsetBase(VSToolsetBase):
                 n["OutputDirectory"] = concat(cfg["outputdir"], "\\")
             else:
                 n["OutputDirectory"] = "$(SolutionDir)$(ConfigurationName)"
-            n["IntermediateDirectory"] = "$(ConfigurationName)"
+            if self.needs_custom_intermediate_dir(target):
+                n["IntermediateDirectory"] = "$(ConfigurationName)\\$(ProjectName)\\"
+            else:
+                n["IntermediateDirectory"] = "$(ConfigurationName)"
             if is_program(target):
                 n["ConfigurationType"] = typeApplication
             elif is_library(target):
