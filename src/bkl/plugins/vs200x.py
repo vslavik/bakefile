@@ -425,7 +425,7 @@ class VS200xToolsetBase(VSToolsetBase):
                 n_file = Node("File", RelativePath=sfile.filename)
                 sources.add(n_file)
                 for cfg in target.configurations:
-                    n_cfg = Node("FileConfiguration", Name=cfg.name)
+                    n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
                     tool = Node("Tool", Name="VCCustomBuildTool")
                     tool["CommandLine"] = compiler.commands(self, target, sfile.filename, genname)
                     tool["Outputs"] = genname
