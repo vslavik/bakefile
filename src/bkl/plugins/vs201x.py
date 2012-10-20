@@ -244,12 +244,13 @@ class VS201xToolsetBase(VSToolsetBase):
         # Source files:
         items = Node("ItemGroup")
         root.add(items)
+        cl_files_map = self.disambiguate_intermediate_file_names(cl_files)
         for sfile in cl_files:
             ext = sfile.filename.get_extension()
             # TODO: share this code with VS200x
             # FIXME: make this more solid
             if ext in ['cpp', 'cxx', 'cc', 'c']:
-                items.add("ClCompile", Include=sfile.filename)
+                n_cl_compile = Node("ClCompile", Include=sfile.filename)
             else:
                 # FIXME: handle both compilation into cpp and c files
                 genfiletype = bkl.compilers.CxxFileType.get()
@@ -264,7 +265,12 @@ class VS201xToolsetBase(VSToolsetBase):
                 customBuild.add("Command", compiler.commands(self, target, sfile.filename, genname))
                 customBuild.add("Outputs", genname)
                 items.add(customBuild)
-                items.add("ClCompile", Include=genname)
+                n_cl_compile = Node("ClCompile", Include=genname)
+            # Handle files with custom object name:
+            if sfile in cl_files_map:
+                n_cl_compile.add("ObjectFileName",
+                                 concat("$(IntDir)\\", cl_files_map[sfile], ".obj"))
+            items.add(n_cl_compile)
 
         # Headers files:
         if target.headers:
@@ -277,8 +283,14 @@ class VS201xToolsetBase(VSToolsetBase):
         if rc_files:
             items = Node("ItemGroup")
             root.add(items)
+            rc_files_map = self.disambiguate_intermediate_file_names(rc_files)
             for sfile in rc_files:
-                items.add("ResourceCompile", Include=sfile.filename)
+                n_rc_compile = Node("ResourceCompile", Include=sfile.filename)
+                # Handle files with custom object name:
+                if sfile in rc_files_map:
+                    n_rc_compile.add("ResourceOutputFileName",
+                                     concat("$(IntDir)\\", rc_files_map[sfile], ".res"))
+                items.add(n_rc_compile)
 
         # Dependencies:
         target_deps = target["deps"].as_py()

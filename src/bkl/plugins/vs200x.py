@@ -404,14 +404,13 @@ class VS200xToolsetBase(VSToolsetBase):
         resources["Filter"] = "rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
         resources["UniqueIdentifier"] = "{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 
+        files_map = self.disambiguate_intermediate_file_names(target.sources)
         for sfile in target.sources:
             ext = sfile.filename.get_extension()
             # TODO: share this code with VS2010
             # FIXME: make this more solid
-            if ext in ['cpp', 'cxx', 'cc', 'c']:
-                sources.add("File", RelativePath=sfile.filename)
-            elif ext == 'rc':
-                resources.add("File", RelativePath=sfile.filename)
+            if ext in ['cpp', 'cxx', 'cc', 'c', 'rc']:
+                n_file = Node("File", RelativePath=sfile.filename)
             else:
                 # FIXME: handle both compilation into cpp and c files
                 genfiletype = bkl.compilers.CxxFileType.get()
@@ -431,7 +430,24 @@ class VS200xToolsetBase(VSToolsetBase):
                     tool["Outputs"] = genname
                     n_cfg.add(tool)
                     n_file.add(n_cfg)
-                sources.add("File", RelativePath=genname)
+                n_file = Node("File", RelativePath=genname)
+
+            # Handle files with custom object name:
+            if sfile in files_map:
+                for cfg in target.configurations:
+                    n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
+                    if ext == 'rc':
+                        objfile = concat("$(IntDir)\\", files_map[sfile], ".res")
+                        n_cfg.add("Tool", Name="VCResourceCompilerTool", ResourceOutputFileName=objfile)
+                    else:
+                        objfile = concat("$(IntDir)\\", files_map[sfile], ".obj")
+                        n_cfg.add("Tool", Name="VCCLCompilerTool", ObjectFile=objfile)
+                    n_file.add(n_cfg)
+
+            if ext == 'rc':
+                resources.add(n_file)
+            else:
+                sources.add(n_file)
 
         for sfile in target.headers:
             headers.add("File", RelativePath=sfile.filename)
