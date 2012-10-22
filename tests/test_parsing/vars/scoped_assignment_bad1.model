@@ -1,0 +1,2 @@
+ERROR:
+vars/scoped_assignment_bad1.bkl:7:0: "nonexistent" not found in module vars/scoped_assignment_bad1.bkl

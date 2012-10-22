@@ -1,0 +1,48 @@
+RootNode
+    AssignmentNode
+        LvalueNode
+            IdNode toolsets
+        LiteralNode "gnu"
+    AssignmentNode
+        LvalueNode
+            IdNode global
+        LiteralNode "a"
+    TargetNode
+        IdNode program
+        IdNode test
+        BaseListNode
+        FilesListNode
+            IdNode sources
+            LiteralNode "foo.c"
+        AssignmentNode
+            LvalueNode
+                IdNode local
+            LiteralNode "b"
+        AppendNode
+            LvalueNode
+                NilNode
+                IdNode global
+            LiteralNode "aa"
+        AssignmentNode
+            LvalueNode
+                IdNode foo.c
+                IdNode generated
+            BoolvalNode True
+    AssignmentNode
+        LvalueNode
+            IdNode test
+            IdNode foo.c
+            IdNode dummy
+        LiteralNode "x"
+    AppendNode
+        LvalueNode
+            IdNode test
+            IdNode foo.c
+            IdNode dummy
+        LiteralNode "xx"
+    AppendNode
+        LvalueNode
+            IdNode test
+            IdNode local
+        LiteralNode "bb"
+

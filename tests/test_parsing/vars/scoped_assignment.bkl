@@ -1,0 +1,15 @@
+toolsets = gnu;
+
+global = a;
+
+program test {
+    sources { foo.c }
+    local = b;
+
+    ::global += aa;
+    foo.c::generated = true;
+}
+
+test::foo.c::dummy = x;
+test::foo.c::dummy += xx;
+test::local += bb;

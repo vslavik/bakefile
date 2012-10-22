@@ -1,0 +1,18 @@
+RootNode
+    AssignmentNode
+        LvalueNode
+            IdNode toolsets
+        LiteralNode "gnu"
+    TargetNode
+        IdNode program
+        IdNode test
+        BaseListNode
+        FilesListNode
+            IdNode sources
+            LiteralNode "foo.c"
+    AssignmentNode
+        LvalueNode
+            IdNode nonexistent
+            IdNode foo.c
+            IdNode generated
+        BoolvalNode True

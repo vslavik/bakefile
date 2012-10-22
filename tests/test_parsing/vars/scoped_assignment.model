@@ -1,0 +1,14 @@
+module {
+  variables {
+    toolsets = [gnu]
+    global = [a, aa]
+  }
+  targets {
+    program test {
+      local = [b, bb]
+      sources {
+        file @top_srcdir/foo.c	{ generated = true; dummy = [x, xx] }
+      }
+    }
+  }
+}

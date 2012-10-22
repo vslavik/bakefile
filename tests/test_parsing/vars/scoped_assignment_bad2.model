@@ -1,0 +1,2 @@
+ERROR:
+vars/scoped_assignment_bad2.bkl:5:4: "bar.c" not found in target "test"

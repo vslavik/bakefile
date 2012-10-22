@@ -1,0 +1,7 @@
+toolsets = gnu;
+
+program test {
+    sources { foo.c }
+}
+
+nonexistent::foo.c::generated = true;
