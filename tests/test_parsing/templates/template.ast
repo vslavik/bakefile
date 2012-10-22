@@ -1,12 +1,12 @@
 RootNode
     TemplateNode
-        LiteralNode "t_foo"
+        IdNode t_foo
         BaseListNode
         AppendNode
             IdNode defines
             LiteralNode "COMPONENT="$(id)""
     TemplateNode
-        LiteralNode "t_second"
+        IdNode t_second
         BaseListNode
         AppendNode
             IdNode defines
@@ -15,10 +15,10 @@ RootNode
             IdNode sources
             LiteralNode "second_file.c"
     TemplateNode
-        LiteralNode "t_combined"
+        IdNode t_combined
         BaseListNode
-            LiteralNode "t_foo"
-            LiteralNode "t_second"
+            IdNode t_foo
+            IdNode t_second
     TargetNode
         IdNode program
         IdNode normal
@@ -30,7 +30,7 @@ RootNode
         IdNode program
         IdNode from_templ
         BaseListNode
-            LiteralNode "t_foo"
+            IdNode t_foo
         FilesListNode
             IdNode sources
             LiteralNode "test.c"
@@ -38,8 +38,8 @@ RootNode
         IdNode program
         IdNode from_two_templs
         BaseListNode
-            LiteralNode "t_foo"
-            LiteralNode "t_second"
+            IdNode t_foo
+            IdNode t_second
         FilesListNode
             IdNode sources
             LiteralNode "test.c"
@@ -47,7 +47,7 @@ RootNode
         IdNode program
         IdNode from_combined
         BaseListNode
-            LiteralNode "t_combined"
+            IdNode t_combined
         FilesListNode
             IdNode sources
             LiteralNode "test.c"
@@ -55,9 +55,9 @@ RootNode
         IdNode program
         IdNode from_combined_dupl
         BaseListNode
-            LiteralNode "t_combined"
-            LiteralNode "t_foo"
-            LiteralNode "t_second"
+            IdNode t_combined
+            IdNode t_foo
+            IdNode t_second
         FilesListNode
             IdNode sources
             LiteralNode "test.c"

@@ -225,7 +225,7 @@ scope StmtScope;
 template_stmt
 scope StmtScope;
 @init { $StmtScope::insideTarget = True }
-    : 'template' id=literal base=base_templates
+    : 'template' id=identifier base=base_templates
       '{' stmt* '}'         -> ^(TEMPLATE $id $base stmt*)
     ;
 
@@ -238,8 +238,8 @@ sources_keyword
     : (t='sources' | t='headers') -> ID[$t];
 
 base_templates
-    :                             ->   BASE_LIST // empty
-    | ':' literal (',' literal)*  -> ^(BASE_LIST literal literal*)
+    :                                   ->   BASE_LIST // empty
+    | ':' identifier (',' identifier)*  -> ^(BASE_LIST identifier identifier*)
     ;
 
 
