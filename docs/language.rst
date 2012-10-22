@@ -186,6 +186,28 @@ Assignment to variables is done in the usual way:
    main_sources = foo.cpp;
    main_sources += bar.cpp third.cpp;
 
+Occasionally, it is useful to set variables on other objects, not just in the
+current scope. For example, you may want to set per-file compilation flags, add
+custom build step for a particular source file or even modify a global
+variable. Bakefile uses operator `::` for this purpose, with semantics
+reminiscent of C++: any number of scopes delimited by `::` may precede the
+variable name, with leading `::` indicating global (i.e. current module) scope.
+Here's a simple example:
+
+.. code-block: bkl
+
+   program test {
+     sources { foo.cpp bar.cpp }
+
+     // set COMPILING_FOO preprocessor symbol only when compiling foo.cpp:
+     foo.cpp::defines += COMPILING_FOO;
+   }
+
+   // for demonstration purposes, add an include path to all tests:
+   test::includedirs += tests;
+   test_another::includedirs += tests;
+
+
 
 Referencing variables
 ^^^^^^^^^^^^^^^^^^^^^

@@ -1,23 +1,29 @@
 RootNode
     AssignmentNode
-        IdNode foo
+        LvalueNode
+            IdNode foo
         LiteralNode "a_foo"
     AssignmentNode
-        IdNode bar
+        LvalueNode
+            IdNode bar
         LiteralNode "a_bar"
     AssignmentNode
-        IdNode foo
+        LvalueNode
+            IdNode foo
         LiteralNode "changed"
     AssignmentNode
-        IdNode bar
+        LvalueNode
+            IdNode bar
         LiteralNode "changed_too"
     TargetNode
         IdNode program
         IdNode a_target
         BaseListNode
         AssignmentNode
-            IdNode my_var
+            LvalueNode
+                IdNode my_var
             LiteralNode "my"
         AssignmentNode
-            IdNode my_var
+            LvalueNode
+                IdNode my_var
             LiteralNode "my_take_2"

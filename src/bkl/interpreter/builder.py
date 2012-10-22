@@ -111,21 +111,36 @@ class Builder(object, CondTrackingMixin):
             func(self, node)
 
 
+    def _resolve_scope_specifier(self, scope):
+        # Given LvalueNode.scope, return context corresponding to it
+        ctxt = self.context
+        for part in scope:
+            if part:
+                # find a matching child object
+                ctxt = ctxt.get_child_part_by_name(part)
+            else:
+                # scope specifier starts with '::', i.e. goes to global scope
+                ctxt = ctxt.module
+        return ctxt
+
+
     def on_assignment(self, node):
         append = node.append
         value = self._build_expression(node.value)
         has_cond = self.active_if_cond is not None
 
-        varname = node.var
+        varname = node.lvalue.var
+        context = self._resolve_scope_specifier(node.lvalue.scope)
+
         if varname[0] == "_":
             warning("variable names beginning with underscore are reserved for internal use (\"%s\")",
                     varname, pos=node.pos)
 
-        var = self.context.get_variable(varname)
+        var = context.get_variable(varname)
         if var is None:
             # the variable may still exist in a higher scope, in which case we
             # need to inherit the value from that, not from a property
-            previous_value = self.context.resolve_variable(varname)
+            previous_value = context.resolve_variable(varname)
         else:
             previous_value = var
 
@@ -134,14 +149,14 @@ class Builder(object, CondTrackingMixin):
             # this assignment expression needs to be interpreted as assignment
             # to said property. In other words, the new variable's type
             # must much that of the property.
-            prop = self.context.get_prop(varname)
+            prop = context.get_prop(varname)
             if prop:
                 if append or has_cond:
-                    propval = prop.default_expr(self.context)
+                    propval = prop.default_expr(context)
                 else:
                     propval = NullExpr() # we'll set it below
                 var = Variable.from_property(prop, propval)
-                self.context.add_variable(var)
+                context.add_variable(var)
                 # and if we didn't get previous value from anywhere else yet,
                 # we'll need to use the property:
                 if previous_value is None:
@@ -181,7 +196,7 @@ class Builder(object, CondTrackingMixin):
                 var = Variable(varname, previous_value.value, previous_value.type)
             else:
                 var = Variable(varname, value)
-            self.context.add_variable(var)
+            context.add_variable(var)
 
         # finally, modify variable value:
         if append:

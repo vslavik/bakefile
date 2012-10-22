@@ -1,16 +1,19 @@
 RootNode
     AssignmentNode
-        IdNode toolsets
+        LvalueNode
+            IdNode toolsets
         LiteralNode "gnu"
     TargetNode
         IdNode program
         IdNode dummy
         BaseListNode
         AssignmentNode
-            IdNode xxx
+            LvalueNode
+                IdNode xxx
             ListNode
                 LiteralNode "one.c"
                 LiteralNode "two.c"
         AppendNode
-            IdNode xxx
+            LvalueNode
+                IdNode xxx
             LiteralNode "three.c"

@@ -168,8 +168,8 @@ class VarReferenceNode(Node):
 
 class AssignmentNode(Node):
     """Assignment of value to a variable."""
-    var = property(lambda self: self.children[0].text,
-                   doc="Variable assigning to")
+    lvalue = property(lambda self: self.children[0],
+                      doc="Variable assigning to, LvalueNode")
     value = property(lambda self: self.children[1],
                      doc="Value being assigned.")
     append = False
@@ -178,6 +178,17 @@ class AssignmentNode(Node):
 class AppendNode(AssignmentNode):
     """Assignment of value to a variable by appending (operator +=)."""
     append = True
+
+
+class LvalueNode(Node):
+    """Left side of assignment."""
+    var = property(lambda self: self.children[-1].text,
+                   doc="Variable assigning to")
+    @property
+    def scope(self):
+        """List of scope identifiers; first one may be None for global."""
+        for c in self.children[0:-1]:
+            yield c.text if c else None
 
 
 class FilesListNode(Node):
@@ -277,6 +288,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.VAR_REFERENCE  : VarReferenceNode,
         BakefileParser.ASSIGN         : AssignmentNode,
         BakefileParser.APPEND         : AppendNode,
+        BakefileParser.LVALUE         : LvalueNode,
         BakefileParser.FILES_LIST     : FilesListNode,
         BakefileParser.TARGET         : TargetNode,
         BakefileParser.IF             : IfNode,

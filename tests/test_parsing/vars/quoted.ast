@@ -1,12 +1,15 @@
 RootNode
     AssignmentNode
-        IdNode foo
+        LvalueNode
+            IdNode foo
         ListNode
             LiteralNode "one two"
             LiteralNode "three"
     AssignmentNode
-        IdNode bar
+        LvalueNode
+            IdNode bar
         LiteralNode "1 2 3"
     AssignmentNode
-        IdNode zar
+        LvalueNode
+            IdNode zar
         LiteralNode "this is called "escaping""

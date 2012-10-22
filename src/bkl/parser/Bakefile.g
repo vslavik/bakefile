@@ -37,6 +37,7 @@ tokens {
     ID;
     ASSIGN;
     APPEND;
+    LVALUE;
     LITERAL;
     BOOLVAL;
     VAR_REFERENCE;
@@ -97,8 +98,18 @@ stmt_inside_target
     ;
 
 assignment_stmt
-    : identifier '=' expression ';'    -> ^(ASSIGN identifier expression)
-    | identifier '+=' expression ';'   -> ^(APPEND identifier expression)
+    : lvalue '='  expression ';'    -> ^(ASSIGN lvalue expression)
+    | lvalue '+=' expression ';'    -> ^(APPEND lvalue expression)
+    ;
+
+lvalue
+    : identifier                    -> ^(LVALUE identifier)
+    | lvalue_scope identifier       -> ^(LVALUE lvalue_scope identifier)
+    ;
+
+lvalue_scope
+    : (identifier SCOPE_SEP)+            -> identifier+
+    | SCOPE_SEP (identifier SCOPE_SEP)*  -> NIL identifier*
     ;
 
 
@@ -258,6 +269,8 @@ RPAREN:    ')';
 
 TRUE:      'true';
 FALSE:     'false';
+
+SCOPE_SEP: '::';
 
 QUOTED_TEXT: '"' ( ESCAPE_SEQ | ~('"' | '\\') )* '"';
 

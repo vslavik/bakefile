@@ -1,8 +1,10 @@
 RootNode
     AssignmentNode
-        IdNode foo
+        LvalueNode
+            IdNode foo
         BoolvalNode True
     AppendNode
-        IdNode foo
+        LvalueNode
+            IdNode foo
         LiteralNode "FOO"
 

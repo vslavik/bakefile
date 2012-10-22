@@ -1,13 +1,17 @@
 RootNode
     AssignmentNode
-        IdNode one
+        LvalueNode
+            IdNode one
         BoolvalNode True
     AssignmentNode
-        IdNode two
+        LvalueNode
+            IdNode two
         BoolvalNode False
     AssignmentNode
-        IdNode three
+        LvalueNode
+            IdNode three
         LiteralNode "true"
     AssignmentNode
-        IdNode four
+        LvalueNode
+            IdNode four
         LiteralNode "false"

@@ -190,6 +190,10 @@ class ModelPart(object):
     Base class for model "parts", i.e. projects, modules or targets. Basically,
     anything that can have variables on it.
 
+    .. attribute:: name
+
+       Name of the part -- e.g. target name, filename of source file etc.
+
     .. attribute:: variables
 
        Dictionary of all variables defined in global scope in this module
@@ -221,11 +225,32 @@ class ModelPart(object):
         assert isinstance(prj, Project)
         return prj
 
+    @property
+    def module(self):
+        """
+        The :class:`bkl.model.Module` that this part belongs to.
+        """
+        prj = self
+        while not isinstance(prj, Module):
+            prj = prj.parent
+        return prj
+
+
     def child_parts(self):
         """
         Yields model parts that are (direct) children of this.
         """
         raise NotImplementedError
+
+    def get_child_part_by_name(self, name):
+        """
+        Returns child of this part of the model with given name (e.g. target
+        with that name). Throws if not found.
+        """
+        for ch in self.child_parts():
+            if ch.name == name:
+                return ch
+        raise error.Error("\"%s\" not found in %s" % (name, self))
 
 
     @property
@@ -438,6 +463,9 @@ class Project(ModelPart):
 
        Dictionary of all templates defined in the project.
     """
+
+    name = "project"
+
     def __init__(self):
         super(Project, self).__init__(parent=None)
         self.modules = []
@@ -523,6 +551,8 @@ class Module(ModelPart):
 
     def __str__(self):
         return "module %s" % self.source_file
+
+    name = property(lambda self: self.source_file)
 
     def child_parts(self):
         return self.targets.itervalues()
@@ -691,6 +721,10 @@ class SourceFile(ModelPart):
     @property
     def filename(self):
         return self["_filename"]
+
+    @property
+    def name(self):
+        return self.filename.as_py()
 
     def __str__(self):
         return "file %s" % self.filename

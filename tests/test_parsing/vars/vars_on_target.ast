@@ -4,8 +4,10 @@ RootNode
         IdNode foo
         BaseListNode
         AssignmentNode
-            IdNode my_var
+            LvalueNode
+                IdNode my_var
             LiteralNode "42"
         AssignmentNode
-            IdNode my_name
+            LvalueNode
+                IdNode my_name
             LiteralNode "a_name"

@@ -1,5 +1,6 @@
 RootNode
     AppendNode
-        IdNode made_up
+        LvalueNode
+            IdNode made_up
         LiteralNode "foo"
 

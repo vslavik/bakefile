@@ -1,39 +1,46 @@
 RootNode
     AssignmentNode
-        IdNode FOO
+        LvalueNode
+            IdNode FOO
         ListNode
             LiteralNode "value1"
             LiteralNode "value2"
     AssignmentNode
-        IdNode SINGLE
+        LvalueNode
+            IdNode SINGLE
         LiteralNode "one"
     AssignmentNode
-        IdNode BAR
+        LvalueNode
+            IdNode BAR
         ListNode
             LiteralNode "bar"
             LiteralNode "zar    foo"
             LiteralNode "let"
             LiteralNode "x"
     AssignmentNode
-        IdNode END
+        LvalueNode
+            IdNode END
         ListNode
             LiteralNode "end1"
             LiteralNode "end2"
     AssignmentNode
-        IdNode END2
+        LvalueNode
+            IdNode END2
         ListNode
             LiteralNode "end1"
             LiteralNode "end2"
             LiteralNode "end3"
     AssignmentNode
-        IdNode END3
+        LvalueNode
+            IdNode END3
         ListNode
             LiteralNode "end1"
             LiteralNode "xxx"
             LiteralNode "end2"
             LiteralNode "end3"
     AssignmentNode
-        IdNode END4
+        LvalueNode
+            IdNode END4
         ListNode
             LiteralNode "end1"
             LiteralNode "xxx"

@@ -3,13 +3,15 @@ RootNode
         IdNode t_foo
         BaseListNode
         AppendNode
-            IdNode defines
+            LvalueNode
+                IdNode defines
             LiteralNode "COMPONENT="$(id)""
     TemplateNode
         IdNode t_second
         BaseListNode
         AppendNode
-            IdNode defines
+            LvalueNode
+                IdNode defines
             LiteralNode "SECOND_TEMPLATE"
         FilesListNode
             IdNode sources

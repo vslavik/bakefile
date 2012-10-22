@@ -1,4 +1,5 @@
 RootNode
     AssignmentNode
-        IdNode x
+        LvalueNode
+            IdNode x
         LiteralNode "1"

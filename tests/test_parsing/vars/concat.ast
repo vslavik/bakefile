@@ -1,12 +1,15 @@
 RootNode
     AssignmentNode
-        IdNode foo
+        LvalueNode
+            IdNode foo
         LiteralNode "1"
     AssignmentNode
-        IdNode bar
+        LvalueNode
+            IdNode bar
         LiteralNode "2"
     AssignmentNode
-        IdNode FOO
+        LvalueNode
+            IdNode FOO
         ListNode
             LiteralNode "bar"
             ConcatNode
@@ -16,27 +19,31 @@ RootNode
                 LiteralNode "xx"
             LiteralNode "zar"
     AssignmentNode
-        IdNode X
+        LvalueNode
+            IdNode X
         ConcatNode
             LiteralNode "foo"
             VarReferenceNode
                 IdNode bar
     AssignmentNode
-        IdNode Y
+        LvalueNode
+            IdNode Y
         ConcatNode
             LiteralNode "foo"
             VarReferenceNode
                 IdNode bar
             LiteralNode "zar"
     AssignmentNode
-        IdNode Z
+        LvalueNode
+            IdNode Z
         ConcatNode
             VarReferenceNode
                 IdNode foo
             VarReferenceNode
                 IdNode bar
     AssignmentNode
-        IdNode W
+        LvalueNode
+            IdNode W
         ConcatNode
             LiteralNode "foo"
             LiteralNode "bar"
