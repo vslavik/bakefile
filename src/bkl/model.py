@@ -696,15 +696,13 @@ class ConfigurationProxy(object):
     See :meth:`bkl.model.Target.configurations` for more information.
     """
     def __init__(self, model, config):
-        self.config = config
-        self.name = config.name
-        self.is_debug = config.is_debug
         self.model = model
+        self.config = config
         self._visitor = _ProxyIfResolver(config.name)
 
-    @property
-    def project(self):
-        return self.model.project
+    name = property(lambda self: self.config.name)
+    is_debug = property(lambda self: self.config.is_debug)
+    project = property(lambda self: self.model.project)
 
     def __getitem__(self, key):
         return self._visitor.visit(self.model[key])
