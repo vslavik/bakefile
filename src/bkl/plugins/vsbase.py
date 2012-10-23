@@ -770,7 +770,7 @@ class VSToolsetBase(Toolset):
             defs.append("%s_EXPORTS" % target.name.upper())
         return defs
 
-    def collect_extra_options_for_node(self, target, prefix):
+    def collect_extra_options_for_node(self, target, prefix, inherit=True):
         """
         Collects extra options from target variables. Extra options are those not supported
         directly by Bakefile, but expressed as specially-named variables, e.g.
@@ -782,6 +782,9 @@ class VSToolsetBase(Toolset):
         :param prefix:  Prefix of the variables, without "<target>.option.". For example,
                         it may be "Link" to collect from e.g. ``vs2010.option.Link.*`` or
                         "" to collect from ``vs2010.option.*``.
+        :param inherit: Should values be inherited from the higher scopes (e.g. module)?
+                        Should be True for targets and modules, false for source files
+                        when used to output per-file settings.
         """
         if prefix:
             scope = "%s.option.%s" % (self.name, prefix)
@@ -802,7 +805,10 @@ class VSToolsetBase(Toolset):
                 if len(split) == 2 and split[0] == scope:
                     yield (str(split[1]), target[varname])
             already_found.update(scope_for_vars.variables.iterkeys())
-            scope_for_vars = scope_for_vars.parent
+            if inherit:
+                scope_for_vars = scope_for_vars.parent
+            else:
+                break
 
 
     def needs_custom_intermediate_dir(self, target):

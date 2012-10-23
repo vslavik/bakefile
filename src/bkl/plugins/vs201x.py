@@ -270,6 +270,7 @@ class VS201xToolsetBase(VSToolsetBase):
             if sfile in cl_files_map:
                 n_cl_compile.add("ObjectFileName",
                                  concat("$(IntDir)\\", cl_files_map[sfile], ".obj"))
+            self._add_per_file_options(sfile, n_cl_compile)
             items.add(n_cl_compile)
 
         # Headers files:
@@ -290,6 +291,7 @@ class VS201xToolsetBase(VSToolsetBase):
                 if sfile in rc_files_map:
                     n_rc_compile.add("ResourceOutputFileName",
                                      concat("$(IntDir)\\", rc_files_map[sfile], ".res"))
+                self._add_per_file_options(sfile, n_rc_compile)
                 items.add(n_rc_compile)
 
         # Dependencies:
@@ -332,6 +334,16 @@ class VS201xToolsetBase(VSToolsetBase):
                 scope = node.name
         for key, value in self.collect_extra_options_for_node(target, scope):
             node.add(key, value)
+
+
+    def _add_per_file_options(self, srcfile, node):
+        """Add options that are set on per-file basis."""
+        # TODO: add regular options such as 'defines' here too, not just
+        #       the vsXXXX.option.* overrides
+        for cfg in srcfile.configurations:
+            cond = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
+            for key, value in self.collect_extra_options_for_node(srcfile, node.name, inherit=False):
+                node.add(Node(key, value, Condition=cond))
 
 
     def _write_filters_file_for(self, filename):
@@ -393,6 +405,12 @@ class VS2010Toolset(VS201xToolsetBase):
       - ``vs2010.option.Link.*``
       - ``vs2010.option.Lib.*``
 
+    These variables can be used in several places in bakefiles:
+
+      - In targets, to applied them as project's global settings.
+      - In modules, to apply them to all projects in the module and its submodules.
+      - On per-file basis, to modify file-specific settings.
+
     Examples:
 
     .. code-block:: bkl
@@ -400,6 +418,7 @@ class VS2010Toolset(VS201xToolsetBase):
         vs2010.option.GenerateManifest = false;
         vs2010.option.Link.CreateHotPatchableImage = Enabled;
 
+        crashrpt.cpp::vs2010.option.ClCompile.ExceptionHandling = Async;
     """
     name = "vs2010"
 

@@ -445,13 +445,14 @@ class VS200xToolsetBase(VSToolsetBase):
                     n_file.add(n_cfg)
 
             if ext == 'rc':
+                self._add_per_file_options(sfile, n_file, "VCResourceCompilerTool")
                 resources.add(n_file)
             else:
+                self._add_per_file_options(sfile, n_file, "VCCLCompilerTool")
                 sources.add(n_file)
 
         for sfile in target.headers:
             headers.add("File", RelativePath=sfile.filename)
-
 
         files.add(sources)
         files.add(headers)
@@ -469,6 +470,19 @@ class VS200xToolsetBase(VSToolsetBase):
         for key, value in self.collect_extra_options_for_node(target, scope):
             node[key] = value
 
+    def _add_per_file_options(self, srcfile, node, tool):
+        """Add options that are set on per-file basis."""
+        # TODO: add regular options such as 'defines' here too, not just
+        #       the vsXXXX.option.* overrides
+        for cfg in srcfile.configurations:
+            extras = list(self.collect_extra_options_for_node(srcfile, tool, inherit=False))
+            if extras:
+                n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
+                n_tool = Node("Tool", Name=tool)
+                for key, value in extras:
+                    n_tool[key] = value
+                n_cfg.add(n_tool)
+                node.add(n_cfg)
 
 
 class VS2008Toolset(VS200xToolsetBase):
@@ -488,17 +502,24 @@ class VS2008Toolset(VS200xToolsetBase):
       - ``vs2008.option.VCCLCompilerTool.EnableFunctionLevelLinking``
       - ``vs2008.option.VCLinkerTool.EnableCOMDATFolding``
 
-    Additionally, the following are support for non-tool nodes:
-    The following nodes are supported:
+    Additionally, the following are supported for non-tool nodes:
 
       - ``vs2008.option.*`` (attributes of the root ``VisualStudioProject`` node)
       - ``vs2008.option.Configuration.*`` (``Configuration`` node attributes)
+
+    These variables can be used in several places in bakefiles:
+
+      - In targets, to applied them as project's global settings.
+      - In modules, to apply them to all projects in the module and its submodules.
+      - On per-file basis, to modify file-specific settings.
 
     Examples:
 
     .. code-block:: bkl
 
         vs2008.option.VCCLCompilerTool.EnableFunctionLevelLinking = false;
+
+        crashrpt.cpp::vs2008.option.VCCLCompilerTool.ExceptionHandling = 2;
     """
     name = "vs2008"
 
