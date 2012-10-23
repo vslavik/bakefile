@@ -585,60 +585,17 @@ class Module(ModelPart):
         return props.enum_module_props()
 
 
-class Target(ModelPart):
+class ConfigurationsPropertyMixin:
     """
-    A Bakefile target.
-
-    Variables are typed.
-
-    .. attribute:: name
-
-       Name (ID) of the target. This must be unique in the entire project.
-
-    .. attribute:: type
-
-       Type of the target, as :class:`bkl.api.TargetType` instance.
-
-    .. attribute:: sources
-
-       List of source files, as SourceFile instances.
-
-    .. attribute:: headers
-
-       List of header files, as SourceFile instances. The difference from
-       :attr:`sources` is that headers are installable and usable for
-       compilation of other targets, while sources are not.
+    Mixin class for implementation configurations property.
     """
-    def __init__(self, parent, name, target_type, source_pos):
-        super(Target, self).__init__(parent, source_pos)
-        self.name = name
-        self.type = target_type
-        self.sources = []
-        self.headers = []
-
-        assert isinstance(parent, Module)
-        assert not parent.project.has_target(name)
-        parent.targets[name] = self
-
-    def __str__(self):
-        return 'target "%s"' % self.name
-
-    def child_parts(self):
-        for x in self.sources: yield x
-        for x in self.headers: yield x
-
-    def get_prop(self, name):
-        return props.get_target_prop(self.type, name)
-
-    def enum_props(self):
-        return props.enum_target_props(self.type)
-
     @property
     def configurations(self):
         """
-        Returns all configurations for this target, as ConfigurationProxy
-        objects that can be used similarly to the way the target object
-        itself is. In particular, it's [] operator works the same.
+        Returns all configurations for this model part (e.g. a target), as
+        ConfigurationProxy objects that can be used similarly to the way the
+        model part object itself is. In particular, it's [] operator works the
+        same.
 
         The proxies are intended to be used in place of targets in code that
         needs to get per-configuration values of properties.
@@ -693,7 +650,7 @@ class ConfigurationProxy(object):
     depending on the value of "config", by substituting appropriate value
     according to the configuration name passed to proxy's constructor.
 
-    See :meth:`bkl.model.Target.configurations` for more information.
+    See :meth:`bkl.model.ModelPartWithConfigurations.configurations` for more information.
     """
     def __init__(self, model, config):
         self.model = model
@@ -708,7 +665,58 @@ class ConfigurationProxy(object):
         return self._visitor.visit(self.model[key])
 
 
-class SourceFile(ModelPart):
+class Target(ModelPart, ConfigurationsPropertyMixin):
+    """
+    A Bakefile target.
+
+    Variables are typed.
+
+    .. attribute:: name
+
+       Name (ID) of the target. This must be unique in the entire project.
+
+    .. attribute:: type
+
+       Type of the target, as :class:`bkl.api.TargetType` instance.
+
+    .. attribute:: sources
+
+       List of source files, as SourceFile instances.
+
+    .. attribute:: headers
+
+       List of header files, as SourceFile instances. The difference from
+       :attr:`sources` is that headers are installable and usable for
+       compilation of other targets, while sources are not.
+    """
+    def __init__(self, parent, name, target_type, source_pos):
+        super(Target, self).__init__(parent, source_pos)
+        self.name = name
+        self.type = target_type
+        self.sources = []
+        self.headers = []
+
+        assert isinstance(parent, Module)
+        assert not parent.project.has_target(name)
+        parent.targets[name] = self
+
+    def __str__(self):
+        return 'target "%s"' % self.name
+
+    def child_parts(self):
+        for x in self.sources: yield x
+        for x in self.headers: yield x
+
+    def get_prop(self, name):
+        return props.get_target_prop(self.type, name)
+
+    def enum_props(self):
+        return props.enum_target_props(self.type)
+
+
+
+
+class SourceFile(ModelPart, ConfigurationsPropertyMixin):
     """
     Source file object.
     """
