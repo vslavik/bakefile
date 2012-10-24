@@ -262,7 +262,7 @@ class VS201xToolsetBase(VSToolsetBase):
                 compiler = bkl.compilers.get_compiler(self, ft_from, genfiletype)
 
                 customBuild = Node("CustomBuild", Include=sfile.filename)
-                customBuild.add("Command", compiler.commands(self, target, sfile.filename, genname))
+                customBuild.add("Command", VSList("\n", compiler.commands(self, target, sfile.filename, genname)))
                 customBuild.add("Outputs", genname)
                 items.add(customBuild)
                 n_cl_compile = Node("ClCompile", Include=genname)
