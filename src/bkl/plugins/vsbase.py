@@ -226,7 +226,8 @@ class XmlFormatter(object):
                                     (key, value, e.msg), pos=value.pos)
         else:
             children_markup = None
-        return self.format_node(n.name, attrs, n.text, children_markup, indent)
+        text = self.format_value(n.text) if n.text else None
+        return self.format_node(n.name, attrs, text, children_markup, indent)
 
     def format_node(self, name, attrs, text, children_markup, indent):
         """
