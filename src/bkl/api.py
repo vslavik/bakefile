@@ -348,22 +348,25 @@ class Property(object):
             the default for. If the default value is defined, its expression
             is evaluated in the context of *for_obj*.
         """
-        if self.default is None:
+        default = self._make_default_expr(self.default, for_obj)
+        if default is None:
             raise error.UndefinedError("required property \"%s\" on %s not set" % (self.name, for_obj),
                                        pos=for_obj.source_pos)
-        return self._make_expr(self.default, for_obj)
+        return default
 
-    def _make_expr(self, val, for_obj):
+    def _make_default_expr(self, val, for_obj):
         if hasattr(val, "__call__"):
             # default is defined as a callback function
             val = val(for_obj)
+        if val is None:
+            return None
         if isinstance(val, expr.Expr):
             return val
         elif isinstance(val, types.StringType):
             # parse strings as bkl language expressions, it's too useful to
             return self._parse_expr(val, for_obj)
         elif isinstance(val, list):
-            return expr.ListExpr([self._make_expr(x, for_obj) for x in val])
+            return expr.ListExpr([self._make_default_expr(x, for_obj) for x in val])
         elif isinstance(val, types.BooleanType):
             return expr.BoolValueExpr(val)
         else:
