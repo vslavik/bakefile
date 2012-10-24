@@ -332,12 +332,10 @@ def make_variables_for_missing_props(model, toolset):
     """
     Creates variables for properties that don't have variables set yet.
     """
-    logger.debug("adding properties' default values")
+    logger.debug("adding properties' default values (%s)" % model)
     model.make_variables_for_missing_props(toolset)
-    for m in model.modules:
-        m.make_variables_for_missing_props(toolset)
-        for t in m.targets.itervalues():
-            t.make_variables_for_missing_props(toolset)
+    for part in model.child_parts():
+        make_variables_for_missing_props(part, toolset)
 
 
 def simplify_exprs(model):
