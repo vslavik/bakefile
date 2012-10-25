@@ -1,0 +1,25 @@
+toolsets = gnu vs2008 vs2010;
+
+vs2008.solutionfile = generated_files_vs2008.sln;
+
+program test {
+    sources {
+        main.cpp
+        gensrc.txt
+        @builddir/gensrc.cpp
+    }
+    headers {
+        gensrc_hdr.txt
+        @builddir/gensrc.h
+    }
+
+    includedirs += @builddir;
+
+    gensrc.txt::compile-commands = "python make_gensrc.py --source %(out) %(in)";
+    gensrc.txt::dependencies = make_gensrc.py;
+    gensrc.txt::outputs = @builddir/gensrc.cpp;
+
+    gensrc_hdr.txt::compile-commands = "python make_gensrc.py --header %(out) %(in)";
+    gensrc_hdr.txt::dependencies = make_gensrc.py;
+    gensrc_hdr.txt::outputs = @builddir/gensrc.h;
+}
