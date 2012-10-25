@@ -148,8 +148,7 @@ class Interpreter(object):
         per-toolset models etc.
         """
         logger.debug("finalizing the model")
-        passes.detect_self_references(self.model)
-        passes.detect_unused_vars(self.model)
+        passes.detect_potential_problems(self.model)
         passes.normalize_and_validate_bool_subexpressions(self.model)
         passes.normalize_vars(self.model)
         passes.validate_vars(self.model)

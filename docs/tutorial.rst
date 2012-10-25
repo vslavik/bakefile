@@ -238,3 +238,54 @@ target property to ``false`` to prevent it from doing it.
 
 
 .. [*] So no meaningful tabulations or backslashes for line continuation.
+
+
+Advanced Stuff
+--------------
+
+Generated Source Files
+^^^^^^^^^^^^^^^^^^^^^^
+
+Bakefile supports custom compilation steps; this can be used both for files
+generated with some script and for compilation of unsupported file types.
+
+Compiling a custom file is as simple as setting the ``compile-commands``
+property on it to the command (or several commands) to compile the file,
+``outputs`` property withthe list of created files and optionally filling in
+additional dependencies:
+
+.. code-block:: bkl
+
+   toolsets = gnu vs2010;
+   program hello {
+       sources { hello.cpp mygen.cpp mygen.desc }
+
+       mygen.desc::compile-commands = "tools/generator.py -o %(out) %(in)";
+       mygen.desc::outputs = mygen.cpp;
+       // add dependency on the generator script:
+       mygen.desc::dependencies = tools/generator.py;
+   }
+
+Notice that the generated files listed in ``outputs`` must be included in
+``sources`` or ``headers`` section as well.
+
+Additionally, any number of other dependency files can be added to the
+``dependencies`` list.  The command uses two placeholders, ``%(in)`` and
+``%(out)``, that are replaced with the name of the source file (``mygen.desc``
+in our example) and ``outputs`` respectively; both placeholders are optional.
+If there are multiple output files, ``%(out0)``, ``%(out1)``, ... placeholders
+can be used to access individual items in the list.
+
+Perhaps a better would be to demonstrate how to use this to generate a grammar
+parser with Bison:
+
+.. code-block:: bkl
+
+   sources {
+       main.cpp
+       parser.ypp              // Bison grammar file
+       parser.cpp parser.hpp   // generated C++ parser
+   }
+
+   parser.ypp::compile-commands = "bison -o %(out0) %(in)"
+   parser.ypp::outputs = parser.cpp parser.hpp;

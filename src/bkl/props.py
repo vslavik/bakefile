@@ -54,6 +54,34 @@ def std_file_props():
              readonly=True,
              inheritable=False,
              doc="Source file name."),
+        Property("compile-commands",
+             type=ListType(StringType()),
+             default=[],
+             inheritable=False,
+             doc="""
+                 Command or commands to run to compile this source file,
+                 i.e. to generate other file(s) from it. This can be used for
+                 generating some files or for compiling custom file types.
+                 """),
+        Property("outputs",
+             type=ListType(PathType()),
+             default=lambda t: None if t["compile-commands"] else expr.NullExpr(),
+             inheritable=False,
+             doc="""
+                 Output files created by the build step that compiles this file
+
+                 Only applicable if *compile-commands* is set.
+                 """),
+        Property("dependencies",
+             type=ListType(PathType()),
+             default=[],
+             inheritable=False,
+             doc="""
+                 List of additional files that the commands that compiles this
+                 source file depend on.
+
+                 Only applicable if *compile-commands* is set.
+                 """),
         ]
 
 

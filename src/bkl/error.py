@@ -153,6 +153,13 @@ class UndefinedError(Error):
     pass
 
 
+class NotFoundError(Error):
+    """
+    Exception thrown when a property or variable wasn't found at all.
+    """
+    pass
+
+
 class _LocalContextStack(threading.local):
     """
     Helper class for keeping track of :class:`error_context` instances.

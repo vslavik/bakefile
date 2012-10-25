@@ -250,7 +250,7 @@ class ModelPart(object):
         for ch in self.child_parts():
             if ch.name == name:
                 return ch
-        raise error.Error("\"%s\" not found in %s" % (name, self))
+        raise error.NotFoundError("\"%s\" not found in %s" % (name, self))
 
 
     @property
@@ -725,6 +725,9 @@ class Target(ModelPart, ConfigurationsPropertyMixin):
     def child_parts(self):
         for x in self.sources: yield x
         for x in self.headers: yield x
+
+    def all_source_files(self):
+        return self.child_parts()
 
     def get_prop(self, name):
         return props.get_target_prop(self.type, name)

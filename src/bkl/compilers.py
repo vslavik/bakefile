@@ -31,7 +31,7 @@ from api import FileType, FileCompiler, BuildNode
 import model
 from error import Error, error_context
 import expr
-
+from expr import format_string
 
 #: Native executable file type
 class NativeProgramFileType(FileType):
@@ -177,6 +177,16 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to):
     return ([node], [node])
 
 
+def _make_build_nodes_for_generated_file(srcfile):
+    commands_var = srcfile["compile-commands"]
+    commands = format_string(commands_var, {"in"  : "$<", "out" : "$@"})
+    node = BuildNode(commands=commands,
+                     inputs=[srcfile.filename] + list(srcfile["dependencies"]),
+                     outputs=list(srcfile["outputs"]),
+                     source_pos=commands_var.pos)
+    return [node]
+
+
 def get_compilation_subgraph(toolset, target, ft_to, outfile):
     """
     Given list of source files (as :class:`bkl.expr.ListExpr`), produces build
@@ -196,10 +206,17 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
 
     for srcfile in target.sources:
         with error_context(srcfile):
-            # FIXME: toolset.object_type shouldn't be needed
-            obj, all = _make_build_nodes_for_file(toolset, target, srcfile, toolset.object_type)
-            objects += obj
-            allnodes += all
+            if srcfile["compile-commands"]:
+                allnodes += _make_build_nodes_for_generated_file(srcfile)
+            else:
+                # FIXME: toolset.object_type shouldn't be needed
+                obj, all = _make_build_nodes_for_file(toolset, target, srcfile, toolset.object_type)
+                objects += obj
+                allnodes += all
+    for srcfile in target.headers:
+        with error_context(srcfile):
+            if srcfile["compile-commands"]:
+                allnodes += _make_build_nodes_for_generated_file(srcfile)
 
     linker = get_compiler(toolset, toolset.object_type, ft_to)
     assert linker

@@ -35,7 +35,7 @@ import simplify
 import bkl.vartypes
 import bkl.expr
 import bkl.model
-from bkl.error import Error, NonConstError, TypeError, warning
+from bkl.error import Error, NonConstError, NotFoundError, TypeError, warning, error_context
 from bkl.expr import Visitor, RewritingVisitor
 from bkl.utils import memoized
 
@@ -131,6 +131,32 @@ def detect_unused_vars(model):
                 # FIXME: Handle this case properly.
                 var.name != "configurations"):
             warning('variable "%s" is never used', var.name, pos=var.value.pos)
+
+
+def detect_missing_generated_outputs(model):
+    """
+    Warns about generated source files not included in sources/headers.
+    """
+    for t in model.all_targets():
+        for srcfile in t.all_source_files():
+            with error_context(srcfile):
+                if not srcfile["compile-commands"]:
+                    continue
+                for cond, item in bkl.expr.enum_possible_values(srcfile["outputs"]):
+                    try:
+                        t.get_child_part_by_name(item)
+                    except NotFoundError:
+                        warning("file %s generated from %s is not among sources or headers of target \"%s\"", item, srcfile.filename, t.name, pos=item.pos)
+
+
+
+def detect_potential_problems(model):
+    """
+    Run several warnings-generating steps, to detect common problems.
+    """
+    detect_self_references(model)
+    detect_unused_vars(model)
+    detect_missing_generated_outputs(model)
 
 
 def normalize_and_validate_bool_subexpressions(model):

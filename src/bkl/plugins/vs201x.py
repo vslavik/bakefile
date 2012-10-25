@@ -29,7 +29,7 @@ import bkl.expr
 from bkl.io import OutputFile, EOL_WINDOWS
 
 from bkl.plugins.vsbase import *
-from bkl.expr import concat
+from bkl.expr import concat, format_string
 
 
 # TODO: Put more content into this class, use it properly
@@ -246,39 +246,45 @@ class VS201xToolsetBase(VSToolsetBase):
         root.add(items)
         cl_files_map = self.disambiguate_intermediate_file_names(cl_files)
         for sfile in cl_files:
-            ext = sfile.filename.get_extension()
-            # TODO: share this code with VS200x
-            # FIXME: make this more solid
-            if ext in ['cpp', 'cxx', 'cc', 'c']:
-                n_cl_compile = Node("ClCompile", Include=sfile.filename)
+            if sfile["compile-commands"]:
+                self._add_custom_build_file(items, sfile)
             else:
-                # FIXME: handle both compilation into cpp and c files
-                genfiletype = bkl.compilers.CxxFileType.get()
-                genname = bkl.expr.PathExpr([bkl.expr.LiteralExpr(sfile.filename.get_basename())],
-                                            bkl.expr.ANCHOR_BUILDDIR,
-                                            pos=sfile.filename.pos).change_extension("cpp")
+                ext = sfile.filename.get_extension()
+                # TODO: share this code with VS200x
+                # FIXME: make this more solid
+                if ext in ['cpp', 'cxx', 'cc', 'c']:
+                    n_cl_compile = Node("ClCompile", Include=sfile.filename)
+                else:
+                    # FIXME: handle both compilation into cpp and c files
+                    genfiletype = bkl.compilers.CxxFileType.get()
+                    genname = bkl.expr.PathExpr([bkl.expr.LiteralExpr(sfile.filename.get_basename())],
+                                                bkl.expr.ANCHOR_BUILDDIR,
+                                                pos=sfile.filename.pos).change_extension("cpp")
 
-                ft_from = bkl.compilers.get_file_type(ext)
-                compiler = bkl.compilers.get_compiler(self, ft_from, genfiletype)
+                    ft_from = bkl.compilers.get_file_type(ext)
+                    compiler = bkl.compilers.get_compiler(self, ft_from, genfiletype)
 
-                customBuild = Node("CustomBuild", Include=sfile.filename)
-                customBuild.add("Command", VSList("\n", compiler.commands(self, target, sfile.filename, genname)))
-                customBuild.add("Outputs", genname)
-                items.add(customBuild)
-                n_cl_compile = Node("ClCompile", Include=genname)
-            # Handle files with custom object name:
-            if sfile in cl_files_map:
-                n_cl_compile.add("ObjectFileName",
-                                 concat("$(IntDir)\\", cl_files_map[sfile], ".obj"))
-            self._add_per_file_options(sfile, n_cl_compile)
-            items.add(n_cl_compile)
+                    customBuild = Node("CustomBuild", Include=sfile.filename)
+                    customBuild.add("Command", VSList("\n", compiler.commands(self, target, sfile.filename, genname)))
+                    customBuild.add("Outputs", genname)
+                    items.add(customBuild)
+                    n_cl_compile = Node("ClCompile", Include=genname)
+                # Handle files with custom object name:
+                if sfile in cl_files_map:
+                    n_cl_compile.add("ObjectFileName",
+                                     concat("$(IntDir)\\", cl_files_map[sfile], ".obj"))
+                self._add_per_file_options(sfile, n_cl_compile)
+                items.add(n_cl_compile)
 
         # Headers files:
         if target.headers:
             items = Node("ItemGroup")
             root.add(items)
             for sfile in target.headers:
-                items.add("ClInclude", Include=sfile.filename)
+                if sfile["compile-commands"]:
+                    self._add_custom_build_file(items, sfile)
+                else:
+                    items.add("ClInclude", Include=sfile.filename)
 
         # Resources:
         if rc_files:
@@ -319,6 +325,24 @@ class VS201xToolsetBase(VSToolsetBase):
         self._write_filters_file_for(filename)
 
 
+    def _add_custom_build_file(self, node, srcfile):
+        outputs = srcfile["outputs"]
+        fmt_dict = {"in": srcfile.filename, "out": outputs}
+        idx = 0
+        for outN in outputs:
+            fmt_dict["out%d" % idx] = outN
+            idx += 1
+        commands = format_string(srcfile["compile-commands"], fmt_dict)
+        n = Node("CustomBuild", Include=srcfile.filename)
+        for cfg in srcfile.configurations:
+            cond = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
+            n.add(Node("Command", VSList("\n", commands), Condition=cond))
+            n.add(Node("Outputs", outputs, Condition=cond))
+            if srcfile["dependencies"]:
+                n.add(Node("AdditionalInputs", srcfile["dependencies"], Condition=cond))
+        node.add(n)
+
+
     def _add_VCTargetsPath(self, node):
         pass
 
@@ -334,6 +358,8 @@ class VS201xToolsetBase(VSToolsetBase):
         except AttributeError:
             pass
         return deps
+
+
     def _add_extra_options_to_node(self, target, node):
         """Add extra native options specified in vs2010.option.* properties."""
         try:

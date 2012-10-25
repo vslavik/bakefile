@@ -27,7 +27,7 @@ Toolsets for Visual Studio 2003, 2005 and 2008.
 """
 
 from bkl.plugins.vsbase import *
-from bkl.expr import concat
+from bkl.expr import concat, format_string
 
 # Misc constants for obscure numbers in the output format:
 typeApplication         = 1
@@ -406,58 +406,85 @@ class VS200xToolsetBase(VSToolsetBase):
 
         files_map = self.disambiguate_intermediate_file_names(target.sources)
         for sfile in target.sources:
-            ext = sfile.filename.get_extension()
-            # TODO: share this code with VS2010
-            # FIXME: make this more solid
-            if ext in ['cpp', 'cxx', 'cc', 'c', 'rc']:
-                n_file = Node("File", RelativePath=sfile.filename)
+            if sfile["compile-commands"]:
+                self._add_custom_build_file(sources, sfile)
             else:
-                # FIXME: handle both compilation into cpp and c files
-                genfiletype = bkl.compilers.CxxFileType.get()
-                genname = bkl.expr.PathExpr([bkl.expr.LiteralExpr(sfile.filename.get_basename())],
-                                            bkl.expr.ANCHOR_BUILDDIR,
-                                            pos=sfile.filename.pos).change_extension("cpp")
+                ext = sfile.filename.get_extension()
+                # TODO: share this code with VS2010
+                # FIXME: make this more solid
+                if ext in ['cpp', 'cxx', 'cc', 'c', 'rc']:
+                    n_file = Node("File", RelativePath=sfile.filename)
+                else:
+                    # FIXME: handle both compilation into cpp and c files
+                    genfiletype = bkl.compilers.CxxFileType.get()
+                    genname = bkl.expr.PathExpr([bkl.expr.LiteralExpr(sfile.filename.get_basename())],
+                                                bkl.expr.ANCHOR_BUILDDIR,
+                                                pos=sfile.filename.pos).change_extension("cpp")
 
-                ft_from = bkl.compilers.get_file_type(ext)
-                compiler = bkl.compilers.get_compiler(self, ft_from, genfiletype)
+                    ft_from = bkl.compilers.get_file_type(ext)
+                    compiler = bkl.compilers.get_compiler(self, ft_from, genfiletype)
 
-                n_file = Node("File", RelativePath=sfile.filename)
-                sources.add(n_file)
-                for cfg in target.configurations:
-                    n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
-                    tool = Node("Tool", Name="VCCustomBuildTool")
-                    tool["CommandLine"] = VSList("\r\n", compiler.commands(self, target, sfile.filename, genname))
-                    tool["Outputs"] = genname
-                    n_cfg.add(tool)
-                    n_file.add(n_cfg)
-                n_file = Node("File", RelativePath=genname)
+                    n_file = Node("File", RelativePath=sfile.filename)
+                    sources.add(n_file)
+                    for cfg in target.configurations:
+                        n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
+                        tool = Node("Tool", Name="VCCustomBuildTool")
+                        tool["CommandLine"] = VSList("\r\n", compiler.commands(self, target, sfile.filename, genname))
+                        tool["Outputs"] = genname
+                        n_cfg.add(tool)
+                        n_file.add(n_cfg)
+                    n_file = Node("File", RelativePath=genname)
 
-            # Handle files with custom object name:
-            if sfile in files_map:
-                for cfg in target.configurations:
-                    n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
-                    if ext == 'rc':
-                        objfile = concat("$(IntDir)\\", files_map[sfile], ".res")
-                        n_cfg.add("Tool", Name="VCResourceCompilerTool", ResourceOutputFileName=objfile)
-                    else:
-                        objfile = concat("$(IntDir)\\", files_map[sfile], ".obj")
-                        n_cfg.add("Tool", Name="VCCLCompilerTool", ObjectFile=objfile)
-                    n_file.add(n_cfg)
+                # Handle files with custom object name:
+                if sfile in files_map:
+                    for cfg in target.configurations:
+                        n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
+                        if ext == 'rc':
+                            objfile = concat("$(IntDir)\\", files_map[sfile], ".res")
+                            n_cfg.add("Tool", Name="VCResourceCompilerTool", ResourceOutputFileName=objfile)
+                        else:
+                            objfile = concat("$(IntDir)\\", files_map[sfile], ".obj")
+                            n_cfg.add("Tool", Name="VCCLCompilerTool", ObjectFile=objfile)
+                        n_file.add(n_cfg)
 
-            if ext == 'rc':
-                self._add_per_file_options(sfile, n_file, "VCResourceCompilerTool")
-                resources.add(n_file)
-            else:
-                self._add_per_file_options(sfile, n_file, "VCCLCompilerTool")
-                sources.add(n_file)
+                if ext == 'rc':
+                    self._add_per_file_options(sfile, n_file, "VCResourceCompilerTool")
+                    resources.add(n_file)
+                else:
+                    self._add_per_file_options(sfile, n_file, "VCCLCompilerTool")
+                    sources.add(n_file)
 
         for sfile in target.headers:
-            headers.add("File", RelativePath=sfile.filename)
+            if sfile["compile-commands"]:
+                self._add_custom_build_file(headers, sfile)
+            else:
+                headers.add("File", RelativePath=sfile.filename)
 
         files.add(sources)
         files.add(headers)
         files.add(resources)
         return files
+
+
+    def _add_custom_build_file(self, node, srcfile):
+        outputs = srcfile["outputs"]
+        fmt_dict = {"in": srcfile.filename, "out": outputs}
+        idx = 0
+        for outN in outputs:
+            fmt_dict["out%d" % idx] = outN
+            idx += 1
+        commands = format_string(srcfile["compile-commands"], fmt_dict)
+        n_file = Node("File", RelativePath=srcfile.filename)
+        for cfg in srcfile.configurations:
+            n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
+            n_tool = Node("Tool", Name="VCCustomBuildTool")
+            n_tool["CommandLine"] = VSList("\r\n", commands)
+            n_tool["Outputs"] = outputs
+            n_tool["AdditionalDependencies"] = srcfile["dependencies"]
+            n_cfg.add(n_tool)
+            n_file.add(n_cfg)
+        node.add(n_file)
+
 
     def _add_extra_options_to_node(self, target, node):
         """Add extra native options specified in vs200x.option.* properties."""
@@ -469,6 +496,7 @@ class VS200xToolsetBase(VSToolsetBase):
             scope = node["Name"]
         for key, value in self.collect_extra_options_for_node(target, scope):
             node[key] = value
+
 
     def _add_per_file_options(self, srcfile, node, tool):
         """Add options that are set on per-file basis."""
