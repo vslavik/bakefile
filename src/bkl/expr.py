@@ -31,6 +31,7 @@ useful functions for evaluating and manipulating expressions.
 
 import os.path
 import itertools
+import re
 from abc import ABCMeta, abstractmethod
 
 from error import NonConstError, CannotDetermineError, ParserError, Error, error_context
@@ -1202,3 +1203,46 @@ def concat(*parts):
             p = LiteralExpr(p)
         items.append(p)
     return ConcatExpr(items)
+
+
+class _FormatStringVisitor(RewritingVisitor):
+    def __init__(self, values):
+        self.values = values
+
+    def literal(self, expr):
+        # Find %(...) substrings in the literal and split the string into
+        # components. The resulting list will start with (possibly empty)
+        # string that should be preserved verbatim, followed by the name of the
+        # variable to be substituted, followed by verbatim string and so on.
+        #
+        # For example:
+        #  input: '%(in) and %(out) arguments'
+        #  parts = ['', 'in', ' and ', 'out', ' arguments']
+        parts = re.split(r'%\(([^)]*)\)', expr.value)
+        if not parts:
+            return None
+        out = []
+        is_subst = False
+        for part in parts:
+            if is_subst:
+                try:
+                    repl = self.values[part]
+                    if not isinstance(repl, Expr):
+                        repl = LiteralExpr(repl)
+                    out.append(repl)
+                except KeyError:
+                    raise Error("unknown substitution key \"%s\" in format string" % part, expr.pos)
+            elif part:
+                out.append(LiteralExpr(part))
+            is_subst = not is_subst
+        return ConcatExpr(out, pos=expr.pos)
+
+def format_string(format, values):
+    """
+    Substitutes occurrences of "%(varname)" in the *format* string with values
+    from the dictionary *values*, similarly to the '%' operator. Values in the
+    dictionary may be either Expr objects or strings.
+
+    Note that there's currently no way to escape "%" in such expressions.
+    """
+    return _FormatStringVisitor(values).visit(format)
