@@ -218,17 +218,17 @@ class VS201xToolsetBase(VSToolsetBase):
                 if ldflags:
                     ldflags.append("%(AdditionalOptions)")
                     n_link.add("AdditionalOptions", ldflags)
-            libs = cfg["libs"]
-            if libs:
-                addlibs = VSList(";", ("%s.lib" % x.as_py() for x in libs))
-                addlibs.append("%(AdditionalDependencies)")
-                if is_library(target):
-                    n_lib = Node("Lib")
-                    self._add_extra_options_to_node(cfg, n_lib)
-                    n.add(n_lib)
-                    n_lib.add("AdditionalDependencies", addlibs)
-                else:
-                    n_link.add("AdditionalDependencies", addlibs)
+                libs = target.type.get_ldlibs(cfg)
+                if libs:
+                    addlibs = VSList(";", ("%s.lib" % x.as_py() for x in libs))
+                    addlibs.append("%(AdditionalDependencies)")
+                    if is_library(target):
+                        n_lib = Node("Lib")
+                        self._add_extra_options_to_node(cfg, n_lib)
+                        n.add(n_lib)
+                        n_lib.add("AdditionalDependencies", addlibs)
+                    else:
+                        n_link.add("AdditionalDependencies", addlibs)
             pre_build = cfg["pre-build-commands"]
             if pre_build:
                 n_script = Node("PreBuildEvent")

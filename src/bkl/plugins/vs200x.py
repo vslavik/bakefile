@@ -326,7 +326,7 @@ class VS200xToolsetBase(VSToolsetBase):
         if is_module_dll(target):
             n["IgnoreImportLibrary"] = True
         n["AdditionalOptions"] = VSList(" ", target.type.get_link_options(cfg))
-        libs = cfg["libs"]
+        libs = target.type.get_ldlibs(cfg)
         if libs:
             n["AdditionalDependencies"] = VSList(" ", ("%s.lib" % x.as_py() for x in libs))
 
