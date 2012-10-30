@@ -262,7 +262,9 @@ class NativeLinkedType(NativeCompiledType):
             if t in found:
                 continue
             found.append(t)
-            self._find_linkable_deps(t, found)
+            if isinstance(t.type, LibraryType):
+                self._find_linkable_deps(t, found)
+            #else: dependencies of shared libraries are not transitive
 
 
 
