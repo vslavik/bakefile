@@ -518,14 +518,12 @@ class PathExpr(Expr):
             raise Error("cannot get basename of empty path", self.pos)
 
         last = self.components[-1]
-        if isinstance(last, LiteralExpr):
-            dot = last.value.rfind(".")
-            if dot != -1:
-                return last.value[:dot]
-            else:
-                return last.value
-
-        raise Error("cannot determine basename of \"%s\"" % self, self.pos)
+        try:
+            value = last.as_py()
+            dot = value.rfind(".")
+            return value[:dot] if dot != -1 else value
+        except NonConstError:
+            raise Error("cannot determine basename of \"%s\"" % self, self.pos)
 
     def get_extension(self):
         """
