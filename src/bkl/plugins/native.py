@@ -212,7 +212,7 @@ class NativeLinkedType(NativeCompiledType):
         """
         Returns list of internal libs (aka dependencies) to link with, as filenames.
         """
-        deps = self._linkable_deps(target)
+        deps = self.get_linkable_deps(target)
         return [dep.type.target_file(toolset, dep) for dep in deps]
 
     def get_ldlibs(self, target):
@@ -234,7 +234,7 @@ class NativeLinkedType(NativeCompiledType):
         return self._get_link_property(target, "link-options")
 
     def _get_link_property(self, target, propname):
-        deps = self._linkable_deps(target)
+        deps = self.get_linkable_deps(target)
         out = []
         for t in [target] + deps:
             for x in t[propname]:
@@ -245,7 +245,10 @@ class NativeLinkedType(NativeCompiledType):
 
 
     @memoized
-    def _linkable_deps(self, target):
+    def get_linkable_deps(self, target):
+        """
+        Returns list of target objects that are (transitive) dependencies.
+        """
         found = []
         self._find_linkable_deps(target, found)
         return found

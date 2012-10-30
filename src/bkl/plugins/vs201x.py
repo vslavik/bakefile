@@ -295,12 +295,11 @@ class VS201xToolsetBase(VSToolsetBase):
                 items.add(n_rc_compile)
 
         # Dependencies:
-        target_deps = target["deps"].as_py()
+        target_deps = self._get_references(target)
         if target_deps:
             refs = Node("ItemGroup")
             root.add(refs)
-            for dep_id in target_deps:
-                dep = target.project.get_target(dep_id)
+            for dep in target_deps:
                 dep_prj = self.get_project_object(dep)
                 depnode = Node("ProjectReference", Include=dep_prj.projectfile)
                 depnode.add("Project", "{%s}" % dep_prj.guid.lower())
@@ -323,6 +322,18 @@ class VS201xToolsetBase(VSToolsetBase):
     def _add_VCTargetsPath(self, node):
         pass
 
+
+    def _get_references(self, target):
+        # In addition to explicit dependencies, add dependencies of static libraries
+        # linked into target to the list of references.
+        prj = target.project
+        deps = [prj.get_target(t) for t in target["deps"].as_py()]
+        try:
+            more = [t for t in target.type.get_linkable_deps(target) if t not in deps]
+            deps.extend(more)
+        except AttributeError:
+            pass
+        return deps
     def _add_extra_options_to_node(self, target, node):
         """Add extra native options specified in vs2010.option.* properties."""
         try:
