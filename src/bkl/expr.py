@@ -1,3 +1,4 @@
+#coding: utf-8
 #
 #  This file is part of Bakefile (http://www.bakefile.org)
 #
@@ -1135,6 +1136,18 @@ def enum_possible_values(e, global_cond=None):
     return v.visit(e)
 
 
+
+class _PrepForAsPyComparisonVisitor(RewritingVisitor):
+    # Prepares the expression for are_equal()'s comparison.
+    # FIXME: This is a hack in absence of symbolic comparison. The problem is
+    #        that as_py() will throw on PlaceholderExpr (such as "$(config)")
+    #        and not even enum_possible_values() would help.
+    #        A good enough (for now at least) solution is to mark the
+    #        placeholders up with something highly unusual and not likely to
+    #        ever appear -- such as lenticular brackets Unicode characters.
+    def placeholder(self, e):
+        return LiteralExpr(u"〖%s〗" % e.var)
+
 def are_equal(a, b):
     """
     Compares two expressions for equality.
@@ -1146,11 +1159,12 @@ def are_equal(a, b):
         # FIXME: This is not good enough, the comparison should be done
         #        symbolically as much as possible.
         if isinstance(a, Expr):
-            a = a.as_py()
+            a = _PrepForAsPyComparisonVisitor().visit(a).as_py()
         if isinstance(b, Expr):
-            b = b.as_py()
+            b = _PrepForAsPyComparisonVisitor().visit(b).as_py()
         return a == b
     except NonConstError:
+        # TODO: Try exploding with enum_possible_values()
         raise CannotDetermineError("cannot determine whether the following two expressions are equal: \"%s\" and \"%s\"; please report this as a bug." % (a,b))
 
 
