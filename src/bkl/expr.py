@@ -205,6 +205,9 @@ class PlaceholderExpr(Expr):
     def as_py(self):
         raise NonConstError(self)
 
+    def __str__(self):
+        return "$(%s)" % self.var
+
 
 class ReferenceExpr(Expr):
     """
@@ -1148,7 +1151,7 @@ def are_equal(a, b):
             b = b.as_py()
         return a == b
     except NonConstError:
-        raise CannotDetermineError
+        raise CannotDetermineError("cannot determine whether the following two expressions are equal: \"%s\" and \"%s\"; please report this as a bug." % (a,b))
 
 
 def add_prefix(prefix, e):
