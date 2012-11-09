@@ -116,6 +116,22 @@ class MakefileFormatter(Extension):
         return out
 
     @staticmethod
+    def multifile_target(outfiles, deps, commands):
+        """
+        Returns string with target definition for targets that produce multiple
+        files. A typical example is Bison parser generator, which produces both
+        .c and .h files.
+
+        :param outfiles: List of output files of the rule, as strings.
+        :param deps:     See target()
+        :param commands: See target()
+        """
+        # TODO: Implement these. Could you pattern rules with GNU make,
+        #       or stamp files.
+        raise Error("rules with multiple output files not implemented yet (%s from %s)" % (outfiles, deps))
+
+
+    @staticmethod
     def submake_command(directory, filename, target):
         """
         Returns string with command to invoke ``make`` in subdirectory
@@ -278,12 +294,10 @@ class MakefileToolset(Toolset):
                 for node in graph:
                     with error_context(node):
                         if node.name:
-                            out = node.name
-                            phony_targets.append(expr_fmt.format(out))
+                            out = [node.name]
+                            phony_targets.append(expr_fmt.format(out[0]))
                         else:
-                            # FIXME: handle multi-output nodes too
-                            assert len(node.outputs) == 1
-                            out = node.outputs[0]
+                            out = node.outputs
 
                         deps = [expr_fmt.format(i) for i in node.inputs]
                         for dep in t["deps"]:
@@ -297,12 +311,20 @@ class MakefileToolset(Toolset):
                                     tmod = tmod.parent
                                 if tmod in module.submodules:
                                     targets_from_submodules[tdepstr] = tmod
-                        text = self.Formatter.target(
-                                name=expr_fmt.format(out),
-                                deps=deps,
-                                commands=[expr_fmt.format(c) for c in node.commands])
+
+                        out_fmt = [expr_fmt.format(x) for x in out]
+                        commands_fmt = [expr_fmt.format(c) for c in node.commands]
+                        if len(out_fmt) == 1:
+                            text = self.Formatter.target(name=out_fmt[0],
+                                                         deps=deps,
+                                                         commands=commands_fmt)
+                        else:
+                            text = self.Formatter.multifile_target(
+                                                         outfiles=out_fmt,
+                                                         deps=deps,
+                                                         commands=commands_fmt)
                         f.write(text)
-                        all_targets.append(expr_fmt.format(out))
+                        all_targets += out_fmt
 
         # dependencies on submodules to build targets from them:
         if targets_from_submodules:
