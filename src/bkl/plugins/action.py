@@ -67,6 +67,7 @@ class ActionTargetType(TargetType):
 
     def get_build_subgraph(self, toolset, target):
         # prefix each line with @ so that make doesn't output the commands:
-        cmds = add_prefix("@", target["commands"])
-        node = BuildNode(commands=list(cmds), name=target["id"])
+        cmds_var = target["commands"]
+        cmds = add_prefix("@", cmds_var)
+        node = BuildNode(commands=list(cmds), name=target["id"], source_pos=cmds_var.pos)
         return [node]

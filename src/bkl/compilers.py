@@ -172,7 +172,8 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to):
 
     node = BuildNode(commands=compiler.commands(toolset, target, src, objname),
                      inputs=[src],
-                     outputs=[objname])
+                     outputs=[objname],
+                     source_pos=srcfile.source_pos)
     return ([node], [node])
 
 
@@ -207,6 +208,7 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
     link_commands = linker.commands(toolset, target, expr.ListExpr(object_files), outfile)
     link_node = BuildNode(commands=link_commands,
                           inputs=object_files,
-                          outputs=[outfile])
+                          outputs=[outfile],
+                          source_pos=target.source_pos)
 
     return [link_node] + allnodes

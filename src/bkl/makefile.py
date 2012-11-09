@@ -276,32 +276,33 @@ class MakefileToolset(Toolset):
             with error_context(t):
                 graph = build_graphs[t]
                 for node in graph:
-                    if node.name:
-                        out = node.name
-                        phony_targets.append(expr_fmt.format(out))
-                    else:
-                        # FIXME: handle multi-output nodes too
-                        assert len(node.outputs) == 1
-                        out = node.outputs[0]
+                    with error_context(node):
+                        if node.name:
+                            out = node.name
+                            phony_targets.append(expr_fmt.format(out))
+                        else:
+                            # FIXME: handle multi-output nodes too
+                            assert len(node.outputs) == 1
+                            out = node.outputs[0]
 
-                    deps = [expr_fmt.format(i) for i in node.inputs]
-                    for dep in t["deps"]:
-                        tdep = module.project.get_target(dep.as_py())
-                        tdepstr = _format_dep(tdep)
-                        deps.append(tdepstr)
-                        if tdep.parent is not module:
-                            # link external dependencies with submodules to build them
-                            tmod = tdep.parent
-                            while tmod.parent is not None and tmod.parent is not module:
-                                tmod = tmod.parent
-                            if tmod in module.submodules:
-                                targets_from_submodules[tdepstr] = tmod
-                    text = self.Formatter.target(
-                            name=expr_fmt.format(out),
-                            deps=deps,
-                            commands=[expr_fmt.format(c) for c in node.commands])
-                    f.write(text)
-                    all_targets.append(expr_fmt.format(out))
+                        deps = [expr_fmt.format(i) for i in node.inputs]
+                        for dep in t["deps"]:
+                            tdep = module.project.get_target(dep.as_py())
+                            tdepstr = _format_dep(tdep)
+                            deps.append(tdepstr)
+                            if tdep.parent is not module:
+                                # link external dependencies with submodules to build them
+                                tmod = tdep.parent
+                                while tmod.parent is not None and tmod.parent is not module:
+                                    tmod = tmod.parent
+                                if tmod in module.submodules:
+                                    targets_from_submodules[tdepstr] = tmod
+                        text = self.Formatter.target(
+                                name=expr_fmt.format(out),
+                                deps=deps,
+                                commands=[expr_fmt.format(c) for c in node.commands])
+                        f.write(text)
+                        all_targets.append(expr_fmt.format(out))
 
         # dependencies on submodules to build targets from them:
         if targets_from_submodules:
