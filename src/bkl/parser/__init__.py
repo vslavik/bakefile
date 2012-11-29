@@ -40,6 +40,7 @@ from BakefileLexer import BakefileLexer
 from BakefileParser import BakefileParser
 
 from bkl.error import ParserError, VersionError, warning
+from bkl.utils import memoized
 
 
 # Helper to implement errors handling in a way we prefer
@@ -161,6 +162,7 @@ def parse(code, filename=None, detect_compatibility_errors=True):
             raise err
 
 
+@memoized
 def parse_file(filename):
     """
     Reads Bakefile code from given file returns parsed AST.
