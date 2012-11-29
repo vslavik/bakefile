@@ -48,6 +48,7 @@ tokens {
     TARGET;
     FILES_LIST;
     SUBMODULE;
+    IMPORT;
     SRCDIR;
     CONFIGURATION;
     TEMPLATE;
@@ -81,6 +82,7 @@ stmt
 stmt_outside_target
     : target_stmt
     | submodule_stmt
+    | import_stmt
     | requires_stmt
     | configuration_stmt
     | template_stmt
@@ -125,6 +127,11 @@ if_body
 
 submodule_stmt
     : 'submodule' literal ';'          -> ^(SUBMODULE literal)
+    ;
+
+
+import_stmt
+    : 'import' literal ';'             -> ^(IMPORT literal)
     ;
 
 srcdir_stmt

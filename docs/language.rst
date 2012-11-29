@@ -504,17 +504,66 @@ using this approach:
 Submodules
 ----------
 
-A bakefile file -- a *module* can include other modules as its children. This
-maps to invoking makefiles in subdirectories when generating makefile-based
-output. The ``submodule`` keyword is used for that:
+A bakefile file -- a *module* -- can include other modules as its children.
+The ``submodule`` keyword is used for that:
 
 .. code-block:: bkl
 
    submodule samples/hello/hello.bkl;
    submodule samples/advanced/adv.bkl;
 
+They are useful for organizing larger projects into more manageable chunks,
+similarly to how makefiles are used with recursive make. The submodules get
+their own makefiles (automatically invoked from the parent module's makefile)
+and a separate Visual Studio solution file is created for them by default as
+well. Typical uses include putting examples or tests into their own modules.
+
 Submodules may only be included at the top level and cannot be included
 conditionally (i.e. inside an ``if`` statement).
+
+
+Importing other files
+---------------------
+
+There's one more way to organize source bakefiles in addition to submodules:
+direct import of another file's content. The syntax is similar to submodules
+one, using the ``import`` keyword:
+
+.. code-block:: bkl
+
+   // define variables, templates etc:
+   import common-defs.bkl;
+
+   program myapp { ... }
+
+Import doesn't change the layout of output files, unlike ``submodule``.
+Instead, it directly includes the content of the referenced file at the point
+of import. Think of it as a variation on C's ``#include``.
+
+Imports help with organizing large bakefiles into more manageable files. You
+could, for example, put commonly used variables or templates, files lists etc.
+into their own reusable files.
+
+Notice that there are some important differences to ``#include``:
+
+ 1. A file is only imported once *in the current scope*, further imports
+    are ignored. Specifically:
+
+    a. Second import of ``foo.bkl`` from the same module is ignored.
+    b. Import of ``foo.bkl`` from a submodule is ignored if it was already
+       imported into its parent (or any of its ancestors).
+    c. If two sibling submodules both import ``foo.bkl`` and none of their
+       ancestors does, then the file is imported into *both*. That's because
+       their local scopes are independent of each other, so it isn't regarded
+       as duplicate import.
+
+ 2. An imported file may contain templates or configurations definitions and
+    be included repeatedly (in the (1c) case above). This would normally result
+    in errors, but Bakefile recognizes imported duplicates as identical and
+    handles them gracefully.
+
+The ``import`` keyword can only be included at the top level and cannot be
+done conditionally (i.e. inside an ``if`` statement).
 
 
 

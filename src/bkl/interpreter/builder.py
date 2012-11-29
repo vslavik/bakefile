@@ -26,6 +26,7 @@ from ..api import TargetType
 from ..expr import *
 from ..model import Module, Target, Variable, SourceFile, Template
 from ..parser.ast import *
+from ..parser import parse_file
 from ..error import ParserError, error_context, warning
 from ..vartypes import ListType, AnyType
 
@@ -364,6 +365,37 @@ class Builder(object, CondTrackingMixin):
         self.on_submodule_callback(fn, node.pos)
 
 
+    def on_import(self, node):
+        if self.active_if_cond is not None:
+            raise ParserError("imports cannot be done conditionally"
+                              ' (condition "%s" set at %s)' % (
+                                  self.active_if_cond, self.active_if_cond.pos))
+
+        fn = os.path.relpath(os.path.join(os.path.dirname(node.pos.filename), node.file))
+
+        module = self.context.module
+        while isinstance(module, Module):
+            if fn in module.imports:
+                logger.debug("skipping import of file %s into %s, already imported at %s",
+                             fn, self.context.module, module)
+                return
+            module = module.parent
+
+        try:
+            module = self.context.module
+            logger.debug("importing file %s into %s", fn, module)
+            imported_ast = parse_file(fn)
+            module.imports.add(fn)
+            # TODO: tag error_context with "imported from ..."
+            self.handle_children(imported_ast.children, self.context)
+        except IOError as e:
+            if e.filename:
+                msg = "%s: %s" % (e.strerror, e.filename)
+            else:
+                msg = e.strerror
+            raise Error(msg)
+
+
     def on_srcdir(self, node):
         assert isinstance(self.context, Module)
         assert self.active_if_cond is None
@@ -383,6 +415,7 @@ class Builder(object, CondTrackingMixin):
         TemplateNode       : on_template,
         ConfigurationNode  : on_configuration,
         SubmoduleNode      : on_submodule,
+        ImportNode         : on_import,
         SrcdirNode         : on_srcdir,
         NilNode            : lambda self,x: x, # do nothing
     }

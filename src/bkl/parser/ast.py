@@ -230,6 +230,12 @@ class SubmoduleNode(Node):
                     doc="File with submodule definition")
 
 
+class ImportNode(Node):
+    """Textual inclusion of a file."""
+    file = property(lambda self: self.children[0].text,
+                    doc="File to include")
+
+
 class SrcdirNode(Node):
     """Overriding of the @srcdir value."""
     srcdir = property(lambda self: self.children[0].text,
@@ -302,6 +308,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.EQUAL          : EqualNode,
         BakefileParser.NOT_EQUAL      : NotEqualNode,
         BakefileParser.SUBMODULE      : SubmoduleNode,
+        BakefileParser.IMPORT         : ImportNode,
         BakefileParser.SRCDIR         : SrcdirNode,
         BakefileParser.BASE_LIST      : BaseListNode,
         BakefileParser.CONFIGURATION  : ConfigurationNode,

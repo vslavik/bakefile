@@ -542,12 +542,18 @@ class Module(ModelPart):
     .. attribute:: srcdir
 
        @srcdir path effective for this module.
+
+    .. attribute:: imports
+
+       Set of filenames of sources imported using the 'import' keyword at this
+       level.
     """
     def __init__(self, parent, source_pos):
         super(Module, self).__init__(parent, source_pos)
         self.targets = utils.OrderedDict()
         self.project.modules.append(self)
         self.srcdir = os.path.dirname(self.source_file)
+        self.imports = set()
 
     def __str__(self):
         return "module %s" % self.source_file
