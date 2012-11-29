@@ -51,6 +51,10 @@ class Position(object):
         self.line = line
         self.column = column
 
+    def __eq__(self, other):
+        return (self.filename == other.filename and
+                self.line == other.line and
+                self.column == other.column)
 
     def __str__(self):
         hdr = []
