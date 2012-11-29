@@ -297,8 +297,12 @@ class Builder(object, CondTrackingMixin):
 
         project = self.context.project
         if node.name in project.templates:
+            previous = project.templates[node.name]
+            if previous.source_pos == node.pos:
+                # template defined in an imported file, just ignore it
+                return
             raise ParserError("template \"%s\" already defined (at %s)" %
-                              (node.name, project.templates[node.name].source_pos))
+                              (node.name, previous.source_pos))
 
         bases = list(self._get_templates(node))
         t = Template(node.name, bases, source_pos=node.pos)
@@ -321,8 +325,12 @@ class Builder(object, CondTrackingMixin):
             if not node.base:
                 raise ParserError("configurations other than Debug and Release must derive from another")
             if node.name in project.configurations:
+                previous = project.configurations[node.name]
+                if previous.source_pos == node.pos:
+                    # configuration defined in an imported file, just ignore it
+                    return
                 raise ParserError("configuration \"%s\" already defined (at %s)" %
-                                  (node.name, project.configurations[node.name].source_pos))
+                                  (node.name, previous.source_pos))
 
             try:
                 base = project.configurations[node.base.text]
