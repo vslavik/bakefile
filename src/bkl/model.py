@@ -471,6 +471,7 @@ class Project(ModelPart):
         self.modules = []
         self.configurations = utils.OrderedDict()
         self.templates = {}
+        self._srcdir_map = {}
         self.add_configuration(Configuration("Debug",   base=None, is_debug=True))
         self.add_configuration(Configuration("Release", base=None, is_debug=False))
 
@@ -523,6 +524,15 @@ class Project(ModelPart):
         assert templ.name not in self.templates
         self.templates[templ.name] = templ
 
+    def get_srcdir(self, filename):
+        try:
+            return self._srcdir_map[filename]
+        except KeyError:
+            return os.path.dirname(filename)
+
+    def set_srcdir(self, filename, srcdir):
+        self._srcdir_map[filename] = srcdir
+
 
 class Module(ModelPart):
     """
@@ -552,7 +562,6 @@ class Module(ModelPart):
         super(Module, self).__init__(parent, source_pos)
         self.targets = utils.OrderedDict()
         self.project.modules.append(self)
-        self.srcdir = os.path.dirname(self.source_file)
         self.imports = set()
 
     def __str__(self):
@@ -566,6 +575,10 @@ class Module(ModelPart):
     @property
     def source_file(self):
         return self.source_pos.filename
+
+    @property
+    def srcdir(self):
+        return self.project.get_srcdir(self.source_file)
 
     @property
     def name(self):

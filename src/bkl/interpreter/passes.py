@@ -238,11 +238,9 @@ class PathsNormalizer(RewritingVisitor):
     """
     def __init__(self, project, toolset=None):
         self.toolset = toolset
+        self.project = project
         self.module = self.target = None
         self.top_srcdir = os.path.abspath(project.top_module.srcdir)
-        self.srcdir_map = {}
-        for m in project.modules:
-            self.srcdir_map[m.source_file] = os.path.abspath(m.srcdir)
 
     def set_context(self, context):
         """
@@ -260,7 +258,7 @@ class PathsNormalizer(RewritingVisitor):
 
     @memoized
     def _src_prefix(self, source_file):
-        srcdir = self.srcdir_map[source_file]
+        srcdir = os.path.abspath(self.project.get_srcdir(source_file))
         prefix = os.path.relpath(srcdir, start=self.top_srcdir)
         logger.debug('translating paths from %s with prefix "%s"', source_file, prefix)
         if prefix == ".":

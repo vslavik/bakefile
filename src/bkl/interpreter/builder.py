@@ -400,10 +400,14 @@ class Builder(object, CondTrackingMixin):
         assert isinstance(self.context, Module)
         assert self.active_if_cond is None
 
-        srcdir = os.path.normpath(os.path.join(os.path.dirname(self.context.source_file),
+        # 'srcdir' may be used inside an imported file, so we can't set it on
+        # self.context, but have to use the real file
+        current_file = node.pos.filename
+
+        srcdir = os.path.normpath(os.path.join(os.path.dirname(current_file),
                                                node.srcdir))
-        logger.debug("setting @srcdir for %s to %s", self.context, srcdir)
-        self.context.srcdir = srcdir
+        logger.debug("setting @srcdir for %s to %s", current_file, srcdir)
+        self.context.project.set_srcdir(current_file, srcdir)
 
 
     _ast_dispatch = {
