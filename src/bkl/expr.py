@@ -1088,7 +1088,11 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
             conds = set(c for c,e in lst if c is not None)
             if conds:
                 if len(conds) > 1:
-                    raise ParserError("too complicated conditional expression, please report this as a bug", pos=e.pos)
+                    # construct intersection of all the conditions
+                    combined = BoolExpr(BoolExpr.AND, conds.pop(), conds.pop())
+                    while conds:
+                        combined = BoolExpr(BoolExpr.AND, combined, conds.pop())
+                    return combined
                 else:
                     return conds.pop()
             else:
