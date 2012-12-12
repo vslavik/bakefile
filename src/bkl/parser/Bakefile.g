@@ -218,7 +218,8 @@ identifier: t=TEXT             -> ID[$t];
 
 literal
     : t=TEXT                   -> LITERAL[$t]
-    | t=QUOTED_TEXT            -> LITERAL[$t, self.unescape($t, $t.text[1:-1\])]
+    | t=SINGLE_QUOTED_TEXT     -> LITERAL[$t, self.unescape($t, $t.text[1:-1\])]
+    | t=DOUBLE_QUOTED_TEXT     -> LITERAL[$t, self.unescape($t, $t.text[1:-1\])]
     ;
 
 bool_value
@@ -280,7 +281,8 @@ FALSE:     'false';
 
 SCOPE_SEP: '::';
 
-QUOTED_TEXT: '"' ( ESCAPE_SEQ | ~('"' | '\\') )* '"';
+SINGLE_QUOTED_TEXT: '\'' ( ESCAPE_SEQ | ~('\'' | '\\') )* '\'';
+DOUBLE_QUOTED_TEXT: '"'  ( ESCAPE_SEQ | ~('"'  | '\\') )* '"';
 
 fragment
 ESCAPE_SEQ: '\\' . ;

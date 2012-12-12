@@ -36,8 +36,9 @@ literal; specifically, a string literal.
 
 Quoting is only needed when the literal contains whitespace or special
 characters such as ``=`` or quotes. Quoted strings are enclosed between ``"``
-characters and may contain any characters except for quotes. Additionally,
-backslash (``\``) can be used inside quoted strings to escape any character. [1]_
+(double quote) or ``'`` (single quote) characters and may contain any
+characters except for the quotes. Additionally, backslash (``\``) can be used
+inside quoted strings to escape any character. [1]_
 
 Values in Bakefile are typed: properties have types associated with them and
 only values that are valid for that type can be assigned to them. The language
