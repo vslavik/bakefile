@@ -121,7 +121,8 @@ if_stmt
 
 if_body
     : stmt
-    | '{' (stmt)* '}'  -> stmt*
+    | '{' '}'          -> NIL
+    | '{' (stmt)+ '}'  -> stmt+
     ;
 
 
