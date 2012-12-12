@@ -5,3 +5,8 @@
 foo = "one two" "three";
 bar = "1 2 3";
 zar = "this is called \"escaping\"";
+
+// Furthermore, test the difference between ' and ":
+single = 'no eval done $(bar) here';
+double = "evaluated $(bar) here (as in shell)...";
+

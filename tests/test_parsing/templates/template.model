@@ -8,27 +8,27 @@ module {
       }
     }
     program from_templ {
-      defines = [COMPONENT="$(id)"]
+      defines = [COMPONENT="from_templ"]
       sources {
         file @top_srcdir/test.c
       }
     }
     program from_two_templs {
-      defines = [COMPONENT="$(id)", SECOND_TEMPLATE]
+      defines = [COMPONENT="from_two_templs", SECOND_TEMPLATE]
       sources {
         file @top_srcdir/second_file.c
         file @top_srcdir/test.c
       }
     }
     program from_combined {
-      defines = [COMPONENT="$(id)", SECOND_TEMPLATE]
+      defines = [COMPONENT="from_combined", SECOND_TEMPLATE]
       sources {
         file @top_srcdir/second_file.c
         file @top_srcdir/test.c
       }
     }
     program from_combined_dupl {
-      defines = [COMPONENT="$(id)", SECOND_TEMPLATE]
+      defines = [COMPONENT="from_combined_dupl", SECOND_TEMPLATE]
       sources {
         file @top_srcdir/second_file.c
         file @top_srcdir/test.c

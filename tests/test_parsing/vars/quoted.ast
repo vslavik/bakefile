@@ -13,3 +13,15 @@ RootNode
         LvalueNode
             IdNode zar
         LiteralNode "this is called "escaping""
+    AssignmentNode
+        LvalueNode
+            IdNode single
+        LiteralNode "no eval done $(bar) here"
+    AssignmentNode
+        LvalueNode
+            IdNode double
+        ConcatNode
+            LiteralNode "evaluated "
+            VarReferenceNode
+                IdNode bar
+            LiteralNode " here (as in shell)..."

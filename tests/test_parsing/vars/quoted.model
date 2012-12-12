@@ -3,6 +3,8 @@ module {
     foo = [one two, three]
     bar = 1 2 3
     zar = this is called "escaping"
+    single = no eval done $(bar) here
+    double = evaluated 1 2 3 here (as in shell)...
   }
   targets {
   }

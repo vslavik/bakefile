@@ -5,7 +5,11 @@ RootNode
         AppendNode
             LvalueNode
                 IdNode defines
-            LiteralNode "COMPONENT="$(id)""
+            ConcatNode
+                LiteralNode "COMPONENT=""
+                VarReferenceNode
+                    IdNode id
+                LiteralNode """
     TemplateNode
         IdNode t_second
         BaseListNode
@@ -63,4 +67,3 @@ RootNode
         FilesListNode
             IdNode sources
             LiteralNode "test.c"
-

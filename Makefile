@@ -4,9 +4,11 @@ ANTLR  := antlr-3.4
 PYTEST := py.test
 
 
-grammar_file := src/bkl/parser/Bakefile.g
-parser_file  := src/bkl/parser/BakefileParser.py
-lexer_file   := src/bkl/parser/BakefileLexer.py
+generated_antlr_files := \
+		src/bkl/parser/BakefileParser.py \
+		src/bkl/parser/BakefileLexer.py \
+		src/bkl/parser/BakefileQuotedStringParser.py \
+		src/bkl/parser/BakefileQuotedStringLexer.py
 
 antlr_from_submodule := $(abspath 3rdparty/antlr3/target/antlr)
 
@@ -19,7 +21,7 @@ endif
 
 all: parser doc
 
-parser: $(parser_file) $(lexer_file)
+parser: $(generated_antlr_files)
 
 %Parser.py %Lexer.py: %.g $(antlr_path)
 	cd $(dir $<) && $(antlr_path) $(notdir $<)
@@ -28,7 +30,7 @@ doc: parser
 	$(MAKE) -C docs all
 
 clean:
-	rm -f $(lexer_file) $(parser_file)
+	rm -f $(generated_antlr_files)
 	find . -name '*.pyc' -delete
 	$(MAKE) -C docs clean
 	$(MAKE) -C 3rdparty clean

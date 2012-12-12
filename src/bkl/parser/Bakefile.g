@@ -219,7 +219,7 @@ identifier: t=TEXT             -> ID[$t];
 literal
     : t=TEXT                   -> LITERAL[$t]
     | t=SINGLE_QUOTED_TEXT     -> LITERAL[$t, self.unescape($t, $t.text[1:-1\])]
-    | t=DOUBLE_QUOTED_TEXT     -> LITERAL[$t, self.unescape($t, $t.text[1:-1\])]
+    | t=DOUBLE_QUOTED_TEXT     -> { self.parse_quoted_str($t) }
     ;
 
 bool_value
@@ -284,11 +284,14 @@ SCOPE_SEP: '::';
 SINGLE_QUOTED_TEXT: '\'' ( ESCAPE_SEQ | ~('\'' | '\\') )* '\'';
 DOUBLE_QUOTED_TEXT: '"'  ( ESCAPE_SEQ | ~('"'  | '\\') )* '"';
 
+// a chunk of simple text, used for identifiers, values etc.
+TEXT: ALLOWED_ID_CHARS+;
+
 fragment
 ESCAPE_SEQ: '\\' . ;
 
-// a chunk of simple text, used for identifiers, values etc.
-TEXT: ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_' | '.' | '/' | '@')+;
+fragment
+ALLOWED_ID_CHARS: ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_' | '.' | '/' | '@');
 
 // ---------------------------------------------------------------------------
 // Comments:

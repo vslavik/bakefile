@@ -37,7 +37,9 @@ except ImportError:
 
 import ast
 from BakefileLexer import BakefileLexer
-from BakefileParser import BakefileParser
+from BakefileParser import BakefileParser, LITERAL
+from BakefileQuotedStringLexer import BakefileQuotedStringLexer
+from BakefileQuotedStringParser import BakefileQuotedStringParser
 
 from bkl.error import ParserError, VersionError, warning
 from bkl.utils import memoized
@@ -68,13 +70,8 @@ class _BakefileErrorsMixin(object):
         return pos
 
 
-# The lexer and parser used to parse .bkl files.
-# Do not use directly, use parse() function instead.
-class _Lexer(_BakefileErrorsMixin, BakefileLexer):
-    pass
-
-class _Parser(_BakefileErrorsMixin, BakefileParser):
-
+# Helper for misc things common to the main parser and island grammars:
+class _BakefileParserMixin(object):
     def unescape(self, token, text):
         """Removes \\ escapes from the text."""
         out = ""
@@ -96,6 +93,22 @@ class _Parser(_BakefileErrorsMixin, BakefileParser):
                             pos=source_pos)
         return out
 
+
+# The lexer and parser used to parse .bkl files.
+# Do not use directly, use parse() function instead.
+
+class _ParserQuotedString(_BakefileErrorsMixin, _BakefileParserMixin, BakefileQuotedStringParser):
+    pass
+
+class _LexerQuotedString(_BakefileErrorsMixin, BakefileQuotedStringLexer):
+    pass
+
+
+class _Lexer(_BakefileErrorsMixin, BakefileLexer):
+    pass
+
+class _Parser(_BakefileErrorsMixin, _BakefileParserMixin, BakefileParser):
+
     def check_version(self, token):
         """Checks Bakefile version, throwing if too old."""
         try:
@@ -104,6 +117,20 @@ class _Parser(_BakefileErrorsMixin, BakefileParser):
         except VersionError as e:
             e.pos = self._get_position(token)
             raise
+
+    def parse_quoted_str(self, token):
+        text = token.text[1:-1]
+        if not text:
+            return self._adaptor.create(LITERAL, token, "")
+
+        stream = antlr3.StringStream(text)
+        stream.setLine(token.line)
+        stream.setCharPositionInLine(token.charPositionInLine + 1)
+        lexer = _LexerQuotedString(stream)
+        parser = _ParserQuotedString(antlr3.CommonTokenStream(lexer))
+        lexer.filename = parser.filename = self.filename
+        parser.adaptor = self.adaptor
+        return parser.quoted_string().tree
 
 
 def get_parser(code, filename=None):

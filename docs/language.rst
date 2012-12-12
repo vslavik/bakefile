@@ -40,6 +40,15 @@ characters such as ``=`` or quotes. Quoted strings are enclosed between ``"``
 characters except for the quotes. Additionally, backslash (``\``) can be used
 inside quoted strings to escape any character. [1]_
 
+The two kinds of quoting differ:
+
+ 1. Double-quoted strings are interpolated. That is, variable references using
+    ``$(...)`` (see below) are recognized and evaluated. If you want to use
+    ``$`` as a literal, you must escape it (``\$``).
+
+ 2. Single-quoted strings are literal, ``$`` doesn't have any special meaning
+    and is treated as any other character.
+
 Values in Bakefile are typed: properties have types associated with them and
 only values that are valid for that type can be assigned to them. The language
 isn't *strongly*-typed, though: conversions are performed whenever needed and
@@ -624,7 +633,8 @@ They can also be included in an expression:
 .. [2] A typical example of *ambiguous* use is in a concatenation. You can't
        write ``$toolset.cpp`` because ``.`` is a valid part of a literal; it
        must be written as ``$(toolset).cpp`` so that it's clear which part is a
-       variable name and which is a literal appended to the reference.
+       variable name and which is a literal appended to the reference. For
+       similar reasons, the shorthand form cannot be used in double-quoted strings.
 
 .. [3] Although the syntax imposes few limits, it's not always possible to
        generate makefiles or projects with complicated conditional content even
