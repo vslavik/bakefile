@@ -319,6 +319,14 @@ class VS200xToolsetBase(VSToolsetBase):
         return n
 
 
+    def VCMIDLTool(self, target, cfg):
+        n = Node("Tool", Name="VCMIDLTool")
+        n["PreprocessorDefinitions"] = cfg["defines"]
+        n["AdditionalIncludeDirectories"] = cfg["includedirs"]
+
+        return n
+
+
     def VCLinkerTool(self, target, cfg):
         if is_library(target):
             return None
@@ -412,7 +420,7 @@ class VS200xToolsetBase(VSToolsetBase):
                 ext = sfile.filename.get_extension()
                 # TODO: share this code with VS2010
                 # FIXME: make this more solid
-                if ext in ['cpp', 'cxx', 'cc', 'c', 'rc']:
+                if ext in ['cpp', 'cxx', 'cc', 'c', 'rc', 'idl']:
                     n_file = Node("File", RelativePath=sfile.filename)
                 else:
                     # FIXME: handle both compilation into cpp and c files
@@ -451,7 +459,10 @@ class VS200xToolsetBase(VSToolsetBase):
                     self._add_per_file_options(sfile, n_file, "VCResourceCompilerTool")
                     resources.add(n_file)
                 else:
-                    self._add_per_file_options(sfile, n_file, "VCCLCompilerTool")
+                    if ext == 'idl':
+                        self._add_per_file_options(sfile, n_file, "VCMIDLTool")
+                    else:
+                        self._add_per_file_options(sfile, n_file, "VCCLCompilerTool")
                     sources.add(n_file)
 
         for sfile in target.headers:

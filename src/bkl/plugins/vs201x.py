@@ -60,12 +60,15 @@ class VS201xToolsetBase(VSToolsetBase):
     def gen_for_target(self, target, project):
         rc_files = []
         cl_files = []
+        idl_files = []
         for sfile in target.sources:
             ext = sfile.filename.get_extension()
             # TODO: share this code with VS200x
             # FIXME: make this more solid
             if ext == 'rc':
                 rc_files.append(sfile)
+            elif ext == 'idl':
+                idl_files.append(sfile)
             else:
                 cl_files.append(sfile)
 
@@ -198,6 +201,13 @@ class VS201xToolsetBase(VSToolsetBase):
                 n_res.add("PreprocessorDefinitions", list(cfg["defines"]) + std_defs)
                 n.add(n_res)
 
+            if idl_files:
+                n_idl = Node("Midl")
+                self._add_extra_options_to_node(cfg, n_idl)
+                n_idl.add("PreprocessorDefinitions", cfg["defines"])
+                n_idl.add("AdditionalIncludeDirectories", cfg["includedirs"])
+                n.add(n_idl)
+
             n_link = Node("Link")
             self._add_extra_options_to_node(cfg, n_link)
             n.add(n_link)
@@ -299,6 +309,13 @@ class VS201xToolsetBase(VSToolsetBase):
                                      concat("$(IntDir)\\", rc_files_map[sfile], ".res"))
                 self._add_per_file_options(sfile, n_rc_compile)
                 items.add(n_rc_compile)
+
+        # IDL files:
+        if idl_files:
+            items = Node("ItemGroup")
+            root.add(items)
+            for sfile in idl_files:
+                items.add("Midl", Include=sfile.filename)
 
         # Dependencies:
         target_deps = self._get_references(target)
