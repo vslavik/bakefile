@@ -142,11 +142,13 @@ def detect_missing_generated_outputs(model):
             with error_context(srcfile):
                 if not srcfile["compile-commands"]:
                     continue
-                for cond, item in bkl.expr.enum_possible_values(srcfile["outputs"]):
-                    try:
-                        t.get_child_part_by_name(item)
-                    except NotFoundError:
-                        warning("file %s generated from %s is not among sources or headers of target \"%s\"", item, srcfile.filename, t.name, pos=item.pos)
+                sources = set(ch.name for ch in t.child_parts())
+                outputs = set(i for c,i in bkl.expr.enum_possible_values(srcfile["outputs"]))
+                for item in outputs:
+                    partname = item.as_py()
+                    if partname not in sources:
+                        warning("file %s generated from %s is not among sources or headers of target \"%s\"",
+                                item, srcfile.filename, t.name, pos=item.pos)
 
 
 

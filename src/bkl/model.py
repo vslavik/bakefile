@@ -30,6 +30,7 @@ logger = logging.getLogger("bkl.model")
 import error, vartypes, utils
 import props
 import expr
+from utils import memoized_property
 
 class Variable(object):
     """
@@ -580,7 +581,7 @@ class Module(ModelPart):
     def srcdir(self):
         return self.project.get_srcdir(self.source_file)
 
-    @property
+    @memoized_property
     def name(self):
         """Name of the module"""
         return os.path.splitext(os.path.basename(self.source_file))[0]
@@ -750,7 +751,7 @@ class SourceFile(ModelPart, ConfigurationsPropertyMixin):
     def filename(self):
         return self["_filename"]
 
-    @property
+    @memoized_property
     def name(self):
         return self.filename.as_py()
 
