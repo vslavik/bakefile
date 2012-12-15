@@ -7,8 +7,10 @@ PYTEST := py.test
 generated_antlr_files := \
 		src/bkl/parser/BakefileParser.py \
 		src/bkl/parser/BakefileLexer.py \
+		src/bkl/parser/Bakefile.tokens \
 		src/bkl/parser/BakefileQuotedStringParser.py \
-		src/bkl/parser/BakefileQuotedStringLexer.py
+		src/bkl/parser/BakefileQuotedStringLexer.py \
+		src/bkl/parser/BakefileQuotedString.tokens
 
 antlr_from_submodule := $(abspath 3rdparty/antlr3/target/antlr)
 
@@ -23,8 +25,11 @@ all: parser doc
 
 parser: $(generated_antlr_files)
 
-%Parser.py %Lexer.py: %.g $(antlr_path)
+%Parser.py %Lexer.py %.tokens: %.g $(antlr_path)
 	cd $(dir $<) && $(antlr_path) $(notdir $<)
+
+# the island-grammar parser emits the same tokens as the main one
+src/bkl/parser/BakefileQuotedStringParser.py: src/bkl/parser/Bakefile.tokens
 
 doc: parser
 	$(MAKE) -C docs all
