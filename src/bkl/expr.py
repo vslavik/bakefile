@@ -1104,7 +1104,7 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
         out = []
         for result in itertools.product(*items):
             cond = self._get_cond_for_list(result)
-            out.append((cond, ConcatExpr([e for c,e in result], pos=e.pos)))
+            out.append((cond, ConcatExpr([x for c,x in result], pos=e.pos)))
         return out
 
     def path(self, e):
@@ -1113,7 +1113,7 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
         out = []
         for result in itertools.product(*components):
             cond = self._get_cond_for_list(result)
-            out.append((cond, PathExpr([e for c,e in result], anchor=e.anchor, anchor_file=e.anchor_file, pos=e.pos)))
+            out.append((cond, PathExpr([x for c,x in result], anchor=e.anchor, anchor_file=e.anchor_file, pos=e.pos)))
         return out
 
 
