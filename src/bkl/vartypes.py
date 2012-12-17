@@ -163,7 +163,10 @@ class StringType(Type):
             # concatenation of strings is a string
             for x in e.items:
                 self.validate(x)
-        elif not isinstance(e, expr.LiteralExpr):
+        elif (not isinstance(e, expr.LiteralExpr) and
+              # paths etc. can be used as strings too
+              not isinstance(e, expr.BoolExpr) and
+              not isinstance(e, expr.PathExpr)):
             raise TypeError(self, e)
 
 
