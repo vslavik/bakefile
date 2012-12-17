@@ -44,6 +44,15 @@ def test_full():
         yield _test_on_file, d, str(f)
 
 
+class TestingInterpreter(bkl.interpreter.Interpreter):
+    def generate(self):
+        # dump the model first, because generate() further modifies
+        # it by doing per-toolset changes:
+        self.dumped_model = bkl.dumper.dump_project(self.model)
+        # then let the generator do its magic
+        super(TestingInterpreter, self).generate()
+
+
 def _test_on_file(testdir, project_file):
     assert project_file.startswith(testdir)
 
@@ -62,9 +71,9 @@ def _do_test_on_file(input, model_file):
 
     try:
         t = bkl.parser.parse_file(input)
-        i = bkl.interpreter.Interpreter()
+        i = TestingInterpreter()
         i.process(t)
-        as_text = bkl.dumper.dump_project(i.model)
+        as_text = i.dumped_model
     except bkl.error.Error, e:
         as_text = "ERROR:\n%s" % str(e).replace("\\", "/")
     print """

@@ -176,13 +176,16 @@ class Interpreter(object):
         passes.normalize_paths_in_model(toolset_model, toolset)
 
 
-    def make_toolset_specific_model(self, toolset):
+    def make_toolset_specific_model(self, toolset, skip_making_copy=False):
         """
         Returns toolset-specific model, i.e. one that works only with
         *toolset*, has the ``toolset`` property set to it. The caller
         still needs to call finalize_for_toolset() on it.
         """
-        model = deepcopy(self.model)
+        if skip_making_copy:
+            model = self.model
+        else:
+            model = deepcopy(self.model)
         # don't use Variable.from_property(), because it's read-only
         model.add_variable(bkl.model.Variable.from_property(
                                               model.get_prop("toolset"),
@@ -216,22 +219,26 @@ class Interpreter(object):
                             module_toolsets.value.items.append(bkl.expr.LiteralExpr(t))
             toolsets = self.toolsets_to_use
 
-        logger.debug("toolsets to generate for: %s", list(toolsets))
+        toolsets = list(toolsets)
+        logger.debug("toolsets to generate for: %s", toolsets)
 
         if not toolsets:
             raise Error("nothing to generate, \"toolsets\" property is empty")
 
-        # and generate the outputs:
-        for toolset in toolsets:
+        # and generate the outputs (notice that we can avoid making a
+        # (expensive!) deepcopy of the model for one of the toolsets and can
+        # reuse the current model):
+        for toolset in toolsets[:-1]:
             self.generate_for_toolset(toolset)
+        self.generate_for_toolset(toolsets[-1], skip_making_copy=True)
 
 
-    def generate_for_toolset(self, toolset):
+    def generate_for_toolset(self, toolset, skip_making_copy=False):
         """
         Generates output for given *toolset*.
         """
         logger.debug("****** preparing model for toolset %s ******", toolset)
-        model = self.make_toolset_specific_model(toolset)
+        model = self.make_toolset_specific_model(toolset, skip_making_copy)
         self.finalize_for_toolset(model, toolset)
 
         logger.debug("****** generating for toolset %s ********", toolset)

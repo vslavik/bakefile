@@ -38,9 +38,12 @@ from bkl.expr import BoolValueExpr, ListExpr, LiteralExpr, ConcatExpr, NullExpr
 import projects
 projects_dir = os.path.dirname(projects.__file__) 
 
+class TestingInterpreter(bkl.interpreter.Interpreter):
+    def generate(self):
+        pass
 
 def test_model_deepcopy():
-    i = bkl.interpreter.Interpreter()
+    i = TestingInterpreter()
     i.process_file(os.path.join(projects_dir, 'submodules', 'main.bkl'))
     model = i.model
     model_copy = copy.deepcopy(model)
