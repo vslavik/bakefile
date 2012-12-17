@@ -971,9 +971,6 @@ class _SplitVisitor(Visitor):
     def __init__(self, sep):
         self.sep = sep
 
-    def _noop_list(self, e):
-        return [e]
-
     bool = lambda self, e: [e]
     bool_value = lambda self, e: [e]
     null = lambda self, e: [e]
