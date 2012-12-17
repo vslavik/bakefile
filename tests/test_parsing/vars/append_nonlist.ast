@@ -1,10 +1,9 @@
 RootNode
-    AssignmentNode
-        LvalueNode
-            IdNode foo
-        BoolvalNode True
-    AppendNode
-        LvalueNode
-            IdNode foo
-        LiteralNode "FOO"
-
+    TargetNode
+        IdNode program
+        IdNode test
+        BaseListNode
+        AppendNode
+            LvalueNode
+                IdNode id
+            LiteralNode "FOO"

@@ -130,6 +130,9 @@ class AnyType(Type):
     def validate(self, e):
         pass # anything is valid
 
+#: For efficiency, singleton instance of AnyType
+TheAnyType = AnyType()
+
 
 class BoolType(Type):
     """
@@ -269,6 +272,20 @@ class ListType(Type):
             raise TypeError(self, e)
 
 
+# Helper for guess_expr_type(), for ReferenceExpr values
+def _guess_ref_expr_type(e):
+    try:
+        var = e.get_variable()
+        if var is not None:
+            if var.type is not TheAnyType:
+                return var.type
+            else:
+                return guess_expr_type(var.value)
+        else:
+            return guess_expr_type(e.get_value())
+    except Error:
+        return TheAnyType
+
 def guess_expr_type(e):
     """
     Attempts to guess type of the expression if it's possible.
@@ -276,13 +293,25 @@ def guess_expr_type(e):
     """
     if isinstance(e, expr.PathExpr):
         return PathType()
-    if isinstance(e, expr.ConcatExpr) and isinstance(e.items[0], expr.PathExpr):
-        return PathType()
     if isinstance(e, expr.ListExpr):
-        return ListType(AnyType())
+        return ListType(TheAnyType)
     if isinstance(e, expr.BoolExpr) or isinstance(e, expr.BoolValueExpr):
         return BoolType()
-    return AnyType()
+
+    if isinstance(e, expr.ReferenceExpr):
+        return _guess_ref_expr_type(e)
+
+    if isinstance(e, expr.ConcatExpr):
+        first = e.items[0]
+        if isinstance(first, expr.PathExpr):
+            return PathType()
+        if isinstance(first, expr.ReferenceExpr):
+            reft = _guess_ref_expr_type(first)
+            if (isinstance(reft, StringType) or
+                isinstance(reft, PathType)):
+                return reft
+
+    return TheAnyType
 
 
 class _BoolNormalizer(expr.Visitor):

@@ -35,6 +35,7 @@ import simplify
 import bkl.vartypes
 import bkl.expr
 import bkl.model
+import bkl.vartypes
 from bkl.error import Error, NonConstError, NotFoundError, TypeError, warning, error_context
 from bkl.expr import Visitor, RewritingVisitor
 from bkl.utils import memoized
@@ -178,6 +179,10 @@ def normalize_vars(model):
     """
     logger.debug("normalizing variables")
     for var in model.all_variables():
+        # if the type of the variable wasn't determined yet, guess it
+        if var.type is bkl.vartypes.TheAnyType:
+            var.type = bkl.vartypes.guess_expr_type(var.value)
+        # normalize the value for the type
         var.value = var.type.normalize(var.value)
 
 

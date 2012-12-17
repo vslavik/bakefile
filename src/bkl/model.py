@@ -71,7 +71,7 @@ class Variable(object):
     def __init__(self, name, value, type=None, readonly=False):
         self.name = name
         if type is None:
-            type = vartypes.guess_expr_type(value)
+            type = vartypes.TheAnyType
         self.type = type
         self.value = value
         self.readonly = readonly

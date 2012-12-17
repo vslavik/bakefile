@@ -1,2 +1,3 @@
-foo = true;
-foo += FOO;
+program test {
+    id += FOO;
+}
