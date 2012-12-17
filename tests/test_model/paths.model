@@ -1,0 +1,10 @@
+module {
+  variables {
+    EXTRAS_DIR = @top_srcdir/../../extras
+  }
+  targets {
+    program test {
+      includedirs = [@top_srcdir/include, @top_srcdir/../../extras/foo/bar/include]
+    }
+  }
+}

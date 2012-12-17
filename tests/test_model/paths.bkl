@@ -1,0 +1,8 @@
+// Test for various issues with paths handling
+
+
+EXTRAS_DIR = @srcdir/../../extras;
+
+program test {
+    includedirs += include $(EXTRAS_DIR)/foo/bar/include;
+}
