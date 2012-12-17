@@ -40,6 +40,7 @@ tokens {
     LVALUE;
     LITERAL;
     BOOLVAL;
+    PATH_ANCHOR;
     VAR_REFERENCE;
     LIST_OR_CONCAT;
     LIST;
@@ -206,6 +207,7 @@ element
 element_part
     : literal
     | bool_value
+    | path_anchor
     | var_reference
     ;
 
@@ -224,6 +226,9 @@ literal
 
 bool_value
     : (t=TRUE | t=FALSE)       -> BOOLVAL[$t];
+
+path_anchor
+    : t=ANCHOR_KEYWORD         -> PATH_ANCHOR[$t];
 
 
 // ---------------------------------------------------------------------------
@@ -279,6 +284,8 @@ RPAREN:    ')';
 TRUE:      'true';
 FALSE:     'false';
 
+ANCHOR_KEYWORD: '@' ('a'..'z' | '_')+;
+
 SCOPE_SEP: '::';
 
 SINGLE_QUOTED_TEXT: '\'' ( ESCAPE_SEQ | ~('\'' | '\\') )* '\'';
@@ -291,7 +298,7 @@ fragment
 ESCAPE_SEQ: '\\' . ;
 
 fragment
-ALLOWED_ID_CHARS: ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_' | '.' | '/' | '@');
+ALLOWED_ID_CHARS: ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_' | '.' | '/');
 
 // ---------------------------------------------------------------------------
 // Comments:

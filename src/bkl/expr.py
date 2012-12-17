@@ -1039,6 +1039,101 @@ def split(e, sep):
         return _SplitVisitor(sep).visit(e)
 
 
+class _SplitIntoPathVisitor(_SplitVisitor):
+    """
+    Helper for the split_into_path() function.
+    """
+    def __init__(self):
+        super(_SplitIntoPathVisitor, self).__init__('/')
+        self.anchor = ANCHOR_SRCDIR
+        self.anchor_file = None
+        self.anchor_set = False
+
+    def list(self, e):
+        raise Error("list can't be a part of a path")
+
+    def path(self, e):
+        if not self.anchor_set:
+            self.anchor = e.anchor
+            self.anchor_file = e.anchor_file
+            self.anchor_set = True
+            return e.components
+        else:
+            raise Error("can't embed a path in another")
+
+    def reference(self, e):
+        had_anchor = self.anchor_set
+        vals = self.visit(e.get_value())
+        if not had_anchor and self.anchor_set:
+            # referenced path must be always substituted, can't have
+            # a PathExpr as a component
+            return vals
+        elif len(vals) == 1:
+            return [e]
+        else:
+            return vals
+
+
+def split_into_path(e):
+    """
+    Splits expression *e* into a list of expressions, using '/' as the
+    delimiter character. Returns a PathExpr.  Works with conditional
+    expressions and variable references too.
+    """
+    with error_context(e):
+        visitor = _SplitIntoPathVisitor()
+        components = visitor.visit(e)
+        # filter out empty components (e.g. "foo//bar.c")
+        components = [x for x in components
+                      if not isinstance(x, LiteralExpr) or x.value]
+        return PathExpr(components,
+                        anchor=visitor.anchor, anchor_file=visitor.anchor_file,
+                        pos=e.pos)
+
+
+class _ModelNameFromPathVisitor(Visitor):
+    """
+    Helper for the get_model_name_from_path() function.
+    """
+    bool = Visitor.noop
+    bool_value = Visitor.noop
+    null = Visitor.noop
+
+    def placeholder(self, e):
+        raise NotImplementedError
+
+    def literal(self, e):
+        return e.value
+
+    def reference(self, e):
+        return self.visit(e.get_value())
+
+    def list(self, e):
+        raise NotImplementedError
+
+    def concat(self, e):
+        return "".join(self.visit(x) for x in e.items)
+
+    def path(self, e):
+        p = "/".join(self.visit(x) for x in e.components)
+        if e.anchor == ANCHOR_SRCDIR:
+            return p
+        else:
+            return "%s/%s" % (e.anchor, p)
+
+    def if_(self, e):
+        return self.visit(e.get_value())
+
+
+def get_model_name_from_path(e):
+    """
+    Give an expression representing filename, return name suitable for
+    model.SourceFile.name.
+    """
+    with error_context(e):
+        return _ModelNameFromPathVisitor().visit(e)
+
+
 class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
     def __init__(self):
         CondTrackingMixin.__init__(self)

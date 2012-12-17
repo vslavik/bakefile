@@ -126,6 +126,11 @@ class LiteralNode(Node):
         return '%s "%s"' % (self.__class__.__name__, self.text)
 
 
+class PathAnchorNode(LiteralNode):
+    """A literal with path anchor (@srcdir etc.)."""
+    pass
+
+
 class BoolvalNode(Node):
     """Boolean constant (true/false)."""
 
@@ -291,6 +296,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.PROGRAM        : RootNode,
         BakefileParser.LITERAL        : LiteralNode,
         BakefileParser.BOOLVAL        : BoolvalNode,
+        BakefileParser.PATH_ANCHOR    : PathAnchorNode,
         BakefileParser.ID             : IdNode,
         BakefileParser.LIST           : ListNode,
         BakefileParser.CONCAT         : ConcatNode,

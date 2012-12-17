@@ -753,7 +753,7 @@ class SourceFile(ModelPart, ConfigurationsPropertyMixin):
 
     @memoized_property
     def name(self):
-        return self.filename.as_py()
+        return expr.get_model_name_from_path(self.filename)
 
     def __str__(self):
         return "file %s" % self.filename

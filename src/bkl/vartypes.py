@@ -192,19 +192,9 @@ class PathType(Type):
         if isinstance(e, expr.PathExpr):
             return e
         try:
-            components = expr.split(e, "/")
+            return expr.split_into_path(e)
         except Error as err:
             raise TypeError(self, e, msg=err.msg)
-        if not components:
-            return e # empty path = invalid
-        first = components[0]
-        anchor_file = first.pos.filename if first.pos else None
-        if (isinstance(first, expr.LiteralExpr) and
-                first.value and first.value[0] == "@"):
-            anchor = first.value
-            return expr.PathExpr(components[1:], anchor, anchor_file, pos=e.pos)
-        else:
-            return expr.PathExpr(components, expr.ANCHOR_SRCDIR, anchor_file, pos=e.pos)
 
     def _validate_impl(self, e):
         if not isinstance(e, expr.PathExpr):
@@ -285,6 +275,8 @@ def guess_expr_type(e):
     Returns AnyType type if unsure.
     """
     if isinstance(e, expr.PathExpr):
+        return PathType()
+    if isinstance(e, expr.ConcatExpr) and isinstance(e.items[0], expr.PathExpr):
         return PathType()
     if isinstance(e, expr.ListExpr):
         return ListType(AnyType())

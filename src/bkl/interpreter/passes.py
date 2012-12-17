@@ -145,7 +145,7 @@ def detect_missing_generated_outputs(model):
                 sources = set(ch.name for ch in t.child_parts())
                 outputs = set(i for c,i in bkl.expr.enum_possible_values(srcfile["outputs"]))
                 for item in outputs:
-                    partname = item.as_py()
+                    partname = bkl.expr.get_model_name_from_path(item)
                     if partname not in sources:
                         warning("file %s generated from %s is not among sources or headers of target \"%s\"",
                                 item, srcfile.filename, t.name, pos=item.pos)

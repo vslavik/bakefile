@@ -433,13 +433,20 @@ class Builder(object, CondTrackingMixin):
         elif t is BoolvalNode:
             e = BoolValueExpr(ast.value)
         elif t is VarReferenceNode:
-            e= ReferenceExpr(ast.var, self.context)
+            e = ReferenceExpr(ast.var, self.context)
         elif t is ListNode:
             items = [self._build_expression(e) for e in ast.values]
             e = ListExpr(items)
         elif t is ConcatNode:
             items = [self._build_expression(e) for e in ast.values]
             e = ConcatExpr(items)
+        elif t is PathAnchorNode:
+            # Note: This creates a degrated "path" with only the anchor.
+            #       If it's part of a full path, it will necessarily be created
+            #       as the first element of a ConcatExpr.
+            #       Later, PathType.normalize() will recognize this case and
+            #       create a proper PathExpr from this.
+            e = PathExpr([], anchor=ast.text, anchor_file=ast.pos.filename)
         elif isinstance(ast, BoolNode):
             e = self._build_bool_expression(ast)
         else:
