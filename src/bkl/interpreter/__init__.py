@@ -200,7 +200,6 @@ class Interpreter(object):
             module_toolsets = module.get_variable("toolsets")
             if module_toolsets:
                 toolsets.update(module_toolsets.value.as_py())
-        logger.debug("toolsets to generate for: %s", list(toolsets))
 
         if self.toolsets_to_use:
             for t in self.toolsets_to_use:
@@ -216,6 +215,8 @@ class Interpreter(object):
                         if module_toolsets:
                             module_toolsets.value.items.append(bkl.expr.LiteralExpr(t))
             toolsets = self.toolsets_to_use
+
+        logger.debug("toolsets to generate for: %s", list(toolsets))
 
         if not toolsets:
             raise Error("nothing to generate, \"toolsets\" property is empty")
