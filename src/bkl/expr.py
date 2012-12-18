@@ -1314,9 +1314,9 @@ class _FormatStringVisitor(RewritingVisitor):
         # For example:
         #  input: '%(in) and %(out) arguments'
         #  parts = ['', 'in', ' and ', 'out', ' arguments']
+        if not expr.value:
+            return expr
         parts = re.split(r'%\(([^)]*)\)', expr.value)
-        if not parts:
-            return None
         out = []
         is_subst = False
         for part in parts:
