@@ -142,7 +142,7 @@ class CannotDetermineError(NonConstError):
     be improved.
     """
     def __init__(self, msg=None, pos=None):
-        super(CannotDetermineError, self).__init__(msg, pos)
+        Error.__init__(self, msg, pos)
 
 
 class UndefinedError(Error):
