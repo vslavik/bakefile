@@ -30,6 +30,7 @@ import uuid
 import types
 from xml.sax.saxutils import escape, quoteattr
 from functools import partial, update_wrapper
+from itertools import izip_longest
 from collections import defaultdict
 
 import logging
@@ -866,16 +867,16 @@ class VSToolsetBase(Toolset):
                 #     fileobj2 : 'x_barb',
                 #     ...
                 #   }
-                components = zip(*(x.filename.components[:-1] for x in files))
                 difference = []
-                for c in components:
+                for c in izip_longest(*(x.filename.components[:-1] for x in files)):
                     all_same = all(x == c[0] for x in c)
                     if not all_same:
                         difference.append(c)
                 results = zip(files, *difference)
                 for x in results:
                     f = x[0]
-                    path = [f.filename.get_basename(), "_"] + list(x[1:])
+                    path = ([f.filename.get_basename(), "_"] +
+                           list(c for c in x[1:] if c is not None))
                     mapping[f] = bkl.expr.concat(*path)
         return mapping
 
