@@ -42,6 +42,11 @@ dry_run = False
 # makefiles that support automatic regeneration.
 force_output = False
 
+# Number of created files
+num_created = 0
+# Number of modified files
+num_modified = 0
+
 EOL_WINDOWS = "win"
 EOL_UNIX    = "unix"
 
@@ -112,10 +117,13 @@ class OutputFile(object):
         else:
             old = None
 
+        global num_created, num_modified
         if old is None:
             status = "A"
+            num_created += 1
         else:
             status = "U"
+            num_modified += 1
 
         logger.info("%s\t%s", status, rel_fn)
 

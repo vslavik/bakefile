@@ -26,6 +26,7 @@
 import sys
 import logging
 from optparse import OptionParser, OptionGroup
+from time import time
 
 # This is needed to initialize colored output on Windows. It must be done
 # before any stdout is done.
@@ -137,6 +138,7 @@ import bkl.dumper
 import bkl.io
 
 try:
+    start_time = time()
     bkl.io.dry_run = options.dry_run
     bkl.io.force_output = options.force
     if options.dump:
@@ -148,6 +150,9 @@ try:
     if options.toolsets:
         intr.limit_toolsets(options.toolsets)
     intr.process_file(args[0])
+    logger.info("created files: %d, updated files: %d (time: %.1fs)",
+                bkl.io.num_created, bkl.io.num_modified, time() - start_time)
+
 except KeyboardInterrupt:
     if options.debug:
         raise
