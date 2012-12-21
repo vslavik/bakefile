@@ -235,6 +235,8 @@ class NativeLinkedType(NativeCompiledType):
 
     def _get_link_property(self, target, propname):
         deps = self.get_linkable_deps(target)
+        # flags used to link shared libraries should be skipped:
+        deps = [x for x in deps if isinstance(x.type, LibraryType)]
         out = []
         for t in [target] + deps:
             for x in t[propname]:
