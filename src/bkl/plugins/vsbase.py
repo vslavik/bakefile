@@ -169,6 +169,9 @@ class VSList(object):
         """Adds an item (not list!) to the list."""
         self.items.append(item)
 
+    def __str__(self):
+        return " ".join(str(x) for x in self.items)
+
     def __nonzero__(self):
         return bool(self.items)
     def __len__(self):
@@ -223,8 +226,9 @@ class XmlFormatter(object):
                             children_markup += "%s<%s>%s</%s>\n" % (subindent, key, v, key)
                         # else: empty value, don't write that
                     except CannotDetermineError as e:
-                        raise Error("cannot set property \"%s\" to non-constant expression \"%s\" (%s)" %
-                                    (key, value, e.msg), pos=value.pos)
+                        with error_context(value):
+                            raise Error("cannot set property \"%s\" to non-constant expression \"%s\" (%s)" %
+                                        (key, value, e.msg))
         else:
             children_markup = None
         text = self.format_value(n.text) if n.text else None
