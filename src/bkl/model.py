@@ -684,6 +684,19 @@ class ConfigurationProxy(object):
     def __getitem__(self, key):
         return self._visitor.visit(self.model[key])
 
+    def apply_subst(self, value):
+        """
+        Applies the proxy's magic on given value. This is useful for when
+        the proxy cannot be simply used in place of a real target. For
+        example, NativeLinkedType.get_ldlibs() inspects other targets too
+        and so the proxy is only partially effective.
+        """
+        if isinstance(value, list):
+            return [self._visitor.visit(x) for x in value]
+        else:
+            return self._visitor.visit(value)
+
+
 
 class Target(ModelPart, ConfigurationsPropertyMixin):
     """

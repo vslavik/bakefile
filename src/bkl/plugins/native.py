@@ -27,9 +27,11 @@ Targets for natively built binaries (executables, static and shared libraries).
 """
 
 from bkl.api import TargetType, Property, FileType
+from bkl.model import ConfigurationProxy
 from bkl.vartypes import *
 from bkl.compilers import *
 from bkl.expr import concat, PathExpr, ANCHOR_BUILDDIR
+from bkl.error import NonConstError
 from bkl.utils import memoized
 
 class NativeCompiledType(TargetType):
@@ -239,9 +241,16 @@ class NativeLinkedType(NativeCompiledType):
         deps = [x for x in deps if isinstance(x.type, LibraryType)]
         out = []
         for t in [target] + deps:
-            for x in t[propname]:
+            values = t[propname]
+            if isinstance(target, ConfigurationProxy):
+                values = target.apply_subst(values)
+            for x in values:
                 # TODO: use some ordered-set type and just merge them
-                if x not in out:
+                try:
+                    if x not in out:
+                        out.append(x)
+                except NonConstError:
+                    # can't meaningfully check for duplicates -> just insert
                     out.append(x)
         return out
 
