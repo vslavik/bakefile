@@ -471,8 +471,9 @@ class PathExpr(Expr):
 
     def as_py(self):
         # We can't represent a path as something natively useful (e.g. native
-        # path), so let's return a tuple of (anchor, relpath) instead:
-        return (self.anchor, '/'.join(x.as_py() for x in self.components))
+        # path), so let's return a representation in bakefile language,
+        # with explicit anchor:
+        return "%s/%s" % (self.anchor, "/".join(x.as_py() for x in self.components))
 
     def __nonzero__(self):
         return bool(self.components)
