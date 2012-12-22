@@ -336,12 +336,12 @@ class BoolExpr(Expr):
             return self.left.as_py() or self.right.as_py()
         elif op == BoolExpr.EQUAL:
             try:
-                return are_equal(self.left, self.right)
+                return are_equal(self.left, self.right, _inside_cond=True)
             except CannotDetermineError:
                 raise CannotDetermineError('cannot evaluate bool expression "%s"' % self, self.pos)
         elif op == BoolExpr.NOT_EQUAL:
             try:
-                return not are_equal(self.left, self.right)
+                return not are_equal(self.left, self.right, _inside_cond=True)
             except CannotDetermineError:
                 raise CannotDetermineError('cannot evaluate bool expression "%s"' % self, self.pos)
         elif op == BoolExpr.NOT:
@@ -1243,10 +1243,32 @@ class _PrepForAsPyComparisonVisitor(RewritingVisitor):
     #        A good enough (for now at least) solution is to mark the
     #        placeholders up with something highly unusual and not likely to
     #        ever appear -- such as lenticular brackets Unicode characters.
-    def placeholder(self, e):
-        return LiteralExpr(u"〖%s〗" % e.var)
+    def __init__(self):
+        self.inside_cond = 0
 
-def are_equal(a, b):
+    def placeholder(self, e):
+        if self.inside_cond:
+            return e
+        else:
+            return LiteralExpr(u"〖%s〗" % e.var)
+
+    def reference(self, e):
+        return self.visit(e.get_value())
+
+    def if_(self, e):
+        try:
+            self.inside_cond += 1
+            cond = self.visit(e.cond)
+        finally:
+            self.inside_cond -= 1
+        yes = self.visit(e.value_yes)
+        no = self.visit(e.value_no)
+        if cond is e.cond and yes is e.value_yes and no is e.value_no:
+            return e
+        return IfExpr(cond, yes, no, pos=e.pos)
+
+
+def are_equal(a, b, _inside_cond=False):
     """
     Compares two expressions for equality.
 
@@ -1256,10 +1278,13 @@ def are_equal(a, b):
     try:
         # FIXME: This is not good enough, the comparison should be done
         #        symbolically as much as possible.
+        vis = _PrepForAsPyComparisonVisitor()
+        if _inside_cond:
+            vis.inside_cond += 1
         if isinstance(a, Expr):
-            a = _PrepForAsPyComparisonVisitor().visit(a).as_py()
+            a = vis.visit(a).as_py()
         if isinstance(b, Expr):
-            b = _PrepForAsPyComparisonVisitor().visit(b).as_py()
+            b = vis.visit(b).as_py()
         return a == b
     except NonConstError:
         # TODO: Try exploding with enum_possible_values()
