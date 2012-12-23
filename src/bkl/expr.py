@@ -585,6 +585,20 @@ class Visitor(object):
     """
     __metaclass__ = ABCMeta
 
+    def __init__(self):
+        self._dispatch = {
+            NullExpr         : self.null,
+            LiteralExpr      : self.literal,
+            ListExpr         : self.list,
+            ConcatExpr       : self.concat,
+            ReferenceExpr    : self.reference,
+            PlaceholderExpr  : self.placeholder,
+            PathExpr         : self.path,
+            BoolValueExpr    : self.bool_value,
+            BoolExpr         : self.bool,
+            IfExpr           : self.if_,
+        }
+
     def visit(self, e):
         """
         Call this method to visit expression *e*. One of object's "callback"
@@ -593,10 +607,7 @@ class Visitor(object):
         Return value is the value returned by the appropriate callback and
         is typically :const:`None`.
         """
-        t = type(e)
-        assert t in self._dispatch, "unknown expression type (%s)" % t
-        func = self._dispatch[t]
-        return func(self, e)
+        return self._dispatch[type(e)](e)
 
     @abstractmethod
     def null(self, e):
@@ -647,19 +658,6 @@ class Visitor(object):
     def if_(self, e):
         """Called on :class:`IfExpr` expressions."""
         raise NotImplementedError
-
-    _dispatch = {
-        NullExpr         : lambda self,e: self.null(e),
-        LiteralExpr      : lambda self,e: self.literal(e),
-        ListExpr         : lambda self,e: self.list(e),
-        ConcatExpr       : lambda self,e: self.concat(e),
-        ReferenceExpr    : lambda self,e: self.reference(e),
-        PlaceholderExpr  : lambda self,e: self.placeholder(e),
-        PathExpr         : lambda self,e: self.path(e),
-        BoolValueExpr    : lambda self,e: self.bool_value(e),
-        BoolExpr         : lambda self,e: self.bool(e),
-        IfExpr           : lambda self,e: self.if_(e),
-    }
 
     #: Helper to quickly implement handler functions that do nothing.
     noop = lambda self, e: e
@@ -869,6 +867,7 @@ class Formatter(Visitor):
     list_sep = " "
 
     def __init__(self, paths_info):
+        super(Formatter, self).__init__()
         self.paths_info = paths_info
 
     def format(self, e):
@@ -970,6 +969,7 @@ class _SplitVisitor(Visitor):
     Helper for the split() function.
     """
     def __init__(self, sep):
+        super(_SplitVisitor, self).__init__()
         self.sep = sep
 
     bool = lambda self, e: [e]
@@ -1137,6 +1137,7 @@ def get_model_name_from_path(e):
 
 class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
     def __init__(self):
+        Visitor.__init__(self)
         CondTrackingMixin.__init__(self)
 
     def null(self, e):
@@ -1244,6 +1245,7 @@ class _PrepForAsPyComparisonVisitor(RewritingVisitor):
     #        placeholders up with something highly unusual and not likely to
     #        ever appear -- such as lenticular brackets Unicode characters.
     def __init__(self):
+        super(_PrepForAsPyComparisonVisitor, self).__init__()
         self.inside_cond = 0
 
     def placeholder(self, e):
@@ -1329,6 +1331,7 @@ def concat(*parts):
 
 class _FormatStringVisitor(RewritingVisitor):
     def __init__(self, values):
+        super(_FormatStringVisitor, self).__init__()
         self.values = values
 
     def literal(self, expr):

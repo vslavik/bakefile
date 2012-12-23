@@ -50,6 +50,7 @@ def detect_self_references(model):
 
     class SelfRefChecker(Visitor):
         def __init__(self):
+            super(SelfRefChecker, self).__init__()
             self.stack = []
             self.checked = set()
 
@@ -100,6 +101,7 @@ def detect_unused_vars(model):
 
     class VariablesChecker(Visitor):
         def __init__(self):
+            super(VariablesChecker, self).__init__()
             self.found = set()
 
         literal = Visitor.noop
@@ -270,6 +272,7 @@ class PathsNormalizer(RewritingVisitor):
     if the context was set to a target.
     """
     def __init__(self, project, toolset=None):
+        super(PathsNormalizer, self).__init__()
         self.toolset = toolset
         self.project = project
         self.module = self.target = None

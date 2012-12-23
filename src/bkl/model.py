@@ -640,6 +640,7 @@ class _ProxyIfResolver(expr.RewritingVisitor):
     to be evaluated.
     """
     def __init__(self, config):
+        super(_ProxyIfResolver, self).__init__()
         self.config = config
         self.inside_cond = 0
 
