@@ -407,7 +407,7 @@ class VSSolutionBase(object):
             prev_count = len(included)
             todo = set(x for x in todo if x not in included)
             todo_new = set()
-            for todo_item in todo:
+            for todo_item in sorted(todo):
                 included.add(todo_item)
                 prj = top._get_project_by_id(todo_item)
                 todo_new.update(prj.dependencies)
