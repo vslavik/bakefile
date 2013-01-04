@@ -26,11 +26,11 @@
 Targets for natively built binaries (executables, static and shared libraries).
 """
 
-from bkl.api import TargetType, Property, FileType
+from bkl.api import TargetType, Property
 from bkl.model import ConfigurationProxy
 from bkl.vartypes import *
 from bkl.compilers import *
-from bkl.expr import concat, PathExpr, ANCHOR_BUILDDIR
+from bkl.expr import concat, PathExpr, LiteralExpr, NullExpr, ANCHOR_BUILDDIR
 from bkl.error import NonConstError
 from bkl.utils import memoized
 
@@ -201,10 +201,27 @@ class NativeCompiledType(TargetType):
         if prefix in tdir:
             parts.append(getattr(toolset, prefix))
         parts.append(target[propname])
-        if ext in tdir:
+        if target.is_variable_explicitly_set("extension"):
+            parts.append(target["extension"])
+        elif ext in tdir:
             parts.append("." + getattr(toolset, ext))
         outdir = target["outputdir"]
         return PathExpr(outdir.components + [concat(*parts)], outdir.anchor, outdir.anchor_file)
+
+    def target_file_extension(self, toolset, target):
+        """
+        Returns expression with extension of the target's filename (as returned
+        by :meth:`target_file()`), including the leading dot.
+        """
+        if target.is_variable_explicitly_set("extension"):
+            return target["extension"]
+        else:
+            try:
+                fileclass = self.name.replace("-", "_")
+                ext = "%s_extension" % fileclass
+                return LiteralExpr(".%s" % getattr(toolset, ext))
+            except AttributeError:
+                return  NullExpr()
 
 
 class NativeLinkedType(NativeCompiledType):
@@ -423,8 +440,24 @@ class LoadableModuleType(NativeLinkedType):
 
                      .. code-block:: bkl
 
-                        module myplugin {
+                        loadable-module myplugin {
                           basename = myplugin-v1;
+                        }
+                     """),
+            Property("extension",
+                 type=StringType(),
+                 default=NullExpr(),
+                 inheritable=False,
+                 doc="""
+                     File extension of the module, including the leading dot.
+
+                     By default, native extension for shared libraries (e.g.
+                     ".dll" on Windows) is used.
+
+                     .. code-block:: bkl
+
+                        loadable-module excel_plugin {
+                          extension = .xll;
                         }
                      """),
         ]

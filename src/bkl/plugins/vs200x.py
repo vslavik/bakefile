@@ -341,8 +341,8 @@ class VS200xToolsetBase(VSToolsetBase):
         n["AdditionalLibraryDirectories"] = target.type.get_libdirs(cfg)
 
         targetname = cfg["basename"]
-        if targetname != target.name:
-            n["OutputFile"] = concat("$(OutDir)\\", targetname, ".", target.type.target_file(self, target).get_extension())
+        if targetname != target.name or target.is_variable_explicitly_set("extension"):
+            n["OutputFile"] = concat("$(OutDir)\\", targetname, target.type.target_file_extension(self, target))
 
         if cfg.is_debug:
             n["LinkIncremental"] = linkIncrementalYes
@@ -366,8 +366,8 @@ class VS200xToolsetBase(VSToolsetBase):
             return None
         n = Node("Tool", Name="VCLibrarianTool")
         targetname = cfg["basename"]
-        if targetname != target.name:
-            n["OutputFile"] = concat("$(OutDir)\\", targetname, ".", target.type.target_file(self, target).get_extension())
+        if targetname != target.name or target.is_variable_explicitly_set("extension"):
+            n["OutputFile"] = concat("$(OutDir)\\", targetname, target.type.target_file_extension(self, target))
         return n
 
     #: List of functions to call to generate <Configuration> children. Note
