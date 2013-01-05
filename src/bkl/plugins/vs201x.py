@@ -140,7 +140,7 @@ class VS201xToolsetBase(VSToolsetBase):
             targetname = cfg["basename"]
             if targetname != target.name:
                 n.add("TargetName", targetname)
-            if target.is_variable_explicitly_set("extension"):
+            if not target.is_variable_null("extension"):
                 n.add("TargetExt", target["extension"])
             if is_module_dll(target):
                 n.add("IgnoreImportLibrary", True)

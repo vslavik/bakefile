@@ -341,7 +341,7 @@ class VS200xToolsetBase(VSToolsetBase):
         n["AdditionalLibraryDirectories"] = target.type.get_libdirs(cfg)
 
         targetname = cfg["basename"]
-        if targetname != target.name or target.is_variable_explicitly_set("extension"):
+        if targetname != target.name or not target.is_variable_null("extension"):
             n["OutputFile"] = concat("$(OutDir)\\", targetname, target.type.target_file_extension(self, target))
 
         if cfg.is_debug:
@@ -366,7 +366,7 @@ class VS200xToolsetBase(VSToolsetBase):
             return None
         n = Node("Tool", Name="VCLibrarianTool")
         targetname = cfg["basename"]
-        if targetname != target.name or target.is_variable_explicitly_set("extension"):
+        if targetname != target.name or not target.is_variable_null("extension"):
             n["OutputFile"] = concat("$(OutDir)\\", targetname, target.type.target_file_extension(self, target))
         return n
 

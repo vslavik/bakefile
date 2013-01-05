@@ -201,7 +201,7 @@ class NativeCompiledType(TargetType):
         if prefix in tdir:
             parts.append(getattr(toolset, prefix))
         parts.append(target[propname])
-        if target.is_variable_explicitly_set("extension"):
+        if not target.is_variable_null("extension"):
             parts.append(target["extension"])
         elif ext in tdir:
             parts.append("." + getattr(toolset, ext))
@@ -213,7 +213,7 @@ class NativeCompiledType(TargetType):
         Returns expression with extension of the target's filename (as returned
         by :meth:`target_file()`), including the leading dot.
         """
-        if target.is_variable_explicitly_set("extension"):
+        if not target.is_variable_null("extension"):
             return target["extension"]
         else:
             try:

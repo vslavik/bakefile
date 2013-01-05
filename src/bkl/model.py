@@ -361,6 +361,17 @@ class ModelPart(object):
         var = self.resolve_variable(name)
         return var.is_explicitly_set if var else False
 
+    def is_variable_null(self, name):
+        """
+        Returns true if the variable is unset or null (which amounts to not
+        being set in this toolset / under current condition).
+        """
+        try:
+            var = self.resolve_variable(name)
+            return (var is None) or (var.value.as_py() is None)
+        except error.NonConstError:
+            return False
+
 
     def add_variable(self, var):
         """Adds a new variable object."""
