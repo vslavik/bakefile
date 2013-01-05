@@ -507,14 +507,15 @@ class VSSolutionBase(object):
         self.write_header(outf)
 
         # Projects:
+        all_own_projects = list(self.all_projects())
         additional_deps = self.additional_deps()
-        included_projects = list(self.all_projects()) + additional_deps
+        included_projects = all_own_projects + additional_deps
 
         if not included_projects:
             return # don't write empty solution files
 
         configurations = []
-        for prj in included_projects:
+        for prj in all_own_projects:
             for cfg in prj.configurations:
                 if cfg not in configurations:
                     configurations.append(cfg)
