@@ -317,7 +317,9 @@ class VS201xToolsetBase(VSToolsetBase):
             items = Node("ItemGroup")
             root.add(items)
             for sfile in idl_files:
-                items.add("Midl", Include=sfile.filename)
+                n_midl = Node("Midl", Include=sfile.filename)
+                self._add_per_file_options(sfile, n_midl)
+                items.add(n_midl)
 
         # Dependencies:
         target_deps = self._get_references(target)
