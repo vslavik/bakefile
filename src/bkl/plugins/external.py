@@ -27,13 +27,13 @@ Implementation of 'external' target type.
 """
 
 from bkl.api import Extension, Property, TargetType, FileRecognizer
-from bkl.model import Configuration
 from bkl.vartypes import PathType
 from bkl.error import Error, error_context
-from bkl.plugins.vsbase import VSProjectBase
+from bkl.plugins.vsbase import VSProjectBase, PROJECT_KIND_NET
 from bkl.utils import memoized_property
 
 import xml.etree.ElementTree
+import re
 
 
 class ExternalBuildHandler(Extension, FileRecognizer):
@@ -58,8 +58,8 @@ class ExternalTargetType(TargetType):
     This target type is used to invoke makefiles or project files not
     implemented in Bakefile, for example to build 3rd party libraries.
 
-    Currently, only Visual Studio projects are supported and only when using
-    a Visual Studio toolset.
+    Currently, only Visual Studio projects (vcproj, vcxproj, csproj) are
+    supported and only when using a Visual Studio toolset.
     """
     name = "external"
 
@@ -133,8 +133,8 @@ class VSExternalProject200x(VSExternalProjectBase):
         elif v == "8.00": return 8
         elif v == "9.00": return 9
         else:
-            raise Error("unrecognized version of Visual Studio project %s: Version=\"%s\"",
-                        self.projectfile, v)
+            raise Error("unrecognized version of Visual Studio project %s: Version=\"%s\"" % (
+                        self.projectfile, v))
 
     @memoized_property
     def name(self):
@@ -157,8 +157,8 @@ class VSExternalProject201x(VSExternalProjectBase):
     def version(self):
         v = self.xml.get("ToolsVersion")
         if v != "4.0":
-            raise Error("unrecognized version of Visual Studio project %s: ToolsVersion=\"%s\"",
-                        self.projectfile, v)
+            raise Error("unrecognized version of Visual Studio project %s: ToolsVersion=\"%s\"" %(
+                        self.projectfile, v))
         # TODO-PY26: use "PropertyGroup[@Label='Configuration']"
         t = self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}PlatformToolset" % XMLNS)
         if t == "v110":
@@ -185,6 +185,38 @@ class VSExternalProject201x(VSExternalProjectBase):
                 self.xml.findall("{%(ms)s}ItemGroup/{%(ms)s}ProjectConfiguration/{%(ms)s}Configuration" % XMLNS)]
 
 
+class VSExternalProjectCSharp(VSExternalProjectBase):
+    """
+    Wrapper around VS C# project files.
+    """
+
+    kind = PROJECT_KIND_NET
+
+    @memoized_property
+    def version(self):
+        # .csproj files are generally usable across VS versions
+        return None
+
+    @memoized_property
+    def name(self):
+        return self.projectfile.get_basename()
+
+    @memoized_property
+    def guid(self):
+        # TODO-PY26: use "PropertyGroup[@Label='Globals']"
+        return self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}ProjectGuid" % XMLNS)[1:-1]
+
+    def _extract_configurations_names(self):
+        found = []
+        for n in self.xml.findall("{%(ms)s}PropertyGroup" % XMLNS):
+            cond = n.get("Condition")
+            if cond:
+                m = re.match(r" *'\$\(Configuration\)\|\$\(Platform\)' *== '(.*)\|(.*)' *", cond)
+                cfg = m.group(1) if m else None
+                if cfg and cfg not in found:
+                    found.append(cfg)
+        return found
+
 
 class VisualStudioHandler(ExternalBuildHandler):
     """
@@ -192,14 +224,17 @@ class VisualStudioHandler(ExternalBuildHandler):
     """
     name = "visual-studio"
 
-    extensions = ["vcproj", "vcxproj"]
+    extensions = ["vcproj", "vcxproj", "csproj"]
+
+    implementations = {
+        "vcproj"  : VSExternalProject200x,
+        "vcxproj" : VSExternalProject201x,
+        "csproj"  : VSExternalProjectCSharp,
+        }
 
     def get_build_subgraph(self, toolset, target):
         raise NotImplementedError # FIXME -- invoke msbuild on windows
 
     def vs_project(self, toolset, target):
-        if target["file"].get_extension() == "vcxproj":
-            prj_class = VSExternalProject201x
-        else:
-            prj_class = VSExternalProject200x
+        prj_class = self.implementations[target["file"].get_extension()]
         return prj_class(target)

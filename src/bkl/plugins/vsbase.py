@@ -48,7 +48,11 @@ from bkl.io import OutputFile, EOL_WINDOWS
 # Namespace constants for the GUID function
 NAMESPACE_PROJECT   = uuid.UUID("{D9BD5916-F055-4D77-8C69-9448E02BF433}")
 NAMESPACE_SLN_GROUP = uuid.UUID("{2D0C29E0-512F-47BE-9AC4-F4CAE74AE16E}")
-NAMESPACE_INTERNAL =  uuid.UUID("{BAA4019E-6D67-4EF1-B3CB-AE6CD82E4060}")
+NAMESPACE_INTERNAL  = uuid.UUID("{BAA4019E-6D67-4EF1-B3CB-AE6CD82E4060}")
+
+# Kinds of projects, as used in solution files
+PROJECT_KIND_C      = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
+PROJECT_KIND_NET    = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
 
 def GUID(namespace, solution, data):
     """
@@ -302,6 +306,9 @@ class VSProjectBase(object):
     #: GUID of the project.
     guid = None
 
+    #: GUID of the kind of the project for use in solution files
+    kind = PROJECT_KIND_C
+
     #: Filename of the project, as :class:`bkl.expr.Expr`."""
     projectfile = None
 
@@ -521,8 +528,8 @@ class VSSolutionBase(object):
                     configurations.append(cfg)
 
         for prj in included_projects:
-            outf.write('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "%s", "%s", "{%s}"\n' %
-                       (prj.name, self.formatter.format(prj.projectfile), str(prj.guid)))
+            outf.write('Project("%s") = "%s", "%s", "{%s}"\n' %
+                       (prj.kind, prj.name, self.formatter.format(prj.projectfile), str(prj.guid)))
             if prj.dependencies:
                 outf.write("\tProjectSection(ProjectDependencies) = postProject\n")
                 for d in prj.dependencies:
@@ -701,7 +708,7 @@ class VSToolsetBase(Toolset):
                     #       project file.
                     raise Error("project name (\"%s\") differs from target name (\"%s\"), they must be the same" %
                                 (prj.name, t.name))
-                if prj.version not in self.proj_versions:
+                if prj.version and prj.version not in self.proj_versions:
                     if prj.version > self.proj_versions[-1]:
                         raise Error("project %s is for Visual Studio %.1f and will not work with %.1f" %
                                     (prj.projectfile, prj.version, self.version))
