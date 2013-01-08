@@ -129,6 +129,10 @@ class VSExternalProject200x(VSExternalProjectBase):
     @memoized_property
     def version(self):
         v = self.xml.get("Version")
+        if v and "," in v:
+            # vcproj files written under some locales (French, Czech) may use
+            # ',' as decimal point character.
+            v = v.replace(",", ".")
         if   v == "7.10": return 7.1
         elif v == "8.00": return 8
         elif v == "9.00": return 9
