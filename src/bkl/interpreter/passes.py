@@ -250,6 +250,7 @@ def remove_disabled_model_parts(model, toolset):
         if not list(module.submodules) and not module.targets:
             logger.debug("removing empty %s", module)
             mods_to_del.append(module)
+            continue
         mod_toolsets = module.get_variable_value("toolsets")
         if toolset not in mod_toolsets.as_py():
             logger.debug("removing %s, because it isn't for toolset %s (is for: %s)",
