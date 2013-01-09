@@ -411,7 +411,22 @@ class VS200xToolsetBase(VSToolsetBase):
         resources["Filter"] = "rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
         resources["UniqueIdentifier"] = "{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 
-        files_map = self.disambiguate_intermediate_file_names(target.sources)
+        rc_files = []
+        cl_files = []
+        idl_files = []
+        for sfile in target.sources:
+            ext = sfile.filename.get_extension()
+            # TODO: share this code with VS200x
+            # FIXME: make this more solid
+            if ext == 'rc':
+                rc_files.append(sfile)
+            elif ext == 'idl':
+                idl_files.append(sfile)
+            else:
+                cl_files.append(sfile)
+        cl_files_map = self.disambiguate_intermediate_file_names(cl_files)
+        rc_files_map = self.disambiguate_intermediate_file_names(rc_files)
+
         for sfile in target.sources:
             if sfile["compile-commands"]:
                 self._add_custom_build_file(sources, sfile)
@@ -442,26 +457,22 @@ class VS200xToolsetBase(VSToolsetBase):
                         n_file.add(n_cfg)
                     n_file = Node("File", RelativePath=genname)
 
-                # Handle files with custom object name:
-                if sfile in files_map:
-                    for cfg in target.configurations:
-                        n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
-                        if ext == 'rc':
-                            objfile = concat("$(IntDir)\\", files_map[sfile], ".res")
-                            n_cfg.add("Tool", Name="VCResourceCompilerTool", ResourceOutputFileName=objfile)
-                        else:
-                            objfile = concat("$(IntDir)\\", files_map[sfile], ".obj")
-                            n_cfg.add("Tool", Name="VCCLCompilerTool", ObjectFile=objfile)
-                        n_file.add(n_cfg)
-
                 if ext == 'rc':
-                    self._add_per_file_options(sfile, n_file, "VCResourceCompilerTool")
+                    extras = None
+                    if sfile in rc_files_map:
+                        objfile = concat("$(IntDir)\\", rc_files_map[sfile], ".res")
+                        extras = [("ResourceOutputFileName", objfile)]
+                    self._add_per_file_options(sfile, n_file, "VCResourceCompilerTool", extras)
                     resources.add(n_file)
                 else:
                     if ext == 'idl':
-                        self._add_per_file_options(sfile, n_file, "VCMIDLTool")
+                        self._add_per_file_options(sfile, n_file, "VCMIDLTool", None)
                     else:
-                        self._add_per_file_options(sfile, n_file, "VCCLCompilerTool")
+                        extras = None
+                        if sfile in cl_files_map:
+                            objfile = concat("$(IntDir)\\", cl_files_map[sfile], ".obj")
+                            extras = [("ObjectFile", objfile)]
+                        self._add_per_file_options(sfile, n_file, "VCCLCompilerTool", extras)
                     sources.add(n_file)
 
         for sfile in target.headers:
@@ -508,12 +519,14 @@ class VS200xToolsetBase(VSToolsetBase):
             node[key] = value
 
 
-    def _add_per_file_options(self, srcfile, node, tool):
+    def _add_per_file_options(self, srcfile, node, tool, additional_options):
         """Add options that are set on per-file basis."""
         # TODO: add regular options such as 'defines' here too, not just
         #       the vsXXXX.option.* overrides
         for cfg in srcfile.configurations:
             extras = list(self.collect_extra_options_for_node(srcfile, tool, inherit=False))
+            if additional_options:
+                extras = additional_options + extras
             if extras:
                 n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
                 n_tool = Node("Tool", Name=tool)
