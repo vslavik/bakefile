@@ -321,7 +321,6 @@ class VS200xToolsetBase(VSToolsetBase):
 
     def VCMIDLTool(self, target, cfg):
         n = Node("Tool", Name="VCMIDLTool")
-        n["PreprocessorDefinitions"] = cfg["defines"]
         n["AdditionalIncludeDirectories"] = cfg["includedirs"]
 
         return n

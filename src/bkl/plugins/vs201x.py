@@ -206,7 +206,6 @@ class VS201xToolsetBase(VSToolsetBase):
             if idl_files:
                 n_idl = Node("Midl")
                 self._add_extra_options_to_node(cfg, n_idl)
-                n_idl.add("PreprocessorDefinitions", cfg["defines"])
                 n_idl.add("AdditionalIncludeDirectories", cfg["includedirs"])
                 n.add(n_idl)
 
