@@ -644,6 +644,8 @@ class VSToolsetBase(Toolset):
 
     program_extension = "exe"
     library_extension = "lib"
+    shared_library_extension = "dll"
+    loadable_module_extension = "dll"
 
     @classmethod
     def properties_target(cls):
