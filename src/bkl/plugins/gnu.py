@@ -270,7 +270,7 @@ class GnuToolset(MakefileToolset):
     library_prefix = "lib"
     library_extension = "a"
     shared_library_prefix = "lib"
-    shared_lirary_extension = "so"
+    shared_library_extension = "so"
     loadable_module_prefix = ""
     loadable_module_extension = "so"
     loadable_module_link_flag = "-shared"
