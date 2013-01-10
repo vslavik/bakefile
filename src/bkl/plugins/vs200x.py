@@ -335,7 +335,7 @@ class VS200xToolsetBase(VSToolsetBase):
         n["AdditionalOptions"] = VSList(" ", target.type.get_link_options(cfg))
         libs = target.type.get_ldlibs(cfg)
         if libs:
-            n["AdditionalDependencies"] = VSList(" ", ("%s.lib" % x.as_py() for x in libs))
+            n["AdditionalDependencies"] = VSList(" ", ("%s.lib" % x.as_py() for x in libs if x))
 
         n["AdditionalLibraryDirectories"] = target.type.get_libdirs(cfg)
 

@@ -231,7 +231,7 @@ class VS201xToolsetBase(VSToolsetBase):
                     n_link.add("AdditionalOptions", ldflags)
                 libs = target.type.get_ldlibs(cfg)
                 if libs:
-                    addlibs = VSList(";", ("%s.lib" % x.as_py() for x in libs))
+                    addlibs = VSList(";", ("%s.lib" % x.as_py() for x in libs if x))
                     addlibs.append("%(AdditionalDependencies)")
                     if is_library(target):
                         n_lib = Node("Lib")
