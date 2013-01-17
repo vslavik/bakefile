@@ -33,6 +33,7 @@ import bkl.expr
 
 # FIXME: shouldn't be needed later
 from bkl.expr import ListExpr, LiteralExpr
+from bkl.error import Error
 
 # GCC flags for supported architectures:
 OSX_ARCH_FLAGS = {
@@ -242,6 +243,24 @@ class GnuMakefileFormatter(MakefileFormatter):
     @staticmethod
     def submake_command(directory, filename, target):
         return "$(MAKE) -C %s -f %s %s" % (directory, filename, target)
+
+    @staticmethod
+    def multifile_target(outfiles, deps, commands):
+        # Use a helper intermediate target to handle multiple outputs of a rule,
+        # because we can't easily use GNU Make's pattern rules matching. The
+        # absence of an intermediate file is not a problem and does not cause
+        # spurious builds. See for details:
+        #   http://www.gnu.org/software/make/manual/html_node/Chained-Rules.html
+        #   http://stackoverflow.com/a/10609434/237188
+        for c in commands:
+            if '$@' in c:
+                raise Error("The use of $@ or %%(out) not supported with multiple outputs (in \"%s\")" % c)
+        inter_name = ".dummy_" + "_".join(outfiles).replace("/", "_")
+        return "\n".join([
+            "%s: %s" % (" ".join(outfiles), inter_name),
+            ".INTERMEDIATE: %s" % inter_name,
+            GnuMakefileFormatter.target(inter_name, deps, commands)
+            ])
 
 
 class GnuToolset(MakefileToolset):
