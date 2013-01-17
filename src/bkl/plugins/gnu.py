@@ -193,7 +193,7 @@ class GnuSharedLibLinker(GnuLinker):
     def commands(self, toolset, target, input, output):
         cmd = [LiteralExpr("$(CXX) -shared -o $@")]
         if toolset.use_sonames:
-            cmd.append(LiteralExpr("-Wl,-soname,$@"))
+            cmd.append(LiteralExpr("-Wl,-soname,$(notdir $@)"))
         cmd.append(LiteralExpr("$(LDFLAGS)"))
         cmd.append(input)
         # FIXME: use a parser instead of constructing the expression manually
