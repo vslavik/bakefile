@@ -185,7 +185,8 @@ class MakefileToolset(Toolset):
 
     def get_builddir_for(self, target):
         # FIXME: use configurable build dir
-        return expr.PathExpr([], expr.ANCHOR_SRCDIR)
+        makefile = target.parent["%s.makefile" % self.name]
+        return makefile.get_directory_path()
 
     def generate(self, project):
         # We need to know build graphs of all targets so that we can generate
@@ -277,7 +278,7 @@ class MakefileToolset(Toolset):
         for sub in module.submodules:
             subpath = sub.get_variable_value("%s.makefile" % self.name)
             # FIXME: use $dirname(), $basename() functions, this is hacky
-            subdir = expr.PathExpr(subpath.components[:-1], anchor=subpath.anchor, anchor_file=subpath.anchor_file)
+            subdir = subpath.get_directory_path()
             subfile = subpath.components[-1]
             submakefiles[sub] = (sub.name,
                                  expr_fmt.format(subdir),

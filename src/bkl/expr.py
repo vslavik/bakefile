@@ -515,6 +515,12 @@ class PathExpr(Expr):
         comp = (e.as_py() for e in self.components)
         return os.path.join(top_srcdir, os.path.sep.join(comp))
 
+    def get_directory_path(self):
+        """
+        Returns PathExpr with the directory component.
+        """
+        return PathExpr(self.components[:-1], anchor=self.anchor, anchor_file=self.anchor_file)
+
     def get_basename(self):
         """
         Returns basename of the filename path (i.e. the name without directory
