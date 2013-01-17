@@ -289,6 +289,21 @@ class MakefileToolset(Toolset):
 
         for t in module.targets.itervalues():
             with error_context(t):
+                # collect target's dependencies
+                target_deps = []
+                for dep in t["deps"]:
+                    tdep = module.project.get_target(dep.as_py())
+                    tdepstr = _format_dep(tdep)
+                    target_deps.append(tdepstr)
+                    if tdep.parent is not module:
+                        # link external dependencies with submodules to build them
+                        tmod = tdep.parent
+                        while tmod.parent is not None and tmod.parent is not module:
+                            tmod = tmod.parent
+                        if tmod in module.submodules:
+                            targets_from_submodules[tdepstr] = tmod
+
+                # generate code for the target's build graph:
                 graph = build_graphs[t]
                 for node in graph.all_nodes():
                     with error_context(node):
@@ -299,17 +314,8 @@ class MakefileToolset(Toolset):
                             out = node.outputs
 
                         deps = [expr_fmt.format(i) for i in node.inputs]
-                        for dep in t["deps"]:
-                            tdep = module.project.get_target(dep.as_py())
-                            tdepstr = _format_dep(tdep)
-                            deps.append(tdepstr)
-                            if tdep.parent is not module:
-                                # link external dependencies with submodules to build them
-                                tmod = tdep.parent
-                                while tmod.parent is not None and tmod.parent is not module:
-                                    tmod = tmod.parent
-                                if tmod in module.submodules:
-                                    targets_from_submodules[tdepstr] = tmod
+                        if node is graph.main:
+                            deps += target_deps
 
                         out_fmt = [expr_fmt.format(x) for x in out]
                         commands_fmt = [expr_fmt.format(c) for c in node.commands]
