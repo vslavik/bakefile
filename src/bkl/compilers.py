@@ -27,7 +27,7 @@ Helpers for working with :class:`bkl.api.FileType` and
 :class:`bkl.api.FileCompiler` extensions.
 """
 
-from api import FileType, FileCompiler, BuildNode
+from api import FileType, FileCompiler, BuildNode, BuildSubgraph
 import model
 from error import Error, error_context
 import expr
@@ -190,10 +190,11 @@ def _make_build_nodes_for_generated_file(srcfile):
 def get_compilation_subgraph(toolset, target, ft_to, outfile):
     """
     Given list of source files (as :class:`bkl.expr.ListExpr`), produces build
-    graph with appropriate :class:`bkl.api.BuildNode` nodes.
+    subgraph (:class:`bkl.api.BuildSubgraph`) with appropriate
+    :class:`bkl.api.BuildNode` nodes.
 
     :param toolset: The toolset used (as :class:`bkl.api.Toolset`).
-    :param target: The target object for which the invocation is done.
+    :param target:  The target object for which the invocation is done.
     :param ft_to:   Type of the output file to compile to.
     :param outfile: Name of the output file (as :class:`bkl.expr.PathExpr`).
     """
@@ -228,4 +229,4 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
                           outputs=[outfile],
                           source_pos=target.source_pos)
 
-    return [link_node] + allnodes
+    return BuildSubgraph(link_node, allnodes)

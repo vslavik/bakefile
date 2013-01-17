@@ -401,7 +401,7 @@ class BuildNode(object):
     exist or b) any of the inputs was modified since the last time the outputs
     were modified.
 
-    .. seealso:: :meth:`bkl.api.TargetType.get_build_subgraph`
+    .. seealso:: :meth:`bkl.api.TargetType.get_build_subgraph`, :class:`bkl.api.BuildSubgraph`
 
     .. attribute:: name
 
@@ -439,6 +439,30 @@ class BuildNode(object):
         self.source_pos = source_pos
         assert name or outputs, \
                "phony target must have a name, non-phony must have outputs"
+
+
+class BuildSubgraph(object):
+    """
+    BuildSubgraph is a collection of :class:`bkl.api.BuildNode` nodes.
+
+    .. attribute:: main
+
+       Primary build node of a target (e.g. its executable file).
+
+    .. attribute:: secondary
+
+       A list of any secondary nodes needed to build the main nodes (e.g.
+       object files for target's source files). May be empty.
+    """
+    def __init__(self, main, secondary=[]):
+        self.main = main
+        self.secondary = secondary
+
+    def all_nodes(self):
+        """Yield all nodes included in the subgraph."""
+        yield self.main
+        for n in self.secondary:
+            yield n
 
 
 class FileRecognizer(object):
@@ -559,13 +583,14 @@ class TargetType(Extension):
     @abstractmethod
     def get_build_subgraph(self, toolset, target):
         """
-        Returns list of :class:`bkl.api.BuildNode` objects with description
+        Returns a :class:`bkl.api.BuildSubgraph` object with description
         of this target's local part of build graph -- that is, its part needed
         to produce output files associated with this target.
 
-        Usually, exactly one BuildNode will be returned, but it's possible to
-        have TargetTypes that correspond to more than one makefile target
-        (e.g. libtool-style libraries or gettext catalogs).
+        Usually, a BuildSubgraph with just one main BuildNode will be
+        returned, but it's possible to have TargetTypes that correspond to more
+        than one makefile target (e.g. libtool-style libraries or gettext
+        catalogs).
 
         :param toolset: The toolset used (:class:`bkl.api.Toolset`).
         :param target:  Target instance (:class:`bkl.model.Target`).

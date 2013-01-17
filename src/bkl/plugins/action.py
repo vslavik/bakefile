@@ -26,7 +26,7 @@
 Target for running arbitrary scripts.
 """
 
-from bkl.api import TargetType, Property, BuildNode
+from bkl.api import TargetType, Property, BuildNode, BuildSubgraph
 from bkl.vartypes import *
 from bkl.expr import add_prefix
 
@@ -70,4 +70,4 @@ class ActionTargetType(TargetType):
         cmds_var = target["commands"]
         cmds = add_prefix("@", cmds_var)
         node = BuildNode(commands=list(cmds), name=target["id"], source_pos=cmds_var.pos)
-        return [node]
+        return BuildSubgraph(node)

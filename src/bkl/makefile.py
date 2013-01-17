@@ -200,8 +200,7 @@ class MakefileToolset(Toolset):
             with error_context(t):
                 norm.set_context(t)
                 graph = t.type.get_build_subgraph(self, t)
-                assert len(graph) > 0, "Build graph for %s is empty" % t
-                for node in graph:
+                for node in graph.all_nodes():
                     node.inputs = [norm.visit(e) for e in node.inputs]
                     node.outputs = [norm.visit(e) for e in node.outputs]
                     node.commands = [norm.visit(e) for e in node.commands]
@@ -252,8 +251,7 @@ class MakefileToolset(Toolset):
 
         #FIXME: make this part of the formatter for (future) IdRefExpr
         def _format_dep(t):
-            # FIXME: instead of using the first node, use some main_node
-            g = build_graphs[t][0]
+            g = build_graphs[t].main
             if g.name:
                 if t.parent is not module:
                     raise Error("cross-module dependencies on phony targets (\"%s\") not supported yet" % t.name) # TODO
@@ -292,7 +290,7 @@ class MakefileToolset(Toolset):
         for t in module.targets.itervalues():
             with error_context(t):
                 graph = build_graphs[t]
-                for node in graph:
+                for node in graph.all_nodes():
                     with error_context(node):
                         if node.name:
                             out = [node.name]
@@ -349,7 +347,7 @@ class MakefileToolset(Toolset):
         for e in self.autoclean_extensions:
             yield "%s *.%s" % (self.del_command, e)
         for g in graphs:
-            for node in g:
+            for node in g.all_nodes():
                 for f in node.outputs:
                     if f.get_extension() not in self.autoclean_extensions:
                         yield "%s %s" % (self.del_command, expr_fmt.format(f))
