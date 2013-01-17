@@ -28,6 +28,7 @@ Toolsets for Visual Studio 2003, 2005 and 2008.
 
 from bkl.plugins.vsbase import *
 from bkl.expr import concat, format_string
+from bkl.compilers import disambiguate_intermediate_file_names
 
 # Misc constants for obscure numbers in the output format:
 typeApplication         = 1
@@ -424,8 +425,8 @@ class VS200xToolsetBase(VSToolsetBase):
                 idl_files.append(sfile)
             else:
                 cl_files.append(sfile)
-        cl_files_map = self.disambiguate_intermediate_file_names(cl_files)
-        rc_files_map = self.disambiguate_intermediate_file_names(rc_files)
+        cl_files_map = disambiguate_intermediate_file_names(cl_files)
+        rc_files_map = disambiguate_intermediate_file_names(rc_files)
 
         for sfile in target.sources:
             if sfile["compile-commands"]:

@@ -33,6 +33,10 @@ from error import Error, error_context
 import expr
 from expr import format_string
 
+from itertools import izip_longest
+from collections import defaultdict
+
+
 #: Native executable file type
 class NativeProgramFileType(FileType):
     name = "program"
@@ -138,14 +142,18 @@ def get_file_types_compilable_into(toolset, ft):
             yield ft_from
 
 
-def _make_build_nodes_for_file(toolset, target, srcfile, ft_to):
+def _make_build_nodes_for_file(toolset, target, srcfile, ft_to, files_map):
     src = srcfile.filename
     assert isinstance(src, expr.PathExpr)
 
     ext = src.get_extension()
     # FIXME: don't use target_basename.o form for object files, use just the basename,
-    #        unless there's a conflict
-    objname = expr.PathExpr([expr.LiteralExpr("%s_%s" % (target.name, src.get_basename()))],
+    #        unless there's a conflict between two targets
+    if srcfile in files_map:
+        objbase = files_map[srcfile]
+    else:
+        objbase = src.get_basename()
+    objname = expr.PathExpr([expr.LiteralExpr("%s_%s" % (target.name, objbase))],
                             expr.ANCHOR_BUILDDIR,
                             pos=src.pos).change_extension(ft_to.extensions[0])
 
@@ -156,7 +164,7 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to):
         # this is flex/bison parser generator.
         for ft_source in get_file_types_compilable_into(toolset, ft_to):
             if get_compiler(toolset, ft_from, ft_source) is not None:
-                compilables, allnodes = _make_build_nodes_for_file(toolset, target, srcfile, ft_source)
+                compilables, allnodes = _make_build_nodes_for_file(toolset, target, srcfile, ft_source, files_map)
                 objects = []
                 for o in compilables:
                     for outf in o.outputs:
@@ -164,7 +172,8 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to):
                                             toolset,
                                             target,
                                             model.SourceFile(target, outf, None),
-                                            ft_to)
+                                            ft_to,
+                                            files_map)
                         objects += objn
                         allnodes += alln
                 return (objects, allnodes)
@@ -204,6 +213,7 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
 
     objects = []
     allnodes = []
+    files_map = disambiguate_intermediate_file_names(target.sources)
 
     for srcfile in target.sources:
         with error_context(srcfile):
@@ -211,7 +221,7 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
                 allnodes += _make_build_nodes_for_generated_file(srcfile)
             else:
                 # FIXME: toolset.object_type shouldn't be needed
-                obj, all = _make_build_nodes_for_file(toolset, target, srcfile, toolset.object_type)
+                obj, all = _make_build_nodes_for_file(toolset, target, srcfile, toolset.object_type, files_map)
                 objects += obj
                 allnodes += all
     for srcfile in target.headers:
@@ -230,3 +240,46 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
                           source_pos=target.source_pos)
 
     return BuildSubgraph(link_node, allnodes)
+
+
+
+def disambiguate_intermediate_file_names(files):
+    """
+    Given a list of SourceFile objects, finds files that would have
+    conflicting object file names (e.g. foo/x.cpp and bar/x.cpp would use
+    the same x.obj filename).
+
+    Returns dictionary with SourceFile objects as keys and unambiguous
+    basenames (e.g. 'x_foo' and 'x_bar' for the above example). Only files
+    with conflicts are included in the dictionary (consequently, it will be
+    empty or near-empty most of the time).
+    """
+    d = defaultdict(list)
+    for f in files:
+        d[f.filename.get_basename()].append(f)
+    mapping = {}
+    for base, files in d.iteritems():
+        if len(files) > 1:
+            # remove longest common prefix, use the rest for the object name:
+            #
+            # for example, for 'src/foo/a/x.cpp' and 'src/bar/b/x.cpp':
+            #   components = [('src','src'), ('foo','bar'), ('a','b')]
+            #   difference = [('foo','bar'), ('a','b')]
+            #   results = [(fileobj1,'foo','a'), (fileobj2,'bar','b')]
+            #   mapping = {
+            #     fileobj1 : 'x_fooa',
+            #     fileobj2 : 'x_barb',
+            #     ...
+            #   }
+            difference = []
+            for c in izip_longest(*(x.filename.components[:-1] for x in files)):
+                all_same = all(x == c[0] for x in c)
+                if not all_same:
+                    difference.append(c)
+            results = zip(files, *difference)
+            for x in results:
+                f = x[0]
+                path = ([f.filename.get_basename(), "_"] +
+                       list(c for c in x[1:] if c is not None))
+                mapping[f] = expr.concat(*path)
+    return mapping

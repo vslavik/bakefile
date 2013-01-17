@@ -255,7 +255,7 @@ class VS201xToolsetBase(VSToolsetBase):
         # Source files:
         items = Node("ItemGroup")
         root.add(items)
-        cl_files_map = self.disambiguate_intermediate_file_names(cl_files)
+        cl_files_map = bkl.compilers.disambiguate_intermediate_file_names(cl_files)
         for sfile in cl_files:
             if sfile["compile-commands"]:
                 self._add_custom_build_file(items, sfile)
@@ -301,7 +301,7 @@ class VS201xToolsetBase(VSToolsetBase):
         if rc_files:
             items = Node("ItemGroup")
             root.add(items)
-            rc_files_map = self.disambiguate_intermediate_file_names(rc_files)
+            rc_files_map = bkl.compilers.disambiguate_intermediate_file_names(rc_files)
             for sfile in rc_files:
                 n_rc_compile = Node("ResourceCompile", Include=sfile.filename)
                 # Handle files with custom object name:
