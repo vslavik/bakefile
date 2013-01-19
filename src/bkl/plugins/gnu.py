@@ -118,6 +118,8 @@ class GnuCCompiler(GnuFileCompiler):
             cmd += [LiteralExpr(GCC_DEPS_FLAGS)]
         # FIXME: evaluating the flags here every time is inefficient
         cmd += self._arch_flags(toolset, target)
+        if toolset.needs_pic_flag and target["pic"]:
+            cmd.append(LiteralExpr("-fPIC"))
         cmd += bkl.expr.add_prefix("-D", target["defines"])
         cmd += bkl.expr.add_prefix("-I", target["includedirs"])
         cmd += target["compiler-options"]
@@ -295,6 +297,7 @@ class GnuToolset(MakefileToolset):
     loadable_module_link_flag = "-shared"
 
     use_sonames = True
+    needs_pic_flag = True
 
     def on_header(self, file, module):
         file.write("""
@@ -347,6 +350,7 @@ class OSXGnuToolset(GnuToolset):
     loadable_module_link_flag = "-bundle"
 
     use_sonames = False
+    needs_pic_flag = False
 
     def on_footer(self, file, module):
         for t in module.targets.itervalues():

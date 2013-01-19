@@ -180,7 +180,20 @@ class NativeCompiledType(TargetType):
                      can be overwritten to for example put all executables into
                      ``bin/`` subdirectory.
                      """),
+            Property("pic",
+                 type=BoolType(),
+                 default=lambda target: target.type.use_pic_by_default,
+                 inheritable=True,
+                 doc="""
+                     Compile position-independent code.
+
+                     By default, libraries (both shared and static, because the
+                     latter could be linked into a shared lib too) are linked
+                     with -fPIC and executables are not.
+                     """),
         ]
+
+    use_pic_by_default = True
 
     def target_file(self, toolset, target):
         """
@@ -349,6 +362,8 @@ class ProgramType(NativeLinkedType):
                      ``windows`` for console-less applications.
                      """),
         ]
+
+    use_pic_by_default = False
 
     def get_build_subgraph(self, toolset, target):
         return get_compilation_subgraph(
