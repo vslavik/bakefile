@@ -1145,6 +1145,7 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
     def __init__(self):
         Visitor.__init__(self)
         CondTrackingMixin.__init__(self)
+        self.inside_a_value = 0
 
     def null(self, e):
         return []
@@ -1177,13 +1178,6 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
             self.pop_cond()
         return yes + no
 
-    def list(self, e):
-        # for lists, simply return the items, see enum_possible_values() docstring:
-        items = []
-        for x in e.items:
-            items += self.visit(x)
-        return items
-
     def _get_cond_for_list(self, lst):
             conds = set(c for c,e in lst if c is not None)
             if conds:
@@ -1199,22 +1193,48 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
                 return None
 
     def concat(self, e):
-        items = [self.visit(x) for x in e.items]
-        items = [x for x in items if x] # filter out nulls
-        out = []
-        for result in itertools.product(*items):
-            cond = self._get_cond_for_list(result)
-            out.append((cond, ConcatExpr([x for c,x in result], pos=e.pos)))
-        return out
+        try:
+            self.inside_a_value += 1
+            items = [self.visit(x) for x in e.items]
+            items = [x for x in items if x] # filter out nulls
+            out = []
+            for result in itertools.product(*items):
+                cond = self._get_cond_for_list(result)
+                out.append((cond, ConcatExpr([x for c,x in result], pos=e.pos)))
+            return out
+        finally:
+            self.inside_a_value -= 1
 
     def path(self, e):
-        components = [self.visit(x) for x in e.components]
-        components = [x for x in components if x] # filter out nulls
-        out = []
-        for result in itertools.product(*components):
-            cond = self._get_cond_for_list(result)
-            out.append((cond, PathExpr([x for c,x in result], anchor=e.anchor, anchor_file=e.anchor_file, pos=e.pos)))
-        return out
+        try:
+            self.inside_a_value += 1
+            components = [self.visit(x) for x in e.components]
+            components = [x for x in components if x] # filter out nulls
+            out = []
+            for result in itertools.product(*components):
+                cond = self._get_cond_for_list(result)
+                out.append((cond, PathExpr([x for c,x in result], anchor=e.anchor, anchor_file=e.anchor_file, pos=e.pos)))
+            return out
+        finally:
+            self.inside_a_value -= 1
+
+    def list(self, e):
+        # for lists, simply return the items, see enum_possible_values() docstring,
+        # but not when they are used in some sort of a literal (e.g. inside a command
+        # string, i.e. within ConcatExpr):
+        if self.inside_a_value:
+            items = [self.visit(x) for x in e.items]
+            items = [x for x in items if x] # filter out nulls
+            out = []
+            for result in itertools.product(*items):
+                cond = self._get_cond_for_list(result)
+                out.append((cond, ListExpr([x for c,x in result], pos=e.pos)))
+            return out
+        else:
+            items = []
+            for x in e.items:
+                items += self.visit(x)
+            return items
 
 
 def enum_possible_values(e, global_cond=None):
