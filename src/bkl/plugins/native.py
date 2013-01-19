@@ -191,6 +191,20 @@ class NativeCompiledType(TargetType):
                      latter could be linked into a shared lib too) are linked
                      with -fPIC and executables are not.
                      """),
+            Property("multithreading",
+                 type=BoolType(),
+                 default=True,
+                 inheritable=True,
+                 doc="""
+                     Enable support for multithreading.
+
+                     MT support is enabled by default, but can be disabled when
+                     not needed.
+
+                     On Unix, this option causes the use of pthreads library.
+                     Visual Studio always uses MT-safe CRT, even if this
+                     setting is disabled.
+                     """),
         ]
 
     use_pic_by_default = True

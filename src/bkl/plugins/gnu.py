@@ -120,6 +120,8 @@ class GnuCCompiler(GnuFileCompiler):
         cmd += self._arch_flags(toolset, target)
         if toolset.needs_pic_flag and target["pic"]:
             cmd.append(LiteralExpr("-fPIC"))
+        if target["multithreading"]:
+            cmd.append(LiteralExpr("-pthread"))
         cmd += bkl.expr.add_prefix("-D", target["defines"])
         cmd += bkl.expr.add_prefix("-I", target["includedirs"])
         cmd += target["compiler-options"]
@@ -167,6 +169,8 @@ class GnuLinker(GnuFileCompiler):
 
     def _linker_flags(self, toolset, target):
         cmd = self._arch_flags(toolset, target)
+        if target["multithreading"]:
+            cmd.append(LiteralExpr("-pthread"))
         libdirs = target.type.get_libdirs(target)
         if libdirs:
             cmd += bkl.expr.add_prefix("-L", ListExpr(libdirs))
