@@ -31,7 +31,7 @@ from bkl.model import ConfigurationProxy
 from bkl.vartypes import *
 from bkl.compilers import *
 from bkl.expr import concat, PathExpr, LiteralExpr, NullExpr, ANCHOR_BUILDDIR
-from bkl.error import NonConstError
+from bkl.error import NonConstError, error_context
 from bkl.utils import memoized
 
 class NativeCompiledType(TargetType):
@@ -275,24 +275,41 @@ class NativeLinkedType(NativeCompiledType):
     @memoized
     def get_linkable_deps(self, target):
         """
-        Returns list of target objects that are (transitive) dependencies.
+        Returns iterator over target objects that are (transitive) dependencies.
+
+        The order is the order that should be used by Unix linkers.
         """
         found = []
-        self._find_linkable_deps(target, found)
-        return found
+        recursed = set()
+        self._find_linkable_deps(target, found, recursed)
+        # _find_linkable_deps() returns libs in reverse order, see below
+        return list(reversed(found))
 
-    def _find_linkable_deps(self, target, found):
-        project = target.project
-        deps = (project.get_target(x.as_py()) for x in target["deps"])
-        todo = (x for x in deps if
-                isinstance(x.type, LibraryType) or isinstance(x.type, SharedLibraryType))
-        for t in todo:
-            if t in found:
-                continue
-            found.append(t)
-            if isinstance(t.type, LibraryType):
-                self._find_linkable_deps(t, found)
-            #else: dependencies of shared libraries are not transitive
+    def _find_linkable_deps(self, target, found, recursed):
+        # Note: We must ensure that the dependencies are in the correct link
+        #       order for Unix linkers. I.e. all dependencies of a library must
+        #       be to the right side of it in the resulting list.
+        #
+        #       A simple way to accomplish this is to scan the dependencies
+        #       backwards (because the 'deps' property must be ordered
+        #       Unix-style) _and_ put the recursively found libraries in front
+        #       of the parent/dependent one. The result will be in inverse order,
+        #       but that's easily corrected by the caller.
+        with error_context(target):
+            if target in recursed:
+                raise Error("circular dependency between targets")
+            recursed.add(target)
+
+            project = target.project
+            deps = reversed([project.get_target(x.as_py()) for x in target["deps"]])
+            todo = (x for x in deps if
+                    isinstance(x.type, LibraryType) or isinstance(x.type, SharedLibraryType))
+            for t in todo:
+                if t in found:
+                    continue
+                if isinstance(t.type, LibraryType): # dependencies of shared libraries are not transitive
+                    self._find_linkable_deps(t, found, recursed)
+                found.append(t)
 
 
 
