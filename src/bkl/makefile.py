@@ -210,27 +210,6 @@ class MakefileToolset(Toolset):
             with error_context(m):
                 self._gen_makefile(build_graphs, m)
 
-    def _get_submodule_deps(self, main, submodule):
-        """
-        Return list of dependencies that 'submodule' has on other submodules of
-        'main'.  Submodules have dependency if a target from one depends on a
-        target from another.
-        """
-        mod_deps = set()
-        project = main.project
-        inspect = [submodule] + [p for p in project.modules if p.is_submodule_of(submodule)]
-        for mod in inspect:
-            for target in mod.targets.itervalues():
-                for dep in target["deps"]:
-                    tdep = project.get_target(dep.as_py())
-                    tmod = tdep.parent
-                    if tmod.is_submodule_of(main):
-                        while tmod.parent is not main:
-                            tmod = tmod.parent
-                        if tmod is not submodule:
-                            mod_deps.add(tmod.name)
-        return sorted(mod_deps)
-
     def _gen_makefile(self, build_graphs, module):
         output_value = module.get_variable_value("%s.makefile" % self.name)
         output = output_value.as_native_path_for_output(module)
@@ -262,6 +241,29 @@ class MakefileToolset(Toolset):
                 out = g.outputs[0]
             return expr_fmt.format(out)
 
+        def _get_submodule_deps(main, submodule):
+            """
+            Return list of dependencies that 'submodule' has on other submodules of
+            'main'.  Submodules have dependency if a target from one depends on a
+            target from another.
+            """
+            mod_deps = set()
+            project = main.project
+            inspect = [submodule] + [p for p in project.modules if p.is_submodule_of(submodule)]
+            for mod in inspect:
+                for target in mod.targets.itervalues():
+                    for dep in target["deps"]:
+                        tdep = project.get_target(dep.as_py())
+                        tmod = tdep.parent
+                        if tmod is main:
+                            mod_deps.add(_format_dep(tdep))
+                        elif tmod.is_submodule_of(main):
+                            while tmod.parent is not main:
+                                tmod = tmod.parent
+                            if tmod is not submodule:
+                                mod_deps.add(tmod.name)
+            return sorted(mod_deps)
+
         # Write the "all" target:
         all_targets = (
                       [_format_dep(t) for t in module.targets.itervalues()] +
@@ -281,7 +283,7 @@ class MakefileToolset(Toolset):
             submakefiles[sub] = (sub.name,
                                  expr_fmt.format(subdir),
                                  expr_fmt.format(subfile),
-                                 self._get_submodule_deps(module, sub))
+                                 _get_submodule_deps(module, sub))
         for subname, subdir, subfile, subdeps in submakefiles.itervalues():
             subcmd = self.Formatter.submake_command(subdir, subfile, "all")
             f.write(self.Formatter.target(name=subname, deps=subdeps, commands=[subcmd]))
