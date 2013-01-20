@@ -1178,7 +1178,7 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
             self.pop_cond()
         return yes + no
 
-    def _get_cond_for_list(self, lst):
+    def _get_cond_for_list_without_current(self, lst):
             conds = set(c for c,e in lst if c is not None)
             if conds:
                 if len(conds) > 1:
@@ -1191,6 +1191,17 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
                     return conds.pop()
             else:
                 return None
+
+    def _get_cond_for_list(self, lst):
+            c = self._get_cond_for_list_without_current(lst)
+            if c is None:
+                return self.active_if_cond
+            else:
+                try:
+                    self.push_cond(c)
+                    return self.active_if_cond
+                finally:
+                    self.pop_cond()
 
     def concat(self, e):
         try:
