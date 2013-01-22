@@ -35,6 +35,10 @@ def dump_project(project):
     is an instance of bakefile.model.Project.
     """
     out = ""
+    if project.variables:
+        out += "variables {\n"
+        out += _indent(_dump_vars(project))
+        out += "}\n"
     for mod in project.modules:
         out += dump_module(mod)
     return out.strip()
