@@ -58,6 +58,7 @@ tokens {
 
 scope StmtScope {
     insideTarget;
+    insideConfig;
 }
 
 
@@ -68,19 +69,28 @@ scope StmtScope {
 
 program
 scope StmtScope;
-@init { $StmtScope::insideTarget = False }
+@init {
+    $StmtScope::insideTarget = False
+    $StmtScope::insideConfig = False
+}
     : introductory_stmt* stmt* EOF -> ^(PROGRAM introductory_stmt* stmt*);
 
 stmt
-    : assignment_stmt
+    : stmt_always_allowed
     | {$StmtScope::insideTarget}?=> stmt_inside_target
-    | {not $StmtScope::insideTarget}?=> stmt_outside_target
-    | if_stmt
+    // {$StmtScope::insideConfig}?=> ...nothing extra here...
+    | {not $StmtScope::insideTarget and not $StmtScope::insideConfig}?=> stmt_global_scope
     | ';' -> // empty statement
     ;
 
+// statements allowed in any context
+stmt_always_allowed
+    : assignment_stmt
+    | if_stmt
+    ;
+
 // statements only allowed outside target definition:
-stmt_outside_target
+stmt_global_scope
     : target_stmt
     | submodule_stmt
     | import_stmt
@@ -147,7 +157,10 @@ requires_stmt
       { self.check_version($t) } -> // produce no AST
     ;
 
+
 configuration_stmt
+scope StmtScope;
+@init { $StmtScope::insideConfig = True }
     : 'configuration' name=literal base=configuration_base
       (configuration_content | ';')  -> ^(CONFIGURATION $name $base configuration_content?)
     ;
@@ -157,7 +170,7 @@ configuration_base
     | ':' literal  -> ^(BASE_LIST literal)
     ;
 
-configuration_content : '{' assignment_stmt* '}' -> assignment_stmt*;
+configuration_content : '{' stmt* '}' -> stmt*;
 
 
 // ---------------------------------------------------------------------------
