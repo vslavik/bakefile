@@ -194,7 +194,7 @@ class Builder(object, CondTrackingMixin):
             if append and previous_value is None:
                 raise ParserError('unknown variable "%s"' % varname)
             if previous_value:
-                var = Variable(varname, previous_value.value, previous_value.type)
+                var = Variable(varname, previous_value.value, previous_value.type, readonly=previous_value.readonly)
             else:
                 var = Variable(varname, value)
             context.add_variable(var)
