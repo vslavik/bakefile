@@ -1330,6 +1330,37 @@ def are_equal(a, b, _inside_cond=False):
         raise CannotDetermineError("cannot determine whether the following two expressions are equal: \"%s\" and \"%s\"; please report this as a bug." % (a,b))
 
 
+class _AddPrefixVisitor(RewritingVisitor):
+    def __init__(self, prefix):
+        super(_AddPrefixVisitor, self).__init__()
+        self.prefix = prefix
+
+    def _add(self, e):
+        return ConcatExpr([self.prefix, e], pos=e.pos)
+
+    placeholder = _add
+    literal = _add
+    path = _add
+    bool_value = _add
+
+    def null(self, e):
+        return e # don't add prefix to empty string
+
+    def reference(self, e):
+        return self.visit(e.get_value())
+
+    def if_(self, e):
+        yes = self.visit(e.value_yes)
+        no = self.visit(e.value_no)
+        return IfExpr(e.cond, yes, no, pos=e.pos)
+
+    def concat(self, e):
+        return ConcatExpr([self.prefix] + e.items, pos=e.pos)
+
+    def bool(self, e):
+        raise NotImplementedError
+
+
 def add_prefix(prefix, e):
     """
     Adds a *prefix* in front of the expression *e* or, if *e* is a list,
@@ -1345,12 +1376,10 @@ def add_prefix(prefix, e):
     if not isinstance(prefix, Expr):
         prefix = LiteralExpr(prefix)
 
-    if isinstance(e, NullExpr):
-        return e
-    elif isinstance(e, ListExpr):
+    if isinstance(e, ListExpr):
         return ListExpr([add_prefix(prefix, i) for i in e.items], pos=e.pos)
     else:
-        return ConcatExpr([prefix, e], pos=e.pos)
+        return _AddPrefixVisitor(prefix).visit(e)
 
 
 def concat(*parts):
