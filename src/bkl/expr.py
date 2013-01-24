@@ -208,7 +208,7 @@ class PlaceholderExpr(Expr):
         raise NonConstError(self)
 
     def __str__(self):
-        return "$(%s)" % self.var
+        return "${%s}" % self.var
 
 
 class ReferenceExpr(Expr):
