@@ -555,7 +555,7 @@ class PathExpr(Expr):
             else:
                 return ""
 
-        raise Error("cannot determine extension of \"%s\"" % self, self.pos)
+        raise CannotDetermineError("cannot determine extension of \"%s\"" % self, self.pos)
 
     def change_extension(self, newext):
         """
