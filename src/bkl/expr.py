@@ -1011,9 +1011,16 @@ class _SplitVisitor(Visitor):
                 # Join the two lists on concatenation boundary. E.g. splitting
                 # two concatenated strings "foo/bar" and "x/y" along "/" should
                 # result in ["foo", "barx", "y"].
-                out = ( out[:-1] +
-                        [ConcatExpr([out[-1], i_out[0]])] +
-                        i_out[1:] )
+                middle_1 = out[-1]
+                middle_2 = i_out[0]
+                middle = []
+                if not (isinstance(middle_1, LiteralExpr) and not middle_1):
+                    middle.append(middle_1)
+                if not (isinstance(middle_2, LiteralExpr) and not middle_2):
+                    middle.append(middle_2)
+                if len(middle) > 1:
+                    middle = [ConcatExpr(middle)]
+                out = out[:-1] + middle + i_out[1:]
             else:
                 out = i_out
         if any_change:
