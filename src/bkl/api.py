@@ -362,7 +362,7 @@ class Property(object):
             return None
         if isinstance(val, expr.Expr):
             return val
-        elif isinstance(val, types.StringType):
+        elif isinstance(val, types.StringType) or isinstance(val, types.UnicodeType):
             # parse strings as bkl language expressions, it's too useful to
             return self._parse_expr(val, for_obj)
         elif isinstance(val, list):
