@@ -592,6 +592,11 @@ class Module(ModelPart):
     def srcdir(self):
         return self.project.get_srcdir(self.source_file)
 
+    def srcdir_as_path(self):
+        p = os.path.relpath(self.srcdir, start=self.project.top_module.srcdir)
+        return expr.PathExpr([expr.LiteralExpr(x) for x in p.split(os.path.sep)],
+                             anchor=expr.ANCHOR_TOP_SRCDIR)
+
     @memoized_property
     def name(self):
         """Name of the module"""

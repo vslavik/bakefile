@@ -160,6 +160,12 @@ def std_module_props():
                  default=[],
                  inheritable=True,
                  doc="List of toolsets to generate makefiles/projects for."),
+        Property("_srcdir",
+             type=PathType(),
+             default=lambda x: x.srcdir_as_path(),
+             readonly=True,
+             inheritable=False,
+             doc="The value of @srcdir anchor for the module."),
         ]
 
 
