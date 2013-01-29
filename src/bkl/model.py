@@ -349,7 +349,7 @@ class ModelPart(object):
         while scope:
             p = scope.get_prop(name)
             if p is not None:
-                return p.default_expr(self)
+                return p.default_expr(scope)
             scope = scope.parent
         raise error.UndefinedError("unknown variable \"%s\"" % name)
 
