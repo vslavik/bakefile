@@ -2,9 +2,8 @@
 #
 
 # You can set these variables from the command line.
-PYTHONPATH   := $(PYTHONPATH):pygments
 SPHINXOPTS   :=
-SPHINXBUILD  := PYTHONPATH=$(PYTHONPATH) sphinx-build
+SPHINXBUILD  := sphinx-build
 
 # Internal variables.
 ALLSPHINXOPTS   = -d .doctrees $(SPHINXOPTS) .
@@ -13,7 +12,7 @@ GENERATED_TS = ref/timestamp
 GENERATED_DOCS_SOURCES := $(wildcard ../src/bkl/*.py) \
                           $(wildcard ../src/bkl/plugins/*.py)
 
-SPHINX_DOC_FILES := conf.py pygments/bkl_lexer.py $(wildcard *.rst)
+SPHINX_DOC_FILES := conf.py bkl_lexer.py $(wildcard *.rst)
 
 ALL_DOCS_INPUTS = $(GENERATED_TS) $(SPHINX_DOC_FILES)
 

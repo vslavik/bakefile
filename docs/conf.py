@@ -17,8 +17,10 @@ import sys, os
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 sys.path.append(os.path.abspath('../src'))
+sys.path.append(os.path.abspath('.'))
 
 import bkl.version
+
 
 # General configuration
 # ---------------------
@@ -76,7 +78,12 @@ add_function_parentheses = True
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+# pygments_style = 'sphinx'
+# highlight_language = 'bkl'
+
+from sphinx.highlighting import lexers
+from bkl_lexer import BakefileLexer
+lexers['bkl'] = BakefileLexer()
 
 
 # Options for HTML output
