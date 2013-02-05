@@ -1,0 +1,22 @@
+setting PROGRAM_NAME {
+  help = String that will be printed by the program
+  default = HelloWorld
+}
+variables {
+    PROGRAM_NAME = ${PROGRAM_NAME}
+}
+module {
+  variables {
+    toolsets = [gnu, vs2010]
+    default_hello = HelloWorld
+    PROGRAM_NAME = (($(toolset) == vs2010) ? HelloWorld : ${PROGRAM_NAME})
+  }
+  targets {
+    program hello {
+      defines = [(($(toolset) == vs2010) ? PROGRAM_NAME="HelloWorld" : null), (!($(toolset) == vs2010) ? PROGRAM_NAME="${PROGRAM_NAME}" : null), (($(PROGRAM_NAME) == HelloWorld) ? DEFAULT_NAME : null)]
+      sources {
+        file @top_srcdir/hello.cpp
+      }
+    }
+  }
+}

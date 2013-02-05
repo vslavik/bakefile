@@ -533,6 +533,64 @@ using this approach:
            defines += NDEBUG;
 
 
+
+Build settings
+--------------
+
+Sometimes, configurability provided by *configurations* is not enough and more
+flexible settings are required; e.g. configurable paths to 3rdparty libraries,
+tools and so on. Bakefile handles this with settings: variable-like constructs
+that are, unlike Bakefile variables, preserved in the generated output and can
+be modified by the user at make-time.
+
+Settings are part of the object model and as such have a name and additional
+properties that affect their behavior. Defining a setting is similar to
+defining a target:
+
+   .. code-block:: bkl
+
+       setting JDK_HOME {
+           help = "Path to the JDK";
+           default = /opt/jdk;
+       }
+
+Notice that the setting object has some properties. You will almost always want
+to set the two shown in the above example. *help* is used to explain the
+setting to the user and *default* provides the default value to use if the user
+of the makefile doesn't specify anything else; both are optional. See
+:ref:`ref_setting` for the full list.
+
+When you need to reference a setting, use the same syntax as when referencing
+variables:
+
+    .. code-block:: bkl
+
+       includedirs += $(JDK_HOME)/include;
+
+In fact, settings also act as variables defined at the highest (project) level.
+This means that they can be assigned to as well and some nice tricks are easily
+done:
+
+    .. code-block:: bkl
+
+       setting LIBFOO_PATH {
+           doc = "Path to the Foo library";
+           default = /opt/libfoo;
+       }
+
+       // On Windows, just use our own copy:
+       if ( $toolset == vs2010 )
+           LIBFOO_PATH = @top_srcdir/3rdparty/libfoo;
+
+This removes the user setting for toolsets that don't need it. Another handy
+use is to import some common code or use a submodule with configurable settings
+and just hard-code their values when you don't need the flexibility.
+
+.. note::
+
+   Settings are currently only supported by makefiles.
+
+
 Submodules
 ----------
 

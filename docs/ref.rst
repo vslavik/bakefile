@@ -6,5 +6,6 @@ Reference documentation
 
    ref/project
    ref/module
+   ref/setting
    ref_toolsets
    ref_targets

@@ -587,6 +587,18 @@ class PathExpr(Expr):
         comps = self.components[:-1] + [LiteralExpr(tail)]
         return PathExpr(comps, self.anchor, self.anchor_file, pos=self.pos)
 
+    def is_external_absolute(self):
+        """
+        Returns true if the path is to be treated as an absolute path provided
+        externally (i.e. via an user setting) when the makefile was invoked.
+
+        TODO: add a @absdir anchor instead?
+        """
+        if self.anchor == ANCHOR_BUILDDIR or not self.components:
+            return False
+        first = self.components[0]
+        return isinstance(first, PlaceholderExpr)
+
 
 class Visitor(object):
     """
@@ -904,6 +916,10 @@ class Formatter(Visitor):
 
     def path(self, e):
         pi = self.paths_info
+        if e.is_external_absolute():
+            # The path is absolute and begins with a reference, so we don't
+            # need to determine a "nice" relative path for it.
+            return pi.dirsep.join([self.format(i) for i in e.components])
         if e.anchor == ANCHOR_TOP_SRCDIR:
             base = pi.top_srcdir
             base_abs = pi.top_srcdir_abs

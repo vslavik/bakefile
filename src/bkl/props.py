@@ -29,7 +29,7 @@ Also define standard, always available, properties.
 """
 
 import expr, api, utils
-from vartypes import IdType, EnumType, ListType, PathType, StringType, BoolType
+from vartypes import IdType, EnumType, ListType, PathType, StringType, BoolType, TheAnyType
 from api import Property
 
 def _std_model_part_props():
@@ -195,6 +195,28 @@ def std_project_props():
         ]
 
 
+def std_setting_props():
+    """Creates list of all standard Setting properties."""
+    return _std_model_part_props() + [
+        Property("help",
+                 type=StringType(),
+                 default=expr.NullExpr(),
+                 inheritable=False,
+                 doc="""
+                     Documentation for the setting.
+                     This will be used in the generated output to explain the setting to
+                     the user, if supported by the toolset.
+                     """
+                 ),
+        Property("default",
+                 type=TheAnyType,
+                 default=expr.NullExpr(),
+                 inheritable=False,
+                 doc="Default value of the setting, if any."
+                 ),
+        ]
+
+
 class PropertiesDict(utils.OrderedDict):
     """
     Dictionary of properties, keyed by their names.
@@ -247,6 +269,7 @@ class PropertiesRegistry(object):
         self.all_files = None
         self.modules = None
         self.project = None
+        self.settings = None
         self.target_types = {}
 
     def get_project_prop(self, name):
@@ -288,6 +311,15 @@ class PropertiesRegistry(object):
             self._init_props()
         return self.all_files.get(name, None)
 
+    def get_setting_prop(self, name):
+        """
+        Returns property *name* of a Setting object if such property exists, or
+        :const:`None` otherwise.
+        """
+        if not self._initialized:
+            self._init_props()
+        return self.settings.get(name, None)
+
     def enum_project_props(self):
         if not self._initialized:
             self._init_props()
@@ -312,6 +344,12 @@ class PropertiesRegistry(object):
         if not self._initialized:
             self._init_props()
         for p in self.all_files.itervalues():
+            yield p
+
+    def enum_setting_props(self):
+        if not self._initialized:
+            self._init_props()
+        for p in self.settings.itervalues():
             yield p
 
     def _init_props(self):
@@ -358,6 +396,13 @@ class PropertiesRegistry(object):
         _propagate_inheritables(self.all_files, self.all_targets)
         _propagate_inheritables(self.all_files, self.modules)
 
+        # Settings:
+        self.settings = _fill_prop_dict(std_setting_props(), api.Property.SCOPE_SETTING)
+        for toolset in api.Toolset.all():
+            for p in toolset.all_properties("properties_setting"):
+                p._add_toolset(toolset.name)
+                self.settings.add(p)
+
         self._initialized = True
 
 
@@ -367,8 +412,10 @@ get_project_prop = registry.get_project_prop
 get_module_prop = registry.get_module_prop
 get_target_prop = registry.get_target_prop
 get_file_prop = registry.get_file_prop
+get_setting_prop = registry.get_setting_prop
 
 enum_project_props = registry.enum_project_props
 enum_module_props = registry.enum_module_props
 enum_target_props = registry.enum_target_props
 enum_file_props = registry.enum_file_props
+enum_setting_props = registry.enum_setting_props

@@ -24,7 +24,7 @@
 
 from ..api import TargetType
 from ..expr import *
-from ..model import Module, Target, Variable, SourceFile, Template
+from ..model import Module, Target, Variable, SourceFile, Template, Setting
 from ..parser.ast import *
 from ..parser import parse_file
 from ..error import ParserError, error_context, warning
@@ -356,6 +356,35 @@ class Builder(object, CondTrackingMixin):
             self.pop_cond()
 
 
+    def on_setting(self, node):
+        name = node.name
+        project = self.context.project
+
+        if name in project.settings:
+            previous = project.settings[name]
+            if previous.source_pos == node.pos:
+                # setting defined in an imported file, just ignore it
+                return
+            raise ParserError("setting \"%s\" already exists (see %s)" %
+                              (name, previous.source_pos))
+
+        setting = Setting(self.context, name, source_pos=node.pos)
+
+        # This is for a dummy variable created at project scope and referencing
+        # the setting. By doing this, it's easy to reference settings as ordinary
+        # variables.
+        var_value = PlaceholderExpr(name, pos=node.pos)
+
+        if self.active_if_cond is not None:
+            cond = self.active_if_cond
+            setting.set_property_value("_condition", cond)
+            var_value = IfExpr(cond, yes=var_value, no=NullExpr(), pos=node.pos)
+
+        project.add_variable(Variable(name, var_value))
+        # set any properties on the setting object:
+        self.handle_children(node.content, setting)
+
+
     def on_submodule(self, node):
         if self.active_if_cond is not None:
             raise ParserError("conditionally included submodules not supported yet"
@@ -418,6 +447,7 @@ class Builder(object, CondTrackingMixin):
         TargetNode         : on_target,
         TemplateNode       : on_template,
         ConfigurationNode  : on_configuration,
+        SettingNode        : on_setting,
         SubmoduleNode      : on_submodule,
         ImportNode         : on_import,
         SrcdirNode         : on_srcdir,

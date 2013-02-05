@@ -1,0 +1,21 @@
+toolsets = gnu vs2010;
+
+default_hello = HelloWorld;
+
+setting PROGRAM_NAME {
+    help = 'String that will be printed by the program';
+    default = $default_hello;
+}
+
+// Don't make PROGRAM_NAME configurable in VC project files:
+if ( $toolset == vs2010 )
+    PROGRAM_NAME = $default_hello;
+
+program hello {
+    defines += "PROGRAM_NAME=\"$(PROGRAM_NAME)\"";
+
+    if ( $PROGRAM_NAME == $default_hello )
+        defines += DEFAULT_NAME;
+
+    sources { hello.cpp }
+}

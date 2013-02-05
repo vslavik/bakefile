@@ -201,3 +201,5 @@ write_docs("project", "Global project properties",
            write_properties(registry.enum_project_props, bkl.api.Property.SCOPE_PROJECT))
 write_docs("module", "Module properties",
            write_properties(registry.enum_module_props, bkl.api.Property.SCOPE_MODULE))
+write_docs("setting", "Setting properties",
+           write_properties(registry.enum_setting_props, bkl.api.Property.SCOPE_SETTING))

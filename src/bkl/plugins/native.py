@@ -284,18 +284,24 @@ class NativeLinkedType(NativeCompiledType):
         # flags used to link shared libraries should be skipped:
         deps = [x for x in deps if isinstance(x.type, LibraryType)]
         out = []
+        out_bookkeeping = set()
         for t in [target] + deps:
             values = t[propname]
             if isinstance(target, ConfigurationProxy):
                 values = target.apply_subst(values)
             for x in values:
-                # TODO: use some ordered-set type and just merge them
+                # TODO: use some ordered-set type and just merge them; this
+                #       type would deal with duplicates identification with
+                #       are_equal or as_symbolic as well
+                x_sym = x.as_symbolic()
                 try:
-                    if x not in out:
+                    if x_sym not in out_bookkeeping and x not in out:
                         out.append(x)
+                        out_bookkeeping.add(x_sym)
                 except NonConstError:
                     # can't meaningfully check for duplicates -> just insert
                     out.append(x)
+                    out_bookkeeping.add(x_sym)
         return out
 
 

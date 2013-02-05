@@ -33,7 +33,7 @@ import os.path
 
 import io
 import expr
-from bkl.error import Error, error_context
+from bkl.error import Error, CannotDetermineError, error_context
 from bkl.api import Extension, Toolset, Property
 from bkl.vartypes import PathType
 from bkl.interpreter.passes import PathsNormalizer
@@ -62,7 +62,7 @@ class MakefileFormatter(Extension):
 
         :param text: text of the comment
         """
-        return "\n".join("# %s" % s for s in text.split("\n"))
+        return "%s\n" % "\n".join("# %s" % s for s in text.split("\n"))
 
     @staticmethod
     def var_reference(var):
@@ -87,7 +87,7 @@ class MakefileFormatter(Extension):
                       to be in make's syntax (e.g. using var_reference()) and
                       may be multi-line
         """
-        return "%s = %s" % (var, " \\\n\t".join(value.split("\n")))
+        return "%s = %s\n" % (var, " \\\n\t".join(value.split("\n")))
 
     @staticmethod
     def target(name, deps, commands):
@@ -140,9 +140,9 @@ class MakefileFormatter(Extension):
         raise NotImplementedError
 
 
-class _MakefileExprFormatter(expr.Formatter):
+class MakefileExprFormatter(expr.Formatter):
     def __init__(self, makefile_formatter, paths_info):
-        super(_MakefileExprFormatter, self).__init__(paths_info)
+        super(MakefileExprFormatter, self).__init__(paths_info)
         self.makefile_formatter = makefile_formatter
 
     def literal(self, e):
@@ -153,7 +153,10 @@ class _MakefileExprFormatter(expr.Formatter):
 
     # TODO: get rid of var_reference(), just require ExprFormatter implementation
     def placeholder(self, e):
-        return self.makefile_formatter.var_reference(e.var)
+        name = e.var
+        if name == "config":
+            raise Error("configurations not supported by makefiles yet ($(config) referenced)", pos=e.pos)
+        return self.makefile_formatter.var_reference(name)
 
 
 class MakefileToolset(Toolset):
@@ -162,6 +165,9 @@ class MakefileToolset(Toolset):
     """
     #: :class:`MakefileFormatter`-derived class for this toolset.
     Formatter = None
+
+    #: :class:`expr.Formatter`-derived class for this toolset.
+    ExprFormatter = MakefileExprFormatter
 
     #: Default filename from output makefile.
     default_makefile = None
@@ -218,13 +224,12 @@ class MakefileToolset(Toolset):
                 builddir=os.path.dirname(output), # FIXME: use configurable build dir
                 model=module)
 
-        expr_fmt = _MakefileExprFormatter(self.Formatter, paths_info)
+        expr_fmt = self.ExprFormatter(self.Formatter, paths_info)
 
         f = io.OutputFile(output, io.EOL_UNIX, creator=self, create_for=module)
         self.on_header(f, module)
 
-        for v in module.variables:
-            pass
+        self._gen_settings(module, expr_fmt, f)
 
         #FIXME: make this part of the formatter for (future) IdRefExpr
         def _format_dep(t):
@@ -349,16 +354,34 @@ class MakefileToolset(Toolset):
 
         f.commit()
 
+
+    def _gen_settings(self, module, expr_fmt, f):
+        # TODO: only include settings used in this module _or_ its submodules
+        #       (for recursive passing downwards)
+        if not module.project.settings:
+            return
+        f.write("\n%s\n" % self.Formatter.comment("------------\nConfigurable settings:\n"))
+        for setting in module.project.settings.itervalues():
+            if setting["help"]:
+                f.write(self.Formatter.comment(expr_fmt.format(setting["help"])))
+            f.write(self.Formatter.var_definition(setting.name, expr_fmt.format(setting["default"])))
+        f.write("\n%s\n" % self.Formatter.comment("------------"))
+
     def _get_clean_commands(self, expr_fmt, graphs, submakefiles):
         for e in self.autoclean_extensions:
             yield "%s *.%s" % (self.del_command, e)
         for g in graphs:
             for node in g.all_nodes():
                 for f in node.outputs:
-                    if f.get_extension() not in self.autoclean_extensions:
+                    try:
+                        if f.get_extension() not in self.autoclean_extensions:
+                            yield "%s %s" % (self.del_command, expr_fmt.format(f))
+                    except CannotDetermineError:
                         yield "%s %s" % (self.del_command, expr_fmt.format(f))
+
         for subname, subdir, subfile, subdeps in submakefiles:
             yield self.Formatter.submake_command(subdir, subfile, "clean")
+
 
     def on_header(self, file, module):
         """

@@ -259,6 +259,14 @@ def remove_disabled_model_parts(model, toolset):
     for module in mods_to_del:
         model.modules.remove(module)
 
+    # and remove unused settings too:
+    settings_to_del = []
+    for sname, setting in model.settings.iteritems():
+        if _should_remove(setting):
+            settings_to_del.append(sname)
+    for sname in settings_to_del:
+        logger.debug("removing setting %s", sname)
+        del model.settings[sname]
 
 
 class PathsNormalizer(RewritingVisitor):
@@ -330,7 +338,10 @@ class PathsNormalizer(RewritingVisitor):
             prefix = self._src_prefix(source_file)
             components = e.components
             if prefix is not None:
-                components = prefix + components
+                # Don't mess the path if it starts with user setting and so
+                # should be treated as absolute.
+                if not e.is_external_absolute():
+                    components = prefix + components
             e = bkl.expr.PathExpr(components,
                                   bkl.expr.ANCHOR_TOP_SRCDIR, None,
                                   pos=e.pos)

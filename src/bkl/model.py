@@ -471,6 +471,10 @@ class Project(ModelPart):
 
        All configurations defined in the project.
 
+    .. attribute: settings
+
+       List of all settings included in the project.
+
     .. attribute: templates
 
        Dictionary of all templates defined in the project.
@@ -482,6 +486,7 @@ class Project(ModelPart):
         super(Project, self).__init__(parent=None)
         self.modules = []
         self.configurations = utils.OrderedDict()
+        self.settings = utils.OrderedDict()
         self.templates = {}
         self._srcdir_map = {}
         self.add_configuration(Configuration("Debug",   base=None, is_debug=True))
@@ -491,7 +496,8 @@ class Project(ModelPart):
         return "the project"
 
     def child_parts(self):
-        return self.modules
+        for x in self.modules: yield x
+        for x in self.settings.itervalues(): yield x
 
     @property
     def top_module(self):
@@ -798,3 +804,26 @@ class SourceFile(ModelPart, ConfigurationsPropertyMixin):
     def enum_props(self):
         # TODO: need to pass file type to it
         return props.enum_file_props()
+
+
+
+class Setting(ModelPart):
+    """
+    User-settable make-time configuration value.
+    """
+    def __init__(self, parent, name, source_pos):
+        super(Setting, self).__init__(parent, source_pos)
+        self.name = name
+        self.project.settings[name] = self
+
+    def __str__(self):
+        return "setting %s" % self.name
+
+    def child_parts(self):
+        return []
+
+    def get_prop(self, name):
+        return props.get_setting_prop(name)
+
+    def enum_props(self):
+        return props.enum_setting_props()

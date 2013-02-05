@@ -35,6 +35,8 @@ def dump_project(project):
     is an instance of bakefile.model.Project.
     """
     out = ""
+    for s in project.settings.itervalues():
+        out += _dump_setting(s)
     if project.variables:
         out += "variables {\n"
         out += _indent(_dump_vars(project))
@@ -121,6 +123,7 @@ def _dump_source(source):
         out += " }"
     return out
 
+
 def _dump_target(target):
     out = "%s %s {\n" % (target.type.name, target.name)
     out += _dump_vars(target)
@@ -136,4 +139,11 @@ def _dump_target(target):
     if out_files:
         out += _indent(out_files)
     out += "}"
+    return out
+
+
+def _dump_setting(setting):
+    out = "setting %s {\n" % setting.name
+    out += _dump_vars(setting)
+    out += "}\n"
     return out

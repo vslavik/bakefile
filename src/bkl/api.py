@@ -286,9 +286,10 @@ class Property(object):
 
     # Scopes for properties
     SCOPE_PROJECT = "project"
-    SCOPE_MODULE = "module"
-    SCOPE_TARGET = "target"
-    SCOPE_FILE = "file"
+    SCOPE_MODULE  = "module"
+    SCOPE_TARGET  = "target"
+    SCOPE_FILE    = "file"
+    SCOPE_SETTING = "setting"
 
     def __init__(self, name, type, default=None, readonly=False,
                  inheritable=False, doc=None):

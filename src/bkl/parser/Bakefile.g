@@ -53,12 +53,13 @@ tokens {
     SRCDIR;
     CONFIGURATION;
     TEMPLATE;
+    SETTING;
     BASE_LIST;
 }
 
 scope StmtScope {
     insideTarget;
-    insideConfig;
+    insideConfigOrSetting;
 }
 
 
@@ -71,15 +72,15 @@ program
 scope StmtScope;
 @init {
     $StmtScope::insideTarget = False
-    $StmtScope::insideConfig = False
+    $StmtScope::insideConfigOrSetting = False
 }
     : introductory_stmt* stmt* EOF -> ^(PROGRAM introductory_stmt* stmt*);
 
 stmt
     : stmt_always_allowed
     | {$StmtScope::insideTarget}?=> stmt_inside_target
-    // {$StmtScope::insideConfig}?=> ...nothing extra here...
-    | {not $StmtScope::insideTarget and not $StmtScope::insideConfig}?=> stmt_global_scope
+    // {$StmtScope::insideConfigOrSetting}?=> ...nothing extra here...
+    | {not $StmtScope::insideTarget and not $StmtScope::insideConfigOrSetting}?=> stmt_global_scope
     | ';' -> // empty statement
     ;
 
@@ -96,6 +97,7 @@ stmt_global_scope
     | import_stmt
     | requires_stmt
     | configuration_stmt
+    | setting_stmt
     | template_stmt
     ;
 
@@ -160,7 +162,7 @@ requires_stmt
 
 configuration_stmt
 scope StmtScope;
-@init { $StmtScope::insideConfig = True }
+@init { $StmtScope::insideConfigOrSetting = True }
     : 'configuration' name=literal base=configuration_base
       (configuration_content | ';')  -> ^(CONFIGURATION $name $base configuration_content?)
     ;
@@ -171,6 +173,15 @@ configuration_base
     ;
 
 configuration_content : '{' stmt* '}' -> stmt*;
+
+
+setting_stmt
+scope StmtScope;
+@init { $StmtScope::insideConfigOrSetting = True }
+    : 'setting' identifier (setting_content | ';') -> ^(SETTING identifier setting_content?)
+    ;
+
+setting_content : '{' stmt* '}' -> stmt*;
 
 
 // ---------------------------------------------------------------------------

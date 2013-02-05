@@ -27,12 +27,12 @@ GNU tools (GCC, GNU Make, ...) toolset.
 """
 
 from bkl.api import FileCompiler, FileType
-from bkl.makefile import MakefileToolset, MakefileFormatter
+from bkl.makefile import MakefileToolset, MakefileFormatter, MakefileExprFormatter
 import bkl.compilers
 import bkl.expr
 
 # FIXME: shouldn't be needed later
-from bkl.expr import ListExpr, LiteralExpr
+from bkl.expr import ListExpr, LiteralExpr, BoolExpr, NonConstError
 from bkl.error import Error
 
 # GCC flags for supported architectures:
@@ -68,6 +68,14 @@ else
   cc_deps_flags =
   cc_deps_cmd   = $1 -M -MP -o $(patsubst %.o,%.d,$@) $2
 endif
+"""
+
+# GNU Make has some boolean functions, but not all that we need, so define them
+GMAKE_IFEXPR_MACROS = """
+_true  := true
+_false :=
+_not    = $(if $(1),$(_false),$(_true_))
+_equal  = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 """
 
 
@@ -247,6 +255,11 @@ class GnuMakefileFormatter(MakefileFormatter):
     Formatter for the GNU Make syntax.
     """
     @staticmethod
+    def var_definition(var, value):
+        # TODO: use = if it depends on any of the macros defined later
+        return "%s ?= %s\n" % (var, " \\\n\t".join(value.split("\n")))
+
+    @staticmethod
     def submake_command(directory, filename, target):
         return "$(MAKE) -C %s -f %s %s" % (directory, filename, target)
 
@@ -269,6 +282,39 @@ class GnuMakefileFormatter(MakefileFormatter):
             ])
 
 
+class GnuExprFormatter(MakefileExprFormatter):
+    def __init__(self, makefile_formatter, paths_info):
+        super(GnuExprFormatter, self).__init__(makefile_formatter, paths_info)
+
+    def bool_value(self, e):
+        return "$(_true)" if e.value else "$(_false)"
+
+    def bool(self, e):
+        l = self.format(e.left)
+        if e.right is not None:
+            r = self.format(e.right)
+        if e.operator == BoolExpr.AND:
+            return "$(and %s,%s)" % (l, r)
+        if e.operator == BoolExpr.OR:
+            return "$(or %s,%s)" % (l, r)
+        if e.operator == BoolExpr.EQUAL:
+            return "$(call _equal,%s,%s)" % (l, r)
+        if e.operator == BoolExpr.NOT_EQUAL:
+            return "$(call _not,$(call _equal,%s,%s))" % (l, r)
+        if e.operator == BoolExpr.NOT:
+            return "$(call _not,%s)" % l
+        assert False, "invalid operator"
+
+    def if_(self, e):
+        try:
+            return super(GnuExprFormatter, self).if_(e)
+        except NonConstError:
+            c = self.format(e.cond)
+            y = self.format(e.value_yes)
+            n = self.format(e.value_no)
+            return "$(if %s,%s,%s)" % (c, y, n)
+
+
 class GnuToolset(MakefileToolset):
     """
     GNU toolchain for Unix systems.
@@ -285,6 +331,7 @@ class GnuToolset(MakefileToolset):
     name = "gnu"
 
     Formatter = GnuMakefileFormatter
+    ExprFormatter = GnuExprFormatter
     default_makefile = "GNUmakefile"
 
     autoclean_extensions = ["o", "d"]
@@ -318,13 +365,27 @@ class GnuToolset(MakefileToolset):
 # to build with debug information. The full list of variables
 # that can be used by this makefile is:
 # AR, CC, CFLAGS, CPPFLAGS, CXX, CXXFLAGS, LD, LDFLAGS, MAKE, RANLIB.
+""")
 
+        if module.project.settings:
+            file.write("""#
+# Additionally, this makefile is customizable with the following
+# settings:
+#
+""")
+            alls = [(s.name, s["help"]) for s in module.project.settings.itervalues()]
+            width = max(len(x[0]) for x in alls)
+            fmtstr = "#      %%-%ds  %%s\n" % width
+            for name, doc in alls:
+                file.write(fmtstr % (name, doc if doc else ""))
 
+        file.write("""
 # Use \"make RANLIB=''\" for platforms without ranlib.
 RANLIB ?= ranlib
-
-
 """)
+        # TODO: only do this if non-const (depending on
+        #       Settings/PlaceholderExpr) IfExpr is present in the file
+        file.write(GMAKE_IFEXPR_MACROS)
 
     def on_phony_targets(self, file, targets):
         file.write(".PHONY: %s\n" % " ".join(targets))

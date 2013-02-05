@@ -285,6 +285,14 @@ class ConfigurationNode(Node):
                        doc="Other content: variables assignments and such")
 
 
+class SettingNode(Node):
+    """Definition of a user setting."""
+    name = property(lambda self: self.children[0].text,
+                    doc="Name of the setting")
+    content = property(lambda self: self.children[1:],
+                       doc="Properties assignments and such")
+
+
 class _TreeAdaptor(CommonTreeAdaptor):
     """Adaptor for ANTLR3 AST tree creation."""
     def __init__(self, filename):
@@ -318,6 +326,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
         BakefileParser.SRCDIR         : SrcdirNode,
         BakefileParser.BASE_LIST      : BaseListNode,
         BakefileParser.CONFIGURATION  : ConfigurationNode,
+        BakefileParser.SETTING        : SettingNode,
         BakefileParser.TEMPLATE       : TemplateNode,
     }
 
