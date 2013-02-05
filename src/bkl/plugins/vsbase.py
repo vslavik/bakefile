@@ -443,63 +443,6 @@ class VSSolutionBase(object):
             assert guid, "can't find GUID of project '%s'" % id
             return guid
 
-    def _get_matching_project_config(self, cfg, prj):
-        with error_context(prj):
-            if cfg in prj.configurations:
-                return cfg
-
-            # else: try to find a configuration closest to the given one, i.e.
-            # the one from which it inherits via the minimal number of
-            # intermediate configurations:
-            compatibles = []
-            for pc in prj.configurations:
-                degree = cfg.derived_from(pc)
-                if degree:
-                    compatibles.append((degree, pc))
-
-            if not compatibles:
-                # if we don't have any project configurations from which this
-                # one inherits, check if we have any which inherit from this
-                # one themselves as they should be a reasonably good fallback:
-                for pc in prj.configurations:
-                    degree = pc.derived_from(cfg)
-                    if degree:
-                        compatibles.append((degree, pc))
-
-            if compatibles:
-                if len(compatibles) > 1:
-                    compatibles.sort()
-                    # It can happen that we have 2 project configurations
-                    # inheriting from the solution configuration with the same
-                    # degree. In this case there we can't really make the
-                    # right choice automatically, so we must warn the user.
-                    degree = compatibles[0][0]
-                    if compatibles[1][0] == degree:
-                        good_ones = [x[1].name for x in compatibles if x[0] == degree]
-                        warning("project %s: no unambiguous choice of project configuration to use for the solution configuration \"%s\", equally good candidates are: \"%s\"",
-                                prj.projectfile,
-                                cfg.name,
-                                '", "'.join(good_ones))
-
-                degree, ret = compatibles[0]
-                logger.debug("%s: solution config \"%s\" -> project %s config \"%s\" (dg %d)",
-                             self.outf.filename, cfg.name, prj.projectfile, ret.name, degree)
-                return ret
-
-            # if all failed, just pick the first config, but at least try to match
-            # debug/release setting:
-            compatibles = [x for x in prj.configurations if x.is_debug == cfg.is_debug]
-            if compatibles:
-                ret = compatibles[0]
-                warning("project %s: using unrelated project configuration \"%s\" for solution configuration \"%s\"",
-                        prj.projectfile, ret.name, cfg.name)
-                return ret
-            else:
-                ret = prj.configurations[0]
-                warning("project %s: using incompatible project configuration \"%s\" for solution configuration \"%s\"",
-                        prj.projectfile, ret.name, cfg.name)
-                return ret
-
     def write_header(self, file):
         file.write("Microsoft Visual Studio Solution File, Format Version %s\n" % self.format_version)
         if self.human_version:
@@ -570,7 +513,7 @@ class VSSolutionBase(object):
         for prj in included_projects:
             guid = prj.guid
             for cfg in configurations:
-                cfgp = self._get_matching_project_config(cfg, prj)
+                cfgp = _get_matching_project_config(cfg, prj)
                 outf.write("\t\t{%s}.%s|Win32.ActiveCfg = %s|Win32\n" % (guid, cfg.name, cfgp.name))
                 outf.write("\t\t{%s}.%s|Win32.Build.0 = %s|Win32\n" % (guid, cfg.name, cfgp.name))
         outf.write("\tEndGlobalSection\n")
@@ -851,6 +794,67 @@ class VSToolsetBase(Toolset):
             builddir = self.get_builddir_for(target).as_native_path_for_output(target)
             d[builddir] += 1
         return d
+
+
+# Internal helper functions:
+
+@memoized
+def _get_matching_project_config(cfg, prj):
+    with error_context(prj):
+        if cfg in prj.configurations:
+            return cfg
+
+        # else: try to find a configuration closest to the given one, i.e.
+        # the one from which it inherits via the minimal number of
+        # intermediate configurations:
+        compatibles = []
+        for pc in prj.configurations:
+            degree = cfg.derived_from(pc)
+            if degree:
+                compatibles.append((degree, pc))
+
+        if not compatibles:
+            # if we don't have any project configurations from which this
+            # one inherits, check if we have any which inherit from this
+            # one themselves as they should be a reasonably good fallback:
+            for pc in prj.configurations:
+                degree = pc.derived_from(cfg)
+                if degree:
+                    compatibles.append((degree, pc))
+
+        if compatibles:
+            if len(compatibles) > 1:
+                compatibles.sort()
+                # It can happen that we have 2 project configurations
+                # inheriting from the solution configuration with the same
+                # degree. In this case there we can't really make the
+                # right choice automatically, so we must warn the user.
+                degree = compatibles[0][0]
+                if compatibles[1][0] == degree:
+                    good_ones = [x[1].name for x in compatibles if x[0] == degree]
+                    warning("project %s: no unambiguous choice of project configuration to use for the solution configuration \"%s\", equally good candidates are: \"%s\"",
+                            prj.projectfile,
+                            cfg.name,
+                            '", "'.join(good_ones))
+
+            degree, ret = compatibles[0]
+            logger.debug("solution config \"%s\" -> project %s config \"%s\" (dg %d)",
+                         cfg.name, prj.projectfile, ret.name, degree)
+            return ret
+
+        # if all failed, just pick the first config, but at least try to match
+        # debug/release setting:
+        compatibles = [x for x in prj.configurations if x.is_debug == cfg.is_debug]
+        if compatibles:
+            ret = compatibles[0]
+            warning("project %s: using unrelated project configuration \"%s\" for solution configuration \"%s\"",
+                    prj.projectfile, ret.name, cfg.name)
+            return ret
+        else:
+            ret = prj.configurations[0]
+            warning("project %s: using incompatible project configuration \"%s\" for solution configuration \"%s\"",
+                    prj.projectfile, ret.name, cfg.name)
+            return ret
 
 
 
