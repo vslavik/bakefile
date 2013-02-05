@@ -510,6 +510,28 @@ using this approach:
         }
     }
 
+.. note::
+
+   Configurations are not supported by all toolsets. Makefiles currently don't
+   implement them and if ``$(config)`` is used in such a way that it affects
+   makefiles, Bakefile will stop with an error. For example, tests for the
+   ``$(config)`` value should only be done in code that is specific to toolsets
+   that support them. This would cause an error when generating ``gnu`` output:
+
+   .. code-block:: bkl
+
+       toolsets = gnu vs2010;
+       if ( $config == Release )
+           defines += NDEBUG;
+
+   Making the test specific to Visual Studio is OK, though:
+
+   .. code-block:: bkl
+
+       toolsets = gnu vs2010;
+       if ( $toolset == vs2010 && $config == Release )
+           defines += NDEBUG;
+
 
 Submodules
 ----------
