@@ -146,7 +146,7 @@ class VSExprFormatter(bkl.expr.Formatter):
 
     configuration_ref = "$(Configuration)"
 
-    def reference(self, e):
+    def placeholder(self, e):
         if e.var == "config":
             return self.configuration_ref
         else:

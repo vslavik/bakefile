@@ -151,11 +151,9 @@ class _MakefileExprFormatter(expr.Formatter):
         else:
             return e.value
 
-    def reference(self, e):
-        # FIXME: don't do this for references to options or other stuff
-        #        that isn't meant to be expanded
-        return self.format(e.get_value())
-        #return self.makefile_formatter.var_reference(e.var)
+    # TODO: get rid of var_reference(), just require ExprFormatter implementation
+    def placeholder(self, e):
+        return self.makefile_formatter.var_reference(e.var)
 
 
 class MakefileToolset(Toolset):

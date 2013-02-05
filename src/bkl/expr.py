@@ -85,6 +85,12 @@ class Expr(object):
         """
         raise NotImplementedError
 
+    def as_symbolic(self):
+        """
+        Returns the value as a symbolic representation, see SymbolicFormatter.
+        """
+        return SymbolicFormatter().format(self)
+
     def __nonzero__(self):
         # Derived expression classes should override this to make testing for
         # non-empty values ("if expr:") work without the need to call as_py().
@@ -931,8 +937,46 @@ class Formatter(Visitor):
         # cannot be determined.
         return self.format(e.get_value())
 
+    def reference(self, e):
+        return self.format(e.get_value())
+
+
+class SymbolicFormatter(Formatter):
+    """
+    Formats into unambiguous symbolic representation of the expression.
+    """
+    def __init__(self):
+        super(SymbolicFormatter, self).__init__(None)
+
+    def null(self, e):
+        return "Null()"
+
+    def literal(self, e):
+        return "Literal(\"%s\")" % e.value
+
+    def concat(self, e):
+        return "Concat(%s)" % ",".join(self.format(x) for x in e.items)
+
+    def list(self, e):
+        return "List(%s)" % ",".join(self.format(x) for x in e.items)
+
+    def path(self, e):
+        return "Path(%s,%s)" % (e.anchor, ",".join(self.format(x) for x in e.components))
+
+    def bool_value(self, e):
+        return "True()" if e.value else "False()"
+
+    def bool(self, e):
+        if e.right is None:
+            return "Bool(%s%s)" % (e.operator, self.format(e.left))
+        else:
+            return "Bool(%s %s %s)" % (self.format(e.left), e.operator, self.format(e.right))
+
+    def if_(self, e):
+        return "If(%s,%s,%s)" % (self.format(e.cond), self.format(e.value_yes), self.format(e.value_no))
+
     def placeholder(self, e):
-        return self.reference(e)
+        return "Placeholder(%s)" % e.var
 
 
 class CondTrackingMixin:
@@ -1321,18 +1365,21 @@ def are_equal(a, b, _inside_cond=False):
     Throws the CannotDetermineError exception if it cannot reliably
     determine equality.
     """
+    a_is_expr = isinstance(a, Expr)
+    b_is_expr = isinstance(b, Expr)
     try:
         # FIXME: This is not good enough, the comparison should be done
         #        symbolically as much as possible.
         vis = _PrepForAsPyComparisonVisitor()
         if _inside_cond:
             vis.inside_cond += 1
-        if isinstance(a, Expr):
-            a = vis.visit(a).as_py()
-        if isinstance(b, Expr):
-            b = vis.visit(b).as_py()
-        return a == b
+        a2 = vis.visit(a).as_py() if a_is_expr else a
+        b2 = vis.visit(b).as_py() if b_is_expr else b
+        return a2 == b2
     except NonConstError:
+        if a_is_expr and b_is_expr and a.as_symbolic() == b.as_symbolic():
+            return True
+        # else: inconclusive
         # TODO: Try exploding with enum_possible_values()
         raise CannotDetermineError("cannot determine whether the following two expressions are equal: \"%s\" and \"%s\"; please report this as a bug." % (a,b))
 
