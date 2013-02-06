@@ -546,7 +546,8 @@ class Project(ModelPart):
         try:
             return self._srcdir_map[filename]
         except KeyError:
-            return os.path.dirname(filename)
+            p = os.path.dirname(filename)
+            return p if p else "."
 
     def set_srcdir(self, filename, srcdir):
         self._srcdir_map[filename] = srcdir
