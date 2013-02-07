@@ -258,6 +258,16 @@ def _propagate_inheritables(props, into):
         if p.inheritable:
             into.add(p, as_inherited=True)
 
+def _collect_properties_from_others(variable_name):
+    """
+    Yields properties from "external" source -- i.e. not defined on the model
+    part type (e.g. target type) itself, but in toolset.
+    """
+    for toolset in api.Toolset.all():
+        for p in toolset.all_properties(variable_name):
+            p._add_toolset(toolset.name)
+            yield p
+
 
 class PropertiesRegistry(object):
     """
@@ -357,51 +367,39 @@ class PropertiesRegistry(object):
 
         # Project:
         self.project = _fill_prop_dict(std_project_props(), api.Property.SCOPE_PROJECT)
-        for toolset in api.Toolset.all():
-            for p in toolset.all_properties("properties_project"):
-                p._add_toolset(toolset.name)
-                self.project.add(p)
+        for p in _collect_properties_from_others("properties_project"):
+            self.project.add(p)
 
         # Modules:
         self.modules = _fill_prop_dict(std_module_props(), api.Property.SCOPE_MODULE)
-        for toolset in api.Toolset.all():
-            for p in toolset.all_properties("properties_module"):
-                p._add_toolset(toolset.name)
-                self.modules.add(p)
+        for p in _collect_properties_from_others("properties_module"):
+            self.modules.add(p)
 
         # All targets:
         self.all_targets = _fill_prop_dict(std_target_props(), api.Property.SCOPE_TARGET)
-        for toolset in api.Toolset.all():
-            for p in toolset.all_properties("properties_target"):
-                p._add_toolset(toolset.name)
-                self.all_targets.add(p)
+        for p in _collect_properties_from_others("properties_target"):
+            self.all_targets.add(p)
         _propagate_inheritables(self.all_targets, self.modules)
 
         # Specific target types:
         for target_type in api.TargetType.all():
             props = _fill_prop_dict(target_type.all_properties(), target_type.name)
-            for toolset in api.Toolset.all():
-                for p in toolset.all_properties("properties_%s" % target_type):
-                    p._add_toolset(toolset.name)
-                    props.add(p)
+            for p in _collect_properties_from_others("properties_%s" % target_type):
+                props.add(p)
             self.target_types[target_type] = props
             _propagate_inheritables(props, self.modules)
 
         # File types:
         self.all_files = _fill_prop_dict(std_file_props(), api.Property.SCOPE_FILE)
-        for toolset in api.Toolset.all():
-            for p in toolset.all_properties("properties_file"):
-                p._add_toolset(toolset.name)
-                self.all_files.add(p)
+        for p in _collect_properties_from_others("properties_file"):
+            self.all_files.add(p)
         _propagate_inheritables(self.all_files, self.all_targets)
         _propagate_inheritables(self.all_files, self.modules)
 
         # Settings:
         self.settings = _fill_prop_dict(std_setting_props(), api.Property.SCOPE_SETTING)
-        for toolset in api.Toolset.all():
-            for p in toolset.all_properties("properties_setting"):
-                p._add_toolset(toolset.name)
-                self.settings.add(p)
+        for p in _collect_properties_from_others("properties_setting"):
+            self.settings.add(p)
 
         self._initialized = True
 
