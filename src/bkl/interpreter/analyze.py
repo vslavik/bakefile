@@ -88,40 +88,61 @@ def detect_self_references(model):
         visitor.check(var)
 
 
+class _UsedVariablesTracker(Visitor):
+    def __init__(self):
+        super(_UsedVariablesTracker, self).__init__()
+        self.used_vars = set()
+
+    literal = Visitor.noop
+    bool_value = Visitor.noop
+    null = Visitor.noop
+    concat = Visitor.visit_children
+    list = Visitor.visit_children
+    path = Visitor.visit_children
+    bool = Visitor.visit_children
+    if_ = Visitor.visit_children
+    placeholder = Visitor.noop
+
+    def reference(self, e):
+        var = e.get_variable()
+        if var is not None and not var.is_property:
+            self.used_vars.add(id(var))
+
+    def is_used(self, var):
+        """Returns if the variable is referenced somewhere."""
+        return id(var) in self.used_vars
+
+# Global list of all used variables
+usage_tracker = _UsedVariablesTracker()
+
+def mark_variables_as_used(expression):
+    """
+    Marks all variables referenced in the expression as used.
+
+    Should be manually called for expressions that don't end up in the created
+    model (e.g. expressions used inside sources {...}) to prevent spurious
+    unused variables warnings.
+    """
+    usage_tracker.visit(expression)
+
+
 def detect_unused_vars(model):
     """
     Warns about unused variables -- they may indicate typos.
     """
+    # First of all, iterate over all variables and mark their usage of other
+    # variables. Notice that it's possible that some code explicitly marked
+    # variables as used with mark_variables_as_used() before this step.
+    for var in model.all_variables():
+        usage_tracker.visit(var.value)
+
+    # Not emit warnings for unused variables.
     import re
     regex_vs_option = re.compile(r'vs[0-9]+\.option\.')
 
-    class VariablesChecker(Visitor):
-        def __init__(self):
-            super(VariablesChecker, self).__init__()
-            self.found = set()
-
-        literal = Visitor.noop
-        bool_value = Visitor.noop
-        null = Visitor.noop
-        concat = Visitor.visit_children
-        list = Visitor.visit_children
-        path = Visitor.visit_children
-        bool = Visitor.visit_children
-        if_ = Visitor.visit_children
-        placeholder = Visitor.noop
-
-        def reference(self, e):
-            var = e.get_variable()
-            if var is not None and not var.is_property:
-                self.found.add(id(var))
-
-    visitor = VariablesChecker()
     for var in model.all_variables():
-        visitor.visit(var.value)
-    used_vars = visitor.found
-    for var in model.all_variables():
-        if (id(var) not in used_vars and
-                not var.is_property and
+        if (not var.is_property and
+                not usage_tracker.is_used(var) and
                 # FIXME: Handle these cases properly. Have a properties group
                 #        declaration similar to Property, with type checking and
                 #        automated docs and all. Then test for it here as other

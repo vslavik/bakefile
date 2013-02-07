@@ -29,6 +29,7 @@ from ..parser.ast import *
 from ..parser import parse_file
 from ..error import ParserError, error_context, warning
 from ..vartypes import ListType, AnyType
+import analyze
 
 import os.path
 
@@ -232,6 +233,7 @@ class Builder(object, CondTrackingMixin):
             assert False, 'invalid files list kind "%s"' % node.kind
 
         files = self._build_expression(node.files)
+        analyze.mark_variables_as_used(files)
         for cond, f in enum_possible_values(files, global_cond=self.active_if_cond):
             obj = SourceFile(self.context, f, source_pos=f.pos)
             if cond is not None:
