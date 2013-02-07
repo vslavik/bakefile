@@ -463,19 +463,19 @@ class Project(ModelPart):
     Abstract model that completely describes state of loaded and processed
     Bakefile file(s) within the project.
 
-    .. attribute: modules
+    .. attribute:: modules
 
        List of all modules included in the project.
 
-    .. attribute: configurations
+    .. attribute:: configurations
 
        All configurations defined in the project.
 
-    .. attribute: settings
+    .. attribute:: settings
 
        List of all settings included in the project.
 
-    .. attribute: templates
+    .. attribute:: templates
 
        Dictionary of all templates defined in the project.
     """

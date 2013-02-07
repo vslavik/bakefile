@@ -53,12 +53,12 @@ class Interpreter(object):
     usage (see :meth:`process`) and other methods with finer granularity that
     allows you to inspect individual steps (most useful for the test suite).
 
-    .. attribute: model
+    .. attribute:: model
 
        Model of the project, as :class:`bkl.model.Project`. It's state always
        reflects current state of processing.
 
-    .. attribute: toolsets_to_use
+    .. attribute:: toolsets_to_use
 
        Set of toolsets to generate for. This list may contain only a subset of
        toolsets the bakefile is written for and may even contain toolsets not
