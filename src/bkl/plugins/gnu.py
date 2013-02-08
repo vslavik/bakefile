@@ -254,17 +254,14 @@ class GnuMakefileFormatter(MakefileFormatter):
     """
     Formatter for the GNU Make syntax.
     """
-    @staticmethod
-    def var_definition(var, value):
+    def var_definition(self, var, value):
         # TODO: use = if it depends on any of the macros defined later
         return "%s ?= %s\n" % (var, " \\\n\t".join(value.split("\n")))
 
-    @staticmethod
-    def submake_command(directory, filename, target):
+    def submake_command(self, directory, filename, target):
         return "$(MAKE) -C %s -f %s %s" % (directory, filename, target)
 
-    @staticmethod
-    def multifile_target(outfiles, deps, commands):
+    def multifile_target(self, outfiles, deps, commands):
         # Use a helper intermediate target to handle multiple outputs of a rule,
         # because we can't easily use GNU Make's pattern rules matching. The
         # absence of an intermediate file is not a problem and does not cause
@@ -278,7 +275,7 @@ class GnuMakefileFormatter(MakefileFormatter):
         return "\n".join([
             "%s: %s" % (" ".join(outfiles), inter_name),
             ".INTERMEDIATE: %s" % inter_name,
-            GnuMakefileFormatter.target(inter_name, deps, commands)
+            self.target(inter_name, deps, commands)
             ])
 
 

@@ -55,8 +55,7 @@ class MakefileFormatter(Extension):
     This base class implements methods that are common for most make variants;
     derived classes can override them and they must implement the rest.
     """
-    @staticmethod
-    def comment(text):
+    def comment(self, text):
         """
         Returns given (possibly multi-line) string formatted as a comment.
 
@@ -64,8 +63,7 @@ class MakefileFormatter(Extension):
         """
         return "%s\n" % "\n".join("# %s" % s for s in text.split("\n"))
 
-    @staticmethod
-    def var_definition(var, value):
+    def var_definition(self, var, value):
         """
         Returns string with definition of a variable value, typically
         `var = value`.
@@ -76,8 +74,7 @@ class MakefileFormatter(Extension):
         """
         return "%s = %s\n" % (var, " \\\n\t".join(value.split("\n")))
 
-    @staticmethod
-    def target(name, deps, commands):
+    def target(self, name, deps, commands):
         """
         Returns string with target definition.
 
@@ -103,8 +100,7 @@ class MakefileFormatter(Extension):
         out += "\n\n"
         return out
 
-    @staticmethod
-    def multifile_target(outfiles, deps, commands):
+    def multifile_target(self, outfiles, deps, commands):
         """
         Returns string with target definition for targets that produce multiple
         files. A typical example is Bison parser generator, which produces both
@@ -119,8 +115,7 @@ class MakefileFormatter(Extension):
         raise Error("rules with multiple output files not implemented yet (%s from %s)" % (outfiles, deps))
 
 
-    @staticmethod
-    def submake_command(directory, filename, target):
+    def submake_command(self, directory, filename, target):
         """
         Returns string with command to invoke ``make`` in subdirectory
         *directory* on makefile *filename*, running *target*.
@@ -207,12 +202,13 @@ class MakefileToolset(Toolset):
                 builddir=os.path.dirname(output), # FIXME: use configurable build dir
                 model=module)
 
+        mk_fmt = self.Formatter()
         expr_fmt = self.ExprFormatter(paths_info)
 
         f = io.OutputFile(output, io.EOL_UNIX, creator=self, create_for=module)
         self.on_header(f, module)
 
-        self._gen_settings(module, expr_fmt, f)
+        self._gen_settings(module, mk_fmt, expr_fmt, f)
 
         #FIXME: make this part of the formatter for (future) IdRefExpr
         def _format_dep(t):
@@ -255,7 +251,7 @@ class MakefileToolset(Toolset):
                       [_format_dep(t) for t in module.targets.itervalues()] +
                       [sub.name for sub in module.submodules]
                       )
-        f.write(self.Formatter.target(name="all", deps=all_targets, commands=None))
+        f.write(mk_fmt.target(name="all", deps=all_targets, commands=None))
 
         phony_targets = ["all", "clean"]
 
@@ -271,8 +267,8 @@ class MakefileToolset(Toolset):
                                  expr_fmt.format(subfile),
                                  _get_submodule_deps(module, sub))
         for subname, subdir, subfile, subdeps in submakefiles.itervalues():
-            subcmd = self.Formatter.submake_command(subdir, subfile, "all")
-            f.write(self.Formatter.target(name=subname, deps=subdeps, commands=[subcmd]))
+            subcmd = mk_fmt.submake_command(subdir, subfile, "all")
+            f.write(mk_fmt.target(name=subname, deps=subdeps, commands=[subcmd]))
             phony_targets.append(subname)
 
         for t in module.targets.itervalues():
@@ -308,14 +304,14 @@ class MakefileToolset(Toolset):
                         out_fmt = [expr_fmt.format(x) for x in out]
                         commands_fmt = [expr_fmt.format(c) for c in node.commands]
                         if len(out_fmt) == 1:
-                            text = self.Formatter.target(name=out_fmt[0],
-                                                         deps=deps,
-                                                         commands=commands_fmt)
+                            text = mk_fmt.target(name=out_fmt[0],
+                                                 deps=deps,
+                                                 commands=commands_fmt)
                         else:
-                            text = self.Formatter.multifile_target(
-                                                         outfiles=out_fmt,
-                                                         deps=deps,
-                                                         commands=commands_fmt)
+                            text = mk_fmt.multifile_target(
+                                                 outfiles=out_fmt,
+                                                 deps=deps,
+                                                 commands=commands_fmt)
                         f.write(text)
                         all_targets += out_fmt
 
@@ -323,14 +319,14 @@ class MakefileToolset(Toolset):
         if targets_from_submodules:
             f.write("# Targets from sub-makefiles:\n")
             for t, tsub in targets_from_submodules.iteritems():
-                f.write(self.Formatter.target(name=t, deps=[submakefiles[tsub][0]], commands=None))
+                f.write(mk_fmt.target(name=t, deps=[submakefiles[tsub][0]], commands=None))
 
         # Write the "clean" target:
         clean_cmds = self._get_clean_commands(
-                        expr_fmt,
+                        mk_fmt, expr_fmt,
                         (build_graphs[t] for t in module.targets.itervalues()),
                         submakefiles.itervalues())
-        f.write(self.Formatter.target(name="clean", deps=[], commands=clean_cmds))
+        f.write(mk_fmt.target(name="clean", deps=[], commands=clean_cmds))
 
         self.on_phony_targets(f, phony_targets)
         self.on_footer(f, module)
@@ -338,19 +334,19 @@ class MakefileToolset(Toolset):
         f.commit()
 
 
-    def _gen_settings(self, module, expr_fmt, f):
+    def _gen_settings(self, module, mk_fmt, expr_fmt, f):
         # TODO: only include settings used in this module _or_ its submodules
         #       (for recursive passing downwards)
         if not module.project.settings:
             return
-        f.write("\n%s\n" % self.Formatter.comment("------------\nConfigurable settings:\n"))
+        f.write("\n%s\n" % mk_fmt.comment("------------\nConfigurable settings:\n"))
         for setting in module.project.settings.itervalues():
             if setting["help"]:
-                f.write(self.Formatter.comment(expr_fmt.format(setting["help"])))
-            f.write(self.Formatter.var_definition(setting.name, expr_fmt.format(setting["default"])))
-        f.write("\n%s\n" % self.Formatter.comment("------------"))
+                f.write(mk_fmt.comment(expr_fmt.format(setting["help"])))
+            f.write(mk_fmt.var_definition(setting.name, expr_fmt.format(setting["default"])))
+        f.write("\n%s\n" % mk_fmt.comment("------------"))
 
-    def _get_clean_commands(self, expr_fmt, graphs, submakefiles):
+    def _get_clean_commands(self, mk_fmt, expr_fmt, graphs, submakefiles):
         for e in self.autoclean_extensions:
             yield "%s *.%s" % (self.del_command, e)
         for g in graphs:
@@ -363,7 +359,7 @@ class MakefileToolset(Toolset):
                         yield "%s %s" % (self.del_command, expr_fmt.format(f))
 
         for subname, subdir, subfile, subdeps in submakefiles:
-            yield self.Formatter.submake_command(subdir, subfile, "clean")
+            yield mk_fmt.submake_command(subdir, subfile, "clean")
 
 
     def on_header(self, file, module):
