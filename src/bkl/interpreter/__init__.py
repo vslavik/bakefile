@@ -142,12 +142,23 @@ class Interpreter(object):
             self.add_module(sub_ast, module)
 
 
+    def _call_custom_steps(self, model, func):
+        for step in bkl.api.CustomStep.all():
+            logger.debug("invoking custom step %s.%s()", step.name, func)
+            getattr(step, func)(model)
+
+
     def finalize(self):
         """
         Finalizes the model, i.e. checks it for validity, optimizes, creates
         per-toolset models etc.
         """
         logger.debug("finalizing the model")
+
+        # call any custom steps first:
+        self._call_custom_steps(self.model, "finalize")
+
+        # then apply standard processing:
         passes.detect_potential_problems(self.model)
         passes.normalize_and_validate_bool_subexpressions(self.model)
         passes.normalize_vars(self.model)
@@ -224,6 +235,9 @@ class Interpreter(object):
 
         if not toolsets:
             raise Error("nothing to generate, \"toolsets\" property is empty")
+
+        # call any custom steps first:
+        self._call_custom_steps(self.model, "generate")
 
         # and generate the outputs (notice that we can avoid making a
         # (expensive!) deepcopy of the model for one of the toolsets and can

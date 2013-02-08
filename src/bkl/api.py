@@ -662,3 +662,35 @@ class Toolset(Extension):
             within the toolset and so on).
         """
         raise NotImplementedError
+
+
+class CustomStep(Extension):
+    """
+    Custom processing step that is applied to the loaded model.
+
+    Plugins of this kind can be used to perform any custom operations with the
+    model. For example, they may enforce coding style, they may add or modify
+    some properties or even generate auxiliary output files.
+
+    CustomStep class has several hook methods called at different phases of
+    processing. All of them do nothing by default and reimplementing them is
+    optional.
+    """
+
+    def finalize(self, model):
+        """
+        Called after loading the model from file(s) and before doing any
+        optimizations or error checking on it.
+
+        Do not create any output files here, leave that to :meth:`generate()`.
+        """
+        pass
+
+    def generate(self, model):
+        """
+        Called right before generating the output. It is called on the common
+        model, before optimizing it for individual toolsets.
+
+        It is permitted to create output files in this method.
+        """
+        pass

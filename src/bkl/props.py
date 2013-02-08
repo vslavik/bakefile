@@ -267,6 +267,9 @@ def _collect_properties_from_others(variable_name):
         for p in toolset.all_properties(variable_name):
             p._add_toolset(toolset.name)
             yield p
+    for step in api.CustomStep.all():
+        for p in step.all_properties(variable_name):
+            yield p
 
 
 class PropertiesRegistry(object):
