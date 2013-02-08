@@ -65,18 +65,6 @@ class MakefileFormatter(Extension):
         return "%s\n" % "\n".join("# %s" % s for s in text.split("\n"))
 
     @staticmethod
-    def var_reference(var):
-        """
-        Returns string with code for referencing a variable.
-
-        For most `make` implementations out there, `var_reference("FOO")`
-        returns `"$(FOO)"`.
-
-        :param var: string with name of the variable
-        """
-        return "$(%s)" % var
-
-    @staticmethod
     def var_definition(var, value):
         """
         Returns string with definition of a variable value, typically
@@ -84,8 +72,7 @@ class MakefileFormatter(Extension):
 
         :param var:   variable being defined
         :param value: value of the variable; this string is already formatted
-                      to be in make's syntax (e.g. using var_reference()) and
-                      may be multi-line
+                      to be in make's syntax and may be multi-line
         """
         return "%s = %s\n" % (var, " \\\n\t".join(value.split("\n")))
 
@@ -98,7 +85,8 @@ class MakefileFormatter(Extension):
         :param deps:     List of its dependencies. Items are strings
                          corresponding to some target's name (may be expressions
                          that reference a variable, in that case the string
-                         must already be processed with :meth:`var_reference`).
+                         must already be formatted with appropriate
+                         :class:`bkl.expr.Formatter`).
                          May be empty.
         :param commands: List of commands to execute to build the target; they
                          are already formatted to be in make's syntax and each
@@ -141,22 +129,17 @@ class MakefileFormatter(Extension):
 
 
 class MakefileExprFormatter(expr.Formatter):
-    def __init__(self, makefile_formatter, paths_info):
-        super(MakefileExprFormatter, self).__init__(paths_info)
-        self.makefile_formatter = makefile_formatter
-
     def literal(self, e):
         if '"' in e.value:
             return e.value.replace('"', '\\"')
         else:
             return e.value
 
-    # TODO: get rid of var_reference(), just require ExprFormatter implementation
     def placeholder(self, e):
         name = e.var
         if name == "config":
             raise Error("configurations not supported by makefiles yet ($(config) referenced)", pos=e.pos)
-        return self.makefile_formatter.var_reference(name)
+        return "$(%s)" % name
 
 
 class MakefileToolset(Toolset):
@@ -224,7 +207,7 @@ class MakefileToolset(Toolset):
                 builddir=os.path.dirname(output), # FIXME: use configurable build dir
                 model=module)
 
-        expr_fmt = self.ExprFormatter(self.Formatter, paths_info)
+        expr_fmt = self.ExprFormatter(paths_info)
 
         f = io.OutputFile(output, io.EOL_UNIX, creator=self, create_for=module)
         self.on_header(f, module)

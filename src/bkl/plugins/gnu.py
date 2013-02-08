@@ -283,9 +283,6 @@ class GnuMakefileFormatter(MakefileFormatter):
 
 
 class GnuExprFormatter(MakefileExprFormatter):
-    def __init__(self, makefile_formatter, paths_info):
-        super(GnuExprFormatter, self).__init__(makefile_formatter, paths_info)
-
     def bool_value(self, e):
         return "$(_true)" if e.value else "$(_false)"
 
