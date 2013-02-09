@@ -680,11 +680,15 @@ class _ProxyIfResolver(expr.RewritingVisitor):
         try:
             self.inside_cond += 1
             cond = self.visit(e.cond)
+            # It is safe -- desirable, even -- to remove the if expression
+            # here. Either it depends on a config value, in which case this
+            # proxy made it evaluate to True or False, or it depends on some
+            # setting, which is an error when outputting configurations-using
+            # format such as Visual Studio projects. So if the below expression
+            # throws NonConstError in the latter case, that's OK.
+            return self.visit(e.value_yes if cond.as_py() else e.value_no)
         finally:
             self.inside_cond -= 1
-        yes = self.visit(e.value_yes)
-        no = self.visit(e.value_no)
-        return expr.IfExpr(cond, yes, no, pos=e.pos)
 
 
 class ConfigurationProxy(object):
