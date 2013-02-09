@@ -202,6 +202,21 @@ def std_project_props():
                      See :ref:`configurations` for more information.
                      """
                  ),
+        Property("arch",
+                 type=StringType(),
+                 default=expr.PlaceholderExpr("arch"),
+                 readonly=True,
+                 inheritable=False,
+                 doc="""
+                     Current architecture.
+
+                     This property is set by Bakefile and can be used for
+                     performing per-architecture modifications (if the toolset
+                     supports it, which currently only Visual Studio does).
+                     The value is one of the *archs* values specified for the
+                     target.
+                     """
+                 ),
         ]
 
 

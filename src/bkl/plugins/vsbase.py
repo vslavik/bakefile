@@ -144,12 +144,16 @@ class Node(object):
 class VSExprFormatter(bkl.expr.Formatter):
     list_sep = ";"
 
-    configuration_ref = "$(Configuration)"
+    # Substitution from placeholders ("config" etc.) to VS variables:
+    substs = {
+                "config" : "$(Configuration)",
+                "arch"   : "$(Platform)",
+             }
 
     def placeholder(self, e):
-        if e.var == "config":
-            return self.configuration_ref
-        else:
+        try:
+            return self.substs[e.var]
+        except KeyError:
             assert False, "All references should be expanded in VS output"
 
     def bool_value(self, e):
@@ -718,7 +722,7 @@ class VSToolsetBase(Toolset):
 
     def get_builddir_for(self, target):
         prj = target["%s.projectfile" % self.name]
-        configuration_ref = self.XmlFormatter.ExprFormatter.configuration_ref
+        configuration_ref = self.XmlFormatter.ExprFormatter.substs["config"]
         return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr(configuration_ref)], prj.anchor, prj.anchor_file)
 
 
@@ -846,6 +850,7 @@ class VSToolsetBase(Toolset):
                 p = self.ARCHS_MAPPING[arch]
                 cfg.vs_platform = p
                 cfg.vs_name = "%s|%s" % (cfg.name, p)
+                cfg._visitor.mapping["arch"] = arch
                 yield cfg
 
 

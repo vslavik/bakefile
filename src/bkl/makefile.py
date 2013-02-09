@@ -133,7 +133,9 @@ class MakefileExprFormatter(expr.Formatter):
     def placeholder(self, e):
         name = e.var
         if name == "config":
-            raise Error("configurations not supported by makefiles yet ($(config) referenced)", pos=e.pos)
+            raise Error("configurations are not supported by makefiles yet ($(config) referenced)", pos=e.pos)
+        if name == "arch":
+            raise Error("multi-arch builds are not supported by makefiles ($(arch) referenced)", pos=e.pos)
         return "$(%s)" % name
 
 

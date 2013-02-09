@@ -657,24 +657,26 @@ class ConfigurationsPropertyMixin:
             yield ConfigurationProxy(self, cfg)
 
 
-class _ProxyIfResolver(expr.RewritingVisitor):
+class ProxyIfResolver(expr.RewritingVisitor):
     """
     Replaces references to $(config) with value, allowing the expressions
     to be evaluated.
     """
     def __init__(self, config):
-        super(_ProxyIfResolver, self).__init__()
-        self.config = config
+        super(ProxyIfResolver, self).__init__()
+        self.mapping = {"config": config}
         self.inside_cond = 0
 
     def reference(self, e):
         return self.visit(e.get_value())
 
     def placeholder(self, e):
-        if self.inside_cond and e.var == "config":
-            return expr.LiteralExpr(self.config, pos=e.pos)
-        else:
-            return e
+        if self.inside_cond:
+            try:
+                return expr.LiteralExpr(self.mapping[e.var], pos=e.pos)
+            except KeyError:
+                pass
+        return e
 
     def if_(self, e):
         try:
@@ -703,7 +705,7 @@ class ConfigurationProxy(object):
     def __init__(self, model, config):
         self.model = model
         self.config = config
-        self._visitor = _ProxyIfResolver(config.name)
+        self._visitor = ProxyIfResolver(config.name)
 
     name = property(lambda self: self.config.name)
     is_debug = property(lambda self: self.config.is_debug)

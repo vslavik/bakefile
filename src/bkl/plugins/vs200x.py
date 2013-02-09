@@ -86,7 +86,10 @@ VCPROJ_CHARSET = "Windows-1252"
 
 class VS200xExprFormatter(VSExprFormatter):
 
-    configuration_ref = "$(ConfigurationName)"
+    substs = {
+                "config" : "$(ConfigurationName)",
+                "arch"   : "$(PlatformName)",
+             }
 
     def literal(self, e):
         if '"' in e.value:
