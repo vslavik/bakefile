@@ -8,11 +8,11 @@ module {
       includedirs = [@builddir/]
       sources {
         file @top_srcdir/main.cpp
-        file @top_srcdir/gensrc.txt	{ compile-commands = [python make_gensrc.py --source %(out) %(in)]; dependencies = [@top_srcdir/make_gensrc.py]; outputs = [@builddir/gensrc.cpp] }
+        file @top_srcdir/gensrc.txt	{ compile-commands = [python make_gensrc.py --source %(out) %(in)]; compile-message = Running make_gensrc.py to generate %(out); dependencies = [@top_srcdir/make_gensrc.py]; outputs = [@builddir/gensrc.cpp] }
         file @builddir/gensrc.cpp
       }
       headers {
-        file @top_srcdir/gensrc_hdr.txt	{ compile-commands = [python make_gensrc.py --header %(out) %(in)]; dependencies = [@top_srcdir/make_gensrc.py]; outputs = [@builddir/gensrc.h] }
+        file @top_srcdir/gensrc_hdr.txt	{ compile-commands = [python make_gensrc.py --header %(out) %(in)]; compile-message = Running make_gensrc.py to generate %(out); dependencies = [@top_srcdir/make_gensrc.py]; outputs = [@builddir/gensrc.h] }
         file @builddir/gensrc.h
       }
     }

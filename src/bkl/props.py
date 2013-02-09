@@ -62,6 +62,19 @@ def std_file_props():
                  Command or commands to run to compile this source file,
                  i.e. to generate other file(s) from it. This can be used for
                  generating some files or for compiling custom file types.
+
+                 Two placeholders can be used in the commands, ``%(in)`` and
+                 ``%(out)``. They are replaced with the name of the source file
+                 and ``outputs`` respectively. Both placeholders are optional.
+                 """),
+        Property("compile-message",
+             type=StringType(),
+             default=expr.NullExpr(),
+             inheritable=False,
+             doc="""
+                 Message shown to the user when running the command.
+
+                 The same placeholder as in *compiler-commands* can be used.
                  """),
         Property("outputs",
              type=ListType(PathType()),

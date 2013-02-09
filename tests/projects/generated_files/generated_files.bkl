@@ -16,10 +16,12 @@ program test {
     includedirs += @builddir;
 
     gensrc.txt::compile-commands = "python make_gensrc.py --source %(out) %(in)";
+    gensrc.txt::compile-message = "Running make_gensrc.py to generate %(out)";
     gensrc.txt::dependencies = make_gensrc.py;
     gensrc.txt::outputs = @builddir/gensrc.cpp;
 
     gensrc_hdr.txt::compile-commands = "python make_gensrc.py --header %(out) %(in)";
+    gensrc_hdr.txt::compile-message = "Running make_gensrc.py to generate %(out)";
     gensrc_hdr.txt::dependencies = make_gensrc.py;
     gensrc_hdr.txt::outputs = @builddir/gensrc.h;
 }

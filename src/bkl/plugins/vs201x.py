@@ -358,13 +358,16 @@ class VS201xToolsetBase(VSToolsetBase):
             fmt_dict["out%d" % idx] = outN
             idx += 1
         commands = format_string(srcfile["compile-commands"], fmt_dict)
+        message = format_string(srcfile["compile-message"], fmt_dict)
         n = Node("CustomBuild", Include=srcfile.filename)
         for cfg in self.configs_and_platforms(srcfile):
             cond = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             n.add(Node("Command", VSList("\n", commands), Condition=cond))
             n.add(Node("Outputs", outputs, Condition=cond))
-            if srcfile["dependencies"]:
-                n.add(Node("AdditionalInputs", srcfile["dependencies"], Condition=cond))
+            dependencies = srcfile["dependencies"]
+            if dependencies:
+                n.add(Node("AdditionalInputs", dependencies, Condition=cond))
+            n.add(Node("Message", message if message else commands, Condition=cond))
         node.add(n)
 
 

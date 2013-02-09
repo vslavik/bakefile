@@ -507,12 +507,14 @@ class VS200xToolsetBase(VSToolsetBase):
         for outN in outputs:
             fmt_dict["out%d" % idx] = outN
             idx += 1
-        commands = format_string(srcfile["compile-commands"], fmt_dict)
+        commands = VSList("\r\n", format_string(srcfile["compile-commands"], fmt_dict))
+        message = format_string(srcfile["compile-message"], fmt_dict)
         n_file = Node("File", RelativePath=srcfile.filename)
         for cfg in self.configs_and_platforms(srcfile):
             n_cfg = Node("FileConfiguration", Name="%s" % cfg.vs_name)
             n_tool = Node("Tool", Name="VCCustomBuildTool")
-            n_tool["CommandLine"] = VSList("\r\n", commands)
+            n_tool["Description"] = message if message else commands
+            n_tool["CommandLine"] = commands
             n_tool["Outputs"] = outputs
             n_tool["AdditionalDependencies"] = srcfile["dependencies"]
             n_cfg.add(n_tool)
