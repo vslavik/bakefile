@@ -28,6 +28,7 @@ Misc. helpers for other Bakefile code.
 
 import copy
 import functools
+import collections
 
 
 class OrderedDict(dict):
@@ -82,6 +83,50 @@ class OrderedDict(dict):
         return list(self.iteritems())
     def values(self):
         return list(self.itervalues())
+
+
+class OrderedSet(collections.MutableSet):
+    """
+    Set class that preserves insertion order during iteration.
+    """
+    def __init__(self, data=None):
+        self._list = list()
+        self._set = set()
+        if data:
+            self.update(data)
+
+    def __contains__(self, x):
+        return x in self._set
+
+    def __len__(self):
+        return len(self._list)
+
+    def __iter__(self):
+        return iter(self._list)
+
+    def add(self, x):
+        if x not in self._set:
+            self._set.add(x)
+            self._list.append(x)
+
+    def discard(self, x):
+        self._set.remove(x)
+        self._list.remove(x)
+
+    def update(self, other):
+        for i in other:
+            self.add(i)
+
+
+def filter_duplicates(it):
+    """
+    Yields items from 'it', removing any duplicates.
+    """
+    found = set()
+    for x in it:
+        if x not in found:
+            found.add(x)
+            yield x
 
 
 class memoized(object):
