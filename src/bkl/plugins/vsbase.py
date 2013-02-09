@@ -36,7 +36,7 @@ import logging
 logger = logging.getLogger("bkl.vsbase")
 
 import bkl.expr
-from bkl.utils import OrderedDict, memoized
+from bkl.utils import OrderedDict, OrderedSet, memoized
 from bkl.error import error_context, warning, Error, CannotDetermineError
 from bkl.api import Toolset, Property
 from bkl.model import ConfigurationProxy
@@ -317,6 +317,9 @@ class VSProjectBase(object):
     #: List of configuration objects."""
     configurations = []
 
+    #: List of platforms ("Win32", "x64")."""
+    platforms = []
+
     #: Location in the sources where the project originated from
     source_pos = None
 
@@ -463,11 +466,16 @@ class VSSolutionBase(object):
         if not included_projects:
             return # don't write empty solution files
 
-        configurations = []
+        configurations = OrderedSet()
         for prj in all_own_projects:
-            for cfg in prj.configurations:
-                if cfg not in configurations:
-                    configurations.append(cfg)
+            configurations.update(prj.configurations)
+
+        platforms = OrderedSet()
+        for prj in all_own_projects:
+            platforms.update(prj.platforms)
+        # HACK: Don't use Any CPU for solution config if there are native ones:
+        if "Any CPU" in platforms and len(platforms) > 1:
+            platforms.remove("Any CPU")
 
         for prj in included_projects:
             outf.write('Project("%s") = "%s", "%s", "{%s}"\n' %
@@ -507,15 +515,24 @@ class VSSolutionBase(object):
         outf.write("Global\n")
         outf.write("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n")
         for cfg in configurations:
-            outf.write("\t\t%s|Win32 = %s|Win32\n" % (cfg.name, cfg.name))
+            for plat in platforms:
+                outf.write("\t\t%s|%s = %s|%s\n" % (cfg.name, plat, cfg.name, plat))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n")
         for prj in included_projects:
             guid = prj.guid
             for cfg in configurations:
                 cfgp = _get_matching_project_config(cfg, prj)
-                outf.write("\t\t{%s}.%s|Win32.ActiveCfg = %s|Win32\n" % (guid, cfg.name, cfgp.name))
-                outf.write("\t\t{%s}.%s|Win32.Build.0 = %s|Win32\n" % (guid, cfg.name, cfgp.name))
+                for plat in platforms:
+                    platp = _get_matching_project_platform(plat, prj)
+                    if platp is None:
+                        # Can't build in this solution config. Just use any project platform
+                        # and omit the Build.0 node -- VS does the same in this case.
+                        platp = prj.platforms[0]
+                        outf.write("\t\t{%s}.%s|%s.ActiveCfg = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
+                    else:
+                        outf.write("\t\t{%s}.%s|%s.ActiveCfg = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
+                        outf.write("\t\t{%s}.%s|%s.Build.0 = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(SolutionProperties) = preSolution\n")
         outf.write("\t\tHideSolutionNode = FALSE\n")
@@ -597,7 +614,7 @@ class VSToolsetBase(Toolset):
                        inheritable=False,
                        doc="File name of the project for the target.")
         yield Property("%s.guid" % cls.name,
-                       # TODO: use custom GUID type, so that user-provided GUIDs can be validated
+                       # TODO: use custom GUID type, so that user-provided GUIDs can be validated (and upper-cased)
                        # TODO: make this vs.guid and share among VS toolsets
                        type=StringType(),
                        default=_default_guid_for_project,
@@ -686,6 +703,7 @@ class VSToolsetBase(Toolset):
                                 target["%s.projectfile" % self.name],
                                 target["deps"].as_py(),
                                 [x.config for x in target.configurations],
+                                self.get_platforms(target),
                                 target.source_pos)
         else:
             # Not natively supported; try if the TargetType has an implementation
@@ -796,10 +814,48 @@ class VSToolsetBase(Toolset):
         return d
 
 
+    ARCHS_MAPPING = { "x86": "Win32", "x86_64": "x64" }
+
+    def get_archs(self, target):
+        if target.is_variable_null("archs"):
+            return ["x86"]
+        else:
+            return target["archs"].as_py()
+
+    def get_platforms(self, target):
+        return [self.ARCHS_MAPPING[a] for a in self.get_archs(target)]
+
+    def _order_configs_and_archs(self, configs_iter, archs_list):
+        raise NotImplementedError
+
+    def configs_and_platforms(self, target):
+        """
+        Yields ConfigurationProxy instances for all of target's configurations
+        *and* architectures (platforms).
+
+        Compared to standard ConfigurationProxy objects, these are modified to
+        contain additional variables:
+
+          - "vs_platform" with the platform name used by VS (Win32, x64)
+          - "vs_name" with the name used by VS (e.g. "Debug|Win32" or "Release|x64")
+        """
+        configs = target.configurations
+        archs = self.get_archs(target)
+        for cfg in target.configurations:
+            for cfg, arch in self._order_configs_and_archs(configs, archs):
+                p = self.ARCHS_MAPPING[arch]
+                cfg.vs_platform = p
+                cfg.vs_name = "%s|%s" % (cfg.name, p)
+                yield cfg
+
+
 # Internal helper functions:
 
 @memoized
 def _get_matching_project_config(cfg, prj):
+    """
+    Returns best match project configuration for given solution configuration.
+    """
     with error_context(prj):
         if cfg in prj.configurations:
             return cfg
@@ -855,6 +911,19 @@ def _get_matching_project_config(cfg, prj):
             warning("project %s: using incompatible project configuration \"%s\" for solution configuration \"%s\"",
                     prj.projectfile, ret.name, cfg.name)
             return ret
+
+
+@memoized
+def _get_matching_project_platform(platform, prj):
+    """
+    Returns best matching platform in the project or None if none found.
+    """
+    if platform in prj.platforms:
+        return platform
+    elif "Any CPU" in prj.platforms:
+        return "Any CPU"
+    else:
+        return None
 
 
 

@@ -38,12 +38,13 @@ class VS2010Project(VSProjectBase):
     """
     version = 10
 
-    def __init__(self, name, guid, projectfile, deps, configs, source_pos=None):
+    def __init__(self, name, guid, projectfile, deps, configs, platforms, source_pos=None):
         self.name = name
         self.guid = guid
         self.projectfile = projectfile
         self.dependencies = deps
         self.configurations = configs
+        self.platforms = platforms
         self.source_pos = source_pos
 
 
@@ -78,10 +79,10 @@ class VS201xToolsetBase(VSToolsetBase):
         root["xmlns"] = "http://schemas.microsoft.com/developer/msbuild/2003"
 
         n_configs = Node("ItemGroup", Label="ProjectConfigurations")
-        for cfg in target.configurations:
-            n = Node("ProjectConfiguration", Include="%s|Win32" % cfg.name)
+        for cfg in self.configs_and_platforms(target):
+            n = Node("ProjectConfiguration", Include="%s" % cfg.vs_name)
             n.add("Configuration", cfg.name)
-            n.add("Platform", "Win32")
+            n.add("Platform", cfg.vs_platform)
             n_configs.add(n)
         root.add(n_configs)
 
@@ -96,10 +97,10 @@ class VS201xToolsetBase(VSToolsetBase):
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.Default.props")
 
-        for cfg in target.configurations:
+        for cfg in self.configs_and_platforms(target):
             n = Node("PropertyGroup", Label="Configuration")
             self._add_extra_options_to_node(cfg, n)
-            n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
+            n["Condition"] = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             if is_program(target):
                 n.add("ConfigurationType", "Application")
             elif is_library(target):
@@ -121,9 +122,9 @@ class VS201xToolsetBase(VSToolsetBase):
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.props")
         root.add("ImportGroup", Label="ExtensionSettings")
 
-        for cfg in target.configurations:
+        for cfg in self.configs_and_platforms(target):
             n = Node("ImportGroup", Label="PropertySheets")
-            n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
+            n["Condition"] = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             n.add("Import",
                   Project="$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props",
                   Condition="exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')",
@@ -132,7 +133,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
         root.add("PropertyGroup", Label="UserMacros")
 
-        for cfg in target.configurations:
+        for cfg in self.configs_and_platforms(target):
             n = Node("PropertyGroup")
             self._add_extra_options_to_node(cfg, n)
             if not is_library(target):
@@ -147,14 +148,18 @@ class VS201xToolsetBase(VSToolsetBase):
             if target.is_variable_explicitly_set("outputdir"):
                 n.add("OutDir", concat(cfg["outputdir"], "\\"))
             if self.needs_custom_intermediate_dir(target):
-                n.add("IntDir", concat(self.get_builddir_for(target), "\\$(ProjectName)\\"))
+                if cfg.vs_platform != "Win32":
+                    intdir = "$(Platform)\\$(Configuration)\\$(ProjectName)\\"
+                else:
+                    intdir = "$(Configuration)\\$(ProjectName)\\"
+                n.add("IntDir", intdir)
             if n.has_children():
-                n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
+                n["Condition"] = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             root.add(n)
 
-        for cfg in target.configurations:
+        for cfg in self.configs_and_platforms(target):
             n = Node("ItemDefinitionGroup")
-            n["Condition"] = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
+            n["Condition"] = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             n_cl = Node("ClCompile")
             self._add_extra_options_to_node(cfg, n_cl)
             n_cl.add("WarningLevel", "Level3")
@@ -354,8 +359,8 @@ class VS201xToolsetBase(VSToolsetBase):
             idx += 1
         commands = format_string(srcfile["compile-commands"], fmt_dict)
         n = Node("CustomBuild", Include=srcfile.filename)
-        for cfg in srcfile.configurations:
-            cond = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
+        for cfg in self.configs_and_platforms(srcfile):
+            cond = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             n.add(Node("Command", VSList("\n", commands), Condition=cond))
             n.add(Node("Outputs", outputs, Condition=cond))
             if srcfile["dependencies"]:
@@ -397,8 +402,8 @@ class VS201xToolsetBase(VSToolsetBase):
         """Add options that are set on per-file basis."""
         # TODO: add regular options such as 'defines' here too, not just
         #       the vsXXXX.option.* overrides
-        for cfg in srcfile.configurations:
-            cond = "'$(Configuration)|$(Platform)'=='%s|Win32'" % cfg.name
+        for cfg in self.configs_and_platforms(srcfile):
+            cond = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             for key, value in self.collect_extra_options_for_node(srcfile, node.name, inherit=False):
                 node.add(Node(key, value, Condition=cond))
 
@@ -426,6 +431,12 @@ class VS201xToolsetBase(VSToolsetBase):
 </Project>
 """)
         f.commit()
+
+
+    def _order_configs_and_archs(self, configs_iter, archs_list):
+        for c in configs_iter:
+            for a in archs_list:
+                yield (c, a)
 
 
 

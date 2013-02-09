@@ -139,12 +139,13 @@ class VS200xXmlFormatter(XmlFormatter):
 
 # TODO: Put more content into these classes, use them properly
 class VS200xProject(VSProjectBase):
-    def __init__(self, name, guid, projectfile, deps, configs, source_pos=None):
+    def __init__(self, name, guid, projectfile, deps, configs, platforms, source_pos=None):
         self.name = name
         self.guid = guid
         self.projectfile = projectfile
         self.dependencies = deps
         self.configurations = configs
+        self.platforms = platforms
         self.source_pos = source_pos
 
 class VS2003Project(VS200xProject):
@@ -196,24 +197,26 @@ class VS200xToolsetBase(VSToolsetBase):
         self._add_extra_options_to_node(target, root)
 
         n_platforms = Node("Platforms")
-        n_platforms.add("Platform", Name="Win32")
+        for p in self.get_platforms(target):
+            n_platforms.add("Platform", Name=p)
         root.add(n_platforms)
 
         self._add_ToolFiles(root)
 
         n_configs = Node("Configurations")
         root.add(n_configs)
-        for cfg in target.configurations:
-            n = Node("Configuration", Name="%s|Win32" % cfg.name)
+        for cfg in self.configs_and_platforms(target):
+            n = Node("Configuration", Name="%s" % cfg.vs_name)
             n_configs.add(n)
+            platform_str = "$(PlatformName)\\" if cfg.vs_platform != "Win32" else ""
             if target.is_variable_explicitly_set("outputdir"):
                 n["OutputDirectory"] = concat(cfg["outputdir"], "\\")
             else:
-                n["OutputDirectory"] = "$(SolutionDir)$(ConfigurationName)"
+                n["OutputDirectory"] = "$(SolutionDir)%s$(ConfigurationName)" % platform_str
             if self.needs_custom_intermediate_dir(target):
-                n["IntermediateDirectory"] = "$(ConfigurationName)\\$(ProjectName)\\"
+                n["IntermediateDirectory"] = "%s$(ConfigurationName)\\$(ProjectName)\\" % platform_str
             else:
-                n["IntermediateDirectory"] = "$(ConfigurationName)"
+                n["IntermediateDirectory"] = "%s$(ConfigurationName)" % platform_str
             if is_program(target):
                 n["ConfigurationType"] = typeApplication
             elif is_library(target):
@@ -303,7 +306,10 @@ class VS200xToolsetBase(VSToolsetBase):
         n["WarningLevel"] = 3
         if self.detect_64bit_problems:
             n["Detect64BitPortabilityProblems"] = True
-        n["DebugInformationFormat"] = debugEditAndContinue if cfg.is_debug else debugEnabled
+        if cfg.is_debug and cfg.vs_platform != "x64":
+            n["DebugInformationFormat"] = debugEditAndContinue
+        else:
+            n["DebugInformationFormat"] = debugEnabled
 
         return n
 
@@ -357,7 +363,10 @@ class VS200xToolsetBase(VSToolsetBase):
         if not cfg.is_debug:
             n["OptimizeReferences"] = optReferences
             n["EnableCOMDATFolding"] = optFolding
-        n["TargetMachine"] = machineX86
+        if cfg.vs_platform == "x64":
+            n["TargetMachine"] = machineAMD64
+        else:
+            n["TargetMachine"] = machineX86
         return n
 
 
@@ -449,8 +458,8 @@ class VS200xToolsetBase(VSToolsetBase):
 
                     n_file = Node("File", RelativePath=sfile.filename)
                     sources.add(n_file)
-                    for cfg in target.configurations:
-                        n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
+                    for cfg in self.configs_and_platforms(target):
+                        n_cfg = Node("FileConfiguration", Name="%s" % cfg.vs_name)
                         tool = Node("Tool", Name="VCCustomBuildTool")
                         tool["CommandLine"] = VSList("\r\n", compiler.commands(self, target, sfile.filename, genname))
                         tool["Outputs"] = genname
@@ -497,8 +506,8 @@ class VS200xToolsetBase(VSToolsetBase):
             idx += 1
         commands = format_string(srcfile["compile-commands"], fmt_dict)
         n_file = Node("File", RelativePath=srcfile.filename)
-        for cfg in srcfile.configurations:
-            n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
+        for cfg in self.configs_and_platforms(srcfile):
+            n_cfg = Node("FileConfiguration", Name="%s" % cfg.vs_name)
             n_tool = Node("Tool", Name="VCCustomBuildTool")
             n_tool["CommandLine"] = VSList("\r\n", commands)
             n_tool["Outputs"] = outputs
@@ -524,17 +533,24 @@ class VS200xToolsetBase(VSToolsetBase):
         """Add options that are set on per-file basis."""
         # TODO: add regular options such as 'defines' here too, not just
         #       the vsXXXX.option.* overrides
-        for cfg in srcfile.configurations:
+        for cfg in self.configs_and_platforms(srcfile):
             extras = list(self.collect_extra_options_for_node(srcfile, tool, inherit=False))
             if additional_options:
                 extras = additional_options + extras
             if extras:
-                n_cfg = Node("FileConfiguration", Name="%s|Win32" % cfg.name)
+                n_cfg = Node("FileConfiguration", Name="%s" % cfg.vs_name)
                 n_tool = Node("Tool", Name=tool)
                 for key, value in extras:
                     n_tool[key] = value
                 n_cfg.add(n_tool)
                 node.add(n_cfg)
+
+
+    def _order_configs_and_archs(self, configs_iter, archs_list):
+        configs_list = list(configs_iter)
+        for a in archs_list:
+            for c in configs_list:
+                yield (c, a)
 
 
 class VS2008Toolset(VS200xToolsetBase):

@@ -30,7 +30,7 @@ from bkl.api import Extension, Property, TargetType, FileRecognizer
 from bkl.vartypes import PathType
 from bkl.error import Error, error_context
 from bkl.plugins.vsbase import VSProjectBase, PROJECT_KIND_NET
-from bkl.utils import memoized_property
+from bkl.utils import memoized_property, filter_duplicates
 
 import xml.etree.ElementTree
 import re
@@ -107,7 +107,7 @@ class VSExternalProjectBase(VSProjectBase):
     def configurations(self):
         known = self._project.configurations
         lst = []
-        for name in self._extract_configurations_names():
+        for name in filter_duplicates(self._extract_configurations_names()):
             try:
                 lst.append(known[name])
             except KeyError:
@@ -122,6 +122,10 @@ class VSExternalProjectBase(VSProjectBase):
                 self._project.add_configuration(cfg)
                 lst.append(cfg)
         return lst
+
+    @memoized_property
+    def platforms(self):
+        return list(filter_duplicates(self._extract_platforms()))
 
 
 class VSExternalProject200x(VSExternalProjectBase):
@@ -151,8 +155,12 @@ class VSExternalProject200x(VSExternalProjectBase):
         return self.xml.get("ProjectGUID")[1:-1]
 
     def _extract_configurations_names(self):
-        return [x.get("Name").partition("|")[0]
-                for x in self.xml.findall("Configurations/Configuration")]
+        for x in self.xml.findall("Configurations/Configuration"):
+            yield x.get("Name").partition("|")[0]
+
+    def _extract_platforms(self):
+        for x in self.xml.findall("Platforms/Platform"):
+            yield x.get("Name")
 
 
 class VSExternalProject201x(VSExternalProjectBase):
@@ -187,8 +195,13 @@ class VSExternalProject201x(VSExternalProjectBase):
 
     def _extract_configurations_names(self):
         # TODO-PY26: use "ItemGroup[@Label='ProjectConfigurations']"
-        return [x.text for x in
-                self.xml.findall("{%(ms)s}ItemGroup/{%(ms)s}ProjectConfiguration/{%(ms)s}Configuration" % XMLNS)]
+        for x in self.xml.findall("{%(ms)s}ItemGroup/{%(ms)s}ProjectConfiguration/{%(ms)s}Configuration" % XMLNS):
+            yield x.text
+
+    def _extract_platforms(self):
+        # TODO-PY26: use "ItemGroup[@Label='ProjectConfigurations']"
+        for x in self.xml.findall("{%(ms)s}ItemGroup/{%(ms)s}ProjectConfiguration/{%(ms)s}Platform" % XMLNS):
+            yield x.text
 
 
 class VSExternalProjectCSharp(VSExternalProjectBase):
@@ -212,16 +225,25 @@ class VSExternalProjectCSharp(VSExternalProjectBase):
         # TODO-PY26: use "PropertyGroup[@Label='Globals']"
         return self.xml.findtext("{%(ms)s}PropertyGroup/{%(ms)s}ProjectGuid" % XMLNS)[1:-1]
 
-    def _extract_configurations_names(self):
-        found = []
+    def _extract_configs_and_platforms(self):
         for n in self.xml.findall("{%(ms)s}PropertyGroup" % XMLNS):
             cond = n.get("Condition")
             if cond:
                 m = re.match(r" *'\$\(Configuration\)\|\$\(Platform\)' *== '(.*)\|(.*)' *", cond)
-                cfg = m.group(1) if m else None
-                if cfg and cfg not in found:
-                    found.append(cfg)
-        return found
+                if m:
+                    yield (m.group(1), m.group(2))
+
+    def _extract_configurations_names(self):
+        return (x[0] for x in self._extract_configs_and_platforms())
+
+    def _extract_platforms(self):
+        for x in filter_duplicates(self._extract_configs_and_platforms()):
+            p = x[1]
+            # .csproj files use "AnyCPU", but .sln files (which is what this is
+            # for) use "Any CPU".
+            if p == "AnyCPU": yield "Any CPU"
+            else:             yield p
+
 
 
 class VisualStudioHandler(ExternalBuildHandler):

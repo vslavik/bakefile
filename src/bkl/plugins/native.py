@@ -133,7 +133,7 @@ class NativeCompiledType(TargetType):
                      """),
             Property("archs",
                  type=ListType(EnumType("architecture", ["x86", "x86_64"])),
-                 default=[], # TODO: should be toolset-specific values (?)
+                 default=NullExpr(),
                  inheritable=True,
                  doc="""
                      Architectures to compile for.
@@ -146,7 +146,7 @@ class NativeCompiledType(TargetType):
                      The default empty value means to do whatever the default
                      behavior of the toolset is.
 
-                     Currently only supported on OS X.
+                     Currently only supported on OS X and in Visual Studio.
                      """),
             Property("win32-crt-linkage",
                  type=EnumType("linkage", ["static", "dll"]),
