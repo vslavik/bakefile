@@ -145,7 +145,11 @@ def std_target_props():
                  type=ListType(StringType()), # FIXME: use a custom type that validates config names
                  default="Debug Release",
                  inheritable=True,
-                 doc="List of configurations to use for this target."
+                 doc="""
+                     List of configurations to use for this target.
+
+                     See :ref:`configurations` for more information.
+                     """
                  ),
         ]
 
@@ -188,9 +192,15 @@ def std_project_props():
                  default=expr.PlaceholderExpr("config"),
                  readonly=True,
                  inheritable=False,
-                 doc="Current configuration. "
-                     "This property is set by Bakefile and can be used for performing "
-                     "per-configuration modifications."
+                 doc="""
+                     Current configuration.
+
+                     This property is set by Bakefile and can be used for performing
+                     per-configuration modifications. The value is one of the
+                     *configurations* values specified for the target.
+
+                     See :ref:`configurations` for more information.
+                     """
                  ),
         ]
 

@@ -427,6 +427,8 @@ for *and*, ``||`` for *or*, ``!`` for *not* and ``==`` and ``!=`` for equality
 and inequality tests respectively.
 
 
+.. _configurations:
+
 Build configurations
 --------------------
 
