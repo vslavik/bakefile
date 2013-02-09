@@ -96,7 +96,7 @@ class VSExternalProjectBase(VSProjectBase):
     Wrapper around externally-provided project file, base class.
     """
     def __init__(self, target):
-        self._known_configurations = target.project.configurations
+        self._project = target.project
         self.projectfile = target["file"]
         self.dependencies = []
         self.source_pos = target.source_pos
@@ -105,7 +105,7 @@ class VSExternalProjectBase(VSProjectBase):
 
     @memoized_property
     def configurations(self):
-        known = self._known_configurations
+        known = self._project.configurations
         lst = []
         for name in self._extract_configurations_names():
             try:
@@ -118,7 +118,9 @@ class VSExternalProjectBase(VSProjectBase):
                 else:
                     raise Error("don't know whether the \"%s\" configuration from external %s is debug or release; please define it in your bakefile explicitly" % (name, self.projectfile),
                                 pos=self.source_pos)
-                lst.append(base.clone(name))
+                cfg = base.clone(name)
+                self._project.add_configuration(cfg)
+                lst.append(cfg)
         return lst
 
 
