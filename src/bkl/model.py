@@ -137,7 +137,7 @@ class Configuration(object):
         # define the configuration
         self._definition = []
 
-    def clone(self, new_name, source_pos=None):
+    def create_derived(self, new_name, source_pos=None):
         """Returns a new copy of this configuration with a new name."""
         return Configuration(new_name, self, self.is_debug, source_pos)
 

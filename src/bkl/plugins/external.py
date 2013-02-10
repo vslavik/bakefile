@@ -118,7 +118,7 @@ class VSExternalProjectBase(VSProjectBase):
                 else:
                     raise Error("don't know whether the \"%s\" configuration from external %s is debug or release; please define it in your bakefile explicitly" % (name, self.projectfile),
                                 pos=self.source_pos)
-                cfg = base.clone(name)
+                cfg = base.create_derived(name)
                 self._project.add_configuration(cfg)
                 lst.append(cfg)
         return lst

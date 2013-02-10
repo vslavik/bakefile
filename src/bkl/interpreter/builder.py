@@ -337,7 +337,7 @@ class Builder(object, CondTrackingMixin):
 
             try:
                 base = project.configurations[node.base.text]
-                cfg = base.clone(node.name, source_pos=node.pos)
+                cfg = base.create_derived(node.name, source_pos=node.pos)
                 project.add_configuration(cfg)
             except KeyError:
                 raise ParserError("unknown base configuration \"%s\"" % node.base.text,
