@@ -262,6 +262,17 @@ class XmlFormatter(object):
         return s
 
     def format_value(self, val):
+        # This trick is necessary, because 'val' may be of many types -- in
+        # particular, it may be an integer or a boolean. Python's bool type is
+        # a specialization of int and dictionaries don't differentiate between
+        # them and so @memoized format_value() would incorrectly return the
+        # same value (e.g. "1") for both True and 1. The dummy 'valtype'
+        # argument disambiguates these cases, with no noticeable lost of
+        # performance.
+        return self._format_value(val, type(val))
+
+    @memoized
+    def _format_value(self, val, valtype):
         """
         Formats given value (of any type) into XML text.
         """
