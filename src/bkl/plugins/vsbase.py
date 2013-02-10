@@ -219,23 +219,24 @@ class XmlFormatter(object):
     def _do_format_node(self, n, indent):
         attrs = self._get_quoted_nonempty_attrs(n)
         if n.children:
-            children_markup = ""
+            children_markup = []
             assert not n.text, "nodes with both text and children not implemented"
             subindent = indent + self.indent_step
             for key, value in n.children:
                 if isinstance(value, Node):
                     assert key == value.name
-                    children_markup += self._do_format_node(value, subindent)
+                    children_markup.append(self._do_format_node(value, subindent))
                 else:
                     try:
                         v = escape(self.format_value(value))
                         if v:
-                            children_markup += "%s<%s>%s</%s>\n" % (subindent, key, v, key)
+                            children_markup.append("%s<%s>%s</%s>\n" % (subindent, key, v, key))
                         # else: empty value, don't write that
                     except CannotDetermineError as e:
                         with error_context(value):
                             raise Error("cannot set property \"%s\" to non-constant expression \"%s\" (%s)" %
                                         (key, value, e.msg))
+            children_markup = "".join(children_markup)
         else:
             children_markup = None
         text = self.format_value(n.text) if n.text else None
@@ -249,17 +250,17 @@ class XmlFormatter(object):
         arguments already use properly escaped markup; values in *attrs* are
         quoted and escaped.
         """
-        s = "%s<%s" % (indent, name)
+        s = ["%s<%s" % (indent, name)]
         if attrs:
             for key, value in attrs:
-                s += ' %s=%s' % (key, value)
+                s.append(' %s=%s' % (key, value))
         if text:
-            s += ">%s</%s>\n" % (text, name)
+            s.append(">%s</%s>\n" % (text, name))
         elif children_markup:
-            s += ">\n%s%s</%s>\n" % (children_markup, indent, name)
+            s.append(">\n%s%s</%s>\n" % (children_markup, indent, name))
         else:
-            s += " />\n"
-        return s
+            s.append(" />\n")
+        return "".join(s)
 
     def format_value(self, val):
         # This trick is necessary, because 'val' may be of many types -- in

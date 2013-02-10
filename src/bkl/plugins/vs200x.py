@@ -120,24 +120,24 @@ class VS200xXmlFormatter(XmlFormatter):
         Formats given Node instance, indented with *indent* text.
         Content is either *text* or *children_markup*; the other is None.
         """
-        s = "%s<%s" % (indent, name)
+        s = ["%s<%s" % (indent, name)]
         if attrs:
             for key, value in attrs:
-                s += "\n%s\t%s=%s" % (indent, key, value)
+                s.append("\n%s\t%s=%s" % (indent, key, value))
         if text:
-            s += ">%s</%s>\n" % (text, name)
+            s.append(">%s</%s>\n" % (text, name))
         elif children_markup:
             if attrs:
-                s += "\n%s\t" % indent
-            s += ">\n%s%s</%s>\n" % (children_markup, indent, name)
+                s.append("\n%s\t" % indent)
+            s.append(">\n%s%s</%s>\n" % (children_markup, indent, name))
         else:
             if name in self.elems_not_collapsed:
                 if attrs:
-                    s += "\n%s\t" % indent
-                s += ">\n%s</%s>\n" % (indent, name)
+                    s.append("\n%s\t" % indent)
+                s.append(">\n%s</%s>\n" % (indent, name))
             else:
-                s += "\n%s/>\n" % indent
-        return s
+                s.append("\n%s/>\n" % indent)
+        return "".join(s)
 
 
 # TODO: Put more content into these classes, use them properly
