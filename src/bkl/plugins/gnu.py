@@ -127,7 +127,7 @@ class GnuCCompiler(GnuFileCompiler):
         # FIXME: evaluating the flags here every time is inefficient
         cmd += self._arch_flags(toolset, target)
         if toolset.needs_pic_flag and target["pic"]:
-            cmd.append(LiteralExpr("-fPIC"))
+            cmd.append(LiteralExpr("-fPIC -DPIC"))
         if target["multithreading"]:
             cmd.append(LiteralExpr("-pthread"))
         cmd += bkl.expr.add_prefix("-D", target["defines"])
