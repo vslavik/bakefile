@@ -123,13 +123,13 @@ class GnuCCompiler(GnuFileCompiler):
         if needs_extra_deps_code:
             cmd += [LiteralExpr("$(cc_deps_flags)")]
         else:
-            cmd += [LiteralExpr(GCC_DEPS_FLAGS)]
+            cmd += [LiteralExpr(toolset.deps_flags)]
         # FIXME: evaluating the flags here every time is inefficient
         cmd += self._arch_flags(toolset, target)
-        if toolset.needs_pic_flag and target["pic"]:
-            cmd.append(LiteralExpr("-fPIC -DPIC"))
+        if toolset.pic_flags and target["pic"]:
+            cmd.append(LiteralExpr(toolset.pic_flags))
         if target["multithreading"]:
-            cmd.append(LiteralExpr("-pthread"))
+            cmd.append(LiteralExpr(toolset.pthread_cc_flags))
         cmd += bkl.expr.add_prefix("-D", target["defines"])
         cmd += bkl.expr.add_prefix("-I", target["includedirs"])
         cmd += target["compiler-options"]
@@ -177,8 +177,6 @@ class GnuLinker(GnuFileCompiler):
 
     def _linker_flags(self, toolset, target):
         cmd = self._arch_flags(toolset, target)
-        if target["multithreading"]:
-            cmd.append(LiteralExpr("-pthread"))
         libdirs = target.type.get_libdirs(target)
         if libdirs:
             cmd += bkl.expr.add_prefix("-L", ListExpr(libdirs))
@@ -187,6 +185,10 @@ class GnuLinker(GnuFileCompiler):
         cmd += libs
         cmd += bkl.expr.add_prefix("-l", ListExpr(ldlibs)).items
         cmd += target.type.get_link_options(target)
+        if toolset.extra_link_flags:
+            cmd.append(LiteralExpr(toolset.extra_link_flags))
+        if target["multithreading"]:
+            cmd.append(LiteralExpr(toolset.pthread_ld_flags))
         return cmd
 
     def commands(self, toolset, target, input, output):
@@ -206,9 +208,9 @@ class GnuSharedLibLinker(GnuLinker):
     out_type = bkl.compilers.NativeSharedLibraryFileType.get()
 
     def commands(self, toolset, target, input, output):
-        cmd = [LiteralExpr("$(CXX) -shared -o $@")]
-        if toolset.use_sonames:
-            cmd.append(LiteralExpr("-Wl,-soname,$(notdir $@)"))
+        cmd = [LiteralExpr("$(CXX) %s -o $@" % toolset.shared_library_link_flag)]
+        if toolset.soname_flags:
+            cmd.append(LiteralExpr(toolset.soname_flags))
         cmd.append(LiteralExpr("$(LDFLAGS)"))
         cmd.append(input)
         # FIXME: use a parser instead of constructing the expression manually
@@ -337,12 +339,17 @@ class GnuToolset(MakefileToolset):
     library_extension = "a"
     shared_library_prefix = "lib"
     shared_library_extension = "so"
+    shared_library_link_flag = "-shared"
     loadable_module_prefix = ""
     loadable_module_extension = "so"
     loadable_module_link_flag = "-shared"
 
-    use_sonames = True
-    needs_pic_flag = True
+    deps_flags = GCC_DEPS_FLAGS
+    pic_flags = "-fPIC -DPIC"
+    pthread_cc_flags = "-pthread"
+    pthread_ld_flags = "-pthread"
+    soname_flags = "-Wl,-soname,$(notdir $@)"
+    extra_link_flags = None
 
     def on_header(self, file, module):
         file.write("""
@@ -408,8 +415,8 @@ class OSXGnuToolset(GnuToolset):
     loadable_module_extension = "bundle"
     loadable_module_link_flag = "-bundle"
 
-    use_sonames = False
-    needs_pic_flag = False
+    pic_flags = None
+    soname_flags = None
 
     def on_footer(self, file, module):
         for t in module.targets.itervalues():
@@ -417,3 +424,36 @@ class OSXGnuToolset(GnuToolset):
                 file.write(OSX_GCC_DEPS_RULES)
                 break
         super(OSXGnuToolset, self).on_footer(file, module)
+
+
+class SunCCGnuToolset(GnuToolset):
+    """
+    GNU toolchain for Sun CC compiler.
+
+    This toolset is for building using the Sun CC (aka Oracle Studio) toolset.
+    """
+
+    # FIXME: This is temporary solution, will be integrated into GnuToolset
+    #        with runtime platform detection.
+    name = "gnu-suncc"
+
+    default_makefile = "Makefile.suncc"
+
+    shared_library_link_flag  = "-G -pic"
+    loadable_module_link_flag = "-G -pic"
+
+    deps_flags = "-xMD"
+    pic_flags = "-pic -DPIC"
+    pthread_cc_flags = "-D_THREAD_SAFE -mt"
+    pthread_ld_flags = "-mt -lpthread"
+    soname_flags = "-h $(notdir $@)"
+    # FIXME: Do this for C++ only
+    extra_link_flags = "-lCstd -lCrun"
+
+    def on_header(self, file, module):
+        super(SunCCGnuToolset, self).on_header(file, module)
+        file.write("""
+CC = suncc
+CXX = sunCC
+
+""")
