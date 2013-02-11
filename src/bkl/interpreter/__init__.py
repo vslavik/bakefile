@@ -27,7 +27,6 @@ This module contains the very core of Bakefile -- the interpreter,
 :class:`bkl.interpreter.Interpreter`, and its supporting classes.
 """
 
-from copy import deepcopy
 import logging
 
 import bkl.parser
@@ -196,7 +195,7 @@ class Interpreter(object):
         if skip_making_copy:
             model = self.model
         else:
-            model = deepcopy(self.model)
+            model = self.model.clone()
         # don't use Variable.from_property(), because it's read-only
         model.add_variable(bkl.model.Variable.from_property(
                                               model.get_prop("toolset"),

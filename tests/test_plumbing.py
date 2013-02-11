@@ -27,7 +27,6 @@ Misc tests of Bakefile's internals' correctness.
 """
 
 import os.path
-import copy
 
 import bkl.interpreter
 import bkl.dumper
@@ -42,11 +41,11 @@ class TestingInterpreter(bkl.interpreter.Interpreter):
     def generate(self):
         pass
 
-def test_model_deepcopy():
+def test_model_cloning():
     i = TestingInterpreter()
     i.process_file(os.path.join(projects_dir, 'submodules', 'main.bkl'))
     model = i.model
-    model_copy = copy.deepcopy(model)
+    model_copy = model.clone()
     model_txt = bkl.dumper.dump_project(model)
     model_copy_txt = bkl.dumper.dump_project(model_copy)
     assert model_txt == model_copy_txt
