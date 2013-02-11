@@ -23,6 +23,7 @@
 #
 
 import os.path
+import copy
 
 import logging
 logger = logging.getLogger("bkl.model")
@@ -137,7 +138,7 @@ class Configuration(object):
         # define the configuration
         self._definition = []
 
-    def clone(self, new_name, source_pos=None):
+    def create_derived(self, new_name, source_pos=None):
         """Returns a new copy of this configuration with a new name."""
         return Configuration(new_name, self, self.is_debug, source_pos)
 
@@ -214,6 +215,17 @@ class ModelPart(object):
         self.parent = parent
         self.variables = utils.OrderedDict()
         self.source_pos = source_pos
+
+    def _clone_into(self, clone):
+        clone.source_pos = self.source_pos
+        # variables must be copied, but shallow copy is OK for them
+        clone.variables = utils.OrderedDict()
+        for k,v in self.variables.iteritems():
+            clone.variables[k] = copy.copy(v)
+
+    def _clone(self, parent, objmap):
+        raise NotImplementedError
+
 
     @property
     def project(self):
@@ -492,6 +504,47 @@ class Project(ModelPart):
         self.add_configuration(Configuration("Debug",   base=None, is_debug=True))
         self.add_configuration(Configuration("Release", base=None, is_debug=False))
 
+    def clone(self):
+        """
+        Makes an independent copy of the model.
+
+        Unlike deepcopy(), this does *not* copy everything, but uses an
+        appropriate mix of deep and shallow copies. For example, expressions,
+        which are read-only, are copied shallowly, but variables or model
+        parts, both of which can be modified in further toolset-specific
+        optimizations, are copied deeply.
+        """
+        c = Project()
+        objmap = {self:c}
+        ModelPart._clone_into(self, c)
+        # These must be fully cloned and they self-register:
+        for x in self.settings.itervalues():
+            x._clone(c, objmap)
+        # We'll clone submodules recursively to preserve their parent links:
+        self.top_module._clone(c, objmap)
+        # These are read-only, but allow manipulating the dict for removals:
+        c.configurations = self.configurations.copy()
+        # These are completely read-only:
+        c.templates = self.templates
+        c._srcdir_map = self._srcdir_map
+
+        # We need to process all expressions and remap ReferenceExpr.context to
+        # point to the new objects. This is relatively expensive (about as much
+        # as all the work above was), but unavoidable without changing the way
+        # ReferenceExpr works.
+        class _RewriteContext(expr.RewritingVisitor):
+            def __init__(self, objmap):
+                super(_RewriteContext, self).__init__()
+                self.objmap = objmap
+            def reference(self, e):
+                return expr.ReferenceExpr(e.var, self.objmap[e.context], e.pos)
+
+        rewr = _RewriteContext(objmap)
+        for var in c.all_variables():
+            var.value = rewr.visit(var.value)
+
+        return c
+
     def __str__(self):
         return "the project"
 
@@ -582,6 +635,19 @@ class Module(ModelPart):
         self.targets = utils.OrderedDict()
         self.project.modules.append(self)
         self.imports = set()
+
+    def _clone(self, parent, objmap):
+        c = Module(parent, self.source_pos)
+        objmap[self] = c
+        ModelPart._clone_into(self, c)
+        # These must be fully cloned and they self-register:
+        for x in self.targets.itervalues():
+            x._clone(c, objmap)
+        for x in self.submodules:
+            x._clone(c, objmap)
+        # These are completely read-only:
+        c.imports = self.imports
+        return c
 
     def __str__(self):
         return "module %s" % self.source_file
@@ -763,6 +829,15 @@ class Target(ModelPart, ConfigurationsPropertyMixin):
         assert not parent.project.has_target(name)
         parent.targets[name] = self
 
+    def _clone(self, parent, objmap):
+        c = Target(parent, self.name, self.type, self.source_pos)
+        objmap[self] = c
+        ModelPart._clone_into(self, c)
+        # These must be fully cloned:
+        c.sources = [x._clone(c, objmap) for x in self.sources]
+        c.headers = [x._clone(c, objmap) for x in self.headers]
+        return c
+
     def __str__(self):
         return 'target "%s"' % self.name
 
@@ -789,6 +864,12 @@ class SourceFile(ModelPart, ConfigurationsPropertyMixin):
     def __init__(self, parent, filename, source_pos):
         super(SourceFile, self).__init__(parent, source_pos)
         self.set_property_value("_filename", filename)
+
+    def _clone(self, parent, objmap):
+        c = SourceFile(parent, self.filename, self.source_pos)
+        objmap[self] = c
+        ModelPart._clone_into(self, c)
+        return c
 
     @property
     def filename(self):
@@ -822,6 +903,12 @@ class Setting(ModelPart):
         super(Setting, self).__init__(parent, source_pos)
         self.name = name
         self.project.settings[name] = self
+
+    def _clone(self, parent, objmap):
+        c = Setting(parent, self.name, self.source_pos)
+        objmap[self] = c
+        ModelPart._clone_into(self, c)
+        return c
 
     def __str__(self):
         return "setting %s" % self.name

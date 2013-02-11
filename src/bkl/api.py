@@ -199,14 +199,6 @@ class Extension(object):
             #   want to add the same properties twice
             t = t.__base__
 
-    # extensions are singletons, they shouldn't be copied:
-    # FIXME: there are more things in the model that shouldn't be duplicated by
-    #        deepcopy (types for example), reconsider using it in the first place
-    def __copy__(self):
-        return self
-    def __deepcopy__(self, memo):
-        return self
-
     name = None
     _implementations = {}
 

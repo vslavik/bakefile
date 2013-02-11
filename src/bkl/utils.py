@@ -39,9 +39,11 @@ class OrderedDict(dict):
     # TODO-PY26: replace this class with collections.OrderedDict() from Python 2.7/3.1
 
     # These must be overriden in derived class:
-    def __init__(self):
+    def __init__(self, data=None):
         dict.__init__(self)
         self.order = []
+        if data:
+            self.update(data)
 
     def __setitem__(self, key, value):
         if not self.has_key(key):
@@ -56,17 +58,26 @@ class OrderedDict(dict):
 
     def __deepcopy__(self, memo):
         c = OrderedDict()
-        for k in self.iterkeys():
-            c[k] = copy.deepcopy(self[k], memo)
+        for k,v in self.iteritems():
+            c[k] = copy.deepcopy(v, memo)
         return c
 
-    # The rest is implemented using above methods:
-    def update(self, dict):
-        for k, v in dict.iteritems():
-            self[k] = v
-
     def __copy__(self):
-        assert 0 # not permitted!
+        c = OrderedDict()
+        c.update(self.iteritems())
+        c.order = self.order[:]
+        return c
+
+    copy = __copy__
+
+    # The rest is implemented using above methods:
+    def update(self, other):
+        if isinstance(other, dict):
+            for k, v in other.iteritems():
+                self[k] = v
+        else:
+            for k, v in other:
+                self[k] = v
 
     def iterkeys(self):
         return self.__iter__()
@@ -83,6 +94,10 @@ class OrderedDict(dict):
         return list(self.iteritems())
     def values(self):
         return list(self.itervalues())
+
+    def __reduce__(self):
+        "Return state information for pickling"
+        return self.__class__, (self.items(),), {"order": self.order}
 
 
 class OrderedSet(collections.MutableSet):
