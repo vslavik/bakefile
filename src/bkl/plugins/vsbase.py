@@ -647,7 +647,7 @@ class VSToolsetBase(Toolset):
         yield Property("%s.generate-solution" % cls.name,
                        type=BoolType(),
                        default=True,
-                       inheritable=True,
+                       inheritable=False,
                        doc="""
                            Whether to generate solution file for the module. Set to
                            ``false`` if you want to omit the solution, e.g. for some
