@@ -652,8 +652,6 @@ class Module(ModelPart):
     def __str__(self):
         return "module %s" % self.source_file
 
-    name = property(lambda self: self.source_file)
-
     def child_parts(self):
         return self.targets.itervalues()
 

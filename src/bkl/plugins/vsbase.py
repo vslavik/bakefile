@@ -356,7 +356,8 @@ class VSSolutionBase(object):
     def __init__(self, toolset, module):
         slnfile = module["%s.solutionfile" % toolset.name].as_native_path_for_output(module)
         self.name = module.name
-        self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.name)
+        # unlike targets, modules' names aren't globally unique, so use the source file, which is
+        self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.source_file)
         self.projects = OrderedDict()
         self.subsolutions = []
         self.parent_solution = None
