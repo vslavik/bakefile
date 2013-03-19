@@ -53,8 +53,7 @@ def dump_module(module):
     """
     if len(module.project.modules) > 1:
         # use Unix filename syntax in the dumps even on Windows
-        filename = module.source_file.replace("\\", "/")
-        out = "module %s {\n" % filename
+        out = "module %s {\n" % module.fully_qualified_name
     else:
         out = "module {\n"
 

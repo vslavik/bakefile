@@ -1,4 +1,4 @@
-module submodules/main.bkl {
+module main {
   submodules {
     submodules/lib/libcommon.bkl
     submodules/child/child.bkl
@@ -17,7 +17,7 @@ module submodules/main.bkl {
   }
 }
 
-module submodules/lib/libcommon.bkl {
+module main::libcommon {
   variables {
     vs2008.solutionfile = @top_srcdir/lib/common2008.sln
   }
@@ -30,7 +30,7 @@ module submodules/lib/libcommon.bkl {
   }
 }
 
-module submodules/child/child.bkl {
+module main::child {
   variables {
     vs2008.solutionfile = @top_srcdir/child/child2008.sln
   }

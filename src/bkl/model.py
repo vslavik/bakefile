@@ -248,6 +248,14 @@ class ModelPart(object):
             prj = prj.parent
         return prj
 
+    @memoized_property
+    def fully_qualified_name(self):
+        """
+        Fully qualified name of this part. E.g. "main::submodule::mylibrary".
+        """
+        s = self.parent.fully_qualified_name
+        return "%s::%s" % (s, self.name) if s else self.name
+
 
     def child_parts(self):
         """
@@ -496,6 +504,7 @@ class Project(ModelPart):
 
     def __init__(self):
         super(Project, self).__init__(parent=None)
+        self.fully_qualified_name = ""
         self.modules = []
         self.configurations = utils.OrderedDict()
         self.settings = utils.OrderedDict()
@@ -670,7 +679,7 @@ class Module(ModelPart):
 
     @memoized_property
     def name(self):
-        """Name of the module"""
+        """Name of the module. Note that this is not globally unique."""
         return os.path.splitext(os.path.basename(self.source_file))[0]
 
     @property
