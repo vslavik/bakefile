@@ -251,7 +251,7 @@ generated with some script and for compilation of unsupported file types.
 
 Compiling a custom file is as simple as setting the ``compile-commands``
 property on it to the command (or several commands) to compile the file,
-``outputs`` property withthe list of created files and optionally filling in
+``outputs`` property with the list of created files and optionally filling in
 additional dependencies:
 
 .. code-block:: bkl
