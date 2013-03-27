@@ -188,10 +188,24 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to, files_map):
 
 def _make_build_nodes_for_generated_file(srcfile):
     commands_var = srcfile["compile-commands"]
-    commands = format_string(commands_var, {"in"  : "$<", "out" : "$@"})
+    inputs=[srcfile.filename] + list(srcfile["dependencies"])
+    outputs = srcfile["outputs"]
+
+    fmt_dict = {"in": "$<"}
+    if len(outputs) == 1:
+        fmt_dict["out"] = fmt_dict["out0"] = "$@"
+    else:
+        fmt_dict["out"] = outputs
+        idx = 0
+        for outN in outputs:
+            fmt_dict["out%d" % idx] = outN
+            idx += 1
+
+    commands = format_string(commands_var, fmt_dict)
+
     node = BuildNode(commands=commands,
-                     inputs=[srcfile.filename] + list(srcfile["dependencies"]),
-                     outputs=list(srcfile["outputs"]),
+                     inputs=inputs,
+                     outputs=list(outputs),
                      source_pos=commands_var.pos)
     return [node]
 
