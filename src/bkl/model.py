@@ -388,7 +388,10 @@ class ModelPart(object):
         """
         try:
             var = self.resolve_variable(name)
-            return (var is None) or (var.value.as_py() is None)
+            if var is None:
+                return True
+            py = var.value.as_py()
+            return py is None or py == [] # [] is effectively None
         except error.NonConstError:
             return False
 
