@@ -4,6 +4,7 @@ src/bkl/parser/BakefileParser.py
 src/bkl/parser/BakefileQuotedString.tokens
 src/bkl/parser/BakefileQuotedStringLexer.py
 src/bkl/parser/BakefileQuotedStringParser.py
+src/tags
 distrib/wix/bkl.msi
 distrib/wix/bkl.wixobj
 distrib/wix/bkl.wixpdb
