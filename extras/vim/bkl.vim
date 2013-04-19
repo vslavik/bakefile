@@ -39,6 +39,7 @@ syn keyword	bklCommonProp	vs2005.solutionfile
 syn keyword	bklCommonProp	vs2008.solutionfile
 syn keyword	bklCommonProp	vs2010.solutionfile
 syn keyword	bklCommonProp	vs2012.solutionfile
+syn keyword	bklCommonProp	gnu.makefile
 
 " Properties common to absolutely all targets.
 syn keyword	bklCommonProp	deps pre-build-commands post-build-commands contained
@@ -74,12 +75,16 @@ syn keyword	bklLinkage	static dll contained
 syn region	bklLinkageRHS	matchgroup=Normal start="= *" end=";" contains=bklLinkage contained
 syn match	bklBuildProp	"\<win32-crt-linkage\ze *=" nextgroup=bklLinkageRHS skipwhite contained
 
+syn keyword	bklWarnings	no minimal default all contained
+syn region	bklWarningsRHS	matchgroup=Normal start="= *" end=";" contains=bklWarnings contained
+syn match	bklBuildProp	"\<warnings\ze *=" nextgroup=bklWarningsRHS skipwhite contained
+
 syn match	bklVar		"\$(\k\+)"hs=s+2,he=e-1
 syn match	bklVar		"\$\k\+"hs=s+1
 
 " Comments definitions stolen from the standard c.vim.
 syn region	bklCommentL	start="//" skip="\\$" end="$" keepend contains=@Spell
-syn region	bklComment	matchgroup=bklCommentStart start="/\*" end="\*/" contains=@Spell fold extend
+syn region	bklComment	matchgroup=bklCommentBoundary start="/\*" end="\*/" contains=@Spell fold extend
 
 " Define a simple block to avoid nested blocks (e.g. "if" statements) inside
 " the more specific blocks below from ending them.
@@ -100,6 +105,7 @@ hi def link bklActionProp	bklCommonProp
 hi def link bklBool		Boolean
 hi def link bklBuildProp	bklCommonProp
 hi def link bklComment		Comment
+hi def link bklCommentBoundary	bklComment
 hi def link bklCommentL		bklComment
 hi def link bklCommonProp	bklGlobalProp
 hi def link bklShLibProp	bklCommonProp
@@ -115,5 +121,6 @@ hi def link bklString		String
 hi def link bklSubsys   	Constant
 hi def link bklTarget		Statement
 hi def link bklVar		Identifier
+hi def link bklWarnings		Constant
 
 let b:current_syntax = "bkl"

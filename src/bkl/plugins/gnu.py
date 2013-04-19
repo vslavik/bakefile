@@ -132,6 +132,11 @@ class GnuCCompiler(GnuFileCompiler):
             cmd.append(LiteralExpr(toolset.pthread_cc_flags))
         cmd += bkl.expr.add_prefix("-D", target["defines"])
         cmd += bkl.expr.add_prefix("-I", target["includedirs"])
+        if target["warnings"] == "no":
+            cmd.append(LiteralExpr("-w"))
+        elif target["warnings"] == "all":
+            cmd.append(LiteralExpr("-Wall"))
+        #else: don't do anything special for "minimal" and "default"
         cmd += target["compiler-options"]
         cmd += target[self._options_prop_name]
         # FIXME: use a parser instead of constructing the expression manually

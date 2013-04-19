@@ -57,6 +57,17 @@ class NativeCompiledType(TargetType):
                  default=[],
                  inheritable=True,
                  doc="Directories where to look for header files."),
+            Property("warnings",
+                 type=EnumType("warnings", ["no", "minimal", "default", "all"]),
+                 default="default",
+                 inheritable=True,
+                 doc="""
+                     Warning level for the compiler.
+
+                     Use ``off`` to completely disable warning, ``serious`` to
+                     show only the most important warning messages or ``all``
+                     to enable all warnings.
+                     """),
             Property("compiler-options",
                  type=ListType(StringType()),
                  default=[],

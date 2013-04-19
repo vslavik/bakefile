@@ -306,7 +306,7 @@ class VS200xToolsetBase(VSToolsetBase):
         if not cfg.is_debug:
             n["EnableFunctionLevelLinking"] = True
         n["UsePrecompiledHeader"] = pchNone
-        n["WarningLevel"] = 3
+        n["WarningLevel"] = self.get_vs_warning_level(cfg)
         if self.detect_64bit_problems:
             n["Detect64BitPortabilityProblems"] = True
         if cfg.is_debug and cfg.vs_platform != "x64":

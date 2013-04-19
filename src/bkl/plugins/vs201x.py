@@ -162,7 +162,7 @@ class VS201xToolsetBase(VSToolsetBase):
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             n_cl = Node("ClCompile")
             self._add_extra_options_to_node(cfg, n_cl)
-            n_cl.add("WarningLevel", "Level3")
+            n_cl.add("WarningLevel", "Level%d" % self.get_vs_warning_level(cfg))
             if cfg.is_debug:
                 n_cl.add("Optimization", "Disabled")
             else:
