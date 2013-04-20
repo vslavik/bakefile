@@ -82,6 +82,10 @@ syn match	bklBuildProp	"\<warnings\ze *=" nextgroup=bklWarningsRHS skipwhite con
 syn match	bklVar		"\$(\k\+)"hs=s+2,he=e-1
 syn match	bklVar		"\$\k\+"hs=s+1
 
+" Properties that can occur inside the settings.
+syn keyword	bklSettingProp	help contained
+syn match	bklSettingProp	"\<default\ze *=" nextgroup=bklBoolRHS skipwhite contained
+
 " Comments definitions stolen from the standard c.vim.
 syn region	bklCommentL	start="//" skip="\\$" end="$" keepend contains=@Spell
 syn region	bklComment	matchgroup=bklCommentBoundary start="/\*" end="\*/" contains=@Spell fold extend
@@ -98,6 +102,7 @@ syn region	bklShLibBlock	matchgroup=Normal start="\%\(shared-library \+\k\+\%\( 
 syn region	bklLibBlock	matchgroup=Normal start="\%\(library \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklLibProp
 syn region	bklTemplBlock	matchgroup=Normal start="\%\(template \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklProgramProp,bklShLibProp,bklLibProp
 syn region	bklActionBlock	matchgroup=Normal start="\%\(action \+\k\+ *\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
+syn region	bklSettingBlock	matchgroup=Normal start="\%\(setting \+\k\+ *\)\@<={" end="}" contains=bklSettingProp
 
 
 " Define the default highlighting.
@@ -117,6 +122,7 @@ hi def link bklGlobalStat	Statement
 hi def link bklIf		Conditional
 hi def link bklLibProp		bklCommonProp
 hi def link bklLinkage		Constant
+hi def link bklSettingProp	bklCommonProp
 hi def link bklString		String
 hi def link bklSubsys   	Constant
 hi def link bklTarget		Statement
