@@ -576,7 +576,7 @@ done:
     .. code-block:: bkl
 
        setting LIBFOO_PATH {
-           doc = "Path to the Foo library";
+           help = "Path to the Foo library";
            default = /opt/libfoo;
        }
 
