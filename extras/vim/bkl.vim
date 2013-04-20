@@ -39,7 +39,7 @@ syn keyword	bklCommonProp	vs2005.solutionfile
 syn keyword	bklCommonProp	vs2008.solutionfile
 syn keyword	bklCommonProp	vs2010.solutionfile
 syn keyword	bklCommonProp	vs2012.solutionfile
-syn keyword	bklCommonProp	gnu.makefile
+syn keyword	bklCommonProp	gnu.makefile gnu-osx.makefile gnu-suncc.makefile
 
 " Properties common to absolutely all targets.
 syn keyword	bklCommonProp	deps pre-build-commands post-build-commands contained
