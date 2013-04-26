@@ -50,15 +50,12 @@ syn keyword	bklCommonProp	vs2010.guid vs2010.projectfile contained
 syn keyword	bklCommonProp	vs2012.guid vs2012.projectfile contained
 syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\)\.option\(\.\w\+\)\{1,2}" contained
 
-" Properties that can occur inside action/program/lib/shlib targets only.
+" Properties that can occur inside action targets only.
 syn keyword	bklActionProp	commands contained
-syn keyword	bklProgramProp	basename contained
-syn keyword	bklShLibProp	basename contained
-syn keyword	bklLibProp	basename contained
 
 " Properties that can only occur in the targets building something i.e.
 " program/lib/dll ones.
-syn keyword	bklBuildProp	archs configurations contained
+syn keyword	bklBuildProp	archs basename configurations contained
 syn keyword	bklBuildProp	compiler-options c-compiler-options cxx-compiler-options contained
 syn keyword	bklBuildProp	defines headers includedirs libdirs libs link-options outputdir sources pic multithreading contained
 
@@ -97,10 +94,7 @@ syn region	bklBlock	start="{" end="}" transparent
 " Cluster of syntax items that can occur in any block.
 syn cluster	bklAnyBlock	contains=bklBlock,bklComment,bklCommentL,bklCommonProp,bklIf,bklVar
 
-syn region	bklProgramBlock	matchgroup=Normal start="\%\(program \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklProgramProp
-syn region	bklShLibBlock	matchgroup=Normal start="\%\(shared-library \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklShLibProp
-syn region	bklLibBlock	matchgroup=Normal start="\%\(library \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklLibProp
-syn region	bklTemplBlock	matchgroup=Normal start="\%\(template \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp,bklProgramProp,bklShLibProp,bklLibProp
+syn region	bklBuildBlock	matchgroup=Normal start="\%\(\(program\|library\|shared-library\|loadable-module\|template\) \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp
 syn region	bklActionBlock	matchgroup=Normal start="\%\(action \+\k\+ *\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
 syn region	bklSettingBlock	matchgroup=Normal start="\%\(setting \+\k\+ *\)\@<={" end="}" contains=bklSettingProp
 
@@ -113,14 +107,11 @@ hi def link bklComment		Comment
 hi def link bklCommentBoundary	bklComment
 hi def link bklCommentL		bklComment
 hi def link bklCommonProp	bklGlobalProp
-hi def link bklShLibProp	bklCommonProp
 hi def link bklError		Error
-hi def link bklProgramProp	bklCommonProp
 hi def link bklFilename		bklString
 hi def link bklGlobalProp	Keyword
 hi def link bklGlobalStat	Statement
 hi def link bklIf		Conditional
-hi def link bklLibProp		bklCommonProp
 hi def link bklLinkage		Constant
 hi def link bklSettingProp	bklCommonProp
 hi def link bklString		String
