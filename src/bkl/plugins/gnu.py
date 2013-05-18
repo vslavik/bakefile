@@ -60,13 +60,21 @@ def _is_multiarch_target(target):
 GCC_DEPS_FLAGS = "-MD -MP"
 OSX_GCC_DEPS_RULES = """
 # Support for generating .d files with multiple -arch options:
-cc_is_clang := $(if $(shell $(CC) --version | grep clang),yes,no)
-ifeq "$(cc_is_clang)" "yes"
-  cc_deps_flags = -MD -MP
-  cc_deps_cmd   =
+CC_is_clang := $(if $(shell $(CC) --version | grep clang),yes,no)
+CXX_is_clang := $(if $(shell $(CXX) --version | grep clang),yes,no)
+ifeq "$(CC_is_clang)" "yes"
+  CC_deps_flags = -MD -MP
+  CC_deps_cmd   =
 else
-  cc_deps_flags =
-  cc_deps_cmd   = $1 -M -MP -o $(patsubst %.o,%.d,$@) $2
+  CC_deps_flags =
+  CC_deps_cmd   = $1 -M -MP -o $(patsubst %.o,%.d,$@) $2
+endif
+ifeq "$(CXX_is_clang)" "yes"
+  CXX_deps_flags = -MD -MP
+  CXX_deps_cmd   =
+else
+  CXX_deps_flags =
+  CXX_deps_cmd   = $1 -M -MP -o $(patsubst %.o,%.d,$@) $2
 endif
 """
 
@@ -111,17 +119,17 @@ class GnuCCompiler(GnuFileCompiler):
     in_type = bkl.compilers.CFileType.get()
     out_type = GnuObjectFileType.get()
 
-    _compiler = "$(CC)"
+    _compiler = "CC"
     _flags_var_name = "CFLAGS"
     _options_prop_name = "c-compiler-options"
 
     def commands(self, toolset, target, input, output):
         needs_extra_deps_code = (isinstance(toolset, OSXGnuToolset) and
                                  _is_multiarch_target(target)) # see GCC_DEPS_FLAGS
-        cmd = [LiteralExpr("%s -c -o $@ $(CPPFLAGS) $(%s)" %
+        cmd = [LiteralExpr("$(%s) -c -o $@ $(CPPFLAGS) $(%s)" %
                 (self._compiler, self._flags_var_name))]
         if needs_extra_deps_code:
-            cmd += [LiteralExpr("$(cc_deps_flags)")]
+            cmd += [LiteralExpr("$(%s_deps_flags)" % self._compiler)]
         else:
             cmd += [LiteralExpr(toolset.deps_flags)]
         # FIXME: evaluating the flags here every time is inefficient
@@ -146,8 +154,8 @@ class GnuCCompiler(GnuFileCompiler):
 
         if needs_extra_deps_code:
             # add command for generating the deps:
-            cmd = [LiteralExpr("$(call cc_deps_cmd,%s,$(CPPFLAGS) $(%s)" %
-                    (self._compiler, self._flags_var_name))]
+            cmd = [LiteralExpr("$(call %s_deps_cmd,$(%s),$(CPPFLAGS) $(%s)" %
+                    (self._compiler, self._compiler, self._flags_var_name))]
             cmd += bkl.expr.add_prefix("-D", target["defines"])
             cmd += bkl.expr.add_prefix("-I", target["includedirs"])
             cmd += target["compiler-options"]
@@ -167,7 +175,7 @@ class GnuCXXompiler(GnuCCompiler):
     in_type = bkl.compilers.CxxFileType.get()
     out_type = GnuObjectFileType.get()
 
-    _compiler = "$(CXX)"
+    _compiler = "CXX"
     _flags_var_name = "CXXFLAGS"
     _options_prop_name = "cxx-compiler-options"
 
