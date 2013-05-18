@@ -335,6 +335,9 @@ class GnuToolset(MakefileToolset):
     ExprFormatter = GnuExprFormatter
     default_makefile = "GNUmakefile"
 
+    default_cc = "cc"
+    default_cxx = "c++"
+
     autoclean_extensions = ["o", "d"]
     del_command = "rm -f"
 
@@ -388,7 +391,10 @@ class GnuToolset(MakefileToolset):
         file.write("""
 # Use \"make RANLIB=''\" for platforms without ranlib.
 RANLIB ?= ranlib
-""")
+
+CC := %s
+CXX := %s
+""" % (self.default_cc, self.default_cxx))
         # TODO: only do this if non-const (depending on
         #       Settings/PlaceholderExpr) IfExpr is present in the file
         file.write(GMAKE_IFEXPR_MACROS)
@@ -444,6 +450,9 @@ class SunCCGnuToolset(GnuToolset):
 
     default_makefile = "Makefile.suncc"
 
+    default_cc = "suncc"
+    default_cxx = "sunCC"
+
     shared_library_link_flag  = "-G -pic"
     loadable_module_link_flag = "-G -pic"
 
@@ -454,11 +463,3 @@ class SunCCGnuToolset(GnuToolset):
     soname_flags = "-h $(notdir $@)"
     # FIXME: Do this for C++ only
     extra_link_flags = "-lCstd -lCrun"
-
-    def on_header(self, file, module):
-        super(SunCCGnuToolset, self).on_header(file, module)
-        file.write("""
-CC = suncc
-CXX = sunCC
-
-""")
