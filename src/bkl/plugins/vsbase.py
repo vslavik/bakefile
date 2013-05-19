@@ -137,6 +137,21 @@ class Node(object):
                     return
         assert 0, "add() is confused: what are you trying to do?"
 
+    def add_or_replace(self, name, value):
+        """
+        Add a child to this node, replacing the existing child with the same
+        name, if any.
+
+        This is used to override the default options with the user-specified
+        ones.
+        """
+        for n,c in enumerate(self.children):
+            if c[0] == name:
+                self.children[n] = (name, value)
+                return
+
+        self.children.append((name, value))
+
     def has_children(self):
         return len(self.children) > 0
 

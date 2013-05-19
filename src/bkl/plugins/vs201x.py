@@ -87,19 +87,18 @@ class VS201xToolsetBase(VSToolsetBase):
         root.add(n_configs)
 
         n_globals = Node("PropertyGroup", Label="Globals")
-        self._add_extra_options_to_node(target, n_globals)
         n_globals.add("ProjectGuid", "{%s}" % project.guid)
         n_globals.add("Keyword", "Win32Proj")
         n_globals.add("RootNamespace", target.name)
         n_globals.add("ProjectName", target.name)
         self._add_VCTargetsPath(n_globals)
+        self._add_extra_options_to_node(target, n_globals)
         root.add(n_globals)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.Default.props")
 
         for cfg in self.configs_and_platforms(target):
             n = Node("PropertyGroup", Label="Configuration")
-            self._add_extra_options_to_node(cfg, n)
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             if is_program(target):
                 n.add("ConfigurationType", "Application")
@@ -117,6 +116,7 @@ class VS201xToolsetBase(VSToolsetBase):
                 n.add("CharacterSet", "MultiByte")
             if self.platform_toolset:
                 n.add("PlatformToolset", self.platform_toolset)
+            self._add_extra_options_to_node(cfg, n)
             root.add(n)
 
         root.add("Import", Project="$(VCTargetsPath)\\Microsoft.Cpp.props")
@@ -135,7 +135,6 @@ class VS201xToolsetBase(VSToolsetBase):
 
         for cfg in self.configs_and_platforms(target):
             n = Node("PropertyGroup")
-            self._add_extra_options_to_node(cfg, n)
             if not is_library(target):
                 n.add("LinkIncremental", cfg.is_debug)
             targetname = cfg["basename"]
@@ -155,13 +154,13 @@ class VS201xToolsetBase(VSToolsetBase):
                 n.add("IntDir", intdir)
             if n.has_children():
                 n["Condition"] = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
+            self._add_extra_options_to_node(cfg, n)
             root.add(n)
 
         for cfg in self.configs_and_platforms(target):
             n = Node("ItemDefinitionGroup")
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             n_cl = Node("ClCompile")
-            self._add_extra_options_to_node(cfg, n_cl)
             n_cl.add("WarningLevel", "Level%d" % self.get_vs_warning_level(cfg))
             if cfg.is_debug:
                 n_cl.add("Optimization", "Disabled")
@@ -194,11 +193,11 @@ class VS201xToolsetBase(VSToolsetBase):
                 all_cflags.append("%(AdditionalOptions)")
                 n_cl.add("AdditionalOptions", all_cflags)
 
+            self._add_extra_options_to_node(cfg, n_cl)
             n.add(n_cl)
 
             if rc_files:
                 n_res = Node("ResourceCompile")
-                self._add_extra_options_to_node(cfg, n_res)
                 n_res.add("AdditionalIncludeDirectories", cfg["includedirs"])
                 std_defs = []
                 if cfg["win32-unicode"]:
@@ -206,17 +205,16 @@ class VS201xToolsetBase(VSToolsetBase):
                     std_defs.append("UNICODE")
                 std_defs.append("%(PreprocessorDefinitions)")
                 n_res.add("PreprocessorDefinitions", list(cfg["defines"]) + std_defs)
+                self._add_extra_options_to_node(cfg, n_res)
                 n.add(n_res)
 
             if idl_files:
                 n_idl = Node("Midl")
-                self._add_extra_options_to_node(cfg, n_idl)
                 n_idl.add("AdditionalIncludeDirectories", cfg["includedirs"])
+                self._add_extra_options_to_node(cfg, n_idl)
                 n.add(n_idl)
 
             n_link = Node("Link")
-            self._add_extra_options_to_node(cfg, n_link)
-            n.add(n_link)
             if is_program(target) and target["win32-subsystem"] == "console":
                 n_link.add("SubSystem", "Console")
             else:
@@ -245,6 +243,8 @@ class VS201xToolsetBase(VSToolsetBase):
                         n_lib.add("AdditionalDependencies", addlibs)
                     else:
                         n_link.add("AdditionalDependencies", addlibs)
+            self._add_extra_options_to_node(cfg, n_link)
+            n.add(n_link)
             pre_build = cfg["pre-build-commands"]
             if pre_build:
                 n_script = Node("PreBuildEvent")
@@ -398,7 +398,7 @@ class VS201xToolsetBase(VSToolsetBase):
             else:
                 scope = node.name
         for key, value in self.collect_extra_options_for_node(target, scope):
-            node.add(key, value)
+            node.add_or_replace(key, value)
 
 
     def _add_per_file_options(self, srcfile, node):
