@@ -94,9 +94,9 @@ syn region	bklBlock	start="{" end="}" transparent
 " Cluster of syntax items that can occur in any block.
 syn cluster	bklAnyBlock	contains=bklBlock,bklComment,bklCommentL,bklCommonProp,bklIf,bklVar
 
-syn region	bklBuildBlock	matchgroup=Normal start="\%\(\(program\|library\|shared-library\|loadable-module\|template\) \+\k\+\%\( *: *\k\+\%\( *, *\k\+\)*\)\? *\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp
-syn region	bklActionBlock	matchgroup=Normal start="\%\(action \+\k\+ *\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
-syn region	bklSettingBlock	matchgroup=Normal start="\%\(setting \+\k\+ *\)\@<={" end="}" contains=bklSettingProp
+syn region	bklBuildBlock	matchgroup=Normal start="\%\(\(program\|library\|shared-library\|loadable-module\|template\)\_s\+\k\+\%\(\_s*:\_s*\k\+\%\(\_s*,\_s*\k\+\)*\)\?\_s*\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp
+syn region	bklActionBlock	matchgroup=Normal start="\%\(action\_s\+\k\+\_s*\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
+syn region	bklSettingBlock	matchgroup=Normal start="\%\(setting\_s\+\k\+\_s*\)\@<={" end="}" contains=bklSettingProp
 
 
 " Define the default highlighting.
