@@ -203,6 +203,10 @@ class VS201xToolsetBase(VSToolsetBase):
                 if cfg["win32-unicode"]:
                     std_defs.append("_UNICODE")
                     std_defs.append("UNICODE")
+                # See the comment in VCResourceCompilerTool in vs200x.py for
+                # the explanation of why do we do this even though the native
+                # projects don't define _DEBUG/NDEBUG for the RC files.
+                std_defs.append("_DEBUG" if cfg.is_debug else "NDEBUG")
                 std_defs.append("%(PreprocessorDefinitions)")
                 n_res.add("PreprocessorDefinitions", list(cfg["defines"]) + std_defs)
                 self._add_extra_options_to_node(cfg, n_res)

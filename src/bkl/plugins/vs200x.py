@@ -323,6 +323,16 @@ class VS200xToolsetBase(VSToolsetBase):
         if cfg["win32-unicode"]:
             std_defs.append("_UNICODE")
             std_defs.append("UNICODE")
+
+        # Native Visual Studio projects don't define _DEBUG/NDEBUG for the
+        # resource files but it's often convenient to be able to distinguish
+        # between debug and release versions in the resources, notably in the
+        # version information block, so we exceptionally deviate from the
+        # general principle of generating projects as close to native ones as
+        # possible and do define these standard MSVC C/C++ definitions to the
+        # RC files too (this is also more consistent as we already apply the
+        # user-specified C preprocessor definitions to RC files).
+        std_defs.append("_DEBUG" if cfg.is_debug else "NDEBUG")
         n["PreprocessorDefinitions"] = list(cfg["defines"]) + std_defs
         n["AdditionalIncludeDirectories"] = cfg["includedirs"]
 
