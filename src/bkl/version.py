@@ -41,11 +41,21 @@ def get_version():
                 ver = ver.strip()
                 if ver:
                     if ver[0] == "v": ver = ver[1:]
-                    ver = ver.split("-")
-                    if len(ver) > 1:
-                        return "%s-%s" % (ver[0], ver[1])
+                    version_fields = ver.split("-")
+                    version = version_fields[0]
+                    if len(version_fields) > 1:
+                        # if we're using a 2 component version, transform it
+                        # into 3 component one to ensure that versions are
+                        # compared correctly: we want to have
+                        #
+                        #       1.2 < 1.2-git < 1.2.1
+                        #
+                        # so the 2nd git version after 1.2 must be "1.2.0.2"
+                        # and not just "1.2.2" which wouldn't compare correctly
+                        if len(version.split(".")) < 3: version += ".0"
+                        return "%s-%s" % (version, version_fields[1])
                     else:
-                        return ver[0]
+                        return version
         # fall back to normal version information in case of any error
         # (e.g. missing git or problem running it):
         except Exception:
