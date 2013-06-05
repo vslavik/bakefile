@@ -305,11 +305,14 @@ class Property(object):
             elif (sc == self.SCOPE_MODULE and
                     isinstance(model_part, bkl.model.Module)):
                 return True
+            elif (sc == self.SCOPE_TARGET and
+                    isinstance(model_part, bkl.model.Target)):
+                return True
             elif (sc == self.SCOPE_FILE and
                     isinstance(model_part, bkl.model.SourceFile)):
                 return True
-            elif (sc == self.SCOPE_TARGET and
-                    isinstance(model_part, bkl.model.Target)):
+            elif (sc == self.SCOPE_SETTING and
+                    isinstance(model_part, bkl.model.Setting)):
                 return True
             # target type scope:
             elif (isinstance(model_part, bkl.model.Target) and
