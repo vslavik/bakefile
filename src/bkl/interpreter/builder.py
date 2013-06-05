@@ -151,7 +151,7 @@ class Builder(object, CondTrackingMixin):
             # this assignment expression needs to be interpreted as assignment
             # to said property. In other words, the new variable's type
             # must much that of the property.
-            prop = context.get_prop(varname)
+            prop = context.get_matching_prop_with_inheritance(varname)
             if prop:
                 if append or has_cond:
                     propval = prop.default_expr(context)
@@ -159,10 +159,14 @@ class Builder(object, CondTrackingMixin):
                     propval = NullExpr() # we'll set it below
                 var = Variable.from_property(prop, propval)
                 context.add_variable(var)
-                # and if we didn't get previous value from anywhere else yet,
-                # we'll need to use the property:
+                # And if we didn't get previous value from anywhere else yet,
+                # we'll need to use the property. But only if the property exists
+                # in this (or parent) scope, not if it is lower-scope inheritable
+                # property (consider e.g. conditionally setting 'outputdir' in
+                # module).
                 if previous_value is None:
-                    previous_value = var
+                    if prop._scope_is_directly_for(context):
+                        previous_value = var
 
         # if the value is set conditionally, modify 'value' so that it reflects
         # the condition:
@@ -202,7 +206,6 @@ class Builder(object, CondTrackingMixin):
 
         # finally, modify variable value:
         if append:
-            assert previous_value is not None
             if not isinstance(var.type, ListType):
                 if isinstance(var.type, AnyType):
                     # if the type is undetermined, it can as well be a list
@@ -214,7 +217,10 @@ class Builder(object, CondTrackingMixin):
                 new_values = value.items
             else:
                 new_values = [value]
-            if isinstance(previous_value.value, ListExpr):
+            if previous_value is None:
+                # appending to inheritable list property with empty default
+                value = ListExpr(new_values)
+            elif isinstance(previous_value.value, ListExpr):
                 value = ListExpr(previous_value.value.items + new_values)
             else:
                 value = ListExpr([previous_value.value] + new_values)

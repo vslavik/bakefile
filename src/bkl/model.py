@@ -427,6 +427,24 @@ class ModelPart(object):
 
         .. seealso:: :meth:`enum_props()`
         """
+        p = self._get_prop(name)
+        if p is None or not p._scope_is_directly_for(self):
+            return None
+        else:
+            return p
+
+    def get_matching_prop_with_inheritance(self, name):
+        """
+        Like :meth:`get_prop()`, but looks for inheritable properties defined
+        for child scopes too (e.g. returns per-target property 'outputdir' even
+        in module scope).
+
+        (This is used for assigning into variables and validating them against
+        properties. Don't use unless you know what you're doing.)
+        """
+        return self._get_prop(name)
+
+    def _get_prop(self, name):
         raise NotImplementedError
 
     def enum_props(self):
@@ -451,15 +469,15 @@ class ModelPart(object):
         for p in self.enum_props():
             if p.toolsets and toolset not in p.toolsets:
                 continue
-            if self.resolve_variable(p.name) is None:
+            if self.is_variable_null(p.name):
                 if p.inheritable and not p._scope_is_directly_for(self):
                     # don't create default for inheritable properties at higher
                     # levels than what they're defined for
                     continue
                 var = Variable.from_property(p, p.default_expr(self))
                 var.is_explicitly_set = False
-                self.add_variable(var)
                 logger.debug("%s: setting default of %s: %s", self, var.name, var.value)
+                self.variables[p.name] = var
 
 
     def all_variables(self):
@@ -591,7 +609,7 @@ class Project(ModelPart):
                 return True
         return False
 
-    def get_prop(self, name):
+    def _get_prop(self, name):
         return props.get_project_prop(name)
 
     def enum_props(self):
@@ -697,7 +715,7 @@ class Module(ModelPart):
             m = m.parent
         return m is module
 
-    def get_prop(self, name):
+    def _get_prop(self, name):
         return props.get_module_prop(name)
 
     def enum_props(self):
@@ -858,7 +876,7 @@ class Target(ModelPart, ConfigurationsPropertyMixin):
     def all_source_files(self):
         return self.child_parts()
 
-    def get_prop(self, name):
+    def _get_prop(self, name):
         return props.get_target_prop(self.type, name)
 
     def enum_props(self):
@@ -895,7 +913,7 @@ class SourceFile(ModelPart, ConfigurationsPropertyMixin):
     def child_parts(self):
         return []
 
-    def get_prop(self, name):
+    def _get_prop(self, name):
         # TODO: need to pass file type to it
         return props.get_file_prop(name)
 
@@ -926,7 +944,7 @@ class Setting(ModelPart):
     def child_parts(self):
         return []
 
-    def get_prop(self, name):
+    def _get_prop(self, name):
         return props.get_setting_prop(name)
 
     def enum_props(self):
