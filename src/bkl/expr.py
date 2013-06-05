@@ -164,7 +164,8 @@ class ConcatExpr(Expr):
         self.items = items
 
     def as_py(self):
-        return "".join(i.as_py() for i in self.items)
+        items = (i.as_py() for i in self.items)
+        return "".join(i for i in items if i is not None)
 
     def __nonzero__(self):
         for i in self.items:
