@@ -811,7 +811,9 @@ class VSToolsetBase(Toolset):
                     continue
                 split = varname.rsplit(".", 1)
                 if len(split) == 2 and split[0] == scope:
-                    yield (str(split[1]), target[varname])
+                    value = target[varname]
+                    if not value.is_null():
+                        yield (str(split[1]), value)
             already_found.update(scope_for_vars.variables.iterkeys())
             if inherit:
                 scope_for_vars = scope_for_vars.parent

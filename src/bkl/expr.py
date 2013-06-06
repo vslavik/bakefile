@@ -70,6 +70,17 @@ class Expr(object):
         except NonConstError:
             return False
 
+    def is_null(self):
+        """
+        Returns true if the expression evaluates to null, i.e. empty value.
+        """
+        try:
+            py = self.as_py()
+            return py is None or py == [] # [] is effectively None
+        except NonConstError:
+            return False
+
+
     def as_py(self):
         """
         Returns the expression as Python value (e.g. a list of strings) if it

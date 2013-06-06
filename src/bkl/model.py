@@ -386,14 +386,10 @@ class ModelPart(object):
         Returns true if the variable is unset or null (which amounts to not
         being set in this toolset / under current condition).
         """
-        try:
-            var = self.resolve_variable(name)
-            if var is None:
-                return True
-            py = var.value.as_py()
-            return py is None or py == [] # [] is effectively None
-        except error.NonConstError:
-            return False
+        var = self.resolve_variable(name)
+        if var is None:
+            return True
+        return var.value.is_null()
 
 
     def add_variable(self, var):
