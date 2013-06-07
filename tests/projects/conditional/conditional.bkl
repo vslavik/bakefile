@@ -1,4 +1,6 @@
-toolsets = gnu gnu-osx vs2010;
+toolsets = gnu gnu-osx vs2010 vs2008;
+
+vs2008.solutionfile = conditional_2008.sln;
 
 build_something = true;
 
@@ -26,9 +28,11 @@ if ( $(build_something) ) {
         }
     }
 
-    if ( $(toolset) == vs2010 ) {
+    if ( $(toolset) == vs2010 || $(toolset) == vs2008 ) {
         program hello_windows {
             sources { hello.c }
+            if ( $config == Debug )
+                sources { debug.c }
         }
     }
 

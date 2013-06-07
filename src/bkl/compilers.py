@@ -231,6 +231,8 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
 
     for srcfile in target.sources:
         with error_context(srcfile):
+            if not srcfile.should_build(): # TODO: allow runtime decision
+                continue
             if srcfile["compile-commands"]:
                 allnodes += _make_build_nodes_for_generated_file(srcfile)
             else:
@@ -240,6 +242,8 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
                 allnodes += all
     for srcfile in target.headers:
         with error_context(srcfile):
+            if not srcfile.should_build(): # TODO: allow runtime decision
+                continue
             if srcfile["compile-commands"]:
                 allnodes += _make_build_nodes_for_generated_file(srcfile)
 

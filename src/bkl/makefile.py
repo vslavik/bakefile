@@ -182,6 +182,8 @@ class MakefileToolset(Toolset):
         norm = PathsNormalizer(project)
         for t in project.all_targets():
             with error_context(t):
+                if not t.should_build():
+                    continue
                 norm.set_context(t)
                 graph = t.type.get_build_subgraph(self, t)
                 for node in graph.all_nodes():

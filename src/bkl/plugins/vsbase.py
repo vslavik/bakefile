@@ -348,6 +348,9 @@ class VSProjectBase(object):
     #: List of configuration objects."""
     configurations = []
 
+    #: List of configurations objects for which building the project is disabled.
+    disabled_configurations = []
+
     #: List of platforms ("Win32", "x64")."""
     platforms = []
 
@@ -564,7 +567,8 @@ class VSSolutionBase(object):
                         outf.write("\t\t{%s}.%s|%s.ActiveCfg = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
                     else:
                         outf.write("\t\t{%s}.%s|%s.ActiveCfg = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
-                        outf.write("\t\t{%s}.%s|%s.Build.0 = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
+                        if cfgp not in prj.disabled_configurations:
+                            outf.write("\t\t{%s}.%s|%s.Build.0 = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(SolutionProperties) = preSolution\n")
         outf.write("\t\tHideSolutionNode = FALSE\n")
@@ -730,7 +734,7 @@ class VSToolsetBase(Toolset):
     @memoized
     def get_project_object(self, target):
         if self.is_natively_supported(target):
-            return self.Project(target.name,
+            proj = self.Project(target.name,
                                 target["%s.guid" % self.name].as_py(),
                                 target["%s.projectfile" % self.name],
                                 target["deps"].as_py(),
@@ -740,12 +744,15 @@ class VSToolsetBase(Toolset):
         else:
             # Not natively supported; try if the TargetType has an implementation
             try:
-                return target.type.vs_project(self, target)
+                proj = target.type.vs_project(self, target)
             except NotImplementedError:
                 # TODO: handle this as generic action target
                 warning("target type \"%s\" is not supported by the %s toolset, ignoring",
                         target.type.name, self.name)
                 return None
+        proj.disabled_configurations = [x.config for x in target.configurations
+                                        if not x.should_build()]
+        return proj
 
 
     def get_builddir_for(self, target):

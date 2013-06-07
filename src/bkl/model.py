@@ -291,6 +291,25 @@ class ModelPart(object):
         except KeyError:
             return None
 
+    def should_build(self):
+        """
+        Evaluates the `condition` property on this part and returns True if it
+        should be built or False otherwise. Throws NonConstError if it cannot
+        be determined.
+        """
+        # see also ConfigurationProxy.should_build(), keep in sync!
+        cond = self.condition
+        if cond is None:
+            return True
+        try:
+            return cond.as_py()
+        except error.NonConstError:
+            from bkl.interpreter.simplify import simplify
+            cond = simplify(cond)
+            raise error.CannotDetermineError("condition for building %s couldn't be resolved\n(condition \"%s\" set at %s)" %
+                        (self, cond, cond.pos),
+                        pos=self.source_pos)
+
 
     def get_variable(self, name):
         """
@@ -757,6 +776,13 @@ class ProxyIfResolver(expr.RewritingVisitor):
         self.mapping = {"config": config}
         self.inside_cond = 0
 
+    def visit_cond(self, e):
+        try:
+            self.inside_cond += 1
+            return self.visit(e)
+        finally:
+            self.inside_cond -= 1
+
     def reference(self, e):
         return self.visit(e.get_value())
 
@@ -815,6 +841,21 @@ class ConfigurationProxy(object):
             return [self._visitor.visit(x) for x in value]
         else:
             return self._visitor.visit(value)
+
+    def should_build(self):
+        # see ModelPart.should_build()
+        cond = self.model.condition
+        if cond is None:
+            return True
+        cond = self._visitor.visit_cond(cond)
+        try:
+            return cond.as_py()
+        except error.NonConstError:
+            from bkl.interpreter.simplify import simplify
+            cond = simplify(cond)
+            raise error.CannotDetermineError("condition for building %s couldn't be resolved\n(condition \"%s\" set at %s)" %
+                        (self.model, cond, cond.pos),
+                        pos=self.model.source_pos)
 
 
 

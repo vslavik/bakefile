@@ -411,6 +411,8 @@ class VS201xToolsetBase(VSToolsetBase):
         #       the vsXXXX.option.* overrides
         for cfg in self.configs_and_platforms(srcfile):
             cond = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
+            if not cfg.should_build():
+                node.add(Node("ExcludedFromBuild", True, Condition=cond))
             for key, value in self.collect_extra_options_for_node(srcfile, node.name, inherit=False):
                 node.add(Node(key, value, Condition=cond))
 

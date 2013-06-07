@@ -549,11 +549,14 @@ class VS200xToolsetBase(VSToolsetBase):
         # TODO: add regular options such as 'defines' here too, not just
         #       the vsXXXX.option.* overrides
         for cfg in self.configs_and_platforms(srcfile):
+            excluded = not cfg.should_build()
             extras = list(self.collect_extra_options_for_node(srcfile, tool, inherit=False))
             if additional_options:
                 extras = additional_options + extras
-            if extras:
+            if extras or excluded:
                 n_cfg = Node("FileConfiguration", Name="%s" % cfg.vs_name)
+                if excluded:
+                    n_cfg["ExcludedFromBuild"] = True
                 n_tool = Node("Tool", Name=tool)
                 for key, value in extras:
                     n_tool[key] = value

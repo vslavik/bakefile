@@ -97,21 +97,19 @@ def remove_disabled_model_parts(model, toolset):
     are those with ``condition`` variable evaluating to false.
     """
 
-    def _should_remove(part):
-        if part.condition is None:
-            return False
+    def _should_remove(part, allow_dynamic):
         try:
-            return not part.condition.as_py()
+            return not part.should_build()
         except NonConstError:
-            cond = simplify.simplify(part.condition)
-            raise Error("condition for building %s couldn't be resolved\n(condition \"%s\" set at %s)" %
-                        (part, cond, cond.pos),
-                        pos=part.source_pos)
+            if allow_dynamic:
+                return False
+            else:
+                raise
 
-    def _remove_from_list(parts):
+    def _remove_from_list(parts, allow_dynamic):
         to_del = []
         for p in parts:
-            if _should_remove(p):
+            if _should_remove(p, allow_dynamic):
                 to_del.append(p)
         for p in to_del:
             logger.debug("removing disabled %s from %s", p, p.parent)
@@ -120,11 +118,11 @@ def remove_disabled_model_parts(model, toolset):
     for module in model.modules:
         targets_to_del = []
         for target in module.targets.itervalues():
-            if _should_remove(target):
+            if _should_remove(target, allow_dynamic=True):
                 targets_to_del.append(target)
                 continue
-            _remove_from_list(target.sources)
-            _remove_from_list(target.headers)
+            _remove_from_list(target.sources, allow_dynamic=True)
+            _remove_from_list(target.headers, allow_dynamic=True)
         for target in targets_to_del:
             logger.debug("removing disabled %s", target)
             del module.targets[target.name]
@@ -149,7 +147,7 @@ def remove_disabled_model_parts(model, toolset):
     # and remove unused settings too:
     settings_to_del = []
     for sname, setting in model.settings.iteritems():
-        if _should_remove(setting):
+        if _should_remove(setting, allow_dynamic=False):
             settings_to_del.append(sname)
     for sname in settings_to_del:
         logger.debug("removing setting %s", sname)
