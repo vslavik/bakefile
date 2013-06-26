@@ -200,7 +200,7 @@ class GnuLinker(GnuFileCompiler):
         cmd += target.type.get_link_options(target)
         if toolset.extra_link_flags:
             cmd.append(LiteralExpr(toolset.extra_link_flags))
-        if target["multithreading"]:
+        if toolset.pthread_ld_flags and target["multithreading"]:
             cmd.append(LiteralExpr(toolset.pthread_ld_flags))
         return cmd
 
@@ -436,6 +436,7 @@ class OSXGnuToolset(GnuToolset):
 
     pic_flags = None
     soname_flags = None
+    pthread_ld_flags = None
 
     def on_footer(self, file, module):
         for t in module.targets.itervalues():
