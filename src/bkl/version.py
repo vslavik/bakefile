@@ -23,7 +23,7 @@
 #
 
 # Grep-friendly version string
-VERSION="1.2.1"
+VERSION="1.2.2"
 
 def get_version():
     # check to see if we're running from a git checkout and report more exact
