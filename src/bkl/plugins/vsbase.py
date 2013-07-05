@@ -567,7 +567,7 @@ class VSSolutionBase(object):
                         outf.write("\t\t{%s}.%s|%s.ActiveCfg = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
                     else:
                         outf.write("\t\t{%s}.%s|%s.ActiveCfg = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
-                        if cfgp not in prj.disabled_configurations:
+                        if cfg not in prj.disabled_configurations:
                             outf.write("\t\t{%s}.%s|%s.Build.0 = %s|%s\n" % (guid, cfg.name, plat, cfgp.name, platp))
         outf.write("\tEndGlobalSection\n")
         outf.write("\tGlobalSection(SolutionProperties) = preSolution\n")
@@ -750,7 +750,13 @@ class VSToolsetBase(Toolset):
                 warning("target type \"%s\" is not supported by the %s toolset, ignoring",
                         target.type.name, self.name)
                 return None
-        proj.disabled_configurations = [x.config for x in target.configurations
+
+        # See which configurations this target is explicitly disabled in.
+        # Notice that we must check _all_ configurations visible in the solution,
+        # not just the ones used by this target.
+        all_global_configs = (ConfigurationProxy(target, x)
+                              for x in target.project.configurations.itervalues())
+        proj.disabled_configurations = [x.config for x in all_global_configs
                                         if not x.should_build()]
         return proj
 
