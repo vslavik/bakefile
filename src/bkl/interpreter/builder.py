@@ -154,7 +154,7 @@ class Builder(object, CondTrackingMixin):
             prop = context.get_matching_prop_with_inheritance(varname)
             if prop:
                 if append or has_cond:
-                    propval = prop.default_expr(context)
+                    propval = prop.default_expr(context, throw_if_required=False)
                 else:
                     propval = NullExpr() # we'll set it below
                 var = Variable.from_property(prop, propval)

@@ -388,7 +388,7 @@ class ModelPart(object):
         while scope:
             p = scope.get_prop(name)
             if p is not None:
-                return p.default_expr(scope)
+                return p.default_expr(scope, throw_if_required=False)
             scope = scope.parent
         raise error.UndefinedError("unknown variable \"%s\"" % name)
 
@@ -489,7 +489,7 @@ class ModelPart(object):
                     # don't create default for inheritable properties at higher
                     # levels than what they're defined for
                     continue
-                var = Variable.from_property(p, p.default_expr(self))
+                var = Variable.from_property(p, p.default_expr(self, throw_if_required=True))
                 var.is_explicitly_set = False
                 logger.debug("%s: setting default of %s: %s", self, var.name, var.value)
                 self.variables[p.name] = var

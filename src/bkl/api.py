@@ -334,7 +334,7 @@ class Property(object):
         """
         return self.name[0] == "_"
 
-    def default_expr(self, for_obj):
+    def default_expr(self, for_obj, throw_if_required):
         """
         Returns the value of :attr:`default` expression. Always returns
         an :class:`bkl.expr.Expr` instance, even if the default is
@@ -343,11 +343,18 @@ class Property(object):
         :param for_obj: The class:`bkl.model.ModelPart` object to return
             the default for. If the default value is defined, its expression
             is evaluated in the context of *for_obj*.
+
+        :param throw_if_required: If False, returns NullExpr if the property
+            is a required one (doesn't have a default value). If True,
+            throws in that case.
         """
         default = self._make_default_expr(self.default, for_obj)
         if default is None:
-            raise error.UndefinedError("required property \"%s\" on %s not set" % (self.name, for_obj),
-                                       pos=for_obj.source_pos)
+            if throw_if_required:
+                raise error.UndefinedError("required property \"%s\" on %s not set" % (self.name, for_obj),
+                                           pos=for_obj.source_pos)
+            else:
+                return expr.NullExpr()
         return default
 
     def _make_default_expr(self, val, for_obj):
