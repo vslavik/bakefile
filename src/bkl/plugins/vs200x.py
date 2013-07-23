@@ -511,22 +511,23 @@ class VS200xToolsetBase(VSToolsetBase):
 
 
     def _add_custom_build_file(self, node, srcfile):
-        outputs = srcfile["outputs"]
-        fmt_dict = {"in": srcfile.filename, "out": outputs}
-        idx = 0
-        for outN in outputs:
-            fmt_dict["out%d" % idx] = outN
-            idx += 1
-        commands = VSList("\r\n", format_string(srcfile["compile-commands"], fmt_dict))
-        message = format_string(srcfile["compile-message"], fmt_dict)
         n_file = Node("File", RelativePath=srcfile.filename)
         for cfg in self.configs_and_platforms(srcfile):
+            outputs = cfg["outputs"]
+            fmt_dict = {"in": srcfile.filename, "out": outputs}
+            idx = 0
+            for outN in outputs:
+                fmt_dict["out%d" % idx] = outN
+                idx += 1
+            commands = VSList("\r\n", format_string(cfg["compile-commands"], fmt_dict))
+            message = format_string(cfg["compile-message"], fmt_dict)
+
             n_cfg = Node("FileConfiguration", Name="%s" % cfg.vs_name)
             n_tool = Node("Tool", Name="VCCustomBuildTool")
             n_tool["Description"] = message if message else commands
             n_tool["CommandLine"] = commands
             n_tool["Outputs"] = outputs
-            n_tool["AdditionalDependencies"] = srcfile["dependencies"]
+            n_tool["AdditionalDependencies"] = cfg["dependencies"]
             n_cfg.add(n_tool)
             n_file.add(n_cfg)
         node.add(n_file)
