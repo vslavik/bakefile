@@ -29,7 +29,7 @@ from ..parser.ast import *
 from ..parser import parse_file
 from ..error import ParserError, error_context, warning
 from ..vartypes import ListType, AnyType
-import analyze
+from . import analyze
 
 import os.path
 
