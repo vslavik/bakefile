@@ -34,7 +34,7 @@ import itertools
 import re
 from abc import ABCMeta, abstractmethod
 
-from error import NonConstError, CannotDetermineError, ParserError, Error, error_context
+from error import NonConstError, CannotDetermineError, ParserError, Error, error_context, warning
 
 
 class Expr(object):
@@ -1134,6 +1134,11 @@ class _SplitIntoPathVisitor(_SplitVisitor):
         self.anchor = ANCHOR_SRCDIR
         self.anchor_file = None
         self.anchor_set = False
+
+    def literal(self, e):
+        if '\\' in e.value:
+            warning("'\\' is not path separator in bakefiles (use '/')", pos=e.pos)
+        return super(_SplitIntoPathVisitor, self).literal(e)
 
     def list(self, e):
         raise Error("list can't be a part of a path")
