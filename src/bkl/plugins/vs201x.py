@@ -91,7 +91,6 @@ class VS201xToolsetBase(VSToolsetBase):
         n_globals.add("Keyword", "Win32Proj")
         n_globals.add("RootNamespace", target.name)
         n_globals.add("ProjectName", target.name)
-        self._add_VCTargetsPath(n_globals)
         self._add_extra_options_to_node(target, n_globals)
         root.add(n_globals)
 
@@ -375,10 +374,6 @@ class VS201xToolsetBase(VSToolsetBase):
         node.add(n)
 
 
-    def _add_VCTargetsPath(self, node):
-        pass
-
-
     def _get_references(self, target):
         # In addition to explicit dependencies, add dependencies of static libraries
         # linked into target to the list of references.
@@ -547,7 +542,3 @@ class VS2012Toolset(VS201xToolsetBase):
     Solution = VS2012Solution
     Project = VS2012Project
 
-    def _add_VCTargetsPath(self, node):
-        node.add(Node("VCTargetsPath",
-                      "$(VCTargetsPath11)",
-                      Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''"))
