@@ -50,13 +50,16 @@ class VS2010Project(VSProjectBase):
 
 
 class VS201xToolsetBase(VSToolsetBase):
-    """Base class for VS2010 and VS2012 toolsets."""
+    """Base class for VS2010, VS2012 and VS2013 toolsets."""
 
     #: Extension of format files
     proj_extension = "vcxproj"
 
     #: PlatformToolset property
     platform_toolset = None
+
+    #: ToolsVersion property
+    tools_version = "4.0"
 
     def gen_for_target(self, target, project):
         rc_files = []
@@ -75,7 +78,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
         root = Node("Project")
         root["DefaultTargets"] = "Build"
-        root["ToolsVersion"] = "4.0"
+        root["ToolsVersion"] = self.tools_version
         root["xmlns"] = "http://schemas.microsoft.com/developer/msbuild/2003"
 
         n_configs = Node("ItemGroup", Label="ProjectConfigurations")
@@ -543,3 +546,48 @@ class VS2012Toolset(VS201xToolsetBase):
     Solution = VS2012Solution
     Project = VS2012Project
 
+
+class VS2013Solution(VS2010Solution):
+    format_version = "12.00" # not a typo - same as VS2010
+    human_version = "2013"
+
+    def write_header(self, file):
+        super(VS2013Solution, self).write_header(file)
+        file.write("VisualStudioVersion = 12.0.20617.1 PREVIEW\n")
+        file.write("MinimumVisualStudioVersion = 10.0.40219.1\n")
+
+
+class VS2013Project(VS2010Project):
+    version = 12
+
+
+class VS2013Toolset(VS201xToolsetBase):
+    """
+    Visual Studio 2013.
+
+
+    Special properties
+    ------------------
+    This toolset supports the same special properties that
+    :ref:`ref_toolset_vs2010`. The only difference is that they are prefixed
+    with ``vs2013.option.`` instead of ``vs2010.option.``, i.e. the nodes are:
+
+      - ``vs2013.option.Globals.*``
+      - ``vs2013.option.Configuration.*``
+      - ``vs2013.option.*`` (this is the unnamed ``PropertyGroup`` with
+        global settings such as ``TargetName``)
+      - ``vs2013.option.ClCompile.*``
+      - ``vs2010.option.ResourceCompile.*``
+      - ``vs2013.option.Link.*``
+      - ``vs2013.option.Lib.*``
+
+    """
+
+    name = "vs2013"
+
+    version = 12
+    proj_versions = [10, 11, 12]
+    platform_toolset = "v120"
+    tools_version = "12.0"
+    Solution = VS2013Solution
+    Project = VS2013Project

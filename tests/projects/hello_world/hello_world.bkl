@@ -1,6 +1,7 @@
-toolsets = gnu gnu-osx gnu-suncc vs2008 vs2010 vs2012;
+toolsets = gnu gnu-osx gnu-suncc vs2008 vs2010 vs2012 vs2013;
 
 vs2012.solutionfile = hello_world_vs2012.sln;
+vs2013.solutionfile = hello_world_vs2013.sln;
 vs2008.solutionfile = hello_world_vs2008.sln;
 
 program hello {
@@ -9,4 +10,5 @@ program hello {
     defines += "SALUTATION=\"Hello\"";
 
     vs2012.projectfile = hello_vs2012.vcxproj;
+    vs2013.projectfile = hello_vs2013.vcxproj;
 }
