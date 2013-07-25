@@ -348,12 +348,14 @@ class VS201xToolsetBase(VSToolsetBase):
         filename = project.projectfile.as_native_path_for_output(target)
         paths_info = self.get_project_paths_info(target, project)
 
+        formatter= XmlFormatter(paths_info)
         f = OutputFile(filename, EOL_WINDOWS,
                        creator=self, create_for=target)
         f.write(codecs.BOM_UTF8)
-        f.write(XmlFormatter(paths_info).format(root))
+        f.write(formatter.format(root))
         f.commit()
-        self._write_filters_file_for(filename)
+        self._write_filters_file_for(filename, formatter,
+                                     target.headers, cl_files, idl_files, rc_files)
 
 
     def _add_custom_build_file(self, node, srcfile):
@@ -415,29 +417,58 @@ class VS201xToolsetBase(VSToolsetBase):
                 node.add(Node(key, value, Condition=cond))
 
 
-    def _write_filters_file_for(self, filename):
+    def _write_filters_file_for(self, filename, formatter,
+                                hdr_files, cl_files, idl_files, rc_files):
+        root = Node("Project")
+        root["ToolsVersion"] = "4.0" # even if tools_version is different (VS2013)
+        root["xmlns"] = "http://schemas.microsoft.com/developer/msbuild/2003"
+        filters = Node("ItemGroup")
+        root.add(filters)
+        f = Node("Filter", Include="Source Files")
+        filters.add(f)
+        f.add("UniqueIdentifier", "{4FC737F1-C7A5-4376-A066-2A32D752A2FF}")
+        f.add("Extensions", "cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx")
+        f = Node("Filter", Include="Header Files")
+        filters.add(f)
+        f.add("UniqueIdentifier", "{93995380-89BD-4b04-88EB-625FBE52EBFB}")
+        f.add("Extensions", "h;hpp;hxx;hm;inl;inc;xsd")
+        f = Node("Filter", Include="Resource Files")
+        filters.add(f)
+        f.add("UniqueIdentifier", "{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}")
+        f.add("Extensions", "rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms")
+
+        if hdr_files:
+            group = Node("ItemGroup")
+            root.add(group)
+            for sfile in hdr_files:
+                n = Node("ClInclude", Include=sfile.filename)
+                group.add(n)
+                n.add("Filter", "Header Files")
+
+        if cl_files or idl_files:
+            group = Node("ItemGroup")
+            root.add(group)
+            for sfile in cl_files:
+                n = Node("ClCompile", Include=sfile.filename)
+                group.add(n)
+                n.add("Filter", "Source Files")
+            for sfile in idl_files:
+                n = Node("Midl", Include=sfile.filename)
+                group.add(n)
+                n.add("Filter", "Source Files")
+
+        if rc_files:
+            group = Node("ItemGroup")
+            root.add(group)
+            for sfile in rc_files:
+                n = Node("ResourceCompile", Include=sfile.filename)
+                group.add(n)
+                n.add("Filter", "Resource Files")
+
         f = OutputFile(filename + ".filters", EOL_WINDOWS,
                        creator=self, create_for=filename)
         f.write(codecs.BOM_UTF8)
-        f.write("""\
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-  </ItemGroup>
-</Project>
-""")
+        f.write(formatter.format(root))
         f.commit()
 
 
