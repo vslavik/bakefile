@@ -415,6 +415,7 @@ class VS201xToolsetBase(VSToolsetBase):
     def _write_filters_file_for(self, filename):
         f = OutputFile(filename + ".filters", EOL_WINDOWS,
                        creator=self, create_for=filename)
+        f.write(codecs.BOM_UTF8)
         f.write("""\
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
