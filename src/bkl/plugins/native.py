@@ -64,7 +64,7 @@ class NativeCompiledType(TargetType):
                  doc="""
                      Warning level for the compiler.
 
-                     Use ``off`` to completely disable warning, ``serious`` to
+                     Use ``no`` to completely disable warning, ``minimal`` to
                      show only the most important warning messages or ``all``
                      to enable all warnings.
                      """),
