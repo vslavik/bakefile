@@ -585,7 +585,7 @@ class VS2013Solution(VS2010Solution):
 
     def write_header(self, file):
         super(VS2013Solution, self).write_header(file)
-        file.write("VisualStudioVersion = 12.0.20617.1 PREVIEW\n")
+        file.write("VisualStudioVersion = 12.0.21005.1\n")
         file.write("MinimumVisualStudioVersion = 10.0.40219.1\n")
 
 
