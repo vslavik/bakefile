@@ -99,6 +99,16 @@ class OutputFile(object):
             text = text.encode(self.charset)
         self.text += text
 
+    def replace(self, placeholder, value):
+        """
+        Replaces the value of the given placeholder with its real value. This
+        is useful for parts of the output which are not known at the time they
+        are written because they depend on other parts coming after them.
+
+        Notice that only the first occurrency of the placeholder is replaced.
+        """
+        self.text = self.text.replace(placeholder, value, 1)
+
     def commit(self):
         if self.eol == EOL_WINDOWS:
             self.text = self.text.replace("\n", "\r\n")

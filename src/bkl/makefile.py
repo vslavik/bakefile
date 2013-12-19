@@ -207,7 +207,7 @@ class MakefileToolset(Toolset):
                 model=module)
 
         mk_fmt = self.Formatter()
-        expr_fmt = self.ExprFormatter(paths_info)
+        expr_fmt = self.ExprFormatter(self, paths_info)
 
         f = io.OutputFile(output, io.EOL_UNIX, creator=self, create_for=module)
         self.on_header(f, module)
