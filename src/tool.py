@@ -90,6 +90,10 @@ parser.add_option(
         action="store_true", dest="dry_run", default=False,
         help="don't write any files, just pretend to do it")
 parser.add_option(
+        "", "--diff-only",
+        action="store_true", dest="diff_only", default=False,
+        help="only output diffs instead of modiyfing the files, implies --dry-run")
+parser.add_option(
         "", "--force",
         action="store_true", dest="force", default=False,
         help="touch output files even if they're unchanged")
@@ -129,6 +133,9 @@ else:
     log_level = logging.WARNING
 logger.setLevel(log_level)
 
+if options.diff_only and options.force:
+    sys.stderr.write("--diff-only and --force option can't be used together\n")
+    sys.exit(3)
 
 # note: we intentionally import bakefile this late so that the logging
 # module is already initialized
@@ -140,6 +147,7 @@ import bkl.io
 try:
     start_time = time()
     bkl.io.dry_run = options.dry_run
+    bkl.io.diff_only = options.diff_only
     bkl.io.force_output = options.force
     if options.dump:
         intr = bkl.dumper.DumpingInterpreter()

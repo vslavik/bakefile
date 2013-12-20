@@ -37,6 +37,9 @@ logger = logging.getLogger("bkl.io")
 # Set to true to prevent any output from being written
 dry_run = False
 
+# Set to true to show diff with the existing file instead of updating it
+diff_only = False
+
 # Set to true to force writing of output files, even if they exist and would be
 # unchanged. In other words, always touch output files. This is useful for
 # makefiles that support automatic regeneration.
@@ -123,6 +126,15 @@ class OutputFile(object):
             if old == self.text:
                 status = "."
                 logger.info("%s\t%s", status, rel_fn)
+                return
+            if diff_only:
+                import sys
+                from difflib import unified_diff
+                for line in unified_diff(old.splitlines(True) if old is not None else [],
+                                         self.text.splitlines(True),
+                                         os.path.normpath(os.path.join("old", self.filename)),
+                                         os.path.normpath(os.path.join("new", self.filename))):
+                    sys.stdout.write(line)
                 return
         else:
             old = None
