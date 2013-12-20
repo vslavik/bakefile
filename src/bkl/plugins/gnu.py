@@ -78,12 +78,16 @@ else
 endif
 """
 
+# This is just a unique string, its exact syntax doesn't matter currently.
+GMAKE_IFEXPR_MACROS_PLACEHOLDER = "{{{BKL_GMAKE_IFEXPR_MACROS}}}"
+
 # GNU Make has some boolean functions, but not all that we need, so define them
 GMAKE_IFEXPR_MACROS = """
 _true  := true
 _false :=
 _not    = $(if $(1),$(_false),$(_true_))
 _equal  = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
+
 """
 
 
@@ -295,7 +299,12 @@ class GnuMakefileFormatter(MakefileFormatter):
 
 
 class GnuExprFormatter(MakefileExprFormatter):
+    def __init__(self, toolset, paths_info):
+        MakefileExprFormatter.__init__(self, paths_info)
+        self.toolset = toolset
+
     def bool_value(self, e):
+        self.toolset.uses_non_std_bool_macros = True
         return "$(_true)" if e.value else "$(_false)"
 
     def bool(self, e):
@@ -307,10 +316,13 @@ class GnuExprFormatter(MakefileExprFormatter):
         if e.operator == BoolExpr.OR:
             return "$(or %s,%s)" % (l, r)
         if e.operator == BoolExpr.EQUAL:
+            self.toolset.uses_non_std_bool_macros = True
             return "$(call _equal,%s,%s)" % (l, r)
         if e.operator == BoolExpr.NOT_EQUAL:
+            self.toolset.uses_non_std_bool_macros = True
             return "$(call _not,$(call _equal,%s,%s))" % (l, r)
         if e.operator == BoolExpr.NOT:
+            self.toolset.uses_non_std_bool_macros = True
             return "$(call _not,%s)" % l
         assert False, "invalid operator"
 
@@ -403,14 +415,19 @@ RANLIB ?= ranlib
 CC := %s
 CXX := %s
 """ % (self.default_cc, self.default_cxx))
-        # TODO: only do this if non-const (depending on
-        #       Settings/PlaceholderExpr) IfExpr is present in the file
-        file.write(GMAKE_IFEXPR_MACROS)
+        # This placeholder will be replaced either with the definition of the
+        # macros, if they turn out to be really needed, or nothing otherwise.
+        file.write(GMAKE_IFEXPR_MACROS_PLACEHOLDER)
+        self.uses_non_std_bool_macros = False
 
     def on_phony_targets(self, file, targets):
         file.write(".PHONY: %s\n" % " ".join(targets))
 
     def on_footer(self, file, module):
+        file.replace(GMAKE_IFEXPR_MACROS_PLACEHOLDER,
+                     GMAKE_IFEXPR_MACROS if self.uses_non_std_bool_macros
+                                         else "")
+
         file.write("\n"
                    "# Dependencies tracking:\n"
                    "-include *.d\n")
