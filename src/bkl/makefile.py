@@ -167,10 +167,14 @@ class MakefileToolset(Toolset):
                        inheritable=False,
                        doc="Name of output file for module's makefile.")
 
+    def get_module_builddir(self, module):
+        makefile = module["%s.makefile" % self.name]
+        builddir = makefile.get_directory_path()
+        builddir.components.insert(0, expr.LiteralExpr("$(builddir)"))
+        return builddir
+
     def get_builddir_for(self, target):
-        # FIXME: use configurable build dir
-        makefile = target.parent["%s.makefile" % self.name]
-        return makefile.get_directory_path()
+        return self.get_module_builddir(target.parent)
 
     def generate(self, project):
         # We need to know build graphs of all targets so that we can generate
@@ -203,7 +207,7 @@ class MakefileToolset(Toolset):
         paths_info = expr.PathAnchorsInfo(
                 dirsep="/", # FIXME - format-configurable
                 outfile=output,
-                builddir=os.path.dirname(output), # FIXME: use configurable build dir
+                builddir=self.get_module_builddir(module).as_native_path_for_output(module),
                 model=module)
 
         mk_fmt = self.Formatter()
@@ -211,6 +215,11 @@ class MakefileToolset(Toolset):
 
         f = io.OutputFile(output, io.EOL_UNIX, creator=self, create_for=module)
         self.on_header(f, module)
+        f.write("""
+# The directory for the build files, may be overridden on make command line.
+builddir = .
+
+""")
 
         self._gen_settings(module, mk_fmt, expr_fmt, f)
 
