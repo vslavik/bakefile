@@ -27,7 +27,7 @@ try:
 except ImportError:
     import os.path
     antlr_path = os.path.join(os.path.dirname(__file__),
-                              "../../../3rdparty/antlr3/runtime/Python")
+                              "../../../3rdparty/antlr3/python-runtime")
     if os.path.isdir(antlr_path):
         import sys
         sys.path.append(os.path.abspath(antlr_path))

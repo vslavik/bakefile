@@ -1,8 +1,8 @@
 
 
-ANTLR  := antlr-3.4
 PYTEST := py.test
 
+ANTLR  := java -jar $(abspath 3rdparty/antlr3/antlr.jar)
 
 generated_antlr_files := \
 		src/bkl/parser/BakefileParser.py \
@@ -12,21 +12,12 @@ generated_antlr_files := \
 		src/bkl/parser/BakefileQuotedStringLexer.py \
 		src/bkl/parser/BakefileQuotedString.tokens
 
-antlr_from_submodule := $(abspath 3rdparty/antlr3/target/antlr)
-
-antlr_is_34 := $(if $(shell $(ANTLR) -version 2>&1 | grep 'Version 3.4'),yes,no)
-ifeq "$(antlr_is_34)" "yes"
-	antlr_path := $(shell which $(ANTLR))
-else
-	antlr_path := $(antlr_from_submodule)
-endif
-
 all: parser doc
 
 parser: $(generated_antlr_files)
 
-%Parser.py %Lexer.py %.tokens: %.g $(antlr_path)
-	cd $(dir $<) && $(antlr_path) $(notdir $<)
+%Parser.py %Lexer.py %.tokens: %.g
+	cd $(dir $<) && $(ANTLR) $(notdir $<)
 
 # the island-grammar parser emits the same tokens as the main one
 src/bkl/parser/BakefileQuotedStringParser.py: src/bkl/parser/Bakefile.tokens
@@ -38,14 +29,8 @@ clean:
 	rm -f $(generated_antlr_files)
 	find . -name '*.pyc' -delete
 	$(MAKE) -C docs clean
-	$(MAKE) -C 3rdparty clean
 
 test: all
 	$(PYTEST)
-
-# Antlr from included submodule:
-$(antlr_from_submodule):
-	$(MAKE) -C 3rdparty antlr
-
 
 .PHONY: clean test doc parser
