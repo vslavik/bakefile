@@ -787,7 +787,6 @@ class VSToolsetBase(Toolset):
         elif is_library(target):
             defs.append("_LIB")
         elif is_dll(target):
-            defs.append("_USRDLL")
             defs.append("%s_EXPORTS" % target.name.upper())
         return defs
 
