@@ -13,7 +13,7 @@ distrib_unix: build
 	rm -rf $(TARBALL_NAME)
 	mkdir $(TARBALL_NAME)
 	(cd .. ; git archive --format=tar HEAD) | (cd $(TARBALL_NAME) ; tar x)
-	(cd ../3rdparty/antlr3/runtime/Python ; git archive --format=tar HEAD antlr3) | (cd $(TARBALL_NAME)/src ; tar x)
+	(cd ../3rdparty/antlr3/python-runtime ; git archive --format=tar HEAD antlr3) | (cd $(TARBALL_NAME)/src ; tar x)
 	cp -a ../src/bkl/parser/Bakefile*.py $(TARBALL_NAME)/src/bkl/parser
 	cp -a ../docs/html $(TARBALL_NAME)/docs/
 	cat ../src/bkl/version.py | sed -e 's/VERSION=".*"/VERSION="$(VERSION)"/' >$(TARBALL_NAME)/src/bkl/version.py
@@ -35,7 +35,7 @@ pyinstaller/bkl.exe: build
 	
 	rm -rf pyinstaller/_extras
 	mkdir -p pyinstaller/_extras/antlr3
-	cp -a ../3rdparty/antlr3/runtime/Python/antlr3/*.py pyinstaller/_extras/antlr3
+	cp -a ../3rdparty/antlr3/python-runtime/antlr3/*.py pyinstaller/_extras/antlr3
 	cd pyinstaller && python ../../3rdparty/pyinstaller/pyinstaller.py -p _extras bkl.spec
 	rm -rf pyinstaller/_extras
 	
