@@ -178,7 +178,7 @@ class VSExprFormatter(bkl.expr.Formatter):
 class VSList(object):
     """
     Helper class for use with XmlFormatter to represent lists with different
-    delimiters. It's constructor takes the delimiter character as its first argument,
+    delimiters. Its constructor takes the delimiter character as its first argument,
     followed by any number of Python lists or ListExprs that will be joined.
     """
     def __init__(self, list_sep, *args):
