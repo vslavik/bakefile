@@ -105,8 +105,8 @@ class VS200xXmlFormatter(XmlFormatter):
     indent_step = "\t"
     ExprFormatter = VS200xExprFormatter
 
-    def __init__(self, paths_info):
-        super(VS200xXmlFormatter, self).__init__(paths_info, charset=VCPROJ_CHARSET)
+    def __init__(self, settings, paths_info):
+        super(VS200xXmlFormatter, self).__init__(settings, paths_info, charset=VCPROJ_CHARSET)
 
     # these are always written as <foo>\n<foo>, not <foo/>
     elems_not_collapsed = set(["References",
@@ -253,7 +253,7 @@ class VS200xToolsetBase(VSToolsetBase):
 
         f = OutputFile(filename, EOL_WINDOWS, charset=VCPROJ_CHARSET,
                        creator=self, create_for=target)
-        f.write(self.XmlFormatter(paths_info).format(root))
+        f.write(self.XmlFormatter(target.project.settings, paths_info).format(root))
         f.commit()
 
 
