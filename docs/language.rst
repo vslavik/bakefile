@@ -590,7 +590,8 @@ and just hard-code their values when you don't need the flexibility.
 
 .. note::
 
-   Settings are currently only supported by makefiles.
+   Settings are currently only fully supported by makefiles, they are always
+   replaced with their default values in the project files.
 
 
 Submodules

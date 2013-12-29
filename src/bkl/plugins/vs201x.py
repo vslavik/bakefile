@@ -348,7 +348,7 @@ class VS201xToolsetBase(VSToolsetBase):
         filename = project.projectfile.as_native_path_for_output(target)
         paths_info = self.get_project_paths_info(target, project)
 
-        formatter= XmlFormatter(paths_info)
+        formatter = XmlFormatter(target.project.settings, paths_info)
         f = OutputFile(filename, EOL_WINDOWS,
                        creator=self, create_for=target)
         f.write(codecs.BOM_UTF8)

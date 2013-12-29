@@ -165,11 +165,21 @@ class VSExprFormatter(bkl.expr.Formatter):
                 "arch"   : "$(Platform)",
              }
 
+    def __init__(self, settings, paths_info):
+        super(VSExprFormatter, self).__init__(paths_info)
+        self.settings = settings
+
     def placeholder(self, e):
         try:
             return self.substs[e.var]
         except KeyError:
-            assert False, "All references should be expanded in VS output"
+            try:
+                # Just use the setting default value in VS output, we don't
+                # allow to configure it yet (we'd need to generate a .props
+                # file for this).
+                return str(self.settings[e.var]["default"])
+            except KeyError:
+                assert False, 'Unexpectedly unexpanded reference "%s"' % e.var
 
     def bool_value(self, e):
         return "true" if e.value else "false"
@@ -220,9 +230,9 @@ class XmlFormatter(object):
     #: Class for expressions formatting
     ExprFormatter = VSExprFormatter
 
-    def __init__(self, paths_info, charset="utf-8"):
+    def __init__(self, settings, paths_info, charset="utf-8"):
         self.charset = charset
-        self.expr_formatter = self.ExprFormatter(paths_info)
+        self.expr_formatter = self.ExprFormatter(settings, paths_info)
 
     def format(self, node):
         """
@@ -384,7 +394,7 @@ class VSSolutionBase(object):
                                     outfile=slnfile,
                                     builddir=None,
                                     model=module)
-        self.formatter = VSExprFormatter(paths_info)
+        self.formatter = VSExprFormatter(module.project.settings, paths_info)
         self.generate_outf = module["%s.generate-solution" % toolset.name]
         if self.generate_outf:
             self.outf = OutputFile(slnfile, EOL_WINDOWS,
