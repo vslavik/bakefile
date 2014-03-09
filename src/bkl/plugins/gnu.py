@@ -379,6 +379,58 @@ class GnuToolset(MakefileToolset):
     soname_flags = "-Wl,-soname,$(notdir $@)"
     extra_link_flags = None
 
+    def output_default_flags(self, file, configs):
+        """
+            Helper of on_header() which outputs default, config-dependent,
+            values for all the usual compilation flags.
+        """
+
+        # Check if we have any custom configurations: we always have at least
+        # two standard ones, "Debug" and "Release".
+        if len(configs) > 2:
+            # We do, so check which of them should use debug settings and
+            # which -- the release ones.
+            debug_config, release_config = configs['Debug'], configs['Release']
+            debug_configs_names = ['Debug']
+            release_configs_names = ['Release']
+            for name, config in configs.iteritems():
+                if config.derived_from(debug_config):
+                    debug_configs_names.append(name)
+                elif config.derived_from(release_config):
+                    release_configs_names.append(name)
+
+            # Assume that tilde characters are never used in the configuration
+            # names (it's certainly not common at the very least).
+            non_config_sep = '~~'
+
+            make_test_fmt = 'ifneq (,$(findstring %s$(config)%s,%s%%s%s))' % \
+                (non_config_sep, non_config_sep, non_config_sep, non_config_sep)
+
+            make_debug_test = make_test_fmt % non_config_sep.join(debug_configs_names)
+            make_release_test = make_test_fmt % non_config_sep.join(release_configs_names)
+        else:
+            # If we only have the two predefined configs, use simpler tests.
+            make_debug_test = 'ifeq ($(config),Debug)'
+            make_release_test = 'ifeq ($(config),Release)'
+
+        file.write("""
+# You may also specify config=%s
+# on make command line to select the corresponding default flags values.
+%s
+CPPFLAGS ?= -DDEBUG
+CFLAGS ?= -g -O0
+CXXFLAGS ?= -g -O0
+LDFLAGS ?= -g
+else %s
+CPPFLAGS ?= -DNDEBUG
+CFLAGS ?= -O2
+CXXFLAGS ?= -O2
+else ifneq (,$(config))
+$(warning Unknown configuration "$(config)")
+endif
+""" % ('|'.join(configs.keys()), make_debug_test, make_release_test))
+
+
     def on_header(self, file, module):
         super(GnuToolset, self).on_header(file, module)
 
@@ -392,6 +444,8 @@ class GnuToolset(MakefileToolset):
 # that can be used by this makefile is:
 # AR, CC, CFLAGS, CPPFLAGS, CXX, CXXFLAGS, LD, LDFLAGS, MAKE, RANLIB.
 """)
+
+        self.output_default_flags(file, module.project.configurations)
 
         if module.project.settings:
             file.write("""#
