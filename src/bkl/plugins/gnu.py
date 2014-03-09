@@ -476,11 +476,11 @@ class SunCCGnuToolset(GnuToolset):
     default_cc = "suncc"
     default_cxx = "sunCC"
 
-    shared_library_link_flag  = "-G -pic"
-    loadable_module_link_flag = "-G -pic"
+    shared_library_link_flag  = "-G -Kpic"
+    loadable_module_link_flag = "-G -Kpic"
 
     deps_flags = "-xMD"
-    pic_flags = "-pic -DPIC"
+    pic_flags = "-Kpic -DPIC"
     pthread_cc_flags = "-D_THREAD_SAFE -mt"
     pthread_ld_flags = "-mt -lpthread"
     soname_flags = "-h $(notdir $@)"
