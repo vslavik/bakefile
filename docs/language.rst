@@ -435,8 +435,19 @@ Build configurations
 A feature common to many IDEs is support for different build configurations,
 i.e. for building the same project using different compilation options.
 Bakefile generates the two standard "Debug" and "Release" configurations by
-default for the toolsets that use them (currently "vs*") but you may also
-define your own *custom configurations*.
+default for the toolsets that usually use them (currently "vs*") and also
+supports the use of configurations with the makefile-based toolsets by
+allowing to specify ``config=NameOfConfig`` on make command line, e.g.
+
+.. code-block:: sh
+
+    $ make config=Debug
+    # ... files are compiled with "-g" option and without optimizations ...
+
+In addition to these two standard configurations, it is also possible to
+define your own *custom configurations*, which is especially useful for the
+project files which can't be customized as easily as the makefiles at build
+time.
 
 Here is a step by step guide to doing this. First, you need to define the new
 configuration. This is done by using a configuration declaration in the global
@@ -514,25 +525,20 @@ using this approach:
 
 .. note::
 
-   Configurations are not supported by all toolsets. Makefiles currently don't
-   implement them and if ``$(config)`` is used in such a way that it affects
-   makefiles, Bakefile will stop with an error. For example, tests for the
-   ``$(config)`` value should only be done in code that is specific to toolsets
-   that support them. This would cause an error when generating ``gnu`` output:
+   As mentioned above, it is often unnecessary (although still possible) to
+   define configurations for the makefile-based toolsets as it's always
+   possible to just write ``make CPPFLAGS=-DEXTRA_DEBUG`` instead of using an
+   "ExtraDebug" configuration from the example above with them. If you want to
+   avoid such unnnecessary configurations in your makefiles, you could define
+   them only conditionally, for example:
 
    .. code-block:: bkl
 
        toolsets = gnu vs2010;
-       if ( $config == Release )
-           defines += NDEBUG;
+       if ( $toolset == vs2010 && $config == ExtraDebug )
+           defines += EXTRA_DEBUG;
 
-   Making the test specific to Visual Studio is OK, though:
-
-   .. code-block:: bkl
-
-       toolsets = gnu vs2010;
-       if ( $toolset == vs2010 && $config == Release )
-           defines += NDEBUG;
+   would work as before in Visual Studio but would generate a simpler makefile.
 
 
 
