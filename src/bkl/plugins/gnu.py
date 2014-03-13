@@ -367,10 +367,10 @@ class GnuToolset(MakefileToolset):
     library_extension = "a"
     shared_library_prefix = "lib"
     shared_library_extension = "so"
-    shared_library_link_flag = "-shared"
+    shared_library_link_flag = "-shared -Wl,-z,defs"
     loadable_module_prefix = ""
     loadable_module_extension = "so"
-    loadable_module_link_flag = "-shared"
+    loadable_module_link_flag = "-shared -Wl,-z,defs"
 
     deps_flags = GCC_DEPS_FLAGS
     pic_flags = "-fPIC -DPIC"
@@ -476,8 +476,8 @@ class SunCCGnuToolset(GnuToolset):
     default_cc = "suncc"
     default_cxx = "sunCC"
 
-    shared_library_link_flag  = "-G -Kpic"
-    loadable_module_link_flag = "-G -Kpic"
+    shared_library_link_flag  = "-G -Kpic -z defs"
+    loadable_module_link_flag = "-G -Kpic -z defs"
 
     deps_flags = "-xMD"
     pic_flags = "-Kpic -DPIC"
