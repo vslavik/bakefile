@@ -444,6 +444,10 @@ allowing to specify ``config=NameOfConfig`` on make command line, e.g.
     $ make config=Debug
     # ... files are compiled with "-g" option and without optimizations ...
 
+Notice that configuration names shouldn't be case-sensitive as
+``config=debug`` is handled in the same way as ``config=Debug`` in make-based
+toolsets.
+
 In addition to these two standard configurations, it is also possible to
 define your own *custom configurations*, which is especially useful for the
 project files which can't be customized as easily as the makefiles at build

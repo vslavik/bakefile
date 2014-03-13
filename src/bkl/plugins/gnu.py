@@ -415,20 +415,37 @@ class GnuToolset(MakefileToolset):
 
         file.write("""
 # You may also specify config=%s
-# on make command line to select the corresponding default flags values.
-%s
+# or their corresponding lower case variants on make command line to select
+# the corresponding default flags values.
+""" % '|'.join(configs.keys()))
+
+        # Accept configs in lower case too to be more Unix-ish.
+        for name in configs:
+            file.write(
+"""ifeq ($(config),%s)
+override config := %s
+endif
+""" % (name.lower(), name))
+
+        file.write(make_debug_test)
+        file.write(
+"""
 CPPFLAGS ?= -DDEBUG
 CFLAGS ?= -g -O0
 CXXFLAGS ?= -g -O0
 LDFLAGS ?= -g
-else %s
+else """
+)
+        file.write(make_release_test)
+        file.write(
+"""
 CPPFLAGS ?= -DNDEBUG
 CFLAGS ?= -O2
 CXXFLAGS ?= -O2
 else ifneq (,$(config))
 $(warning Unknown configuration "$(config)")
 endif
-""" % ('|'.join(configs.keys()), make_debug_test, make_release_test))
+""")
 
 
     def on_header(self, file, module):
