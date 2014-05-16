@@ -13,6 +13,9 @@
 
 import sys, os
 
+# Check if Sphinx is running on readthedocs.org
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
@@ -92,7 +95,8 @@ lexers['bkl'] = BakefileLexer()
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
-html_theme = 'haiku'
+if not on_rtd:
+    html_theme = 'haiku'
 
 
 # The name for this set of Sphinx documents.  If None, it defaults to
