@@ -36,7 +36,6 @@ import expr
 from bkl.error import Error, CannotDetermineError, error_context
 from bkl.api import Extension, Toolset, Property
 from bkl.vartypes import PathType
-from bkl.interpreter.passes import PathsNormalizer
 from bkl.utils import OrderedDict
 
 
@@ -180,8 +179,9 @@ class MakefileToolset(Toolset):
         # all modules before generating the output, because of cross-module
         # dependencies.
         # TODO-MT: read only, can be ran in parallel
-        build_graphs = {}
+        from bkl.interpreter.passes import PathsNormalizer
         norm = PathsNormalizer(project)
+        build_graphs = {}
         for t in project.all_targets():
             with error_context(t):
                 if not t.should_build():
