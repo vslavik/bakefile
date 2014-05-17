@@ -1,6 +1,6 @@
 #coding: utf-8
 #
-#  This file is part of Bakefile (http://www.bakefile.org)
+#  This file is part of Bakefile (http://bakefile.org)
 #
 #  Copyright (C) 2008-2013 Vaclav Slavik
 #

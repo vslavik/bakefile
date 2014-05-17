@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#  This file is part of Bakefile (http://www.bakefile.org)
+#  This file is part of Bakefile (http://bakefile.org)
 #
 #  Copyright (C) 2009-2013 Vaclav Slavik
 #
