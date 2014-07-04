@@ -773,7 +773,7 @@ class VSToolsetBase(Toolset):
 
     def get_builddir_for(self, target):
         prj = target["%s.projectfile" % self.name]
-        configuration_ref = self.XmlFormatter.ExprFormatter.substs["config"]
+        configuration_ref = "$(IntDir)"
         return bkl.expr.PathExpr(prj.components[:-1] + [bkl.expr.LiteralExpr(configuration_ref)], prj.anchor, prj.anchor_file)
 
 
