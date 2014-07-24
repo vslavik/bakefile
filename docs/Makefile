@@ -8,13 +8,9 @@ SPHINXBUILD  := sphinx-build
 # Internal variables.
 ALLSPHINXOPTS   = -d .doctrees $(SPHINXOPTS) .
 
-GENERATED_TS = ref/timestamp
-GENERATED_DOCS_SOURCES := $(wildcard ../src/bkl/*.py) \
-                          $(wildcard ../src/bkl/plugins/*.py)
-
 SPHINX_DOC_FILES := conf.py bkl_lexer.py $(wildcard *.rst)
 
-ALL_DOCS_INPUTS = $(GENERATED_TS) $(SPHINX_DOC_FILES)
+ALL_DOCS_INPUTS = $(SPHINX_DOC_FILES)
 
 .PHONY: all help clean html htmlhelp changes linkcheck
 
@@ -31,10 +27,6 @@ clean:
 	rm -rf .build .doctrees
 	rm -rf html
 	rm -rf ref
-
-$(GENERATED_TS): $(GENERATED_DOCS_SOURCES) gen_reference.py
-	./gen_reference.py
-	@touch $(GENERATED_TS)
 
 html: html/.buildinfo
 html/.buildinfo: $(ALL_DOCS_INPUTS)

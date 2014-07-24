@@ -11,7 +11,7 @@
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
 
-import sys, os
+import sys, os, subprocess
 
 # Check if Sphinx is running on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -186,3 +186,5 @@ class Mock(object):
 
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
+
+subprocess.call(os.path.abspath('gen_reference.py'))
