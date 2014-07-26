@@ -1,0 +1,24 @@
+v1.2.5 (????-??-??)
+===================
+
+New Features
+------------
+
+- Support "config" variable for choosing debug/release configuration in
+  "gnu" toolset.
+- Support "builddir" variable in "gnu" toolset for out of source builds.
+- Allow using settings with MSVS toolsets.
+- Generate makefiles which don't allow creation of shared libraries or
+  loadable modules with undefined symbols.
+
+Bug fixes
+---------
+
+- Don't define _USRDLL unnecessarily in the generated MSVS projects.
+- Use correct (-Kpic) flag with Sun cc C compiler instead of wrong "-pic".
+
+Other Changes
+-------------
+
+- Include ANTLR 3.5.1 binaries in the source tree to make Bakefile build out
+  of the box without any extra dependencies.
