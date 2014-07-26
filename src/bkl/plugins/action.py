@@ -43,6 +43,13 @@ class ActionTargetType(TargetType):
     ``pre-build-commands`` and ``post-build-commands`` properties for another
     alternative that is supported by Visual Studio projects.
 
+    If the optional ``outputs`` property is specified, the action is supposed
+    to generate the files listed in this property. This means that other
+    targets depending on this action will depend on these files in the
+    generated makefile, instead of depending on the phony target for an action
+    without outputs and also that these files will be cleaned up by the
+    ``clean`` target of the generated makefile.
+
     .. code-block:: bkl
 
        action osx-bundle
@@ -55,19 +62,26 @@ class ActionTargetType(TargetType):
     """
     name = "action"
 
-    # TODO: add ability to specify action's output files (?)
-
     properties = [
             Property("commands",
                  type=ListType(StringType()),
                  default=[],
                  inheritable=False,
                  doc="List of commands to run."),
+
+            Property("outputs",
+                 type=ListType(PathType()),
+                 default=expr.NullExpr(),
+                 inheritable=False,
+                 doc="Output files created by this action, if any."),
         ]
 
     def get_build_subgraph(self, toolset, target):
         # prefix each line with @ so that make doesn't output the commands:
         cmds_var = target["commands"]
         cmds = add_prefix("@", cmds_var)
-        node = BuildNode(commands=list(cmds), name=target["id"], source_pos=cmds_var.pos)
+        node = BuildNode(commands=list(cmds),
+                         name=target["id"],
+                         outputs=target["outputs"],
+                         source_pos=cmds_var.pos)
         return BuildSubgraph(node)

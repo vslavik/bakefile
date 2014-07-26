@@ -6,6 +6,12 @@ module {
     action hello {
       commands = [echo Hello, cwd is:, pwd]
     }
+    action build-external-lib {
+      commands = [make -C external-dir]
+      outputs = [@top_srcdir/external-dir/libexternal.so]
+    }
+    program main {
+      deps = [build-external-lib, hello]
+    }
   }
 }
-

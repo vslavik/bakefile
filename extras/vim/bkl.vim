@@ -53,7 +53,7 @@ syn keyword	bklCommonProp	vs2013.guid vs2013.projectfile contained
 syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\|2013\)\.option\(\.\w\+\)\{1,2}" contained
 
 " Properties that can occur inside action targets only.
-syn keyword	bklActionProp	commands contained
+syn keyword	bklActionProp	commands outputs contained
 
 " Properties that can only occur in the targets building something i.e.
 " program/lib/dll ones.

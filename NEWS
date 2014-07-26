@@ -7,6 +7,7 @@ New Features
 - Support "config" variable for choosing debug/release configuration in
   "gnu" toolset.
 - Support "builddir" variable in "gnu" toolset for out of source builds.
+- Allow specifying "outputs" property for the actions in makefiles.
 - Allow using settings with MSVS toolsets.
 - Generate makefiles which don't allow creation of shared libraries or
   loadable modules with undefined symbols.

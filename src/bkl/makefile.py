@@ -224,7 +224,8 @@ builddir = .
         #FIXME: make this part of the formatter for (future) IdRefExpr
         def _format_dep(t):
             g = build_graphs[t].main
-            if g.name:
+            if len(g.outputs) == 0:
+                assert g.name
                 if t.parent is not module:
                     raise Error("cross-module dependencies on phony targets (\"%s\") not supported yet" % t.name) # TODO
                 out = g.name
@@ -302,11 +303,11 @@ builddir = .
                 graph = build_graphs[t]
                 for node in graph.all_nodes():
                     with error_context(node):
-                        if node.name:
+                        if node.outputs:
+                            out = node.outputs
+                        else:
                             out = [node.name]
                             phony_targets.append(expr_fmt.format(out[0]))
-                        else:
-                            out = node.outputs
 
                         deps = [expr_fmt.format(i) for i in node.inputs]
                         if node is graph.main:

@@ -5,3 +5,12 @@ action hello {
                "pwd"
                ;
 }
+
+action build-external-lib {
+    commands = "make -C external-dir";
+    outputs = external-dir/libexternal.so;
+}
+
+program main {
+    deps = build-external-lib hello;
+}
