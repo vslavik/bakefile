@@ -187,4 +187,4 @@ class Mock(object):
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
 
-subprocess.call(os.path.abspath('gen_reference.py'))
+subprocess.call(os.path.abspath('gen_reference.py'), shell = True)
