@@ -2,7 +2,7 @@
 a = Analysis(['..\\..\\src\\tool.py'],
              pathex=[
                       '..\\..\\src',
-                      '..\\..\\3rdparty\\antlr3\\runtime\\Python',
+                      '..\\..\\3rdparty\\antlr3\\python-runtime',
                     ],
              hiddenimports=['encodings','antlr3'],
              hookspath=['.'])
