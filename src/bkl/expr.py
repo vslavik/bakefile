@@ -55,7 +55,7 @@ class Expr(object):
     """
     def __init__(self, pos=None):
         self.pos = pos
-    
+
     def is_const(self):
         """
         Returns true if the expression is constant, i.e. can be evaluated
@@ -176,7 +176,7 @@ class ConcatExpr(Expr):
 
     def as_py(self):
         items = (i.as_py() for i in self.items)
-        return "".join(i for i in items if i is not None)
+        return "".join(i if not isinstance(i, list) else " ".join(i) for i in items if i is not None)
 
     def __nonzero__(self):
         for i in self.items:
@@ -336,7 +336,7 @@ class BoolExpr(Expr):
         self.operator = operator
         self.left = left
         self.right = right
-    
+
     def has_bool_operands(self):
         """
         Returns true if the operator is such that it requires boolean operands

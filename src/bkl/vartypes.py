@@ -170,7 +170,11 @@ class StringType(Type):
               # paths etc. can be used as strings too
               not isinstance(e, expr.BoolExpr) and
               not isinstance(e, expr.PathExpr)):
-            raise TypeError(self, e)
+            if isinstance(e, expr.ListExpr):
+                for i in e.items:
+                    self.validate(i)
+            else:
+                raise TypeError(self, e)
 
 
 class IdType(Type):
