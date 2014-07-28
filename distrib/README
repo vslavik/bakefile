@@ -1,0 +1,33 @@
+0. Before making a distribution
+-------------------------------
+
+- Run "make test".
+- Create a tag vX.Y.Z where "X.Y.Z" is the version.
+
+
+1. Making Unix distribution
+---------------------------
+
+Run "make -C distrib distrib_unix", the output file will be
+bakefile-X.Y.Z_beta-bin.tar.bz2.
+
+
+2. Making Windows distribution
+------------------------------
+
+Ensure that you have pyinstaller submodule (which is only needed for making
+Windows distributions) and do
+
+       git submodule update --init 3rdparty/pyinstaller
+
+if necessary.
+
+Check that upx and zip are in PATH.
+
+Run "make -C distrib distrib_win", the output file be
+bakefile-X.Y.Z_beta-win.zip
+
+Notice that at one time there was an effort to produce an MSI installer for
+bakefile and its remains can be found in wix subdirectory, however the files
+there are not maintained and bakefile currently is not distributed in this
+form.

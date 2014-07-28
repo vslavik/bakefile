@@ -48,10 +48,6 @@ the git repository:
 
        easy_install clint    (for colorized output)
 
-If you are using a git checkout, then you just need to checkout the submodules:
-
-       git submodule init
-       git submodule update
 
 Once all tools are installed, you can build Bakefile by running `make`. This
 generates the parser from ANTLR grammar and build the HTML documentation.
