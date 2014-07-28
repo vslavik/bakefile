@@ -26,7 +26,7 @@ distrib_win: build pyinstaller/bkl.exe
 	mkdir $(TARBALL_NAME)-win
 	cp -a pyinstaller/bkl.exe ../COPYING ../README $(TARBALL_NAME)-win
 	cp -a ../docs/html $(TARBALL_NAME)-win/docs
-	zip -r -9 $(TARBALL_NAME)-win.zip $(TARBALL_NAME)-win
+	zip -q -r -9 $(TARBALL_NAME)-win.zip $(TARBALL_NAME)-win
 	rm -rf $(TARBALL_NAME)-win
 
 pyinstaller/bkl.exe: build
