@@ -2,7 +2,9 @@
 
 PYTEST := py.test
 
-ANTLR  := java -jar $(abspath 3rdparty/antlr3/antlr.jar)
+# This path is relative to src/bkl/parser from where java is ran from.
+ANTLR_JAR := ../../../3rdparty/antlr3/antlr.jar
+ANTLR  := java -jar $(ANTLR_JAR)
 
 generated_antlr_files := \
 		src/bkl/parser/BakefileParser.py \
