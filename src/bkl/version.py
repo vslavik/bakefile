@@ -30,7 +30,9 @@ def get_version():
     # version if we do:
     import os.path
     gitdir = os.path.join(os.path.dirname(__file__), "../../.git")
-    if os.path.isdir(gitdir):
+    # notice that we intentionally use exists() and not isdir() as this git
+    # "directory" is actually a file inside a git submodule
+    if os.path.exists(gitdir):
         import subprocess
         try:
             # TODO-2.6: replace this with subprocess.check_output() once we
