@@ -22,6 +22,7 @@ parser: $(generated_antlr_files)
 	cd $(dir $<) && $(ANTLR) $(notdir $<)
 
 # the island-grammar parser emits the same tokens as the main one
+src/bkl/parser/BakefileQuotedString.g: src/bkl/parser/Bakefile.tokens
 src/bkl/parser/BakefileQuotedStringParser.py: src/bkl/parser/Bakefile.tokens
 
 doc: parser
