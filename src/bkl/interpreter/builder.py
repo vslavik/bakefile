@@ -483,6 +483,8 @@ class Builder(object, CondTrackingMixin):
             e = BoolValueExpr(ast.value)
         elif t is VarReferenceNode:
             e = ReferenceExpr(ast.var, self.context)
+        elif t is VarRefAsStrNode:
+            e = ReferenceAsStringExpr(ast.var, self.context)
         elif t is ListNode:
             items = [self._build_expression(e) for e in ast.values]
             e = ListExpr(items)

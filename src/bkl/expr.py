@@ -55,7 +55,7 @@ class Expr(object):
     """
     def __init__(self, pos=None):
         self.pos = pos
-    
+
     def is_const(self):
         """
         Returns true if the expression is constant, i.e. can be evaluated
@@ -96,6 +96,12 @@ class Expr(object):
         """
         raise NotImplementedError
 
+    def to_string(self):
+        """
+        Return the expression as a Python string. Has same semantics :meth:`as_py()`.
+        """
+        raise NotImplementedError
+
     def as_symbolic(self):
         """
         Returns the value as a symbolic representation, see SymbolicFormatter.
@@ -133,6 +139,9 @@ class LiteralExpr(Expr):
     def as_py(self):
         return self.value
 
+    def to_string(self):
+        return str(self.value)
+
     def __nonzero__(self):
         return bool(self.value)
 
@@ -150,6 +159,9 @@ class ListExpr(Expr):
 
     def as_py(self):
         return [ i.as_py() for i in self.items ]
+
+    def to_string(self):
+        return " ".join([i.to_string() for i in self.items])
 
     def __nonzero__(self):
         return bool(self.items)
@@ -175,8 +187,11 @@ class ConcatExpr(Expr):
         self.items = items
 
     def as_py(self):
-        items = (i.as_py() for i in self.items)
+        items = (i.to_string() for i in self.items)
         return "".join(i for i in items if i is not None)
+
+    def to_string(self):
+        return self.as_py()
 
     def __nonzero__(self):
         for i in self.items:
@@ -194,6 +209,9 @@ class NullExpr(Expr):
     """
     def as_py(self):
         return None
+
+    def to_string(self):
+        return ""
 
     def __nonzero__(self):
         return False
@@ -225,6 +243,9 @@ class PlaceholderExpr(Expr):
     def as_py(self):
         raise NonConstError(self)
 
+    def to_string(self):
+        self.as_py()
+
     def __str__(self):
         return "${%s}" % self.var
 
@@ -250,6 +271,9 @@ class ReferenceExpr(Expr):
 
     def as_py(self):
         return self.get_value().as_py()
+
+    def to_string(self):
+        return self.get_value().to_string()
 
     def get_value(self):
         """
@@ -280,6 +304,14 @@ class ReferenceExpr(Expr):
         return "$(%s)" % self.var
 
 
+class ReferenceAsStringExpr(ReferenceExpr):
+    """
+    Reference to a variable inside of a string. Has the same attributes as :class:bkl.expr.ReferenceExpr.
+    """
+    def as_py(self):
+        return self.get_value().to_string()
+
+
 class BoolValueExpr(Expr):
     """
     Constant boolean value, i.e. true or false.
@@ -294,6 +326,9 @@ class BoolValueExpr(Expr):
 
     def as_py(self):
         return self.value
+
+    def to_string(self):
+        return str(self)
 
     def __nonzero__(self):
         return self.value
@@ -336,7 +371,7 @@ class BoolExpr(Expr):
         self.operator = operator
         self.left = left
         self.right = right
-    
+
     def has_bool_operands(self):
         """
         Returns true if the operator is such that it requires boolean operands
@@ -366,6 +401,9 @@ class BoolExpr(Expr):
             return not self.left.as_py()
         else:
             assert False, "invalid BoolExpr operator"
+
+    def to_string(self):
+        return BoolValueExpr(self.as_py()).to_string()
 
     def __nonzero__(self):
         left = bool(self.left)
@@ -411,6 +449,9 @@ class IfExpr(Expr):
 
     def as_py(self):
         return self.get_value().as_py()
+
+    def to_string(self):
+        return self.get_value().to_string()
 
     def get_value(self):
         """
@@ -492,6 +533,9 @@ class PathExpr(Expr):
         # path), so let's return a representation in bakefile language,
         # with explicit anchor:
         return "%s/%s" % (self.anchor, "/".join(x.as_py() for x in self.components))
+
+    def to_string(self):
+        return self.as_py()
 
     def __nonzero__(self):
         return bool(self.components)
@@ -623,16 +667,17 @@ class Visitor(object):
 
     def __init__(self):
         self._dispatch = {
-            NullExpr         : self.null,
-            LiteralExpr      : self.literal,
-            ListExpr         : self.list,
-            ConcatExpr       : self.concat,
-            ReferenceExpr    : self.reference,
-            PlaceholderExpr  : self.placeholder,
-            PathExpr         : self.path,
-            BoolValueExpr    : self.bool_value,
-            BoolExpr         : self.bool,
-            IfExpr           : self.if_,
+            NullExpr               : self.null,
+            LiteralExpr            : self.literal,
+            ListExpr               : self.list,
+            ConcatExpr             : self.concat,
+            ReferenceExpr          : self.reference,
+            ReferenceAsStringExpr  : self.reference,
+            PlaceholderExpr        : self.placeholder,
+            PathExpr               : self.path,
+            BoolValueExpr          : self.bool_value,
+            BoolExpr               : self.bool,
+            IfExpr                 : self.if_,
         }
 
     def visit(self, e):

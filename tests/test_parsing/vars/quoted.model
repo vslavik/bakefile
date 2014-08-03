@@ -5,6 +5,9 @@ module {
     zar = this is called "escaping"
     single = no eval done $(bar) here
     double = evaluated 1 2 3 here (as in shell)...
+    a = [1, 2, 3]
+    b = true
+    r = !!$(a) true
   }
   targets {
   }

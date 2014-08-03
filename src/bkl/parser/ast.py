@@ -174,6 +174,8 @@ class VarReferenceNode(Node):
     var = property(lambda self: self.children[0].text,
                    doc="Referenced variable")
 
+class VarRefAsStrNode(VarReferenceNode):
+    """Variable interpolating into a string."""
 
 class AssignmentNode(Node):
     """Assignment of value to a variable."""
@@ -306,35 +308,36 @@ class _TreeAdaptor(CommonTreeAdaptor):
 
     # mapping of token types to AST node classes
     TOKENS_MAP = {
-        BakefileParser.NIL            : NilNode,
-        BakefileParser.PROGRAM        : RootNode,
-        BakefileParser.LITERAL        : LiteralNode,
-        BakefileParser.BOOLVAL        : BoolvalNode,
-        BakefileParser.PATH_ANCHOR    : PathAnchorNode,
-        BakefileParser.ID             : IdNode,
-        BakefileParser.LIST           : ListNode,
-        BakefileParser.CONCAT         : ConcatNode,
-        BakefileParser.LIST_OR_CONCAT : Node, # post-processed below
-        BakefileParser.VAR_REFERENCE  : VarReferenceNode,
-        BakefileParser.ASSIGN         : AssignmentNode,
-        BakefileParser.APPEND         : AppendNode,
-        BakefileParser.LVALUE         : LvalueNode,
-        BakefileParser.FILES_LIST     : FilesListNode,
-        BakefileParser.TARGET         : TargetNode,
-        BakefileParser.IF             : IfNode,
-        BakefileParser.OR             : OrNode,
-        BakefileParser.AND            : AndNode,
-        BakefileParser.NOT            : NotNode,
-        BakefileParser.EQUAL          : EqualNode,
-        BakefileParser.NOT_EQUAL      : NotEqualNode,
-        BakefileParser.SUBMODULE      : SubmoduleNode,
-        BakefileParser.IMPORT         : ImportNode,
-        BakefileParser.PLUGIN         : PluginNode,
-        BakefileParser.SRCDIR         : SrcdirNode,
-        BakefileParser.BASE_LIST      : BaseListNode,
-        BakefileParser.CONFIGURATION  : ConfigurationNode,
-        BakefileParser.SETTING        : SettingNode,
-        BakefileParser.TEMPLATE       : TemplateNode,
+        BakefileParser.NIL                     : NilNode,
+        BakefileParser.PROGRAM                 : RootNode,
+        BakefileParser.LITERAL                 : LiteralNode,
+        BakefileParser.BOOLVAL                 : BoolvalNode,
+        BakefileParser.PATH_ANCHOR             : PathAnchorNode,
+        BakefileParser.ID                      : IdNode,
+        BakefileParser.LIST                    : ListNode,
+        BakefileParser.CONCAT                  : ConcatNode,
+        BakefileParser.LIST_OR_CONCAT          : Node, # post-processed below
+        BakefileParser.VAR_REFERENCE           : VarReferenceNode,
+        BakefileParser.VAR_REFERENCE_ASSTRING  : VarRefAsStrNode,
+        BakefileParser.ASSIGN                  : AssignmentNode,
+        BakefileParser.APPEND                  : AppendNode,
+        BakefileParser.LVALUE                  : LvalueNode,
+        BakefileParser.FILES_LIST              : FilesListNode,
+        BakefileParser.TARGET                  : TargetNode,
+        BakefileParser.IF                      : IfNode,
+        BakefileParser.OR                      : OrNode,
+        BakefileParser.AND                     : AndNode,
+        BakefileParser.NOT                     : NotNode,
+        BakefileParser.EQUAL                   : EqualNode,
+        BakefileParser.NOT_EQUAL               : NotEqualNode,
+        BakefileParser.SUBMODULE               : SubmoduleNode,
+        BakefileParser.IMPORT                  : ImportNode,
+        BakefileParser.PLUGIN                  : PluginNode,
+        BakefileParser.SRCDIR                  : SrcdirNode,
+        BakefileParser.BASE_LIST               : BaseListNode,
+        BakefileParser.CONFIGURATION           : ConfigurationNode,
+        BakefileParser.SETTING                 : SettingNode,
+        BakefileParser.TEMPLATE                : TemplateNode,
     }
 
     def createWithPayload(self, payload):
@@ -360,7 +363,7 @@ class _TreeAdaptor(CommonTreeAdaptor):
 
         FIXME: It would be better to do it here, with backtrack=true and
                validating predicates to build it directly, but bugs in
-               ANTLR 3.4's Python binding prevent it from working at the moment. 
+               ANTLR 3.4's Python binding prevent it from working at the moment.
         """
         concats = []
         children = node.children

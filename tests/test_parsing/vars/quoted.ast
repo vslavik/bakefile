@@ -22,6 +22,27 @@ RootNode
             IdNode double
         ConcatNode
             LiteralNode "evaluated "
-            VarReferenceNode
+            VarRefAsStrNode
                 IdNode bar
             LiteralNode " here (as in shell)..."
+    AssignmentNode
+        LvalueNode
+            IdNode a
+        ListNode
+            LiteralNode "1"
+            LiteralNode "2"
+            LiteralNode "3"
+    AssignmentNode
+        LvalueNode
+            IdNode b
+        BoolvalNode True
+    AssignmentNode
+        LvalueNode
+            IdNode r
+        ConcatNode
+            LiteralNode "!!"
+            VarRefAsStrNode
+                IdNode a
+            LiteralNode " "
+            VarRefAsStrNode
+                IdNode b
