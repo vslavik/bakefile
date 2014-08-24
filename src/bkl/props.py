@@ -260,7 +260,7 @@ class PropertiesDict(utils.OrderedDict):
     Dictionary of properties, keyed by their names.
     """
     def __init__(self, scope):
-        super(PropertiesDict, self). __init__()
+        super(PropertiesDict, self).__init__()
         self.scope = scope
 
     def add(self, prop, as_inherited=False):
@@ -315,6 +315,9 @@ class PropertiesRegistry(object):
     Registry of existing properties.
     """
     def __init__(self):
+        self._init_vars()
+
+    def _init_vars(self):
         self._initialized = False
         self.all_targets = None
         self.all_files = None
@@ -443,6 +446,10 @@ class PropertiesRegistry(object):
             self.settings.add(p)
 
         self._initialized = True
+
+    def force_rescan(self):
+        """Force re-scanning of properties"""
+        self._init_vars()
 
 
 registry = PropertiesRegistry()

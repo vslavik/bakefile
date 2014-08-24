@@ -30,6 +30,7 @@ from ..parser import parse_file
 from ..error import ParserError, error_context, warning
 from ..vartypes import ListType, AnyType
 from . import analyze
+from .. import props
 
 import os.path
 
@@ -441,6 +442,7 @@ class Builder(object, CondTrackingMixin):
         fn = os.path.join(os.path.dirname(node.pos.filename), node.file)
         import bkl.plugins
         bkl.plugins.load_from_file(fn)
+        props.registry.force_rescan()
 
 
     def on_srcdir(self, node):
