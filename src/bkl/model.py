@@ -938,7 +938,15 @@ class SourceFile(ModelPart, ConfigurationsPropertyMixin):
 
     @property
     def filename(self):
-        return self["_filename"]
+        f = self["_filename"]
+        # Most of the time the filenames are just expr.PathExpr here, but this
+        # isn't necessarily the case. For now the only other case that does
+        # happen in practice is a variable containing a path, so we deal just
+        # with it, but we may want to use a proper visitor to handle values of
+        # any type correctly here in the future.
+        if isinstance(f, expr.ReferenceExpr):
+            f = f.get_value()
+        return f
 
     @memoized_property
     def name(self):

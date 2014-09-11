@@ -1,0 +1,19 @@
+module {
+  variables {
+    toolsets = [gnu]
+  }
+  targets {
+    library lib1 {
+      SRC_DIR = src
+      sources {
+        file @top_srcdir/src/foo.c
+      }
+    }
+    library lib2 {
+      SRC_DIR = source
+      sources {
+        file @top_srcdir/source/foo.c
+      }
+    }
+  }
+}

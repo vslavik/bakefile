@@ -1,0 +1,18 @@
+// This test checks that setting a variable used in a base template "sources"
+// statement does affect the sources used for the current target.
+
+toolsets = gnu;
+
+template base {
+    SRC_DIR = src;
+
+    sources { $(SRC_DIR)/foo.c }
+}
+
+library lib1 : base {
+}
+
+library lib2 : base {
+    SRC_DIR = source;
+}
+

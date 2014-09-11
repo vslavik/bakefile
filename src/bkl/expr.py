@@ -1225,6 +1225,70 @@ def get_model_name_from_path(e):
         return _ModelNameFromPathVisitor().visit(e)
 
 
+class _KeepPossibleValuesUnexpandedVisitor(Visitor):
+    """
+    Visitor determining if a reference should be expanded when determining its
+    possible values.
+
+    The rule is that anything inside the reference expansion that doesn't end
+    up being a simple value should result in the top level visit() returning
+    :const:`False`.
+    """
+    def null(self, e):
+        return True
+
+    def literal(self, e):
+        return True
+
+    def list(self, e):
+        return False
+
+    def concat(self, e):
+        for x in e.items:
+            if not self.visit(x):
+                return False
+        return True
+
+    def reference(self, e):
+        return self.visit(e.get_value())
+
+    def placeholder(self, e):
+        return False
+
+    def path(self, e):
+        for x in e.components:
+            if not self.visit(x):
+                return False
+        return True
+
+    def bool_value(self, e):
+        return True
+
+    def bool(self, e):
+        return True
+
+    def if_(self, e):
+        return False
+
+def keep_possible_values_unexpanded(e):
+    """
+    Determines if the given reference value should be expanded or not.
+
+    This is a helper of enum_possible_values() and is used to decide whether
+    a value returned by that function is fully expanded or kept in its
+    original form, with variable references in it. The latter is useful when
+    dealing with the source files containing variables as it prevents them
+    from being expanded too early, before the variable value for the current
+    target is really known.
+
+    However anything not representing a simple single value should still be
+    expanded and this function task is to check whether the argument is a
+    reference to such simple single value or not.
+    """
+    v = _KeepPossibleValuesUnexpandedVisitor()
+    return v.visit(e)
+
+
 class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
     def __init__(self):
         Visitor.__init__(self)
@@ -1241,6 +1305,8 @@ class _PossibleValuesVisitor(Visitor, CondTrackingMixin):
         return [(self.active_if_cond, e)]
 
     def reference(self, e):
+        if keep_possible_values_unexpanded(e):
+            return [(self.active_if_cond, e)]
         return self.visit(e.get_value())
 
     def placeholder(self, e):
