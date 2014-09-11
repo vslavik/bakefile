@@ -1,5 +1,5 @@
-// This tests proper unwinding of conditions stack in the even of an exception
-// inside an 'if' block.
+// This tests that a variable containing a list is endeed represented by a
+// list in the model.
 
 toolsets = vs2010;
 wx_include_dirs = ../wxWidgets_setup_h include;
