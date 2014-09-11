@@ -1,0 +1,6 @@
+*.vcproj
+*.vcxproj
+*.vcxproj.filters
+GNUmakefile
+Makefile.osx
+Makefile.suncc

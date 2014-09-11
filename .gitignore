@@ -18,7 +18,6 @@ docs/html
 distrib/pyinstaller/build
 Debug
 Release
-*.vcxproj*
 *.sln
 *.suo
 *.o
@@ -26,5 +25,3 @@ Release
 *.a
 *.so
 *.dylib
-GNUmakefile
-Makefile.osx
