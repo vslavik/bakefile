@@ -460,11 +460,11 @@ class PathExpr(Expr):
        following:
 
        * ``expr.ANCHOR_SRCDIR`` -- Path is relative to the directory where
-         the input bakefile is (unless overriden in it).
+         the input bakefile is (unless overridden in it).
 
        * ``expr.ANCHOR_TOP_SRCDIR`` -- Path is relative to the top
          source directory (where the toplevel ``.bkl`` file is, unless
-         overriden in it).
+         overridden in it).
 
        * ``expr.ANCHOR_BUILDDIR`` -- Path is relative to the build directory.
          This anchor should be used for all transient files (object files
