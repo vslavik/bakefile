@@ -303,6 +303,18 @@ class GnuExprFormatter(MakefileExprFormatter):
         MakefileExprFormatter.__init__(self, paths_info)
         self.toolset = toolset
 
+    def path(self, e):
+        # We handle all build paths in a very special way to allow customizing
+        # them at make time by setting the make builddir variable, which is
+        # used to initialize another make variable called _builddir which is
+        # then used to construct all build paths.
+        if e.anchor == bkl.expr.ANCHOR_BUILDDIR:
+            # Notice that _builddir is either empty or contains the
+            # trailing slash, so we must not add another one here.
+            return "$(_builddir)" + "/".join(self.format(c) for c in e.components)
+
+        return super(GnuExprFormatter, self).path(e)
+
     def bool_value(self, e):
         self.toolset.uses_non_std_bool_macros = True
         return "$(_true)" if e.value else "$(_false)"
@@ -487,6 +499,32 @@ CXX := %s
         # macros, if they turn out to be really needed, or nothing otherwise.
         file.write(GMAKE_IFEXPR_MACROS_PLACEHOLDER)
         self.uses_non_std_bool_macros = False
+
+        # Build the value actually representing the build directory, it is
+        # only used here (see GnuExprFormatter.path) and only to initialize
+        # the internal _builddir in the fragment below.
+        makefile = module["%s.makefile" % self.name]
+        module_builddir = makefile.get_directory_path()
+        module_builddir.components.insert(0, bkl.expr.LiteralExpr("$(builddir)"))
+
+        paths_info = bkl.expr.PathAnchorsInfo(
+                dirsep="/",
+                outfile=makefile.as_native_path_for_output(module),
+                builddir=None,
+                model=module)
+
+        builddir_path = GnuExprFormatter(self, paths_info).visit(module_builddir)
+
+        file.write("""
+# The directory for the build files, may be overridden on make command line.
+builddir = .
+
+ifneq ($(builddir),.)
+_builddir := $(shell mkdir -p %s && echo $$_/)
+endif
+
+""" % builddir_path)
+
 
     def on_phony_targets(self, file, targets):
         file.write(".PHONY: %s\n" % " ".join(targets))

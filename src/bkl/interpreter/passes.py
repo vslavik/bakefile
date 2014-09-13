@@ -200,7 +200,6 @@ class PathsNormalizer(RewritingVisitor):
     @memoized
     def _builddir(self, target):
         builddir = self.toolset.get_builddir_for(target)
-        assert builddir.anchor != bkl.expr.ANCHOR_BUILDDIR
         logger.debug('translating @builddir paths of %s into %s', target, builddir)
         return builddir
 
