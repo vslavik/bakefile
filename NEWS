@@ -6,6 +6,7 @@ Bug fixes
 
 - Changing variable appearing in "source" statement of a base template
   from the derived target now works as expected.
+- Simplify paths involving $(builddir) in the "gnu" toolset output.
 
 
 v1.2.5 (2014-07-28)
