@@ -44,13 +44,13 @@ def test_full():
         yield _test_on_file, d, str(f)
 
 
-class TestingInterpreter(bkl.interpreter.Interpreter):
+class InterpreterForTestSuite(bkl.interpreter.Interpreter):
     def generate(self):
         # dump the model first, because generate() further modifies
         # it by doing per-toolset changes:
         self.dumped_model = bkl.dumper.dump_project(self.model)
         # then let the generator do its magic
-        super(TestingInterpreter, self).generate()
+        super(InterpreterForTestSuite, self).generate()
 
 
 def _test_on_file(testdir, project_file):
@@ -71,7 +71,7 @@ def _do_test_on_file(input, model_file):
 
     try:
         t = bkl.parser.parse_file(input)
-        i = TestingInterpreter()
+        i = InterpreterForTestSuite()
         i.process(t)
         as_text = i.dumped_model
     except bkl.error.Error, e:
