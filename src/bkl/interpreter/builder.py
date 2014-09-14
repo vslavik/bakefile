@@ -382,14 +382,19 @@ class Builder(object, CondTrackingMixin):
         # This is for a dummy variable created at project scope and referencing
         # the setting. By doing this, it's easy to reference settings as ordinary
         # variables.
-        var_value = PlaceholderExpr(name, pos=node.pos)
+        placeholder = PlaceholderExpr(name, pos=node.pos)
 
         if self.active_if_cond is not None:
             cond = self.active_if_cond
             setting.set_property_value("_condition", cond)
-            var_value = IfExpr(cond, yes=var_value, no=NullExpr(), pos=node.pos)
+            var_value = IfExpr(cond, yes=placeholder, no=NullExpr(), pos=node.pos)
+        else:
+            var_value = placeholder
 
-        project.add_variable(Variable(name, var_value))
+        variable = Variable(name, var_value)
+        placeholder.set_associated_variable(variable)
+
+        project.add_variable(variable)
         # set any properties on the setting object:
         self.handle_children(node.content, setting)
 
