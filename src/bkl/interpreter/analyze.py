@@ -115,7 +115,10 @@ class _UsedVariablesTracker(Visitor):
 # Global list of all used variables
 usage_tracker = _UsedVariablesTracker()
 
-def mark_variables_as_used(expression):
+def mark_variable_as_used(var):
+    usage_tracker.used_vars.add(id(var))
+
+def mark_variables_in_expr_as_used(expression):
     """
     Marks all variables referenced in the expression as used.
 
@@ -132,7 +135,7 @@ def detect_unused_vars(model):
     """
     # First of all, iterate over all variables and mark their usage of other
     # variables. Notice that it's possible that some code explicitly marked
-    # variables as used with mark_variables_as_used() before this step.
+    # variables as used with mark_variables_in_expr_as_used() before this step.
     for var in model.all_variables():
         usage_tracker.visit(var.value)
 

@@ -230,6 +230,11 @@ class Builder(object, CondTrackingMixin):
         else:
             var.set_value(value)
 
+        # avoid potential spurious warning about a variable that was modified
+        # in another scope and not used anywhere else:
+        if previous_value:
+            analyze.mark_variable_as_used(previous_value)
+
 
     def on_sources_or_headers(self, node):
         if node.kind == "sources":
@@ -240,7 +245,7 @@ class Builder(object, CondTrackingMixin):
             assert False, 'invalid files list kind "%s"' % node.kind
 
         files = self._build_expression(node.files)
-        analyze.mark_variables_as_used(files)
+        analyze.mark_variables_in_expr_as_used(files)
         for cond, f in enum_possible_values(files, global_cond=self.active_if_cond):
             obj = SourceFile(self.context, f, source_pos=f.pos)
             if cond is not None:
