@@ -214,6 +214,10 @@ class PlaceholderExpr(Expr):
     In particular, it is used for the "toolset" property before the model is split into
     toolset-specific copies, to allow partial evaluation common to all of them.
 
+    It is also used together with artificial variables to represent settings.
+    For placeholders used for this purpose, :meth:`get_associated_variable()`
+    can be used to retrieve the associated variable object.
+
     .. attribute:: var
 
        Name of referenced setting (e.g. "config" or "toolset").
@@ -221,9 +225,24 @@ class PlaceholderExpr(Expr):
     def __init__(self, var, pos=None):
         super(PlaceholderExpr, self).__init__(pos)
         self.var = var
+        self.associated_variable = None
 
     def as_py(self):
         raise NonConstError(self)
+
+    def set_associated_variable(self, associated_variable):
+        """
+        Sets the associated variable object for placeholders used for settings
+        values.
+        """
+        self.associated_variable = associated_variable
+
+    def get_associated_variable(self):
+        """
+        Returns the associated variable object if this placeholder is used for
+        a setting value, returns None otherwise.
+        """
+        return self.associated_variable
 
     def __str__(self):
         return "${%s}" % self.var

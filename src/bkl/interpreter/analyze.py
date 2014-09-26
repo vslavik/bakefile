@@ -101,10 +101,14 @@ class _UsedVariablesTracker(Visitor):
     path = Visitor.visit_children
     bool = Visitor.visit_children
     if_ = Visitor.visit_children
-    placeholder = Visitor.noop
+
+    def placeholder(self, e):
+        self._track_var(e.get_associated_variable())
 
     def reference(self, e):
-        var = e.get_variable()
+        self._track_var(e.get_variable())
+
+    def _track_var(self, var):
         if var is not None and not var.is_property:
             self.used_vars.add(id(var))
 
