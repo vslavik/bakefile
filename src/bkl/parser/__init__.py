@@ -89,7 +89,8 @@ class _BakefileParserMixin(object):
                 if c != '"' and c != '\\' and c != '$':
                     source_pos = self._get_position(token)
                     source_pos.column += pos+1
-                    warning("unnecessary escape sequence '\\%s' (did you mean '\\\\%s'?)" % (c, c),
+                    warning(WARN.BAD_ESCAPE_SEQUENCE,
+                            "unnecessary escape sequence '\\%s' (did you mean '\\\\%s'?)" % (c, c),
                             pos=source_pos)
         return out
 

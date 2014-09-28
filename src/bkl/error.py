@@ -228,10 +228,39 @@ class error_context:
         else:
             return None
 
+class WARN:
+    """
+    Scope for warning number constants.
 
-def warning(msg, *args, **kwargs):
+    The number of all the currently defined warnings are defined in this
+    class. These numbers are used with :func:`bkl.error.warning` and are also
+    fixed in the sense that they shouldn't change in the future versions of
+    the program as they are user-visible via the command-line `-w` option.
+    """
+
+    # Generic warnings.
+    PATH_SEPARATOR                  = 101
+    UNUSED_VARIABLE                 = 102
+    UNUSED_GENERATED_OUTPUT         = 103
+    UNDERSCORE_VARIABLE             = 104
+    BAD_ESCAPE_SEQUENCE             = 105
+
+    # Backend-specific warnings.
+
+    # Range [200,300[ reserved for MSVS.
+    MSVS_PROJECT_VERSION_MISMATCH   = 201
+    MSVS_UNSUPPORTED_TARGET         = 202
+    MSVS_AMBIGUOUS_SOLUTION_CONFIG  = 203
+    MSVS_UNRELATED_CONFIG           = 204
+    MSVS_INCOMPATIBLE_CONFIG        = 205
+
+
+def warning(wnum, msg, *args, **kwargs):
     """
     Logs a warning.
+
+    The first argument of this function is the predefined warning number, see
+    :class:`WARN`.
 
     The function takes position arguments similarly to logging module's
     functions. It also accepts options *pos* argument with position information
@@ -244,7 +273,7 @@ def warning(msg, *args, **kwargs):
 
     .. code-block:: python
 
-       bkl.error.warning("target %s not supported", t.name, pos=t.source_pos)
+       bkl.error.warning(WARN.NOT_SUPPORTED, "target %s not supported", t.name, pos=t.source_pos)
     """
     text = msg % args
     e = {}

@@ -34,7 +34,7 @@ import itertools
 import re
 from abc import ABCMeta, abstractmethod
 
-from error import NonConstError, CannotDetermineError, ParserError, Error, error_context, warning
+from error import NonConstError, CannotDetermineError, ParserError, Error, error_context, warning, WARN
 
 
 class Expr(object):
@@ -1137,7 +1137,7 @@ class _SplitIntoPathVisitor(_SplitVisitor):
 
     def literal(self, e):
         if '\\' in e.value:
-            warning("'\\' is not path separator in bakefiles (use '/')", pos=e.pos)
+            warning(WARN.PATH_SEPARATOR, "'\\' is not path separator in bakefiles (use '/')", pos=e.pos)
         return super(_SplitIntoPathVisitor, self).literal(e)
 
     def list(self, e):
