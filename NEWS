@@ -1,6 +1,11 @@
 v1.2.6 (????-??-??)
 ===================
 
+New Features
+------------
+
+- Add "-w" command line option to disable specific warnings.
+
 Bug fixes
 ---------
 

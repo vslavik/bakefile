@@ -275,8 +275,12 @@ def warning(wnum, msg, *args, **kwargs):
 
        bkl.error.warning(WARN.NOT_SUPPORTED, "target %s not supported", t.name, pos=t.source_pos)
     """
+    root_logger = logging.getLogger()
+    if hasattr(root_logger, "disabled_warnings") and wnum in root_logger.disabled_warnings:
+        return
+
     text = msg % args
-    e = {}
+    e = { "wnum": wnum }
     try:
         e["pos"] = kwargs["pos"]
     except KeyError:

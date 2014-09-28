@@ -55,7 +55,11 @@ class BklFormatter(logging.Formatter):
             if hasattr(record, "pos") and record.pos:
                 msg = "%s: " % record.pos
             if level != logging.INFO:
-                msg += "%s: " % record.levelname.lower()
+                msg += record.levelname.lower()
+                if hasattr(record, "wnum"):
+                    msg += " "
+                    msg += str(record.wnum)
+                msg += ": "
             msg += record.getMessage()
             if level == logging.ERROR:
                 msg = self.format_error(msg)
@@ -102,6 +106,11 @@ parser.add_option(
         action="append", dest="toolsets",
         metavar="TOOLSET",
         help="only generate files for the given toolset (may be specified more than once)")
+parser.add_option(
+        "-w", "--warning",
+        action="append", dest="warnings",
+        metavar="WNUM",
+        help="disable the given warning(s) (separate with commas to specify more than one)")
 
 debug_group = OptionGroup(parser, "Debug Options")
 debug_group.add_option(
@@ -157,6 +166,18 @@ try:
         intr = Interpreter()
     if options.toolsets:
         intr.limit_toolsets(options.toolsets)
+
+    if options.warnings:
+        logger.disabled_warnings = set()
+        for optval in options.warnings:
+            for s in optval.split(','):
+                try:
+                    wnum = int(s)
+                except ValueError:
+                    sys.stderr.write('invalid warning number "%s" specified\n' % s)
+                    sys.exit(3)
+                logger.disabled_warnings.add(wnum)
+
     intr.process_file(args[0])
     logger.info("created files: %d, updated files: %d (time: %.1fs)",
                 bkl.io.num_created, bkl.io.num_modified, time() - start_time)
