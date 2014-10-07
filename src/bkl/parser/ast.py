@@ -26,6 +26,7 @@ from antlr3.tree import CommonTree, CommonTreeAdaptor
 
 import BakefileParser
 
+from bkl.utils import memoized_property
 
 class Position(object):
     """
@@ -72,18 +73,18 @@ class Node(CommonTree):
     Base class for Bakefile AST tree node.
     """
 
-    def _get_pos(self):
+    # Position of the node in source code, as parser.Position object.
+    # FIXME: if it doesn't have position, look at siblings in the tree
+    # and return "near $foo.pos" for some foo parent or sibling
+    @memoized_property
+    def pos(self):
+        """Position of the node in source code"""
         pos = Position()
         pos.filename = self.filename
         if self.token:
             pos.line = self.line
             pos.column = self.charPositionInLine
         return pos
-
-    # Position of the node in source code, as parser.Position object.
-    # FIXME: if it doesn't have position, look at siblings in the tree
-    # and return "near $foo.pos" for some foo parent or sibling
-    pos = property(_get_pos, "position of the node in source code")
 
     def __str__(self):
         return self.__class__.__name__
