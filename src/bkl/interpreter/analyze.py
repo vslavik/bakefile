@@ -88,6 +88,13 @@ def detect_self_references(model):
         visitor.check(var)
 
 
+# Key usage tracking by not the variable object, but the source code position
+# of its declaration. In practice, variable may be duplicated in non-obvious
+# ways, e.g. at different submodules, or due to imported files. Using source
+# code position does what is expected from unused variables warnings.
+def _usage_id(var):
+    return var.pos
+
 class _UsedVariablesTracker(Visitor):
     def __init__(self):
         super(_UsedVariablesTracker, self).__init__()
@@ -106,17 +113,17 @@ class _UsedVariablesTracker(Visitor):
     def reference(self, e):
         var = e.get_variable()
         if var is not None and not var.is_property:
-            self.used_vars.add(id(var))
+            self.used_vars.add(_usage_id(var))
 
     def is_used(self, var):
         """Returns if the variable is referenced somewhere."""
-        return id(var) in self.used_vars
+        return _usage_id(var) in self.used_vars
 
 # Global list of all used variables
 usage_tracker = _UsedVariablesTracker()
 
 def mark_variable_as_used(var):
-    usage_tracker.used_vars.add(id(var))
+    usage_tracker.used_vars.add(_usage_id(var))
 
 def mark_variables_in_expr_as_used(expression):
     """

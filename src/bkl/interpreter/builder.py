@@ -200,9 +200,9 @@ class Builder(object, CondTrackingMixin):
             if append and previous_value is None:
                 raise ParserError('unknown variable "%s"' % varname)
             if previous_value:
-                var = Variable(varname, previous_value.value, previous_value.type, readonly=previous_value.readonly)
+                var = Variable(varname, previous_value.value, previous_value.type, readonly=previous_value.readonly, source_pos=previous_value.pos)
             else:
-                var = Variable(varname, value)
+                var = Variable(varname, value, source_pos=node.pos)
             context.add_variable(var)
 
         # finally, modify variable value:
@@ -394,7 +394,7 @@ class Builder(object, CondTrackingMixin):
             setting.set_property_value("_condition", cond)
             var_value = IfExpr(cond, yes=var_value, no=NullExpr(), pos=node.pos)
 
-        project.add_variable(Variable(name, var_value))
+        project.add_variable(Variable(name, var_value, source_pos=node.pos))
         # set any properties on the setting object:
         self.handle_children(node.content, setting)
 

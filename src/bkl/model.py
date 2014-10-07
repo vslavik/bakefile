@@ -69,7 +69,7 @@ class Variable(object):
        Indicates if the value was set explicitly by the user.
        Normally true, only false for properties' default values.
     """
-    def __init__(self, name, value, type=None, readonly=False):
+    def __init__(self, name, value, type=None, readonly=False, source_pos=None):
         self.name = name
         if type is None:
             type = vartypes.TheAnyType
@@ -78,6 +78,7 @@ class Variable(object):
         self.readonly = readonly
         self.is_property = False
         self.is_explicitly_set = True
+        self.pos = source_pos
 
     @staticmethod
     def from_property(prop, value=None):
