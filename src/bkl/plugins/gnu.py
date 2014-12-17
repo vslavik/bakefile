@@ -26,6 +26,7 @@
 GNU tools (GCC, GNU Make, ...) toolset.
 """
 
+import os.path
 from bkl.api import FileCompiler, FileType
 from bkl.makefile import MakefileToolset, MakefileFormatter, MakefileExprFormatter
 import bkl.compilers
@@ -315,7 +316,19 @@ class GnuExprFormatter(MakefileExprFormatter):
             self.toolset.uses_builddir = True
             return "$(_builddir)" + "/".join(self.format(c) for c in e.components)
 
-        return super(GnuExprFormatter, self).path(e)
+        super_self = super(GnuExprFormatter, self)
+
+        if e.anchor == bkl.expr.ANCHOR_TOP_BUILDDIR:
+            self.toolset.uses_builddir = True
+
+            # To handle top build directory-relative paths correctly, just
+            # interpret the path relatively to the top source directory.
+            p = super_self.path(bkl.expr.PathExpr(e.components, bkl.expr.ANCHOR_TOP_SRCDIR))
+
+            # But then root it at build directory.
+            return "$(_builddir)" + p
+
+        return super_self.path(e)
 
     def bool_value(self, e):
         self.toolset.uses_non_std_bool_macros = True

@@ -441,9 +441,10 @@ class IfExpr(Expr):
 ANCHOR_SRCDIR = "@srcdir"
 ANCHOR_TOP_SRCDIR = "@top_srcdir"
 ANCHOR_BUILDDIR = "@builddir"
+ANCHOR_TOP_BUILDDIR = "@top_builddir"
 
 # all possible anchors
-ANCHORS = [ANCHOR_SRCDIR, ANCHOR_TOP_SRCDIR, ANCHOR_BUILDDIR]
+ANCHORS = [ANCHOR_SRCDIR, ANCHOR_TOP_SRCDIR, ANCHOR_BUILDDIR, ANCHOR_TOP_BUILDDIR]
 
 class PathExpr(Expr):
     """
@@ -467,8 +468,12 @@ class PathExpr(Expr):
          overridden in it).
 
        * ``expr.ANCHOR_BUILDDIR`` -- Path is relative to the build directory.
-         This anchor should be used for all transient files (object files
-         or other generated files).
+         Either this anchor or ``expr.ANCHOR_TOP_BUILDDIR`` should be used for
+         all transient files (object files or other generated files).
+
+       * ``expr.ANCHOR_TOP_BUILDDIR`` -- Path is relative to the top build
+         directory. This is currently only used by makefile backends where the
+         build directory for a sub-makefile is different from the top one.
 
     .. attribute:: anchor_file
 
@@ -606,7 +611,7 @@ class PathExpr(Expr):
 
         TODO: add a @absdir anchor instead?
         """
-        if self.anchor == ANCHOR_BUILDDIR or not self.components:
+        if self.anchor in [ANCHOR_BUILDDIR, ANCHOR_TOP_BUILDDIR] or not self.components:
             return False
         first = self.components[0]
         return isinstance(first, PlaceholderExpr)

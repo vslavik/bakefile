@@ -165,7 +165,9 @@ class MakefileToolset(Toolset):
                        doc="Name of output file for module's makefile.")
 
     def get_builddir_for(self, target):
-        return expr.PathExpr([], expr.ANCHOR_BUILDDIR)
+        makefile = target["%s.makefile" % self.name]
+        builddir = makefile.get_directory_path()
+        return expr.PathExpr(builddir.components, expr.ANCHOR_TOP_BUILDDIR)
 
     def generate(self, project):
         # We need to know build graphs of all targets so that we can generate
