@@ -934,12 +934,10 @@ class Formatter(Visitor):
             return pi.dirsep.join([self.format(i) for i in e.components])
         if e.anchor == ANCHOR_TOP_SRCDIR:
             base = pi.top_srcdir
-            base_abs = pi.top_srcdir_abs
         elif e.anchor == ANCHOR_BUILDDIR:
             if pi.builddir is None:
                 raise Error("%s anchor is unknown in this context (\"%s\")" % (e.anchor, e), pos=e.pos)
             base = pi.builddir
-            base_abs = pi.builddir_abs
         else:
             assert False, "unknown path anchor (%s)" % e.anchor
         try:
