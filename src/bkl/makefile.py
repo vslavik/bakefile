@@ -351,7 +351,8 @@ class MakefileToolset(Toolset):
 
     def _get_clean_commands(self, mk_fmt, expr_fmt, graphs, submakefiles):
         for e in self.autoclean_extensions:
-            yield "%s *.%s" % (self.del_command, e)
+            p = expr.PathExpr([expr.LiteralExpr("*." + e)], expr.ANCHOR_BUILDDIR)
+            yield "%s %s" % (self.del_command, expr_fmt.format(p))
         for g in graphs:
             for node in g.all_nodes():
                 for f in node.outputs:
