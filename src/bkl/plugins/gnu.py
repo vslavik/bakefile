@@ -553,9 +553,10 @@ $(if $(findstring $(abspath $(builddir)),$(builddir)),,%s)\
 builddir = .
 
 ifneq ($(builddir),.)
-_builddir := $(shell mkdir -p %s && echo $$_/)
+_builddir := %s/
+_builddir_error := $(shell mkdir -p $(_builddir) 2>&1)
+$(if $(_builddir_error),$(error Failed to create build directory: $(_builddir_error)))
 endif
-
 """ % builddir_path
 
 
