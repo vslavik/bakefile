@@ -453,18 +453,18 @@ endif
         file.write(make_debug_test)
         file.write(
 """
-CPPFLAGS ?= -DDEBUG
-CFLAGS ?= -g -O0
-CXXFLAGS ?= -g -O0
-LDFLAGS ?= -g
+override CPPFLAGS += -DDEBUG
+override CFLAGS += -g -O0
+override CXXFLAGS += -g -O0
+override LDFLAGS += -g
 else """
 )
         file.write(make_release_test)
         file.write(
 """
-CPPFLAGS ?= -DNDEBUG
-CFLAGS ?= -O2
-CXXFLAGS ?= -O2
+override CPPFLAGS += -DNDEBUG
+override CFLAGS += -O2
+override CXXFLAGS += -O2
 else ifneq (,$(config))
 $(warning Unknown configuration "$(config)")
 endif
