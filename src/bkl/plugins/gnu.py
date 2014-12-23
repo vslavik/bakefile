@@ -524,16 +524,29 @@ CXX := %s
         # only used here (see GnuExprFormatter.path) and only to initialize
         # the internal _builddir in the fragment below.
         makefile = module["%s.makefile" % self.name]
-        module_builddir = makefile.get_directory_path()
-        module_builddir.components.insert(0, bkl.expr.LiteralExpr("$(builddir)"))
+        rel_dir_comps = makefile.components[:-1]
 
-        paths_info = bkl.expr.PathAnchorsInfo(
-                dirsep="/",
-                outfile=makefile.as_native_path_for_output(module),
-                builddir=None,
-                model=module)
+        # None of the complications is needed in the top level makefile,
+        # _builddir is the same as $builddir in it anyhow.
+        if rel_dir_comps == []:
+            builddir_path = "$(builddir)"
+        else:
+            # Build the relative path to the top source directory.
+            to_top_srcdir = "../"*len(rel_dir_comps)
 
-        builddir_path = GnuExprFormatter(self, paths_info).visit(module_builddir)
+            # First a hack to ensure we start from the top build directory: we
+            # need to do this only if the user-defined builddir is relative at
+            # make time, so we check for this by comparing it with its absolute
+            # path.
+            builddir_path = """\
+$(if $(findstring $(abspath $(builddir)),$(builddir)),,%s)\
+""" % to_top_srcdir
+
+            # Next the build directory itself, whether relative or absolute.
+            builddir_path = builddir_path + "$(builddir)"
+
+            # Finally tackle on the relative path to this directory.
+            builddir_path = builddir_path + "/" + "/".join(c.as_py() for c in rel_dir_comps)
 
         return """
 # The directory for the build files, may be overridden on make command line.
