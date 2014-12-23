@@ -123,11 +123,20 @@ class MakefileFormatter(Extension):
 
 
 class MakefileExprFormatter(expr.Formatter):
+    def __init__(self, toolset, paths_info):
+        expr.Formatter.__init__(self, paths_info)
+        self.toolset = toolset
+
     def literal(self, e):
         if '"' in e.value:
             return e.value.replace('"', '\\"')
         else:
             return e.value
+
+    def path(self, e):
+        if e.anchor in [expr.ANCHOR_BUILDDIR, expr.ANCHOR_TOP_BUILDDIR]:
+            self.toolset.uses_builddir = True
+        return super(MakefileExprFormatter, self).path(e)
 
     def placeholder(self, e):
         name = e.var
@@ -195,6 +204,9 @@ class MakefileToolset(Toolset):
                 self._gen_makefile(build_graphs, m)
 
     def _gen_makefile(self, build_graphs, module):
+        # Flag indicating whether this makefile actually builds anything.
+        self.uses_builddir = False
+
         output_value = module.get_variable_value("%s.makefile" % self.name)
         output = output_value.as_native_path_for_output(module)
 
@@ -350,9 +362,10 @@ class MakefileToolset(Toolset):
         f.write("\n%s\n" % mk_fmt.comment("------------"))
 
     def _get_clean_commands(self, mk_fmt, expr_fmt, graphs, submakefiles):
-        for e in self.autoclean_extensions:
-            p = expr.PathExpr([expr.LiteralExpr("*." + e)], expr.ANCHOR_BUILDDIR)
-            yield "%s %s" % (self.del_command, expr_fmt.format(p))
+        if self.uses_builddir:
+            for e in self.autoclean_extensions:
+                p = expr.PathExpr([expr.LiteralExpr("*." + e)], expr.ANCHOR_BUILDDIR)
+                yield "%s %s" % (self.del_command, expr_fmt.format(p))
         for g in graphs:
             for node in g.all_nodes():
                 for f in node.outputs:

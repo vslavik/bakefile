@@ -301,10 +301,6 @@ class GnuMakefileFormatter(MakefileFormatter):
 
 
 class GnuExprFormatter(MakefileExprFormatter):
-    def __init__(self, toolset, paths_info):
-        MakefileExprFormatter.__init__(self, paths_info)
-        self.toolset = toolset
-
     def path(self, e):
         # We handle all build paths in a very special way to allow customizing
         # them at make time by setting the make builddir variable, which is
@@ -521,7 +517,6 @@ CXX := %s
         # makefiles which just dispatch the work to other makefiles, no need
         # to clutter them).
         file.write(GMAKE_BUILDDIR_DEF_PLACEHOLDER)
-        self.uses_builddir = False
 
 
     def _get_builddir_fragment(self, module):
