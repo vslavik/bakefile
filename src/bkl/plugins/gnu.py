@@ -282,7 +282,7 @@ class GnuMakefileFormatter(MakefileFormatter):
     def submake_command(self, directory, filename, target):
         return "$(MAKE) -C %s -f %s %s" % (directory, filename, target)
 
-    def multifile_target(self, outfiles, deps, commands):
+    def multifile_target(self, outputs, outfiles, deps, commands):
         # Use a helper intermediate target to handle multiple outputs of a rule,
         # because we can't easily use GNU Make's pattern rules matching. The
         # absence of an intermediate file is not a problem and does not cause
@@ -292,7 +292,7 @@ class GnuMakefileFormatter(MakefileFormatter):
         for c in commands:
             if '$@' in c:
                 raise Error("The use of $@ or %%(out) not supported with multiple outputs (in \"%s\")" % c)
-        inter_name = ".dummy_" + "_".join(outfiles).replace("/", "_")
+        inter_name = ".dummy_" + "_".join("_".join(c.as_py() for c in f.components) for f in outputs)
         return "\n".join([
             "%s: %s" % (" ".join(outfiles), inter_name),
             ".INTERMEDIATE: %s" % inter_name,

@@ -99,12 +99,13 @@ class MakefileFormatter(Extension):
         out += "\n\n"
         return out
 
-    def multifile_target(self, outfiles, deps, commands):
+    def multifile_target(self, outputs, outfiles, deps, commands):
         """
         Returns string with target definition for targets that produce multiple
         files. A typical example is Bison parser generator, which produces both
         .c and .h files.
 
+        :param outputs:  List of output files of the rule, as objects.
         :param outfiles: List of output files of the rule, as strings.
         :param deps:     See target()
         :param commands: See target()
@@ -324,6 +325,7 @@ class MakefileToolset(Toolset):
                                                  commands=commands_fmt)
                         else:
                             text = mk_fmt.multifile_target(
+                                                 outputs=out,
                                                  outfiles=out_fmt,
                                                  deps=deps,
                                                  commands=commands_fmt)
