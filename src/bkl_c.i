@@ -42,6 +42,8 @@
         return NULL;
 }
 
+%inline %{
+
 /* Tokenizes input string \a expr that may contain Python expressions
    inside $(...) and calls \a textCallb(\a moreArgs, text)
    for text parts (outside $(...)) and
@@ -91,6 +93,8 @@ extern PyObject *proxydict_create(void);
 extern void proxydict_hijack(PyObject *data, PyObject *dict);
 /* add new dictionary to the proxy: */
 extern void proxydict_add(PyObject *data, PyObject *dict);
+
+%}
 
 %pythoncode %{
 class ProxyDictionary:
