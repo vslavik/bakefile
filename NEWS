@@ -7,7 +7,7 @@ Bug fixes
 - Changing variable appearing in "source" statement of a base template
   from the derived target now works as expected.
 - Simplify paths involving $(builddir) in the "gnu" toolset output.
-
+- Generate correct warning options for "suncc" backend.
 
 v1.2.5 (2014-07-28)
 ===================

@@ -146,11 +146,11 @@ class GnuCCompiler(GnuFileCompiler):
             cmd.append(LiteralExpr(toolset.pthread_cc_flags))
         cmd += bkl.expr.add_prefix("-D", target["defines"])
         cmd += bkl.expr.add_prefix("-I", target["includedirs"])
-        if target["warnings"] == "no":
-            cmd.append(LiteralExpr("-w"))
-        elif target["warnings"] == "all":
-            cmd.append(LiteralExpr("-Wall"))
-        #else: don't do anything special for "minimal" and "default"
+
+        warning_flags = toolset.warning_flags[str(target["warnings"])]
+        if warning_flags is not None:
+            cmd.append(LiteralExpr(warning_flags))
+
         cmd += target["compiler-options"]
         cmd += target[self._options_prop_name]
         # FIXME: use a parser instead of constructing the expression manually
@@ -402,6 +402,13 @@ class GnuToolset(MakefileToolset):
     soname_flags = "-Wl,-soname,$(notdir $@)"
     extra_link_flags = None
 
+    warning_flags = {
+        "no":       "-w",
+        "minimal":  None,
+        "default":  None,
+        "all":      "-Wall",
+    }
+
     def output_default_flags(self, file, configs):
         """
             Helper of on_header() which outputs default, config-dependent,
@@ -634,3 +641,10 @@ class SunCCGnuToolset(GnuToolset):
     soname_flags = "-h $(notdir $@)"
     # FIXME: Do this for C++ only
     extra_link_flags = "-lCstd -lCrun"
+
+    warning_flags = {
+        "no":       "-w",
+        "minimal":  None,
+        "default":  "+w",
+        "all":      "+w2 -xport64",
+    }
