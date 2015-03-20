@@ -631,8 +631,13 @@ class SunCCGnuToolset(GnuToolset):
     default_cc = "suncc"
     default_cxx = "sunCC"
 
-    shared_library_link_flag  = "-G -Kpic -z defs"
-    loadable_module_link_flag = "-G -Kpic -z defs"
+    # When using "-z defs" for shared libraries, _all_ libraries must be
+    # specified with this toolchain, even libc and libm, if it is used
+    # (and as we can't know whether it is or not, it is better to always
+    # include it ending up with an unused library rather than not include it
+    # and ending up with broken build).
+    shared_library_link_flag  = "-G -Kpic -z defs -lm -lc"
+    loadable_module_link_flag = shared_library_link_flag
 
     deps_flags = "-xMD"
     pic_flags = "-Kpic -DPIC"

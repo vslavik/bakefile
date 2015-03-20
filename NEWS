@@ -8,6 +8,7 @@ Bug fixes
   from the derived target now works as expected.
 - Simplify paths involving $(builddir) in the "gnu" toolset output.
 - Generate correct warning options for "suncc" backend.
+- Fix linking shared libraries with Sun toolset, use "-lc" explicitly.
 
 v1.2.5 (2014-07-28)
 ===================
