@@ -580,9 +580,10 @@ endif
                                                          else "")
 
 
-        file.write("\n"
-                   "# Dependencies tracking:\n"
-                   "-include *.d\n")
+        if self.uses_builddir:
+            file.write("\n"
+                       "# Dependencies tracking:\n"
+                       "-include $(_builddir)*.d\n")
 
 
 class OSXGnuToolset(GnuToolset):
