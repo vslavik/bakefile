@@ -572,6 +572,18 @@ class VS200xToolsetBase(VSToolsetBase):
                 yield (c, a)
 
 
+    def get_vs_warning_level(self, cfg):
+        """
+        Return numeric MSVS warning level corresponding to the warning option
+        in the specified config.
+        """
+        WARNING_LEVELS = { "no": 0,
+                           "minimal": 1,
+                           "default": 3,
+                           "all": 4 }
+        return WARNING_LEVELS[cfg["warnings"].as_py()]
+
+
 class VS2008Toolset(VS200xToolsetBase):
     """
     Visual Studio 2008.

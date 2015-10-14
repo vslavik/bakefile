@@ -163,7 +163,7 @@ class VS201xToolsetBase(VSToolsetBase):
             n = Node("ItemDefinitionGroup")
             n["Condition"] = "'$(Configuration)|$(Platform)'=='%s'" % cfg.vs_name
             n_cl = Node("ClCompile")
-            n_cl.add("WarningLevel", "Level%d" % self.get_vs_warning_level(cfg))
+            n_cl.add("WarningLevel", self.get_vs_warning_level(cfg))
             if cfg.is_debug:
                 n_cl.add("Optimization", "Disabled")
             else:
@@ -477,6 +477,18 @@ class VS201xToolsetBase(VSToolsetBase):
         for c in configs_iter:
             for a in archs_list:
                 yield (c, a)
+
+
+    def get_vs_warning_level(self, cfg):
+        """
+        Return numeric MSVS warning level corresponding to the warning option
+        in the specified config.
+        """
+        WARNING_LEVELS = { "no": "TurnOffAllWarnings",
+                           "minimal": "Level1",
+                           "default": "Level3",
+                           "all": "EnableAllWarnings" }
+        return WARNING_LEVELS[cfg["warnings"].as_py()]
 
 
 
