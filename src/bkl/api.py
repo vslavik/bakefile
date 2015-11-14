@@ -247,7 +247,7 @@ class Property(object):
        A property is *inheritable* if its value can be specified in the
        (grand-)parent scope. For example, an inheritable property on a target
        may be specified at the module level or even in the parent module; an
-       iheritable property on a source file (e.g. "defines") may be specified
+       inheritable property on a source file (e.g. "defines") may be specified
        on the target, the module and so on.
 
     .. attribute:: toolsets
