@@ -687,6 +687,8 @@ specified one.
 
 
 
+.. _loading_plugins:
+
 Loading plugins
 ---------------
 
