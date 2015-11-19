@@ -33,7 +33,7 @@ import bkl.vartypes
 import bkl.expr
 import bkl.model
 import bkl.vartypes
-from bkl.error import Error, warning, error_context
+from bkl.error import Error, warning, WARN, error_context
 from bkl.expr import Visitor
 
 
@@ -160,7 +160,8 @@ def detect_unused_vars(model):
                 not regex_vs_option.match(var.name) and
                 # FIXME: Handle this case properly.
                 var.name != "configurations"):
-            warning('variable "%s" is never used', var.name, pos=var.value.pos)
+            warning(WARN.UNUSED_VARIABLE,
+                    'variable "%s" is never used', var.name, pos=var.value.pos)
 
 
 def detect_missing_generated_outputs(model):
@@ -177,6 +178,7 @@ def detect_missing_generated_outputs(model):
                 for item in outputs:
                     partname = bkl.expr.get_model_name_from_path(item)
                     if partname not in sources:
-                        warning("file %s generated from %s is not among sources or headers of target \"%s\"",
+                        warning(WARN.UNUSED_GENERATED_OUTPUT,
+                                "file %s generated from %s is not among sources or headers of target \"%s\"",
                                 item, srcfile.filename, t.name, pos=item.pos)
 

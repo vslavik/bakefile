@@ -136,7 +136,8 @@ class Builder(object, CondTrackingMixin):
         context = self._resolve_scope_specifier(node.lvalue.scope)
 
         if varname[0] == "_":
-            warning("variable names beginning with underscore are reserved for internal use (\"%s\")",
+            warning(WARN.UNDERSCORE_VARIABLE,
+                    "variable names beginning with underscore are reserved for internal use (\"%s\")",
                     varname, pos=node.pos)
 
         var = context.get_variable(varname)

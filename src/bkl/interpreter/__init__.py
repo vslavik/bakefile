@@ -35,7 +35,7 @@ import bkl.api
 import bkl.expr
 import passes
 from builder import Builder
-from bkl.error import Error, warning
+from bkl.error import Error, warning, WARN
 from bkl.parser import parse_file
 
 logger = logging.getLogger("bkl.interpreter")
@@ -221,7 +221,7 @@ class Interpreter(object):
                         bkl.api.Toolset.get(t)
                     except KeyError:
                         raise Error("unknown toolset \"%s\" given on command line" % t)
-                    warning("toolset \"%s\" is not supported by the project, there may be issues", t)
+                    warning(WARN.UNSUPPORTED_TOOLSET, "toolset \"%s\" is not supported by the project, there may be issues", t)
                     # Add the forced toolset to all submodules:
                     for module in self.model.modules:
                         module_toolsets = module.get_variable("toolsets")

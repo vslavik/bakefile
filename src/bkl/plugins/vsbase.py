@@ -37,7 +37,7 @@ logger = logging.getLogger("bkl.vsbase")
 
 import bkl.expr
 from bkl.utils import OrderedDict, OrderedSet, memoized
-from bkl.error import error_context, warning, Error, CannotDetermineError
+from bkl.error import error_context, warning, WARN, Error, CannotDetermineError
 from bkl.api import Toolset, Property
 from bkl.model import ConfigurationProxy
 from bkl.vartypes import PathType, StringType, BoolType
@@ -720,7 +720,8 @@ class VSToolsetBase(Toolset):
                         raise Error("project %s is for Visual Studio %.1f and will not work with %.1f" %
                                     (prj.projectfile, prj.version, self.version))
                     else:
-                        warning("project %s is for Visual Studio %.1f, not %.1f, will be converted when built",
+                        warning(WARN.MSVS_PROJECT_VERSION_MISMATCH,
+                                "project %s is for Visual Studio %.1f, not %.1f, will be converted when built",
                                 prj.projectfile, prj.version, self.version)
 
                 if self.is_natively_supported(t):
@@ -757,7 +758,8 @@ class VSToolsetBase(Toolset):
                 proj = target.type.vs_project(self, target)
             except NotImplementedError:
                 # TODO: handle this as generic action target
-                warning("target type \"%s\" is not supported by the %s toolset, ignoring",
+                warning(WARN.MSVS_UNSUPPORTED_TARGET,
+                        "target type \"%s\" is not supported by the %s toolset, ignoring",
                         target.type.name, self.name)
                 return None
 
@@ -944,7 +946,8 @@ def _get_matching_project_config(cfg, prj):
                 degree = compatibles[0][0]
                 if compatibles[1][0] == degree:
                     good_ones = [x[1].name for x in compatibles if x[0] == degree]
-                    warning("project %s: no unambiguous choice of project configuration to use for the solution configuration \"%s\", equally good candidates are: \"%s\"",
+                    warning(WARN.MSVS_AMBIGUOUS_SOLUTION_CONFIG,
+                            "project %s: no unambiguous choice of project configuration to use for the solution configuration \"%s\", equally good candidates are: \"%s\"",
                             prj.projectfile,
                             cfg.name,
                             '", "'.join(good_ones))
@@ -959,12 +962,14 @@ def _get_matching_project_config(cfg, prj):
         compatibles = [x for x in prj.configurations if x.is_debug == cfg.is_debug]
         if compatibles:
             ret = compatibles[0]
-            warning("project %s: using unrelated project configuration \"%s\" for solution configuration \"%s\"",
+            warning(WARN.MSVS_UNRELATED_CONFIG,
+                    "project %s: using unrelated project configuration \"%s\" for solution configuration \"%s\"",
                     prj.projectfile, ret.name, cfg.name)
             return ret
         else:
             ret = prj.configurations[0]
-            warning("project %s: using incompatible project configuration \"%s\" for solution configuration \"%s\"",
+            warning(WARN.MSVS_INCOMPATIBLE_CONFIG,
+                    "project %s: using incompatible project configuration \"%s\" for solution configuration \"%s\"",
                     prj.projectfile, ret.name, cfg.name)
             return ret
 
