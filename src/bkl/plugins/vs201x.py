@@ -60,7 +60,7 @@ class VS2010Project(VSProjectBase):
 
 
 class VS201xToolsetBase(VSToolsetBase):
-    """Base class for VS2010, VS2012, VS2013 and VS2015 toolsets."""
+    """Base class for VS2010, VS2012, VS2013, VS2015 and VS2017 toolsets."""
 
     #: XML formatting class
     XmlFormatter = VS201xXmlFormatter
@@ -702,3 +702,49 @@ class VS2015Toolset(VS201xToolsetBase):
     tools_version = "14.0"
     Solution = VS2015Solution
     Project = VS2015Project
+
+
+class VS2017Solution(VS2010Solution):
+    format_version = "12.00"
+    human_version = "15"
+
+    def write_header(self, file):
+        super(VS2017Solution, self).write_header(file)
+        file.write("VisualStudioVersion = 15.0.27130.2003\n")
+        file.write("MinimumVisualStudioVersion = 10.0.40219.1\n")
+
+
+class VS2017Project(VS2010Project):
+    version = 15
+
+
+class VS2017Toolset(VS201xToolsetBase):
+    """
+    Visual Studio 2017.
+
+
+    Special properties
+    ------------------
+    This toolset supports the same special properties that
+    :ref:`ref_toolset_vs2010`. The only difference is that they are prefixed
+    with ``vs2017.option.`` instead of ``vs2010.option.``, i.e. the nodes are:
+
+      - ``vs2017.option.Globals.*``
+      - ``vs2017.option.Configuration.*``
+      - ``vs2017.option.*`` (this is the unnamed ``PropertyGroup`` with
+        global settings such as ``TargetName``)
+      - ``vs2017.option.ClCompile.*``
+      - ``vs2017.option.ResourceCompile.*``
+      - ``vs2017.option.Link.*``
+      - ``vs2017.option.Lib.*``
+
+    """
+
+    name = "vs2017"
+
+    version = 15
+    proj_versions = [10, 11, 12, 14, 15]
+    platform_toolset = "v141"
+    tools_version = "15.0"
+    Solution = VS2017Solution
+    Project = VS2017Project
