@@ -50,7 +50,7 @@ class VS2010Project(VSProjectBase):
 
 
 class VS201xToolsetBase(VSToolsetBase):
-    """Base class for VS2010, VS2012 and VS2013 toolsets."""
+    """Base class for VS2010, VS2012, VS2013 and VS2015 toolsets."""
 
     #: Extension of format files
     proj_extension = "vcxproj"
@@ -635,3 +635,51 @@ class VS2013Toolset(VS201xToolsetBase):
     tools_version = "12.0"
     Solution = VS2013Solution
     Project = VS2013Project
+
+
+class VS2015Solution(VS2010Solution):
+    format_version = "12.00"
+    # Unlike the previous versions, this one uses the numeric version and not
+    # the year in the comment in the solution files.
+    human_version = "14"
+
+    def write_header(self, file):
+        super(VS2015Solution, self).write_header(file)
+        file.write("VisualStudioVersion = 14.0.23107.0\n")
+        file.write("MinimumVisualStudioVersion = 10.0.40219.1\n")
+
+
+class VS2015Project(VS2010Project):
+    version = 14
+
+
+class VS2015Toolset(VS201xToolsetBase):
+    """
+    Visual Studio 2015.
+
+
+    Special properties
+    ------------------
+    This toolset supports the same special properties that
+    :ref:`ref_toolset_vs2010`. The only difference is that they are prefixed
+    with ``vs2015.option.`` instead of ``vs2010.option.``, i.e. the nodes are:
+
+      - ``vs2015.option.Globals.*``
+      - ``vs2015.option.Configuration.*``
+      - ``vs2015.option.*`` (this is the unnamed ``PropertyGroup`` with
+        global settings such as ``TargetName``)
+      - ``vs2015.option.ClCompile.*``
+      - ``vs2015.option.ResourceCompile.*``
+      - ``vs2015.option.Link.*``
+      - ``vs2015.option.Lib.*``
+
+    """
+
+    name = "vs2015"
+
+    version = 14
+    proj_versions = [10, 11, 12, 14]
+    platform_toolset = "v140"
+    tools_version = "14.0"
+    Solution = VS2015Solution
+    Project = VS2015Project
