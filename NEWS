@@ -1,6 +1,11 @@
 v1.2.6 (????-??-??)
 ===================
 
+New Features
+------------
+
+- Add MSVS 2015 toolset support.
+
 Bug fixes
 ---------
 
