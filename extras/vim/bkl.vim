@@ -33,7 +33,7 @@ syn keyword	bklGlobalStat	configuration
 syn keyword	bklGlobalStat	setting
 syn keyword	bklGlobalProp	toolsets
 syn keyword	bklGlobalProp	configurations
-syn match	bklGlobalProp	"\<vs\(2003\|2005\|2008\|2010\|2012\|2013\|2015\).generate-solution\ze *=" nextgroup=bklBoolRHS skipwhite
+syn match	bklGlobalProp	"\<vs\(2003\|2005\|2008\|2010\|2012\|2013\|2015\|2017\).generate-solution\ze *=" nextgroup=bklBoolRHS skipwhite
 syn keyword	bklCommonProp	vs2003.solutionfile
 syn keyword	bklCommonProp	vs2005.solutionfile
 syn keyword	bklCommonProp	vs2008.solutionfile
@@ -41,6 +41,7 @@ syn keyword	bklCommonProp	vs2010.solutionfile
 syn keyword	bklCommonProp	vs2012.solutionfile
 syn keyword	bklCommonProp	vs2013.solutionfile
 syn keyword	bklCommonProp	vs2015.solutionfile
+syn keyword	bklCommonProp	vs2017.solutionfile
 syn keyword	bklCommonProp	gnu.makefile gnu-osx.makefile gnu-suncc.makefile
 
 " Properties common to absolutely all targets.
@@ -52,7 +53,8 @@ syn keyword	bklCommonProp	vs2010.guid vs2010.projectfile contained
 syn keyword	bklCommonProp	vs2012.guid vs2012.projectfile contained
 syn keyword	bklCommonProp	vs2013.guid vs2013.projectfile contained
 syn keyword	bklCommonProp	vs2015.guid vs2015.projectfile contained
-syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\|2013\|2015\)\.option\(\.\w\+\)\{1,2}" contained
+syn keyword	bklCommonProp	vs2017.guid vs2017.projectfile contained
+syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\|2013\|2015\|2017\)\.option\(\.\w\+\)\{1,2}" contained
 
 " Properties that can occur inside action targets only.
 syn keyword	bklActionProp	commands outputs contained
