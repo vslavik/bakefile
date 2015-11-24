@@ -481,13 +481,15 @@ class VS201xToolsetBase(VSToolsetBase):
 
     def get_vs_warning_level(self, cfg):
         """
-        Return numeric MSVS warning level corresponding to the warning option
-        in the specified config.
+        Return MSVS warning level option value corresponding to the warning
+        option in the specified config.
         """
         WARNING_LEVELS = { "no": "TurnOffAllWarnings",
                            "minimal": "Level1",
                            "default": "Level3",
-                           "all": "EnableAllWarnings" }
+                           "all": "Level4",
+                           "max": "EnableAllWarnings",
+        }
         return WARNING_LEVELS[cfg["warnings"].as_py()]
 
 

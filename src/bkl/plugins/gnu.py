@@ -407,6 +407,7 @@ class GnuToolset(MakefileToolset):
         "minimal":  None,
         "default":  None,
         "all":      "-Wall",
+        "max":      "-Wall -Wextra", # Not really max, more could be added.
     }
 
     def output_default_flags(self, file, configs):
@@ -652,5 +653,6 @@ class SunCCGnuToolset(GnuToolset):
         "no":       "-w",
         "minimal":  None,
         "default":  "+w",
-        "all":      "+w2 -xport64",
+        "all":      "+w2 -xport64=implicit",
+        "max":      "+w2 -xport64=full",
     }

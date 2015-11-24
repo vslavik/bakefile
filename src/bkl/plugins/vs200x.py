@@ -580,7 +580,9 @@ class VS200xToolsetBase(VSToolsetBase):
         WARNING_LEVELS = { "no": 0,
                            "minimal": 1,
                            "default": 3,
-                           "all": 4 }
+                           "all": 4,
+                           "max": 4,
+                         }
         return WARNING_LEVELS[cfg["warnings"].as_py()]
 
 
