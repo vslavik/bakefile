@@ -115,7 +115,13 @@ class OutputFile(object):
     def commit(self):
         if self.eol == EOL_WINDOWS:
             self.text = self.text.replace("\n", "\r\n")
-        rel_fn = os.path.relpath(self.filename)
+        try:
+            rel_fn = os.path.relpath(self.filename)
+        except ValueError:
+            # This can happen under Windows if the filename is on a different
+            # drive from the current directory, in this case we have no other
+            # choice but to use the absolute path to it.
+            rel_fn = self.filename
 
         if not force_output:
             try:
