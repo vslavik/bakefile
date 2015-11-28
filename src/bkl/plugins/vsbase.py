@@ -118,7 +118,7 @@ class Node(object):
         >>> n.add("LinkIncremental", target["vs-incremental-link"])
 
         Or it can take the same arguments that Node constructor takes; this is
-        equivalent to creating a Node using the same arguments and than adding
+        equivalent to creating a Node using the same arguments and then adding
         it using the first form of add():
         >>> n.add("ImportGroup", Label="PropertySheets")
         """
@@ -293,7 +293,7 @@ class XmlFormatter(object):
         # a specialization of int and dictionaries don't differentiate between
         # them and so @memoized format_value() would incorrectly return the
         # same value (e.g. "1") for both True and 1. The dummy 'valtype'
-        # argument disambiguates these cases, with no noticeable lost of
+        # argument disambiguates these cases, with no noticeable loss of
         # performance.
         return self._format_value(val, type(val))
 
