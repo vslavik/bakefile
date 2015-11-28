@@ -1,15 +1,20 @@
-toolsets = gnu gnu-osx gnu-suncc vs2008 vs2010 vs2012 vs2013 vs2015;
+toolsets = gnu gnu-osx gnu-suncc vs2003 vs2005 vs2008 vs2010 vs2012 vs2013 vs2015;
 
+vs2003.solutionfile = hello_world_vs2003.sln;
+vs2005.solutionfile = hello_world_vs2005.sln;
+vs2008.solutionfile = hello_world_vs2008.sln;
 vs2012.solutionfile = hello_world_vs2012.sln;
 vs2013.solutionfile = hello_world_vs2013.sln;
 vs2015.solutionfile = hello_world_vs2015.sln;
-vs2008.solutionfile = hello_world_vs2008.sln;
 
 program hello {
     archs = x86 x86_64;
     sources { hello.c }
     defines += "SALUTATION=\"Hello\"";
 
+    vs2003.projectfile = hello_vs2003.vcproj;
+    vs2005.projectfile = hello_vs2005.vcproj;
+    vs2008.projectfile = hello_vs2008.vcproj;
     vs2012.projectfile = hello_vs2012.vcxproj;
     vs2013.projectfile = hello_vs2013.vcxproj;
     vs2015.projectfile = hello_vs2015.vcxproj;
