@@ -32,6 +32,16 @@ from bkl.plugins.vsbase import *
 from bkl.expr import concat, format_string
 
 
+class VS201xXmlFormatter(XmlFormatter):
+    """
+    XmlFormatter for VS 201x output.
+    """
+
+    elems_not_collapsed = set(["ImportGroup"])
+
+    def __init__(self, settings, paths_info):
+        super(VS201xXmlFormatter, self).__init__(settings, paths_info)
+
 # TODO: Put more content into this class, use it properly
 class VS2010Project(VSProjectBase):
     """
@@ -348,7 +358,7 @@ class VS201xToolsetBase(VSToolsetBase):
         filename = project.projectfile.as_native_path_for_output(target)
         paths_info = self.get_project_paths_info(target, project)
 
-        formatter = XmlFormatter(target.project.settings, paths_info)
+        formatter = VS201xXmlFormatter(target.project.settings, paths_info)
         f = OutputFile(filename, EOL_WINDOWS,
                        creator=self, create_for=target)
         f.write(codecs.BOM_UTF8)
