@@ -792,7 +792,7 @@ class VSToolsetBase(Toolset):
         """
         defs = ["WIN32"]
         defs.append("_DEBUG" if cfg.is_debug else "NDEBUG")
-        if is_program(target):
+        if is_program(target) and target["win32-subsystem"] == "console":
             defs.append("_CONSOLE")
         elif is_library(target):
             defs.append("_LIB")
