@@ -230,6 +230,9 @@ class XmlFormatter(object):
     #: Class for expressions formatting
     ExprFormatter = VSExprFormatter
 
+    #: Elements which are written in full form when empty.
+    elems_not_collapsed = set()
+
     def __init__(self, settings, paths_info, charset="utf-8"):
         self.charset = charset
         self.expr_formatter = self.ExprFormatter(settings, paths_info)
@@ -275,17 +278,49 @@ class XmlFormatter(object):
         arguments already use properly escaped markup; values in *attrs* are
         quoted and escaped.
         """
-        s = ["%s<%s" % (indent, name)]
+        s = "%s<%s" % (indent, name)
         if attrs:
-            for key, value in attrs:
-                s.append(' %s=%s' % (key, value))
-        if text:
-            s.append(">%s</%s>\n" % (text, name))
-        elif children_markup:
-            s.append(">\n%s%s</%s>\n" % (children_markup, indent, name))
+            # Different versions put attributes on the same or different
+            # lines, so do this in a separate method to allow overriding it.
+            s += self.format_attrs(attrs, indent)
+
+            if text or children_markup:
+                # Moreover, different versions may or not put a new line
+                # before the closing angle bracket, so we need a method here
+                # too.
+                s += self.format_end_tag_with_attrs(indent)
+            else: # An empty element
+                # Some empty elements are output as "<foo/>" while others as
+                # "<foo>\n</foo>".
+                if name not in self.elems_not_collapsed:
+                    # And different versions close an empty tag differently,
+                    # so abstract it into a separate method as well.
+                    s += self.format_end_empty_tag(indent)
+
+                    # Skip the closing tag addition below.
+                    s += "\n"
+                    return s
+
+                s += self.format_end_tag_with_attrs(indent)
+                s += "\n"
+                s += indent
         else:
-            s.append(" />\n")
-        return "".join(s)
+            if text or children_markup:
+                s += ">"
+            else:
+                s += ">\n"
+                s += indent
+
+        if text:
+            s += text
+        elif children_markup:
+            s += "\n"
+            s += children_markup
+            s += indent
+
+        s += "</%s>\n" % name
+
+        return s
 
     def format_value(self, val):
         # This trick is necessary, because 'val' may be of many types -- in
@@ -296,6 +331,32 @@ class XmlFormatter(object):
         # argument disambiguates these cases, with no noticeable loss of
         # performance.
         return self._format_value(val, type(val))
+
+    def format_attrs(self, attrs, indent):
+        """
+        Returns the list containing formatted attributes.
+
+        Parameters of this method are a subset of format_node() parameters.
+        """
+        s = ''
+        for key, value in attrs:
+            s += ' %s=%s' % (key, value)
+        return s
+
+    def format_end_tag_with_attrs(self, indent):
+        """
+        Returns the string at the end of the opening tag with attributes.
+        """
+        return ">"
+
+    def format_end_empty_tag(self, indent):
+        """
+        Returns the string at the end of an empty tag.
+
+        This method only exists because MSVS 2003 doesn't insert an extra
+        space here while all the other formats do.
+        """
+        return " />"
 
     @memoized
     def _format_value(self, val, valtype):
