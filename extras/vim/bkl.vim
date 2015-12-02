@@ -34,6 +34,7 @@ syn keyword	bklGlobalStat	setting
 syn keyword	bklGlobalProp	toolsets
 syn keyword	bklGlobalProp	configurations
 syn match	bklGlobalProp	"\<vs\(2003\|2005\|2008\|2010\|2012\|2013\|2015\).generate-solution\ze *=" nextgroup=bklBoolRHS skipwhite
+syn keyword	bklCommonProp	vs.solutionfile
 syn keyword	bklCommonProp	vs2003.solutionfile
 syn keyword	bklCommonProp	vs2005.solutionfile
 syn keyword	bklCommonProp	vs2008.solutionfile

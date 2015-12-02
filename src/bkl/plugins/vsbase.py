@@ -62,6 +62,25 @@ def GUID(namespace, solution, data):
     return str(g).upper()
 
 
+def get_solution_file(toolset, module):
+    """
+    Return the solution file PathExpr object for the given module and toolset.
+
+    This helper function checks for a version-specific `vs20xx.solutionfile`
+    property first and falls back to the version-independent `vs.solutionfile`
+    if the former is not defined.
+    """
+    slnfile = module["%s.solutionfile" % toolset.name]
+
+    # The default value for toolset-specific property is not a PathExpr just
+    # to allow determining whether a property was specified and we use this to
+    # check for it here:
+    if not isinstance(slnfile, bkl.expr.PathExpr):
+        slnfile = module["vs.solutionfile"]
+
+    return slnfile
+
+
 class Node(object):
     """
     Convenience representation of XML node for project file output. It provides
@@ -382,7 +401,8 @@ class VSSolutionBase(object):
     human_version = None
 
     def __init__(self, toolset, module):
-        slnfile = module["%s.solutionfile" % toolset.name].as_native_path_for_output(module)
+        slnfile = get_solution_file(toolset, module).as_native_path_for_output(module)
+
         self.name = module.name
         # unlike targets, modules' names aren't globally unique, so use the fully qualified name, which is
         self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.fully_qualified_name)
@@ -621,7 +641,7 @@ def _default_solution_name(module):
 
 def _project_name_from_solution(toolset_class, target):
     """``$(id).vcxproj`` in the same directory as the ``.sln`` file"""
-    sln = target["%s.solutionfile" % toolset_class.name]
+    sln = get_solution_file(toolset_class, target)
     proj_ext = toolset_class.proj_extension
     return bkl.expr.PathExpr(sln.components[:-1] +
                              [bkl.expr.LiteralExpr("%s.%s" % (target.name, proj_ext))],
@@ -652,6 +672,15 @@ class VSToolsetBase(Toolset):
     shared_library_extension = "dll"
     loadable_module_extension = "dll"
 
+    #: Properties common for all MSVS toolsets, it is important to define them
+    #: here so that there is just a single Property object which is returned
+    #: multiple times from properties_module() below.
+    slnprop = Property("vs.solutionfile",
+                       type=PathType(),
+                       default=_default_solution_name,
+                       inheritable=False,
+                       doc="File name of the solution file for the module.")
+
     @classmethod
     def properties_target(cls):
         yield Property("%s.projectfile" % cls.name,
@@ -669,11 +698,18 @@ class VSToolsetBase(Toolset):
 
     @classmethod
     def properties_module(cls):
+        yield VSToolsetBase.slnprop
         yield Property("%s.solutionfile" % cls.name,
                        type=PathType(),
-                       default=_default_solution_name,
+                       # We need to use a valid object (so that the property
+                       # doesn't become required here) which can be
+                       # distinguished from any valid path when we test
+                       # whether this property was defined later, so we use a
+                       # hack with defining a property of a wrong type just so
+                       # that we could test for it using isinstance().
+                       default=bkl.expr.LiteralExpr(''),
                        inheritable=False,
-                       doc="File name of the solution file for the module.")
+                       doc="MSVS version-specific file name of the solution file for the module.")
         yield Property("%s.generate-solution" % cls.name,
                        type=BoolType(),
                        default=True,

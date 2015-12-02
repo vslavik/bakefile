@@ -1,10 +1,7 @@
 module {
   variables {
     toolsets = [gnu, gnu-osx, gnu-suncc, vs2008, vs2010, vs2012, vs2013, vs2015]
-    vs2012.solutionfile = @top_srcdir/hello_world_vs2012.sln
-    vs2013.solutionfile = @top_srcdir/hello_world_vs2013.sln
-    vs2015.solutionfile = @top_srcdir/hello_world_vs2015.sln
-    vs2008.solutionfile = @top_srcdir/hello_world_vs2008.sln
+    vs.solutionfile = @top_srcdir/hello_world_$(toolset).sln
   }
   targets {
     program hello {
