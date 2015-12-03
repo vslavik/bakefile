@@ -104,40 +104,27 @@ class VS200xXmlFormatter(XmlFormatter):
 
     indent_step = "\t"
     ExprFormatter = VS200xExprFormatter
-
-    def __init__(self, settings, paths_info):
-        super(VS200xXmlFormatter, self).__init__(settings, paths_info, charset=VCPROJ_CHARSET)
-
-    # these are always written as <foo>\n<foo>, not <foo/>
     elems_not_collapsed = set(["References",
                                "Globals",
                                "File",
                                "Filter",
                                "ToolFiles"])
 
-    def format_node(self, name, attrs, text, children_markup, indent):
-        """
-        Formats given Node instance, indented with *indent* text.
-        Content is either *text* or *children_markup*; the other is None.
-        """
-        s = ["%s<%s" % (indent, name)]
-        if attrs:
-            for key, value in attrs:
-                s.append("\n%s\t%s=%s" % (indent, key, value))
-        if text:
-            s.append(">%s</%s>\n" % (text, name))
-        elif children_markup:
-            if attrs:
-                s.append("\n%s\t" % indent)
-            s.append(">\n%s%s</%s>\n" % (children_markup, indent, name))
-        else:
-            if name in self.elems_not_collapsed:
-                if attrs:
-                    s.append("\n%s\t" % indent)
-                s.append(">\n%s</%s>\n" % (indent, name))
-            else:
-                s.append("\n%s/>\n" % indent)
-        return "".join(s)
+    def __init__(self, settings, paths_info):
+        super(VS200xXmlFormatter, self).__init__(settings, paths_info, charset=VCPROJ_CHARSET)
+
+    # Override to insert line breaks before each attribute.
+    def format_attrs(self, attrs, indent):
+        s = ''
+        for key, value in attrs:
+            s += "\n%s\t%s=%s" % (indent, key, value)
+        return s
+
+    def format_end_tag_with_attrs(self, indent):
+        return "\n%s\t>" % indent
+
+    def format_end_empty_tag(self, indent):
+        return "\n%s/>" % indent
 
 
 # TODO: Put more content into these classes, use them properly
@@ -664,23 +651,13 @@ class VS2003ExprFormatter(VS200xExprFormatter):
 
 class VS2003XmlFormatter(VS200xXmlFormatter):
     ExprFormatter = VS2003ExprFormatter
-    # VS2003 formats > after attributes list differently:
-    def format_node(self, name, attrs, text, children_markup, indent):
-        s = "%s<%s" % (indent, name)
-        if attrs:
-            for key, value in attrs:
-                s += "\n%s\t%s=%s" % (indent, key, value)
-        if text:
-            s += ">%s</%s>\n" % (text, name)
-        elif children_markup:
-            s += ">\n%s%s</%s>\n" % (children_markup, indent, name)
-        else:
-            if name in self.elems_not_collapsed:
-                s += ">\n%s</%s>\n" % (indent, name)
-            else:
-                s += "/>\n"
-        return s
 
+    # Override to get rid of the new lines which are not present in VS 2003
+    def format_end_tag_with_attrs(self, indent):
+        return ">"
+
+    def format_end_empty_tag(self, indent):
+        return "/>"
 
 class VS2003Toolset(VS200xToolsetBase):
     """
