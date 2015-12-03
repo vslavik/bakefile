@@ -62,6 +62,9 @@ class VS2010Project(VSProjectBase):
 class VS201xToolsetBase(VSToolsetBase):
     """Base class for VS2010, VS2012, VS2013 and VS2015 toolsets."""
 
+    #: XML formatting class
+    XmlFormatter = VS201xXmlFormatter
+
     #: Extension of format files
     proj_extension = "vcxproj"
 
@@ -359,7 +362,7 @@ class VS201xToolsetBase(VSToolsetBase):
         filename = project.projectfile.as_native_path_for_output(target)
         paths_info = self.get_project_paths_info(target, project)
 
-        formatter = VS201xXmlFormatter(target.project.settings, paths_info)
+        formatter = self.XmlFormatter(target.project.settings, paths_info)
         f = OutputFile(filename, EOL_WINDOWS,
                        creator=self, create_for=target)
         f.write(codecs.BOM_UTF8)
