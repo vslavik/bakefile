@@ -165,12 +165,14 @@ class VSExternalProject200x(VSExternalProjectBase):
 
 class VSExternalProject201x(VSExternalProjectBase):
     """
-    Wrapper around VS 2010/2012 project files.
+    Wrapper around VS 2010/2012/2013/2015 project files.
     """
     @memoized_property
     def version(self):
         v = self.xml.get("ToolsVersion")
-        if v != "4.0":
+        if v == "14.0":
+            return 14
+        elif v != "4.0":
             raise Error("unrecognized version of Visual Studio project %s: ToolsVersion=\"%s\"" %(
                         self.projectfile, v))
         # TODO-PY26: use "PropertyGroup[@Label='Configuration']"
