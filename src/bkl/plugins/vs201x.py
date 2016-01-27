@@ -395,6 +395,9 @@ class VS201xToolsetBase(VSToolsetBase):
 
 
     def _get_references(self, target):
+        if not target["deps"]:
+            return None
+
         # In addition to explicit dependencies, add dependencies of static libraries
         # linked into target to the list of references.
         prj = target.project

@@ -515,7 +515,8 @@ class VSSolutionBase(object):
         included = set(x.name for x in self.all_projects())
         todo = set()
         for prj in self.all_projects():
-            todo.update(prj.dependencies)
+            if prj.dependencies:
+                todo.update(prj.dependencies)
 
         prev_count = 0
         while prev_count != len(included):
@@ -525,7 +526,8 @@ class VSSolutionBase(object):
             for todo_item in sorted(todo):
                 included.add(todo_item)
                 prj = top._get_project_by_id(todo_item)
-                todo_new.update(prj.dependencies)
+                if prj.dependencies:
+                    todo_new.update(prj.dependencies)
                 additional.append(prj)
             todo.update(todo_new)
         return additional
