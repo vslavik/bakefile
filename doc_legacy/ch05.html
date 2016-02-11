@@ -1,0 +1,725 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 5. Commands Reference</title><link rel="stylesheet" href="style.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /><link rel="home" href="index.html" title="Bakefile Manual" /><link rel="up" href="index.html" title="Bakefile Manual" /><link rel="prev" href="ch04.html" title="Chapter 4. Targets" /><link rel="next" href="ch06.html" title="Chapter 6. Frequently encountered issues" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 5. Commands Reference</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch06.html">Next</a></td></tr></table><hr /></div><div class="chapter" title="Chapter 5. Commands Reference"><div class="titlepage"><div><div><h2 class="title"><a id="ch.commands"></a>Chapter 5. Commands Reference</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch05.html#sec.makefile.cmds">Makefile Commands</a></span></dt><dd><dl><dt><span class="section"><a href="ch05.html#cmd.set">set</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.unset">unset</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.option">option</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.template">template</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.using">using</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.include">include</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.if">if</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.fragment">fragment</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.requires">requires</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.error">error</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.warning">warning</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.echo">echo</a></span></dt></dl></dd><dt><span class="section"><a href="ch05.html#sec.extending.bkl">Commands for Extending Bakefile</a></span></dt><dd><dl><dt><span class="section"><a href="ch05.html#cmd.define-rule">define-rule</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.define-tag">define-tag</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.define-global-tag">define-global-tag</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.add-target">add-target</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.modify-target">modify-target</a></span></dt><dt><span class="section"><a href="ch05.html#cmd.output">output</a></span></dt></dl></dd></dl></div><p><a id="commands"></a>
+        Commands are top-level makefile constructs. They have following form:
+        </p><pre class="programlisting">
+&lt;COMMAND [PROPERTY="VALUE", ...]&gt;
+    CONTENT
+&lt;/COMMAND&gt;
+</pre><p>
+        Here, <code class="varname">CONTENT</code> is either a text value (as in e.g.
+        <a class="xref" href="ch05.html#cmd.set" title="set">set</a>) or XML subtree.
+    </p><div class="section" title="Makefile Commands"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec.makefile.cmds"></a>Makefile Commands</h2></div></div></div><div class="section" title="set"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.set"></a>set</h3></div></div></div><p>
+            Sets a variable. There are two forms of the command. The first
+            one is for setting variables unconditionally:
+            </p><pre class="programlisting">
+&lt;set var="NAME" [append="APP"] [prepend="PREP"] [overwrite="OVERWRITE"]
+     [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]&gt;
+  VALUE
+&lt;/set&gt;
+  </pre><p>
+            The other one resembles <span class="emphasis"><em>switch</em></span> statement known
+            from C and is used to set the variable to one of possible values
+            depending on certain condition:
+            </p><pre class="programlisting">
+&lt;set var="NAME" [append="APP"] [prepend="PREP"] [overwrite="OVERWRITE"]
+     [scope="SCOPE"] [make_var="MAKEVAR"] [hints="HINTS"]&gt;
+  &lt;if cond="COND"&gt;VALUE&lt;/if&gt;
+  [
+  &lt;if cond="COND"&gt;VALUE&lt;/if&gt;
+  ...
+  ]
+&lt;/set&gt;
+  </pre><p>
+            If the second from is used then the variable is set to value from
+            the first <code class="function">if</code> node whose condition is met, or
+            to empty string if no condition is met.
+            Note that conditions within one <code class="function">set</code> command
+            <span class="emphasis"><em>must be mutually exclusive.</em></span>
+          </p><p>
+              The value is any text that may contain
+              <a class="link" href="ch03.html#concept.variables" title="Variables">variable expansions</a>.
+          </p><p>
+              If an <a class="link" href="ch03.html#concept.option" title="Options">option</a>
+              with same name exists, the variable takes precedence and the
+              option is shadowed by it. This behaviour allows you to hardcode
+              values for some ruleset's options in the makefile or to specify
+              the value on command line when running Bakefile.
+          </p><div class="variablelist" title="Parameters:"><a id="cmd.set.params"></a><p class="title"><b>Parameters:</b></p><dl><dt><span class="term">var</span></dt><dd><p>
+                          Name of the variable to assign the value.
+                          Any constant expression is allowed for this
+                          attribute, not only literals.
+                          </p><pre class="programlisting">
+&lt;set var="postfix"&gt;world&lt;/set&gt;
+&lt;set var="prefix"&gt;hello&lt;/set&gt;
+
+&lt;!-- the following &lt;set&gt; tag will create a "hello_world" variable: --&gt;
+&lt;set var="$(prefix)_$(postfix)"&gt;Hello world&lt;/set&gt;
+&lt;echo&gt;$(hello_world)&lt;/echo&gt;
+</pre><p>
+                     </p><p class="default">
+                          Required parameter
+                      </p></dd><dt><span class="term">append</span></dt><dd><p>
+                          If 1, the value is appended to previous value of the
+                          variable if it is already defined, with a space
+                          inserted between them. If the variable
+                          wasn't defined yet, the command behaves as if
+                          append=0.
+                          Following two <code class="function">set</code>
+                          commands are equivalent:
+                          </p><pre class="programlisting">
+&lt;set var="FOO" append="1"&gt;something&lt;/set&gt;
+&lt;set var="FOO"&gt;$(FOO) something&lt;/set&gt;
+</pre><p>
+                      </p><p class="default">
+                          Default value: 0
+                      </p></dd><dt><span class="term">prepend</span></dt><dd><p>
+                          If 1, the value is prepended in front of previous 
+                          value of the variable if it is already defined
+                          (otherwise the command behaves as if prepend=0).
+                          Following two <code class="function">set</code>
+                          commands are equivalent:
+                          </p><pre class="programlisting">
+&lt;set var="FOO" prepend="1"&gt;something&lt;/set&gt;
+&lt;set var="FOO"&gt;something $(FOO)&lt;/set&gt;
+</pre><p>
+                      </p><p class="default">
+                          Default value: 0
+                      </p></dd><dt><span class="term">cond</span></dt><dd><p>
+                          If present, the variable is set only if the condition
+                          is met. If the condition evaluates to 0, the variable
+                          is not set, if it evaluates to 1, the variable is set.
+                          If condition's value can't be determined at the time
+                          of makefile processing, a
+                          <a class="link" href="ch03.html#concept.condvar" title="Conditional Variables">conditional variable
+                          </a> is created instead of ordinary variable.
+                          See <a class="xref" href="ch03.html#concept.conditions" title="Conditions">the section called “Conditions”</a> for more
+                          details.
+                          </p><pre class="programlisting">
+&lt;set var="FILES"&gt;
+  &lt;if cond="BUILD=='debug'"&gt;foo_dbg.c&lt;/if&gt;
+  &lt;if cond="BUILD=='release'"&gt;foo.c&lt;/if&gt;
+&lt;/set&gt;
+</pre><p>
+                          The condition can also value special value
+                          <code class="literal">target</code>, which can only be used
+                          within <a class="link" href="ch03.html#concept.target" title="Targets">target</a>
+                          specification. In that case parent
+                          <a class="link" href="ch04.html#targets">target's condition</a>
+                          is used (or <code class="literal">1</code> if there's no
+                          condition set on the target).
+                          The condition can also be "<code class="literal">target
+                            and</code><span class="emphasis"><em>condexpr</em></span>" in
+                          which case target's condition (if any) is combined
+                          with <span class="emphasis"><em>condexpr</em></span>.
+                      </p><p>
+                        The string with condition may itself be a
+                        constant expression, so you can write this:
+                        </p><pre class="programlisting">
+&lt;set var="IsRelease"&gt;=='release'&lt;/set&gt;
+&lt;set var="CondDebug"&gt;BUILD=='debug'&lt;/set&gt;
+&lt;set var="FILES"&gt;
+  &lt;if cond="BUILD$(IsRelease)"&gt;foo_dbg.c&lt;/if&gt;
+  &lt;if cond="$(CondDebug)"&gt;foo.c&lt;/if&gt;
+&lt;/set&gt;
+</pre><p>
+                      </p></dd><dt><span class="term">overwrite</span></dt><dd><p>
+                        If set to 0 and variable with this name already exists,
+                        then it's value is not changed (the default is to change
+                        it).
+                      </p><p class="default">
+                        Default value: 1
+                      </p></dd><dt><span class="term">scope</span></dt><dd><p>
+                      Specify scope of variable being set. Possible values are
+                      <code class="varname">local</code> (current target if the command is
+                      applied on a target, same as <code class="varname">global</code>
+                      otherwise), <code class="varname">global</code> or a name of
+                      existing target (in which case the variable is set on
+                      that target).
+                    </p><p>
+                      Can't be used with conditional variables.
+                    </p><p class="default">
+                      Default value: local
+                    </p></dd><dt><span class="term">make_var</span></dt><dd><p>
+                          If set to <code class="literal">1</code>, then the variable
+                          is preserved in the makefile instead of being
+                          substituted by Bakefile. This happens only if the
+                          output format supports it
+                          (<a class="xref" href="ch07.html#var.FORMAT_HAS_VARIABLES">FORMAT_HAS_VARIABLES</a> is set to
+                          <code class="literal">1</code>) and if variable's value is not
+                          empty string. This settings is useful
+                          together with frequently used variables with long
+                          values, it helps reduce size of generated makefiles.
+                      </p><p class="default">
+                          Default value: 0
+                      </p></dd><dt><span class="term">hints</span></dt><dd><p>
+                          Comma-separated list of hint keywords. These hints
+                          are optional and Bakefile can (but doesn't have to)
+                          use them to better format generated makefiles. So
+                          far only <code class="literal">files</code> hint is supported.
+                          It tells Bakefile that the variable holds list of
+                          files and if it is either make or conditional
+                          variable, it is formatted in such way that only
+                          one file per line is written to the output (and
+                          therefore adding or removing files does only cause
+                          small differences).
+                      </p><p class="default"></p></dd></dl></div><p class="example">
+              Example:
+              </p><pre class="programlisting">
+&lt;set var="APP_VERSION"&gt;1.0.3&lt;/set&gt;
+&lt;set var="TAR_NAME"&gt;app-$(APP_VERSION).tar.gz&lt;/set&gt;
+</pre><p class="example">
+          </p><p class="seealso">
+              See also: <a class="xref" href="ch05.html#cmd.unset" title="unset">unset</a>
+          </p></div><div class="section" title="unset"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.unset"></a>unset</h3></div></div></div><p>
+              Unsets variable previously set by <a class="xref" href="ch05.html#cmd.set" title="set">set</a>. Note
+              that you can only unset a <span class="emphasis"><em>variable</em></span>, not
+              an <a class="link" href="ch03.html#concept.option" title="Options">option</a> or 
+              <a class="link" href="ch03.html#concept.condvar" title="Conditional Variables">conditional variable</a>.
+              </p><pre class="programlisting">
+&lt;unset var="NAME"/&gt;
+  </pre><p>
+          </p><div class="variablelist" title="Parameters:"><a id="cmd.unset.params"></a><p class="title"><b>Parameters:</b></p><dl><dt><span class="term">var</span></dt><dd><p>
+                          The meaning is same as in
+                          <a class="link" href="ch05.html#cmd.set.params" title="Parameters:">set's properties</a>.
+                      </p></dd></dl></div></div><div class="section" title="option"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.option"></a>option</h3></div></div></div><p>
+          Adds an <a class="link" href="ch03.html#concept.option" title="Options">option</a>
+          to the makefile.
+          </p><pre class="programlisting">
+&lt;option name="NAME" [never_empty="NEVER_EMPTY"] [category="CATEGORY"]&gt;
+  [&lt;default-value [force="FORCE"]&gt;DEFVALUE&lt;/default-value&gt;]
+  [&lt;description&gt;DESC&lt;/description&gt;]
+  [&lt;values&gt;VALUES&lt;/values&gt;]
+  [&lt;values-description&gt;VALUES_DESC&lt;/values-description&gt;]
+&lt;/option&gt;
+</pre><p>
+          <code class="varname">NAME</code> is variable name under which the option is
+          used in the makefile (using same syntax as when expanding
+          <a class="link" href="ch03.html#concept.variables" title="Variables">variables</a>).
+          <code class="varname">NAME</code> is required, the rest of parameters is
+          optional.
+        </p><p>
+          <code class="varname">DEFVALUE</code> is default value of the
+          option, if appliable. It can be used by format backends that don't
+          support options and it is used as default in those that do. Use it
+          whenever possible.
+          Note that for options with listed values (see the <code class="varname">VALUES</code> 
+          parameter), the default value must be one of the values listed unless
+          <code class="varname">FORCE</code> is set to <code class="literal">1</code>.
+        </p><p>
+          <code class="varname">FORCE</code> can be <code class="literal">0</code> (the default) or 
+          <code class="literal">1</code> to indicate that Bakefile should not check that the 
+          default value is in the list of allowed values.
+          This is useful when you want to use e.g. a shell command as the default value
+          (<code class="literal">$(shell some-command)</code>) or an environment
+          variable <code class="literal">$(MYENVVAR)</code>. It is your responsibility
+          to ensure that the default value is a legal value if you use
+          <code class="literal">force=1</code>.
+        </p><p>
+          <code class="varname">NEVER_EMPTY</code> may be set to <code class="literal">1</code> to
+          tell Bakefile that it can treat the option as non-empty variable.
+          This is useful only rarely in situations when Bakefile requires some
+          non-empty value as tag's argument.
+        </p><p>
+          <code class="varname">CATEGORY</code> may be set to provide Bakefile
+          additional information about the option. Certain operations
+          (typically substitutions) may fail when applied to options unless
+          all of its possible values are known. Because many tags use
+          substitutions internally, this can be very limiting; the category
+          hint can be used to work around most common problems.
+
+          Possible values are <code class="literal">unspecified</code> (the default)
+          and <code class="literal">path</code>, which indicates that the option will
+          contain valid <span class="emphasis"><em>native</em></span>, non-empty path name. An
+          option with category set to <code class="literal">path</code> can be used as
+          argument to tags like <a class="xref" href="ch04.html#tag.include">include</a>.
+        </p><p>
+          <code class="varname">DESC</code> is human-readable description of the option,
+          for use in comments.
+        </p><p>
+          <code class="varname">VALUES</code> is comma-separated list of all
+          possible values the option can have. It is used by backends that
+          don't support options (such as Visual C++ project files) to generate
+          all possible configurations. It's use is highly recommended.
+        </p><p>
+          <code class="varname">VALUES_DESC</code> is comma-separated list of
+          single-word description of corresponding values. It may be used
+          only if <code class="varname">VALUES</code> were specified and both
+          lists must have same length. These descriptions will show up
+          in formats that don't support conditions, such as Visual C++
+          projects (the project will contain several configurations that
+          will be described using these words).
+        </p></div><div class="section" title="template"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.template"></a>template</h3></div></div></div><p>
+          Defines new <a class="link" href="ch03.html#concept.template" title="Templates">template</a>.
+          </p><pre class="programlisting">
+&lt;template id="NAME" [template="TEMPLATE,..."]&gt;
+  SPECIFICATION
+&lt;/template&gt;
+  </pre><p>
+          Template definition is syntactically identical to
+          <a class="link" href="ch04.html#targets">target definition</a>.
+          <code class="varname">template</code> is optional comma-separated list of
+          templates this template derives from and
+          <code class="varname">SPECIFICATION</code> may contain the very same things that
+          target node.
+        </p><p>
+          Content of <code class="function">template</code> node is
+          <span class="emphasis"><em>not</em></span> processed by Bakefile when it is encountered
+          in makefile. It is stored in templates dictionary instead. When a
+          target that derives from the template is encountered, the template
+          is inserted before target's content.
+        </p><p>
+          For example consider this makefile fragment:
+          </p><pre class="programlisting">
+&lt;template id="t1"&gt;
+  &lt;define&gt;NAME=$(id)&lt;/define&gt;
+&lt;/template&gt;
+&lt;template id="t2"&gt;
+  &lt;include&gt;../headers&lt;/include&gt;
+&lt;/template&gt;
+
+&lt;exe id="app" template="t1,t2"&gt;
+  &lt;sources&gt;hello.c&lt;/sources&gt;
+&lt;/exe&gt;
+</pre><p>
+          It looks like this after templates expansion:
+          </p><pre class="programlisting">
+&lt;exe id="app" template="t1,t2"&gt;
+  &lt;define&gt;NAME=$(id)&lt;/define&gt;
+  &lt;include&gt;../headers&lt;/include&gt;
+  &lt;sources&gt;hello.c&lt;/sources&gt;
+&lt;/exe&gt;
+</pre><p>
+        </p></div><div class="section" title="using"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.using"></a>using</h3></div></div></div><p>
+        This commands is used to declare what modules the makefile requires.
+        See more about modules in <a class="xref" href="ch03.html#concept.modules" title="Modules">the section called “Modules”</a>.
+              </p><pre class="programlisting">
+&lt;using module="MODULE1[,MODULE2[,...]]"/&gt;
+  </pre><p>
+      </p><p>
+        The effect of <code class="function">using</code> is as follows: the modules are
+        added to the list of used modules (unless they are already in it) and
+        additional ruleset files are loaded from
+        <a class="link" href="rn01re01.html#searchpaths">Bakefile search paths</a>. Name of every
+        file in every search path is decomposed into components by making every
+        subdirectory name a component and splitting the basename into components
+        by separating it on hyphens. A file is included as soon as all
+        components of its name appear in the list of used modules. The inclusion
+        behaves indentically to <a class="xref" href="ch05.html#cmd.include" title="include">include</a>.
+      </p><p>
+        Consider this structure of ruleset files:
+        </p><pre class="programlisting">
+python/common.bakefile        # python,common
+python/cxx.bakefile           # python,cxx
+cxx-common.bakefile           # cxx,common
+cxx-qt.bakefile               # cxx,qt
+qt/python.bakefile            # qt,python
+qt/cxx-python.bakefile        # qt,cxx,python</pre><p>
+        Anotated makefile fragment illustrates order of modules loading:
+        </p><pre class="programlisting">
+&lt;using module="python"/&gt;
+&lt;!-- python/common.bakefile loaded --&gt;
+
+&lt;using module="cxx"/&gt;
+&lt;!-- cxx-common.bakefile loaded --&gt;
+&lt;!-- python/cxx.bakefile loaded --&gt;
+
+&lt;using module="qt"/&gt;
+&lt;!-- qt/python.bakefile loaded --&gt;
+&lt;!-- cxx-qt.bakefile loaded --&gt;
+&lt;!-- qt/cxx-python.bakefile loaded --&gt;
+</pre><p>
+      </p><p>
+        (Note that module "common" and module named after the target format are
+        always used. Therefore ruleset files
+        <code class="filename">common/MODULE.bakefile</code> are always loaded if they exist.)
+      </p><p>
+        The command may be used repeatedly in the makefile or included files.
+        Repeating the <code class="function">using</code> command with module that was
+        already added to the list of used modules with <code class="function">using</code>
+        has no effect.
+      </p><div class="variablelist" title="Parameters:"><p class="title"><b>Parameters:</b></p><dl><dt><span class="term">module</span></dt><dd><p>
+                Comma-separated list of modules to use.
+              </p></dd></dl></div><p>
+          In this example the makefile uses Gettext, Python and Pascal modules:
+          </p><pre class="programlisting">
+&lt;using module="gettext,python"/&gt;
+&lt;using module="pascal"/&gt;
+</pre><p>
+        </p></div><div class="section" title="include"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.include"></a>include</h3></div></div></div><p>
+        Includes Bakefile file. This is done by loading the file and
+        processing it immediately after <code class="function">include</code> command
+        is encountered during parsing. The effect of using
+        <code class="function">include</code> is identical to including content of the
+        file in place of the
+        <code class="function">include</code> command.
+        </p><pre class="programlisting">
+&lt;include file="FILENAME" [ignore_missing="0|1"] [once="0|1"]/&gt;
+</pre><p>
+      </p><div class="variablelist" title="Parameters:"><p class="title"><b>Parameters:</b></p><dl><dt><span class="term">file</span></dt><dd><p>
+                Name of the file to include. The filename may be either absolute
+                or relative. In the latter case, it is looked up relative to the
+                location of the makefile that contains the
+                <code class="function">include</code> command and if that fails,
+                relative to standard Bakefile search paths.
+              </p></dd><dt><span class="term">ignore_missing</span></dt><dd><p>
+                If set to 1, it is not an error if the file can't be found. If
+                0, Bakefile will abort with an error if it can't find the file.
+              </p><p class="default">
+                Default value: 0
+              </p></dd><dt><span class="term">once</span></dt><dd><p>
+                If set to 1, then the file won't be included if it was already
+                included previously.
+              </p><p class="default">
+                Default value: 0
+              </p></dd></dl></div></div><div class="section" title="if"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.if"></a>if</h3></div></div></div><p>
+          Conditionally process part of the makefile.
+          </p><pre class="programlisting">
+&lt;if cond="WEAKCONDITION"&gt;
+  ...statements...
+&lt;/if&gt;
+</pre><p>
+          The condition must be
+          <a class="link" href="ch03.html#concept.conditions.weak">weak</a>. If it evaluates to
+          1 nodes under <code class="function">if</code> node are processed as if they
+          were toplevel nodes. If it evaluates to 0, they are discarded.
+        </p></div><div class="section" title="fragment"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.fragment"></a>fragment</h3></div></div></div><p>
+          Inserts text into generated native makefile verbatim, so that it is
+          possible to include things not yet supported by Bakefile in the
+          makefiles. The text can be either read from a file or is taken from
+          command node's content. Variables are <span class="emphasis"><em>not</em></span>
+          substituted in fragment's content, it is copied to the makefile 
+          as-is, with no changes.
+          </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Parameter</th><th>Description</th><th>Required/Default value</th></tr></thead><tbody><tr><td class="paramname">format</td><td>
+                    Output format the fragment is for.
+                  </td><td class="default">required</td></tr><tr><td class="paramname">file</td><td>
+                    Read the fragment from file.
+                  </td><td class="default">no file, text is embedded</td></tr></tbody></table></div><p>
+        </p></div><div class="section" title="requires"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.requires"></a>requires</h3></div></div></div><p>
+          Declares bakefile's requirements that the installed bakefile
+          version must meet to be able to correctly generate native makefiles
+          from it.
+          </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Parameter</th><th>Description</th><th>Required/Default value</th></tr></thead><tbody><tr><td class="paramname">version</td><td>
+                    Minimal required version of Bakefile, e.g.
+                    <code class="literal">0.1.1</code>.
+                  </td><td class="default">optional</td></tr></tbody></table></div><p>
+          Example:
+          </p><pre class="programlisting">
+&lt;!-- refuse to run with Bakefile &lt; 0.5.0,
+     it's missing feature foo: --&gt;
+&lt;requires version="0.5.0"/&gt;
+</pre><p>
+        </p></div><div class="section" title="error"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.error"></a>error</h3></div></div></div><p>
+              Reports error to output and exits. This command is useful for
+              adding sanity checks to bakefiles (both user bakefiles and
+              format definitions).
+              </p><pre class="programlisting">
+&lt;!-- This code prevents creation of rules
+     for console mode apps: --&gt;
+&lt;define-tag name="app-type" rules="exe"&gt;
+  &lt;if cond="value == 'console'"&gt;
+    &lt;error&gt;
+      Windows CE doesn't support console applications.
+      &lt;/error&gt;
+  &lt;/if&gt;
+&lt;/define-tag&gt;
+</pre><p>
+          </p></div><div class="section" title="warning"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.warning"></a>warning</h3></div></div></div><p>
+              Reports warning to output and exits. This command is useful for
+              adding sanity checks to bakefiles (both user bakefiles and
+              format definitions).
+              </p><pre class="programlisting">
+&lt;if cond="FORMAT=='msvc'"&gt;
+    &lt;warning&gt;msvc support is experimental&lt;/warning&gt;
+&lt;/if&gt;
+</pre><p>
+          </p></div><div class="section" title="echo"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.echo"></a>echo</h3></div></div></div><p>
+            Prints the text in tag's value to output and,
+            unlike <a class="xref" href="ch05.html#cmd.error" title="error">error</a>,
+            continues processing. This command is useful for debugging
+            bakefiles (e.g. by printing variable values or adding progress
+            messages).
+          </p><p>
+            Note that if a variable is used in the text, it must evaluate to
+            a constant (i.e. <a class="link" href="ch03.html#concept.condvar" title="Conditional Variables">conditional
+            variables</a> or <a class="link" href="ch03.html#concept.option" title="Options">options</a>
+            cannot be used).
+            </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Parameter</th><th>Description</th><th>Default value</th></tr></thead><tbody><tr><td class="paramname">level</td><td>
+                        Can be <code class="literal">verbose</code> (in which case the
+                        message is printed only when <a class="xref" href="rn01re01.html" title="bakefile"><span class="refentrytitle">bakefile</span>(1)</a> is run with
+                      <code class="literal">--verbose</code> argument),
+                      <code class="literal">debug</code> (printed only when using the
+                      <code class="literal">--debug</code> flag) or
+                        <code class="literal">normal</code> (message is printed
+                        in any case to stdout).
+                      </td><td class="default"><code class="literal">normal</code></td></tr></tbody></table></div><p>
+
+            Example:
+
+              </p><pre class="programlisting">
+&lt;!-- Show the content of the variable X --&gt;
+&lt;set var="X"&gt;$(someComplexFunction())&lt;/set&gt;
+&lt;echo&gt;The content of the X variable is: $(X)&lt;/echo&gt;
+</pre><p>
+          </p></div></div><div class="section" title="Commands for Extending Bakefile"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec.extending.bkl"></a>Commands for Extending Bakefile</h2></div></div></div><div class="section" title="define-rule"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.define-rule"></a>define-rule</h3></div></div></div><p>
+            Creates a new rule which can then be used as any other
+            <a class="link" href="ch04.html#rules" title="Standard Target Types (&quot;Rules&quot;)">rule</a>. A rule consists of the template
+            (which is processed before target-specific code for all targets
+            created by this rule) and unlimited number of
+            <a class="xref" href="ch05.html#cmd.define-tag" title="define-tag">define-tag</a> statements that define tags
+            specific to this rule (and derived rules).
+          </p><p>
+            The usage of &lt;define-rule&gt; is as follows:
+              </p><pre class="programlisting">
+&lt;define-rule name="NAME"&gt;
+  &lt;template&gt;
+    &lt;!-- here goes the template for this rule --&gt;
+  &lt;/template&gt;
+
+  &lt;define-tag name="TAG1"&gt;
+    ..
+  &lt;/define-tag&gt;
+  &lt;define-tag name="TAG2"&gt;
+    ..
+  &lt;/define-tag&gt;
+  ...
+&lt;/define-rule&gt;
+</pre><p>
+          </p><p>
+            </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Parameter</th><th>Description</th><th>Required/Default value</th></tr></thead><tbody><tr><td class="paramname">name</td><td>
+                        The name of the rule to create.
+                      </td><td class="default">required</td></tr><tr><td class="paramname">pseudo</td><td>
+                        Allowed values are <code class="literal">0</code> and
+                        <code class="literal">1</code>; the value of  means that the
+                        rule is a 
+                        <a class="link" href="ch04.html#pseudotargets" title="Pseudo targets">pseudotarget</a>.
+                      </td><td class="default">
+                        <code class="literal">0</code>
+                      </td></tr><tr><td class="paramname">extends</td><td>
+                        A comma-separed list of the rules which are
+                        <span class="emphasis"><em>extended</em></span> by this rule. If
+                        rule B extends rule A, it means that all tags defined
+                        for A are also valid for B and the
+                        template of rule B automatically derives from the
+                        the template of rule A.
+                      </td><td class="default"> </td></tr></tbody></table></div><p>
+
+            Example:
+
+              </p><pre class="programlisting">
+&lt;!-- Creates a new "copymo" rule with its own specialized
+     tags; example usage of this rule:
+
+        &lt;copymo id="i18n"&gt;
+            &lt;lang&gt;en&lt;/lang&gt;
+            &lt;mo&gt;myfile.mo&lt;/mo&gt;
+        &lt;/copymo&gt;
+--&gt;
+&lt;using module="datafiles"/&gt;
+&lt;define-rule name="copymo" extends="copy-files"&gt;
+    &lt;template&gt;
+        &lt;srcdir&gt;$(SRCDIR)/locale&lt;/srcdir&gt;
+        &lt;files&gt;$(__mofiles)&lt;/files&gt;
+        &lt;dependency-of&gt;all&lt;/dependency-of&gt;
+    &lt;/template&gt;
+    &lt;define-tag name="lang"&gt;
+        &lt;dstdir&gt;$(DATADIR)/locale/$(value)/LC_MESSAGES&lt;/dstdir&gt;
+    &lt;/define-tag&gt;
+    &lt;define-tag name="mo"&gt;
+        &lt;set var="__mofiles"&gt;$(value)&lt;/set&gt;
+    &lt;/define-tag&gt;
+&lt;/define-rule&gt;
+</pre><p>
+          </p></div><div class="section" title="define-tag"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.define-tag"></a>define-tag</h3></div></div></div><p>
+          Creates a new tag which can be used inside target definition or
+          rules templates.
+        </p><p>
+          This command can be used in two ways: either it's used inside of
+          <a class="xref" href="ch05.html#cmd.define-rule" title="define-rule">define-rule</a>, in which case it defines a new
+          tag for the current rule, or it's used in the global scope, in
+          which case it must have the <code class="literal">rules</code> attribute that
+          specifies which rules the tag applies to.
+        </p><p>
+          </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Parameter</th><th>Description</th><th>Required/Default value</th></tr></thead><tbody><tr><td class="paramname">name</td><td>
+                      Name of the tag to define.
+                    </td><td class="default">required</td></tr><tr><td class="paramname">rules</td><td>
+                      Comma-separed list of rules to which the tag
+                      applies.
+                    </td><td class="default">
+                      required in global scope, implicit inside
+                      <a class="xref" href="ch05.html#cmd.define-rule" title="define-rule">define-rule</a>
+                    </td></tr></tbody></table></div><p>
+
+          Example:
+            </p><pre class="programlisting">
+&lt;!--
+Create a new tag which adds include and lib paths for a "standard"
+library and can be used inside &lt;exe&gt; or &lt;dll&gt; tags; e.g.
+
+  &lt;exe id="test"&gt;
+    &lt;stdlib&gt;lib1&lt;/stdlib&gt;
+    &lt;stdlib&gt;lib2&lt;/stdlib&gt;
+  &lt;/exe&gt;
+--&gt;
+&lt;define-tag name="stdlib" rules="exe,dll"&gt;
+  &lt;include&gt;$(value)/include&lt;/include&gt;
+  &lt;lib-path&gt;$(value)/lib&lt;/lib-path&gt;
+&lt;/define-tag&gt;
+</pre><p>
+        </p></div><div class="section" title="define-global-tag"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.define-global-tag"></a>define-global-tag</h3></div></div></div><p>
+          Like <a class="xref" href="ch05.html#cmd.define-tag" title="define-tag">define-tag</a>, but creates a tag that can
+          only be used in the global scope (i.e. alongside targets definitions
+          as opposed to inside them).
+        </p><p>
+          </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Parameter</th><th>Description</th><th>Required/Default value</th></tr></thead><tbody><tr><td class="paramname">name</td><td>
+                      Name of the tag to define.
+                    </td><td class="default">required</td></tr></tbody></table></div><p>
+
+          Example:
+
+            </p><pre class="programlisting">
+&lt;!--
+Create a global tag which defines 3 variables with the same given
+prefix and with the same content; e.g.
+
+  &lt;dummyset prefix="test"&gt;abc&lt;/dummyset&gt;
+  &lt;echo&gt;$(test_first) $(test_second) $(test_third)&lt;/echo&gt;
+
+will display "abc abc abc"
+--&gt;
+&lt;define-global-tag name="dummyset"&gt;
+  &lt;set var="$(attributes['prefix'])_first"&gt;$(value)&lt;/set&gt;
+  &lt;set var="$(attributes['prefix'])_second"&gt;$(value)&lt;/set&gt;
+  &lt;set var="$(attributes['prefix'])_third"&gt;$(value)&lt;/set&gt;
+&lt;/define-global-tag&gt;
+</pre><p>
+
+        </p></div><div class="section" title="add-target"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.add-target"></a>add-target</h3></div></div></div><p>
+          Creates a target programmatically.
+        </p><p>
+          Using this command is equivalent to defining a target by using
+          the standard rules syntax, but it makes it possible to add a target
+          using dynamically determined rule. As such, it's only useful when
+          implementing other, higher-level rules.
+          This tag is hardly useful for normal uses of bakefile and is used
+          mostly as an internal utility.
+        </p><p>
+          This command can only be used inside rule definition, not in the
+          global scope.
+        </p><p>
+          </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Parameter</th><th>Description</th><th>Required/Default value</th></tr></thead><tbody><tr><td class="paramname">target</td><td>
+                      ID of the target to create.
+                    </td><td class="default">required</td></tr><tr><td class="paramname">type</td><td>
+                      The rule for the target.
+                    </td><td class="default">required</td></tr><tr><td class="paramname">cond</td><td>
+                        The condition under which the target is built.
+                        In addition to regular condition syntax, two special
+                        forms are supported. If the condition is
+                        <code class="literal">target</code>, the condition of the target
+                        within which the <a class="xref" href="ch05.html#cmd.add-target" title="add-target">add-target</a> tag
+                        has been used (if any). If the condition has the form
+                        of <code class="literal">target and
+                        </code><code class="varname">someOtherCondition</code>, then
+                        target's condition as described above will be appended
+                        with <code class="literal">and
+                        </code><code class="varname">someOtherCondition</code>.
+                    </td><td class="default"><code class="literal">1</code></td></tr></tbody></table></div><p>
+
+          Example:
+
+            </p><pre class="programlisting">
+&lt;!--
+Creates a new EXE target 'myexe'; this is equivalent to
+  &lt;exe id="myexe"&gt;
+    &lt;sources&gt;source1.c&lt;/sources&gt;
+  &lt;/exe&gt;
+--&gt;
+&lt;add-target target="myexe" type="exe"&gt;
+  &lt;sources&gt;source1.c&lt;/sources&gt;
+&lt;/add-target&gt;
+
+
+&lt;!--
+Now define a &lt;do_special_cmd&gt; tag which creates a target with
+a name dynamically defined by the target from which the tag is used
+--&gt;
+&lt;define-tag name="do_special_cmd" rules="exe"&gt;
+  &lt;add-target target="do_special_for_$(id)" type="action" cond="target"/&gt;
+  &lt;modify-target target="do_special_for_$(id)"&gt;
+    &lt;command&gt;special_command $(id)&lt;/command&gt;
+  &lt;/modify-target&gt;
+&lt;/define-tag&gt;
+
+&lt;exe id="myapp" cond="BUILD_MYAPP=='1'"&gt;
+  ...
+
+  &lt;!-- the following tag will create a target 'do_special_for_myapp' which will
+       be executed only when BUILD_MYAPP=='1' --&gt;
+  &lt;do_special_cmd/&gt;
+&lt;/exe&gt;
+</pre><p>
+        </p></div><div class="section" title="modify-target"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.modify-target"></a>modify-target</h3></div></div></div><p>
+          Modifies an existing target by appending tags under this node to
+          its definition.
+        </p><p>
+          </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Parameter</th><th>Description</th><th>Required/Default value</th></tr></thead><tbody><tr><td class="paramname">target</td><td>
+                      ID of the target to modify.
+                    </td><td class="default">required</td></tr></tbody></table></div><p>
+
+          Example:
+
+            </p><pre class="programlisting">
+&lt;!-- Modifies the global 'install' target to run an additional command --&gt;
+&lt;modify-target target="install"&gt;
+  &lt;command&gt;$(CP) myfile dest&lt;/command&gt;
+&lt;/modify-target&gt;
+</pre><p>
+        </p></div><div class="section" title="output"><div class="titlepage"><div><div><h3 class="title"><a id="cmd.output"></a>output</h3></div></div></div><p>
+          Bakefile uses this command to specify what files a format produces.
+          Output is generated only as the result of
+          <code class="function">output</code> command's presence in ruleset.
+          </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Parameter</th><th>Description</th><th>Required/Default value</th></tr></thead><tbody><tr><td class="paramname">file</td><td>
+                    The file where output goes. Commontly used
+                    value is <code class="literal">$(OUTPUT_FILE)</code>.
+                  </td><td class="default">required</td></tr><tr><td class="paramname">writer</td><td>
+                    Name of Empy template that is used to generated the
+                    output.
+                  </td><td class="default">required</td></tr><tr><td class="paramname">method</td><td>
+                    <p>
+                      Method of combining generated output with existing
+                      content of the file. The default is
+                      <code class="literal">replace</code>, which overwrites the file.
+                    </p>
+                    <p>
+                      <code class="literal">mergeBlocks</code> divides both the old and
+                      the new file's content into blocks that begin with block
+                      signature like this:
+                      </p><pre class="programlisting">### beging block <span class="emphasis"><em>BLOCKNAME</em></span> ###</pre><p>
+                      Blocks of the new content are copied over to the file,
+                      replacing old copies of the blocks, but blocks that are
+                      not present in new content are preserved. This can be used
+                      e.g. to merge configuration settings from several
+                      makefiles.
+                    </p>
+                    <p>
+                      <code class="literal">mergeBlocksWithFilelist</code> works
+                      similarly to <code class="literal">mergeBlocks</code>, but it
+                      includes list of input files that generated the block in
+                      the output and ensures that blocks that have no
+                      generator (e.g. because user's bakefiles changed and no
+                      longer cause some piece of code to be generated) are
+                      removed from the output. The list of files is added to
+                      block name like this:
+                      </p><pre class="programlisting">### beging block
+                      <span class="emphasis"><em>BLOCKNAME[file1.bkl,file2.bkl]</em></span> ###</pre><p>
+                    </p>
+                    <p>
+                      <code class="literal">insertBetweenMarkers</code> takes first and
+                      last line of generated output, finds them in the output
+                      file (which must exist and must contain them) and
+                      inserts generated content between them.
+                    </p>
+                  </td><td class="default">
+                    <code class="literal">replace</code>
+                  </td></tr></tbody></table></div><p>
+        </p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch06.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 4. Targets </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 6. Frequently encountered issues</td></tr></table></div></body></html>

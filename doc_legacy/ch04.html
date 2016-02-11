@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 4. Targets</title><link rel="stylesheet" href="style.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /><link rel="home" href="index.html" title="Bakefile Manual" /><link rel="up" href="index.html" title="Bakefile Manual" /><link rel="prev" href="ch03.html" title="Chapter 3. Bakefile Concepts" /><link rel="next" href="ch05.html" title="Chapter 5. Commands Reference" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 4. Targets</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch05.html">Next</a></td></tr></table><hr /></div><div class="chapter" title="Chapter 4. Targets"><div class="titlepage"><div><div><h2 class="title"><a id="ch.targets"></a>Chapter 4. Targets</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch04.html#rules">Standard Target Types ("Rules")</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#rule.exe">exe</a></span></dt><dt><span class="section"><a href="ch04.html#rule.lib">lib</a></span></dt><dt><span class="section"><a href="ch04.html#rule.dll">dll</a></span></dt><dt><span class="section"><a href="ch04.html#rule.module">module</a></span></dt><dt><span class="section"><a href="ch04.html#rule.phony">phony</a></span></dt><dt><span class="section"><a href="ch04.html#rule.action">action</a></span></dt><dt><span class="section"><a href="ch04.html#rule.subproject">subproject</a></span></dt></dl></dd><dt><span class="section"><a href="ch04.html#sec.commontags">Common tags</a></span></dt></dl></div><p><a id="targets"></a>
+    Bakefile targets correspond to native makefile targets: they are compiled
+    programs, libraries, or more complex actions such as "install" or "dist".
+    Target syntax is similar to <a class="link" href="ch05.html" title="Chapter 5. Commands Reference">command</a>
+    syntax:
+    </p><pre class="programlisting">
+&lt;TYPE id="NAME" [template="TEMPLATE,..."] [template_append="TEMPLATE,..."]
+      [cond="CONDITION"] [category="CATEGORY"]&gt;
+  SPECIFICATION
+&lt;/TYPE&gt;
+</pre><p>
+  </p><p>
+    There are six standard target types: <a class="xref" href="ch04.html#rule.exe" title="exe">exe</a>,
+    <a class="xref" href="ch04.html#rule.dll" title="dll">dll</a>, <a class="xref" href="ch04.html#rule.module" title="module">module</a>,
+    <a class="xref" href="ch04.html#rule.lib" title="lib">lib</a>, <a class="xref" href="ch04.html#rule.phony" title="phony">phony</a> and
+    <a class="xref" href="ch04.html#rule.action" title="action">action</a>. You can define a new "rule"
+    (that is, a target type) based on one of the standard rules
+    using the <a class="xref" href="ch05.html#cmd.define-rule" title="define-rule">define-rule</a> command.
+  </p><p>
+    Each target requires a unique <code class="varname">id</code>. This ID is usually
+    present in the generated makefile, so you can type <strong class="userinput"><code>make
+    myprogram</code></strong> to create the target with the ID
+    <code class="literal">myprogram</code>. The target's ID also controls
+    the name of the output file.
+  </p><p>
+    <code class="varname">template</code> is an optional comma-separated list of
+    IDs of <a class="link" href="ch05.html#cmd.template" title="template">templates</a> that the target is
+    derived from. <code class="varname">template_append</code> is an optional
+    comma-separated list of templates that are <span class="emphasis"><em>appended</em></span>
+    to the target specification. (<code class="varname">template</code> inserts the
+    template before the specification).
+  </p><p>
+    If the <code class="varname">cond</code> attribute is given, the target is only
+    compiled if the named <a class="link" href="ch03.html#concept.conditions" title="Conditions">condition</a>
+    was met. (Follow that link to see the rules governing whether Bakefile
+    evaluates the condition, or the native build system (e.g.
+    <code class="filename">make</code>) evaluates it).
+  </p><p>
+    In addition to the ID, every target can have
+    <a class="link" href="ch03.html#concept.variables" title="Variables">variables</a> attached to it.
+    These variables are only effective for the target; contrast global
+    variables, which affect all targets. They can be used to override a
+    global variable: for example, the <code class="varname">DLLEXT</code> variable
+    is <code class="literal">.dll</code> for Windows makefiles, but you can override
+    the variable locally for the <code class="literal">sharpen_plugin</code> target to
+    be <code class="literal">.plugin</code>.
+  </p><p>
+    Target is described using <code class="varname">SPECIFICATION</code>, which is a
+    list of <a class="xref" href="ch05.html#cmd.set" title="set">set</a>
+    commands and <span class="emphasis"><em>tags</em></span>. Tags are rule-specific
+    constructs, so they come in several forms: they can list source files for
+    an executable, set include directories, or define compiler flags. Unlike
+    <code class="function">set</code>, they don't set any specific variable, but rather
+    set various variables in a <span class="emphasis"><em>generator-specific way</em></span>.
+    Tag syntax is almost identical to the <code class="function">set</code> function,
+    but without a variable name:
+    </p><pre class="programlisting">&lt;TAGNAME&gt;VALUE&lt;/TAGNAME&gt;</pre><p>
+  </p><p>
+    Common tags are described in
+    <a class="link" href="ch04.html#rules" title="Standard Target Types (&quot;Rules&quot;)">the section below</a>. Tags specific to
+    particular modules are described in <a class="xref" href="ch10.html" title="Chapter 10. Modules">Chapter 10, <i>Modules</i></a>.
+    A small example of using tags:
+    </p><pre class="programlisting">
+&lt;exe id="myprogram"&gt;
+  &lt;!-- set target-specific variable: --&gt;
+  &lt;set var="SOME_VAR"&gt;value&lt;/set&gt;
+  &lt;!-- three tags: --&gt;
+  &lt;sources&gt;file1.c myprogram.c utils.c&lt;/sources&gt;
+  &lt;include&gt;./includes&lt;/include&gt;
+  &lt;define&gt;USE_UNICODE&lt;/define&gt;
+&lt;/exe&gt;
+</pre><p>
+    Unless the documentation says otherwise, you can use the same tag
+    repeatedly with the same target.
+  </p><p>
+    The optional <code class="varname">category</code> attribute can be given to classify
+    the target. Possible classifications are <code class="literal">all</code> (reserved
+    for the <code class="literal">all</code> target of makefiles and cannot be used
+    in user Bakefiles), <code class="literal">normal</code> for targets declared in
+    Bakefiles, and <code class="literal">automatic</code> for targets that are created
+    as a side-effect of Bakefile's processing (e.g. object file targets).
+    The targets are sorted in the generated makefile according to the category:
+    the <code class="literal">all</code> target is first, followed by
+    <code class="literal">normal</code> targets, and then <code class="literal">automatic</code>
+    targets.
+  </p><div class="note" title="Pseudo targets" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title"><a id="pseudotargets"></a>Pseudo targets</h3><p>
+      Some rules don't declare real targets but so-called
+      <span class="emphasis"><em>pseudo targets</em></span>. Pseudo targets are processed as
+      standard targets, but they don't appear in the generated makefile, have
+      no action associated with them, can't depend on any other target, and
+      can't be a dependency of another target. They can only modify the
+      behavior of other targets. An example of a pseudo target is
+      <a class="xref" href="ch10.html#rule.datafiles.data-files" title="data-files">data-files</a>.
+    </p><p>
+      The advantage of pseudo targets is that the <code class="varname">id</code>
+      attribute is not required. The disadvantage is that they can't be
+      conditional.
+    </p></div><div class="section" title="Standard Target Types (&quot;Rules&quot;)"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="rules"></a>Standard Target Types ("Rules")</h2></div></div></div><p>
+      Description of builtin rules and their tags follows. Additional rules
+      and tags are defined by modules, see <a class="xref" href="ch10.html" title="Chapter 10. Modules">Chapter 10, <i>Modules</i></a>.
+    </p><div class="section" title="exe"><div class="titlepage"><div><div><h3 class="title"><a id="rule.exe"></a>exe</h3></div></div></div><p>
+        Builds a program.
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th></tr></thead><tbody><tr><td class="tagname"><a id="tags.exe.app-type"></a>app-type</td><td>
+                  Use this tag to specify whether the executable is console
+                  application (<code class="literal">console</code>) or windowed one
+                  (<code class="literal">gui</code>). These two kinds of applications
+                  are linked differently on Windows.
+                  <pre class="programlisting">
+&lt;exe id="foo"&gt;
+  &lt;app-type&gt;gui&lt;/app-type&gt;
+  &lt;sources&gt;foo.c bar.c&lt;/sources&gt;
+&lt;/exe&gt;
+</pre>
+                </td></tr><tr><td class="tagname"><a id="tags.lib.exename"></a>exename</td><td>
+                  Set name of the executable. By default, the name is same as
+                  <code class="varname">id</code>, but it is sometimes useful to use
+                  different name to identify the executable in makefiles
+                  (<code class="varname">id</code>) and for created program file
+                  (<code class="varname">exename</code>). Physical filename is
+                  deriver from <code class="varname">exename</code> and format-specific
+                  extension (e.g. <code class="literal">.exe</code> on Windows).
+                </td></tr><tr><td class="tagname"><a id="tags.exe.stack"></a>stack</td><td>
+                  Set the size of the stack on platforms where it is possible.
+                  The default stack size varies for different platforms and
+                  compilers. With too small stack you may get an error
+                  indicating stack has overflowed. (Currently used by
+                  <a class="link" href="ch09.html#format.watcom" title="Watcom format extended functionality">Watcom format</a> only.)
+                </td></tr></tbody></table></div><p>
+      </p></div><div class="section" title="lib"><div class="titlepage"><div><div><h3 class="title"><a id="rule.lib"></a>lib</h3></div></div></div><p>
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th></tr></thead><tbody><tr><td class="tagname"><a id="tags.lib.libname"></a>libname</td><td>
+                  Set name of the library. By default, the name is same as
+                  <code class="varname">id</code>, but it is sometimes useful to use
+                  different name to identify the library in makefiles
+                  (<code class="varname">id</code>) and for created library file
+                  (<code class="varname">libname</code>). This tag does
+                  <span class="emphasis"><em>not</em></span> set physical filename -- that is
+                  derived from <code class="varname">libname</code> and other
+                  generator-specific variables.
+                  <pre class="programlisting">
+&lt;lib id="foo"&gt;
+  &lt;libname&gt;foo$(COMPILER)_$(DBGFLAG)&lt;/libname&gt;
+  &lt;sources&gt;foo.c bar.c&lt;/sources&gt;
+&lt;/lib&gt;
+</pre>
+                </td></tr></tbody></table></div><p>
+      </p></div><div class="section" title="dll"><div class="titlepage"><div><div><h3 class="title"><a id="rule.dll"></a>dll</h3></div></div></div><p>
+        
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th></tr></thead><tbody><tr><td class="tagname"><a id="tags.dll.dllname"></a>dllname</td><td>
+                  Similar to <a class="link" href="ch04.html#tags.lib.libname">libname tag on
+                    dll</a>, but it affects the name of shared library/DLL.
+                </td></tr><tr><td class="tagname"><a id="tags.dll.libname"></a>libname</td><td>
+                  Similar to <a class="xref" href="ch04.html#tags.dll.dllname">dllname</a>, but used for
+                  import library on Windows and .so symlink on Unix.
+                </td></tr><tr><td class="tagname"><a id="tags.dll.version"></a>version</td><td>
+                  Portable platform-independent shared library version.
+                  <span class="emphasis"><em>Not yet implemented.</em></span>
+                </td></tr><tr><td class="tagname"><a id="tags.dll.so_version"></a>so_version</td><td>
+                  <p>
+                  The value consists of three numbers separated by dots.
+                  Library name plus the first component of the version
+                  together form <span class="emphasis"><em>soname</em></span> (e.g.
+                  <code class="literal">libfoo.so.1</code> on Linux) which is used
+                  for runtime resolution of dependencies. Libraries with
+                  different <span class="emphasis"><em>sonames</em></span> are binary
+                  incompatible and cannot be used interchangeable. On the
+                  other hand, the remaining two components contain information
+                  about minor versions that don't change backward
+                  compatibility and aren't used by runtime linker.
+                  </p>
+                  <p>
+                  Note that this version number is strictly for runtime
+                  linker's use and for maintaining binary compatiblity, it
+                  should <span class="emphasis"><em>not</em></span> be version number of your
+                  library.
+                  </p>
+                  <p>
+                  This tag is only implemented in the
+                  <code class="literal">autoconf</code> format.
+                  </p>
+                </td></tr><tr><td class="tagname"><a id="tags.dll.mac_version"></a>mac_version</td><td>
+                  <p>
+                    This tag is used to specify shared library version for
+                    runtime linker on Darwin platforms. Similarly to
+                    <a class="xref" href="ch04.html#tags.dll.so_version">so_version</a>, it expects three
+                    numbers separated by dots, but their interpretation is
+                    different. The value is passed as-is to compilers
+                    <code class="literal">-current_version</code> argument and the
+                    first two components are passed to
+                    <code class="literal">--compatibility_version</code>. See
+                    See <a class="ulink" href="http://developer.apple.com/documentation/Darwin/Reference/ManPages/man1/ld.1.html" target="_top">Apple's
+                    ld documentation</a> for details.
+                  </p>
+                  <p>
+                  This tag is only implemented in the
+                  <code class="literal">autoconf</code> and <code class="literal">xcode2</code>
+                  formats.
+                  </p>
+                </td></tr></tbody></table></div><p>
+
+      </p></div><div class="section" title="module"><div class="titlepage"><div><div><h3 class="title"><a id="rule.module"></a>module</h3></div></div></div><p>
+        Builds loadable module (aka plugin). Unlike <a class="xref" href="ch04.html#rule.dll" title="dll">dll</a>,
+        this one does not create import library on Windows.
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th></tr></thead><tbody><tr><td class="tagname"><a id="tags.module.dllname"></a>dllname</td><td>
+                  See <a class="xref" href="ch04.html#tags.dll.dllname">dllname</a>.
+                </td></tr></tbody></table></div><p>
+
+      </p></div><div class="section" title="phony"><div class="titlepage"><div><div><h3 class="title"><a id="rule.phony"></a>phony</h3></div></div></div><p>
+        This type of target does nothing. It is usually used as convenience
+        target together with <a class="link" href="ch04.html#tag.depends">depends</a> tag to
+        easily build set of targets. Standard target <code class="literal">all</code>
+        is an example of phony target.
+      </p></div><div class="section" title="action"><div class="titlepage"><div><div><h3 class="title"><a id="rule.action"></a>action</h3></div></div></div><p>
+        This is most generic rule. It allows you to execute arbitrary sequence
+        of commands when building the target and can therefore be used to
+        extend Bakefile with custom build rules. Note that this rule is not
+        platform- and compiler-independent as the rest of rules.
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th></tr></thead><tbody><tr><td class="tagname"><a id="tags.action.command"></a>command</td><td>
+                  <p>
+                    Adds command to list of commands to be executed when
+                    building the target.
+                    </p><pre class="programlisting">
+&lt;action id="manual.html"&gt;
+  &lt;command&gt;docbook2html manual.xml manual.html&lt;/command&gt;
+&lt;/action&gt;
+</pre><p>
+                  </p>
+                </td></tr><tr><td class="tagname"><a id="tags.action.is-phony"></a>is-phony</td><td>
+                  <p>
+                    Marks the target as <span class="emphasis"><em>phony</em></span>.
+                    A phony target is target whose name is not really
+                    the name of file produced by it, as is the case with
+                    "standard" targets. Instead,
+                    it's just a symbolic name for some commands to be
+                    executed. In other words, this target should not be
+                    considered by <code class="literal">make</code> when creating
+                    the file dependency graph. For an example of why this
+                    is useful, consider a
+                    <code class="literal">tags</code> target that runs the Unix
+                    <code class="filename">ctags</code> program. That
+                    program creates a file called <code class="filename">tags</code>,
+                    so after saying <code class="computeroutput">make
+                    tags</code> once, <code class="filename">make</code>
+                    will always say that the tags target is up to date.
+                    By marking the target as phony, you disable the file
+                    dependency checking for it, so <code class="computeroutput">make
+                    tags</code> always runs the
+                    <code class="filename">ctags</code> program.
+                  </p>
+                </td></tr></tbody></table></div><p>
+      </p></div><div class="section" title="subproject"><div class="titlepage"><div><div><h3 class="title"><a id="rule.subproject"></a>subproject</h3></div></div></div><p>
+        Declares a subproject. This is typically another makefile in a
+        subdirectory and is independent of its parent project. Therefore you
+        can't use any variables or refer to targets from the parent project
+        in a subproject.
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th><th>Required/Default value</th></tr></thead><tbody><tr><td class="tagname"><a id="tags.subproject.dir"></a>dir</td><td>
+                  <p>
+                    Directory containing subproject. Parent makefile calls
+                    makefile in this directory.
+                  </p>
+                </td><td class="default">required</td></tr><tr><td class="tagname"><a id="tags.subproject.target"></a>target</td><td>
+                  <p>
+                    Optional argument which specifies what target to build
+                    in the subproject.
+                  </p>
+                </td><td class="default"><code class="literal">all</code></td></tr><tr><td class="tagname"><a id="tags.subproject.installable"></a>installable</td><td>
+                  <p>
+                    Whether <span class="command"><strong>make install</strong></span> (if supported by
+                    the format) should descend into subproject's directory.
+                    The value can only be <code class="literal">yes</code> or
+                    <code class="literal">no</code> and must be a constant expression.
+                  </p>
+                </td><td class="default"><code class="literal">yes</code></td></tr></tbody></table></div><p>
+      </p><p>
+        Here is an example of how to use the subproject target:
+        </p><pre class="programlisting">
+&lt;subproject id="examples"&gt;
+  &lt;dir&gt;examples&lt;/dir&gt;
+  &lt;installable&gt;no&lt;/installable&gt;
+&lt;/subproject&gt;
+</pre><p>
+      </p></div></div><div class="section" title="Common tags"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec.commontags"></a>Common tags</h2></div></div></div><p>
+			These are tags you can use with any of the above target types.
+			These tags are always available: it is not neccessary to load any
+			<a class="link" href="ch10.html" title="Chapter 10. Modules">module</a> to use them.
+
+			</p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th><th>Availability</th></tr></thead><tbody><tr><td class="tagname"><a id="tag.depends"></a>depends</td><td>
+								<p>
+									This tag is used to express target's dependency on other
+									targets. All targets in the <code class="function">depends</code>
+									tag must be built prior to building this target. The value
+									is whitespace-separated list of target IDs. It is an error
+									to specify a nonexistent target here.
+								</p>
+								<p>
+									Note that the <a class="xref" href="ch04.html#tag.library">library</a> tag implies
+									<code class="function">depends</code>.
+								</p>
+								<pre class="programlisting">
+&lt;exe id="app"&gt;
+&lt;sources&gt;app.c&lt;/sources&gt;
+&lt;depends&gt;setup&lt;/depends&gt;
+&lt;/exe&gt;
+</pre>
+							</td><td class="availability">all rules</td></tr><tr><td class="tagname"><a id="tag.dependency-of"></a>dependency-of</td><td>
+								Mark the target as dependency of target specified in tag's
+								value. The value must be ID of existing target. This tag
+								is opposite of <a class="xref" href="ch04.html#tag.depends">depends</a>. Following two
+								examples have identical effect:
+								<pre class="programlisting">
+&lt;exe id="setup"&gt;&lt;/exe&gt;
+&lt;exe id="app"&gt;
+&lt;depends&gt;setup&lt;/depends&gt;
+&lt;/exe&gt;
+</pre><pre class="programlisting">
+&lt;exe id="app"&gt;&lt;/exe&gt;
+&lt;exe id="setup"&gt;
+&lt;dependency-of&gt;app&lt;/dependency-of&gt;
+&lt;/exe&gt;
+</pre>
+							Note that only one of these tags should be used, it is not
+							necessary to specify both of them.
+							</td><td class="availability">all</td></tr><tr><td class="tagname"><a id="tag.headers"></a>headers</td><td>
+                Specify (C/C++) header files used by the target.
+								<pre class="programlisting">
+&lt;exe id="app"&gt;
+  &lt;headers&gt;app.h&lt;/headers&gt;
+  &lt;headers&gt;utils.h additionalheader.h&lt;/headers&gt;
+  &lt;sources&gt;app.c&lt;/sources&gt;
+&lt;/exe&gt;
+</pre>
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.depends-on-file"></a>depends-on-file</td><td>
+								Mark the target as depending on a given file. Use this
+								when the dependency isn't one of the other declared
+								targets. This can be useful for example when the dependency is
+								generated by a script:
+								<pre class="programlisting">
+&lt;action id="generated-header.h"&gt;
+	&lt;command&gt;./header-generator.pl&lt;/command&gt;
+	&lt;depends-on-file&gt;header-generator.pl&lt;/depends-on-file&gt;
+&lt;/action&gt;
+</pre>
+							  In this example, the header-generator.pl script creates
+								generated-header.h. You would want the script to be
+								re-run any time it changes, since the change probably
+								would make it generate different contents for that
+								header file. But since generated-header.pl is not itself
+								generated by the makefile, you cannot use the <a class="link" href="ch04.html#tag.depends">depends</a> tag here.
+							</td><td class="availability">all</td></tr><tr><td class="tagname"><a id="tag.objects-depend"></a>objects-depend</td><td>
+                Same as <a class="xref" href="ch04.html#tag.depends">depends</a>, except the dependency
+                is added to all <span class="emphasis"><em>object files</em></span> used
+                to build the target instead of to the target itself.
+                This is useful e.g. in combination with precompiled
+                headers (which must be generated before any source file
+                is compiled) or when a commonly used header file is
+                generated by the makefile.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tags.lib.dirname"></a>dirname</td><td>
+								Set name of directory where the target will be created.
+								<code class="varname">BUILDDIR</code> is used by default.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.sources"></a>sources</td><td>
+								Specify source files used to build the target.
+								<pre class="programlisting">
+&lt;exe id="app"&gt;
+  &lt;sources&gt;app.c&lt;/sources&gt;
+  &lt;sources&gt;utils.c utils2.c&lt;/sources&gt;
+&lt;/exe&gt;
+</pre>
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.include"></a>include</td><td>
+								Add directory where the compiler should look for headers.
+                This corresponds to the <code class="literal">-I</code> switch used by
+                many compilers.
+                Calls <a class="xref" href="ch04.html#tag.res-include">res-include</a> with the same value.
+                Example:
+                <pre class="programlisting">
+&lt;exe id="hello"&gt;
+  &lt;sources&gt;hello.c&lt;/sources&gt;
+  &lt;include&gt;../include/foo&lt;/include&gt;
+&lt;/exe&gt;
+</pre>
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.define"></a>define</td><td>
+								Define C preprocessor macro.
+								The value may be empty, in which case no flag is added.
+								Calls <a class="xref" href="ch04.html#tag.res-define">res-define</a> with same value.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.sys-lib"></a>sys-lib</td><td>
+								Link against specified library installed in the system. Note
+								that this is <span class="emphasis"><em>not</em></span> meant for linking in
+								libraries that were built by the same makefile; use
+								<a class="xref" href="ch04.html#tag.library">library</a> for that. This command links
+								against a library installed in the system or provided by the
+								compiler and corresponds to the <code class="literal">-l</code> switch
+								of Unix compilers.
+						<pre class="programlisting">
+&lt;exe id="png2bmp"&gt;
+  &lt;sources&gt;png2bmp.c&lt;/sources&gt;
+  &lt;sys-lib&gt;png&lt;/sys-lib&gt;
+  &lt;sys-lib&gt;z&lt;/sys-lib&gt;
+&lt;/exe&gt;
+</pre>
+								The library name may be empty. Only one library may be
+								given as the tag's argument; the following usage is
+								incorrect:
+						<pre class="programlisting">
+&lt;exe id="png2bmp"&gt;
+  &lt;sources&gt;png2bmp.c&lt;/sources&gt;
+  &lt;sys-lib&gt;png z&lt;/sys-lib&gt; &lt;!-- INCORRECT --&gt;
+&lt;/exe&gt;
+</pre>
+								Note that the name of the library in this tag is
+								<span class="emphasis"><em>not</em></span> a file name and must not
+								include paths. Use <a class="xref" href="ch04.html#tag.lib-path">lib-path</a> to
+								add a directory to the library search path.
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.lib-path"></a>lib-path</td><td>
+								Add a directory to the search path used by the compiler
+								to find <a class="link" href="ch04.html#tag.sys-lib">system
+								libraries</a>. This corresponds to the
+								<code class="literal">-L</code> switch of Unix compilers.
+								Example:
+						<pre class="programlisting">
+&lt;exe id="hello"&gt;
+  &lt;sources&gt;hello.c&lt;/sources&gt;
+  &lt;!-- note that hardcoding library paths like this is a bad
+       idea, it's done here only for the sake of simplicity;
+       in real bakefile, an &lt;option&gt; would be used --&gt;
+  &lt;lib-path&gt;/usr/lib/mysql&lt;/lib-path&gt;
+  &lt;sys-lib&gt;mysqlclient&lt;/sys-lib&gt;
+&lt;/exe&gt;
+</pre>
+								On a typical Unix system, this asks the linker to link
+								the <code class="filename">hello</code> program against
+								<code class="filename">libmysqlclient.so</code> and to search for
+								it in the directory <code class="filename">/usr/lib/mysql</code>
+								in addition to any other directories the linker is
+								configured to use.
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.library"></a>library</td><td>
+								Link against library compiled by this makefile. The value
+								passed to this tag must be name of existing target. Compare
+								<a class="xref" href="ch04.html#tag.sys-lib">sys-lib</a>.
+								<pre class="programlisting">
+&lt;lib id="mylib"&gt;
+  &lt;sources&gt;lib1.c lib2.c&lt;/sources&gt;
+&lt;/lib&gt;
+&lt;exe id="myapp"&gt;
+  &lt;sources&gt;main.c&lt;/sources&gt;
+  &lt;library&gt;mylib&lt;/library&gt;
+  &lt;sys-lib&gt;X11&lt;/sys-lib&gt;
+  &lt;sys-lib&gt;GL&lt;/sys-lib&gt;
+&lt;/exe&gt;
+</pre>
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.optimize"></a>optimize</td><td>
+								Set compiler's optimization level. May be one of
+								<code class="literal">off</code> (no optimization),
+								<code class="literal">speed</code> (generate fastest code) or
+								<code class="literal">size</code> (smallest code).
+								<pre class="programlisting">
+&lt;set var="OPTIMIZE_FLAG"&gt;
+  &lt;if cond="BUILD=='release'"&gt;speed&lt;/if&gt;
+  &lt;if cond="BUILD=='debug'"&gt;off&lt;/if&gt;
+&lt;/set&gt;
+&lt;exe id="myapp"&gt;
+  &lt;optimize&gt;$(OPTIMIZE_FLAG)&lt;/optimize&gt;
+  &lt;sources&gt;main.c&lt;/sources&gt;
+  &lt;sys-lib&gt;GL&lt;/sys-lib&gt;
+&lt;/exe&gt;
+</pre>
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.debug-info"></a>debug-info</td><td>
+								Enable or disable debugging information. Can be either
+								<code class="literal">on</code> or <code class="literal">off</code>.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.debug-runtime-libs"></a>debug-runtime-libs</td><td>
+								Enable or disable linking against debug version of C runtime.
+								Can be either <code class="literal">on</code> or <code class="literal">off</code>
+								and <span class="emphasis"><em>must</em></span> appear after
+								<a class="xref" href="ch04.html#tag.debug-info">debug-info</a>. If not specified, then
+								debug runtime libraries are used if and only if
+								<a class="xref" href="ch04.html#tag.debug-info">debug-info</a> was set to
+								<code class="literal">on</code>. Note that this tag has effect only
+								with Visual C++; other compilers respect only
+								<a class="xref" href="ch04.html#tag.debug-info">debug-info</a>.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.debug-info-edit-and-continue"></a>debug-info-edit-and-continue</td><td>
+                Enable or disable additional debugging information to support
+                <a class="ulink" href="http://msdn.microsoft.com/en-us/library/bcew296c(VS.80).aspx" target="_top">Edit
+                  and Continue</a> feature of Visual C++ compilers.
+                  Can be either
+                  <code class="literal">on</code> or <code class="literal">off</code> (default).
+                  Only supported by Visual C++ project files, does nothing
+                  in other formats.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.arch"></a>arch</td><td>
+								Set target CPU architecture. Note that this is not portable
+								and should be avoided if possible. Accepted values are
+								<code class="literal">i[3456]86</code>.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.pic"></a>pic</td><td>
+								Tells the compiler whether to generate position-independent
+								code or not. The default is to use PIC for DLLs and
+								<span class="emphasis"><em>not</em></span> use it for executables and static
+								libraries, but you may want to change it if your static
+								library may be linked into a DLL.
+								Accepted values are
+								<code class="literal">on</code> and <code class="literal">off</code>.
+							</td><td class="availability">exe, lib</td></tr><tr><td class="tagname"><a id="tag.threading"></a>threading</td><td>
+								Use <code class="literal">multi</code> to enable and
+								<code class="literal">single</code> to disable multithreading in the
+								application. This affects what libraries are linked into
+								executable on some platforms.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.warnings"></a>warnings</td><td>
+								Sets warnings level for C/C++ compiler. Possible values
+								are <code class="literal">no</code>, <code class="literal">default</code>
+								and <code class="literal">max</code>.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.precomp-headers"></a>precomp-headers</td><td>
+								Can be <code class="literal">on</code> or <code class="literal">off</code>,
+								enables or disables use of precompiled headers with
+								compilers that support them.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.precomp-headers-file"></a>precomp-headers-file</td><td>
+								Use this tag to fine-tune where precompiled headers are
+								stored. The compiler must support this and the value passed
+								to <code class="function">precomp-headers-file</code> can be modified
+								by Bakefile, e.g. by apending <code class="literal">.pch</code>
+								extension to it.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.precomp-headers-gen"></a>precomp-headers-gen</td><td>
+                For compilers that support it, specify which source file
+                should be used to generate precompiled headers.
+								<pre class="programlisting">
+&lt;exe id="myapp"&gt;
+  &lt;sources&gt;foo.cpp bar.cpp&lt;/sources&gt;
+  &lt;precomp-headers&gt;on&lt;/precomp-headers&gt;
+  &lt;precomp-headers-gen&gt;foo.cpp&lt;/precomp-headers-gen&gt;
+  &lt;precomp-headers-header&gt;mypch.h&lt;/precomp-headers-header&gt;
+&lt;/exe&gt;
+</pre>
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.precomp-headers-header"></a>precomp-headers-header</td><td>
+                For compilers that support it, specify which header file
+                should be used as the precompiled header. Typically, this
+                header must be the first header included and it must be
+                included by all source files. Some compilers (GCC in
+                particular) ignore this, because they use different PCH model.
+								<pre class="programlisting">
+&lt;exe id="myapp"&gt;
+  &lt;sources&gt;foo.cpp bar.cpp&lt;/sources&gt;
+  &lt;precomp-headers&gt;on&lt;/precomp-headers&gt;
+  &lt;precomp-headers-gen&gt;foo.cpp&lt;/precomp-headers-gen&gt;
+  &lt;precomp-headers-header&gt;mypch.h&lt;/precomp-headers-header&gt;
+&lt;/exe&gt;
+</pre>
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.cxx-rtti"></a>cxx-rtti</td><td>
+								Enable or disable RTTI when compiling C++ sources. Can be either
+								<code class="literal">on</code> or <code class="literal">off</code>.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.cxx-exceptions"></a>cxx-exceptions</td><td>
+								Enable or disable C++ exceptions handling. Can be either
+								<code class="literal">on</code> or <code class="literal">off</code>.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname">
+								<p><a id="tag.cflags"></a>cflags</p>
+								<p><a id="tag.cxxflags"></a>cxxflags</p>
+								<p><a id="tag.cppflags"></a>cppflags</p>
+							</td><td>
+								Add <span class="emphasis"><em>compiler dependent</em></span> compilation
+								flags to compiler flags.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname">
+								<p><a id="tag.ldflags"></a>ldflags</p>
+							</td><td>
+								Add <span class="emphasis"><em>linker dependent</em></span>
+								flags for the linker.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname">
+								<p><a id="tag.ldlibs"></a>ldlibs</p>
+							</td><td>
+								Same as <a class="xref" href="ch04.html#tag.ldflags">ldflags</a>, but adds the flags
+								<span class="emphasis"><em>after</em></span> all flags specified using
+								<code class="function">ldflags</code>. This is useful when resolving
+								command line order problems that gcc is prone to.
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.win32-res"></a>win32-res</td><td>
+								Sets win32 resource (.rc) file for executable or DLL.
+								The tag does nothing on platforms other than Windows.
+								Compilation of the resource respects 
+								<a class="xref" href="ch04.html#tag.define">define</a> and 
+								<a class="xref" href="ch04.html#tag.include">include</a> tags on the target,
+								as well as their resource specific counterparts
+								<a class="xref" href="ch04.html#tag.res-define">res-define</a> and
+								<a class="xref" href="ch04.html#tag.res-include">res-include</a>.
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.mac-res"></a>mac-res</td><td>
+								Sets Mac resource (.r) file for executable or DLL.
+								The tag does nothing on platforms other than Mac.
+								Compilation of the resource respects 
+								<a class="xref" href="ch04.html#tag.define">define</a> and 
+								<a class="xref" href="ch04.html#tag.include">include</a> tags on the target,
+								as well as their resource specific counterparts
+								<a class="xref" href="ch04.html#tag.res-define">res-define</a> and
+								<a class="xref" href="ch04.html#tag.res-include">res-include</a>.
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.symbian-res"></a>symbian-res</td><td>
+								Sets Symbian resource file for executable or DLL.
+								The tag does nothing on platforms other than Symbian.
+								Compilation of the resource respects 
+								<a class="xref" href="ch04.html#tag.define">define</a> and 
+								<a class="xref" href="ch04.html#tag.include">include</a> tags on the target,
+								as well as their resource specific counterparts
+								<a class="xref" href="ch04.html#tag.res-define">res-define</a> and
+								<a class="xref" href="ch04.html#tag.res-include">res-include</a>.
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.res-include"></a>res-include</td><td>
+								Similar to <a class="xref" href="ch04.html#tag.include">include</a>, but applies only
+								to resources (<a class="xref" href="ch04.html#tag.mac-res">mac-res</a>,
+								<a class="xref" href="ch04.html#tag.win32-res">win32-res</a>) and not to C/C++ sources.
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.res-define"></a>res-define</td><td>
+								Similar to <a class="xref" href="ch04.html#tag.define">define</a>, but applies only
+								to resources (<a class="xref" href="ch04.html#tag.mac-res">mac-res</a>,
+								<a class="xref" href="ch04.html#tag.win32-res">win32-res</a>) and not to C/C++ sources.
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.clean-files"></a>clean-files</td><td>
+								Adds files to list of files that are cleaned when
+								<span class="command"><strong>make clean</strong></span> is run -- i.e. files created
+								while building the target.
+							</td><td class="availability">all</td></tr><tr><td class="tagname"><a id="tag.install-to"></a>install-to</td><td>
+								If used, then the target is installed into directory
+								specified as tag's value by <span class="command"><strong>make install</strong></span>
+                (and uninstalled from there by the
+                <span class="command"><strong>make uninstall</strong></span> target).
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.install-headers-to"></a>install-headers-to</td><td>
+                    If used, then the headers (see <a class="xref" href="ch04.html#tag.headers">headers</a> tag)
+                    of the target are installed into the directory
+                    specified as tag's value by <span class="command"><strong>make install</strong></span>
+                    (and uninstalled from there by the
+                    <span class="command"><strong>make uninstall</strong></span> target).
+                </td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.install-if"></a>install-if</td><td>
+								Install (see <a class="xref" href="ch04.html#tag.install-to">install-to</a>
+								the target conditionally. The value must be well-formed
+								condition.
+								<pre class="programlisting">
+&lt;option name="INSTALL_HELLO"&gt;
+  &lt;values&gt;0,1&lt;/values&gt;
+  &lt;default-value&gt;1&lt;/default-value&gt;
+&lt;/option&gt;
+&lt;exe id="hello"&gt;
+  &lt;sources&gt;hello.c&lt;/sources&gt;
+  &lt;install-to&gt;$(BINDIR)&lt;/install-to&gt;
+  &lt;install-if&gt;INSTALL_HELLO=='1'&lt;/install-if&gt;
+&lt;/exe&gt;
+</pre>
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.postlink-command"></a>postlink-command</td><td>
+								Use this tag to specify command(s) that must be executed
+								after the target is linked. This can be used to e.g. add
+								resources or strip debugging information.
+							</td><td class="availability">exe, dll, module, lib</td></tr><tr><td class="tagname"><a id="tag.uid"></a>uid</td><td>
+								Defines target's unique ID number for formats that need it.
+								<span class="emphasis"><em>FIXME: currently not implemented in any format;
+								document use of type=symbian1 etc. once it is used by
+								something</em></span>
+							</td><td class="availability">exe, dll, module</td></tr><tr><td class="tagname"><a id="tag.msvc-guid"></a>msvc-guid</td><td>
+                (Visual C++ project formats only.) Sets project's GUID.
+							</td><td class="availability">exe, lib, dll, module</td></tr></tbody></table></div><p>
+						
+						
+			
+			
+			</p><div class="note" title="Autoconf Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Autoconf Note</h3><p>
+					Many configuration options listed above are not supported by the
+					Autoconf format (e.g. <a class="xref" href="ch04.html#tag.optimize">optimize</a>,
+					<a class="xref" href="ch04.html#tag.debug-info">debug-info</a> or <a class="xref" href="ch04.html#tag.arch">arch</a>.
+					This is because <code class="filename">configure</code> is used to find
+					appropriate compiler flags.
+				</p></div><p>
+
+		</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 3. Bakefile Concepts </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 5. Commands Reference</td></tr></table></div></body></html>

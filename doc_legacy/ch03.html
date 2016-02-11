@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 3. Bakefile Concepts</title><link rel="stylesheet" href="style.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /><link rel="home" href="index.html" title="Bakefile Manual" /><link rel="up" href="index.html" title="Bakefile Manual" /><link rel="prev" href="ch02.html" title="Chapter 2. Tutorial" /><link rel="next" href="ch04.html" title="Chapter 4. Targets" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 3. Bakefile Concepts</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch02.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch04.html">Next</a></td></tr></table><hr /></div><div class="chapter" title="Chapter 3. Bakefile Concepts"><div class="titlepage"><div><div><h2 class="title"><a id="ch.concepts"></a>Chapter 3. Bakefile Concepts</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch03.html#concept.target">Targets</a></span></dt><dt><span class="section"><a href="ch03.html#concept.variables">Variables</a></span></dt><dt><span class="section"><a href="ch03.html#concept.template">Templates</a></span></dt><dt><span class="section"><a href="ch03.html#concept.option">Options</a></span></dt><dt><span class="section"><a href="ch03.html#concept.conditions">Conditions</a></span></dt><dt><span class="section"><a href="ch03.html#concept.condvar">Conditional Variables</a></span></dt><dt><span class="section"><a href="ch03.html#concept.modules">Modules</a></span></dt><dt><span class="section"><a href="ch03.html#concept.preset">Presets</a></span></dt><dt><span class="section"><a href="ch03.html#concept.paths">Paths</a></span></dt></dl></div><div class="section" title="Targets"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="concept.target"></a>Targets</h2></div></div></div><p>
+      Like in traditional makefiles. Target is a single buildable entity,
+      e.g. executable, library or DLL. See <a class="xref" href="ch04.html" title="Chapter 4. Targets">Chapter 4, <i>Targets</i></a>
+      for details.
+    </p></div><div class="section" title="Variables"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="concept.variables"></a>Variables</h2></div></div></div><p>
+      You can set and use variables in Bakefile in a way very similar to other
+      make programs. Variables may be either global or local to the target
+      they are bound to.
+      Note that variables are expanded by Bakefile and do 
+      <span class="emphasis"><em>not</em></span> appear as variables in generated native
+      makefiles (compare with <a class="link" href="ch03.html#concept.option" title="Options">options</a>).
+    </p><p>
+      Variables are expanded by typing <span class="command"><strong>$(var)</strong></span> (for some
+      variable <code class="varname">var</code>) in makefile text. Same syntax is used
+      to expand <a class="link" href="ch03.html#concept.option" title="Options">options</a> and
+      <a class="link" href="ch03.html#concept.condvar" title="Conditional Variables">conditional variables</a>, too.
+    </p></div><div class="section" title="Templates"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="concept.template"></a>Templates</h2></div></div></div><p>
+      It is often the case that several targets in the makefile share the same
+      properties: for example, they are installed into same directory, use
+      same compiler settings or include headers from same directories.
+      Templates are a mechanism designed to eliminate such duplication from
+      makefiles. In Bakefile, you simply declare that a target
+      <span class="emphasis"><em>derives</em></span> from template (or templates) and it will
+      inherit all its properties. See description of <a class="link" href="ch05.html#cmd.template" title="template">template command</a>.
+    </p></div><div class="section" title="Options"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="concept.option"></a>Options</h2></div></div></div><p>
+      It is desirable that generated makefiles are configurable to some
+      degree (especially with the <code class="literal">autoconf</code> backend). Bakefile
+      makes it possible to declare so-called <span class="emphasis"><em>options</em></span>
+      using <a class="xref" href="ch05.html#cmd.option" title="option">option</a> command. Each format backend has its
+      own way of presenting options and some formats may fail to support them
+      at all. Some formats (such as Visual C++ project files backend) have
+      only limited support of options. Typically, options are translated into
+      variables in native makefiles and can be modified by the user.
+    </p><p>
+      This is how setting an option may look with <code class="literal">autoconf</code>:
+    </p><p>
+      <code class="prompt">$ </code><strong class="userinput"><code>./configure --enable-debug</code></strong>
+    </p><p>
+      Or with VC++ makefiles:
+    </p><p>
+      <code class="prompt">C:\&gt; </code><strong class="userinput"><code>nmake DEBUG=1</code></strong>
+    </p></div><div class="section" title="Conditions"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="concept.conditions"></a>Conditions</h2></div></div></div><p>
+      Condition is a boolean expression that is used to conditionally
+      determine values of variables and also to conditionally disable or
+      enable parts of the makefile. Conditions are commonly used to differ
+      generated native makefiles based on output format and user settings of
+      <a class="link" href="ch03.html#concept.option" title="Options">options</a>.
+    </p><p>
+      There are two types of conditions:
+      </p><div class="variablelist"><a id="concept.conditions.types"></a><dl><dt><a id="concept.conditions.weak"></a><span class="term">Weak</span></dt><dd><p>
+              The condition may be any Python expression that only uses
+              variables defined with the <a class="xref" href="ch05.html#cmd.set" title="set">set</a> command
+              and Python helper functions from available modules. The
+              expression must evaluate to either 0 (false) or 1 (true).
+            </p><p>
+              If it evaluates to 0, then the statement that has the condition
+              associated with it is not processed. If it evalues to 1, that
+              the statement is processed as if it had no condition.
+            </p></dd><dt><a id="concept.conditions.strong"></a><span class="term">Strong</span></dt><dd><p>
+              These conditions depend on the value of an
+              <a class="link" href="ch03.html#concept.option" title="Options">option</a>. Their syntax is
+              very limited compared to weak conditions, because the
+              decisition (condition evaluation) is postponed until make-time 
+              -- i.e. generated native makefile contains the condition
+              in some form.
+            </p><p>
+              The condition may only take the form of simple test for
+              equality:
+              </p><pre class="programlisting">OPTION=="VALUE"</pre><p>
+              Here, <code class="varname">OPTION</code> is the name of an already defined
+              <a class="link" href="ch03.html#concept.option" title="Options">option</a>
+              <span class="emphasis"><em>with enumerated possible values</em></span> and
+              <code class="varname">VALUE</code> is one of the option's values.
+            </p><p>
+              If a strong conditions is used with the
+              <a class="xref" href="ch05.html#cmd.set" title="set">set</a> command, a
+              <a class="link" href="ch03.html#concept.condvar" title="Conditional Variables">conditional variable</a> is
+              created.
+            </p></dd></dl></div><p>
+
+      Examples of valid conditions:
+      </p><pre class="programlisting">
+&lt;set var="NUM1"&gt;1&lt;/set&gt;
+&lt;set var="NUM2"&gt;10&lt;/set&gt;
+&lt;set var="RESULT_11" cond="NUM1+NUM2==11"&gt;yes&lt;/set&gt;
+        
+&lt;option name="BUILD"&gt;
+  &lt;values&gt;debug,release&lt;/values&gt;
+  &lt;default-value&gt;release&lt;/default-value&gt;
+&lt;/option&gt;
+
+&lt;set var="USE_DEBUG" cond="BUILD=='debug'"&gt;1&lt;/set&gt;
+&lt;set var="USE_DEBUG" cond="BUILD=='release'"&gt;0&lt;/set&gt;
+</pre><p>
+
+      Examples of invalid conditions:
+      </p><pre class="programlisting">
+&lt;option name="NUM1"&gt;
+  &lt;default-value&gt;1&lt;/default-value&gt;
+&lt;/option&gt;
+&lt;/set&gt;
+&lt;set var="NUM2"&gt;10&lt;/set&gt;
+&lt;set var="RESULT_11" cond="NUM1+NUM2==1"&gt;yes&lt;/set&gt;
+        
+&lt;option name="BUILD"&gt;
+  &lt;values&gt;R D&lt;/values&gt;
+&lt;/option&gt;
+
+&lt;set var="USE_DEBUG" cond="BUILD=='debug'"&gt;1&lt;/set&gt;
+     &lt;!-- not in the list of values --&gt;
+
+&lt;option name="BUILD2"&gt;&lt;/option&gt;
+
+&lt;set var="USE_DEBUG2" cond="BUILD2=='debug'"&gt;1&lt;/set&gt;
+     &lt;!-- not option with enumeration --&gt;
+
+&lt;option name="BUILD3"&gt;
+  &lt;values&gt;release debug&lt;/values&gt;
+&lt;/option&gt;
+
+&lt;set var="USE_DEBUG3" cond="BUILD!='debug'"&gt;1&lt;/set&gt;
+     &lt;!-- not equality test --&gt;
+</pre><p>
+      
+    </p><p>
+      See also:
+      <a class="xref" href="ch03.html#concept.condvar" title="Conditional Variables">the section called “Conditional Variables”</a>,
+      <a class="xref" href="ch05.html#cmd.set" title="set">set</a>
+    </p></div><div class="section" title="Conditional Variables"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="concept.condvar"></a>Conditional Variables</h2></div></div></div><p>
+      Conditional variables are variables whose value differs depending on
+      a condition. They are created by using the conditional form of
+      <a class="xref" href="ch05.html#cmd.set" title="set">set</a> command. Unlike options, they can't be
+      directly modified by user of native makefile. Unlike variables, they
+      are not evaluated by Bakefile during processing (the value depends on
+      values of options).
+    </p><p>
+      Summary of differences between options, variables and conditional
+      variables:
+      </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Type</th><th>Value</th><th>Set by user</th></tr></thead><tbody><tr><td>variable</td><td>constant</td><td>no</td></tr><tr><td>option</td><td>variable</td><td>yes</td></tr><tr><td>conditional variable</td><td>variable (derived from some option)</td><td>no</td></tr></tbody></table></div><p>
+    </p></div><div class="section" title="Modules"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="concept.modules"></a>Modules</h2></div></div></div><p>
+      <span class="emphasis"><em>Modules</em></span> extend Bakefile with additional abilities.
+      For example, standard configuration of Bakefile can't build Python
+      modules. You must explicitly load <code class="literal">python</code> module which
+      will add, among other things, <code class="function">python-module</code> rule.
+      Functionality is divided into modules so that generated makefiles are
+      not cluttered with unused options and to avoid unnecessary
+      <span class="emphasis"><em>configure</em></span> checks.
+    </p></div><div class="section" title="Presets"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="concept.preset"></a>Presets</h2></div></div></div><p>
+      Presets are pieces of Bakefile code that can be included in user
+      bakefiles. Their purpose is to provide support for e.g. libraries or
+      tools or to provide commonly used code snippets in convenient form.
+    </p><p>
+      For example, Bakefile contains the <code class="literal">simple</code> preset
+      that can be used to quickly create makefiles with support for both
+      debug and release builds.
+    </p></div><div class="section" title="Paths"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="concept.paths"></a>Paths</h2></div></div></div><p>
+      Regardless of the operating system where Bakefile is running, the convention
+      respected by all Bakefile tags and variables is to use Unix-style paths, i.e. to
+      use forward slash (<code class="literal">/</code>) as the path separator.
+    </p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch02.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 2. Tutorial </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 4. Targets</td></tr></table></div></body></html>

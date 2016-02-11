@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>bakefile</title><link rel="stylesheet" href="style.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /><link rel="home" href="index.html" title="Bakefile Manual" /><link rel="up" href="rn01.html" title="Running Bakefile" /><link rel="prev" href="rn01.html" title="Running Bakefile" /><link rel="next" href="rn01re02.html" title="bakefile_gen" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">bakefile</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="rn01.html">Prev</a> </td><th width="60%" align="center">Running Bakefile</th><td width="20%" align="right"> <a accesskey="n" href="rn01re02.html">Next</a></td></tr></table><hr /></div><div class="refentry" title="bakefile"><a id="man.bakefile"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>bakefile — native makefiles generator</p></div><div class="refsynopsisdiv" title="Synopsis"><h2>Synopsis</h2><div class="cmdsynopsis"><p><code class="command">bakefile</code>  [
+          <code class="option">--version</code>
+        ] [
+          <code class="option">--help</code>
+        ]  
+          <code class="option">-f</code><em class="replaceable"><code>FORMAT</code></em>
+           
+          <code class="option">-o</code><em class="replaceable"><code>OUTFILE</code></em>
+          [
+          <code class="option">--eol=[format|dos|unix|mac|native]</code>
+        ] [
+          <code class="option">--wrap-output=[no|<em class="replaceable"><code>LENGTH</code></em>]</code>
+        ] [
+          <code class="option">-D</code><em class="replaceable"><code>VAR</code></em>=<em class="replaceable"><code>VALUE</code></em>
+        ...] [
+          <code class="option">-I</code><em class="replaceable"><code>PATH</code></em>
+        ...] [
+          <code class="option">-v</code>
+        ] [
+          <code class="option">-q</code>
+        ] [
+          <code class="option">--dry-run</code>
+        ] [
+          <code class="option">--touch</code>
+        ] [
+          <code class="option">--dump</code>
+        ]  
+          <em class="replaceable"><code>file.bkl</code></em>
+         </p></div></div><div class="refsect1" title="Description"><a id="idp11820128"></a><h2>Description</h2><p>
+        <span class="command"><strong>bakefile</strong></span> creates various types of
+        Makefiles and project files from a single project
+        description called a "Bakefile".
+      </p></div><div class="refsect1" title="Command Line Options"><a id="idp11818976"></a><h2>Command Line Options</h2><p>
+        </p><div class="variablelist"><dl><dt><span class="term">
+              <code class="option">--version</code>
+            </span></dt><dd><p>
+                Display Bakefile version and exit.
+              </p></dd><dt><span class="term">
+              <code class="option">-h</code>, <code class="option">--help</code>
+            </span></dt><dd><p>
+                Display usage information and exit.
+              </p></dd><dt><span class="term">
+              <code class="option">-f</code><em class="replaceable"><code>FORMAT</code></em>,
+              <code class="option">--format</code>=<em class="replaceable"><code>FORMAT</code></em>
+            </span></dt><dd><p>
+                Specify output format. Bakefile supports the following formats:
+              </p><p>
+                </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Format</th><th>File(s) Generated</th></tr></thead><tbody><tr><td>autoconf</td><td>Makefile.in for GNU Autoconf</td></tr><tr><td>borland</td><td>Makefile for Borland C++ and Borland
+                        make</td></tr><tr><td>dmars</td><td>Generic Makefile for Digital Mars C/C++</td></tr><tr><td>dmars_smake</td><td>Makefile for Digital Mars C/C++ with
+                        SMAKE</td></tr><tr><td>gnu</td><td>Makefile for GNU toolchain: GNU Make, GCC,
+                        etc.</td></tr><tr><td>mingw</td><td>Makefile for MinGW toolchain:
+                        mingw32-make, MinGW port of GCC, etc.</td></tr><tr><td>msvc</td><td>Makefile for Visual C++ with Microsoft
+                        nmake</td></tr><tr><td>msvc6prj</td><td>Microsoft Visual C++ 6.0 project files</td></tr><tr><td>msevc4prj</td><td>Microsoft Embedded Visual C++ 4 project
+                        files</td></tr><tr><td>msvs2003prj</td><td>
+                          MS Visual Studio 2003 project files
+                        </td></tr><tr><td>msvs2005prj</td><td>
+                          MS Visual Studio 2005 project files
+                        </td></tr><tr><td>msvs2008prj</td><td>
+                          MS Visual Studio 2008 project files
+                        </td></tr><tr><td>suncc</td><td>GNU makefile for SunCC compiler</td></tr><tr><td>symbian</td><td>Symbian development files</td></tr><tr><td>watcom</td><td>Makefile for OpenWatcom C/C++</td></tr><tr><td>xcode2</td><td>Apple Xcode 2.4 project files</td></tr></tbody></table></div><p>
+              </p></dd><dt><span class="term">
+              <code class="option">-o</code><em class="replaceable"><code>OUTFILE</code></em>,
+              <code class="option">--output</code>=<em class="replaceable"><code>OUTFILE</code></em>
+            </span></dt><dd><p>
+                File to write generated makefile to. For those backends
+                that generate more than one file, this option specifies
+                the name of the main makefile.
+              </p><p>
+                This option has special meaning for msvs200xprj formats: by
+                default, both the project files (one for each target) and a
+                solution file, containing all the project files, are generated.
+                However if OUTFILE is a file with .vcproj extension, then only
+                the (necessarily unique) project file will be generated.
+              </p></dd><dt><span class="term">
+              <code class="option">-D</code><em class="replaceable"><code>VAR</code></em>=<em class="replaceable"><code>VALUE</code></em>
+            </span></dt><dd><p>
+                Define Bakefile variable. This definition overrides any
+                definition from the ruleset or input makefile. You can use it
+                to customize generated output.
+              </p></dd><dt><span class="term">
+              <code class="option">--eol</code>=<em class="replaceable"><code>[format|dos|unix|mac|native]</code></em>
+            </span></dt><dd><p>
+                Change the type of line endings used by general files.
+                <code class="literal">dos</code>, <code class="literal">unix</code> and
+                <code class="literal">mac</code> specify the line endings used by
+                respective platforms. <code class="literal">native</code> will use
+                line endings of the platform Bakefile is ran on (doing this is
+                usually a bad idea, but it is useful e.g. when checking
+                generated files into RCS system that can't deal with line
+                endings correctly, such as CVS). The default value is
+                <code class="literal">format</code> and means that the most appropriate
+                line endings for the output format will
+                be used - Windows makefiles will use DOS line endings,
+                Autoconf makefiles will use Unix ones and so on.
+              </p></dd><dt><span class="term">
+              <code class="option">--wrap-output</code>=<em class="replaceable"><code>[no|LENGTH]</code></em>
+            </span></dt><dd><p>
+                Change line wrappings behavior. By default, Bakefile wraps
+                generated makefiles so that lines don't exceed 75 characters.
+                Use this option to either change the limit or to disable
+                wrapping entirely by using <code class="literal">no</code> as the value.
+              </p></dd><dt><span class="term">
+              <code class="option">-I</code><em class="replaceable"><code>PATH</code></em>
+            </span></dt><dd><p>
+                Add path to the list of directories where Bakefile looks for
+                rules and output templates.
+              </p></dd><dt><span class="term">
+              <code class="option">--dry-run</code>
+            </span></dt><dd><p>
+                Process the bakefile normally, but instead of creating or
+                modifying files, just print which files would be changed
+                without actually modifying them.
+              </p></dd><dt><span class="term">
+              <code class="option">-v</code>, <code class="option">--verbose</code>
+            </span></dt><dd><p>Be verbose.</p></dd><dt><span class="term">
+              <code class="option">-q</code>, <code class="option">--quiet</code>
+            </span></dt><dd><p>Supress all output except for errors.</p></dd><dt><span class="term">
+              <code class="option">--touch</code>
+            </span></dt><dd><p>
+                Always touch output files, even if their content doesn't
+                change.
+              </p></dd><dt><span class="term">
+              <code class="option">--debug</code>
+            </span></dt><dd><p>show internal debugging information</p></dd><dt><span class="term">
+              <code class="option">--dump</code>
+            </span></dt><dd><p>
+                Dump all Bakefile variables and targets to standard output
+                instead of generating output. This is only useful for
+                debugging Bakefile or ill-behaving makefiles.
+              </p></dd><dt><span class="term">
+              <code class="option">--output-deps</code>=<em class="replaceable"><code>FILE</code></em>
+            </span></dt><dd><p>
+                Output dependency information needed by
+                <span class="command"><strong>bakefile_gen</strong></span> utility
+              </p></dd><dt><span class="term">
+              <code class="option">--output-changes</code>=<em class="replaceable"><code>FILE</code></em>
+            </span></dt><dd><p>
+                Store list of changed files to the given file
+              </p></dd><dt><span class="term">
+              <code class="option">--xml-cache</code>=<em class="replaceable"><code>FILE</code></em>
+            </span></dt><dd><p>
+                specify cache file where <span class="command"><strong>bakefile_gen</strong></span>
+                stores pre-parsed XML files
+              </p></dd></dl></div><p>
+      </p></div><div class="refsect1" title="Environment Variables"><a id="idp13703680"></a><h2>Environment Variables</h2><p>
+        </p><div class="variablelist"><dl><dt><a id="searchpaths"></a><span class="term">BAKEFILE_PATHS</span></dt><dd><p>
+                List of directories where ruleset files are looked for (syntax
+                is same as in <code class="varname">PATH</code>). Bakefile's data
+                directory is always searched in addition to paths listed in
+                <code class="varname">BAKEFILE_PATHS</code>, but
+                <code class="varname">BAKEFILE_PATHS</code> has higher priority.
+              </p></dd></dl></div><p>
+      </p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="rn01.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="rn01.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="rn01re02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Running Bakefile </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> bakefile_gen</td></tr></table></div></body></html>

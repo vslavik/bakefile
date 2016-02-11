@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 10. Modules</title><link rel="stylesheet" href="style.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /><link rel="home" href="index.html" title="Bakefile Manual" /><link rel="up" href="index.html" title="Bakefile Manual" /><link rel="prev" href="ch09.html" title="Chapter 9. Format specific documentation" /><link rel="next" href="ch11.html" title="Chapter 11. Batch bakefile generation with bakefile_gen" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 10. Modules</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch09.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch11.html">Next</a></td></tr></table><hr /></div><div class="chapter" title="Chapter 10. Modules"><div class="titlepage"><div><div><h2 class="title"><a id="ch.modules"></a>Chapter 10. Modules</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch10.html#module.datafiles">datafiles</a></span></dt><dd><dl><dt><span class="section"><a href="ch10.html#rule.datafiles.data-files">data-files</a></span></dt><dt><span class="section"><a href="ch10.html#rule.datafiles.data-files-ng">data-files-ng</a></span></dt><dt><span class="section"><a href="ch10.html#rule.datafiles.script-files">script-files</a></span></dt><dt><span class="section"><a href="ch10.html#rule.datafiles.script-files-ng">script-files-ng</a></span></dt><dt><span class="section"><a href="ch10.html#rule.datafiles.data-files-tree">data-files-tree</a></span></dt><dt><span class="section"><a href="ch10.html#rule.datafiles.copy-files">copy-files</a></span></dt><dt><span class="section"><a href="ch10.html#rule.datafiles.copy-file-to-file">copy-file-to-file</a></span></dt><dt><span class="section"><a href="ch10.html#rule.datafiles.mkdir">mkdir</a></span></dt></dl></dd><dt><span class="section"><a href="ch10.html#module.pkgconfig">pkgconfig</a></span></dt><dd><dl><dt><span class="section"><a href="ch10.html#rule.pkgconfig.pkgconfig">pkgconfig</a></span></dt></dl></dd></dl></div><div class="section" title="datafiles"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="module.datafiles"></a>datafiles</h2></div></div></div><p>
+    This module provides rules for installing data files during
+    <strong class="userinput"><code>make install</code></strong> phase. It also defines two rules for
+    copying files during build process (typically from source to build
+    directory).
+
+    </p><div class="note" title="Implementation Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Implementation Note</h3><p>
+        This module currently works only with the <code class="literal">autoconf</code>
+        format.
+      </p></div><p>
+  </p><p>
+    The following targets are defined in <code class="literal">datafiles</code> module:
+  </p><div class="section" title="data-files"><div class="titlepage"><div><div><h3 class="title"><a id="rule.datafiles.data-files"></a>data-files</h3></div></div></div><p>
+      <a class="link" href="ch04.html#pseudotargets" title="Pseudo targets">Pseudo target</a> that declares
+      installable data files. Note that <span class="emphasis"><em>all</em></span> files are
+      installed into target directory, their relative directories are
+      <span class="emphasis"><em>not</em></span> preserved.
+      </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th><th>Default</th></tr></thead><tbody><tr><td class="tagname">srcdir</td><td>
+                <p>
+                  Directory where source files are.
+                </p>
+              </td><td class="default">$(SRCDIR)</td></tr><tr><td class="tagname">files</td><td>
+                <p>
+                  List of files to copy. Names are relative to source
+                  directory. May be used more than once.
+                </p>
+              </td><td class="default">at least one use required</td></tr><tr><td class="tagname">install-to</td><td>
+                <p>
+                  Directory where to install the files.
+                </p>
+              </td><td class="default">required</td></tr></tbody></table></div><p>
+    </p></div><div class="section" title="data-files-ng"><div class="titlepage"><div><div><h3 class="title"><a id="rule.datafiles.data-files-ng"></a>data-files-ng</h3></div></div></div><p>
+      Same as <a class="xref" href="ch10.html#rule.datafiles.data-files" title="data-files">data-files</a>, except that
+      <span class="command"><strong>data-files-ng</strong></span> is real target and not pseudo target.
+      This has two consequences: the target must have <code class="varname">id</code>
+      set and it can be conditional.
+    </p></div><div class="section" title="script-files"><div class="titlepage"><div><div><h3 class="title"><a id="rule.datafiles.script-files"></a>script-files</h3></div></div></div><p>
+      Same as <a class="xref" href="ch10.html#rule.datafiles.data-files" title="data-files">data-files</a>, but installed
+      files have executable permissions on Unix.
+    </p></div><div class="section" title="script-files-ng"><div class="titlepage"><div><div><h3 class="title"><a id="rule.datafiles.script-files-ng"></a>script-files-ng</h3></div></div></div><p>
+      Same as <a class="xref" href="ch10.html#rule.datafiles.data-files-ng" title="data-files-ng">data-files-ng</a>, but installed
+      files have executable permissions on Unix.
+    </p></div><div class="section" title="data-files-tree"><div class="titlepage"><div><div><h3 class="title"><a id="rule.datafiles.data-files-tree"></a>data-files-tree</h3></div></div></div><p>
+      Unlike <a class="xref" href="ch10.html#rule.datafiles.data-files" title="data-files">data-files</a>, this rule preserves
+      directory structure of installed files. Available tags are same and
+      have same meaning as <a class="xref" href="ch10.html#rule.datafiles.data-files" title="data-files">data-files</a> tags.
+    </p></div><div class="section" title="copy-files"><div class="titlepage"><div><div><h3 class="title"><a id="rule.datafiles.copy-files"></a>copy-files</h3></div></div></div><p>
+      Copies file(s) from source directory to destination directory. Creates
+      destionation directory if it doesn't exist.
+      </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th></tr></thead><tbody><tr><td class="tagname">srcdir</td><td>
+                <p>
+                  Directory where source files are. This tag is not required
+                  (unlike the other two) -- source directory is empty by
+                  default.
+                </p>
+              </td></tr><tr><td class="tagname">files</td><td>
+                <p>
+                  List of files to copy. Names are relative to source
+                  directory.
+                </p>
+              </td></tr><tr><td class="tagname">dstdir</td><td>
+                <p>
+                  Directory where to copy the files.
+                </p>
+              </td></tr></tbody></table></div><p>
+    </p></div><div class="section" title="copy-file-to-file"><div class="titlepage"><div><div><h3 class="title"><a id="rule.datafiles.copy-file-to-file"></a>copy-file-to-file</h3></div></div></div><p>
+      Copies single file to another file.
+      </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th></tr></thead><tbody><tr><td class="tagname">src</td><td>Source file.</td></tr><tr><td class="tagname">dst</td><td>Destination file.</td></tr></tbody></table></div><p>
+    </p></div><div class="section" title="mkdir"><div class="titlepage"><div><div><h3 class="title"><a id="rule.datafiles.mkdir"></a>mkdir</h3></div></div></div><p>
+      Creates directory.
+      </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th></tr></thead><tbody><tr><td class="tagname">dir</td><td>Name of the directory.</td></tr></tbody></table></div><p>
+    </p></div></div><div class="section" title="pkgconfig"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="module.pkgconfig"></a>pkgconfig</h2></div></div></div><p>
+    This module provides a simple rule for installing and uninstalling
+    <a class="ulink" href="http://pkgconfig.freedesktop.org/wiki/" target="_top">pkg-config</a>
+    template files.
+
+    </p><div class="note" title="Implementation Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Implementation Note</h3><p>
+        This module currently works only with the <code class="literal">autoconf</code>
+        format because pkg-config files contain values such as prefix that are
+        set by configure.
+      </p></div><p>
+  </p><p>
+    The following targets are defined in <code class="literal">pkgconfig</code> module:
+  </p><div class="section" title="pkgconfig"><div class="titlepage"><div><div><h3 class="title"><a id="rule.pkgconfig.pkgconfig"></a>pkgconfig</h3></div></div></div><p>
+      Installs a .pc template file in the standard location of the pkgconfig files
+      (i.e. <a class="xref" href="ch07.html#var.LIBDIR">LIBDIR</a>/pkgconfig).
+      </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th><th>Default</th></tr></thead><tbody><tr><td class="tagname">src</td><td>
+                <p>
+                  Name of the pkgconfig file to install. Can contain a relative path.
+                  E.g. <code class="literal">build/myprj.pc</code>
+                </p>
+              </td><td class="default">$(id).pc</td></tr></tbody></table></div><p>
+    </p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch09.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch11.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 9. Format specific documentation </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 11. Batch bakefile generation with bakefile_gen</td></tr></table></div></body></html>

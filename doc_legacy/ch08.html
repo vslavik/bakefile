@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 8. Python functions</title><link rel="stylesheet" href="style.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /><link rel="home" href="index.html" title="Bakefile Manual" /><link rel="up" href="index.html" title="Bakefile Manual" /><link rel="prev" href="ch07.html" title="Chapter 7. Variables defined by Bakefile" /><link rel="next" href="ch09.html" title="Chapter 9. Format specific documentation" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 8. Python functions</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch09.html">Next</a></td></tr></table><hr /></div><div class="chapter" title="Chapter 8. Python functions"><div class="titlepage"><div><div><h2 class="title"><a id="ch.functions"></a>Chapter 8. Python functions</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch08.html#sec.intro">Introduction</a></span></dt><dt><span class="section"><a href="ch08.html#sec.pyfn.howto">How to use a Python function in a bakefile</a></span></dt><dt><span class="section"><a href="ch08.html#sec.py.fn">Python functions</a></span></dt><dd><dl><dt><span class="section"><a href="ch08.html#pyfunc.envvar">envvar</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.isconst">isconst</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.isdefined">isdefined</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.isoption">isoption</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.iscondvar">iscondvar</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.ifthenelse">ifthenelse</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.ref">ref</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.isDeadTarget">isDeadTarget</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.substituteFromDict">substituteFromDict</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.nativePaths">nativePaths</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.addPrefixIfNotEmpty">addPrefixIfNotEmpty</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.addPrefixToList">addPrefixToList</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.safeSplit">safeSplit</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.fileList">fileList</a></span></dt><dt><span class="section"><a href="ch08.html#pyfunc.removeDuplicates">removeDuplicates</a></span></dt></dl></dd></dl></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec.intro"></a>Introduction</h2></div></div></div><p>
+            In Bakefile, the expression inside <code class="literal">$(...)</code>
+            doesn't have to be a variable name, it can be
+            <span class="emphasis"><em>any</em></span> Python expression. Expressions that
+            cannot be evaluated at runtime and are translated into output
+            format conditions are more limited, but as long as the expression
+            is evaluated only at Bakefile execution time, it can be any valid
+            Python expression.  In particular, any Python functions may be
+            called.
+        </p><p>
+            In order to make common tasks easier, Bakefile provides
+            miscellaneous utility functions which can
+            be used in your bakefiles. Unlike tags and
+            rules provided through <a class="link" href="ch10.html" title="Chapter 10. Modules">modules</a>,
+            the functions documented in this section are available everywhere
+            in Bakefile.
+        </p><p>
+            Except where explicitely stated differently, all functions accept
+            as arguments Python strings.
+        </p></div><div class="section" title="How to use a Python function in a bakefile"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec.pyfn.howto"></a>How to use a Python function in a bakefile</h2></div></div></div><p>
+            Python instructions and thus also Python calls to functions, can
+            be used in bakefile wrapping them into the <code class="literal">$( )</code>
+            symbols.  E.g. suppose you want to use the
+            <a class="xref" href="ch08.html#pyfunc.fileList" title="fileList">fileList</a> function described below to
+            set variable <code class="literal">A</code>; you should then write:
+
+            </p><pre class="programlisting">
+&lt;set var="A"&gt;
+    $(fileList('mypath/*.c'))
+&lt;/set&gt;
+            </pre><p>
+        </p></div><div class="section" title="Python functions"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec.py.fn"></a>Python functions</h2></div></div></div><p>
+            The following Python functions are defined:
+        </p><div class="section" title="envvar"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.envvar"></a>envvar</h3></div></div></div><pre class="synopsis">envvar(<em class="parameter"><code>"name"</code></em>)</pre><p>
+              Returns reference to environment variable
+              <code class="varname">name</code>. This function should be used instead
+              of <code class="literal">$(DOLLAR)(name)</code> idiom, because some output
+              formats (namely, Watcom makefiles) use different syntax for
+              referencing environment variables.
+            </p></div><div class="section" title="isconst"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.isconst"></a>isconst</h3></div></div></div><pre class="synopsis">isconst(<em class="parameter"><code>expr</code></em>)</pre><p>
+              Returns <code class="literal">true</code> if the
+              <span class="emphasis"><em>expression</em></span> (i.e. not variable name as in
+              the case of <a class="xref" href="ch08.html#pyfunc.isdefined" title="isdefined">isdefined</a> etc.) given as
+              argument is constant expression.
+            </p></div><div class="section" title="isdefined"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.isdefined"></a>isdefined</h3></div></div></div><pre class="synopsis">isdefined(<em class="parameter"><code>name</code></em>)</pre><p>
+            Returns <code class="literal">true</code> if the given string is the name
+            of an option or a (conditional) variable previously defined in the bakefile.
+            </p></div><div class="section" title="isoption"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.isoption"></a>isoption</h3></div></div></div><pre class="synopsis">isoption(<em class="parameter"><code>name</code></em>)</pre><p>
+            Returns <code class="literal">true</code> if the given string is the name
+            of an option previously defined in the bakefile.
+            </p></div><div class="section" title="iscondvar"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.iscondvar"></a>iscondvar</h3></div></div></div><pre class="synopsis">iscondvar(<em class="parameter"><code>name</code></em>)</pre><p>
+            Returns <code class="literal">true</code> if the given string is the name
+            of a conditional variable previously defined in the bakefile.
+            </p></div><div class="section" title="ifthenelse"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.ifthenelse"></a>ifthenelse</h3></div></div></div><pre class="synopsis">ifthenelse(<em class="parameter"><code>cond</code></em>, <em class="parameter"><code>iftrue</code></em>, <em class="parameter"><code>iffalse</code></em>)</pre><p>
+            Allows to write if-then-else constructs inside bakefiles. The
+            arguments are respectively the <span class="emphasis"><em>if condition</em></span>
+            (use Python syntax!), the Python expression to execute in case the
+            condition results true and the Python expression to execute in
+            case the condition results false.
+            </p></div><div class="section" title="ref"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.ref"></a>ref</h3></div></div></div><pre class="synopsis">ref(<em class="parameter"><code>var</code></em>, <em class="parameter"><code>target=None</code></em>)</pre><p>
+            Creates a reference to the given <em class="parameter"><code>var</code></em> variable
+            which will be evaluated only in the final stage of bakefile
+            processing.
+            </p></div><div class="section" title="isDeadTarget"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.isDeadTarget"></a>isDeadTarget</h3></div></div></div><pre class="synopsis">isDeadTarget(<em class="parameter"><code>target</code></em>)</pre><p>
+            Returns <span class="emphasis"><em>true</em></span> if the given string is the name
+            of a conditional target whose condition is never met.
+            </p></div><div class="section" title="substituteFromDict"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.substituteFromDict"></a>substituteFromDict</h3></div></div></div><pre class="synopsis">substituteFromDict(<em class="parameter"><code>var</code></em>, <em class="parameter"><code>dict</code></em>, <em class="parameter"><code>desc=None</code></em>)</pre><p>
+            Returns the <span class="emphasis"><em>value</em></span> of the dictionary entry
+            whose <span class="emphasis"><em>key</em></span> matches the value of the variable
+            or option named <em class="parameter"><code>var</code></em>.
+            E.g.
+            </p><pre class="programlisting">
+&lt;set var="A"&gt;
+    $(substituteFromDict(OPTION,{'1':'value1','0':'value0'}))
+&lt;/set&gt;
+                </pre><p>
+
+            sets <span class="emphasis"><em>A</em></span> to <span class="emphasis"><em>value1</em></span> if
+            <span class="emphasis"><em>OPTION</em></span> is <span class="emphasis"><em>1</em></span> or to
+            <span class="emphasis"><em>value2</em></span> if <span class="emphasis"><em>OPTION</em></span> is
+            <span class="emphasis"><em>0</em></span>.
+            Note that Python requires curly brackets to define a dictionary.
+            </p></div><div class="section" title="nativePaths"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.nativePaths"></a>nativePaths</h3></div></div></div><pre class="synopsis">nativePaths(<em class="parameter"><code>filenames</code></em>)</pre><p>
+            Returns the given string with the <code class="literal">/</code> characters
+            substituted by the content of the <a class="xref" href="ch07.html#var.DIRSEP">DIRSEP</a>
+            variable (see the Variables section).
+            </p></div><div class="section" title="addPrefixIfNotEmpty"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.addPrefixIfNotEmpty"></a>addPrefixIfNotEmpty</h3></div></div></div><pre class="synopsis">addPrefixIfNotEmpty(<em class="parameter"><code>prefix</code></em>, <em class="parameter"><code>value</code></em>)</pre><p>
+            Returns the <em class="parameter"><code>value</code></em> string prefixed with
+            <em class="parameter"><code>prefix</code></em>, unless <em class="parameter"><code>value</code></em> is
+            empty.
+            </p></div><div class="section" title="addPrefixToList"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.addPrefixToList"></a>addPrefixToList</h3></div></div></div><pre class="synopsis">addPrefixToList(<em class="parameter"><code>prefix</code></em>, <em class="parameter"><code>value</code></em>)</pre><p>
+            Adds <em class="parameter"><code>prefix</code></em> to every item in
+            <em class="parameter"><code>value</code></em> interpreted as whitespace-separated
+            list.
+            E.g.
+            </p><pre class="programlisting">
+&lt;set var="A"&gt;
+    $(addPrefixToList('file','1.txt 2.txt 3.txt'))
+&lt;/set&gt;
+                </pre><p>
+            sets the <span class="emphasis"><em>A</em></span> variable to <code class="literal">file1.txt file2.txt file3.txt</code>
+            </p></div><div class="section" title="safeSplit"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.safeSplit"></a>safeSplit</h3></div></div></div><pre class="synopsis">safeSplit(<em class="parameter"><code>str</code></em>)</pre><p>
+            Splits the given string like the built-in split() Python function
+            but, unlike the Python <code class="literal">split()</code> function,
+            recognizes that an expression like
+            </p><pre class="programlisting">
+"$(myPythonFuncCall(arg1, arg2)) item2"
+            </pre><p>
+            must be split as
+            </p><pre class="programlisting">
+[ "$(myPythonFuncCall(arg1, arg2))", "item2" ]
+            </pre><p>
+            and not as the built-in split() function would do
+            </p><pre class="programlisting">
+[ "$(myPythonFuncCall(arg1,", "arg2))", "item2" ]
+            </pre><p>
+            </p></div><div class="section" title="fileList"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.fileList"></a>fileList</h3></div></div></div><pre class="synopsis">fileList(<em class="parameter"><code>path</code></em>)</pre><p>
+                Returns a string containing a space-separed list of all files
+                found in the given <em class="parameter"><code>path</code></em>.
+                <em class="parameter"><code>path</code></em> typically is a relative path
+                (absolute paths should be avoided in well-designed bakefiles)
+                with a mask used to match only wanted files.
+            </p><p>
+                When the given path is relative, it must be relative to the
+                <a class="xref" href="ch07.html#var.SRCDIR">SRCDIR</a>
+                global variable; remember that <a class="xref" href="ch07.html#var.SRCDIR">SRCDIR</a>
+                is in turn relative to
+                the location of the generated makefile
+                (see <a class="xref" href="ch07.html#var.OUTPUT_FILE">OUTPUT_FILE</a>).
+            </p><p>
+                Additionally this function can accept Python lists of strings,
+                too.  The returned value is the list of all files found in all
+                the paths of the list.
+
+            E.g.
+            </p><pre class="programlisting">
+&lt;sources&gt;$(fileList('../src/*.cpp'))&lt;/sources&gt;
+&lt;sources&gt;$(fileList(['../src/*.cpp', '../src/*.c']))&lt;/sources&gt;
+                </pre><p>
+            </p></div><div class="section" title="removeDuplicates"><div class="titlepage"><div><div><h3 class="title"><a id="pyfunc.removeDuplicates"></a>removeDuplicates</h3></div></div></div><pre class="synopsis">removeDuplicates(<em class="parameter"><code>list</code></em>)</pre><p>
+                Returns a copy of the given (space-separed) list with all 
+                duplicate tokens removed.
+            </p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch09.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 7. Variables defined by Bakefile </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 9. Format specific documentation</td></tr></table></div></body></html>

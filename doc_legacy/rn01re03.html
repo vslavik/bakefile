@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>bakefilize</title><link rel="stylesheet" href="style.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /><link rel="home" href="index.html" title="Bakefile Manual" /><link rel="up" href="rn01.html" title="Running Bakefile" /><link rel="prev" href="rn01re02.html" title="bakefile_gen" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">bakefilize</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="rn01re02.html">Prev</a> </td><th width="60%" align="center">Running Bakefile</th><td width="20%" align="right"> </td></tr></table><hr /></div><div class="refentry" title="bakefilize"><a id="man.bakefilize"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>bakefilize — prepare Bakefile project for use with Autoconf</p></div><div class="refsynopsisdiv" title="Synopsis"><h2>Synopsis</h2><div class="cmdsynopsis"><p><code class="command">bakefilize</code>  [
+          <code class="option">--copy</code>
+        ] [
+          <code class="option">--dry-run</code>
+        ] [
+          <code class="option">--force</code>
+        ] [
+          <code class="option">--verbose</code>
+        ] [
+          <code class="option">--help</code>
+        ]</p></div></div><div class="refsect1" title="Description"><a id="idp14611984"></a><h2>Description</h2><p>
+      For the "autoconf" format, Bakefile creates Makefile.in
+      files that depend on the availability of common pieces
+      of a GNU build system. (<code class="filename">config.guess</code>, 
+    <code class="filename">install-sh</code>, etc.) These tools
+    are part of Automake, which can copy these files
+    into a project's directory during processing.
+    <span class="command"><strong>bakefilize</strong></span> effectively replaces
+    the <span class="command"><strong>automake --add-missing</strong></span> feature.
+    </p><p>
+      It is standard practice in Autoconf-based projects to
+      provide a "bootstrap" script (commonly called
+    either <span class="command"><strong>bootstrap</strong></span> or
+    <span class="command"><strong>autogen.sh</strong></span>) to run commands
+    like <span class="command"><strong>autoconf</strong></span> with the proper
+    flags and in the proper order. You should run
+    <span class="command"><strong>bakefilize</strong></span> in that script, at
+    some point before the <span class="command"><strong>configure</strong></span>
+    script runs.
+    </p></div><div class="refsect1" title="Command Line Options"><a id="idp14820384"></a><h2>Command Line Options</h2><p>
+        </p><div class="variablelist"><dl><dt><span class="term">
+              <code class="option">-c</code>, <code class="option">--copy</code>
+            </span></dt><dd><p>
+                Copy the files from the Automake directory, rather than
+        the default behavior of making symbolic links.
+              </p></dd><dt><span class="term">
+              <code class="option">-n</code>, <code class="option">--dry-run</code>
+            </span></dt><dd><p>
+                Only show the commands that would be executed.
+              </p></dd><dt><span class="term">
+              <code class="option">-f</code>, <code class="option">--force</code>
+            </span></dt><dd><p>
+                Replace all existing files, instead of only adding
+        missing files.
+              </p></dd><dt><span class="term">
+              <code class="option">-v</code>, <code class="option">--verbose</code>
+            </span></dt><dd><p>
+                Show debugging messages.
+              </p></dd><dt><span class="term">
+              <code class="option">--help</code>
+            </span></dt><dd><p>
+                Display usage information for
+        <span class="command"><strong>bakefilize</strong></span>
+              </p></dd></dl></div><p>
+      </p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="rn01re02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="rn01.html">Up</a></td><td width="40%" align="right"> </td></tr><tr><td width="40%" align="left" valign="top">bakefile_gen </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>

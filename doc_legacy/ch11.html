@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 11. Batch bakefile generation with bakefile_gen</title><link rel="stylesheet" href="style.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /><link rel="home" href="index.html" title="Bakefile Manual" /><link rel="up" href="index.html" title="Bakefile Manual" /><link rel="prev" href="ch10.html" title="Chapter 10. Modules" /><link rel="next" href="rn01.html" title="Running Bakefile" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 11. Batch bakefile generation with bakefile_gen</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch10.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="rn01.html">Next</a></td></tr></table><hr /></div><div class="chapter" title="Chapter 11. Batch bakefile generation with bakefile_gen"><div class="titlepage"><div><div><h2 class="title"><a id="ch.bakefile_gen"></a>Chapter 11. Batch bakefile generation with bakefile_gen</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch11.html#idp5669264">Introduction</a></span></dt><dt><span class="section"><a href="ch11.html#idp6827680">bakefile_gen tags</a></span></dt><dt><span class="section"><a href="ch11.html#idp10472384">Processing order</a></span></dt></dl></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idp5669264"></a>Introduction</h2></div></div></div><p>
+        As soon as you start using Bakefile for your project and you need to
+        generate many makefile formats from your bakefiles (after all, this is
+        the purpose of Bakefile!), you'll find very useful to automate the
+        regeneration process.
+    </p><p>
+        Here is where <a class="xref" href="rn01re02.html" title="bakefile_gen"><span class="refentrytitle">bakefile_gen</span>(1)</a> comes into play.
+        You can script all the bakefile calls you would have to do manually in a
+        single <code class="filename">Bakefiles.bkgen</code> file and then just call:
+
+        <strong class="userinput"><code>bakefile_gen</code></strong>
+
+        to run Bakefile for all the formats you need to regenerate on all the
+        bakefiles which are required by your project.
+    </p><p>
+      <code class="filename">Bakefiles.bkgen</code> files use a simple XML format to
+      describe what outputs and how to generate.
+        The root tag is called <code class="literal">bakefile-gen</code> and inside it
+        you can use any of the tags described below.
+    </p></div><div class="section" title="bakefile_gen tags"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idp6827680"></a>bakefile_gen tags</h2></div></div></div><p>
+        In addition to the following tags, bakefile_gen also supports the
+        <a class="xref" href="ch05.html#cmd.include" title="include">include</a> tag.
+
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Tag</th><th>Description</th><td class="auto-generated"> </td></tr></thead><tbody><tr><td class="tagname"><a id="tag.input"></a>input</td><td>
+                            <p>
+                                Adds the given list of whitespace-separed bakefiles to
+                                the list of bakefiles which must be regenerated.
+                            </p>
+                            <p>
+                                You can use wildcards and relative paths to match all the
+                                bakefiles scattered in the directory tree of your project.
+                                Example:
+                            </p>
+                            <pre class="programlisting">
+&lt;!-- tell bakefile_gen to regenerate all the bakefiles of this project --&gt;
+&lt;input&gt;
+    mybakefile1.bkl
+    ../mybakefile2.bkl
+    ../../../build/bakefiles/*.bkl
+&lt;/input&gt;
+</pre>
+                        </td><td class="auto-generated"> </td></tr><tr><td class="tagname"><a id="tag.add-formats"></a>add-formats</td><td>
+                            <p>
+                                Adds the comma-separed list of formats contained in
+                                this tag, to the list of formats to regenerate.
+                            </p>
+                            <p>
+                                You can use the <span class="emphasis"><em>files</em></span> attribute
+                                of this tag to selectively add the listed formats to
+                                a (set of) bakefile(s) only.
+                            </p>
+                            <pre class="programlisting">
+&lt;!-- add the GNU format to all bakefiles under 'build/bakefiles' --&gt;
+&lt;add-formats files="build/bakefiles/*.bkl"&gt;gnu&lt;/add-formats&gt;
+</pre>
+                        </td><td class="auto-generated"> </td></tr><tr><td class="tagname"><a id="tag.del-formats"></a>del-formats</td><td>
+                            <p>
+                                Removes the comma-separed list of formats contained in
+                                this tag, from the list of formats to regenerate.
+                            </p>
+                            <p>
+                                You can use the <code class="literal">files</code> attribute
+                                of this tag to selectively add the listed formats to
+                                a (set of) bakefile(s) only.
+                            </p>
+                            <pre class="programlisting">
+&lt;!-- remove some rarely used formats from the bakefiles under the 'a' and 'b' subfolders --&gt;
+&lt;del-formats files="a/*.bkl,b/*.bkl"&gt;cbuilderx,dmars,dmars_smake,msevc4prj,symbian,xcode2&lt;/disable-formats&gt;
+</pre>
+                        </td><td class="auto-generated"> </td></tr><tr><td class="tagname"><a id="tag.enable-formats"></a>enable-formats</td><td>
+                            <p>
+                                Enables the regeneration of the comma-separed list of
+                                formats contained in this tag.
+                            </p>
+                            <p>
+                                Note that by default all formats supported by Bakefile
+                                are enabled, thus this tag will actually have some effect
+                                only if you used the <a class="xref" href="ch11.html#tag.disable-formats">disable-formats</a>
+                                tag before.
+                            </p>
+                            <pre class="programlisting">
+&lt;disable-formats&gt;msvc,gnu&lt;/disable-formats&gt;
+...
+&lt;!-- we've changed idea; turn GNU format on --&gt;
+&lt;enable-formats&gt;gnu&lt;/enable-formats&gt;
+</pre>
+                        </td><td class="auto-generated"> </td></tr><tr><td class="tagname"><a id="tag.disable-formats"></a>disable-formats</td><td>
+                            <p>
+                                Disables the regeneration of the comma-separed list of
+                                formats contained in this tag.
+                            </p>
+                            <p>
+                                Typically you'll want to use this tag to disable all
+                                those formats you are not interested to.
+                            </p>
+                            <pre class="programlisting">
+&lt;!-- disable rarely used formats: --&gt;
+&lt;disable-formats&gt;cbuilderx,dmars,dmars_smake,msevc4prj,symbian,xcode2&lt;/disable-formats&gt;
+</pre>
+                        </td><td class="auto-generated"> </td></tr><tr><td class="tagname"><a id="tag.add-flags"></a>add-flags</td><td>
+                            <p>
+                                Adds some flags to the command executed to regenerate
+                                the bakefiles.
+                            </p>
+                            <p>
+                                You can use the <code class="literal">files</code> attribute
+                                of this tag to selectively add the flags to
+                                a (set of) bakefile(s) only.
+                            </p>
+                            <p>
+                                You can use the <code class="literal">formats</code> attribute
+                                of this tag to selectively add the flags to
+                                a (set of) format(s) only.
+                            </p>
+                            <p>
+                                Additionally, inside this tag, bakefile_gen recognizes
+                                various variables:
+                                <code class="literal">$(INPUT_FILE)</code> is the path of the bakefile being processed;
+                                <code class="literal">$(INPUT_FILE_BASENAME)</code> is the filename of the bakefile being processed;
+                                <code class="literal">$(INPUT_FILE_BASENAME_NOEXT)</code> is the filename of the bakefile being processed without the extension;
+                                <code class="literal">$(INPUT_FILE_DIR)</code> is the directory of the bakefile being processed.
+                            </p>
+                            <pre class="programlisting">
+&lt;!-- tell bakefile to output the generated Makefile.in for bake.bkl two levels up --&gt;
+&lt;add-flags files="bake.bkl" formats="autoconf"&gt;
+    -o../../Makefile.in
+&lt;/add-flags&gt;
+
+&lt;!-- always generate the windows makefiles in ../msw respect the bakefile's being processed: --&gt;
+&lt;add-flags formats="borland"&gt;-o$(INPUT_FILE_DIR)/../msw/makefile.bcc&lt;/add-flags&gt;
+&lt;add-flags formats="mingw"&gt;-o$(INPUT_FILE_DIR)/../msw/makefile.gcc&lt;/add-flags&gt;
+&lt;add-flags formats="msvc"&gt;-o$(INPUT_FILE_DIR)/../msw/makefile.vc&lt;/add-flags&gt;
+&lt;add-flags formats="watcom"&gt;-o$(INPUT_FILE_DIR)/../msw/makefile.wat&lt;/add-flags&gt;
+</pre>
+                        </td><td class="auto-generated"> </td></tr><tr><td class="tagname"><a id="tag.del-flags"></a>del-flags</td><td>
+                            <p>
+                                Removes some flags to the command executed to regenerate
+                                the bakefiles.
+                            </p>
+                            <p>
+                                You can use the <code class="literal">files</code> attribute
+                                of this tag to selectively remove the flags to
+                                a (set of) bakefile(s) only.
+                            </p>
+                            <p>
+                                You can use the <code class="literal">formats</code> attribute
+                                of this tag to selectively remove the flags to
+                                a (set of) format(s) only.
+                            </p>
+                            <pre class="programlisting">
+&lt;add-flags&gt;-DVARIABLE1=value&lt;/add-flags&gt;
+
+&lt;!-- delete the -DVARIABLE1=value option from the MSVC and BORLAND formats --&gt;
+&lt;del-flags formats="msvc,borland"&gt;
+    -DVARIABLE1=value
+&lt;/del-flags&gt;
+</pre>
+                        </td><td class="auto-generated"> </td></tr></tbody></table></div><p>
+    </p></div><div class="section" title="Processing order"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idp10472384"></a>Processing order</h2></div></div></div><p>
+      <code class="filename">Bakefiles.bkgen</code> file is processed in the following
+      order:
+
+      </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+            <code class="literal">disable-formats</code> entries are read into blacklist
+            of formats to globally ignore 
+          </p></li><li class="listitem"><p>
+            <code class="literal">enable-formats</code> entries are read and the formats
+            listed are <span class="emphasis"><em>removed</em></span> from the blacklist (so
+            that your <code class="filename">Bakefiles.local.bkgen</code> file can
+            re-enable something disabled by default).
+          </p></li><li class="listitem"><p>
+            <code class="literal">add-formats</code> and <code class="literal">del-formats</code>
+            are processed in the order they appear in the file. They specify
+            which formats should be generated for which files (the default
+            being all files), assuming the blacklist is empty (in other words,
+            they describe what this <code class="filename">Bakefiles.bkgen</code> is
+            <span class="emphasis"><em>capable</em></span> of generating).
+          </p></li><li class="listitem"><p>
+            The list from step 3. is filtered using the blacklist from steps
+            1. and 2.
+          </p></li></ol></div><p>
+    </p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch10.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="rn01.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 10. Modules </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Running Bakefile</td></tr></table></div></body></html>

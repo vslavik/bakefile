@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 7. Variables defined by Bakefile</title><link rel="stylesheet" href="style.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /><link rel="home" href="index.html" title="Bakefile Manual" /><link rel="up" href="index.html" title="Bakefile Manual" /><link rel="prev" href="ch06.html" title="Chapter 6. Frequently encountered issues" /><link rel="next" href="ch08.html" title="Chapter 8. Python functions" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 7. Variables defined by Bakefile</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch08.html">Next</a></td></tr></table><hr /></div><div class="chapter" title="Chapter 7. Variables defined by Bakefile"><div class="titlepage"><div><div><h2 class="title"><a id="ch.variables"></a>Chapter 7. Variables defined by Bakefile</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch07.html#sec.noformat.vars">Format independent variables</a></span></dt><dd><dl><dt><span class="section"><a href="ch07.html#sec.change.bkl.behavior">Changing Bakefile behaviour</a></span></dt><dt><span class="section"><a href="ch07.html#sec.dirs">Directories</a></span></dt><dd><dl><dt><span class="section"><a href="ch07.html#sec.install.dirs">Installation Directories</a></span></dt></dl></dd><dt><span class="section"><a href="ch07.html#platform">Recognizing Platform</a></span></dt><dt><span class="section"><a href="ch07.html#sec.format.features">Format features</a></span></dt><dt><span class="section"><a href="ch07.html#sec.misc.vars">Miscellaneous</a></span></dt></dl></dd><dt><span class="section"><a href="ch07.html#sec.make.vars">Standard makefile variables</a></span></dt><dt><span class="section"><a href="ch07.html#sec.format.vars">Format specific variables</a></span></dt><dd><dl><dt><span class="section"><a href="ch07.html#sec.autoconf.vars">autoconf</a></span></dt><dt><span class="section"><a href="ch07.html#sec.dmars.vars">dmars, dmars_smake</a></span></dt><dt><span class="section"><a href="ch07.html#sec.msvs2005prj.vars">msvs2005prj, msvs2008prj</a></span></dt><dt><span class="section"><a href="ch07.html#sec.msvs2003prj.vars">msvs2003prj</a></span></dt></dl></dd></dl></div><p>
+    Bakefile rulesets define lots of variables; this chapter provides brief
+    summary of variables that are available for makefile writers.
+  </p><div class="section" title="Format independent variables"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec.noformat.vars"></a>Format independent variables</h2></div></div></div><div class="section" title="Changing Bakefile behaviour"><div class="titlepage"><div><div><h3 class="title"><a id="sec.change.bkl.behavior"></a>Changing Bakefile behaviour</h3></div></div></div><p>
+        These variables are meant to be changed using <code class="literal">-D</code>
+        command line argument
+        (see <a class="link" href="rn01re01.html" title="bakefile">manual page</a> for details).
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th><th>Default</th></tr></thead><tbody><tr><td class="varname"><a id="var.OPTIONS_FILE"></a>OPTIONS_FILE</td><td>
+                  If set, then user-configurable part of generated makefile
+                  (i.e. <a class="link" href="ch03.html#concept.option" title="Options">options</a> list)
+                  is written into another file instead that the makefile will
+                  include. <code class="varname">OPTIONS_FILE</code> value must be
+                  relative to <code class="varname">OUTPUT_FILE</code>.
+                </td><td class="default">(not set, empty)</td></tr><tr><td class="varname">WRITE_OPTIONS_FILE</td><td>
+                  If <code class="varname">OPTIONS_FILE</code> is set and
+                  <code class="varname">WRITE_OPTIONS_FILE</code> is 1, then
+                  file <code class="varname">OPTIONS_FILE</code> is created. If 0, then
+                  it is not, but it is still included by the main makefile.
+                  This allows you to generate options file shared by lots of
+                  subproject makefiles and don't repeatedly generate it.
+                </td><td class="default">1</td></tr></tbody></table></div><p>
+
+        Variables for fine-tuning Bakefile's output (rarely needed):
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th><th>Default</th></tr></thead><tbody><tr><td class="varname"><a id="var.VARS_DONT_ELIMINATE"></a>VARS_DONT_ELIMINATE</td><td>
+                  Bakefile normally eliminates all unused variables from
+                  the output. In some rare situations, it may not detect
+                  that a variable is used, in which case you can tell it to
+                  keep the variable by adding its name to this variable.
+                  So far this is only useful if the variables is used in
+                  makefile code included using <a class="xref" href="ch05.html#cmd.fragment" title="fragment">fragment</a>.
+                </td><td class="default">(empty)</td></tr><tr><td class="varname"><a id="var.LIB_PAGESIZE"></a>LIB_PAGESIZE</td><td>
+                  Set this variable to a large power of two if your linker
+                  (on Windows) complains that page size is too small when
+                  building static library.
+                </td><td class="default"><code class="literal">4096</code></td></tr></tbody></table></div><p>
+
+      </p></div><div class="section" title="Directories"><div class="titlepage"><div><div><h3 class="title"><a id="sec.dirs"></a>Directories</h3></div></div></div><p>
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th><th>Default</th></tr></thead><tbody><tr><td class="varname"><a id="var.SRCDIR"></a>SRCDIR</td><td>
+                  <p>
+                    Directory to which names of source files are relative to.
+                    This value is relative to <a class="xref" href="ch07.html#var.OUTPUT_FILE">OUTPUT_FILE</a>
+                    (the only exception is the <code class="literal">autoconf</code>
+                    format, which prefixes the value with
+                    <code class="literal">$(srcdir)</code> in order to allow out-of-tree
+                    compilation).
+                  </p>
+                  <p>
+                    Note that the value of <code class="varname">SRCDIR</code>
+                    <span class="emphasis"><em>cannot</em></span> be set manually; if you want
+                    to change it, you must use the
+                    <span class="command"><strong>set-srcdir</strong></span> command as early in your
+                    bakefile as possible. For example:
+                    </p><pre class="programlisting">
+&lt;makefile&gt;
+  &lt;set-srcdir&gt;../..&lt;/set-srcdir&gt;
+  ..
+&lt;/makefile&gt;
+</pre><p>
+                    The argument to <span class="command"><strong>set-srcdir</strong></span> must be
+                    a constant expression.
+                  </p>
+                </td><td class="default">.</td></tr><tr><td class="varname"><a id="var.BUILDDIR"></a>BUILDDIR</td><td>
+                  Directory where object files and executables are built.
+                  This value is relative to <a class="xref" href="ch07.html#var.OUTPUT_FILE">OUTPUT_FILE</a>.
+                </td><td class="default">(depends on format)</td></tr></tbody></table></div><p>
+
+      </p><div class="section" title="Installation Directories"><div class="titlepage"><div><div><h4 class="title"><a id="sec.install.dirs"></a>Installation Directories</h4></div></div></div><p>
+          These are standard installation directories as used on Unix (most
+          notably in Autoconf). They are used by <span class="command"><strong>install</strong></span>
+          target if the backend supports it. They are defined on all platforms.
+          You can change their values freely (unless you are using Autoconf
+          backend).
+          </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th><th>Default</th></tr></thead><tbody><tr><td class="varname"><a id="var.PREFIX"></a>PREFIX</td><td>Base directory for installed files.</td><td class="default">/usr/local on Unix</td></tr><tr><td class="varname"><a id="var.BINDIR"></a>BINDIR</td><td>Directory where programs are installed.</td><td class="default">$(PREFIX)/bin on Unix</td></tr><tr><td class="varname"><a id="var.LIBDIR"></a>LIBDIR</td><td>Directory where libraries are installed.</td><td class="default">$(PREFIX)/lib on Unix</td></tr><tr><td class="varname"><a id="var.DLLDIR"></a>DLLDIR</td><td>Directory where DLLs are installed.</td><td class="default">
+                    $(PREFIX)/lib on Unix, $(PREFIX)/bin when targetting
+                    win32
+                  </td></tr><tr><td class="varname"><a id="var.INCLUDEDIR"></a>INCLUDEDIR</td><td>Directory where C and C++ headers are installed.</td><td class="default">$(PREFIX)/include on Unix</td></tr><tr><td class="varname"><a id="var.DATADIR"></a>DATADIR</td><td>Directory where data files are installed.</td><td class="default">$(PREFIX)/share on Unix</td></tr></tbody></table></div><p>
+        </p></div></div><div class="section" title="Recognizing Platform"><div class="titlepage"><div><div><h3 class="title"><a id="platform"></a>Recognizing Platform</h3></div></div></div><p>
+        All of these are variables defined to either 0 or 1, with the
+        exception of <code class="literal">autoconf</code> format backend where they are
+        options.
+      </p><p>
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th></tr></thead><tbody><tr><td class="varname">PLATFORM_UNIX</td><td>UNIX variant</td></tr><tr><td class="varname">PLATFORM_WIN32</td><td>32bit Windows</td></tr><tr><td class="varname">PLATFORM_MSDOS</td><td>MS-DOS</td></tr><tr><td class="varname">PLATFORM_MAC</td><td>Mac OS X or Mac Classic</td></tr><tr><td class="varname">PLATFORM_MACOSX</td><td>Mac OS X</td></tr><tr><td class="varname">PLATFORM_OS2</td><td>OS/2</td></tr><tr><td class="varname">PLATFORM_BEOS</td><td>BeOS</td></tr><tr><td class="varname">PLATFORM_SYMBIAN</td><td>Symbian OS</td></tr></tbody></table></div><p>
+      </p></div><div class="section" title="Format features"><div class="titlepage"><div><div><h3 class="title"><a id="sec.format.features"></a>Format features</h3></div></div></div><p>
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th></tr></thead><tbody><tr><td class="varname"><a id="var.FORMAT_HAS_VARIABLES"></a>FORMAT_HAS_VARIABLES</td><td>
+                    This boolean flag indicates whether the output format supports variables.
+                    If it does, then some space and time optimization are possible and long
+                    Bakefile variables that would otherwise be expanded into literals are left
+                    as variables in generated makefile/project.
+                </td></tr><tr><td class="varname"><a id="var.FORMAT_SUPPORTS_CONDITIONS"></a>FORMAT_SUPPORTS_CONDITIONS</td><td>
+                    Whether the output format can handle conditions (i.e. variable values
+                    depending on conditions and conditionally built targets) at all. Most
+                    make-tools do, but e.g. MSVC project files can't do it. If set to 0, then
+                    the targets and variables are "flattened", i.e. expanded into multiple
+                    'configurations' as in many IDEs.
+                </td></tr><tr><td class="varname"><a id="var.FORMAT_SUPPORTS_CONFIGURATIONS"></a>FORMAT_SUPPORTS_CONFIGURATIONS</td><td>
+                    Whether it is at least possible to have multiple configurations if
+                    conditions are not supported (such as in IDEs). Meaningless if
+                    FORMAT_SUPPORTS_CONDITIONS=1. If both FORMAT_SUPPORTS_CONDITIONS and
+                    FORMAT_SUPPORTS_CONFIGURATIONS are 0, then we're in deep trouble and
+                    we can only generate makefiles that are not configurable.
+                </td></tr><tr><td class="varname"><a id="var.FORMAT_SUPPORTS_ACTIONS"></a>FORMAT_SUPPORTS_ACTIONS</td><td>
+                    Whether the output format can handle <a class="xref" href="ch04.html#rule.action" title="action">action</a>s at all.
+                    Most make-tools do, but IDE project files typically don't.
+                </td></tr><tr><td class="varname"><a id="var.FORMAT_SUPPORTS_SUBPROJECTS"></a>FORMAT_SUPPORTS_SUBPROJECTS</td><td>
+                    Whether the output format can handle <a class="xref" href="ch04.html#rule.subproject" title="subproject">subproject</a>s at all.
+                    Most make-tools do, but IDE project files typically don't.
+                </td></tr><tr><td class="varname"><a id="var.FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS"></a>FORMAT_NEEDS_OPTION_VALUES_FOR_CONDITIONS</td><td>
+                    Whether the output format needs to have options that are
+                    used by conditions listed in the output file. This is true
+                    in majority of cases because the conditions take form such
+                    as <code class="literal">"!if $(OPT) == value"</code> and OPT must
+                    be defined, but there's one exception: autoconf. It
+                    decides on whether the condition is true or false in
+                    autoconf_inc.m4 and Makefile.in does not need the
+                    variables, so we can safely purge them and save some
+                    space.
+                </td></tr></tbody></table></div><p>
+
+      </p></div><div class="section" title="Miscellaneous"><div class="titlepage"><div><div><h3 class="title"><a id="sec.misc.vars"></a>Miscellaneous</h3></div></div></div><p>
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th></tr></thead><tbody><tr><td class="varname">BAKEFILE_VERSION</td><td>
+                  String with Bakefile version number. The version is formed from
+                  three numbers delimined by period. Read only.
+                </td></tr><tr><td class="varname"><a id="var.OPTIONS"></a>OPTIONS</td><td>
+                  Space-separation list of
+                  <a class="link" href="ch03.html#concept.option" title="Options">options</a> defined in
+                  the makefiles. Note that the value of this variable
+                  changes during processing as new options are defined!
+                </td><td class="default"> </td></tr><tr><td class="varname"><a id="var.INPUT_FILE"></a>INPUT_FILE</td><td>
+                  Name of input file. The name is always absolute path.
+                  Read only.
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname"><a id="var.INPUT_FILE_ARG"></a>INPUT_FILE_ARG</td><td>
+                  Same as <a class="link" href="ch07.html#var.INPUT_FILE">INPUT_FILE</a>, but
+                  the name is in exactly same form as it was passed on command
+                  line, it's not made absolute as in case of
+                  <code class="varname">INPUT_FILE</code>.
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname"><a id="var.OUTPUT_FILE"></a>OUTPUT_FILE</td><td>
+                  Name of the file where generated native makefile will be
+                  written. Read only.
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname">FORMAT</td><td>
+                  Format of makefile currently being generated, e.g.
+                  <code class="literal">autoconf</code>. Always constant expression.
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname">COMPILER</td><td>
+                  Short identifier of used compiler (e.g. "bcc" or "vc6"). This
+                  variable is only defined for Windows compilers and is
+                  guaranteed to evaluate to constant expression.
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname">TOOLSET</td><td>
+                  What kind of tools the makefile uses. Use this to determine
+                  what commands to put into
+                  <a class="xref" href="ch04.html#tags.action.command">command</a> tags.
+                  Can be one of <code class="literal">win32</code>,
+                  <code class="literal">unix</code>. Always a constanst expression.
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname">EOL_STYLE</td><td>
+                  Default line endings style for current format, one of
+                  <code class="literal">unix</code>, <code class="literal">dos</code> and
+                  <code class="literal">mac</code>.
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname">LF</td><td>
+                  Line feed character (\n in C).
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname">TAB</td><td>
+                  Tabelator character (\t in C).
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname">DOLLAR</td><td>
+                  Dollar sign ($).
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname">SPACE</td><td>
+                  Space character (" "). Note that <code class="varname">SPACE</code>
+                  is not evaluated and so you can't use it in places where
+                  constant expression is expected.
+                </td><td class="auto-generated"> </td></tr><tr><td class="varname"><a id="var.DIRSEP"></a>DIRSEP</td><td>
+                  Character used to separate directory components in paths on
+                  target platform (/ on Unix, \ on Windows).
+                </td><td class="auto-generated"> </td></tr></tbody></table></div><p>
+
+      </p></div></div><div class="section" title="Standard makefile variables"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec.make.vars"></a>Standard makefile variables</h2></div></div></div><p>
+      Makefile-based formats (<code class="literal">gnu</code>, <code class="literal">msvc</code>
+      etc.) define standard options <code class="literal">CC</code>,
+      <code class="literal">CXX</code>, <code class="literal">CFLAGS</code>,
+      <code class="literal">CXXFLAGS</code>, <code class="literal">CPPFLAGS</code>,
+      <code class="literal">LDFLAGS</code> for specifying the compiler and its
+      flags. Their default values are set to the default or typical compiler.
+      If necessary, the defaults for <code class="literal">FOO</code> can be overriden
+      by setting the <code class="literal">DEFAULT_FOO</code> (e.g.
+      <code class="literal">DEFAULT_CXX</code> for the C++ compiler) variable to
+      a constant value anywhere in user bakefiles.
+    </p></div><div class="section" title="Format specific variables"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec.format.vars"></a>Format specific variables</h2></div></div></div><div class="section" title="autoconf"><div class="titlepage"><div><div><h3 class="title"><a id="sec.autoconf.vars"></a>autoconf</h3></div></div></div><p>
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th><th>Default</th></tr></thead><tbody><tr><td class="varname">AUTOCONF_MACROS_FILE</td><td>
+                  <p>
+                  Where <code class="filename">configure.in</code> macros for setting
+                  options and conditional variables (mostly
+                  <code class="function">AC_SUBST</code>
+                  calls) are written. This file <span class="emphasis"><em>must</em></span> be
+                  included by your <code class="filename">configure.in</code> script.
+                  Set it to empty string to disable creation of this file
+                  (e.g. for subprojects of main project, see also
+                  <a class="link" href="ch07.html#var.OPTIONS_FILE">
+                    <code class="varname">OPTIONS_FILE</code>
+                  </a>).
+                  </p>
+                  <p>
+                    Note that the value of <code class="varname">AUTOCONF_MACROS_FILE</code>
+                    <span class="emphasis"><em>shouldn't</em></span> be set manually; if you want
+                    to change it, use the
+                    <span class="command"><strong>autoconf-needs-macro</strong></span> command. For example:
+                    </p><pre class="programlisting">
+&lt;makefile&gt;
+  &lt;autoconf-needs-macro&gt;AC_BAKEFILE_PYTHON&lt;/autoconf-needs-macro&gt;
+  ..
+&lt;/makefile&gt;
+</pre><p>
+                    The argument to <span class="command"><strong>autoconf-needs-macro</strong></span>
+                    must be a constant expression. It can be repeated more
+                    than once.
+                  </p>
+                </td><td class="default">autoconf_inc.m4</td></tr></tbody></table></div><p>
+      </p></div><div class="section" title="dmars, dmars_smake"><div class="titlepage"><div><div><h3 class="title"><a id="sec.dmars.vars"></a>dmars, dmars_smake</h3></div></div></div><p>
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th><th>Default</th></tr></thead><tbody><tr><td class="varname">DMARS_MEM_POOL_SIZE</td><td>
+                  Specifies size of memory pool used by the
+                  <span class="command"><strong>dmc</strong></span> compiler. The default should be
+                  sufficient most of the time and only needs increasing if the
+                  compiler fails to compile source code with out of memory
+                  errors.
+                </td><td class="default">99</td></tr></tbody></table></div><p>
+      </p></div><div class="section" title="msvs2005prj, msvs2008prj"><div class="titlepage"><div><div><h3 class="title"><a id="sec.msvs2005prj.vars"></a>msvs2005prj, msvs2008prj</h3></div></div></div><p>
+        </p><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><thead><tr><th>Variable name</th><th>Description</th><th>Default</th></tr></thead><tbody><tr><td class="varname"><a id="var.MSVS_PLATFORMS"></a>MSVS_PLATFORMS</td><td>
+                  Comma-separated list of platforms to generate project
+                  configurations for. Can be set by the user using the
+                  <code class="literal">-D</code> command line argument.
+                  See <a class="link" href="ch09.html#format.msvs2005prj" title="MS VisualStudio 2005/2008 extended functionality">
+                  MS VisualStudio 2005/2008 format documentation
+                  </a>
+                  for details.
+                </td><td class="default">win32</td></tr><tr><td class="varname"><a id="var.MSVS_PLATFORM"></a>MSVS_PLATFORM</td><td>
+                  This variable is not meant to be set by the user. It's
+                  an <a class="link" href="ch03.html#concept.option" title="Options">option</a> created by
+                  the format itself. It's allowed values are values from
+                  <a class="xref" href="ch07.html#var.MSVS_PLATFORMS">MSVS_PLATFORMS</a> variable set by the
+                  user. It can be used by the bakefiles to generate different
+                  project settings for different platform, in the same way
+                  user-added options are used.
+                </td><td class="default"> </td></tr><tr><td class="varname"><a id="var.MSVS_PROJECT_FILE"></a>MSVS_PROJECT_FILE</td><td>
+                  Unlike other variables in this section, this variable can
+                  optionally be set <span class="emphasis"><em>on targets</em></span> to specify
+                  the location of <code class="literal">.vcproj</code> file created for
+                  them. The location is relative to
+                  <a class="xref" href="ch07.html#var.OUTPUT_FILE">OUTPUT_FILE</a>. See an example:
+                  <pre class="programlisting">
+&lt;exe id="hello_world"&gt;
+  ...
+  &lt;!-- create subdirectory for projects if needed and put it there --&gt;
+  &lt;set var="MSVS_PROJECT_FILE"&gt;examples/HelloWorld.vcproj&lt;/set&gt;
+&lt;/exe&gt;
+</pre>
+                </td><td class="default">(derived from <a class="xref" href="ch07.html#var.OUTPUT_FILE">OUTPUT_FILE</a>)</td></tr></tbody></table></div><p>
+      </p></div><div class="section" title="msvs2003prj"><div class="titlepage"><div><div><h3 class="title"><a id="sec.msvs2003prj.vars"></a>msvs2003prj</h3></div></div></div><p>
+        The <a class="xref" href="ch07.html#var.MSVS_PLATFORM">MSVS_PLATFORM</a> option is present in
+        this format as well, but it is always set to <code class="literal">win32</code>.
+        <a class="xref" href="ch07.html#var.MSVS_PROJECT_FILE">MSVS_PROJECT_FILE</a> is fully supported.
+      </p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch08.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 6. Frequently encountered issues </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 8. Python functions</td></tr></table></div></body></html>
