@@ -602,6 +602,9 @@ class OSXGnuToolset(GnuToolset):
     default_makefile = "Makefile.osx"
 
     shared_library_extension = "dylib"
+    # "-z defs" is not supported by OS X linker, the corresponding option is
+    # "-undefined error" but it is the default anyhow
+    shared_library_link_flag = "-shared"
     loadable_module_extension = "bundle"
     loadable_module_link_flag = "-bundle"
 
