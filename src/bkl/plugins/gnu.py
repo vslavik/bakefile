@@ -617,7 +617,7 @@ class OSXGnuToolset(GnuToolset):
     loadable_module_link_flag = "-bundle"
 
     pic_flags = None
-    soname_flags = None
+    soname_flags = "-install_name @rpath/$(notdir $@)"
     pthread_ld_flags = None
 
     def on_footer(self, file, module):
