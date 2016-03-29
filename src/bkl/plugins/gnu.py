@@ -210,12 +210,31 @@ class GnuLinker(GnuFileCompiler):
             cmd.append(LiteralExpr(toolset.pthread_ld_flags))
         return cmd
 
-    def commands(self, toolset, target, input, output):
-        cmd = [LiteralExpr("$(CXX) -o $@ $(LDFLAGS)"), input]
+
+    def _make_link_command(self, toolset, target, input, output_flags=None, extra_flags=None):
+        """
+        Return the link command taking the specified inputs.
+
+        The output_flags argument contains linker flags controlling the kind of
+        output file to generate while extra_flags contain other options. This
+        separation is relatively arbitrary and just makes the code using this
+        function more convenient to write.
+        """
+        cmd = [LiteralExpr("$(CXX)")]
+        if output_flags:
+            cmd.append(LiteralExpr(output_flags))
+        cmd.append(LiteralExpr("-o $@"))
+        if extra_flags:
+            cmd.append(LiteralExpr(extra_flags))
+        cmd.append(LiteralExpr("$(LDFLAGS)"))
+        cmd.append(input)
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         cmd += self._linker_flags(toolset, target)
         return [ListExpr(cmd)]
+
+    def commands(self, toolset, target, input, output):
+        return self._make_link_command(toolset, target, input)
 
 
 class GnuSharedLibLinker(GnuLinker):
@@ -227,15 +246,9 @@ class GnuSharedLibLinker(GnuLinker):
     out_type = bkl.compilers.NativeSharedLibraryFileType.get()
 
     def commands(self, toolset, target, input, output):
-        cmd = [LiteralExpr("$(CXX) %s -o $@" % toolset.shared_library_link_flag)]
-        if toolset.soname_flags:
-            cmd.append(LiteralExpr(toolset.soname_flags))
-        cmd.append(LiteralExpr("$(LDFLAGS)"))
-        cmd.append(input)
-        # FIXME: use a parser instead of constructing the expression manually
-        #        in here
-        cmd += self._linker_flags(toolset, target)
-        return [ListExpr(cmd)]
+        return self._make_link_command(toolset, target, input,
+                                       toolset.shared_library_link_flag,
+                                       toolset.soname_flags)
 
 
 class GnuLoadableModuleLinker(GnuLinker):
@@ -247,13 +260,8 @@ class GnuLoadableModuleLinker(GnuLinker):
     out_type = bkl.compilers.NativeLoadableModuleFileType.get()
 
     def commands(self, toolset, target, input, output):
-        cmd = [LiteralExpr("$(CXX) %s -o $@" % toolset.loadable_module_link_flag)]
-        cmd.append(LiteralExpr("$(LDFLAGS)"))
-        cmd.append(input)
-        # FIXME: use a parser instead of constructing the expression manually
-        #        in here
-        cmd += self._linker_flags(toolset, target)
-        return [ListExpr(cmd)]
+        return self._make_link_command(toolset, target, input,
+                                       toolset.loadable_module_link_flag)
 
 
 class GnuLibLinker(GnuFileCompiler):
