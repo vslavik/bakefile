@@ -976,7 +976,17 @@ def _get_matching_project_config(cfg, prj):
     Returns best match project configuration for given solution configuration.
     """
     with error_context(prj):
-        if cfg in prj.configurations:
+        # If the project doesn't have any configurations, it means that we
+        # failed to parse it properly, presumably because it defines its
+        # configurations (and platforms, see _get_matching_project_platform()
+        # too) in a separately imported file. Ideal would be to follow the
+        # import chain, but this is not trivial, e.g. we would need to parse
+        # and evaluate MSBuild functions to find the full path of the file
+        # being imported, so for now we just optimistically assume that the
+        # project supports all solution configurations because it's the only
+        # thing we can do, the only alternative would be to refuse to use it
+        # completely.
+        if cfg in prj.configurations or not prj.configurations:
             return cfg
 
         # else: try to find a configuration closest to the given one, i.e.
@@ -1037,7 +1047,9 @@ def _get_matching_project_platform(platform, prj):
     """
     Returns best matching platform in the project or None if none found.
     """
-    if platform in prj.platforms:
+    # As with the configurations above, assume that all solution platforms are
+    # supported by the project if we failed to find which ones it really has.
+    if platform in prj.platforms or not prj.platforms:
         return platform
     elif "Any CPU" in prj.platforms:
         return "Any CPU"
