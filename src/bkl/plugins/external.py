@@ -172,6 +172,8 @@ class VSExternalProject201x(VSExternalProjectBase):
         v = self.xml.get("ToolsVersion")
         if v == "14.0":
             return 14
+        elif v == "12.0":
+            return 12
         elif v != "4.0":
             raise Error("unrecognized version of Visual Studio project %s: ToolsVersion=\"%s\"" %(
                         self.projectfile, v))
