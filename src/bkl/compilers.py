@@ -155,7 +155,7 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to, files_map):
         objbase = src.get_basename()
     objname = expr.PathExpr([expr.LiteralExpr("%s_%s" % (target.name, objbase))],
                             expr.ANCHOR_BUILDDIR,
-                            pos=src.pos).change_extension(ft_to.extensions[0])
+                            pos=src.pos).add_extension(ft_to.extensions[0])
 
     ft_from = get_file_type(ext)
     compiler = get_compiler(toolset, ft_from, ft_to)
