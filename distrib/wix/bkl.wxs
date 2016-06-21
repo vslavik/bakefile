@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<?if $(sys.BUILDARCH)="x86"?>
+    <?define Minimum_Version="100"?>
+    <?define Program_Files="ProgramFilesFolder"?>
+<?elseif $(sys.BUILDARCH)="x64"?>
+    <?define Minimum_Version="200"?>
+    <?define Program_Files="ProgramFiles64Folder"?>
+<?else?>
+    <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
+<?endif?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product
         Id="*"
@@ -8,12 +17,12 @@
         Manufacturer="Bakefile Developers"
         UpgradeCode="3333163D-CC42-4920-B26E-E4B58611ABCF">
 
-        <Package Compressed="yes"/>
+        <Package InstallerVersion="$(var.Minimum_Version)" Compressed="yes"/>
         <MajorUpgrade DowngradeErrorMessage='A more recent version of [ProductName] is already installed.'/>
         <Media Id="1" Cabinet="main.cab" EmbedCab="yes"/>
 
         <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="ProgramFilesFolder">
+            <Directory Id="$(var.Program_Files)">
                 <Directory Id="INSTALLDIR" Name="Bakefile">
                     <Directory Id="DOCSDIR" Name="docs"/>
                 </Directory>

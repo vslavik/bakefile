@@ -5,6 +5,8 @@
 VERSION      := $(shell python ../src/tool.py --version | cut -f2 -d' ')
 TARBALL_NAME := bakefile-$(VERSION)_beta
 
+CANDLE_FLAGS = -arch x86
+
 
 all:
 
@@ -43,8 +45,8 @@ pyinstaller/bkl.exe: build
 
 distrib_msi: build pyinstaller/bkl.exe
 	cd wix && heat dir ../../docs/html/ -srd -ag -sfrag -template fragment -dr DOCSDIR -cg docs -var var.DocSource -out docs.wxs
-	cd wix && candle bkl.wxs
-	cd wix && candle -dDocSource="..\..\docs\html" docs.wxs
+	cd wix && candle $(CANDLE_FLAGS) bkl.wxs
+	cd wix && candle $(CANDLE_FLAGS) -dDocSource="../../docs/html" docs.wxs
 	cd wix && light -ext WixUIExtension bkl.wixobj docs.wixobj -out $(TARBALL_NAME).msi
 
 build:
