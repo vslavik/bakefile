@@ -33,7 +33,7 @@
             <Component Id="cmpenvpath" Guid="F834E56E-B074-4C8E-B3C9-638640BC6397">
                 <CreateFolder/>
                 <Environment Id="envpath" Name="PATH" Value="[INSTALLDIR]"
-                             Action="set" Part="last" Permanent="no"/>
+                             Action="set" Part="last" Permanent="no" System="yes"/>
             </Component>
         </DirectoryRef>
 
