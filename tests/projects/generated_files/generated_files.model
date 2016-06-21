@@ -7,7 +7,7 @@ module {
     program test {
       includedirs = [@builddir/]
       sources {
-        file @top_srcdir/main.cpp
+        file @top_srcdir/main.cpp	{ dependencies = [@builddir/gensrc.h, @builddir/gensrc2.h] }
         file @top_srcdir/gensrc.txt	{ compile-commands = [python make_gensrc.py --source %(out) %(in)]; compile-message = Running make_gensrc.py to generate %(out); dependencies = [@top_srcdir/make_gensrc.py]; outputs = [@builddir/gensrc.cpp] }
         file @top_srcdir/gensrc2.txt	{ compile-commands = [python make_gensrc.py --both %(out0) %(in)]; compile-message = Running make_gensrc.py to generate %(out).cpp and %(out).h; dependencies = [@top_srcdir/make_gensrc.py]; outputs = [@builddir/gensrc2.cpp, @builddir/gensrc2.h] }
         file @builddir/gensrc.cpp

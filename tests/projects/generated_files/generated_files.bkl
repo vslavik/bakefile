@@ -32,4 +32,6 @@ program test {
     gensrc2.txt::compile-message = "Running make_gensrc.py to generate %(out).cpp and %(out).h";
     gensrc2.txt::dependencies = make_gensrc.py;
     gensrc2.txt::outputs = @builddir/gensrc2.cpp @builddir/gensrc2.h;
+
+    main.cpp::dependencies = @builddir/gensrc.h @builddir/gensrc2.h;
 }

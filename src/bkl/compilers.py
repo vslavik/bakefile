@@ -180,7 +180,7 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to, files_map):
         raise Error("don't know how to compile \"%s\" files into \"%s\"" % (ft_from.name, ft_to.name))
 
     node = BuildNode(commands=compiler.commands(toolset, target, src, objname),
-                     inputs=[src],
+                     inputs=[src] + list(srcfile["dependencies"]),
                      outputs=[objname],
                      source_pos=srcfile.source_pos)
     return ([node], [node])

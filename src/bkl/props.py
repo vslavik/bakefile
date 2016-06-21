@@ -90,10 +90,12 @@ def std_file_props():
              default=[],
              inheritable=False,
              doc="""
-                 List of additional files that the commands that compiles this
-                 source file depend on.
+                 List of additional files that the source file or or its
+                 commands depend on.
 
-                 Only applicable if *compile-commands* is set.
+                 List any files that must be created before the source file is
+                 compiled, such as generated header files. If *compile-commands*
+                 is set, list any other files referenced by the commands.
                  """),
         ]
 
