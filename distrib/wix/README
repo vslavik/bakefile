@@ -10,8 +10,10 @@ was used for testing.
 Assuming WiX tools are in the path, simply run the following commands to
 produce bkl.msi:
 
+	heat dir ..\..\docs\html\ -srd -ag -sfrag -template fragment -dr DOCSDIR -cg docs -var var.DocSource -out docs.wxs
 	candle bkl.wxs
-	light -ext WixUIExtension bkl.wixobj
+	candle -dDocSource="..\..\docs\html" docs.wxs
+	light -ext WixUIExtension bkl.wixobj docs.wixobj -out bkl.msi
 
 Then you can do
 

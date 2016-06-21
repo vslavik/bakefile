@@ -42,8 +42,10 @@ pyinstaller/bkl.exe: build
 	mv -f ../src/bkl/version.py.orig ../src/bkl/version.py
 
 distrib_msi: build pyinstaller/bkl.exe
+	cd wix && heat dir ../../docs/html/ -srd -ag -sfrag -template fragment -dr DOCSDIR -cg docs -var var.DocSource -out docs.wxs
 	cd wix && candle bkl.wxs
-	cd wix && light -ext WixUIExtension bkl.wixobj
+	cd wix && candle -dDocSource="..\..\docs\html" docs.wxs
+	cd wix && light -ext WixUIExtension bkl.wixobj docs.wixobj -out $(TARBALL_NAME).msi
 
 build:
 	make -C ..
