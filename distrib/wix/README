@@ -7,16 +7,11 @@ To use it you need to install WiX (http://wixtoolset.org/).
 Version 3.5 or later must be used (because of "MajorUpgrade" use), 3.5.2519.0
 was used for testing.
 
-Assuming WiX tools are in the path, simply run the following commands to
-produce bkl.msi:
+Run "make -C distrib distrib_msi" and the output file will be
+bakefile-X.Y.Z_beta-bin.msi.
 
-	heat dir ..\..\docs\html\ -srd -ag -sfrag -template fragment -dr DOCSDIR -cg docs -var var.DocSource -out docs.wxs
-	candle bkl.wxs
-	candle -dDocSource="..\..\docs\html" docs.wxs
-	light -ext WixUIExtension bkl.wixobj docs.wixobj -out bkl.msi
+Then you can do:
 
-Then you can do
-
-	msiexec /i bkl.msi
+	msiexec /i distrib/bakefile-*.msi
 
 to test installation.
