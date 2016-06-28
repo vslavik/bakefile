@@ -7,6 +7,9 @@ TARBALL_NAME := bakefile-$(VERSION)_beta
 
 CANDLE_FLAGS = -arch x86
 
+# If this is changed, File_Bkl in wix/bkl.wxs needs to be updated as well.
+BKL_EXE := pyinstaller/dist/bkl.exe
+
 
 all:
 
@@ -23,15 +26,15 @@ distrib_unix: build
 	rm -rf $(TARBALL_NAME)
 
 
-distrib_win: build pyinstaller/bkl.exe
+distrib_win: $(BKL_EXE)
 	rm -rf $(TARBALL_NAME)-win
 	mkdir $(TARBALL_NAME)-win
-	cp -a pyinstaller/bkl.exe ../COPYING ../README $(TARBALL_NAME)-win
+	cp -a $(BKL_EXE) ../COPYING ../README $(TARBALL_NAME)-win
 	cp -a ../docs/html $(TARBALL_NAME)-win/docs
 	zip -q -r -9 $(TARBALL_NAME)-win.zip $(TARBALL_NAME)-win
 	rm -rf $(TARBALL_NAME)-win
 
-pyinstaller/bkl.exe: build
+$(BKL_EXE): build
 	cp -a ../src/bkl/version.py ../src/bkl/version.py.orig
 	cat ../src/bkl/version.py.orig | sed -e 's/VERSION=".*"/VERSION="$(VERSION)"/' >../src/bkl/version.py
 	
@@ -43,7 +46,7 @@ pyinstaller/bkl.exe: build
 	
 	mv -f ../src/bkl/version.py.orig ../src/bkl/version.py
 
-distrib_msi: build pyinstaller/bkl.exe
+distrib_msi: build $(BKL_EXE)
 	cd wix && heat dir ../../docs/html/ -srd -ag -sfrag -template fragment -dr DOCSDIR -cg docs -var var.DocSource -out docs.wxs
 	cd wix && candle $(CANDLE_FLAGS) bkl.wxs
 	cd wix && candle $(CANDLE_FLAGS) -dDocSource="../../docs/html" docs.wxs

@@ -34,7 +34,7 @@
 
         <DirectoryRef Id="INSTALLDIR">
             <Component Id="cmpbkl" Guid="*">
-                <File Id="File_Bkl" Source="../pyinstaller/bkl.exe" KeyPath="yes"/>
+                <File Id="File_Bkl" Source="../pyinstaller/dist/bkl.exe" KeyPath="yes"/>
             </Component>
             <Component Id="cmpreadme" Guid="*">
                 <File Id="File_Readme" Source="../../Readme" KeyPath="yes"/>
