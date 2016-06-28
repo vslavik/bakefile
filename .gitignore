@@ -8,6 +8,8 @@ src/bkl/tags
 distrib/wix/bkl.msi
 distrib/wix/bkl.wixobj
 distrib/wix/bkl.wixpdb
+distrib/wix/docs.wixobj
+distrib/wix/docs.wxs
 docs/ref
 docs/.doctrees
 docs/.build
