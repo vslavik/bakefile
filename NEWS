@@ -1,4 +1,10 @@
 
+Version 0.3.0
+-------------
+
+- msvc: Fix RTTI off flag (Raul Tambre)
+
+
 Version 0.2.9
 -------------
 
