@@ -94,7 +94,7 @@
         <set var="__FLAG_WARNINGS_DEFAULT">$(__FLAG_MSVC_WARNINGS_DEFAULT)</set>
         <set var="__FLAG_WARNINGS_MAX">$(__FLAG_MSVC_WARNINGS_MAX)</set>
         <set var="__FLAG_RTTI_ON">/GR</set>
-        <set var="__FLAG_RTTI_OFF"></set>
+        <set var="__FLAG_RTTI_OFF">/GR-</set>
         <set var="__FLAG_EXCEPTIONS_ON">/EHsc</set>
         <set var="__FLAG_EXCEPTIONS_OFF"></set>
 

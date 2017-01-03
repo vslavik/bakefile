@@ -1,4 +1,10 @@
 
+Version 0.2.9.1
+-------------
+
+- msvc: Fix RTTI off flag
+
+
 Version 0.2.9
 -------------
 
