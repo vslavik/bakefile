@@ -73,8 +73,6 @@ UseAbsolutePaths=false
 
 [Dirs]
 
-[_ISToolPreCompile]
-
 [Components]
 Name: base; Description: Bakefile code; Flags: fixed; Types: custom compact full
 Name: python; Description: Python runtime; Flags: fixed; Types: custom compact full
@@ -105,6 +103,9 @@ Name: {app}\lib; Type: filesandordirs
 
 [Tasks]
 Name: addpath; Description: Add Bakefile to PATH environment variable; Flags: checkedonce
+
+[ThirdParty]
+CompileLogMethod=append
 
 [Code]
 // -----------------------------------------------------------------
@@ -251,95 +252,6 @@ begin
 end; // ModifyPathString
 
 
-{ Helper function: Modify path on Windows 9x }
-function ModifyPath9x(DirName: string; Method: integer): integer;
-var
-  AutoexecLines: TStringList;
-  ActualLine: String;
-  PathLineNos: TStringList;
-  FirstPathLineNo: Integer;
-  OldPath, ResultPath: String;
-  LineNo, CharNo, Index: integer;
-
-  TempString: String;
-begin
-  // Expect everything to be OK
-  result := mpOK;
-
-  // Create stringslists
-  AutoexecLines := TStringList.Create;
-  PathLineNos := TStringList.Create;
-
-  // Read existing path
-  OldPath := '';
-  LoadStringFromFile('c:\Autoexec.bat', TempString);
-  AutoexecLines.Text := TempString;
-  PathLineNos.Clear;
-  // Read Autoexec line by line
-  for LineNo := 0 to AutoexecLines.Count - 1 do begin
-    ActualLine := AutoexecLines.Strings[LineNo];
-    // Check if line starts with "PATH=" after first stripping spaces and other "fill-chars"
-    if Pos('=', ActualLine) > 0 then
-    begin
-      for CharNo := Pos('=', ActualLine)-1 downto 1 do
-        if (ActualLine[CharNo]=' ') or (ActualLine[CharNo]=#9) then
-          Delete(ActualLine, CharNo, 1);
-      if Pos('@', ActualLine) = 1 then
-        Delete(ActualLine, 1, 1);
-      if (Pos('PATH=', uppercase(ActualLine))=1) or (Pos('SETPATH=', uppercase(ActualLine))=1) then
-      begin
-        // Remove 'PATH=' and add path to "OldPath" variable
-        Delete(ActualLine, 1, pos('=', ActualLine));
-        // Check if an earlier PATH variable is referenced, but there has been no previous PATH defined in Autoexec
-        if (pos('%PATH%',uppercase(ActualLine))>0) and (PathLineNos.Count=0) then
-          OldPath := ExpandConstant('{win}') + ';' + ExpandConstant('{win}')+'\COMMAND';
-        if (pos('%PATH%',uppercase(ActualLine))>0) then
-        begin
-          ActualLine := Copy(ActualLine, 1, pos('%PATH%',uppercase(ActualLine))-1) +
-                        OldPath +
-                        Copy(ActualLine, pos('%PATH%',uppercase(ActualLine))+6, Length(ActualLine));
-        end;
-        OldPath := ActualLine;
-
-        // Update list of line numbers holding path variables
-        PathLineNos.Add(IntToStr(LineNo));
-      end;
-    end;
-  end;
-
-  // Save first line number in Autoexec.bat which modifies path environment variable
-  if PathLineNos.Count > 0 then
-    FirstPathLineNo := StrToInt(PathLineNos.Strings[0])
-  else
-    FirstPathLineNo := 0;
-
-  // Modify path
-  ModifyPathString(OldPath, DirName, Method, True, ResultPath);
-
-  // Write Modified path back to Autoexec.bat
-  // First delete all existing path references from Autoexec.bat
-  Index := PathLineNos.Count-1;
-  while (Index>=0) do
-  begin
-    AutoexecLines.Delete(StrToInt(PathLineNos.Strings[Index]));
-    Index := Index-1;
-  end;
-  // Then insert new path variable into Autoexec.bat
-  AutoexecLines.Insert(FirstPathLineNo, '@PATH='+ResultPath);
-  // Delete old Autoexec.bat from disk
-  if not DeleteFile('c:\Autoexec.bat') then
-    result := mpAutoexecNoWriteAcc;
-  Sleep(500);
-  // And finally write Autoexec.bat back to disk
-  if not (result=mpAutoexecNoWriteAcc) then
-    SaveStringToFile('c:\Autoexec.bat', AutoexecLines.Text, false);
-
-  // Free stringlists
-  PathLineNos.Free;
-  AutoexecLines.Free;
-end; // ModifyPath9x
-
-
 { Helper function: Modify path on Windows NT, 2000 and XP }
 function ModifyPathNT(DirName: string; Method, Scope: integer): integer;
 var
@@ -401,10 +313,6 @@ begin
 
   // Perform directory constant expansion
   Path := ExpandConstantEx(Path, ' ', ' ');
-
-  // Test if Win9x
-  if InstallOnThisVersion('4,0','0,0') = irInstall then
-    ModifyPath9x(Path, Method);
 
   // Test if WinNT, 2000 or XP
   if InstallOnThisVersion('0,4','0,0') = irInstall then
