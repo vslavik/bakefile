@@ -40,7 +40,12 @@ def checkBakefileVersion(version):
        e.g. '0.1.4'."""
     vcur = mk.vars['BAKEFILE_VERSION'].split('.')
     vreq = version.split('.')
-    return vcur >= vreq
+    #return vcur >= vreq
+    for i in range(len(vcur)):
+        if int(vreq[i]) > int(vcur[i]):
+            return False
+    return True
+
 
 def isoption(name):
     return name in mk.options
