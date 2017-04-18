@@ -38,8 +38,8 @@ def checkBakefileVersion(version):
     """Returns true iff current bakefile version is at least 'version'.
        'version' is string with three numbers separated with dots,
        e.g. '0.1.4'."""
-    vcur = mk.vars['BAKEFILE_VERSION'].split('.')
-    vreq = version.split('.')
+    vcur = [int(x) for x in mk.vars['BAKEFILE_VERSION'].split('.')]
+    vreq = [int(x) for x in version.split('.')]
     return vcur >= vreq
 
 def isoption(name):
