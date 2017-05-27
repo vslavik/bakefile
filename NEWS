@@ -2,6 +2,7 @@
 Version 0.2.10
 --------------
 
+- remove support for classic Mac OS resources
 - msvc: Fix RTTI off flag (Raul Tambre)
 
 
