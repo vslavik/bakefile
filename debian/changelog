@@ -1,3 +1,14 @@
+bakefile (0.2.9) unstable; urgency=low
+
+  * added -I flag to bakefile_gen too
+  * msevc4prj: fixed breakage of <debug-info> introduced in 0.2.7
+  * added suncc backend
+  * msvs2005prj, msvs2008prj: added support for x64 builds
+  * msvs2008prj: fixed compatibility with VS 2010
+
+ -- Vadim Zeitlin <vadim@wxwindows.org>  Feb, 03 Thu 2011 15:30:37 +0100
+
+
 bakefile (0.2.8) unstable; urgency=low
   * msvc: fixed incorrect compiler flags for debug info without debug runtime
 
