@@ -71,7 +71,6 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
 [
     PLATFORM_UNIX=0
     PLATFORM_WIN32=0
-    PLATFORM_MSDOS=0
     PLATFORM_MAC=0
     PLATFORM_MACOS=0
     PLATFORM_MACOSX=0
@@ -82,9 +81,6 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
         case "${BAKEFILE_HOST}" in
             *-*-mingw32* )
                 PLATFORM_WIN32=1
-            ;;
-            *-pc-msdosdjgpp )
-                PLATFORM_MSDOS=1
             ;;
             *-pc-os2_emx | *-pc-os2-emx )
                 PLATFORM_OS2=1
@@ -109,9 +105,6 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
             win32 )
                 PLATFORM_WIN32=1
             ;;
-            msdos )
-                PLATFORM_MSDOS=1
-            ;;
             os2 )
                 PLATFORM_OS2=1
             ;;
@@ -133,7 +126,6 @@ AC_DEFUN([AC_BAKEFILE_PLATFORM],
 
     AC_SUBST(PLATFORM_UNIX)
     AC_SUBST(PLATFORM_WIN32)
-    AC_SUBST(PLATFORM_MSDOS)
     AC_SUBST(PLATFORM_MAC)
     AC_SUBST(PLATFORM_MACOS)
     AC_SUBST(PLATFORM_MACOSX)
@@ -236,11 +228,6 @@ AC_DEFUN([AC_BAKEFILE_SUFFIXES],
             SO_SUFFIX="dll"
             SO_SUFFIX_MODULE="dll"
             DLLIMP_SUFFIX="dll.a"
-            EXEEXT=".exe"
-            DLLPREFIX=""
-            dlldir="$bindir"
-        ;;
-        *-pc-msdosdjgpp )
             EXEEXT=".exe"
             DLLPREFIX=""
             dlldir="$bindir"
@@ -448,8 +435,7 @@ AC_DEFUN([AC_BAKEFILE_SHARED_LD],
       *-*-sunos4* | \
       *-*-osf* | \
       *-*-dgux5* | \
-      *-*-sysv5* | \
-      *-pc-msdosdjgpp )
+      *-*-sysv5* )
         dnl defaults are ok
       ;;
 
