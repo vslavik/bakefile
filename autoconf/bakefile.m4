@@ -29,7 +29,7 @@ dnl
 
 dnl ---------------------------------------------------------------------------
 dnl Lots of compiler & linker detection code contained here was taken from
-dnl wxWidgets configure.in script (see http://www.wxwidgets.org)
+dnl wxWidgets configure.in script (see https://www.wxwidgets.org)
 dnl ---------------------------------------------------------------------------
 
 
@@ -574,7 +574,7 @@ AC_DEFUN([AC_BAKEFILE_CHECK_BASIC_STUFF],
     AC_CHECK_TOOL(STRIP, strip, :)
     AC_CHECK_TOOL(NM, nm, :)
 
-    dnl Don't use `install -d`, see http://trac.wxwidgets.org/ticket/13452
+    dnl Don't use `install -d`, see https://trac.wxwidgets.org/ticket/13452
     INSTALL_DIR="mkdir -p"
     AC_SUBST(INSTALL_DIR)
 
