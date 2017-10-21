@@ -567,7 +567,7 @@ AC_DEFUN([AC_BAKEFILE_CHECK_BASIC_STUFF],
         AC_SUBST(AR)
     else
         AC_CHECK_TOOL(AR, ar, ar)
-        AROPTIONS=rcu
+        AROPTIONS=rc
     fi
     AC_SUBST(AROPTIONS)
 
