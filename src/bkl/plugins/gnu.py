@@ -275,7 +275,7 @@ class GnuLibLinker(GnuFileCompiler):
     def commands(self, toolset, target, input, output):
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
-        return [ListExpr([LiteralExpr("$(AR) rcu $@"), input]),
+        return [ListExpr([LiteralExpr("$(AR) rc $@"), input]),
                 ListExpr([LiteralExpr("$(RANLIB) $@")])]
 
 
