@@ -23,26 +23,25 @@
 #
 
 import os, os.path
+import pytest
 from glob import glob
 
 import bkl.parser, bkl.interpreter, bkl.error
 import bkl.dumper
 
-
-def test_full():
-    """
-    Fully tests Bakefile interpreter and compares resulting model with a copy
-    saved in .model file, as well as with all the generated files. Does this
-    for all .bkl files under tests/projects directory that have a model dump
-    present.
-    """
+@pytest.fixture(scope='session')
+def testdir():
     import projects
-    d = os.path.dirname(projects.__file__)
-    for f in glob("%s/*.bkl" % d):
-        yield _test_on_file, d, str(f)
-    for f in glob("%s/*/*.bkl" % d):
-        yield _test_on_file, d, str(f)
+    return os.path.dirname(projects.__file__)
 
+@pytest.fixture(scope='session')
+def project_filenames():
+    """
+    This fixture returns the list of all .bkl files under tests/projects
+    directory.
+    """
+    return ([str(f) for f in glob("%s/*.bkl" % testdir())] +
+            [str(f) for f in glob("%s/*/*.bkl" % testdir())])
 
 class InterpreterForTestSuite(bkl.interpreter.Interpreter):
     def generate(self):
@@ -53,7 +52,12 @@ class InterpreterForTestSuite(bkl.interpreter.Interpreter):
         super(InterpreterForTestSuite, self).generate()
 
 
-def _test_on_file(testdir, project_file):
+@pytest.mark.parametrize('project_file', project_filenames())
+def test_full(testdir, project_file):
+    """
+    Fully tests Bakefile interpreter and compares resulting model with a copy
+    saved in .model file, as well as with all the generated files.
+    """
     assert project_file.startswith(testdir)
 
     model_file = os.path.splitext(project_file)[0] + '.model'
