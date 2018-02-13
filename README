@@ -7,7 +7,7 @@ the -bin.tar.bz2 tarball for Unix and OS X), then you can simply unpack it
 somewhere and run the 'bkl' tool in its top directory.
 
 On Windows, you don't need anything else, bkl.exe is self-contained executable.
-On other systems, you must have Python (2.6 or newer) installed.
+On other systems, you must have Python 2.7 installed.
 
 
   2. Documentation
@@ -34,7 +34,7 @@ https://github.com/vslavik/bakefile/wiki
 You'll need the following to compile Bakefile from sources obtained from
 the git repository:
 
-1. Python >= 2.6+
+1. Python 2.7
 
 2. Sphinx documentation tool. Install it with
 
