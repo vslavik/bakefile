@@ -23,29 +23,37 @@
 #
 
 import os, os.path
+import pytest
 from glob import glob
 
 import bkl.parser, bkl.interpreter, bkl.error
 import bkl.dumper
 
+@pytest.fixture(scope='session')
+def testdirs():
+    import test_parsing, test_model
+    return [os.path.dirname(test_parsing.__file__),
+            os.path.dirname(test_model.__file__)]
 
-def test_builder():
+@pytest.fixture(scope='session')
+def model_filenames():
+    """
+    This fixture returns the list of pairs consisting of the directory name
+    and file name of all .bkl files under tests/parsing and test/model
+    directories that have a model dump present.
+    """
+    result = []
+    for d in testdirs():
+        result += [(d, str(f)) for f in glob("%s/*.model" % d)]
+        result += [(d, str(f)) for f in glob("%s/*/*.model" % d)]
+    return result
+
+@pytest.mark.parametrize('testdir,model_file', model_filenames())
+def test_builder(testdir, model_file):
     """
     Tests Bakefile parser and compares resulting model with a copy saved
-    in .model file. Does this for all .bkl files under tests/parser directory
-    that have a model dump present.
+    in .model file.
     """
-    import test_parsing, test_model
-    paths = [os.path.dirname(test_parsing.__file__),
-             os.path.dirname(test_model.__file__)]
-    for d in paths:
-        for f in glob("%s/*.model" % d):
-            yield _test_builder_on_file, d, str(f)
-        for f in glob("%s/*/*.model" % d):
-            yield _test_builder_on_file, d, str(f)
-
-
-def _test_builder_on_file(testdir, model_file):
     assert model_file.startswith(testdir)
 
     input = os.path.splitext(model_file)[0] + '.bkl'

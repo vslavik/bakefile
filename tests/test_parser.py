@@ -28,20 +28,25 @@ from glob import glob
 
 import bkl.parser, bkl.error
 
+@pytest.fixture(scope='session')
+def testdir():
+    import test_parsing
+    return os.path.dirname(test_parsing.__file__)
 
-def test_parser():
+@pytest.fixture(scope='session')
+def ast_filenames():
+    """
+    This fixture returns the list of all .bkl files under tests/parser
+    directory that have a matching .ast present.
+    """
+    return [str(f) for f in glob("%s/*/*.ast" % testdir())]
+
+@pytest.mark.parametrize('ast_file', ast_filenames())
+def test_parser(testdir, ast_file):
     """
     Tests Bakefile parser and compares resulting AST with a copy saved
-    in .ast file. Does this for all .bkl files under tests/parser directory
-    that have .ast present.
+    in .ast file.
     """
-    import test_parsing
-    d = os.path.dirname(test_parsing.__file__)
-    for f in glob("%s/*/*.ast" % d):
-        yield _test_parser_on_file, d, str(f)
-
-
-def _test_parser_on_file(testdir, ast_file):
     assert ast_file.startswith(testdir)
 
     input = os.path.splitext(ast_file)[0] + '.bkl'
