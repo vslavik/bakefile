@@ -26,6 +26,9 @@ re-package things if necessary.
 2. Copy `.pyd` and `.exe` files from root and `src/` to the same location
    in source tree.
 
-3. Copy `lib` and Python files (including MSVC runtime DLL) into `py-runtime`.
+3. Copy `lib` and Python files (including MSVC runtime DLL and licence) into
+   `py-runtime`.
 
-4. Use Inno Setup.
+4. Copy `doc/*.html` files to `doc/html`.
+
+5. Use Inno Setup.
