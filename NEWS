@@ -1,13 +1,15 @@
 Version 0.2.11
 --------------
 
+- don't use "u" option with ar to avoid warnings from recent binutils
+- remove support for extremely obsolete platforms (OS/2, MS DOS) and compilers
+  (MetroWerks)
 - remove support for classic Mac OS resources
 
 
 Version 0.2.10
 --------------
 
-- remove support for classic Mac OS resources
 - msvc: Fix RTTI off flag (Raul Tambre)
 
 
