@@ -2,7 +2,7 @@
 #
 #  This file is part of Bakefile (http://bakefile.org)
 #
-#  Copyright (C) 2008-2013 Vaclav Slavik
+#  Copyright (C) 2008-2018 Vaclav Slavik
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -520,7 +520,7 @@ class PathExpr(Expr):
             base = paths_info.builddir_abs
         else:
             assert False, "unsupported anchor in PathExpr.as_native_path()"
-        comp = (e.as_py() for e in self.components)
+        comp = (e.as_py().encode('utf-8') for e in self.components)
         return os.path.abspath(os.path.join(base, os.path.sep.join(comp)))
 
     def as_native_path_for_output(self, model):
@@ -860,7 +860,7 @@ class PathAnchorsInfo(object):
         """
 
         self.dirsep = dirsep
-        outdir = os.path.dirname(os.path.abspath(outfile))
+        outdir = os.path.dirname(os.path.abspath(outfile.encode('utf-8')))
         self.outdir_abs = outdir
 
         top_srcdir = os.path.abspath(model.project.top_module.srcdir)
