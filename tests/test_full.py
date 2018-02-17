@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 #  This file is part of Bakefile (http://bakefile.org)
 #
@@ -96,3 +97,28 @@ expected model:
 """ % expected
 
     assert as_text == expected
+
+def test_unicode_filename():
+    """
+    This test checks that filenames relative to a directory containing
+    non-ASCII characters work correctly, see
+    https://github.com/vslavik/bakefile/issues/96
+    """
+    t = bkl.parser.parse("""
+toolsets = gnu;
+program progname {
+    sources { ../relpath.c }
+}
+""", "test.bkl")
+    i = InterpreterForTestSuite()
+
+    import shutil
+    import tempfile
+    cwd = os.getcwd()
+    tmpdir = tempfile.mkdtemp(prefix=u"Üñîçöḍè")
+    os.chdir(tmpdir)
+    try:
+        i.process(t)
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(tmpdir)
