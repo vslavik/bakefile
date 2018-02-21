@@ -115,7 +115,7 @@ program progname {
     import shutil
     import tempfile
     cwd = os.getcwd()
-    tmpdir = tempfile.mkdtemp(prefix=u"Üñîçöḍè")
+    tmpdir = tempfile.mkdtemp(prefix=u"Üñîçöḍè".encode('utf-8'))
     os.chdir(tmpdir)
     try:
         i.process(t)
