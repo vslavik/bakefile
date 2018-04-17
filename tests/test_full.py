@@ -30,6 +30,8 @@ from glob import glob
 import bkl.parser, bkl.interpreter, bkl.error
 import bkl.dumper
 
+from indir import in_directory
+
 @pytest.fixture(scope='session')
 def testdir():
     import projects
@@ -64,12 +66,8 @@ def test_full(testdir, project_file):
     model_file = os.path.splitext(project_file)[0] + '.model'
 
     f = project_file[len(testdir)+1:]
-    cwd = os.getcwd()
-    os.chdir(testdir)
-    try:
+    with in_directory(testdir):
         _do_test_on_file(f, model_file)
-    finally:
-        os.chdir(cwd)
 
 def _do_test_on_file(input, model_file):
     print 'interpreting %s' % input
@@ -116,9 +114,8 @@ program progname {
     import tempfile
     cwd = os.getcwd()
     tmpdir = tempfile.mkdtemp(prefix=u"Üñîçöḍè".encode('utf-8'))
-    os.chdir(tmpdir)
     try:
-        i.process(t)
+        with in_directory(tmpdir):
+            i.process(t)
     finally:
-        os.chdir(cwd)
         shutil.rmtree(tmpdir)

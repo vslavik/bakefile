@@ -27,6 +27,7 @@ import pytest
 from glob import glob
 
 import bkl.parser, bkl.error
+from indir import in_directory
 
 @pytest.fixture(scope='session')
 def testdir():
@@ -52,12 +53,8 @@ def test_parser(testdir, ast_file):
     input = os.path.splitext(ast_file)[0] + '.bkl'
 
     f = input[len(testdir)+1:]
-    cwd = os.getcwd()
-    os.chdir(testdir)
-    try:
+    with in_directory(testdir):
         _do_test_parser_on_file(f, ast_file)
-    finally:
-        os.chdir(cwd)
 
 
 def _do_test_parser_on_file(input, ast_file):
