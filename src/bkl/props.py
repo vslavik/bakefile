@@ -113,6 +113,7 @@ def std_target_props():
         Property("deps",
                  type=ListType(IdType()),
                  default=[],
+                 idempotent=True,
                  inheritable=False,
                  doc="""
                      Dependencies of the target (list of IDs).
