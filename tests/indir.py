@@ -1,7 +1,6 @@
-#
 #  This file is part of Bakefile (http://bakefile.org)
 #
-#  Copyright (C) 2008-2013 Vaclav Slavik
+#  Copyright (C) 2018 Vadim Zeitlin
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -22,14 +21,15 @@
 #  IN THE SOFTWARE.
 #
 
+import os
+from contextlib import contextmanager
 
-def pytest_configure(config):
-    import sys, os.path
-
-    tests_path = os.path.dirname(__file__)
-    bkl_path = os.path.normpath(os.path.join(tests_path, '..', 'src'))
-    sys.path = [bkl_path, tests_path] + sys.path
-
-    import logging
-    log_level = logging.DEBUG if config.getvalue("debug") else logging.WARNING
-    logging.basicConfig(level=log_level)
+@contextmanager
+def in_directory(path):
+    """
+    Context manager for temporarily changing the current directory.
+    """
+    cwd_orig = os.getcwd()
+    os.chdir(path)
+    yield
+    os.chdir(cwd_orig)

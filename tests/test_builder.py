@@ -28,6 +28,7 @@ from glob import glob
 
 import bkl.parser, bkl.interpreter, bkl.error
 import bkl.dumper
+from indir import in_directory
 
 @pytest.fixture(scope='session')
 def testdirs():
@@ -59,12 +60,8 @@ def test_builder(testdir, model_file):
     input = os.path.splitext(model_file)[0] + '.bkl'
 
     f = input[len(testdir)+1:]
-    cwd = os.getcwd()
-    os.chdir(testdir)
-    try:
+    with in_directory(testdir):
         _do_test_builder_on_file(f, model_file)
-    finally:
-        os.chdir(cwd)
 
 def _do_test_builder_on_file(input, model_file):
     print 'interpreting %s' % input
