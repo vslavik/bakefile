@@ -1,0 +1,16 @@
+toolsets = vs2010;
+
+vs2010.solutionfile = dup_deps.sln;
+
+library libA {
+    sources { a.c }
+}
+
+template usesA {
+    deps = libA;
+}
+
+program dup_deps : usesA {
+    deps += libA;
+    sources { dup_deps.c }
+}
