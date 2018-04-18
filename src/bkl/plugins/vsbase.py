@@ -574,9 +574,13 @@ class VSSolutionBase(object):
         if not included_projects:
             return # don't write empty solution files
 
-        configurations = OrderedSet()
+        configurations_set = set()
         for prj in all_own_projects:
-            configurations.update(prj.configurations)
+            configurations_set.update(prj.configurations)
+
+        # MSVS own projects always list configurations in alphabetical order,
+        # so do the same thing as it does.
+        configurations = sorted(configurations_set, key=lambda c: c.name.lower())
 
         platforms = OrderedSet()
         for prj in all_own_projects:
