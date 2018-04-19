@@ -232,6 +232,13 @@ class Property(object):
        derived from some other value and exist as a convenience. An example
        of read-only property is the ``id`` property on targets.
 
+    .. attribute:: idempotent
+
+       If a list property is idempotent, appending an element already existing
+       in the list does nothing, instead of adding a second copy of it. This
+       is useful for the list of the target dependencies, for example, as it's
+       not useful to depend on something more than once.
+
     .. attribute:: scopes
 
        Optional scope of the property, as list of strings. Each item may be one
@@ -284,11 +291,12 @@ class Property(object):
     SCOPE_SETTING = "setting"
 
     def __init__(self, name, type, default=None, readonly=False,
-                 inheritable=False, doc=None):
+                 idempotent=False, inheritable=False, doc=None):
         self.name = name
         self.type = type
         self.default = default
         self.readonly = readonly
+        self.idempotent = idempotent
         self.inheritable = inheritable
         self.scopes = None
         self.toolsets = None

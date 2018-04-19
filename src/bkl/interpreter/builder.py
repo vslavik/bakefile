@@ -221,10 +221,23 @@ class Builder(object, CondTrackingMixin):
             if previous_value is None:
                 # appending to inheritable list property with empty default
                 value = ListExpr(new_values)
-            elif isinstance(previous_value.value, ListExpr):
-                value = ListExpr(previous_value.value.items + new_values)
             else:
-                value = ListExpr([previous_value.value] + new_values)
+                if isinstance(previous_value.value, ListExpr):
+                    previous_values = previous_value.value.items
+                else:
+                    previous_values = [previous_value.value]
+
+                combined_values = previous_values
+                if var.idempotent:
+                    # avoid adding the items more than once
+                    for new_value in new_values:
+                        if not new_value in combined_values:
+                            combined_values.append(new_value)
+                else:
+                    combined_values.extend(new_values)
+
+                value = ListExpr(combined_values)
+
             value.pos = node.pos
             var.set_value(value)
         else:

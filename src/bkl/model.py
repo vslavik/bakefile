@@ -60,6 +60,11 @@ class Variable(object):
        Indicates if the variable is read-only. Read-only variables can only
        be assigned once and cannot be modified afterwards.
 
+    .. attribute:: idempotent
+
+       Idempotent list variables are not changed by appending an item already
+       existing in the list to them.
+
     .. attribute:: is_property
 
        Indicates if the variable corresponds to a property.
@@ -69,13 +74,15 @@ class Variable(object):
        Indicates if the value was set explicitly by the user.
        Normally true, only false for properties' default values.
     """
-    def __init__(self, name, value, type=None, readonly=False, source_pos=None):
+    def __init__(self, name, value, type=None, readonly=False,
+                 idempotent=False, source_pos=None):
         self.name = name
         if type is None:
             type = vartypes.TheAnyType
         self.type = type
         self.value = value
         self.readonly = readonly
+        self.idempotent = idempotent
         self.is_property = False
         self.is_explicitly_set = True
         self.pos = source_pos
@@ -90,7 +97,8 @@ class Variable(object):
         v = Variable(name=prop.name,
                      value=value,
                      type=prop.type,
-                     readonly=prop.readonly)
+                     readonly=prop.readonly,
+                     idempotent=prop.idempotent)
         v.is_property = True
         return v
 
