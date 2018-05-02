@@ -29,8 +29,9 @@ Implementation of 'external' target type.
 from bkl.api import Extension, Property, TargetType, FileRecognizer
 from bkl.vartypes import PathType
 from bkl.error import Error, error_context
-from bkl.plugins.vsbase import VSProjectBase, PROJECT_KIND_NET
+from bkl.plugins.vsbase import VSProjectBase, VSToolsetBase, PROJECT_KIND_NET
 from bkl.utils import memoized_property, filter_duplicates
+from bkl.vartypes import ListType, StringType
 
 import xml.etree.ElementTree
 import re
@@ -67,7 +68,7 @@ class ExternalTargetType(TargetType):
             Property("file",
                  type=PathType(),
                  inheritable=False,
-                 doc="File name of the external makefile or project."),
+                 doc="File name of the external makefile or project.")
         ]
 
     def get_build_subgraph(self, toolset, target):
@@ -98,6 +99,24 @@ class VSExternalProjectBase(VSProjectBase):
     def __init__(self, target):
         self._project = target.project
         self.projectfile = target["file"]
+
+        # Helper function to get the property value without inheriting it from
+        # the parent: needed in order to allow specifying the properties below
+        # in the external itself to override auto-detection (which is not 100%
+        # reliable), but still auto-detecting them by default otherwise.
+        def get_prop_value_from_here(target, propname):
+            var = target.get_variable(propname)
+
+            # Ignore the variables using the default value of the
+            # corresponding property: they will exist but not be explicitly
+            # set.
+            if var is None or not var.is_explicitly_set:
+                return []
+
+            return var.value.as_py()
+
+        self._archs = get_prop_value_from_here(target, "archs")
+        self._configurations = get_prop_value_from_here(target, "configurations")
         self.dependencies = []
         self.source_pos = target.source_pos
         xmldoc = xml.etree.ElementTree.parse(self.projectfile.as_native_path_for_output(target))
@@ -107,7 +126,10 @@ class VSExternalProjectBase(VSProjectBase):
     def configurations(self):
         known = self._project.configurations
         lst = []
-        for name in filter_duplicates(self._extract_configurations_names()):
+        vs_configurations = self._configurations
+        if not vs_configurations:
+            vs_configurations = filter_duplicates(self._extract_configurations_names())
+        for name in vs_configurations:
             try:
                 lst.append(known[name])
             except KeyError:
@@ -125,7 +147,10 @@ class VSExternalProjectBase(VSProjectBase):
 
     @memoized_property
     def platforms(self):
-        return list(filter_duplicates(self._extract_platforms()))
+        if self._archs:
+            return [VSToolsetBase.ARCHS_MAPPING[a] for a in self._archs]
+        else:
+            return list(filter_duplicates(self._extract_platforms()))
 
 
 class VSExternalProject200x(VSExternalProjectBase):

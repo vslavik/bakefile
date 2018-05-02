@@ -60,7 +60,7 @@ syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\|2013\|2015\|2017\)\.o
 syn keyword	bklActionProp	commands outputs contained
 
 " Properties that can occur inside external targets only.
-syn keyword	bklExtProp	file contained
+syn keyword	bklExtProp	file archs configurations contained
 
 " Properties that can only occur in the targets building something i.e.
 " program/lib/dll ones.
