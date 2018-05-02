@@ -59,6 +59,9 @@ syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\|2013\|2015\|2017\)\.o
 " Properties that can occur inside action targets only.
 syn keyword	bklActionProp	commands outputs contained
 
+" Properties that can occur inside external targets only.
+syn keyword	bklExtProp	file contained
+
 " Properties that can only occur in the targets building something i.e.
 " program/lib/dll ones.
 syn keyword	bklBuildProp	archs basename configurations contained
@@ -102,6 +105,7 @@ syn cluster	bklAnyBlock	contains=bklBlock,bklComment,bklCommentL,bklCommonProp,b
 
 syn region	bklBuildBlock	matchgroup=Normal start="\%\(\(program\|library\|shared-library\|loadable-module\|template\)\_s\+\k\+\%\(\_s*:\_s*\k\+\%\(\_s*,\_s*\k\+\)*\)\?\_s*\)\@<={" end="}" contains=@bklAnyBlock,bklBuildProp
 syn region	bklActionBlock	matchgroup=Normal start="\%\(action\_s\+\k\+\_s*\)\@<={" end="}" contains=@bklAnyBlock,bklActionProp
+syn region	bklExtBlock	matchgroup=Normal start="\%\(external\_s\+\k\+\_s*\)\@<={" end="}" contains=@bklAnyBlock,bklExtProp
 syn region	bklSettingBlock	matchgroup=Normal start="\%\(setting\_s\+\k\+\_s*\)\@<={" end="}" contains=bklSettingProp
 
 
@@ -114,6 +118,7 @@ hi def link bklCommentBoundary	bklComment
 hi def link bklCommentL		bklComment
 hi def link bklCommonProp	bklGlobalProp
 hi def link bklError		Error
+hi def link bklExtProp		bklCommonProp
 hi def link bklFilename		bklString
 hi def link bklGlobalProp	Keyword
 hi def link bklGlobalStat	Statement
