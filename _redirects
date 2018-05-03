@@ -1,0 +1,20 @@
+# redirect schema links:
+/schema/bakefile-formats    https://github.com/vslavik/bakefile/raw/legacy-0.2-branch/schema/bakefile-formats.xsd
+/schema/bakefile-gen        https://github.com/vslavik/bakefile/raw/legacy-0.2-branch/schema/bakefile-gen.xsd
+
+# rewrite URLs from the old site, with Trac:
+/doc/*              /doc_legacy/:splat
+/download.html      /
+/index.html         /
+/browser*           /
+/log*               /
+/changeset*         /
+/report*            /
+/newticket          /
+/search             /
+/timeline           /
+/query              /
+/about              /
+/wiki*              /
+/roadmap*           /
+/ticket*            /
