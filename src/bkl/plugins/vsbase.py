@@ -42,6 +42,7 @@ from bkl.api import Toolset, Property
 from bkl.model import ConfigurationProxy
 from bkl.vartypes import PathType, StringType, BoolType
 from bkl.io import OutputFile, EOL_WINDOWS
+from bkl.utils import filter_duplicates
 
 
 # Namespace constants for the GUID function
@@ -594,7 +595,12 @@ class VSSolutionBase(object):
                        (prj.kind, prj.name, self.formatter.format(prj.projectfile), str(prj.guid)))
             if prj.dependencies:
                 outf.write("\tProjectSection(ProjectDependencies) = postProject\n")
-                for d in prj.dependencies:
+                # We may happen to have duplicate dependencies, e.g. a
+                # dependency could be defined explicitly and also inherited
+                # from a base template, but we shouldn't duplicate them in the
+                # solution file as MSVS doesn't do it and would rewrite them
+                # to get rid of the duplicates if we generated them.
+                for d in filter_duplicates(prj.dependencies):
                     outf.write("\t\t{%(g)s} = {%(g)s}\n" % {'g':self._get_target_guid(d)})
                 outf.write("\tEndProjectSection\n")
             outf.write("EndProject\n")

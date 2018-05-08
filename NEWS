@@ -12,6 +12,7 @@ Bug fixes
 
 - Changing variable appearing in "source" statement of a base template
   from the derived target now works as expected.
+- Don't generate duplicate dependencies in vs201x toolset output.
 - Simplify paths involving $(builddir) in the "gnu" toolset output.
 - Generate correct warning options for "suncc" backend.
 - Fix linking shared libraries with Sun toolset, use "-lc" explicitly.

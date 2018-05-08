@@ -30,6 +30,7 @@ from bkl.io import OutputFile, EOL_WINDOWS
 
 from bkl.plugins.vsbase import *
 from bkl.expr import concat, format_string
+from bkl.utils import filter_duplicates
 
 
 class VS201xXmlFormatter(XmlFormatter):
@@ -356,7 +357,9 @@ class VS201xToolsetBase(VSToolsetBase):
         if target_deps:
             refs = Node("ItemGroup")
             root.add(refs)
-            for dep in target_deps:
+            # See comment for similar code dealing with dependencies in
+            # VSSolutionBase.write().
+            for dep in filter_duplicates(target_deps):
                 dep_prj = self.get_project_object(dep)
                 depnode = Node("ProjectReference", Include=dep_prj.projectfile)
                 depnode.add("Project", "{%s}" % dep_prj.guid.lower())
