@@ -66,15 +66,18 @@
     </template>
     <template id="__commands_templ">
         <set var="__LINK_EXE_CMD" eval="0">
-            $(__linker) -o $@ $(__objects_var) $(__ldflags_all) $(__ldlibs)
-        </set>        
+            $(file >$@.in,$(subst \,/,$(__objects_var)))
+            $(__linker) -o $@ @$@.in $(__ldflags_all) $(__ldlibs)
+        </set>
         <set var="__LINK_LIB_CMD" eval="0">
             if exist $@ del $@
-            $(AR) $(AROPTIONS) $@ $(__objects_var)
+            $(file >$@.in,$(subst \,/,$(__objects_var)))
+            $(AR) $(AROPTIONS) $@ @$@.in
             $(RANLIB) $@
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) $@ $(__objects_var) $(__ldflags_all) $(__ldlibs)
+            $(file >$@.in,$(subst \,/,$(__objects_var)))
+            $(__dll_linker) $@ @$@.in $(__ldflags_all) $(__ldlibs)
         </set>
         <set var="__LINK_MODULE_CMD" eval="0">
             $(__module_linker) $@ $(__objects_var) $(__ldflags_all) $(__ldlibs)
