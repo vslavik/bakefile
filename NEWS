@@ -1,3 +1,9 @@
+Version 0.2.12
+--------------
+
+- use response files to avoid problems with MinGW and overlong command lines
+
+
 Version 0.2.11
 --------------
 
