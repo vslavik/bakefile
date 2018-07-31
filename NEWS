@@ -1,3 +1,7 @@
+Version 0.2.12
+
+- don't give "unknown system" warning for HaikuOS (mill-j)
+
 Version 0.2.11
 --------------
 
