@@ -255,13 +255,20 @@ class VS201xToolsetBase(VSToolsetBase):
                 if libs:
                     addlibs = VSList(";", ("%s.lib" % x.as_py() for x in libs if x))
                     addlibs.append("%(AdditionalDependencies)")
-                    if is_library(target):
-                        n_lib = Node("Lib")
-                        self._add_extra_options_to_node(cfg, n_lib)
-                        n.add(n_lib)
-                        n_lib.add("AdditionalDependencies", addlibs)
-                    else:
-                        n_link.add("AdditionalDependencies", addlibs)
+                    n_link.add("AdditionalDependencies", addlibs)
+            if is_library(target):
+                n_lib = Node("Lib")
+                self._add_extra_options_to_node(cfg, n_lib)
+                n.add(n_lib)
+                libdirs = VSList(";", target["libdirs"])
+                if libdirs:
+                    libdirs.append("%(AdditionalLibraryDirectories)")
+                    n_lib.add("AdditionalLibraryDirectories", libdirs)
+                libs = target["libs"];
+                if libs:
+                    addlibs = VSList(";", ("%s.lib" % x.as_py() for x in libs if x))
+                    addlibs.append("%(AdditionalDependencies)")
+                    n_lib.add("AdditionalDependencies", addlibs)
             self._add_extra_options_to_node(cfg, n_link)
             n.add(n_link)
 
