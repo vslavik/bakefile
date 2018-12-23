@@ -64,28 +64,29 @@ def load_from_file(filename):
         raise Error("failed to load plugin %s:\n%s" % (filename, traceback.format_exc()))
 
 
-def __find_all_plugins(paths):
+def __find_all_plugins():
     """
-    Finds all Bakefile plugins in given directories that aren't loaded yet and
-    yields them.
+    Finds all Bakefile plugins and yields them.
     """
-    from os import walk
-    from os.path import splitext
-    x = []
-    for dirname in paths:
-        for root, dirs, files in walk(dirname):
-            for f in files:
-                basename, ext = splitext(f)
-                if ext != ".py":
-                    continue
-                if basename == "__init__":
-                    continue
-                x.append(basename)
-    return x
+    import pkgutil
+
+    if hasattr(sys, 'frozen'):
+        # Special handling for PyInstaller, which as of v3.4 doesn't support walk_packages
+        # (see https://github.com/pyinstaller/pyinstaller/issues/1905)
+        toc = set()
+        for importer in pkgutil.iter_importers(__name__):
+            if hasattr(importer, 'toc'):
+                toc |= importer.toc
+        for name in toc:
+            if name.startswith(__name__ + '.'):
+                yield name[len(__name__) + 1:]
+    else:
+        for _, name, _ in pkgutil.walk_packages(__path__):
+            yield name
 
 
 # import all plugins:
-__all__ = __find_all_plugins(__path__)
+__all__ = list(__find_all_plugins())
 from . import *
 assert __all__, "No plugins found - broken Bakefile installation?"
 
