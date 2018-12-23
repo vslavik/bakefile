@@ -41,7 +41,7 @@ $(BKL_EXE): build
 	rm -rf pyinstaller/_extras
 	mkdir -p pyinstaller/_extras/antlr3
 	cp -a ../3rdparty/antlr3/python-runtime/antlr3/*.py pyinstaller/_extras/antlr3
-	cd pyinstaller && python ../../3rdparty/pyinstaller/pyinstaller.py -p _extras bkl.spec
+	cd pyinstaller && pyinstaller -p _extras bkl.spec
 	rm -rf pyinstaller/_extras
 	
 	mv -f ../src/bkl/version.py.orig ../src/bkl/version.py
