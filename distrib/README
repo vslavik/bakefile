@@ -15,17 +15,21 @@ bakefile-X.Y.Z_beta-bin.tar.bz2.
 2. Making Windows distribution
 ------------------------------
 
-Ensure that you have pyinstaller submodule (which is only needed for making
-Windows distributions) and do
+1. Install a recent version of Python 2.7 (last tested with 2.7.15).
 
-       git submodule update --init 3rdparty/pyinstaller
+2. Make sure Python's Scripts directory (typically C:\Python27\Scripts) is in PATH.
 
-if necessary.
+2. Install PyInstaller:
 
-Check that upx and zip are in PATH.
+     $ pip2 install pyinstaller
 
-Run "make -C distrib distrib_win", the output file be
-bakefile-X.Y.Z_beta-win.zip
+   Or to install the 3.4 version these instructions were last tested with:
+
+     $ pip2 install pyinstaller==3.4
+
+3. Check that upx and zip are in PATH.
+
+4. Run "make -C distrib distrib_win", the output file be bakefile-X.Y.Z_beta-win.zip
 
 Notice that at one time there was an effort to produce an MSI installer for
 bakefile and its remains can be found in wix subdirectory, however the files
