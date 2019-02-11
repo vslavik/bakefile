@@ -176,6 +176,10 @@ class VS200xToolsetBase(VSToolsetBase):
     #: Whether Detect64BitPortabilityProblems is supported
     detect_64bit_problems = True
 
+    @classmethod
+    def properties_target(cls):
+        return cls.properties_target_vsbase()
+
     def gen_for_target(self, target, project):
         root = Node("VisualStudioProject")
         root["ProjectType"] = "Visual C++"

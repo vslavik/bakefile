@@ -54,6 +54,7 @@ syn keyword	bklCommonProp	vs2012.guid vs2012.projectfile contained
 syn keyword	bklCommonProp	vs2013.guid vs2013.projectfile contained
 syn keyword	bklCommonProp	vs2015.guid vs2015.projectfile contained
 syn keyword	bklCommonProp	vs2017.guid vs2017.projectfile contained
+syn keyword	bklCommonProp	vs.property-sheets contained
 syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\|2013\|2015\|2017\)\.option\(\.\w\+\)\{1,2}" contained
 
 " Properties that can occur inside action targets only.

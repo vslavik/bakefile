@@ -6,6 +6,7 @@ New Features
 
 - Add MSVS 2015 and 2017 toolsets support.
 - Allow specifying configurations/platforms for external projects.
+- Support including user-defined property sheets in MSVS 201x toolsets.
 
 Bug fixes
 ---------

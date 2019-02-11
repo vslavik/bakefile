@@ -30,6 +30,7 @@ from bkl.io import OutputFile, EOL_WINDOWS
 
 from bkl.plugins.vsbase import *
 from bkl.expr import concat, format_string
+from bkl.vartypes import ListType, PathType
 
 
 class VS201xXmlFormatter(XmlFormatter):
@@ -73,6 +74,25 @@ class VS201xToolsetBase(VSToolsetBase):
 
     #: ToolsVersion property
     tools_version = "4.0"
+
+    properties_target_vs201x = [
+            Property("vs.property-sheets",
+                     type=ListType(PathType()),
+                     default=bkl.expr.NullExpr(),
+                     inheritable=False,
+                     doc="""
+                         May contain paths to one or more property sheets files
+                         that will be imported from the generated project if they
+                         exist.
+                         """)
+        ]
+
+    @classmethod
+    def properties_target(cls):
+        for p in cls.properties_target_vsbase():
+            yield p
+        for p in cls.properties_target_vs201x:
+            yield p
 
     def gen_for_target(self, target, project):
         rc_files = []
@@ -144,6 +164,17 @@ class VS201xToolsetBase(VSToolsetBase):
                   Project="$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props",
                   Condition="exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')",
                   Label="LocalAppDataPlatform")
+
+            for property_sheet in cfg["vs.property-sheets"]:
+                # For now, always add exists() condition unconditionally as
+                # it's often useful to have it, but we don't provide any way
+                # to request it explicitly and not having it would be more
+                # problematic than using it unnecessarily (which is not really
+                # a problem in practice).
+                n.add("Import",
+                      Project=property_sheet,
+                      Condition=concat("exists('", property_sheet, "')"))
+
             root.add(n)
 
         root.add("PropertyGroup", Label="UserMacros")
