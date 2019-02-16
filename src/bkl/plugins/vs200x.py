@@ -178,8 +178,7 @@ class VS200xToolsetBase(VSToolsetBase):
 
     @classmethod
     def properties_target(cls):
-        for p in cls.properties_target_vsbase():
-            yield p
+        return cls.properties_target_vsbase()
 
     def gen_for_target(self, target, project):
         root = Node("VisualStudioProject")
