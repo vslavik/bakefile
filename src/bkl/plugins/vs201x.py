@@ -75,24 +75,24 @@ class VS201xToolsetBase(VSToolsetBase):
     #: ToolsVersion property
     tools_version = "4.0"
 
-    property_sheets_property_defined = False
+    properties_target_vs = [
+            Property("vs.property-sheets",
+                     type=ListType(PathType()),
+                     default=bkl.expr.NullExpr(),
+                     inheritable=False,
+                     doc="""
+                         May contain paths to one or more property sheets files
+                         that will be imported from the generated project if they
+                         exist.
+                         """)
+        ]
 
     @classmethod
     def properties_target(cls):
         for p in cls.properties_target_vsbase():
             yield p
-
-        if not VS201xToolsetBase.property_sheets_property_defined:
-            VS201xToolsetBase.property_sheets_property_defined = True
-            yield Property("vs.property-sheets",
-                    type=ListType(PathType()),
-                    default=bkl.expr.NullExpr(),
-                    inheritable=False,
-                    doc="""
-                        May contain paths to one or more property sheets files
-                        that will be imported from the generated project if they
-                        exist.
-                        """)
+        for p in cls.properties_target_vs:
+            yield p
 
     def gen_for_target(self, target, project):
         rc_files = []
