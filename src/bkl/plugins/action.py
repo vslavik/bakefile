@@ -43,6 +43,12 @@ class ActionTargetType(TargetType):
     ``pre-build-commands`` and ``post-build-commands`` properties for another
     alternative that is supported by Visual Studio projects.
 
+    The optional ``inputs`` property may be used to specify the list of file
+    paths that the makefile target generated for this action should depend on.
+    Notice that if the action depends on another target defined in the
+    bakefile, this should be specified in ``deps``, as for any other kind of
+    target and not in ``inputs``.
+
     If the optional ``outputs`` property is specified, the action is supposed
     to generate the files listed in this property. This means that other
     targets depending on this action will depend on these files in the
@@ -69,6 +75,12 @@ class ActionTargetType(TargetType):
                  inheritable=False,
                  doc="List of commands to run."),
 
+            Property("inputs",
+                 type=ListType(PathType()),
+                 default=expr.NullExpr(),
+                 inheritable=False,
+                 doc="Extra input files this action depends on, if any."),
+
             Property("outputs",
                  type=ListType(PathType()),
                  default=expr.NullExpr(),
@@ -82,6 +94,7 @@ class ActionTargetType(TargetType):
         cmds = add_prefix("@", cmds_var)
         node = BuildNode(commands=list(cmds),
                          name=target["id"],
+                         inputs=target["inputs"],
                          outputs=target["outputs"],
                          source_pos=cmds_var.pos)
         return BuildSubgraph(node)

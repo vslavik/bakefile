@@ -8,6 +8,7 @@ action hello {
 
 action build-external-lib {
     commands = "make -C external-dir";
+    inputs = external-dir/Makefile;
     outputs = external-dir/libexternal.so;
 }
 

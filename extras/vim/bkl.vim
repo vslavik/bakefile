@@ -58,7 +58,7 @@ syn keyword	bklCommonProp	vs.property-sheets contained
 syn match	bklCommonProp	"vs\(2003\|2005\|2008\|2010\|2012\|2013\|2015\|2017\)\.option\(\.\w\+\)\{1,2}" contained
 
 " Properties that can occur inside action targets only.
-syn keyword	bklActionProp	commands outputs contained
+syn keyword	bklActionProp	commands inputs outputs contained
 
 " Properties that can occur inside external targets only.
 syn keyword	bklExtProp	file archs configurations contained

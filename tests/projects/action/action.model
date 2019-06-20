@@ -8,6 +8,7 @@ module {
     }
     action build-external-lib {
       commands = [make -C external-dir]
+      inputs = [@top_srcdir/external-dir/Makefile]
       outputs = [@top_srcdir/external-dir/libexternal.so]
     }
     program main {
