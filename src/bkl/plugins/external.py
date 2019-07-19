@@ -195,7 +195,9 @@ class VSExternalProject201x(VSExternalProjectBase):
     @memoized_property
     def version(self):
         v = self.xml.get("ToolsVersion")
-        if v == "14.0":
+        if v == "15.0":
+            return 15
+        elif v == "14.0":
             return 14
         elif v == "12.0":
             return 12
