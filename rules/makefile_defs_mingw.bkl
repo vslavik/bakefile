@@ -67,13 +67,13 @@
     <template id="__commands_templ">
         <set var="__LINK_EXE_CMD" eval="0">
             $(DOLLAR)(foreach f,$(DOLLAR)(subst &#92;,&#47;,$(__objects_var)),$(DOLLAR)(shell echo $(DOLLAR)f &gt;&gt; $(DOLLAR)(subst &#92;,&#47;,$@).rsp.tmp))
-            @move /y $@.rsp.tmp $@.rsp
+            @move /y $@.rsp.tmp $@.rsp >nul
             $(__linker) -o $@ @$@.rsp $(__ldflags_all) $(__ldlibs)
             @$(RM) $@.rsp
         </set>
         <set var="__LINK_LIB_CMD" eval="0">
             $(DOLLAR)(foreach f,$(DOLLAR)(subst &#92;,&#47;,$(__objects_var)),$(DOLLAR)(shell echo $(DOLLAR)f &gt;&gt; $(DOLLAR)(subst &#92;,&#47;,$@).rsp.tmp))
-            @move /y $@.rsp.tmp $@.rsp
+            @move /y $@.rsp.tmp $@.rsp >nul
             if exist $@ del $@
             $(AR) $(AROPTIONS) $@ @$@.rsp
             @$(RM) $@.rsp
@@ -81,7 +81,7 @@
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
             $(DOLLAR)(foreach f,$(DOLLAR)(subst &#92;,&#47;,$(__objects_var)),$(DOLLAR)(shell echo $(DOLLAR)f &gt;&gt; $(DOLLAR)(subst &#92;,&#47;,$@).rsp.tmp))
-            @move /y $@.rsp.tmp $@.rsp
+            @move /y $@.rsp.tmp $@.rsp >nul
             $(__dll_linker) $@ @$@.rsp $(__ldflags_all) $(__ldlibs)
             @$(RM) $@.rsp
         </set>
