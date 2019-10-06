@@ -27,10 +27,10 @@
 
 -->
 <makefile>
-    
+
     <include file="win32.bkl"/>
     <include file="makefile_defs_gnu.bkl"/>
-    
+
     <set var="AR">ar</set>
     <set var="RANLIB">ranlib</set>
     <set var="WINDRES">windres --use-temp-file</set>
@@ -41,16 +41,16 @@
     <set var="DLLIMPEXT">.a</set>
     <set var="DLLPREFIX"></set>
     <set var="PIC_CFLAGS"></set>
-    
+
     <set var="__LINKER_CC" eval="0">$(CC)</set>
     <set var="__LINKER_CXX" eval="0">$(CXX)</set>
-    
+
     <set var="__FLAG_MULTI_THREADING_LD">-mthreads</set>
     <set var="__FLAG_MULTI_THREADING_CPP">-mthreads</set>
 
     <set var="__FLAG_EXE_CONSOLE"></set>
     <set var="__FLAG_EXE_GUI">-Wl,--subsystem,windows -mwindows</set>
-    
+
     <!-- dependency tracking: -->
     <set var="CPPDEPS" make_var="1">-MT$(DOLLAR)@ -MF$(DOLLAR)@.d -MD -MP</set>
 
@@ -66,15 +66,24 @@
     </template>
     <template id="__commands_templ">
         <set var="__LINK_EXE_CMD" eval="0">
-            $(__linker) -o $@ $(__objects_var) $(__ldflags_all) $(__ldlibs)
-        </set>        
+            $(DOLLAR)(foreach f,$(DOLLAR)(subst &#92;,&#47;,$(__objects_var)),$(DOLLAR)(shell echo $(DOLLAR)f &gt;&gt; $(DOLLAR)(subst &#92;,&#47;,$@).rsp.tmp))
+            @move /y $@.rsp.tmp $@.rsp >nul
+            $(__linker) -o $@ @$@.rsp $(__ldflags_all) $(__ldlibs)
+            @$(RM) $@.rsp
+        </set>
         <set var="__LINK_LIB_CMD" eval="0">
+            $(DOLLAR)(foreach f,$(DOLLAR)(subst &#92;,&#47;,$(__objects_var)),$(DOLLAR)(shell echo $(DOLLAR)f &gt;&gt; $(DOLLAR)(subst &#92;,&#47;,$@).rsp.tmp))
+            @move /y $@.rsp.tmp $@.rsp >nul
             if exist $@ del $@
-            $(AR) $(AROPTIONS) $@ $(__objects_var)
+            $(AR) $(AROPTIONS) $@ @$@.rsp
+            @$(RM) $@.rsp
             $(RANLIB) $@
         </set>
         <set var="__LINK_DLL_CMD" eval="0">
-            $(__dll_linker) $@ $(__objects_var) $(__ldflags_all) $(__ldlibs)
+            $(DOLLAR)(foreach f,$(DOLLAR)(subst &#92;,&#47;,$(__objects_var)),$(DOLLAR)(shell echo $(DOLLAR)f &gt;&gt; $(DOLLAR)(subst &#92;,&#47;,$@).rsp.tmp))
+            @move /y $@.rsp.tmp $@.rsp >nul
+            $(__dll_linker) $@ @$@.rsp $(__ldflags_all) $(__ldlibs)
+            @$(RM) $@.rsp
         </set>
         <set var="__LINK_MODULE_CMD" eval="0">
             $(__module_linker) $@ $(__objects_var) $(__ldflags_all) $(__ldlibs)

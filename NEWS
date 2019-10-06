@@ -1,6 +1,10 @@
 Version 0.2.12
+--------------
 
+- use response files to avoid problems with MinGW and overlong command lines
+  (Jannick)
 - don't give "unknown system" warning for HaikuOS (mill-j)
+
 
 Version 0.2.11
 --------------
