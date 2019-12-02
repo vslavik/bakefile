@@ -219,7 +219,7 @@ class VS201xToolsetBase(VSToolsetBase):
             n_cl.add("PreprocessorDefinitions", list(cfg["defines"]) + std_defs)
             n_cl.add("MultiProcessorCompilation", True)
             n_cl.add("MinimalRebuild", False)
-            n_cl.add("AdditionalIncludeDirectories", cfg["includedirs"])
+            n_cl.add_with_default("AdditionalIncludeDirectories", cfg["includedirs"])
 
             crt = "MultiThreaded"
             if cfg.is_debug:
@@ -244,7 +244,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
             if rc_files:
                 n_res = Node("ResourceCompile")
-                n_res.add("AdditionalIncludeDirectories", cfg["includedirs"])
+                n_res.add_with_default("AdditionalIncludeDirectories", cfg["includedirs"])
                 std_defs = []
                 if cfg["win32-unicode"]:
                     std_defs.append("_UNICODE")
@@ -260,7 +260,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
             if idl_files:
                 n_idl = Node("Midl")
-                n_idl.add("AdditionalIncludeDirectories", cfg["includedirs"])
+                n_idl.add_with_default("AdditionalIncludeDirectories", cfg["includedirs"])
                 self._add_extra_options_to_node(cfg, n_idl)
                 n.add(n_idl)
 
