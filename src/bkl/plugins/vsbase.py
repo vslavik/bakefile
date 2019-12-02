@@ -153,7 +153,10 @@ class Node(object):
             # If there is no value at all, there is no need to add anything.
             return
 
-        value_with_def = list(value)
+        if isinstance(value, VSList):
+            value_with_def = VSList(value.list_sep, value.items)
+        else:
+            value_with_def = list(value)
         value_with_def.append('%%(%s)' % name)
 
         self.children.append((name, value_with_def))
