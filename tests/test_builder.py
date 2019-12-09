@@ -30,16 +30,14 @@ import bkl.parser, bkl.interpreter, bkl.error
 import bkl.dumper
 from indir import in_directory
 
-@pytest.fixture(scope='session')
 def testdirs():
     import test_parsing, test_model
     return [os.path.dirname(test_parsing.__file__),
             os.path.dirname(test_model.__file__)]
 
-@pytest.fixture(scope='session')
 def model_filenames():
     """
-    This fixture returns the list of pairs consisting of the directory name
+    This function returns the list of pairs consisting of the directory name
     and file name of all .bkl files under tests/parsing and test/model
     directories that have a model dump present.
     """

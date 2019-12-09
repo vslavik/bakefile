@@ -29,18 +29,20 @@ from glob import glob
 import bkl.parser, bkl.error
 from indir import in_directory
 
-@pytest.fixture(scope='session')
-def testdir():
+def do_get_testdir():
     import test_parsing
     return os.path.dirname(test_parsing.__file__)
 
 @pytest.fixture(scope='session')
+def testdir():
+    return do_get_testdir()
+
 def ast_filenames():
     """
     This fixture returns the list of all .bkl files under tests/parser
     directory that have a matching .ast present.
     """
-    return [str(f) for f in glob("%s/*/*.ast" % testdir())]
+    return [str(f) for f in glob("%s/*/*.ast" % do_get_testdir())]
 
 @pytest.mark.parametrize('ast_file', ast_filenames())
 def test_parser(testdir, ast_file):

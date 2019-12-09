@@ -32,19 +32,21 @@ import bkl.dumper
 
 from indir import in_directory
 
-@pytest.fixture(scope='session')
-def testdir():
+def do_get_testdir():
     import projects
     return os.path.dirname(projects.__file__)
 
 @pytest.fixture(scope='session')
+def testdir():
+    return do_get_testdir()
+
 def project_filenames():
     """
-    This fixture returns the list of all .bkl files under tests/projects
+    This function returns the list of all .bkl files under tests/projects
     directory.
     """
-    return ([str(f) for f in glob("%s/*.bkl" % testdir())] +
-            [str(f) for f in glob("%s/*/*.bkl" % testdir())])
+    return ([str(f) for f in glob("%s/*.bkl" % do_get_testdir())] +
+            [str(f) for f in glob("%s/*/*.bkl" % do_get_testdir())])
 
 class InterpreterForTestSuite(bkl.interpreter.Interpreter):
     def generate(self):
