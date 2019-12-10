@@ -215,11 +215,10 @@ class VS201xToolsetBase(VSToolsetBase):
                 n_cl.add("FunctionLevelLinking", True)
                 n_cl.add("IntrinsicFunctions", True)
             std_defs = self.get_std_defines(target, cfg)
-            std_defs.append("%(PreprocessorDefinitions)")
-            n_cl.add("PreprocessorDefinitions", list(cfg["defines"]) + std_defs)
+            n_cl.add_with_default("PreprocessorDefinitions", list(cfg["defines"]) + std_defs)
             n_cl.add("MultiProcessorCompilation", True)
             n_cl.add("MinimalRebuild", False)
-            n_cl.add("AdditionalIncludeDirectories", cfg["includedirs"])
+            n_cl.add_with_default("AdditionalIncludeDirectories", cfg["includedirs"])
 
             crt = "MultiThreaded"
             if cfg.is_debug:
@@ -235,16 +234,14 @@ class VS201xToolsetBase(VSToolsetBase):
             all_cflags = VSList(" ", cfg["compiler-options"],
                                      cfg["c-compiler-options"],
                                      cfg["cxx-compiler-options"])
-            if all_cflags:
-                all_cflags.append("%(AdditionalOptions)")
-                n_cl.add("AdditionalOptions", all_cflags)
+            n_cl.add_with_default("AdditionalOptions", all_cflags)
 
             self._add_extra_options_to_node(cfg, n_cl)
             n.add(n_cl)
 
             if rc_files:
                 n_res = Node("ResourceCompile")
-                n_res.add("AdditionalIncludeDirectories", cfg["includedirs"])
+                n_res.add_with_default("AdditionalIncludeDirectories", cfg["includedirs"])
                 std_defs = []
                 if cfg["win32-unicode"]:
                     std_defs.append("_UNICODE")
@@ -253,14 +250,13 @@ class VS201xToolsetBase(VSToolsetBase):
                 # the explanation of why do we do this even though the native
                 # projects don't define _DEBUG/NDEBUG for the RC files.
                 std_defs.append("_DEBUG" if cfg.is_debug else "NDEBUG")
-                std_defs.append("%(PreprocessorDefinitions)")
-                n_res.add("PreprocessorDefinitions", list(cfg["defines"]) + std_defs)
+                n_res.add_with_default("PreprocessorDefinitions", list(cfg["defines"]) + std_defs)
                 self._add_extra_options_to_node(cfg, n_res)
                 n.add(n_res)
 
             if idl_files:
                 n_idl = Node("Midl")
-                n_idl.add("AdditionalIncludeDirectories", cfg["includedirs"])
+                n_idl.add_with_default("AdditionalIncludeDirectories", cfg["includedirs"])
                 self._add_extra_options_to_node(cfg, n_idl)
                 n.add(n_idl)
 
@@ -275,24 +271,19 @@ class VS201xToolsetBase(VSToolsetBase):
                 n_link.add("OptimizeReferences", True)
             if not is_library(target):
                 libdirs = VSList(";", target.type.get_libdirs(cfg))
-                if libdirs:
-                    libdirs.append("%(AdditionalLibraryDirectories)")
-                    n_link.add("AdditionalLibraryDirectories", libdirs)
+                n_link.add_with_default("AdditionalLibraryDirectories", libdirs)
                 ldflags = VSList(" ", target.type.get_link_options(cfg))
-                if ldflags:
-                    ldflags.append("%(AdditionalOptions)")
-                    n_link.add("AdditionalOptions", ldflags)
+                n_link.add_with_default("AdditionalOptions", ldflags)
                 libs = target.type.get_ldlibs(cfg)
                 if libs:
                     addlibs = VSList(";", ("%s.lib" % x.as_py() for x in libs if x))
-                    addlibs.append("%(AdditionalDependencies)")
                     if is_library(target):
                         n_lib = Node("Lib")
                         self._add_extra_options_to_node(cfg, n_lib)
                         n.add(n_lib)
-                        n_lib.add("AdditionalDependencies", addlibs)
+                        n_lib.add_with_default("AdditionalDependencies", addlibs)
                     else:
-                        n_link.add("AdditionalDependencies", addlibs)
+                        n_link.add_with_default("AdditionalDependencies", addlibs)
             self._add_extra_options_to_node(cfg, n_link)
             n.add(n_link)
 

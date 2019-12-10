@@ -137,6 +137,30 @@ class Node(object):
                     return
         assert 0, "add() is confused: what are you trying to do?"
 
+    def add_with_default(self, name, value):
+        """
+        Add an element with the given value and the default element value.
+
+        This produces output of the form "<Foo>our-value-of-foo;%(Foo)</Foo>"
+        in the generated project file, which is desirable as it preserves any
+        changes to this property in the previously included property sheets.
+
+        Additionally, if the value is empty, this method doesn't do anything
+        at all as using empty value followed by the current value of the
+        property is equivalent to doing nothing in any case.
+        """
+        if not value:
+            # If there is no value at all, there is no need to add anything.
+            return
+
+        if isinstance(value, VSList):
+            value_with_def = VSList(value.list_sep, value.items)
+        else:
+            value_with_def = list(value)
+        value_with_def.append('%%(%s)' % name)
+
+        self.children.append((name, value_with_def))
+
     def add_or_replace(self, name, value):
         """
         Add a child to this node, replacing the existing child with the same
