@@ -219,10 +219,24 @@ class GnuLinker(GnuFileCompiler):
         output file to generate while extra_flags contain other options. This
         separation is relatively arbitrary and just makes the code using this
         function more convenient to write.
+
+        Notice that if output_flags is specified, we also automatically append
+        the necessary linked flags to allow, or disallow, undefined symbols in
+        output. This is again just a convenience, as this is only needed by those
+        callers of this function that use output_flags.
         """
         cmd = [LiteralExpr("$(CXX)")]
         if output_flags:
             cmd.append(LiteralExpr(output_flags))
+
+            if target["allow-undefined"]:
+                undefined_link_flag = toolset.allow_undefined_link_flag
+            else:
+                undefined_link_flag = toolset.disallow_undefined_link_flag
+
+            if undefined_link_flag:
+                cmd.append(LiteralExpr(undefined_link_flag))
+
         cmd.append(LiteralExpr("-o $@"))
         if extra_flags:
             cmd.append(LiteralExpr(extra_flags))
@@ -394,14 +408,17 @@ class GnuToolset(MakefileToolset):
 
     object_type = GnuObjectFileType.get()
 
+    allow_undefined_link_flag = "" # This is the default
+    disallow_undefined_link_flag = "-Wl,-z,defs"
+
     library_prefix = "lib"
     library_extension = "a"
     shared_library_prefix = "lib"
     shared_library_extension = "so"
-    shared_library_link_flag = "-shared -Wl,-z,defs"
+    shared_library_link_flag = "-shared"
     loadable_module_prefix = ""
     loadable_module_extension = "so"
-    loadable_module_link_flag = "-shared -Wl,-z,defs"
+    loadable_module_link_flag = "-shared"
 
     deps_flags = GCC_DEPS_FLAGS
     pic_flags = "-fPIC -DPIC"
@@ -609,9 +626,10 @@ class OSXGnuToolset(GnuToolset):
 
     default_makefile = "Makefile.osx"
 
+    allow_undefined_link_flag = "-undefined dynamic_lookup"
+    disallow_undefined_link_flag = "" # This is the default
+
     shared_library_extension = "dylib"
-    # "-z defs" is not supported by OS X linker, the corresponding option is
-    # "-undefined error" but it is the default anyhow
     shared_library_link_flag = "-shared"
     loadable_module_extension = "bundle"
     loadable_module_link_flag = "-bundle"
@@ -649,7 +667,10 @@ class SunCCGnuToolset(GnuToolset):
     # (and as we can't know whether it is or not, it is better to always
     # include it ending up with an unused library rather than not include it
     # and ending up with broken build).
-    shared_library_link_flag  = "-G -Kpic -z defs -lm -lc"
+    allow_undefined_link_flag = ""
+    disallow_undefined_link_flag = "-z defs -lm -lc"
+
+    shared_library_link_flag  = "-G -Kpic"
     loadable_module_link_flag = shared_library_link_flag
 
     deps_flags = "-xMD"

@@ -8,6 +8,7 @@ New Features
 - Allow specifying configurations/platforms for external projects.
 - Support including user-defined property sheets in MSVS 201x toolsets.
 - Add "inputs" property for action targets.
+- Add "allow-undefined" target property.
 
 Bug fixes
 ---------
