@@ -205,7 +205,7 @@ class NativeCompiledType(TargetType):
                      """),
             Property("allow-undefined",
                  type=BoolType(),
-                 default=lambda target: target.type.link_allow_undefined,
+                 default=False,
                  inheritable=True,
                  doc="""
                      Allow undefined symbols when linking.
@@ -238,8 +238,6 @@ class NativeCompiledType(TargetType):
         ]
 
     use_pic_by_default = True
-
-    link_allow_undefined = False
 
     def target_file(self, toolset, target):
         """
