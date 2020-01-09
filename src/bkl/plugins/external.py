@@ -190,12 +190,14 @@ class VSExternalProject200x(VSExternalProjectBase):
 
 class VSExternalProject201x(VSExternalProjectBase):
     """
-    Wrapper around VS 2010/2012/2013/2015 project files.
+    Wrapper around VS 201x project files.
     """
     @memoized_property
     def version(self):
         v = self.xml.get("ToolsVersion")
-        if v == "15.0":
+        if v == "16.0":
+            return 16
+        elif v == "15.0":
             return 15
         elif v == "14.0":
             return 14

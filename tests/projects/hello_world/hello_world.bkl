@@ -1,4 +1,4 @@
-toolsets = gnu gnu-osx gnu-suncc vs2003 vs2005 vs2008 vs2010 vs2012 vs2013 vs2015 vs2017;
+toolsets = gnu gnu-osx gnu-suncc vs2003 vs2005 vs2008 vs2010 vs2012 vs2013 vs2015 vs2017 vs2019;
 
 vs2003.solutionfile = hello_world_vs2003.sln;
 vs2005.solutionfile = hello_world_vs2005.sln;
@@ -8,6 +8,7 @@ vs2012.solutionfile = hello_world_vs2012.sln;
 vs2013.solutionfile = hello_world_vs2013.sln;
 vs2015.solutionfile = hello_world_vs2015.sln;
 vs2017.solutionfile = hello_world_vs2017.sln;
+vs2019.solutionfile = hello_world_vs2019.sln;
 
 program hello {
     archs = x86 x86_64;
@@ -22,4 +23,5 @@ program hello {
     vs2013.projectfile = hello_vs2013.vcxproj;
     vs2015.projectfile = hello_vs2015.vcxproj;
     vs2017.projectfile = hello_vs2017.vcxproj;
+    vs2019.projectfile = hello_vs2019.vcxproj;
 }
