@@ -4,6 +4,7 @@ Version 0.2.12
 - use response files to avoid problems with MinGW and overlong command lines
   (Jannick)
 - don't give "unknown system" warning for HaikuOS (mill-j)
+- define INSTALL_SCRIPT to avoid problems when installing scripts under NetBSD
 
 
 Version 0.2.11
