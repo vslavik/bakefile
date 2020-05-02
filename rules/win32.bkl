@@ -100,6 +100,7 @@
     <set var="RM">-del</set>
 
     <set var="INSTALL_PROGRAM">copy /Y</set>
+    <set var="INSTALL_SCRIPT">$(INSTALL_PROGRAM)</set>
     <set var="INSTALL_DATA">$(INSTALL_PROGRAM)</set>
     
     <!-- trying to create an existing directory will fail... thus we must ignore

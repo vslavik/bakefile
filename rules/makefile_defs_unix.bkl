@@ -53,6 +53,7 @@
    <set var="RM">rm -f</set>
 
     <set var="INSTALL_PROGRAM" overwrite="0">install -c</set>
+    <set var="INSTALL_SCRIPT" overwrite="0">$(INSTALL_PROGRAM)</set>
     <set var="INSTALL_DATA" overwrite="0">$(INSTALL) -m 644</set>
     <set var="INSTALL_DIR" overwrite="0">$(INSTALL) -d</set>
 

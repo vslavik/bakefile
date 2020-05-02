@@ -57,6 +57,7 @@
     <option name="NM"/>
     <option name="INSTALL"/>
     <option name="INSTALL_PROGRAM"/>
+    <option name="INSTALL_SCRIPT"/>
     <option name="INSTALL_DATA"/>
     <option name="INSTALL_DIR"/>
 

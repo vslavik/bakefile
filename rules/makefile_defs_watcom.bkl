@@ -93,6 +93,7 @@
         <set var="RM">-del</set>
 
         <set var="INSTALL_PROGRAM">copy /Y</set>
+        <set var="INSTALL_SCRIPT">$(INSTALL_PROGRAM)</set>
         <set var="INSTALL_DATA">$(INSTALL_PROGRAM)</set>
         <set var="UNINSTALL_PROGRAM">$(RM)</set>
         <set var="UNINSTALL_DATA">$(UNINSTALL_PROGRAM)</set>
