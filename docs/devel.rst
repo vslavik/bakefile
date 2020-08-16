@@ -34,7 +34,7 @@ example, here is a complete example of a plugin:
         properties_project = [
             Property("MY_VERSION",
                      type=StringType(),
-                     default=data.today().isoformat(),
+                     default=date.today().isoformat(),
                      inheritable=False,
                      readonly=True),
         ]
