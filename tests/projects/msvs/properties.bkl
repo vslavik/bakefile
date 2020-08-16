@@ -1,0 +1,11 @@
+toolsets = vs2017;
+
+vs.property-sheets = common.props;
+
+program hello {
+    vs.property-sheets += hello.props;
+}
+
+program bye {
+    vs.property-sheets = bye; // override common.props
+}

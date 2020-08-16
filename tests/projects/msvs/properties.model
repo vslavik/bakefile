@@ -1,0 +1,14 @@
+module {
+  variables {
+    toolsets = [vs2017]
+    vs.property-sheets = [@top_srcdir/common.props]
+  }
+  targets {
+    program hello {
+      vs.property-sheets = [@top_srcdir/common.props, @top_srcdir/hello.props]
+    }
+    program bye {
+      vs.property-sheets = [@top_srcdir/bye]
+    }
+  }
+}
