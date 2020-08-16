@@ -79,7 +79,7 @@ class VS201xToolsetBase(VSToolsetBase):
             Property("vs.property-sheets",
                      type=ListType(PathType()),
                      default=bkl.expr.NullExpr(),
-                     inheritable=False,
+                     inheritable=True,
                      doc="""
                          May contain paths to one or more property sheets files
                          that will be imported from the generated project if they
