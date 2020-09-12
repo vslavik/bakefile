@@ -4,7 +4,7 @@ v1.2.6 (????-??-??)
 New Features
 ------------
 
-- Add MSVS 2015 and 2017 toolsets support.
+- Add MSVS 2015, 2017 and 2019 toolsets support.
 - Allow specifying configurations/platforms for external projects.
 - Support including user-defined property sheets in MSVS 201x toolsets.
 - Add "inputs" property for action targets.
