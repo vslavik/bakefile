@@ -453,6 +453,20 @@ class VSProjectBase(object):
     source_pos = None
 
 
+class VSSolutionNull(object):
+    """
+    Dummy solution class not doing anything.
+
+    This is useful to avoid testing whether we need to generate the solution
+    file or not in multiple places: instead, we do it just once and use this
+    "null" solution object if we don't need to do anything.
+    """
+
+    def add_project(self, prj): pass
+    def add_subsolution(self, subsol): pass
+    def write(self): pass
+
+
 class VSSolutionBase(object):
     """
     Base class for a representation of a Visual Studio solution file.
@@ -480,12 +494,8 @@ class VSSolutionBase(object):
                                     builddir=None,
                                     model=module)
         self.formatter = VSExprFormatter(module.project.settings, paths_info)
-        self.generate_outf = module["%s.generate-solution" % toolset.name]
-        if self.generate_outf:
-            self.outf = OutputFile(slnfile, EOL_WINDOWS,
-                                   creator=toolset, create_for=module)
-        else:
-            self.outf = None
+        self.outf = OutputFile(slnfile, EOL_WINDOWS,
+                               creator=toolset, create_for=module)
 
     def add_project(self, prj):
         """
@@ -585,8 +595,6 @@ class VSSolutionBase(object):
 
     def write(self):
         """Writes the solution to the file."""
-        if not self.generate_outf:
-            return # silently do nothing
         outf = self.outf
         self.write_header(outf)
 
@@ -791,8 +799,12 @@ class VSToolsetBase(Toolset):
 
 
     def gen_for_module(self, module):
-        # attach VS2010-specific data to the model
-        module.solution = self.Solution(self, module)
+        # create the actual solution object or a special dummy one if we don't
+        # need to generate any solution at all
+        if module["%s.generate-solution" % self.name]:
+            module.solution = self.Solution(self, module)
+        else:
+            module.solution = VSSolutionNull()
 
         for t in module.targets.itervalues():
             with error_context(t):
