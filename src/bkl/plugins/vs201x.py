@@ -75,7 +75,7 @@ class VS201xToolsetBase(VSToolsetBase):
     #: ToolsVersion property
     tools_version = "4.0"
 
-    properties_target_vs201x = [
+    vs201x_target_properties = [
             Property("vs.property-sheets",
                      type=ListType(PathType()),
                      default=bkl.expr.NullExpr(),
@@ -89,9 +89,9 @@ class VS201xToolsetBase(VSToolsetBase):
 
     @classmethod
     def properties_target(cls):
-        for p in cls.properties_target_vsbase():
+        for p in cls.vsbase_target_properties():
             yield p
-        for p in cls.properties_target_vs201x:
+        for p in cls.vs201x_target_properties:
             yield p
 
     def gen_for_target(self, target, project):

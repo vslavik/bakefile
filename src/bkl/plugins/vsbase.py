@@ -744,7 +744,7 @@ class VSToolsetBase(Toolset):
     loadable_module_extension = "dll"
 
     @classmethod
-    def properties_target_vsbase(cls):
+    def vsbase_target_properties(cls):
         yield Property("%s.projectfile" % cls.name,
                        type=PathType(),
                        default=update_wrapper(partial(_project_name_from_solution, cls), _project_name_from_solution),
