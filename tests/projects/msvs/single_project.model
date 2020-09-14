@@ -1,0 +1,14 @@
+module {
+  variables {
+    toolsets = [msvs]
+    msvs2017.solutionfile = @top_srcdir/single_project_141.sln
+    msvs2019.solutionfile = @top_srcdir/single_project_142.sln
+  }
+  targets {
+    program single_project {
+      sources {
+        file @top_srcdir/single_project.cpp
+      }
+    }
+  }
+}

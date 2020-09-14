@@ -480,8 +480,8 @@ class VSSolutionBase(object):
     #: ...and in the comment under it (2005 and up)
     human_version = None
 
-    def __init__(self, toolset, module):
-        slnfile = module["%s.solutionfile" % toolset.name].as_native_path_for_output(module)
+    def __init__(self, toolset, module, slnprop):
+        slnfile = slnprop.as_native_path_for_output(module)
         self.name = module.name
         # unlike targets, modules' names aren't globally unique, so use the fully qualified name, which is
         self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.fully_qualified_name)
@@ -720,10 +720,14 @@ def _default_solution_name(module):
 
 def _project_name_from_solution(toolset_class, target):
     """``$(id).vcxproj`` in the same directory as the ``.sln`` file"""
-    sln = target["%s.solutionfile" % toolset_class.name]
     proj_ext = toolset_class.proj_extension
-    return bkl.expr.PathExpr(sln.components[:-1] +
-                             [bkl.expr.LiteralExpr("%s.%s" % (target.name, proj_ext))],
+    proj_basename = bkl.expr.LiteralExpr("%s.%s" % (target.name, proj_ext))
+
+    sln = target.get_prop("%s.solutionfile" % toolset_class.name)
+    if sln is None:
+        return bkl.expr.PathExpr([proj_basename])
+
+    return bkl.expr.PathExpr(sln.components[:-1] + [proj_basename],
                              sln.anchor, sln.anchor_file)
 
 def _default_guid_for_project(target):
@@ -801,8 +805,13 @@ class VSToolsetBase(Toolset):
     def gen_for_module(self, module):
         # create the actual solution object or a special dummy one if we don't
         # need to generate any solution at all
-        if module["%s.generate-solution" % self.name]:
+        generate_prop = module.get_prop("%s.generate-solution" % self.name)
+        if generate_prop is None:
+            # Special case of MSVSSolutionsBundle which decides whether, and
+            # which, solutions to generate on its own.
             module.solution = self.Solution(self, module)
+        elif generate_prop:
+            module.solution = self.Solution(self, module, module["%s.solutionfile" % self.name])
         else:
             module.solution = VSSolutionNull()
 
