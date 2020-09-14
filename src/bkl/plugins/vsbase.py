@@ -720,14 +720,10 @@ def _default_solution_name(module):
 
 def _project_name_from_solution(toolset_class, target):
     """``$(id).vcxproj`` in the same directory as the ``.sln`` file"""
+    sln = toolset_class.get_solutionfile_path(target)
     proj_ext = toolset_class.proj_extension
-    proj_basename = bkl.expr.LiteralExpr("%s.%s" % (target.name, proj_ext))
-
-    sln = target.get_prop("%s.solutionfile" % toolset_class.name)
-    if sln is None:
-        return bkl.expr.PathExpr([proj_basename])
-
-    return bkl.expr.PathExpr(sln.components[:-1] + [proj_basename],
+    return bkl.expr.PathExpr(sln.components[:-1] +
+                             [bkl.expr.LiteralExpr("%s.%s" % (target.name, proj_ext))],
                              sln.anchor, sln.anchor_file)
 
 def _default_guid_for_project(target):
@@ -786,6 +782,13 @@ class VSToolsetBase(Toolset):
                            ``false`` if you want to omit the solution, e.g. for some
                            submodules with only a single target.
                            """)
+
+    @classmethod
+    def get_solutionfile_path(cls, target):
+        """
+        Get the value of the ``solutionfile`` property for the toolset.
+        """
+        return target["%s.solutionfile" % cls.name]
 
 
     def generate(self, project):

@@ -981,3 +981,31 @@ class MSVSToolset(VS201xToolsetBase):
                                In particular, if no such properties are defined,
                                no solution files will be generated at all.
                                """)
+
+    @classmethod
+    def get_solutionfile_path(cls, module):
+        # Choose the first solution file path, but check that any other ones
+        # that are specified are consistent with it.
+        slnpath = None
+        for v in all_versions:
+            slnpath2 = module["%s%s.solutionfile" % (cls.name, all_versions[v].msvs_version)]
+            if not slnpath2:
+                continue
+
+            if slnpath is None:
+                slnpath = slnpath2
+                continue
+
+            if slnpath.components[:-1] != slnpath2.components[:-1] or \
+                   slnpath.anchor != slnpath2.anchor or \
+                       slnpath.anchor_file != slnpath2.anchor_file:
+               raise Error(("can't deduce default project path " +
+                            "(solution files \"%s\" and \"%s\" don't use " +
+                            "the same path), specify it explicitly") %
+                           (slnpath, slnpath2))
+
+        if slnpath is None:
+            # If no solution file paths are specified, just use the default.
+            slnpath = bkl.expr.PathExpr([bkl.expr.LiteralExpr(module.name + ".sln")])
+
+        return slnpath
