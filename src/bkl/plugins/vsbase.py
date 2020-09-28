@@ -805,16 +805,14 @@ class VSToolsetBase(Toolset):
             m.solution.write()
 
 
+    def create_solution(self, module):
+        return self.Solution(self, module, module["%s.solutionfile" % self.name])
+
     def gen_for_module(self, module):
         # create the actual solution object or a special dummy one if we don't
         # need to generate any solution at all
-        generate_prop = module.get_prop("%s.generate-solution" % self.name)
-        if generate_prop is None:
-            # Special case of MSVSSolutionsBundle which decides whether, and
-            # which, solutions to generate on its own.
-            module.solution = self.Solution(self, module)
-        elif generate_prop:
-            module.solution = self.Solution(self, module, module["%s.solutionfile" % self.name])
+        if module["%s.generate-solution" % self.name]:
+            module.solution = self.create_solution(module)
         else:
             module.solution = VSSolutionNull()
 
