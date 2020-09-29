@@ -462,6 +462,10 @@ class VSSolutionNull(object):
     "null" solution object if we don't need to do anything.
     """
 
+    def __init__(self):
+        # Pretend to be MSVSSolutionsBundle-like by providing this attribute.
+        self.solutions = {}
+
     def add_project(self, prj): pass
     def add_subsolution(self, subsol): pass
     def write(self): pass
