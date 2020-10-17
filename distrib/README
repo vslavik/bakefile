@@ -15,17 +15,12 @@ bakefile-X.Y.Z-bin.tar.bz2.
 2. Making Windows distribution
 ------------------------------
 
-1. Install a recent version of Python 2.7 (last tested with 2.7.15).
+1. Install a recent version of Python 2.7 (last tested with 2.7.15) and
+   make sure Python's Scripts directory (e.g. C:\Python27\Scripts) is in PATH.
 
-2. Make sure Python's Scripts directory (typically C:\Python27\Scripts) is in PATH.
+2. Install PyInstaller v3.6 (latest version compatible with PyInstaller 2.7):
 
-2. Install PyInstaller:
-
-     $ pip2 install pyinstaller
-
-   Or to install the 3.4 version these instructions were last tested with:
-
-     $ pip2 install pyinstaller==3.4
+     $ pip2 install pyinstaller==3.6
 
 3. Check that upx and zip are in PATH.
 
