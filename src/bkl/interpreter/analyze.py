@@ -148,7 +148,7 @@ def detect_unused_vars(model):
 
     # Not emit warnings for unused variables.
     import re
-    regex_vs_option = re.compile(r'vs[0-9]+\.option\.')
+    regex_vs_option = re.compile(r'(msvs|vs[0-9]+)\.option\.')
 
     for var in model.all_variables():
         if (not var.is_property and

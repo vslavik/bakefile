@@ -453,6 +453,24 @@ class VSProjectBase(object):
     source_pos = None
 
 
+class VSSolutionNull(object):
+    """
+    Dummy solution class not doing anything.
+
+    This is useful to avoid testing whether we need to generate the solution
+    file or not in multiple places: instead, we do it just once and use this
+    "null" solution object if we don't need to do anything.
+    """
+
+    def __init__(self):
+        # Pretend to be MSVSSolutionsBundle-like by providing this attribute.
+        self.solutions = {}
+
+    def add_project(self, prj): pass
+    def add_subsolution(self, subsol): pass
+    def write(self): pass
+
+
 class VSSolutionBase(object):
     """
     Base class for a representation of a Visual Studio solution file.
@@ -466,8 +484,8 @@ class VSSolutionBase(object):
     #: ...and in the comment under it (2005 and up)
     human_version = None
 
-    def __init__(self, toolset, module):
-        slnfile = module["%s.solutionfile" % toolset.name].as_native_path_for_output(module)
+    def __init__(self, toolset, module, slnprop):
+        slnfile = slnprop.as_native_path_for_output(module)
         self.name = module.name
         # unlike targets, modules' names aren't globally unique, so use the fully qualified name, which is
         self.guid = GUID(NAMESPACE_SLN_GROUP, module.project.top_module.name, module.fully_qualified_name)
@@ -480,12 +498,8 @@ class VSSolutionBase(object):
                                     builddir=None,
                                     model=module)
         self.formatter = VSExprFormatter(module.project.settings, paths_info)
-        self.generate_outf = module["%s.generate-solution" % toolset.name]
-        if self.generate_outf:
-            self.outf = OutputFile(slnfile, EOL_WINDOWS,
-                                   creator=toolset, create_for=module)
-        else:
-            self.outf = None
+        self.outf = OutputFile(slnfile, EOL_WINDOWS,
+                               creator=toolset, create_for=module)
 
     def add_project(self, prj):
         """
@@ -585,8 +599,6 @@ class VSSolutionBase(object):
 
     def write(self):
         """Writes the solution to the file."""
-        if not self.generate_outf:
-            return # silently do nothing
         outf = self.outf
         self.write_header(outf)
 
@@ -712,7 +724,7 @@ def _default_solution_name(module):
 
 def _project_name_from_solution(toolset_class, target):
     """``$(id).vcxproj`` in the same directory as the ``.sln`` file"""
-    sln = target["%s.solutionfile" % toolset_class.name]
+    sln = toolset_class.get_solutionfile_path(target)
     proj_ext = toolset_class.proj_extension
     return bkl.expr.PathExpr(sln.components[:-1] +
                              [bkl.expr.LiteralExpr("%s.%s" % (target.name, proj_ext))],
@@ -775,6 +787,13 @@ class VSToolsetBase(Toolset):
                            submodules with only a single target.
                            """)
 
+    @classmethod
+    def get_solutionfile_path(cls, target):
+        """
+        Get the value of the ``solutionfile`` property for the toolset.
+        """
+        return target["%s.solutionfile" % cls.name]
+
 
     def generate(self, project):
         # generate vcxproj files and prepare solutions
@@ -790,9 +809,16 @@ class VSToolsetBase(Toolset):
             m.solution.write()
 
 
+    def create_solution(self, module):
+        return self.Solution(self, module, module["%s.solutionfile" % self.name])
+
     def gen_for_module(self, module):
-        # attach VS2010-specific data to the model
-        module.solution = self.Solution(self, module)
+        # create the actual solution object or a special dummy one if we don't
+        # need to generate any solution at all
+        if module["%s.generate-solution" % self.name]:
+            module.solution = self.create_solution(module)
+        else:
+            module.solution = VSSolutionNull()
 
         for t in module.targets.itervalues():
             with error_context(t):

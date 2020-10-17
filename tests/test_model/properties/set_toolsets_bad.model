@@ -1,2 +1,2 @@
 ERROR:
-properties/set_toolsets_bad.bkl:1:11: variable "toolsets" (list of toolsets): expression "nonexistent" is not a valid toolset value: must be one of "gnu", "gnu-osx", "gnu-suncc", "vs2003", "vs2005", "vs2008", "vs2010", "vs2012", "vs2013", "vs2015", "vs2017", "vs2019"
+properties/set_toolsets_bad.bkl:1:11: variable "toolsets" (list of toolsets): expression "nonexistent" is not a valid toolset value: must be one of "gnu", "gnu-osx", "gnu-suncc", "msvs", "vs2003", "vs2005", "vs2008", "vs2010", "vs2012", "vs2013", "vs2015", "vs2017", "vs2019"
