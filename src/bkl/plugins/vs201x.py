@@ -994,8 +994,15 @@ class MSVSToolset(VS201xToolsetBase):
         # Choose the first solution file path, but check that any other ones
         # that are specified are consistent with it.
         slnpath = None
-        for v in all_versions:
-            slnpath2 = module["%s%s.solutionfile" % (cls.name, all_versions[v].msvs_version)]
+
+        # Consider both version-specific and version-independent solutions here.
+        for ver_str in [''] + [all_versions[v].msvs_version for v in all_versions]:
+            slnprop = "%s%s.solutionfile" % (cls.name, ver_str)
+
+            if not module.is_variable_explicitly_set(slnprop):
+                continue
+
+            slnpath2 = module[slnprop]
             if not slnpath2:
                 continue
 
