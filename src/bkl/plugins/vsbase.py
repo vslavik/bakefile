@@ -453,24 +453,6 @@ class VSProjectBase(object):
     source_pos = None
 
 
-class VSSolutionNull(object):
-    """
-    Dummy solution class not doing anything.
-
-    This is useful to avoid testing whether we need to generate the solution
-    file or not in multiple places: instead, we do it just once and use this
-    "null" solution object if we don't need to do anything.
-    """
-
-    def __init__(self):
-        # Pretend to be MSVSSolutionsBundle-like by providing this attribute.
-        self.solutions = {}
-
-    def add_project(self, prj): pass
-    def add_subsolution(self, subsol): pass
-    def write(self): pass
-
-
 class VSSolutionBase(object):
     """
     Base class for a representation of a Visual Studio solution file.
@@ -806,19 +788,19 @@ class VSToolsetBase(Toolset):
             for sub in m.submodules:
                 m.solution.add_subsolution(sub.solution)
         for m in project.modules:
-            m.solution.write()
+            if m.generate_solution:
+                m.solution.write()
 
 
     def create_solution(self, module):
         return self.Solution(self, module, module["%s.solutionfile" % self.name])
 
     def gen_for_module(self, module):
-        # create the actual solution object or a special dummy one if we don't
-        # need to generate any solution at all
-        if module["%s.generate-solution" % self.name]:
-            module.solution = self.create_solution(module)
-        else:
-            module.solution = VSSolutionNull()
+        # Note that we need to create the solution object even if we're not
+        # generating the solution file, to make projects included in this
+        # solution part of the global projects tree.
+        module.generate_solution = module["%s.generate-solution" % self.name]
+        module.solution = self.create_solution(module)
 
         for t in module.targets.itervalues():
             with error_context(t):
