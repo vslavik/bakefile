@@ -9,7 +9,7 @@
 ---------------------------
 
 Run "make -C distrib distrib_unix", the output file will be
-bakefile-X.Y.Z_beta-bin.tar.bz2.
+bakefile-X.Y.Z-bin.tar.bz2.
 
 
 2. Making Windows distribution
@@ -29,7 +29,7 @@ bakefile-X.Y.Z_beta-bin.tar.bz2.
 
 3. Check that upx and zip are in PATH.
 
-4. Run "make -C distrib distrib_win", the output file be bakefile-X.Y.Z_beta-win.zip
+4. Run "make -C distrib distrib_win", the output file be bakefile-X.Y.Z-win.zip
 
 Notice that at one time there was an effort to produce an MSI installer for
 bakefile and its remains can be found in wix subdirectory, however the files

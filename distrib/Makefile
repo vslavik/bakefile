@@ -3,7 +3,7 @@
 #
 
 VERSION      := $(shell python ../src/tool.py --version | cut -f2 -d' ')
-TARBALL_NAME := bakefile-$(VERSION)_beta
+TARBALL_NAME := bakefile-$(VERSION)
 
 CANDLE_FLAGS = -arch x86
 
