@@ -760,16 +760,18 @@
         </define-tag>
 
         <define-tag name="install-to" rules="dll">
+            <set var="__dllinstdir">$(nativePaths(value))</set>
+
             <modify-target target="install_$(id)">
                 <command>
                     $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(DESTDIR)$(nativePaths(value))
-                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(nativePaths(value))
+                    $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(ref('__dllinstdir',id))
                 </command>
             </modify-target>
             <modify-target target="uninstall_$(id)">
                 <command>
                     $(UNINSTALL_DATA) $(DESTDIR)$(nativePaths(value))$(DIRSEP)$(ref('__linkname',id))
-                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(nativePaths(value))$(DIRSEP)$(ref('__targetname',id))
+                    $(UNINSTALL_PROGRAM) $(DESTDIR)$(ref('__dllinstdir',id))$(DIRSEP)$(ref('__targetname',id))
                 </command>
             </modify-target>
         </define-tag>
