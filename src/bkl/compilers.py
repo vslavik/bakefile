@@ -29,7 +29,7 @@ Helpers for working with :class:`bkl.api.FileType` and
 
 from api import FileType, FileCompiler, BuildNode, BuildSubgraph
 import model
-from error import Error, error_context
+from error import Error, CannotDetermineError, error_context
 import expr
 from expr import format_string
 
@@ -143,6 +143,13 @@ def get_file_types_compilable_into(toolset, ft):
 
 
 def _make_build_nodes_for_file(toolset, target, srcfile, ft_to, files_map):
+    try:
+        condition = None
+        if not srcfile.should_build():
+            return ([] , [])
+    except CannotDetermineError:
+        condition = srcfile.condition
+
     src = srcfile.filename
     assert isinstance(src, expr.PathExpr)
 
@@ -176,13 +183,16 @@ def _make_build_nodes_for_file(toolset, target, srcfile, ft_to, files_map):
                                             files_map)
                         objects += objn
                         allnodes += alln
+                for o in objects:
+                    o.condition = condition
                 return (objects, allnodes)
         raise Error("don't know how to compile \"%s\" files into \"%s\"" % (ft_from.name, ft_to.name))
 
     node = BuildNode(commands=compiler.commands(toolset, target, src, objname),
                      inputs=[src] + list(srcfile["dependencies"]),
                      outputs=[objname],
-                     source_pos=srcfile.source_pos)
+                     source_pos=srcfile.source_pos,
+                     condition=condition)
     return ([node], [node])
 
 
@@ -231,9 +241,9 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
 
     for srcfile in target.sources:
         with error_context(srcfile):
-            if not srcfile.should_build(): # TODO: allow runtime decision
-                continue
             if srcfile["compile-commands"]:
+                if not srcfile.should_build(): # TODO: allow runtime decision
+                    continue
                 allnodes += _make_build_nodes_for_generated_file(srcfile)
             else:
                 # FIXME: toolset.object_type shouldn't be needed
@@ -250,7 +260,13 @@ def get_compilation_subgraph(toolset, target, ft_to, outfile):
     linker = get_compiler(toolset, toolset.object_type, ft_to)
     assert linker
 
-    object_files = [o.outputs[0] for o in objects]
+    object_files = []
+    for o in objects:
+        obj = o.outputs[0]
+        if o.condition is not None:
+            obj = expr.IfExpr(o.condition, obj, expr.NullExpr())
+        object_files.append(obj)
+
     link_commands = linker.commands(toolset, target, expr.ListExpr(object_files), outfile)
     link_node = BuildNode(commands=link_commands,
                           inputs=object_files,

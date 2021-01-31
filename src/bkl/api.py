@@ -429,16 +429,22 @@ class BuildNode(object):
        List of commands to execute when the rebuild condition is met, as
        :class:`bkl.expr.Expr`.
 
+    .. attribute:: condition:
+
+       Optional condition if the node is to be built only in some configurations,
+       as :class:`bkl.expr.Expr`.
+
     .. attribute:: source_pos
 
        Source code position of whatever code was the cause for the creation of
        this BuildNode (e.g. associated source file), or :const:`None`.
     """
-    def __init__(self, commands, inputs=[], outputs=[], name=None, source_pos=None):
+    def __init__(self, commands, inputs=[], outputs=[], name=None, source_pos=None, condition=None):
         self.commands = commands
         self.inputs = inputs
         self.outputs = outputs
         self.name = name
+        self.condition = condition
         self.source_pos = source_pos
         assert name or outputs, \
                "phony target must have a name, non-phony must have outputs"
