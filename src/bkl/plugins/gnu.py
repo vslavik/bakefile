@@ -38,6 +38,7 @@ from bkl.error import Error
 
 # GCC flags for supported architectures:
 OSX_ARCH_FLAGS = {
+    'arm64'  : '-arch arm64',
     'x86'    : '-arch i386',
     'x86_64' : '-arch x86_64',
 }

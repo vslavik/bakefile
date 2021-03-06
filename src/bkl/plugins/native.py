@@ -144,7 +144,7 @@ class NativeCompiledType(TargetType):
                      executables that use the library.
                      """),
             Property("archs",
-                 type=ListType(EnumType("architecture", ["x86", "x86_64"])),
+                 type=ListType(EnumType("architecture", ["arm64", "x86", "x86_64"])),
                  default=NullExpr(),
                  inheritable=True,
                  doc="""
