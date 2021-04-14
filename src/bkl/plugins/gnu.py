@@ -211,9 +211,9 @@ class GnuLinker(GnuFileCompiler):
         return cmd
 
 
-    def _make_link_command(self, toolset, target, input, output_flags=None, extra_flags=None):
+    def _make_link_commands(self, toolset, target, input, output_flags=None, extra_flags=None):
         """
-        Return the link command taking the specified inputs.
+        Return the list containing the link command taking the specified inputs.
 
         The output_flags argument contains linker flags controlling the kind of
         output file to generate while extra_flags contain other options. This
@@ -248,7 +248,7 @@ class GnuLinker(GnuFileCompiler):
         return [ListExpr(cmd)]
 
     def commands(self, toolset, target, input, output):
-        return self._make_link_command(toolset, target, input)
+        return self._make_link_commands(toolset, target, input)
 
 
 class GnuSharedLibLinker(GnuLinker):
@@ -260,9 +260,9 @@ class GnuSharedLibLinker(GnuLinker):
     out_type = bkl.compilers.NativeSharedLibraryFileType.get()
 
     def commands(self, toolset, target, input, output):
-        return self._make_link_command(toolset, target, input,
-                                       toolset.shared_library_link_flag,
-                                       toolset.soname_flags)
+        return self._make_link_commands(toolset, target, input,
+                                        toolset.shared_library_link_flag,
+                                        toolset.soname_flags)
 
 
 class GnuLoadableModuleLinker(GnuLinker):
@@ -274,8 +274,8 @@ class GnuLoadableModuleLinker(GnuLinker):
     out_type = bkl.compilers.NativeLoadableModuleFileType.get()
 
     def commands(self, toolset, target, input, output):
-        return self._make_link_command(toolset, target, input,
-                                       toolset.loadable_module_link_flag)
+        return self._make_link_commands(toolset, target, input,
+                                        toolset.loadable_module_link_flag)
 
 
 class GnuLibLinker(GnuFileCompiler):
