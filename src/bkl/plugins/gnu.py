@@ -224,6 +224,14 @@ class GnuLinker(GnuFileCompiler):
         the necessary linked flags to allow, or disallow, undefined symbols in
         output. This is again just a convenience, as this is only needed by those
         callers of this function that use output_flags.
+
+        Finally, if the target defines a custom value of the outputdir
+        property, the list of commands returned by this function also contains
+        a command to create the output directory, as it might not exist yet,
+        but must in order for the linker to succeed (note that this is done
+        only here as compiler commands generate files in the build directory,
+        which is global and is created at the top of the makefile, but output
+        directories are per target and so can't be handled in the same way).
         """
         cmd = [LiteralExpr("$(CXX)")]
         if output_flags:
@@ -245,7 +253,12 @@ class GnuLinker(GnuFileCompiler):
         # FIXME: use a parser instead of constructing the expression manually
         #        in here
         cmd += self._linker_flags(toolset, target)
-        return [ListExpr(cmd)]
+        cmds = [ListExpr(cmd)]
+
+        if target.is_variable_explicitly_set("outputdir"):
+            cmds.insert(0, LiteralExpr("@mkdir -p $(dirname $@)"))
+
+        return cmds
 
     def commands(self, toolset, target, input, output):
         return self._make_link_commands(toolset, target, input)

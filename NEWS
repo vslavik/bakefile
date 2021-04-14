@@ -1,3 +1,10 @@
+v1.2.7 (2021-??-??)
+
+Enhancements
+------------
+
+- Automatically create output directory in "gnu" toolset if necessary.
+
 v1.2.6 (2020-10-17)
 ===================
 
