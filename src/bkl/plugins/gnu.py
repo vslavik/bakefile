@@ -256,7 +256,7 @@ class GnuLinker(GnuFileCompiler):
         cmds = [ListExpr(cmd)]
 
         if target.is_variable_explicitly_set("outputdir"):
-            cmds.insert(0, LiteralExpr("@mkdir -p $(dirname $@)"))
+            cmds.insert(0, LiteralExpr("@mkdir -p $(dir $@)"))
 
         return cmds
 
