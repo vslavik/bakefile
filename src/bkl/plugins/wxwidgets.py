@@ -28,7 +28,7 @@ wxWidgets library support.
 
 from bkl.api import FileCompiler, FileType
 from bkl.compilers import CxxFileType
-from bkl.expr import LiteralExpr, ConcatExpr
+from bkl.expr import LiteralExpr, ConcatExpr, ReferenceExpr
 
 
 class XRCFileType(FileType):
@@ -46,9 +46,15 @@ class WXRCCompiler(FileCompiler):
     out_type = CxxFileType.get()
 
     def commands(self, toolset, target, input, output):
+        if target.resolve_variable("WXRC"):
+            wxrc_expr = ReferenceExpr("WXRC", target)
+        else:
+            wxrc_expr = LiteralExpr("wxrc")
+
         # FIXME: make this easier to write with parsing
         cmd = ConcatExpr([
-                    LiteralExpr("wxrc --cpp-code -o "),
+                    wxrc_expr,
+                    LiteralExpr(" --cpp-code -o "),
                     output,
                     LiteralExpr(" "),
                     input
