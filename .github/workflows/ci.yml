@@ -1,0 +1,26 @@
+# CI workflow running the unit tests.
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out
+      uses: actions/checkout@v2
+
+    - name: Set up Python 2.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 2.7
+
+    - name: Install dependencies
+      run: |
+        pip install Sphinx
+        pip install pytest
+        pip install clint
+
+    - name: Run tests
+      run: make test
