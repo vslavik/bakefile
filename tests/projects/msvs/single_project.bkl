@@ -2,6 +2,7 @@ toolsets = msvs;
 
 msvs2017.solutionfile = single_project_141.sln;
 msvs2019.solutionfile = single_project_142.sln;
+msvs2022.solutionfile = single_project_143.sln;
 
 program single_project {
     sources { single_project.cpp }

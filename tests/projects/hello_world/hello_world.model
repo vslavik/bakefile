@@ -1,6 +1,6 @@
 module {
   variables {
-    toolsets = [gnu, gnu-osx, gnu-suncc, vs2003, vs2005, vs2008, vs2010, vs2012, vs2013, vs2015, vs2017, vs2019]
+    toolsets = [gnu, gnu-osx, gnu-suncc, vs2003, vs2005, vs2008, vs2010, vs2012, vs2013, vs2015, vs2017, vs2019, vs2022]
     vs2003.solutionfile = @top_srcdir/hello_world_vs2003.sln
     vs2005.solutionfile = @top_srcdir/hello_world_vs2005.sln
     vs2008.solutionfile = @top_srcdir/hello_world_vs2008.sln
@@ -10,6 +10,7 @@ module {
     vs2015.solutionfile = @top_srcdir/hello_world_vs2015.sln
     vs2017.solutionfile = @top_srcdir/hello_world_vs2017.sln
     vs2019.solutionfile = @top_srcdir/hello_world_vs2019.sln
+    vs2022.solutionfile = @top_srcdir/hello_world_vs2022.sln
   }
   targets {
     program hello {
@@ -24,6 +25,7 @@ module {
       vs2015.projectfile = @top_srcdir/hello_vs2015.vcxproj
       vs2017.projectfile = @top_srcdir/hello_vs2017.vcxproj
       vs2019.projectfile = @top_srcdir/hello_vs2019.vcxproj
+      vs2022.projectfile = @top_srcdir/hello_vs2022.vcxproj
       sources {
         file @top_srcdir/hello.c
       }
