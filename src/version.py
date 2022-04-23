@@ -24,4 +24,4 @@
 #  $Id$
 #
 
-BAKEFILE_VERSION = "0.2.12"
+BAKEFILE_VERSION = "0.2.13"

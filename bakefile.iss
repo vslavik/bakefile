@@ -1,7 +1,7 @@
 ; This script was first created by ISTool
 ; http://www.lerstad.com/istool/
 
-#define VERSION          "0.2.12"
+#define VERSION          "0.2.13"
 
 [Setup]
 OutputBaseFilename=bakefile-{#VERSION}-setup
