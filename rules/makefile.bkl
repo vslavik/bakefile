@@ -765,6 +765,7 @@
             <modify-target target="install_$(id)">
                 <command>
                     $(INSTALL_DATA) $(ref('__targetdir',id))$(ref('__linkname',id)) $(DESTDIR)$(nativePaths(value))
+                    $(INSTALL_DIR) $(DESTDIR)$(ref('__dllinstdir',id))
                     $(INSTALL_PROGRAM) $(ref('__targetdir',id))$(ref('__targetname',id)) $(DESTDIR)$(ref('__dllinstdir',id))
                 </command>
             </modify-target>
