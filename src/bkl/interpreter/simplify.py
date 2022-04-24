@@ -102,7 +102,7 @@ class BasicSimplifier(RewritingVisitor):
         if left is e.left and right is e.right:
             return e
         else:
-            if (isinstance(left, NullExpr) and 
+            if (isinstance(left, NullExpr) and
                 (right is None or isinstance(right, NullExpr))):
                 return NullExpr(pos=e.pos)
             else:
@@ -174,9 +174,9 @@ class ConditionalsSimplifier(BasicSimplifier):
                 if left is not None and right is not None:
                     assert (left or right) == False
                     return BoolValueExpr(False, pos=e.pos)
-            elif op == BoolExpr.EQUAL: 
+            elif op == BoolExpr.EQUAL:
                 return BoolValueExpr(e.left.as_py() == e.right.as_py())
-            elif op == BoolExpr.NOT_EQUAL: 
+            elif op == BoolExpr.NOT_EQUAL:
                 return BoolValueExpr(e.left.as_py() != e.right.as_py())
         except NonConstError:
             pass

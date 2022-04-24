@@ -51,7 +51,7 @@ quoted_string_component
     ;
 
 var_reference
-    : REF_OPEN identifier REF_CLOSE   -> ^(VAR_REFERENCE identifier)
+    : REF_OPEN identifier REF_CLOSE   -> ^(VAR_REFERENCE_ASSTRING identifier)
     ;
 
 literal_text: t=ANY_TEXT              -> LITERAL[$t, self.unescape($t, $t.text)];

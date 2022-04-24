@@ -163,9 +163,8 @@ class StringType(Type):
 
     def _validate_impl(self, e):
         if isinstance(e, expr.ConcatExpr):
-            # concatenation of strings is a string
-            for x in e.items:
-                self.validate(x)
+            # all types can be concatenated into string
+            return True
         elif (not isinstance(e, expr.LiteralExpr) and
               # paths etc. can be used as strings too
               not isinstance(e, expr.BoolExpr) and

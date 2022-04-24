@@ -10,3 +10,7 @@ zar = "this is called \"escaping\"";
 single = 'no eval done $(bar) here';
 double = "evaluated $(bar) here (as in shell)...";
 
+// Also test interpolation of various types
+a = 1 2 3;
+b = true;
+r = "!!$(a) $(b)";
