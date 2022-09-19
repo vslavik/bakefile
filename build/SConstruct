@@ -115,8 +115,8 @@ libxml2_win32 = env.BuildComponent(
 
 
 
-OSX_10_6_FLAGS="-O2 -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk"
-OSX_10_5_FLAGS="-O2 -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk"
+OSX_10_6_FLAGS="-O2 -arch i386 -arch x86_64 -arch ppc -isysroot /Developer/SDKs/MacOSX10.6.sdk"
+OSX_10_5_FLAGS="-O2 -arch i386 -arch ppc -arch ppc64 -isysroot /Developer/SDKs/MacOSX10.5.sdk"
 OSX_10_4_FLAGS="-O2 -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
 
 libxml2_osx = env.BuildComponent(
@@ -125,9 +125,9 @@ libxml2_osx = env.BuildComponent(
         sources=src_libxml2,
         deps=None,
         commands=[
-            # Build 10.5 version first, then install 10.4 version on top of
-            # it.  This way, libxml2.dylib will be usable on all systems (and
-            # py modules are installed in different places)
+            # Build 10.5 version first, then install 10.4 version on top of it.
+            # This way, libxml2.dylib will be usable on all systems
+            # (and py modules are installed in different places).
             "mkdir B10.5",
             "cd B10.5",
             "../configure --libdir=/usr/local/lib/bakefile/binmodules %s CFLAGS='%s' LDFLAGS='%s' --with-python=/usr/bin/python2.5" % (LIBXML2_CONFIGURE, OSX_10_5_FLAGS, OSX_10_5_FLAGS),
