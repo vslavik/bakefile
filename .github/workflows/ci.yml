@@ -6,15 +6,17 @@ on: [ push, pull_request ]
 jobs:
   build:
     runs-on: ubuntu-latest
+    # We need to use an OLS old enough to still have Python 2
+    container: ubuntu:18.04
 
     steps:
-    - name: Check out
-      uses: actions/checkout@v2
+    - name: Set up
+      run: |
+        apt-get update -qq
+        apt-get install -qq default-jre git make python python-pip
 
-    - name: Set up Python 2.7
-      uses: actions/setup-python@v2
-      with:
-        python-version: 2.7
+    - name: Check out
+      uses: actions/checkout@v3
 
     - name: Install dependencies
       run: |
