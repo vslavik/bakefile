@@ -10,6 +10,7 @@ Enhancements
 
 - Automatically create output directory in "gnu" toolset if necessary.
 - Allow using "arm64" architecture name (useful with "gnu-osx" toolset).
+- Don't use "liblib" in the output libraries names with Unix toolsets.
 
 v1.2.6 (2020-10-17)
 ===================

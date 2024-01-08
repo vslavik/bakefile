@@ -256,7 +256,16 @@ class NativeCompiledType(TargetType):
         ext = "%s_extension" % fileclass
         parts = []
         if prefix in tdir:
-            parts.append(getattr(toolset, prefix))
+            # This is normally used to prepend "lib" prefix automatically, but
+            # we want to avoid doing this if the target name already starts
+            # with "lib" as having "liblib" in the name is clearly undesirable
+            # and working around this in application bakefiles is not simple
+            # as it requires using platform-specific checks (assuming we do
+            # want to have just the "lib" prefix under non-Unix platforms), so
+            # do it here.
+            prefix_value = getattr(toolset, prefix)
+            if prefix_value and not target[propname].as_py().startswith(prefix_value):
+                parts.append(prefix_value)
         parts.append(target[propname])
         if not target.is_variable_null("extension"):
             parts.append(target["extension"])
