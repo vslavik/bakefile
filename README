@@ -9,6 +9,21 @@ somewhere and run the 'bkl' tool in its top directory.
 On Windows, you don't need anything else, bkl.exe is self-contained executable.
 On other systems, you must have Python 2.7 installed.
 
+ Running with Docker or Podman
+-------------------------------
+
+As an alternative to installing Bakefile on your system, you can use Docker
+or Podman to run Bakefile in a container. The following command will run
+Bakefile in a container and mount the current directory as a volume:
+
+    docker run --rm -v $(pwd):$(pwd) -w $(pwd) ghcr.io/vslavik/bakefile:1 foo.bkl
+
+If your bakefiles depend on files in parent directories, you can mount a larger
+part of local filesystem, even your entire home directory, like this:
+
+    docker run --rm -v $HOME:$HOME -w $(pwd) ghcr.io/vslavik/bakefile:1 [...args...]
+
+
 
   2. Documentation
 ====================
