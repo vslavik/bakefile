@@ -7,6 +7,25 @@
 ============================================================================
 ============================================================================
 
+ Running with Docker or Podman
+-------------------------------
+
+As an alternative to installing Bakefile on your system, you can use Docker
+or Podman to run Bakefile in a container. The following command will run
+Bakefile in a container and mount the current directory as a volume:
+
+    docker run --rm -v $(pwd):/workdir -w /workdir ghcr.io/vslavik/bakefile:0.2 bakefile
+
+To run bakefile_gen, use the following command:
+
+    docker run --rm -v $(pwd):/workdir -w /workdir ghcr.io/vslavik/bakefile:0.2 bakefile_gen
+
+If your bakefiles depend on files in parent directories, you can mount a larger
+part of local filesystem, even your entire home directory, like this:
+
+    docker run --rm -v $HOME:$HOME -w $(pwd) ghcr.io/vslavik/bakefile:0.2 bakefile_gen
+
+
  Requirements
 --------------
 
