@@ -98,6 +98,7 @@ class VS201xToolsetBase(VSToolsetBase):
         rc_files = []
         cl_files = []
         idl_files = []
+        natvis_files = []
         for sfile in target.sources:
             ext = sfile.filename.get_extension()
             # TODO: share this code with VS200x
@@ -106,6 +107,8 @@ class VS201xToolsetBase(VSToolsetBase):
                 rc_files.append(sfile)
             elif ext == 'idl':
                 idl_files.append(sfile)
+            elif ext == 'natvis':
+                natvis_files.append(sfile)
             else:
                 cl_files.append(sfile)
 
@@ -380,6 +383,14 @@ class VS201xToolsetBase(VSToolsetBase):
                 self._add_per_file_options(sfile, n_rc_compile)
                 items.add(n_rc_compile)
 
+        # Visualizers:
+        if natvis_files:
+            items = Node("ItemGroup")
+            root.add(items)
+            for sfile in natvis_files:
+                n_natvis = Node("Natvis", Include=sfile.filename)
+                items.add(n_natvis)
+
         # IDL files:
         if idl_files:
             items = Node("ItemGroup")
@@ -413,7 +424,7 @@ class VS201xToolsetBase(VSToolsetBase):
         f.write(formatter.format(root))
         f.commit()
         self._write_filters_file_for(filename, formatter,
-                                     target.headers, cl_files, idl_files, rc_files)
+                                     target.headers, cl_files, idl_files, rc_files, natvis_files)
 
 
     def _add_custom_build_file(self, node, srcfile):
@@ -480,7 +491,7 @@ class VS201xToolsetBase(VSToolsetBase):
 
 
     def _write_filters_file_for(self, filename, formatter,
-                                hdr_files, cl_files, idl_files, rc_files):
+                                hdr_files, cl_files, idl_files, rc_files, natvis_files):
         root = Node("Project")
         root["ToolsVersion"] = "4.0" # even if tools_version is different (VS2013)
         root["xmlns"] = "http://schemas.microsoft.com/developer/msbuild/2003"
@@ -526,6 +537,13 @@ class VS201xToolsetBase(VSToolsetBase):
                 n = Node("ResourceCompile", Include=sfile.filename)
                 group.add(n)
                 n.add("Filter", "Resource Files")
+
+        if natvis_files:
+            group = Node("ItemGroup")
+            root.add(group)
+            for sfile in natvis_files:
+                n = Node("Natvis", Include=sfile.filename)
+                group.add(n)
 
         f = OutputFile(filename + ".filters", EOL_WINDOWS,
                        creator=self, create_for=filename)

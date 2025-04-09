@@ -4,6 +4,7 @@ New Features
 ------------
 
 - Add MSVS 2022 support.
+- Add support for Natvis files in MSVS 201x projects.
 
 Enhancements
 ------------
