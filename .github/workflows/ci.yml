@@ -3,15 +3,11 @@ name: CI
 
 on: [ push, pull_request ]
 
-env:
-   # workaround required for checkout@v3, https://github.com/actions/checkout/issues/1590
-   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    # We need to use an OLS old enough to still have Python 2
-    container: ubuntu:18.04
+    # We need to use an OS old enough to still have Python 2
+    container: ubuntu:22.04
 
     steps:
     - name: Set up
@@ -20,7 +16,7 @@ jobs:
         apt-get install -qq default-jre git make python python-pip
 
     - name: Check out
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install dependencies
       run: |
