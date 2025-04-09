@@ -13,7 +13,7 @@ jobs:
     - name: Set up
       run: |
         apt-get update -qq
-        apt-get install -qq default-jre git make python python-pip
+        apt-get install -qq default-jre git make python2 python2-pip
 
     - name: Check out
       uses: actions/checkout@v4
