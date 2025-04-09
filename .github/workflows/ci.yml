@@ -13,7 +13,9 @@ jobs:
     - name: Set up
       run: |
         apt-get update -qq
-        apt-get install -qq default-jre git make python2 python2-pip
+        apt-get install -qq curl default-jre git make python2
+        curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+        python2 get-pip.py
 
     - name: Check out
       uses: actions/checkout@v4
