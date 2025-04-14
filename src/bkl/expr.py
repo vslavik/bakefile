@@ -604,6 +604,26 @@ class PathExpr(Expr):
         comps = self.components[:-1] + [LiteralExpr(tail)]
         return PathExpr(comps, self.anchor, self.anchor_file, pos=self.pos)
 
+    def add_extension(self, newext):
+        """
+        Adds extension *newext* to the filename and returns
+        :class:`bkl.expr.PathExpr` with the new path.
+        """
+        if not self.components:
+            raise Error("cannot change extension of empty path", self.pos)
+
+        last = self.components[-1]
+        if isinstance(last, ConcatExpr):
+            last = last.items[-1]
+        if not isinstance(last, LiteralExpr):
+            raise Error("cannot add extension .%s to \"%s\"" % (newext, self),
+                        self.pos)
+
+        tail = "%s.%s" % (last.value, newext)
+
+        comps = self.components[:-1] + [LiteralExpr(tail)]
+        return PathExpr(comps, self.anchor, self.anchor_file, pos=self.pos)
+
     def is_external_absolute(self):
         """
         Returns true if the path is to be treated as an absolute path provided

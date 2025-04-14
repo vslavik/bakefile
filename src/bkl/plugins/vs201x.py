@@ -342,7 +342,7 @@ class VS201xToolsetBase(VSToolsetBase):
                         genfiletype = bkl.compilers.CxxFileType.get()
                         genname = bkl.expr.PathExpr([bkl.expr.LiteralExpr(sfile.filename.get_basename())],
                                                     bkl.expr.ANCHOR_BUILDDIR,
-                                                    pos=sfile.filename.pos).change_extension("cpp")
+                                                    pos=sfile.filename.pos).add_extension("cpp")
 
                         ft_from = bkl.compilers.get_file_type(ext)
                         compiler = bkl.compilers.get_compiler(self, ft_from, genfiletype)
