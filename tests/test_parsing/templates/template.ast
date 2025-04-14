@@ -7,7 +7,7 @@ RootNode
                 IdNode defines
             ConcatNode
                 LiteralNode "COMPONENT=""
-                VarReferenceNode
+                VarRefAsStrNode
                     IdNode id
                 LiteralNode """
     TemplateNode

@@ -42,6 +42,7 @@ tokens {
     BOOLVAL;
     PATH_ANCHOR;
     VAR_REFERENCE;
+    VAR_REFERENCE_ASSTRING;
     LIST_OR_CONCAT;
     LIST;
     CONCAT;
@@ -225,7 +226,7 @@ expr_atom
 // ("foo $(bar)") -- the former is a single value, the latter is a list. This
 // grammar, however, does *NOT* differentiate between these two cases, that is
 // done in the bkl.parser.ast._TreeAdaptor.rulePostProcessing() in Python code.
-// 
+//
 // FIXME: It would be better to do it here, with backtrack=true and validating
 //        predicates to build it directly, but bugs in ANTLR 3.4's Python
 //        binding prevent it from working at the moment.
