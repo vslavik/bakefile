@@ -1,3 +1,14 @@
+WARNING: This project is not developed any longer
+=================================================
+
+Development of this project has been frozen and there are no current
+plans to resume it.
+
+See the brief [postmortem analysis][] if you're curious.
+
+[postmortem analysis]: https://www.tt-solutions.com/en/articles/bakefile_postmortem
+
+
 Using Bakefile
 ---------------------
 
